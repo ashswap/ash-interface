@@ -1,0 +1,13 @@
+.container{
+    @apply flex flex-row justify-center select-none text-xs text-white font-medium;
+}
+
+.container > .btn{
+    @apply py-3 px-6;
+    cursor: pointer;
+}
+
+.container > .btn.active{
+    @apply bg-active-nav-btn;
+    cursor: default;
+}

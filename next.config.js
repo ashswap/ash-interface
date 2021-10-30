@@ -1,4 +1,9 @@
 /** @type {import('next').NextConfig} */
-module.exports = {
-  reactStrictMode: true,
-}
+const withFonts = require('next-fonts');
+const withReactSvg = require('next-react-svg')
+const path = require('path')
+
+module.exports = withReactSvg(withFonts({
+    include: path.resolve(__dirname, 'assets/svg'),
+    reactStrictMode: true,
+}))
