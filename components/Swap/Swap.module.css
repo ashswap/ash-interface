@@ -1,4 +1,4 @@
-.border{
+.corner{
     @apply relative;
 
     width: 492px;
@@ -16,8 +16,15 @@
 }
 
 .fire{
-    @apply absolute;
+    @apply absolute z-10;
 
     left: -70px;
     top: -70px;
+}
+
+.revert{
+    @apply absolute w-7 h-7 rounded-lg bg-ash-dark flex items-center justify-center cursor-pointer select-none;
+    left: 50%;
+    top: 50%;
+    transform: translateX(-50%) translateY(-50%);
 }

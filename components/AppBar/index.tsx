@@ -13,7 +13,7 @@ const AppBar = () => {
                 </div>
             </Link>
             <Nav/>
-            <Button leftIcon={<Wallet/>}>Connect wallet</Button>
+            <Button leftIcon={<Wallet/>} bottomRightCorner>Connect wallet</Button>
         </div>
     )
 }

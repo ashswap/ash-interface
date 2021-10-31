@@ -1,4 +1,4 @@
-.border{
+.bottomRightCorner{
     border-left: theme('colors.pink.600') 4px solid;
     border-top: theme('colors.pink.600') 4px solid;
     padding-right: 4px;
@@ -9,5 +9,34 @@
 
     background-repeat: no-repeat;
     background-size: calc(100% - 4px) calc(100% - 4px);
+    cursor: pointer;
+}
+
+.topLeftCorner{
+    border-right: theme('colors.pink.600') 4px solid;
+    border-bottom: theme('colors.pink.600') 4px solid;
+    padding-left: 4px;
+    padding-top: 4px;
+    background:
+        linear-gradient(to right, theme('colors.pink.600') 5px, transparent 5px) 0 100%,
+        linear-gradient(to bottom, theme('colors.pink.600') 5px, transparent 5px) 100% 0;
+
+    background-repeat: no-repeat;
+    background-size: calc(100% - 4px) calc(100% - 4px);
+    cursor: pointer;
+}
+
+.outline{
+    border-bottom: #88878d 0.5px solid;
+    border-top: #88878d 0.5px solid;
+    padding: 4px 4.5px;
+    background:
+        linear-gradient(to right, #88878d 0.5px, transparent 0.5px) 0 100%,
+        linear-gradient(to right, #88878d 0.5px, transparent 0.5px) 100% 0,
+        linear-gradient(to left, #88878d 0.5px, transparent 0.5px) 0 100%,
+        linear-gradient(to left, #88878d 0.5px, transparent 0.5px) 100% 0;
+
+    background-repeat: no-repeat;
+    background-size: 100% calc(50% - 5px);
     cursor: pointer;
 }

@@ -1,0 +1,38 @@
+.topLeftCorner{
+    @apply relative;
+
+    margin: 4px 0;
+
+    border-right: theme('colors.bg') 10px solid;
+    border-bottom: theme('colors.bg') 10px solid;
+    padding-left: 10px;
+    padding-top: 10px;
+    background:
+        linear-gradient(to right, theme('colors.bg') 12px, transparent 12px) 0 100%,
+        linear-gradient(to bottom, theme('colors.bg') 12px, transparent 12px) 100% 0;
+
+    background-repeat: no-repeat;
+    background-size: calc(100% - 10px) calc(100% - 10px);
+}
+
+.bottomRightCorner{
+    @apply relative;
+
+    margin: 4px 0;
+
+    border-left: theme('colors.bg') 10px solid;
+    border-top: theme('colors.bg') 10px solid;
+    padding-right: 10px;
+    padding-bottom: 10px;
+    background:
+        linear-gradient(to left, theme('colors.bg') 12px, transparent 12px) 100% 0,
+        linear-gradient(to top, theme('colors.bg') 12px, transparent 12px) 0 100%;
+
+    background-repeat: no-repeat;
+    background-size: calc(100% - 10px) calc(100% - 10px);
+}
+
+.input{
+    @apply flex-1 outline-none bg-transparent text-right text-2xl font-normal text-text-input placeholder-text-input;
+    max-width: 50%;
+}
