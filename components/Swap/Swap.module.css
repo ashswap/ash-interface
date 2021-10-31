@@ -1,8 +1,6 @@
 .corner{
     @apply relative;
 
-    width: 492px;
-
     border-right: theme('colors.ash-dark') 16px solid;
     border-bottom: theme('colors.ash-dark') 16px solid;
     padding-left: 16px;
@@ -13,7 +11,16 @@
 
     background-repeat: no-repeat;
     background-size: calc(100% - 16px) calc(100% - 16px);
+
+    display: flex;
+    flex-direction: row;
 }
+
+.container{
+    @apply relative bg-ash-dark text-white p-7;
+    width: 460px
+}
+
 
 .fire{
     @apply absolute z-10;
