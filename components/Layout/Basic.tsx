@@ -5,9 +5,9 @@ import BackgroundEffect from 'components/BackgroundEffect'
 const BasicLayout = ({ children }: { children: any }) => {
     return (
         <>
-            {children}
             <AppBar />
             <BackgroundEffect />
+            {children}
         </>
     );
 };

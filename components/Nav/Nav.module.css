@@ -1,5 +1,5 @@
 .container{
-    @apply flex flex-row justify-center select-none text-xs text-white font-medium;
+    @apply flex flex-row justify-center select-none text-xs text-black dark:text-white font-medium;
 }
 
 .container > .btn{
@@ -8,6 +8,6 @@
 }
 
 .container > .btn.active{
-    @apply bg-active-nav-btn;
+    @apply bg-ash-dark text-white;
     cursor: default;
 }

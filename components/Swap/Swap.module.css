@@ -1,0 +1,23 @@
+.border{
+    @apply relative;
+
+    width: 492px;
+
+    border-right: theme('colors.ash-dark') 16px solid;
+    border-bottom: theme('colors.ash-dark') 16px solid;
+    padding-left: 16px;
+    padding-top: 16px;
+    background:
+        linear-gradient(to right, theme('colors.ash-dark') 18px, transparent 18px) 0 100%,
+        linear-gradient(to bottom, theme('colors.ash-dark') 18px, transparent 18px) 100% 0;
+
+    background-repeat: no-repeat;
+    background-size: calc(100% - 16px) calc(100% - 16px);
+}
+
+.fire{
+    @apply absolute;
+
+    left: -70px;
+    top: -70px;
+}

@@ -1,12 +1,11 @@
 import type { NextPage } from 'next'
-import Head from 'next/head'
-import styles from 'styles/Home.module.css'
 import BasicLayout from "components/Layout/Basic";
+import Swap from 'components/Swap'
 
 const Home: NextPage = () => {
     return (
         <BasicLayout>
-            
+            <Swap />
         </BasicLayout>
     )
 }

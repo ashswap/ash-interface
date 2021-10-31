@@ -4,8 +4,8 @@
     padding-right: 4px;
     padding-bottom: 4px;
     background:
-        linear-gradient(to left, theme('colors.pink.600') 4px, transparent 4px) 100% 0,
-        linear-gradient(to top, theme('colors.pink.600') 4px, transparent 4px) 0 100%;
+        linear-gradient(to left, theme('colors.pink.600') 5px, transparent 5px) 100% 0,
+        linear-gradient(to top, theme('colors.pink.600') 5px, transparent 5px) 0 100%;
 
     background-repeat: no-repeat;
     background-size: calc(100% - 4px) calc(100% - 4px);

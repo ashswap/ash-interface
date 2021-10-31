@@ -5,7 +5,7 @@ module.exports = {
         extend: {
             colors: {
                 "bg": "#191629",
-                "active-nav-btn": "#12101D",
+                "ash-dark": "#12101D",
                 pink: {
                     700: "#F90060",
                     600: "#FF005C"
