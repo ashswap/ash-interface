@@ -14,7 +14,7 @@ const Swap = () => {
         <div className="flex flex-col items-center pt-3.5">
             <div className={styles.corner}>
                 <div className={styles.fire}>
-                    <Image src={Fire} width={151} height={230} />
+                    <Image src={Fire} width={151} height={230} alt="Ash"  />
                 </div>
                 <div className="relative bg-ash-dark text-white p-7">
                     <div className="flex flex-row justify-between px-4">
