@@ -1,4 +1,4 @@
-.corner{
+.container{
     @apply relative;
 
     border-right: theme('colors.ash-dark.600') 16px solid;
@@ -14,22 +14,7 @@
     flex-direction: row;
 }
 
-.container{
+.content{
     @apply relative bg-ash-dark-600 text-white py-11 pl-8 pr-12;
     width: 460px
-}
-
-
-.fire{
-    @apply absolute z-10;
-
-    left: -85px;
-    top: -70px;
-}
-
-.revert{
-    @apply absolute w-7 h-7 rounded-lg bg-ash-dark-600 flex items-center justify-center cursor-pointer select-none;
-    left: 50%;
-    top: 50%;
-    transform: translateX(-50%) translateY(-50%);
 }

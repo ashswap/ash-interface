@@ -33,6 +33,6 @@
 }
 
 .input{
-    @apply flex-1 outline-none bg-transparent text-right text-2xl font-normal text-text-input placeholder-text-input;
+    @apply flex-1 outline-none bg-transparent text-right text-2xl font-normal text-text-input-1 placeholder-text-input-1;
     max-width: 50%;
 }

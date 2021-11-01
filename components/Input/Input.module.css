@@ -1,0 +1,17 @@
+.container{
+    @apply flex items-center justify-center flex-row bg-bg;
+    padding: 15px 22px;
+}
+
+.input{
+    @apply flex-1 outline-none bg-transparent text-left font-bold text-sm text-text-input-2 placeholder-text-input-2;
+}
+
+.container.outline{
+    @apply bg-transparent;
+    border: 1px solid #757391;
+}
+
+.outline .input{
+    @apply text-text-input-3 placeholder-text-input-3;
+}

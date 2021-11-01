@@ -11,7 +11,7 @@ const SwapAmount = (props: Props) => {
         <div className={props.topLeftCorner ? styles.topLeftCorner : (props.bottomRightCorner ? styles.bottomRightCorner : '')}>
             <div className="bg-bg flex flex-row px-2.5 pt-3.5 pb-5.5">
                 <TokenSelect />
-                <input className={styles.input} type="text" placeholder="0.00" />
+                <input className={styles.input} type="number" placeholder="0.00" />
             </div>
         </div>
     )

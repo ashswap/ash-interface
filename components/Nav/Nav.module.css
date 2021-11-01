@@ -8,6 +8,6 @@
 }
 
 .container > .btn.active{
-    @apply bg-ash-dark text-white;
+    @apply bg-ash-dark-600 text-white;
     cursor: default;
 }
