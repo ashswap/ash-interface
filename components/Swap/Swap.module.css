@@ -28,8 +28,8 @@
 }
 
 .revert{
-    @apply absolute w-7 h-7 rounded-lg bg-ash-dark-600 flex items-center justify-center cursor-pointer select-none;
+    @apply absolute w-7 h-7 rounded-lg bg-ash-dark-600 flex items-center justify-center cursor-pointer select-none z-10;
     left: 50%;
-    top: 50%;
-    transform: translateX(-50%) translateY(-50%);
+    bottom: -10px;
+    transform: translateX(-50%) translateY(50%);
 }

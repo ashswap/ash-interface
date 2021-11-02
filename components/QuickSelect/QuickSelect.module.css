@@ -1,0 +1,14 @@
+.container{
+    @apply bg-bg pb-2;
+    padding: 0 10px 8px;
+}
+
+.content{
+    border-top: 0.5px solid rgba(117, 115, 145, 0.5);
+}
+
+.label{
+    @apply text-text-input-3 font-normal;
+    font-size: 10px;
+    padding: 17px 0;
+}

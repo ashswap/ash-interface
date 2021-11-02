@@ -12,9 +12,12 @@ import SettingIcon from 'assets/svg/setting.svg'
 import SettingActiveIcon from 'assets/svg/setting-active.svg'
 import Revert from 'assets/svg/revert.svg'
 import Wallet from 'assets/svg/wallet.svg'
+import IToken from 'interface/token'
 
 const Swap = () => {
     const [showSetting, setShowSetting] = useState<boolean>(false)
+    const [tokenFrom, setTokenFrom] = useState<IToken | undefined>(undefined)
+    const [tokenTo, setTokenTo] = useState<IToken | undefined>(undefined)
 
     return (
         <div className="flex flex-col items-center pt-3.5">
@@ -32,11 +35,12 @@ const Swap = () => {
                     </div>
 
                     <div className="relative py-12">
-                        <SwapAmount topLeftCorner />
-                        <SwapAmount bottomRightCorner />
-                        <div className={styles.revert}>
-                            <Revert />
-                        </div>
+                        <SwapAmount topLeftCorner onChange={setTokenFrom} poolWithToken={tokenTo} showQuickSelect={!tokenFrom && !!tokenTo} type='from'>
+                            <div className={styles.revert}>
+                                <Revert />
+                            </div>
+                        </SwapAmount>
+                        <SwapAmount bottomRightCorner onChange={setTokenTo} poolWithToken={tokenFrom} showQuickSelect={!!tokenFrom && !tokenTo} type='to' />
                     </div>
 
                     <Button

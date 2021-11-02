@@ -13,7 +13,7 @@ const ListToken = (props: Props) => {
             {
                 props.items.map(token => (
                     <div
-                        key={token.token.name}
+                        key={token.token.id}
                         className="flex flex-row items-center justify-between my-5 cursor-pointer select-none"
                         onClick={() => props.onSelect && props.onSelect(token)}
                     >

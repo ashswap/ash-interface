@@ -1,14 +1,18 @@
 import IToken from "interface/token";
+import styles from './Token.module.css';
 
 interface Props {
     token: IToken
+    small?: boolean
+    className?: string | undefined;
+    onClick?: () => void;
 }
 
-const Token = ({token: {name, icon}}: Props) => {
+const Token = ({token: {name, icon}, small, className, onClick}: Props) => {
     return (
-        <div className="flex flex-row items-center">
-            <div style={{backgroundColor: icon}} className="w-5 h-5 rounded-full m-2"/>
-            <div className="text-sm font-bold text-white">{name}</div>
+        <div className={`flex flex-row items-center ${small ? styles.small : ''} ${className ? className : ''}`} onClick={onClick}>
+            <div style={{backgroundColor: icon}} className={styles.icon} />
+            <div className={styles.text}>{name}</div>
         </div>
     )
 }
