@@ -1,0 +1,10 @@
+.content {
+    width: 900px;
+}
+
+.tokenIcon {
+    @apply rounded-full;
+
+    width: 52px;
+    height: 52px;
+}

@@ -45,6 +45,51 @@ const pools: IPool[] = [
                 name: "DAI",
             },
         ]
+    },
+    {
+        id: "4",
+        tokens: [
+            {
+                id: "4",
+                icon: "#FFC10D",
+                name: "wNEAR",
+            },
+            {
+                id: "5",
+                icon: "#54C8EA",
+                name: "cNEAR",
+            },
+        ]
+    },
+    {
+        id: "5",
+        tokens: [
+            {
+                id: "6",
+                icon: "#FFC10D",
+                name: "cETH",
+            },
+            {
+                id: "7",
+                icon: "#54C8EA",
+                name: "nETH",
+            },
+        ]
+    },
+    {
+        id: "6",
+        tokens: [
+            {
+                id: "8",
+                icon: "#FFC10D",
+                name: "cEGLD",
+            },
+            {
+                id: "9",
+                icon: "#54C8EA",
+                name: "wEGLD",
+            },
+        ]
     }
 ]
 

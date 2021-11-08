@@ -95,6 +95,7 @@ const TokenSelect = ({value, validPools, onChange, modalTitle, pivotToken, type}
                     autoFocus
                     value={keyword}
                     onChange={e => onChangeKeyword(e.target.value)}
+                    textClassName="text-sm"
                 />
                 <div className="font-normal text-xs text-white ml-2">{validPools ? 'Supported pairs' : 'Owned'}</div>
 

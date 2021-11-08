@@ -1,0 +1,12 @@
+.container {
+    @apply flex flex-row gap-6 justify-start select-none text-lg text-black dark:text-text-input-3 font-bold;
+}
+
+.container > .btn {
+    cursor: pointer;
+}
+
+.container > .btn.active {
+    @apply text-pink-650;
+    cursor: default;
+}

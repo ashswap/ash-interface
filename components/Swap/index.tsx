@@ -34,7 +34,7 @@ const Swap = () => {
                         </div>
                     </div>
 
-                    <div className="relative py-12">
+                    <div className="relative pt-12">
                         <SwapAmount topLeftCorner onChange={setTokenFrom} poolWithToken={tokenTo} showQuickSelect={!tokenFrom && !!tokenTo} type='from'>
                             <div className={styles.revert}>
                                 <Revert />
@@ -43,10 +43,20 @@ const Swap = () => {
                         <SwapAmount bottomRightCorner onChange={setTokenTo} poolWithToken={tokenFrom} showQuickSelect={!!tokenFrom && !tokenTo} type='to' />
                     </div>
 
+                    {
+                        tokenFrom && tokenTo && (
+                            <div className="flex flex-row justify-between text-xs text-white my-5">
+                                <div className="opacity-50">Rate</div>
+                                <div>1 {tokenFrom?.name} = 0.9999 {tokenTo?.name}</div>
+                            </div>
+                        )
+                    }
+
                     <Button
                         leftIcon={<Wallet/>}
                         topLeftCorner
                         style={{height: 48}}
+                        className="mt-12"
                         outline
                     >CONNECT WALLET</Button>
                 </PanelContent>

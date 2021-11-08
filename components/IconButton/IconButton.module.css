@@ -1,4 +1,4 @@
-.container{
+.container {
     @apply cursor-pointer select-none text-white;
 
     width: 40px;
@@ -6,7 +6,7 @@
     padding: 8px;
 }
 
-.container > svg{
+.container > svg {
     width: 24px;
     height: 24px;
 }
@@ -23,6 +23,6 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: theme('colors.pink.600');
+    background-color: theme("colors.pink.600");
     opacity: 0.1;
 }

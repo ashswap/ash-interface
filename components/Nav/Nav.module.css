@@ -1,13 +1,13 @@
-.container{
+.container {
     @apply flex flex-row justify-center select-none text-xs text-black dark:text-white font-medium;
 }
 
-.container > .btn{
+.container > .btn {
     @apply py-3 px-6;
     cursor: pointer;
 }
 
-.container > .btn.active{
+.container > .btn.active {
     @apply bg-ash-dark-600 text-white;
     cursor: default;
 }

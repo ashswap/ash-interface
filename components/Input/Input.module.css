@@ -1,17 +1,18 @@
-.container{
-    @apply flex items-center justify-center flex-row bg-bg;
-    padding: 15px 22px;
+.container {
+    @apply flex items-center justify-center flex-row;
+    padding: 0px 22px;
+    height: 48px;
 }
 
-.input{
-    @apply flex-1 outline-none bg-transparent text-left font-bold text-sm text-text-input-2 placeholder-text-input-2;
+.input {
+    @apply flex-1 outline-none bg-transparent;
 }
 
-.container.outline{
+.outline.container {
     @apply bg-transparent;
     border: 1px solid #757391;
 }
 
-.outline .input{
+.outline .input {
     @apply text-text-input-3 placeholder-text-input-3;
 }

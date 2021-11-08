@@ -31,12 +31,12 @@ const ListSwapPool = (props: Props) => {
                         }
                         {
                             pool.tokens.filter(t => t.id !== props.pivotToken.id).map((t, index) => (
-                                <>
-                                    <Token key={t.id} token={t} />
+                                <div key={t.id}>
+                                    <Token token={t} />
                                     {
                                         index !== pool.tokens.length-2 && <div className="mx-7">-</div>
                                     }
-                                </>
+                                </div>
                             ))
                         }
                         {

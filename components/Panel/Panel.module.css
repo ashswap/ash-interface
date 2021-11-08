@@ -1,11 +1,7 @@
-.container{
+.topLeftCorner {
     @apply relative;
 
-    border-right: theme('colors.ash-dark.600') 16px solid;
     padding-left: 16px;
-    background:
-        linear-gradient(to right, theme('colors.ash-dark.600') 18px, transparent 18px) 0 100%,
-        linear-gradient(to bottom, theme('colors.ash-dark.600') 18px, transparent 18px) 100% 0;
 
     background-repeat: no-repeat;
     background-size: calc(100% - 16px) calc(100% - 16px);
@@ -14,7 +10,106 @@
     flex-direction: row;
 }
 
-.content{
-    @apply relative bg-ash-dark-600 text-white py-11 pl-8 pr-12;
-    width: 460px
+.topRightCorner {
+    @apply relative;
+
+    padding-right: 16px;
+
+    background-repeat: no-repeat;
+    background-size: calc(100% - 16px) calc(100% - 16px);
+    background-position: bottom right;
+
+    display: flex;
+    flex-direction: row;
+}
+
+.content {
+    @apply relative text-white py-11 pl-8 pr-12;
+    width: 460px;
+}
+
+.dark700 .topLeftCorner {
+    border-right: theme("colors.ash-dark.600") 16px solid;
+    background: linear-gradient(
+                to right,
+                theme("colors.ash-dark.600") 18px,
+                transparent 18px
+            )
+            0 100%,
+        linear-gradient(
+                to bottom,
+                theme("colors.ash-dark.600") 18px,
+                transparent 18px
+            )
+            100% 0;
+}
+
+.dark700 .topRightCorner {
+    border-left: theme("colors.ash-dark.600") 16px solid;
+    background: linear-gradient(
+            to left,
+            theme("colors.ash-dark.600") 18px,
+            transparent 18px
+        )
+        100% 0;
+}
+
+.dark700 .content {
+    @apply bg-ash-dark-600;
+}
+
+.dark600 .topLeftCorner {
+    border-right: theme("colors.bg") 16px solid;
+    background: linear-gradient(
+                to right,
+                theme("colors.bg") 18px,
+                transparent 18px
+            )
+            0 100%,
+        linear-gradient(to bottom, theme("colors.bg") 18px, transparent 18px)
+            100% 0;
+}
+
+.dark600 .topRightCorner {
+    border-left: theme("colors.bg") 16px solid;
+    background: linear-gradient(
+            to left,
+            theme("colors.bg") 18px,
+            transparent 18px
+        )
+        100% 0;
+}
+
+.dark600 .content {
+    @apply bg-bg;
+}
+
+.dark650 .topLeftCorner {
+    border-right: theme("colors.bg") 16px solid;
+    background: linear-gradient(
+                to right,
+                theme("colors.bg") 18px,
+                transparent 18px
+            )
+            0 100%,
+        linear-gradient(
+                to bottom,
+                theme("colors.bg") 18px,
+                transparent 18px
+            )
+            100% 0;
+}
+
+.dark650 .topRightCorner {
+    border-left: theme("colors.bg") 16px solid;
+    background: linear-gradient(
+            to left,
+            theme("colors.bg") 18px,
+            transparent 18px
+        )
+        100% 0;
+}
+
+.dark650 .content {
+    @apply bg-bg;
 }

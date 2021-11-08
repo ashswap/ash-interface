@@ -64,6 +64,14 @@ const SwapAmount = (props: Props) => {
             {
                 props.showQuickSelect && <QuickSelect tokens={suggestedTokens} onChange={onSelectToken} />
             }
+            {
+                selectedToken && (
+                    <div className="bg-bg px-2.5 pb-3.5 text-sm text-text-input-3">
+                        <span>Balance: </span>
+                        <span className="text-earn">341.311 {selectedToken.name}</span>
+                    </div>
+                )
+            }
             {props.children}
         </div>
     )

@@ -8,13 +8,19 @@ interface Props {
     topLeftCorner?: boolean
     bottomRightCorner?: boolean
     outline?: boolean
+    white?: boolean
+    dark?: boolean
+    disable?: boolean
+    className?: string | undefined;
+    textClassName?: string | undefined;
+    onClick?: () => void
 }
 
 const Button = (props: Props) => {
     return (
-        <div className={props.outline ? styles.outline : ''}>
+        <div className={`${props.disable ? styles.disable : ''} ${props.white ? styles.white : ''} ${props.dark ? styles.dark : ''} ${props.outline ? styles.outline : ''} ${props.className || ''}`} onClick={props.onClick}>
             <div className={props.topLeftCorner ? styles.topLeftCorner : (props.bottomRightCorner ? styles.bottomRightCorner : '')} style={props.style}>
-                <div className="flex flex-row justify-center items-center gap-2 h-full bg-pink-600 px-4 py-1.5 cursor-pointer select-none text-white font-medium text-xs leading-5">
+                <div className={`${styles.content} ${props.textClassName || ''}`}>
                     {props.leftIcon}
                     {props.children}
                 </div>

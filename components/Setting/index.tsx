@@ -24,7 +24,7 @@ const Setting = (props: Props) => {
                 <SlippageSelect active={slippage === "0.5%"} onClick={() => setSlippage("0.5%")}>0.5%</SlippageSelect>
                 <SlippageSelect active={slippage === "1%"} onClick={() => setSlippage("1%")}>1%</SlippageSelect>
             </div>
-            <Input suffix="%" placeholder="Custom" type="number" />
+            <Input suffix="%" placeholder="Custom" type="number" textClassName="text-sm" />
         </div>
     )
 }

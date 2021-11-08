@@ -1,0 +1,7 @@
+.containerCard {
+    @apply flex flex-wrap gap-7 items-baseline;
+}
+
+.containerList {
+    @apply flex flex-col;
+}

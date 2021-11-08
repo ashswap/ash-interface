@@ -1,0 +1,15 @@
+.content{
+    width: 350px;
+    padding: 34px 27px 20px;
+}
+
+.poolInfoLabel{
+    font-size: 10px;
+}
+
+.tokenIcon {
+    @apply rounded-full;
+
+    width: 52px;
+    height: 52px;
+}
