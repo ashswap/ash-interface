@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { ReactElement } from 'react'
 import styles from './Select.module.css'
 import Select, { components, IndicatorsContainerProps, OptionsOrGroups, StylesConfig, Theme } from 'react-select'
 import DownIcon from 'assets/svg/down.svg'
@@ -8,6 +8,7 @@ interface Props {
     onChange?: (v: string) => void
     children?: any
     options: OptionsOrGroups<any, any>,
+    prefix?: ReactElement | string
 }
 
 type MyOptionType = {
@@ -60,12 +61,12 @@ const selectStyles: StylesConfig<MyOptionType, IsMulti> = {
     },
 }
 
-const MySelect = (props: Props) => {
+const MySelect = ({prefix, options}: Props) => {
     return (
         <div className={styles.container}>
             <Select
-                defaultValue={props.options[0]}
-                options={props.options}
+                defaultValue={options[0]}
+                options={options}
                 styles={selectStyles}
                 theme={(theme: Theme) => ({
                     ...theme,
@@ -80,7 +81,7 @@ const MySelect = (props: Props) => {
                         <components.SingleValue {...props}>
                         {
                             <>
-                                <span className="text-text-input-3 text-sm">Sort by </span>
+                                {prefix && <span className="text-text-input-3 text-sm">{prefix} </span>}
                                 {children}
                             </>
                         }

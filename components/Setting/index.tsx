@@ -4,13 +4,14 @@ import IconButton from 'components/IconButton'
 import SlippageSelect from 'components/SlippageSelect'
 import styles from './Setting.module.css'
 import Input from 'components/Input'
+import { useWallet } from 'context/wallet'
 
 interface Props {
     onClose?: () => void
 }
 
 const Setting = (props: Props) => {
-    const [slippage, setSlippage] = useState<string>("0.1%")
+    const { slippage, setSlippage } = useWallet();
 
     return (
         <div className={styles.container}>
@@ -20,11 +21,17 @@ const Setting = (props: Props) => {
             <div className="font-bold text-lg">Setting</div>
             <div className="font-normal text-xs mt-14">Slippage Tolerance</div>
             <div className="flex flex-row gap-1 my-5">
-                <SlippageSelect active={slippage === "0.1%"} onClick={() => setSlippage("0.1%")}>0.1%</SlippageSelect>
-                <SlippageSelect active={slippage === "0.5%"} onClick={() => setSlippage("0.5%")}>0.5%</SlippageSelect>
-                <SlippageSelect active={slippage === "1%"} onClick={() => setSlippage("1%")}>1%</SlippageSelect>
+                <SlippageSelect active={slippage === 0.001} onClick={() => setSlippage(0.001)}>0.1%</SlippageSelect>
+                <SlippageSelect active={slippage === 0.005} onClick={() => setSlippage(0.005)}>0.5%</SlippageSelect>
+                <SlippageSelect active={slippage === 0.01} onClick={() => setSlippage(0.01)}>1%</SlippageSelect>
             </div>
-            <Input suffix="%" placeholder="Custom" type="number" textClassName="text-sm" />
+            <Input
+                suffix="%"
+                placeholder="Custom"
+                type="number"
+                textClassName="text-sm"
+                onChange={(e) => {setSlippage(parseFloat(e.target.value)/100)}}
+            />
         </div>
     )
 }

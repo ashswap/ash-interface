@@ -1,6 +1,7 @@
 import Head from 'next/head'
 import type { AppProps } from 'next/app'
 import { NextSeo } from 'next-seo';
+import {WalletProvider} from 'context/wallet'
 import '../styles/globals.css'
 
 function MyApp({ Component, pageProps }: AppProps) {
@@ -13,7 +14,9 @@ function MyApp({ Component, pageProps }: AppProps) {
                 title="AshSwap Interface"
                 description="Swap or provide liquidity on the AshSwap Protocol."
             />
-            <Component {...pageProps} />
+            <WalletProvider>
+                <Component {...pageProps} />
+            </WalletProvider>
         </>
     )
 }

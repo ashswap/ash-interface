@@ -1,6 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import '~antd/dist/antd.css';
 
 @font-face {
     font-family: 'SamsungSharpSans';

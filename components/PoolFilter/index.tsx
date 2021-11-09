@@ -54,6 +54,7 @@ const PoolFilter = (props: Props) => {
             </div>
             <div>
                 <Select
+                    prefix="Sort by"
                     options={options}
                 />
             </div>

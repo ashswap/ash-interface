@@ -1,0 +1,20 @@
+.connect, .connect:hover, .connect:focus, .connect:active {
+    @apply flex flex-row items-center justify-center bg-ash-dark-600 border-0 text-white;
+    padding: 9px 16px;
+    height: 41px;
+}
+
+.address {
+    @apply font-bold;
+    margin: 0 20px 0 10px;
+}
+
+.addressMenu {
+    @apply bg-ash-dark-600;
+    width: 214px;
+}
+
+.addressMenuItem, .addressMenuItem:hover {
+    @apply bg-ash-dark-600 text-white font-bold;
+    font-size: 12px;
+}

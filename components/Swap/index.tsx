@@ -11,13 +11,16 @@ import Clock from 'assets/svg/clock.svg'
 import SettingIcon from 'assets/svg/setting.svg'
 import SettingActiveIcon from 'assets/svg/setting-active.svg'
 import Revert from 'assets/svg/revert.svg'
-import Wallet from 'assets/svg/wallet.svg'
+import IconWallet from 'assets/svg/wallet.svg'
+import IconRight from 'assets/svg/right-white.svg'
 import IToken from 'interface/token'
+import { useWallet } from 'context/wallet'
 
 const Swap = () => {
     const [showSetting, setShowSetting] = useState<boolean>(false)
     const [tokenFrom, setTokenFrom] = useState<IToken | undefined>(undefined)
     const [tokenTo, setTokenTo] = useState<IToken | undefined>(undefined)
+    const { provider, connectExtension } = useWallet();
 
     return (
         <div className="flex flex-col items-center pt-3.5">
@@ -53,12 +56,14 @@ const Swap = () => {
                     }
 
                     <Button
-                        leftIcon={<Wallet/>}
+                        leftIcon={!provider ? <IconWallet/> : <></>}
+                        rightIcon={provider ? <IconRight/> : <></>}
                         topLeftCorner
                         style={{height: 48}}
                         className="mt-12"
                         outline
-                    >CONNECT WALLET</Button>
+                        onClick={provider ? () => {} : connectExtension}
+                    >{provider ? 'SWAP' : 'CONNECT WALLET'}</Button>
                 </PanelContent>
                 {
                     showSetting && <Setting onClose={() => setShowSetting(false)} />
