@@ -3,7 +3,7 @@ import IPool from "interface/pool";
 const pools: IPool[] = [
     {
         address:
-            "erd1qqqqqqqqqqqqqpgqwwap22mm7jyx5hjd7taa3yeeg3qpx9cvj9tsla8rfy",
+            "erd1qqqqqqqqqqqqqpgqhnlv0pkt5av66zv8zw86tql7wfu8z38tj9ts8yddxc",
         lpToken: {
             id: "LPT-c7b5cd",
             icon: "#fff",
@@ -27,7 +27,7 @@ const pools: IPool[] = [
     },
     {
         address:
-            "erd1qqqqqqqqqqqqqpgqtgjy2ag9h8gdgu8lx9840ktdjq0mlls4j9ts8phm7q",
+            "erd1qqqqqqqqqqqqqpgqrd725zlgqm9q5ahmdz6clvzn73g392g4j9tsx95p5q",
         lpToken: {
             id: "LPT-653fc9",
             icon: "#fff",
@@ -51,7 +51,7 @@ const pools: IPool[] = [
     },
     {
         address:
-            "erd1qqqqqqqqqqqqqpgqj4ejy959tw2yw3aq07x5j3lrv3mqxtysj9tsysu5s6",
+            "erd1qqqqqqqqqqqqqpgqusddpmj3a3h87sfzhwk39skkv3sdjfrqj9tsk9mtt5",
         lpToken: {
             id: "LPT-7998fb",
             icon: "#fff",

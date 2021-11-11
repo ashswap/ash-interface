@@ -4,11 +4,11 @@ export const gasLimit = 600000000;
 export const gasPerDataByte = 1500;
 
 export const network = {
-    id: "D",
-    name: "Devnet",
+    id: "T",
+    name: "Testnet",
     egldLabel: "xEGLD",
-    walletAddress: "https://devnet-wallet.elrond.com",
-    apiAddress: "https://devnet-api.elrond.com",
-    gatewayAddress: "https://devnet-gateway.elrond.com",
-    explorerAddress: "http://devnet-explorer.elrond.com"
+    walletAddress: "https://testnet-wallet.elrond.com",
+    apiAddress: "https://testnet-api.elrond.com",
+    gatewayAddress: "https://testnet-api.elrond.com",
+    explorerAddress: "http://testnet-explorer.elrond.com"
 };
