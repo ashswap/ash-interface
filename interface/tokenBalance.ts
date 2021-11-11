@@ -1,7 +1,11 @@
 import BigNumber from "bignumber.js";
-import IToken from "./token";
+import { IToken } from "./token";
 
-export default interface TokenBalance {
-    token: IToken
-    balance: BigNumber
+export interface TokenBalance {
+    token: IToken;
+    balance: BigNumber;
+}
+
+export interface TokenBalancesMap {
+    [key: string]: TokenBalance;
 }

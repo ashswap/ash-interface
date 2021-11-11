@@ -10,14 +10,15 @@ import PoolFilter, {ViewType} from 'components/PoolFilter';
 
 const Home: NextPage = () => {
     const [view, setView] = useState<ViewType>(ViewType.Card);
+    const [search, setSearch] = useState<string>("")
 
     return (
         <BasicLayout>
             <PoolBanner />
             <div className={styles.content}>
                 <PoolMenu />
-                <PoolFilter view={view} onChangeView={setView} />
-                <ListPool items={pools} view={view} />
+                <PoolFilter view={view} onChangeView={setView} search={search} onSearch={setSearch} />
+                <ListPool items={pools} view={view} search={search} />
             </div>
         </BasicLayout>
     )

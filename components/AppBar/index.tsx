@@ -1,7 +1,5 @@
-import { useEffect, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ExtensionProvider } from "@elrondnetwork/erdjs";
 import Button from "components/Button";
 import Nav from "components/Nav";
 import Wallet from "assets/svg/wallet.svg";
@@ -12,20 +10,32 @@ import IconChange from "assets/svg/change.svg";
 import IconDisconnect from "assets/svg/disconnect.svg";
 import Avatar from "assets/images/avatar.png";
 import { Dropdown, Menu, Button as AntdButton } from "antd";
-import styles from './AppBar.module.css'
+import styles from "./AppBar.module.css";
 
 const AppBar = () => {
     const { provider, connectExtension } = useWallet();
 
     const menu = (
         <Menu className={styles.addressMenu}>
-            <Menu.Item key="1" className={styles.addressMenuItem} icon={<IconCopy/>}>
+            <Menu.Item
+                key="1"
+                className={styles.addressMenuItem}
+                icon={<IconCopy />}
+            >
                 Copy address
             </Menu.Item>
-            <Menu.Item key="2" className={styles.addressMenuItem} icon={<IconChange/>}>
+            <Menu.Item
+                key="2"
+                className={styles.addressMenuItem}
+                icon={<IconChange />}
+            >
                 Change wallet
             </Menu.Item>
-            <Menu.Item key="3" className={styles.addressMenuItem} icon={<IconDisconnect/>}>
+            <Menu.Item
+                key="3"
+                className={styles.addressMenuItem}
+                icon={<IconDisconnect />}
+            >
                 Disconnect wallet
             </Menu.Item>
         </Menu>
@@ -47,11 +57,26 @@ const AppBar = () => {
 
             {provider && provider?.account ? (
                 <Dropdown overlay={menu} className={styles.connect}>
-                    <AntdButton icon={<Image src={Avatar} width={24} height={24} />}>
+                    <AntdButton
+                        icon={
+                            <Image
+                                src={Avatar}
+                                width={24}
+                                height={24}
+                                alt="avatar"
+                            />
+                        }
+                    >
                         <span className={styles.address}>
-                            {provider?.account.address.slice(0, 4) + "..." + provider?.account.address.slice(provider?.account.address.length-4)}
+                            {provider?.account.address.slice(0, 4) +
+                                "..." +
+                                provider?.account.address.slice(
+                                    provider?.account.address.length - 4
+                                )}
                         </span>
-                        <span><IconDown /></span>
+                        <span>
+                            <IconDown />
+                        </span>
                     </AntdButton>
                 </Dropdown>
             ) : (

@@ -1,6 +1,7 @@
-import IToken from "./token";
+import { IToken } from "./token";
 
 export default interface IPool {
-    id: string
-    tokens: IToken[]
+    address: string;
+    tokens: IToken[];
+    lpToken: IToken;
 }

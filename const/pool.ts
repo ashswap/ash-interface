@@ -2,95 +2,77 @@ import IPool from "interface/pool";
 
 const pools: IPool[] = [
     {
-        id: "1",
+        address:
+            "erd1qqqqqqqqqqqqqpgqwwap22mm7jyx5hjd7taa3yeeg3qpx9cvj9tsla8rfy",
+        lpToken: {
+            id: "LPT-c7b5cd",
+            icon: "#fff",
+            name: "LPT-c7b5cd",
+            decimals: 18
+        },
         tokens: [
             {
-                id: "1",
+                id: "USDT-90d1e5",
                 icon: "#FF005C",
                 name: "USDT",
+                decimals: 6
             },
             {
-                id: "2",
+                id: "USDC-af9b3b",
                 icon: "#FFC10D",
                 name: "USDC",
-            },
+                decimals: 6
+            }
         ]
     },
     {
-        id: "2",
+        address:
+            "erd1qqqqqqqqqqqqqpgqtgjy2ag9h8gdgu8lx9840ktdjq0mlls4j9ts8phm7q",
+        lpToken: {
+            id: "LPT-653fc9",
+            icon: "#fff",
+            name: "LPT-653fc9",
+            decimals: 18
+        },
         tokens: [
             {
-                id: "1",
-                icon: "#FF005C",
-                name: "USDT",
-            },
-            {
-                id: "3",
-                icon: "#54C8EA",
-                name: "DAI",
-            },
-        ]
-    },
-    {
-        id: "3",
-        tokens: [
-            {
-                id: "2",
+                id: "USDC-af9b3b",
                 icon: "#FFC10D",
                 name: "USDC",
+                decimals: 6
             },
             {
-                id: "3",
+                id: "WUSDC-d38f26",
                 icon: "#54C8EA",
-                name: "DAI",
-            },
+                name: "wUSDC",
+                decimals: 6
+            }
         ]
     },
     {
-        id: "4",
+        address:
+            "erd1qqqqqqqqqqqqqpgqj4ejy959tw2yw3aq07x5j3lrv3mqxtysj9tsysu5s6",
+        lpToken: {
+            id: "LPT-7998fb",
+            icon: "#fff",
+            name: "LPT-7998fb",
+            decimals: 18
+        },
         tokens: [
             {
-                id: "4",
+                id: "BTC-c2da5f",
                 icon: "#FFC10D",
-                name: "wNEAR",
+                name: "BTC",
+                decimals: 6
             },
             {
-                id: "5",
+                id: "WBTC-e7ca82",
                 icon: "#54C8EA",
-                name: "cNEAR",
-            },
-        ]
-    },
-    {
-        id: "5",
-        tokens: [
-            {
-                id: "6",
-                icon: "#FFC10D",
-                name: "cETH",
-            },
-            {
-                id: "7",
-                icon: "#54C8EA",
-                name: "nETH",
-            },
-        ]
-    },
-    {
-        id: "6",
-        tokens: [
-            {
-                id: "8",
-                icon: "#FFC10D",
-                name: "cEGLD",
-            },
-            {
-                id: "9",
-                icon: "#54C8EA",
-                name: "wEGLD",
-            },
+                name: "wBTC",
+                decimals: 6
+            }
         ]
     }
-]
+];
 
-export default pools
+export default pools;

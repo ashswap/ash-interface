@@ -1,41 +1,50 @@
-import {ChangeEvent, HTMLInputTypeAttribute, ReactElement} from 'react'
-import styles from './Input.module.css'
+import { ChangeEvent, HTMLInputTypeAttribute, ReactElement, CSSProperties } from "react";
+import styles from "./Input.module.css";
 
 interface Props {
-    suffix?: ReactElement | string
-    placeholder?: string
-    outline?: boolean
-    autoFocus?: boolean
-    type?: HTMLInputTypeAttribute
+    suffix?: ReactElement | string;
+    placeholder?: string;
+    outline?: boolean;
+    disabled?: boolean;
+    autoFocus?: boolean;
+    type?: HTMLInputTypeAttribute;
     className?: string | undefined;
-    value?: string
-    onChange?: (e: ChangeEvent<HTMLInputElement>) => void
-    textAlign?: 'left' | 'right'
+    value?: string;
+    onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
+    textAlign?: "left" | "right";
     backgroundClassName?: string | undefined;
     textColorClassName?: string | undefined;
     textClassName?: string | undefined;
+    style?: CSSProperties | undefined;
 }
 
 const Input = (props: Props) => {
-    let textAlign = props.textAlign || 'left'
-    let backgroundClassName = props.backgroundClassName || 'bg-bg'
-    let textColorClassName = props.textColorClassName || 'text-input-2'
+    let textAlign = props.textAlign || "left";
+    let backgroundClassName = props.backgroundClassName || "bg-bg";
+    let textColorClassName = props.textColorClassName || "text-input-2";
 
     return (
-        <div className={`${styles.container} ${backgroundClassName} ${props.outline ? styles.outline : ''} ${props.className || ''}`}>
+        <div
+            className={`${styles.container} ${backgroundClassName} ${
+                props.outline ? styles.outline : ""
+            } ${props.className || ""}`}
+            style={props.style}
+        >
             <input
-                className={`${styles.input} text-${textAlign} text-${textColorClassName} placeholder-${textColorClassName} ${props.textClassName || ''}`}
+                className={`${
+                    styles.input
+                } text-${textAlign} text-${textColorClassName} placeholder-${textColorClassName} ${props.textClassName ||
+                    ""}`}
                 type={props.type || "text"}
                 placeholder={props.placeholder}
                 autoFocus={props.autoFocus}
                 value={props.value}
                 onChange={props.onChange}
+                disabled={props.disabled}
             />
-            {
-                props.suffix && <span className="ml-3">{props.suffix}</span>
-            }
+            {props.suffix && <span className="ml-3">{props.suffix}</span>}
         </div>
-    )
-}
+    );
+};
 
 export default Input;
