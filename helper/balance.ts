@@ -26,11 +26,7 @@ export const toEGLD = (token: IToken, valueStr: string) => {
     }
 
     let amount = new BigNumber(valueStr);
-    amount = new BigNumber(
-        amount
-            .div(new BigNumber(10).exponentiatedBy(token.decimals))
-            .toFixed(0)
-    );
+    amount = amount.div(new BigNumber(10).exponentiatedBy(token.decimals));
 
     if (amount.lt(0)) {
         return new BigNumber(0);

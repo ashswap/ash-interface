@@ -3,12 +3,15 @@ import {
     ApiProvider,
     CallArguments,
     ChainID,
+    ContractFunction,
     ExtensionProvider,
     GasLimit,
     GasPrice,
     Nonce,
     ProxyProvider,
+    Query,
     SmartContract,
+    TokenIdentifierValue,
     Transaction
 } from "@elrondnetwork/erdjs";
 import {
@@ -93,6 +96,36 @@ export function WalletProvider({ children }: Props) {
                 tokens[p.lpToken.id] = p.lpToken;
             }
         });
+
+        let promiseLpSupply: any[] = [];
+        let tokenIds: any[] = [];
+        for (const tokenId in tokens) {
+            if (Object.prototype.hasOwnProperty.call(tokens, tokenId)) {
+                const lpToken = tokens[tokenId];
+                tokenIds.push(tokenId);
+                promiseLpSupply.push(
+                    initState.proxy.queryContract(
+                        new Query({
+                            address: new Address(
+                                "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u"
+                            ),
+                            func: new ContractFunction("getTokenProperties"),
+                            args: [
+                                new TokenIdentifierValue(Buffer.from(tokenId))
+                            ]
+                        })
+                    )
+                );
+            }
+        }
+
+        Promise.all(promiseLpSupply).then(results =>
+            results.map((r: any, i: number) => {
+                tokens[tokenIds[i]].totalSupply = new BigNumber(
+                    Buffer.from(r.returnData[3], "base64").toString("hex")
+                );
+            })
+        );
 
         return tokens;
     }, pools);

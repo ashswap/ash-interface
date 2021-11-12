@@ -5,3 +5,9 @@
 .containerList {
     @apply flex flex-col;
 }
+
+.listHeader {
+    padding: 16px 43px;
+    font-size: 12px;
+    margin-top: 28px;
+}

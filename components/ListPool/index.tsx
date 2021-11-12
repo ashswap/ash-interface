@@ -1,11 +1,12 @@
-import { useMemo, useEffect } from "react";
-import ListPoolItem from "components/ListPoolItem";
+import { useMemo } from "react";
+import ListPoolItemDeposit from "components/ListPoolItemDeposit";
 import PoolCard from "components/PoolCard";
 import { ViewType } from "components/PoolFilter";
 import { useWallet } from "context/wallet";
 import { useRouter } from "next/router";
 import IPool from "interface/pool";
 import styles from "./ListPool.module.css";
+import ListPoolItemWithdraw from "components/ListPoolItemWithdraw";
 
 interface Props {
     items: IPool[];
@@ -30,7 +31,14 @@ const ListPool = (props: Props) => {
         }
 
         if (!!props.search) {
-            pools = pools.filter(p => p.tokens.findIndex(t => t.name.toLowerCase().includes(props.search!.toLowerCase())) !== -1)
+            pools = pools.filter(
+                p =>
+                    p.tokens.findIndex(t =>
+                        t.name
+                            .toLowerCase()
+                            .includes(props.search!.toLowerCase())
+                    ) !== -1
+            );
         }
 
         return pools;
@@ -44,6 +52,26 @@ const ListPool = (props: Props) => {
                     : styles.containerList
             }`}
         >
+            {props.view == ViewType.List ? (
+                poolType === "my-pool" ? (
+                    <div
+                        className={`flex flex-row bg-ash-dark-600 text-text-input-3 ${styles.listHeader}`}
+                    >
+                        <div className="w-3/12">Your Liquidity</div>
+                        <div className="w-2/12">Your capacity</div>
+                    </div>
+                ) : (
+                    <div
+                        className={`flex flex-row bg-ash-dark-600 text-text-input-3 ${styles.listHeader}`}
+                    >
+                        <div className="w-2/12">Deposite</div>
+                        <div className="w-1/12">APR Earn</div>
+                        <div className="w-2/12">Farming per day</div>
+                        <div className="w-2/12">Total Liquidity</div>
+                        <div className="w-2/12">24H Volume</div>
+                    </div>
+                )
+            ) : null}
             {pools.map((pool, i) => {
                 if (props.view == ViewType.Card) {
                     return (
@@ -56,13 +84,23 @@ const ListPool = (props: Props) => {
                         />
                     );
                 } else {
-                    return (
-                        <ListPoolItem
-                            key={pool.address}
-                            pool={pool}
-                            dark={i % 2 === 0}
-                        />
-                    );
+                    if (poolType === "my-pool") {
+                        return (
+                            <ListPoolItemWithdraw
+                                key={pool.address}
+                                pool={pool}
+                                dark={i % 2 === 0}
+                            />
+                        );
+                    } else {
+                        return (
+                            <ListPoolItemDeposit
+                                key={pool.address}
+                                pool={pool}
+                                dark={i % 2 === 0}
+                            />
+                        );
+                    }
                 }
             })}
         </div>

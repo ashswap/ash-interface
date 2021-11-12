@@ -1,10 +1,16 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import {
     Address,
     ContractFunction,
     GasLimit,
     TokenIdentifierValue,
-    BigUIntValue
+    BigUIntValue,
+    Query,
+    TupleType,
+    TypeExpressionParser,
+    TypeMapper,
+    ArgSerializer,
+    EndpointParameterDefinition
 } from "@elrondnetwork/erdjs";
 import BigNumber from "bignumber.js";
 import Button from "components/Button";
@@ -13,13 +19,14 @@ import Modal from "components/Modal";
 import Token from "components/Token";
 import { gasLimit, network } from "const/network";
 import { useWallet } from "context/wallet";
-import { toWei } from "helper/balance";
+import { toEGLD, toWei } from "helper/balance";
 import IPool from "interface/pool";
 import IconRight from "assets/svg/right-yellow.svg";
 import styles from "./RemoveLiquidityModal.module.css";
 import { notification } from "antd";
 import { Slider } from "antd";
 import { theme } from "tailwind.config";
+import { useDebounce } from "use-debounce";
 
 interface Props {
     open?: boolean;
@@ -27,24 +34,139 @@ interface Props {
     pool: IPool;
 }
 
-const RemoveLiquidityModal = (props: Props) => {
+const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
     const [liquidity, setLiquidity] = useState<string>("");
+    const [liquidityPercent, setLiquidityPercent] = useState<number>(0);
     const [value0, setValue0] = useState<string>("");
     const [value1, setValue1] = useState<string>("");
-    const { provider, callContract, fetchBalances, balances, slippage } = useWallet();
+    const [liquidityDebounce] = useDebounce(liquidity, 500);
+    const {
+        provider,
+        callContract,
+        fetchBalances,
+        balances,
+        slippage,
+        proxy
+    } = useWallet();
+
+    const ownLiquidity = useMemo(() => {
+        return balances[pool.lpToken.id]
+            ? balances[pool.lpToken.id].balance
+            : new BigNumber(0);
+    }, [balances, pool]);
+
+    const onChangeLiquidityNumber = useCallback(
+        l => {
+            let totalOwnLiquid = toEGLD(pool.lpToken, ownLiquidity.toString());
+            if (new BigNumber(l).gt(totalOwnLiquid)) {
+                l = totalOwnLiquid.toString();
+            }
+
+            setLiquidity(l);
+            setLiquidityPercent(
+                toWei(pool.lpToken, l)
+                    .multipliedBy(100)
+                    .div(ownLiquidity)
+                    .toNumber()
+            );
+        },
+        [pool.lpToken, ownLiquidity]
+    );
+
+    const onChangeLiquidityPercent = useCallback(
+        (percent: number) => {
+            setLiquidity(
+                toEGLD(
+                    pool.lpToken,
+                    ownLiquidity
+                        .multipliedBy(percent)
+                        .div(100)
+                        .toString(10)
+                ).toString(10)
+            );
+            setLiquidityPercent(percent);
+        },
+        [ownLiquidity, pool.lpToken]
+    );
+
+    useEffect(() => {
+        if (!liquidityDebounce) {
+            return;
+        }
+
+        proxy
+            .queryContract(
+                new Query({
+                    address: new Address(pool.address),
+                    func: new ContractFunction("getRemoveLiquidityTokens"),
+                    args: [
+                        new BigUIntValue(
+                            new BigNumber(
+                                toWei(pool.lpToken, liquidityDebounce)
+                            )
+                        ),
+                        new BigUIntValue(new BigNumber(0)),
+                        new BigUIntValue(new BigNumber(0))
+                    ]
+                })
+            )
+            .then(({ returnData }) => {
+                console.log(returnData);
+
+                let resultHex = Buffer.from(returnData[0], "base64").toString(
+                    "hex"
+                );
+                let parser = new TypeExpressionParser();
+                let mapper = new TypeMapper();
+                let serializer = new ArgSerializer();
+
+                let type = parser.parse("tuple2<BigUint,BigUint>");
+                let mappedType = mapper.mapType(type);
+
+                let endpointDefinitions = [
+                    new EndpointParameterDefinition("foo", "bar", mappedType)
+                ];
+                let values = serializer.stringToValues(
+                    resultHex,
+                    endpointDefinitions
+                );
+
+                setValue0(
+                    toEGLD(
+                        pool.tokens[0],
+                        values[0].valueOf().field0.toString()
+                    ).toString()
+                );
+                setValue1(
+                    toEGLD(
+                        pool.tokens[1],
+                        values[0].valueOf().field1.toString()
+                    ).toString()
+                );
+            });
+    }, [liquidityDebounce, pool, proxy]);
 
     const removeLP = useCallback(async () => {
-        let tx = await callContract(new Address(props.pool.address), {
+        let tx = await callContract(new Address(pool.address), {
             func: new ContractFunction("ESDTTransfer"),
             gasLimit: new GasLimit(gasLimit),
             args: [
-                new TokenIdentifierValue(Buffer.from(props.pool.lpToken.id)),
-                new BigUIntValue(toWei(props.pool.lpToken, liquidity)),
+                new TokenIdentifierValue(Buffer.from(pool.lpToken.id)),
+                new BigUIntValue(toWei(pool.lpToken, liquidity)),
                 new TokenIdentifierValue(Buffer.from("removeLiquidity")),
-                new BigUIntValue(toWei(props.pool.tokens[0], value0).multipliedBy(slippage)),
-                new BigUIntValue(toWei(props.pool.tokens[1], value1).multipliedBy(slippage)),
+                new BigUIntValue(
+                    new BigNumber(toWei(pool.tokens[0], value0).multipliedBy(1 - slippage).toFixed(0))
+                ),
+                new BigUIntValue(
+                    new BigNumber(toWei(pool.tokens[1], value1).multipliedBy(1 - slippage).toFixed(0))
+                )
             ]
         });
+
+        console.log(new BigNumber(toWei(pool.tokens[0], value0).multipliedBy(1 - slippage).toFixed(0)).toString());
+        console.log(new BigNumber(toWei(pool.tokens[1], value1).multipliedBy(1 - slippage).toFixed(0)).toString());
+        
+        
 
         fetchBalances();
 
@@ -59,34 +181,42 @@ const RemoveLiquidityModal = (props: Props) => {
                 )
         });
 
-        if (props.onClose) {
-            props.onClose();
+        if (onClose) {
+            onClose();
         }
-    }, [provider, value0, value1, props.pool]);
+    }, [
+        value0,
+        value1,
+        slippage,
+        pool,
+        onClose,
+        callContract,
+        fetchBalances,
+        liquidity
+    ]);
 
     return (
         <Modal
-            open={props.open}
-            onClose={props.onClose}
+            open={open}
+            onClose={onClose}
             contentClassName={styles.content}
             dark="600"
         >
             <div className="flex flex-row items-center mb-3">
                 <div className="mr-3">
                     <div className="text-text-input-3 text-xs">
-                        {props.pool.tokens[0].name} &{" "}
-                        {props.pool.tokens[1].name}
+                        {pool.tokens[0].name} & {pool.tokens[1].name}
                     </div>
                 </div>
                 <div className="flex flex-row justify-between items-center">
                     <div
                         className={styles.tokenIcon}
-                        style={{ backgroundColor: props.pool.tokens[0].icon }}
+                        style={{ backgroundColor: pool.tokens[0].icon }}
                     ></div>
                     <div
                         className={styles.tokenIcon}
                         style={{
-                            backgroundColor: props.pool.tokens[1].icon,
+                            backgroundColor: pool.tokens[1].icon,
                             marginLeft: "-3px"
                         }}
                     ></div>
@@ -112,7 +242,9 @@ const RemoveLiquidityModal = (props: Props) => {
                                 textAlign="right"
                                 textClassName="text-lg"
                                 value={liquidity}
-                                onChange={e => setLiquidity(e.target.value)}
+                                onChange={e =>
+                                    onChangeLiquidityNumber(e.target.value)
+                                }
                                 style={{ height: 72 }}
                             />
                         </div>
@@ -139,6 +271,10 @@ const RemoveLiquidityModal = (props: Props) => {
                                         width: 7,
                                         height: 7
                                     }}
+                                    min={0}
+                                    max={100}
+                                    value={liquidityPercent}
+                                    onChange={e => onChangeLiquidityPercent(e)}
                                 />
                             </div>
                         </div>
@@ -147,7 +283,7 @@ const RemoveLiquidityModal = (props: Props) => {
                         <div className="my-1.5">
                             <div className="flex flex-row">
                                 <Token
-                                    token={props.pool.tokens[0]}
+                                    token={pool.tokens[0]}
                                     className="w-1/3"
                                 />
                                 <Input
@@ -165,22 +301,19 @@ const RemoveLiquidityModal = (props: Props) => {
                             <div className="bg-bg py-2 text-sm text-text-input-3 text-right">
                                 <span>Available: </span>
                                 <span className="text-earn">
-                                    {balances[props.pool.tokens[0].id]
-                                        ? balances[
-                                              props.pool.tokens[0].id
-                                          ].balance
+                                    {balances[pool.tokens[0].id]
+                                        ? balances[pool.tokens[0].id].balance
                                               .div(
                                                   new BigNumber(
                                                       10
                                                   ).exponentiatedBy(
-                                                      props.pool.tokens[0]
-                                                          .decimals
+                                                      pool.tokens[0].decimals
                                                   )
                                               )
                                               .toFixed(3)
                                               .toString()
                                         : "0"}{" "}
-                                    {props.pool.tokens[0].name}
+                                    {pool.tokens[0].name}
                                 </span>
                             </div>
                         </div>
@@ -188,7 +321,7 @@ const RemoveLiquidityModal = (props: Props) => {
                         <div className="my-1.5">
                             <div className="flex flex-row">
                                 <Token
-                                    token={props.pool.tokens[1]}
+                                    token={pool.tokens[1]}
                                     className="w-1/3"
                                 />
                                 <Input
@@ -206,22 +339,19 @@ const RemoveLiquidityModal = (props: Props) => {
                             <div className="bg-bg py-2 text-sm text-text-input-3 text-right">
                                 <span>Available: </span>
                                 <span className="text-earn">
-                                    {balances[props.pool.tokens[1].id]
-                                        ? balances[
-                                              props.pool.tokens[1].id
-                                          ].balance
+                                    {balances[pool.tokens[1].id]
+                                        ? balances[pool.tokens[1].id].balance
                                               .div(
                                                   new BigNumber(
                                                       10
                                                   ).exponentiatedBy(
-                                                      props.pool.tokens[1]
-                                                          .decimals
+                                                      pool.tokens[1].decimals
                                                   )
                                               )
                                               .toFixed(3)
                                               .toString()
                                         : "0"}{" "}
-                                    {props.pool.tokens[1].name}
+                                    {pool.tokens[1].name}
                                 </span>
                             </div>
                         </div>

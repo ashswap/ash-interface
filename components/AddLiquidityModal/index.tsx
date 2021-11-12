@@ -29,7 +29,7 @@ interface Props {
     pool: IPool;
 }
 
-const AddLiquidityModal = (props: Props) => {
+const AddLiquidityModal = ({open, onClose, pool}: Props) => {
     const [isAgree, setAgree] = useState<boolean>(false);
     const [value0, setValue0] = useState<string>("");
     const [value1, setValue1] = useState<string>("");
@@ -37,30 +37,30 @@ const AddLiquidityModal = (props: Props) => {
 
     // reset when open modal
     useEffect(() => {
-        if (props.open) {
+        if (open) {
             setAgree(false);
         }
-    }, [props.open]);
+    }, [open]);
 
     const addLP = useCallback(async () => {
         let tx = await callContract(new Address(provider?.account.address), {
             func: new ContractFunction("MultiESDTNFTTransfer"),
             gasLimit: new GasLimit(gasLimit),
             args: [
-                new AddressValue(new Address(props.pool.address)),
+                new AddressValue(new Address(pool.address)),
                 new BigUIntValue(new BigNumber(2)),
 
-                new TokenIdentifierValue(Buffer.from(props.pool.tokens[0].id)),
+                new TokenIdentifierValue(Buffer.from(pool.tokens[0].id)),
                 new BigUIntValue(new BigNumber(0)),
-                new BigUIntValue(toWei(props.pool.tokens[0], value0)),
+                new BigUIntValue(toWei(pool.tokens[0], value0)),
 
-                new TokenIdentifierValue(Buffer.from(props.pool.tokens[1].id)),
+                new TokenIdentifierValue(Buffer.from(pool.tokens[1].id)),
                 new BigUIntValue(new BigNumber(0)),
-                new BigUIntValue(toWei(props.pool.tokens[1], value1)),
+                new BigUIntValue(toWei(pool.tokens[1], value1)),
 
                 new TokenIdentifierValue(Buffer.from("addLiquidity")),
-                new BigUIntValue(toWei(props.pool.tokens[0], value0)),
-                new BigUIntValue(toWei(props.pool.tokens[1], value1)),
+                new BigUIntValue(toWei(pool.tokens[0], value0)),
+                new BigUIntValue(toWei(pool.tokens[1], value1)),
             ]
         });
 
@@ -77,15 +77,15 @@ const AddLiquidityModal = (props: Props) => {
                 )
         });
 
-        if (props.onClose) {
-            props.onClose();
+        if (onClose) {
+            onClose();
         }
-    }, [provider, value0, value1, props.pool]);
+    }, [provider, value0, value1, pool, onClose, callContract, fetchBalances]);
 
     return (
         <Modal
-            open={props.open}
-            onClose={props.onClose}
+            open={open}
+            onClose={onClose}
             contentClassName={styles.content}
             dark="600"
         >
@@ -93,20 +93,20 @@ const AddLiquidityModal = (props: Props) => {
                 <div>
                     <div className="text-text-input-3 text-xs">Deposit</div>
                     <div className="flex flex-row items-baseline text-2xl font-bold">
-                        <span>{props.pool.tokens[0].name}</span>
+                        <span>{pool.tokens[0].name}</span>
                         <span className="text-sm px-3">&</span>
-                        <span>{props.pool.tokens[1].name}</span>
+                        <span>{pool.tokens[1].name}</span>
                     </div>
                 </div>
                 <div className="flex flex-row justify-between items-center">
                     <div
                         className={styles.tokenIcon}
-                        style={{ backgroundColor: props.pool.tokens[0].icon }}
+                        style={{ backgroundColor: pool.tokens[0].icon }}
                     ></div>
                     <div
                         className={styles.tokenIcon}
                         style={{
-                            backgroundColor: props.pool.tokens[1].icon,
+                            backgroundColor: pool.tokens[1].icon,
                             marginLeft: "-10px"
                         }}
                     ></div>
@@ -117,7 +117,7 @@ const AddLiquidityModal = (props: Props) => {
                     <div className="my-1.5">
                         <div className="flex flex-row">
                             <Token
-                                token={props.pool.tokens[0]}
+                                token={pool.tokens[0]}
                                 className="w-1/3"
                             />
                             <Input
@@ -135,17 +135,17 @@ const AddLiquidityModal = (props: Props) => {
                         <div className="bg-bg py-2 text-sm text-text-input-3 text-right">
                             <span>Balance: </span>
                             <span className="text-earn">
-                                {balances[props.pool.tokens[0].id]
-                                    ? balances[props.pool.tokens[0].id].balance
+                                {balances[pool.tokens[0].id]
+                                    ? balances[pool.tokens[0].id].balance
                                           .div(
                                               new BigNumber(10).exponentiatedBy(
-                                                  props.pool.tokens[0].decimals
+                                                  pool.tokens[0].decimals
                                               )
                                           )
                                           .toFixed(3)
                                           .toString()
                                     : "0"}{" "}
-                                {props.pool.tokens[0].name}
+                                {pool.tokens[0].name}
                             </span>
                         </div>
                     </div>
@@ -153,7 +153,7 @@ const AddLiquidityModal = (props: Props) => {
                     <div className="my-1.5">
                         <div className="flex flex-row">
                             <Token
-                                token={props.pool.tokens[1]}
+                                token={pool.tokens[1]}
                                 className="w-1/3"
                             />
                             <Input
@@ -171,17 +171,17 @@ const AddLiquidityModal = (props: Props) => {
                         <div className="bg-bg py-2 text-sm text-text-input-3 text-right">
                             <span>Balance: </span>
                             <span className="text-earn">
-                                {balances[props.pool.tokens[1].id]
-                                    ? balances[props.pool.tokens[1].id].balance
+                                {balances[pool.tokens[1].id]
+                                    ? balances[pool.tokens[1].id].balance
                                           .div(
                                               new BigNumber(10).exponentiatedBy(
-                                                  props.pool.tokens[1].decimals
+                                                  pool.tokens[1].decimals
                                               )
                                           )
                                           .toFixed(3)
                                           .toString()
                                     : "0"}{" "}
-                                {props.pool.tokens[1].name}
+                                {pool.tokens[1].name}
                             </span>
                         </div>
                     </div>
