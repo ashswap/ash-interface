@@ -13,6 +13,7 @@ import Down from "assets/svg/down.svg";
 import Search from "assets/svg/search.svg";
 import IconClose from "assets/svg/close-1.svg";
 import styles from "./TokenSelect.module.css";
+import { useWallet } from "context/wallet";
 
 interface Props {
     onChange?: (t: IToken) => void;
@@ -21,7 +22,7 @@ interface Props {
     pivotToken?: IToken;
     modalTitle: string;
     type: "from" | "to";
-    resetPivotToken: () => any
+    resetPivotToken: () => any;
 }
 
 const TokenSelect = ({
@@ -39,22 +40,24 @@ const TokenSelect = ({
     >([]);
     const [filtedValidPools, setFiltedValidPools] = useState<IPool[]>([]);
     const [keyword, setKeyword] = useState<string>("");
+    const { tokens, balances } = useWallet();
 
-    let tokenBalances = useMemo(() => {
+    const tokenBalances = useMemo(() => {
         let tokenBalances: TokenBalance[] = [];
-        pools.map(p => {
-            p.tokens.forEach(t => {
-                if (tokenBalances.findIndex(b => b.token.id === t.id) === -1) {
-                    tokenBalances.push({
-                        token: t,
-                        balance: new BigNumber(100)
-                    });
+
+        for (const tokenId in tokens) {
+            if (Object.prototype.hasOwnProperty.call(tokens, tokenId)) {
+                const tokenBalance: TokenBalance = {
+                    token: tokens[tokenId],
+                    balance: balances[tokenId] ? balances[tokenId].balance : new BigNumber(0),
                 }
-            });
-        });
+
+                tokenBalances.push(tokenBalance);
+            }
+        }
 
         return tokenBalances;
-    }, []);
+    }, [tokens, balances]);
 
     const onChangeKeyword = useCallback(
         (keyword: string) => {
@@ -114,9 +117,15 @@ const TokenSelect = ({
                 <div className="flex flex-row items-center my-8 w-full">
                     {pivotToken && (
                         <>
-                            <div className="flex flex-row items-center justify-center gap-3.5 bg-bg h-12 rounded-lg" style={{padding: "18px 12px 18px 18px"}}>
+                            <div
+                                className="flex flex-row items-center justify-center gap-3.5 bg-bg h-12 rounded-lg"
+                                style={{ padding: "18px 12px 18px 18px" }}
+                            >
                                 <Token token={pivotToken} />
-                                <IconClose className="cursor-pointer" onClick={resetPivotToken} />
+                                <IconClose
+                                    className="cursor-pointer"
+                                    onClick={resetPivotToken}
+                                />
                             </div>
                             <div className="mx-2">-</div>
                         </>

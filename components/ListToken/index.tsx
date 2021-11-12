@@ -1,4 +1,5 @@
 import Token from "components/Token";
+import { toEGLD } from "helper/balance";
 import { TokenBalance } from "interface/tokenBalance";
 
 interface Props {
@@ -18,7 +19,7 @@ const ListToken = (props: Props) => {
                 >
                     <Token token={token.token} />
                     <div className="text-text-input-3 font-normal text-xs">
-                        {token.balance.toString()}
+                        {toEGLD(token.token, token.balance.toString()).toFixed(5)}
                     </div>
                 </div>
             ))}
