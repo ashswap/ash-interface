@@ -2,6 +2,7 @@ name: Build docker
 
 on:
   push:
+    tags:
 
 jobs:
   build:
