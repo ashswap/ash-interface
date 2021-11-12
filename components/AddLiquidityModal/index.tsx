@@ -3,7 +3,8 @@ import {
     ContractFunction,
     GasLimit,
     TokenIdentifierValue,
-    BigUIntValue
+    BigUIntValue,
+    AddressValue
 } from "@elrondnetwork/erdjs";
 import BigNumber from "bignumber.js";
 import Button from "components/Button";
@@ -41,34 +42,25 @@ const AddLiquidityModal = (props: Props) => {
         }
     }, [props.open]);
 
-    const deposit = useCallback(
-        async (token: IToken, value: BigNumber) => {
-            if (value.lte(0)) {
-                return;
-            }
-
-            await callContract(new Address(props.pool.address), {
-                func: new ContractFunction("ESDTTransfer"),
-                gasLimit: new GasLimit(gasLimit),
-                args: [
-                    new TokenIdentifierValue(Buffer.from(token.id)),
-                    new BigUIntValue(value),
-                    new TokenIdentifierValue(Buffer.from("acceptEsdtPayment"))
-                ]
-            });
-        },
-        [provider]
-    );
-
     const addLP = useCallback(async () => {
-        let tx = await callContract(new Address(props.pool.address), {
-            func: new ContractFunction("addLiquidity"),
+        let tx = await callContract(new Address(provider?.account.address), {
+            func: new ContractFunction("MultiESDTNFTTransfer"),
             gasLimit: new GasLimit(gasLimit),
             args: [
+                new AddressValue(new Address(props.pool.address)),
+                new BigUIntValue(new BigNumber(2)),
+
+                new TokenIdentifierValue(Buffer.from(props.pool.tokens[0].id)),
+                new BigUIntValue(new BigNumber(0)),
                 new BigUIntValue(toWei(props.pool.tokens[0], value0)),
-                new BigUIntValue(toWei(props.pool.tokens[1], value0)),
+
+                new TokenIdentifierValue(Buffer.from(props.pool.tokens[1].id)),
+                new BigUIntValue(new BigNumber(0)),
+                new BigUIntValue(toWei(props.pool.tokens[1], value1)),
+
+                new TokenIdentifierValue(Buffer.from("addLiquidity")),
                 new BigUIntValue(toWei(props.pool.tokens[0], value0)),
-                new BigUIntValue(toWei(props.pool.tokens[1], value0))
+                new BigUIntValue(toWei(props.pool.tokens[1], value1)),
             ]
         });
 
@@ -139,17 +131,6 @@ const AddLiquidityModal = (props: Props) => {
                                 value={value0}
                                 onChange={e => setValue0(e.target.value)}
                             />
-                            <IconButton
-                                icon={<IconRight />}
-                                className="bg-ash-dark-700"
-                                style={{ paddingTop: 12 }}
-                                onClick={() =>
-                                    deposit(
-                                        props.pool.tokens[0],
-                                        toWei(props.pool.tokens[0], value0)
-                                    )
-                                }
-                            />
                         </div>
                         <div className="bg-bg py-2 text-sm text-text-input-3 text-right">
                             <span>Balance: </span>
@@ -185,17 +166,6 @@ const AddLiquidityModal = (props: Props) => {
                                 textClassName="text-lg"
                                 value={value1}
                                 onChange={e => setValue1(e.target.value)}
-                            />
-                            <IconButton
-                                icon={<IconRight />}
-                                className="bg-ash-dark-700"
-                                style={{ paddingTop: 12 }}
-                                onClick={() =>
-                                    deposit(
-                                        props.pool.tokens[1],
-                                        toWei(props.pool.tokens[1], value1)
-                                    )
-                                }
                             />
                         </div>
                         <div className="bg-bg py-2 text-sm text-text-input-3 text-right">

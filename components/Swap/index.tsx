@@ -24,7 +24,8 @@ import {
     Query,
     TokenIdentifierValue,
     BigUIntValue,
-    GasLimit
+    GasLimit,
+    AddressValue
 } from "@elrondnetwork/erdjs";
 import BigNumber from "bignumber.js";
 import { notification } from "antd";
@@ -108,6 +109,7 @@ const Swap = () => {
     }, [tokenFrom, tokenTo]);
 
     const swap = useCallback(async () => {
+        console.log(new AddressValue(new Address("erd1qqqqqqqqqqqqqpgq8duuqkxu5zmd6n8qrnmsqv3sayt7dc3nj9ts97ddum")));
         if (!provider || !tokenFrom || !tokenTo) {
             return;
         }
