@@ -34,10 +34,10 @@ import { toWei } from "helper/balance";
 const Swap = () => {
     const [showSetting, setShowSetting] = useState<boolean>(false);
 
-    const [tokenFrom, setTokenFrom] = useState<IToken | undefined>(undefined);
+    const [tokenFrom, _setTokenFrom] = useState<IToken | undefined>(undefined);
     const [valueFrom, setValueFrom] = useState<string>("");
 
-    const [tokenTo, setTokenTo] = useState<IToken | undefined>(undefined);
+    const [tokenTo, _setTokenTo] = useState<IToken | undefined>(undefined);
     const [valueTo, setValueTo] = useState<string>("");
 
     const [pool, setPool] = useState<IPool | undefined>(undefined);
@@ -55,14 +55,31 @@ const Swap = () => {
         setTokenTo(tokenFrom);
     };
 
+    const setTokenFrom = useCallback(
+        (t: IToken | undefined) => {
+            _setTokenFrom(t);
+            fetchBalances();
+        },
+        [fetchBalances]
+    );
+
+    const setTokenTo = useCallback(
+        (t: IToken | undefined) => {
+            _setTokenTo(t);
+            fetchBalances();
+        },
+        [fetchBalances]
+    );
+
     const rawValueFrom = useMemo(() => {
         if (!valueFrom || !tokenFrom) {
             return new BigNumber(0);
         }
 
-        return toWei(tokenFrom, valueFrom)
+        return toWei(tokenFrom, valueFrom);
     }, [valueFrom, tokenFrom]);
 
+    // calculate amount out
     useEffect(() => {
         if (!pool || !tokenFrom || !tokenTo || !valueFrom) {
             return;
@@ -94,6 +111,7 @@ const Swap = () => {
             });
     }, [valueFrom, tokenFrom, tokenTo, provider, pool, proxy, rawValueFrom]);
 
+    // find pools
     useEffect(() => {
         if (!tokenFrom || !tokenTo) {
             return;
@@ -141,7 +159,17 @@ const Swap = () => {
                     "_blank"
                 )
         });
-    }, [provider, pool, rawValueFrom, callContract, tokenFrom, tokenTo, fetchBalances, valueFrom, valueTo]);
+    }, [
+        provider,
+        pool,
+        rawValueFrom,
+        callContract,
+        tokenFrom,
+        tokenTo,
+        fetchBalances,
+        valueFrom,
+        valueTo
+    ]);
 
     return (
         <div className="flex flex-col items-center pt-3.5">
