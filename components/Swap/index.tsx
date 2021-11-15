@@ -174,11 +174,11 @@ const Swap = () => {
     return (
         <div className="flex flex-col items-center pt-3.5">
             <Panel>
-                <PanelContent>
+                <PanelContent style={{paddingRight: 48}}>
                     <div className={styles.fire}>
                         <Image src={Fire} width={151} height={230} alt="Ash" />
                     </div>
-                    <div className="flex flex-row justify-between px-4">
+                    <div className="flex flex-row justify-between pl-4">
                         <div className="font-bold text-2xl">Swap</div>
                         <div className="flex flex-row gap-2">
                             <IconButton icon={<Clock />} />

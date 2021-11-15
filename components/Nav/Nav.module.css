@@ -1,5 +1,5 @@
 .container {
-    @apply flex flex-row justify-center select-none text-xs text-black dark:text-white font-medium;
+    @apply flex flex-row justify-center select-none text-xs font-medium;
 }
 
 .container > .btn {

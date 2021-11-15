@@ -11,7 +11,7 @@
 
 .addressMenu {
     @apply bg-ash-dark-600;
-    width: 214px;
+    width: 160px;
 }
 
 .addressMenuItem, .addressMenuItem:hover {

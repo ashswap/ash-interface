@@ -16,11 +16,12 @@ const PoolBanner = () => {
     }
 
     return (
-        <Panel className="h-full mb-12" dark="650">
+        <Panel className="h-full mb-12" dark="600">
             <PanelContent className={styles.content}>
-                <div className="absolute top-4 right-4 z-40">
+                <div className="absolute top-0 right-0 z-40">
                     <IconButton
                         icon={<IconClose />}
+                        iconSize="small"
                         className="bg-ash-dark-700"
                         onClick={() => setShow(false)}
                     />
@@ -66,7 +67,7 @@ const PoolBanner = () => {
                         leftIcon={<IconNext />}
                         bottomRightCorner
                         primaryColor="dark-700"
-                        style={{ height: 64, marginLeft: 120 }}
+                        style={{ height: 64, marginLeft: 75 }}
                         className="z-50"
                         textClassName="text-xs"
                     >

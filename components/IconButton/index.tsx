@@ -3,6 +3,7 @@ import styles from "./IconButton.module.css";
 
 interface Props {
     icon?: ReactElement;
+    iconSize?: "small" | "big";
     activeIcon?: ReactElement;
     onClick?: () => void;
     active?: boolean;
@@ -14,7 +15,7 @@ const IconButton = (props: Props) => {
     return (
         <div
             className={`${styles.container} ${props.className ||
-                "bg-bg"} ${props.active || ""}`}
+                "bg-bg"} ${props.active || ""} ${props.iconSize === 'small' ? styles.iconSmall : styles.iconBig }`}
             onClick={props.onClick}
             style={props.style}
         >

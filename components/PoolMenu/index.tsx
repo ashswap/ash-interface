@@ -10,7 +10,7 @@ const PoolMenu = () => {
     ]);
 
     return (
-        <div className={styles.container}>
+        <div className={`${styles.container} text-black dark:text-text-input-3`}>
             <div
                 className={`${styles.btn} ${
                     !isActive("my-pool") ? styles.active : ""

@@ -16,7 +16,7 @@ interface Props {
 }
 
 const ListPool = (props: Props) => {
-    const { provider, balances } = useWallet();
+    const { balances } = useWallet();
     const router = useRouter();
     const poolType = router.query["type"];
 

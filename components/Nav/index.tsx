@@ -11,7 +11,7 @@ const Nav = () => {
     ]);
 
     return (
-        <div className={styles.container}>
+        <div className={`${styles.container} text-black dark:text-white`}>
             <Link href="/swap" passHref>
                 <div
                     className={`${styles.btn} ${

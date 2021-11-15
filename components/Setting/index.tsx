@@ -15,7 +15,11 @@ const Setting = (props: Props) => {
     return (
         <div className={styles.container}>
             <div className="absolute top-4 right-4">
-                <IconButton icon={<IconClose />} onClick={props.onClose} />
+                <IconButton
+                    icon={<IconClose />}
+                    iconSize="small"
+                    onClick={props.onClose}
+                />
             </div>
             <div className="font-bold text-lg">Setting</div>
             <div className="font-normal text-xs mt-14">Slippage Tolerance</div>

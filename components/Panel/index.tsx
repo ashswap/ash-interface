@@ -1,3 +1,4 @@
+import { CSSProperties } from "react";
 import styles from "./Panel.module.css";
 
 interface Props {
@@ -6,6 +7,7 @@ interface Props {
     topLeftCorner?: boolean;
     topRightCorner?: boolean;
     dark?: "600" | "650" | "700";
+    style?: CSSProperties | undefined;
 }
 
 const Panel = (props: Props) => {
@@ -38,7 +40,7 @@ const Panel = (props: Props) => {
 
 export const PanelContent = (props: Props) => {
     return (
-        <div className={`${styles.content} ${props.className || ""}`}>
+        <div className={`${styles.content} ${props.className || ""}`} style={props.style}>
             {props.children}
         </div>
     );

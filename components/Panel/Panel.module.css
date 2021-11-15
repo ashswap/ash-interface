@@ -2,6 +2,7 @@
     @apply relative;
 
     padding-left: 16px;
+    padding-top: 16px;
 
     background-repeat: no-repeat;
     background-size: calc(100% - 16px) calc(100% - 16px);
@@ -24,12 +25,12 @@
 }
 
 .content {
-    @apply relative text-white py-11 pl-8 pr-12;
+    @apply relative text-white;
     width: 460px;
+    padding: 30px 32px;
 }
 
 .dark700 .topLeftCorner {
-    border-right: theme("colors.ash-dark.600") 16px solid;
     background: linear-gradient(
                 to right,
                 theme("colors.ash-dark.600") 18px,
@@ -42,6 +43,8 @@
                 transparent 18px
             )
             100% 0;
+    background-repeat: no-repeat;
+    background-size: calc(100% - 16px) calc(100% - 16px);
 }
 
 .dark700 .topRightCorner {
@@ -52,6 +55,8 @@
             transparent 18px
         )
         100% 0;
+    background-repeat: no-repeat;
+    background-size: calc(100% - 16px) calc(100% - 16px);
 }
 
 .dark700 .content {
@@ -59,29 +64,31 @@
 }
 
 .dark600 .topLeftCorner {
-    border-right: theme("colors.bg") 16px solid;
+    border-right: theme("colors.ash-dark.600") 16px solid;
     background: linear-gradient(
                 to right,
-                theme("colors.bg") 18px,
+                theme("colors.ash-dark.600") 18px,
                 transparent 18px
             )
             0 100%,
-        linear-gradient(to bottom, theme("colors.bg") 18px, transparent 18px)
+        linear-gradient(to bottom, theme("colors.ash-dark.600") 18px, transparent 18px)
             100% 0;
+    background-repeat: no-repeat;
+    background-size: calc(100% - 16px) calc(100% - 16px);
 }
 
 .dark600 .topRightCorner {
-    border-left: theme("colors.bg") 16px solid;
+    border-left: theme("colors.ash-dark.600") 16px solid;
     background: linear-gradient(
             to left,
-            theme("colors.bg") 18px,
+            theme("colors.ash-dark.600") 18px,
             transparent 18px
         )
         100% 0;
 }
 
 .dark600 .content {
-    @apply bg-bg;
+    @apply bg-ash-dark-600;
 }
 
 .dark650 .topLeftCorner {
@@ -92,12 +99,10 @@
                 transparent 18px
             )
             0 100%,
-        linear-gradient(
-                to bottom,
-                theme("colors.bg") 18px,
-                transparent 18px
-            )
+        linear-gradient(to bottom, theme("colors.bg") 18px, transparent 18px)
             100% 0;
+    background-repeat: no-repeat;
+    background-size: calc(100% - 16px) calc(100% - 16px);
 }
 
 .dark650 .topRightCorner {
@@ -108,6 +113,8 @@
             transparent 18px
         )
         100% 0;
+    background-repeat: no-repeat;
+    background-size: calc(100% - 16px) calc(100% - 16px);
 }
 
 .dark650 .content {

@@ -66,6 +66,7 @@ const AppBar = () => {
                                 alt="avatar"
                             />
                         }
+                        style={{width: 160}}
                     >
                         <span className={styles.address}>
                             {provider?.account.address.slice(0, 4) +

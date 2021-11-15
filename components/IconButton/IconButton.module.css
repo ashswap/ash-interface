@@ -1,12 +1,17 @@
 .container {
-    @apply cursor-pointer select-none text-white;
+    @apply cursor-pointer select-none text-white flex items-center justify-center;
 
     width: 40px;
     height: 40px;
     padding: 8px;
 }
 
-.container > svg {
+.container.iconSmall svg {
+    width: 10px;
+    height: 10px;
+}
+
+.container.iconBig svg {
     width: 24px;
     height: 24px;
 }
