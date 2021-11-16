@@ -200,7 +200,7 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
             open={open}
             onClose={onClose}
             contentClassName={styles.content}
-            dark="600"
+            dark="650"
         >
             <div className="flex flex-row items-center mb-3">
                 <div className="mr-3">

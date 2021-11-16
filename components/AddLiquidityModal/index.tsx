@@ -87,7 +87,7 @@ const AddLiquidityModal = ({open, onClose, pool}: Props) => {
             open={open}
             onClose={onClose}
             contentClassName={styles.content}
-            dark="600"
+            dark="650"
         >
             <div className="flex flex-row justify-between items-center w-1/3">
                 <div>

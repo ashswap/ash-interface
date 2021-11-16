@@ -7,7 +7,7 @@ interface Props {
     onClose?: () => void;
     children?: any;
     contentClassName?: string | undefined;
-    dark?: "700" | "600";
+    dark?: "600" | "650" | "700";
 }
 
 const Modal = (props: Props) => {
