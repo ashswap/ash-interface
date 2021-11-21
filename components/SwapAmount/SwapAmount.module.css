@@ -1,6 +1,7 @@
 .topLeftCorner {
     @apply relative;
 
+    transition: none !important;
     margin: 4px 0;
 
     border-right: theme("colors.bg") 10px solid;
@@ -40,6 +41,12 @@
     background-size: calc(100% - 10px) calc(100% - 10px);
 }
 
+.content,
+.quickSelectContainer,
+.balanceContainer {
+    transition: none !important;
+}
+
 .topLeftCorner:hover .content,
 .topLeftCorner:hover .quickSelectContainer,
 .topLeftCorner:hover .balanceContainer {
@@ -49,6 +56,7 @@
 .bottomRightCorner {
     @apply relative;
 
+    transition: none !important;
     margin: 4px 0;
 
     border-left: theme("colors.bg") 10px solid;

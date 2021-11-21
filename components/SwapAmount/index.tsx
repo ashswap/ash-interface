@@ -65,7 +65,7 @@ const SwapAmount = (props: Props) => {
                   .toFixed(3)
                   .toString()
             : "0";
-    }, [props.token]);
+    }, [props.token, balances]);
 
     return (
         <div
