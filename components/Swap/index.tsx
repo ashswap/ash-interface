@@ -174,7 +174,7 @@ const Swap = () => {
     return (
         <div className="flex flex-col items-center pt-3.5">
             <Panel>
-                <PanelContent style={{paddingRight: 48}}>
+                <PanelContent style={{paddingRight: showSetting ? 48 : 30}}>
                     <div className={styles.fire}>
                         <Image src={Fire} width={151} height={230} alt="Ash" />
                     </div>

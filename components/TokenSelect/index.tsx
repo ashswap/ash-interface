@@ -49,8 +49,10 @@ const TokenSelect = ({
             if (Object.prototype.hasOwnProperty.call(tokens, tokenId)) {
                 const tokenBalance: TokenBalance = {
                     token: tokens[tokenId],
-                    balance: balances[tokenId] ? balances[tokenId].balance : new BigNumber(0),
-                }
+                    balance: balances[tokenId]
+                        ? balances[tokenId].balance
+                        : new BigNumber(0)
+                };
 
                 tokenBalances.push(tokenBalance);
             }
@@ -104,8 +106,10 @@ const TokenSelect = ({
         <>
             <div
                 className={
-                    "flex flex-row items-center justify-between text-sm font-bold w-44 cursor-pointer select-none p-4 rounded-xl text-pink-600 " +
-                    (value ? "bg-ash-dark-600" : "bg-bg-select")
+                    `flex flex-row items-center justify-between text-sm font-bold w-44 cursor-pointer select-none p-4 rounded-xl text-pink-600 ` +
+                    (value
+                        ? "bg-ash-dark-600"
+                        : `bg-bg-select hover:bg-bg-select-hover ${styles.containerHover}`)
                 }
                 onClick={() => setOpen(true)}
             >
@@ -138,7 +142,7 @@ const TokenSelect = ({
                         value={keyword}
                         onChange={e => onChangeKeyword(e.target.value)}
                         textClassName="text-sm"
-                        className="w-full"
+                        className="flex-1"
                     />
                 </div>
                 <div className="font-normal text-xs text-white ml-2">

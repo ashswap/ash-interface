@@ -37,6 +37,7 @@ a {
 
 * {
     box-sizing: border-box;
+    transition: all 0.3s ease;
 }
 
 /* Chrome, Safari, Edge, Opera */
@@ -61,16 +62,18 @@ input[type="number"] {
     border-radius: 0;
     height: 7px;
     width: 7px;
-    transform: translateX(-50%) rotate(45deg)!important;
+    transform: translateX(-50%) rotate(45deg) !important;
     margin-top: -2px;
 }
 
-.ash-slider .ant-slider-track, .ash-slider:hover .ant-slider-track {
+.ash-slider .ant-slider-track,
+.ash-slider:hover .ant-slider-track {
     @apply bg-slider-track;
     height: 2px;
 }
 
-.ash-slider .ant-slider-dot, .ash-slider .ant-slider-dot-active {
+.ash-slider .ant-slider-dot,
+.ash-slider .ant-slider-dot-active {
     @apply bg-bg border-slider-track;
     border-radius: 0;
     width: 7px;
@@ -78,4 +81,8 @@ input[type="number"] {
     transform: rotate(45deg);
     border-width: 2px;
     border-style: solid;
+}
+
+.ant-dropdown {
+    transform: translateY(-10px);
 }

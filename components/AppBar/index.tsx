@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import Button from "components/Button";
@@ -13,7 +14,15 @@ import { Dropdown, Menu, Button as AntdButton } from "antd";
 import styles from "./AppBar.module.css";
 
 const AppBar = () => {
-    const { provider, connectExtension } = useWallet();
+    const { provider, connectExtension, disconnectExtension } = useWallet();
+
+    const copyAddress = useCallback(() => {
+        if (!provider) {
+            return;
+        }
+
+        navigator.clipboard.writeText(provider.account.address);
+    }, [provider]);
 
     const menu = (
         <Menu className={styles.addressMenu}>
@@ -21,6 +30,7 @@ const AppBar = () => {
                 key="1"
                 className={styles.addressMenuItem}
                 icon={<IconCopy />}
+                onClick={copyAddress}
             >
                 Copy address
             </Menu.Item>
@@ -35,6 +45,7 @@ const AppBar = () => {
                 key="3"
                 className={styles.addressMenuItem}
                 icon={<IconDisconnect />}
+                onClick={disconnectExtension}
             >
                 Disconnect wallet
             </Menu.Item>
@@ -56,7 +67,11 @@ const AppBar = () => {
             <Nav />
 
             {provider && provider?.account ? (
-                <Dropdown overlay={menu} className={styles.connect}>
+                <Dropdown
+                    overlay={menu}
+                    className={styles.connect}
+                    trigger={["click"]}
+                >
                     <AntdButton
                         icon={
                             <Image
@@ -66,7 +81,7 @@ const AppBar = () => {
                                 alt="avatar"
                             />
                         }
-                        style={{width: 160}}
+                        style={{ width: 160 }}
                     >
                         <span className={styles.address}>
                             {provider?.account.address.slice(0, 4) +

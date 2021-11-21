@@ -22,6 +22,7 @@ const Panel = (props: Props) => {
                     ? styles.dark650
                     : styles.dark600
             } ${props.className || ""}`}
+            style={props.style}
         >
             <div
                 className={

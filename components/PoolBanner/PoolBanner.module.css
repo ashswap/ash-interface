@@ -27,5 +27,5 @@
 
 .blurValue{
     @apply font-bold text-2xl;
-    margin-top: 50px;
+    margin-top: 25px;
 }

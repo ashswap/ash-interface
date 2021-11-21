@@ -3,7 +3,6 @@ import QuickSelect from "components/QuickSelect";
 import TokenSelect from "components/TokenSelect";
 import pools from "const/pool";
 import { useWallet } from "context/wallet";
-import IPool from "interface/pool";
 import { IToken } from "interface/token";
 import { useMemo } from "react";
 import styles from "./SwapAmount.module.css";
@@ -20,7 +19,7 @@ interface Props {
     children?: any;
     type: "from" | "to";
     poolWithToken?: IToken;
-    resetPivotToken: () => any
+    resetPivotToken: () => any;
 }
 
 const SwapAmount = (props: Props) => {
@@ -55,6 +54,19 @@ const SwapAmount = (props: Props) => {
         return tokens;
     }, [validPools, props.poolWithToken]);
 
+    const balance = useMemo(() => {
+        if (!props.token) {
+            return "0";
+        }
+
+        return balances[props.token.id]
+            ? balances[props.token.id].balance
+                  .div(new BigNumber(10).exponentiatedBy(props.token.decimals))
+                  .toFixed(3)
+                  .toString()
+            : "0";
+    }, [props.token]);
+
     return (
         <div
             className={
@@ -65,7 +77,9 @@ const SwapAmount = (props: Props) => {
                     : ""
             }
         >
-            <div className="bg-bg flex flex-row px-2.5 pt-3.5 pb-5.5">
+            <div
+                className={`bg-bg flex flex-row px-2.5 pt-3.5 pb-5.5 ${styles.content}`}
+            >
                 <TokenSelect
                     modalTitle={props.type === "from" ? "Swap from" : "Swap to"}
                     value={props.token}
@@ -89,25 +103,27 @@ const SwapAmount = (props: Props) => {
             </div>
             {props.showQuickSelect && (
                 <QuickSelect
+                    className={styles.quickSelectContainer}
                     tokens={suggestedTokens}
                     onChange={onSelectToken}
                 />
             )}
             {props.token && (
-                <div className="bg-bg px-2.5 pb-3.5 text-sm text-text-input-3">
+                <div
+                    className={`${styles.balanceContainer} bg-bg px-2.5 pb-3.5 text-sm text-text-input-3`}
+                >
                     <span>Balance: </span>
-                    <span className="text-earn">
-                        {balances[props.token.id]
-                            ? balances[props.token.id].balance
-                                  .div(
-                                      new BigNumber(10).exponentiatedBy(
-                                          props.token.decimals
-                                      )
-                                  )
-                                  .toFixed(3)
-                                  .toString()
-                            : "0"}{" "}
-                        {props.token.name}
+                    <span
+                        className={`text-earn ${
+                            balances[props.token.id] && props.type === 'from'
+                                ? "select-none cursor-pointer"
+                                : ""
+                        }`}
+                        onClick={() => {
+                            props.type === 'from' && props.onChangeValue && props.onChangeValue(balance);
+                        }}
+                    >
+                        {balance} {props.token.name}
                     </span>
                 </div>
             )}

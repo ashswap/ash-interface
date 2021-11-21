@@ -1,11 +1,20 @@
-.corner{
+.corner {
     @apply relative;
 
-    border-right: theme('colors.ash-dark.600') 16px solid;
+    border-right: theme("colors.ash-dark.600") 16px solid;
     padding-left: 16px;
-    background:
-        linear-gradient(to right, theme('colors.ash-dark.600') 18px, transparent 18px) 0 100%,
-        linear-gradient(to bottom, theme('colors.ash-dark.600') 18px, transparent 18px) 100% 0;
+    background: linear-gradient(
+                to right,
+                theme("colors.ash-dark.600") 18px,
+                transparent 18px
+            )
+            0 100%,
+        linear-gradient(
+                to bottom,
+                theme("colors.ash-dark.600") 18px,
+                transparent 18px
+            )
+            100% 0;
 
     background-repeat: no-repeat;
     background-size: calc(100% - 16px) calc(100% - 16px);
@@ -14,22 +23,25 @@
     flex-direction: row;
 }
 
-.container{
+.container {
     @apply relative bg-ash-dark-600 text-white py-11 pl-8 pr-12;
-    width: 460px
+    width: 460px;
 }
 
-
-.fire{
+.fire {
     @apply absolute z-10;
 
     left: -85px;
     top: -70px;
 }
 
-.revert{
+.revert {
     @apply absolute w-7 h-7 rounded-lg bg-ash-dark-600 flex items-center justify-center cursor-pointer select-none z-10;
     left: 50%;
     bottom: -10px;
     transform: translateX(-50%) translateY(50%);
+}
+
+.revert:hover {
+    background-color: #292540;
 }

@@ -1,18 +1,49 @@
-.topLeftCorner{
+.topLeftCorner {
     @apply relative;
 
     margin: 4px 0;
 
-    border-right: theme('colors.bg') 10px solid;
-    border-bottom: theme('colors.bg') 10px solid;
+    border-right: theme("colors.bg") 10px solid;
+    border-bottom: theme("colors.bg") 10px solid;
     padding-left: 10px;
     padding-top: 10px;
-    background:
-        linear-gradient(to right, theme('colors.bg') 12px, transparent 12px) 0 100%,
-        linear-gradient(to bottom, theme('colors.bg') 12px, transparent 12px) 100% 0;
+    background: linear-gradient(
+                to right,
+                theme("colors.bg") 12px,
+                transparent 12px
+            )
+            0 100%,
+        linear-gradient(to bottom, theme("colors.bg") 12px, transparent 12px)
+            100% 0;
 
     background-repeat: no-repeat;
     background-size: calc(100% - 10px) calc(100% - 10px);
+}
+
+.topLeftCorner:hover {
+    border-right: theme("colors.bg-hover") 10px solid;
+    border-bottom: theme("colors.bg-hover") 10px solid;
+    background: linear-gradient(
+                to right,
+                theme("colors.bg-hover") 12px,
+                transparent 12px
+            )
+            0 100%,
+        linear-gradient(
+                to bottom,
+                theme("colors.bg-hover") 12px,
+                transparent 12px
+            )
+            100% 0;
+
+    background-repeat: no-repeat;
+    background-size: calc(100% - 10px) calc(100% - 10px);
+}
+
+.topLeftCorner:hover .content,
+.topLeftCorner:hover .quickSelectContainer,
+.topLeftCorner:hover .balanceContainer {
+    @apply bg-bg-hover;
 }
 
 .bottomRightCorner {
@@ -20,16 +51,45 @@
 
     margin: 4px 0;
 
-    border-left: theme('colors.bg') 10px solid;
-    border-top: theme('colors.bg') 10px solid;
+    border-left: theme("colors.bg") 10px solid;
+    border-top: theme("colors.bg") 10px solid;
     padding-right: 10px;
     padding-bottom: 10px;
-    background:
-        linear-gradient(to left, theme('colors.bg') 12px, transparent 12px) 100% 0,
-        linear-gradient(to top, theme('colors.bg') 12px, transparent 12px) 0 100%;
+    background: linear-gradient(
+                to left,
+                theme("colors.bg") 12px,
+                transparent 12px
+            )
+            100% 0,
+        linear-gradient(to top, theme("colors.bg") 12px, transparent 12px) 0
+            100%;
 
     background-repeat: no-repeat;
     background-size: calc(100% - 10px) calc(100% - 10px);
+}
+
+.bottomRightCorner:hover {
+    border-left: theme("colors.bg-hover") 10px solid;
+    border-top: theme("colors.bg-hover") 10px solid;
+    padding-right: 10px;
+    padding-bottom: 10px;
+    background: linear-gradient(
+                to left,
+                theme("colors.bg-hover") 12px,
+                transparent 12px
+            )
+            100% 0,
+        linear-gradient(to top, theme("colors.bg-hover") 12px, transparent 12px)
+            0 100%;
+
+    background-repeat: no-repeat;
+    background-size: calc(100% - 10px) calc(100% - 10px);
+}
+
+.bottomRightCorner:hover .content,
+.bottomRightCorner:hover .quickSelectContainer,
+.bottomRightCorner:hover .balanceContainer {
+    @apply bg-bg-hover;
 }
 
 .input {
@@ -37,6 +97,9 @@
     max-width: 50%;
 }
 
-.input::placeholder, .input::-webkit-input-placeholder, .input::-moz-placeholder, .input::-ms-input-placeholder {
+.input::placeholder,
+.input::-webkit-input-placeholder,
+.input::-moz-placeholder,
+.input::-ms-input-placeholder {
     @apply font-normal;
 }

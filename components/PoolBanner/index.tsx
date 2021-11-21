@@ -47,9 +47,9 @@ const PoolBanner = () => {
                 <div className={`${styles.blur}`}>
                     <Image src={Blur} width={426} height={257} alt="blur" />
                     <div className={styles.blurContent}>
-                        <div className="flex flex-row">
+                        <div className="flex flex-row items-center">
                             <div className="text-lg font-bold text-white opacity-70 mr-8">
-                                Your total bounty
+                                Farm bounty
                             </div>
                             <Button
                                 bottomRightCorner
@@ -60,7 +60,8 @@ const PoolBanner = () => {
                             </Button>
                         </div>
                         <div className={styles.blurValue}>
-                            <span>00.00 ELGD</span>
+                            <div>FARM IS ARRIVING</div>
+                            <div>IN 2022</div>
                         </div>
                     </div>
                     <Button

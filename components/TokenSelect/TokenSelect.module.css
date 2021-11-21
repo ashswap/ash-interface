@@ -1,4 +1,8 @@
-.listToken{
+.container:hover {
+    box-shadow: 0px 4px 30px rgba(255, 0, 92, 0.4);
+}
+
+.listToken {
     max-height: calc(100vh - 290px);
     overflow: auto;
 }

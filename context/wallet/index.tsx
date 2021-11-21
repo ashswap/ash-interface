@@ -34,6 +34,7 @@ export interface State {
     apiProvider: ApiProvider;
     slippage: number;
     connectExtension: () => void;
+    disconnectExtension: () => void;
     setSlippage: (slippage: number) => void;
     fetchBalances: () => void;
     callContract: (addr: Address, arg: CallArguments) => Promise<Transaction>;
@@ -51,6 +52,7 @@ export const initState: State = {
     proxy: new ProxyProvider(network.gatewayAddress, { timeout: 10000 }),
     apiProvider: new ApiProvider(network.apiAddress, { timeout: 10000 }),
     connectExtension: () => {},
+    disconnectExtension: () => {},
     setSlippage: () => {},
     fetchBalances: () => {},
     callContract: (addr: Address, arg: CallArguments) =>
@@ -215,11 +217,16 @@ export function WalletProvider({ children }: Props) {
                 gasLimit: new GasLimit(gasLimit),
                 version: tx.getVersion()
             });
-
+            
             return await provider?.sendTransaction(tx);
         },
         [provider]
     );
+
+    const disconnectExtension = useCallback(() => {
+        provider?.logout();
+        setProvider(undefined);
+    }, [provider])
 
     const value: State = {
         ...initState,
@@ -229,6 +236,7 @@ export function WalletProvider({ children }: Props) {
         slippage,
         setSlippage,
         connectExtension,
+        disconnectExtension,
         fetchBalances,
         callContract
     };

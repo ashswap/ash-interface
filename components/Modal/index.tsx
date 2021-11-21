@@ -21,7 +21,7 @@ const Modal = (props: Props) => {
                 className="absolute left-0 top-0 right-0 bottom-0"
                 onClick={props.onClose}
             />
-            <Panel className="h-full" dark={props.dark}>
+            <Panel dark={props.dark} style={{marginTop: 100}}>
                 <PanelContent className={props.contentClassName}>
                     <div className="absolute top-4 right-4">
                         <IconButton

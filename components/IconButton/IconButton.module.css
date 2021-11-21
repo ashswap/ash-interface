@@ -6,6 +6,14 @@
     padding: 8px;
 }
 
+.container:hover {
+    background-color: #292540;
+}
+
+.container:active {
+    @apply bg-bg;
+}
+
 .container.iconSmall svg {
     width: 10px;
     height: 10px;

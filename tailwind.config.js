@@ -8,13 +8,15 @@ module.exports = {
             },
             colors: {
                 "bg": "#191629",
+                "bg-hover": "#211D36",
                 "bg-overlay": "#7B61FF",
                 "ash-dark": {
                     500: "#212036",
                     600: "#12101D",
                     700: "#0D0B15",
                 },
-                "bg-select": "rgba(238, 54, 76, 0.2)",
+                "bg-select": "rgba(255, 0, 92, 0.2)",
+                "bg-select-hover": "rgba(255, 0, 92, 0.4)",
                 "text-input": {
                     1: "#74738e",
                     2: "#8C8A94",
