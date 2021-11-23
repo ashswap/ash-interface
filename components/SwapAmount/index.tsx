@@ -1,10 +1,10 @@
+import { useMemo, useEffect } from "react";
 import BigNumber from "bignumber.js";
 import QuickSelect from "components/QuickSelect";
 import TokenSelect from "components/TokenSelect";
 import pools from "const/pool";
 import { useWallet } from "context/wallet";
 import { IToken } from "interface/token";
-import { useMemo } from "react";
 import styles from "./SwapAmount.module.css";
 
 interface Props {
@@ -67,16 +67,30 @@ const SwapAmount = (props: Props) => {
             : "0";
     }, [props.token, balances]);
 
+    const isInsufficentFund = useMemo(() => {
+        return new BigNumber(balance).lt(new BigNumber(props.value));
+    }, [balance, props.value]);
+
     return (
         <div
-            className={
+            className={`${
                 props.topLeftCorner
                     ? styles.topLeftCorner
                     : props.bottomRightCorner
                     ? styles.bottomRightCorner
                     : ""
-            }
+            } ${"relative"}`}
         >
+            {props.type === "from" && isInsufficentFund && (
+                <>
+                    <div className={styles.insufficentFundBorderTop} />
+                    <div className={styles.insufficentFundBorderRight} />
+                    <div className={styles.insufficentFundBorderBottom} />
+                    <div className={styles.insufficentFundBorderLeft} />
+                    <div className={styles.insufficentFundBorderCorner1} />
+                    <div className={styles.insufficentFundBorderCorner2} />
+                </>
+            )}
             <div
                 className={`bg-bg flex flex-row px-2.5 pt-3.5 pb-5.5 ${styles.content}`}
             >
@@ -95,6 +109,12 @@ const SwapAmount = (props: Props) => {
                     disabled={props.disableInput}
                     placeholder="0.00"
                     value={props.value}
+                    style={{
+                        color:
+                            props.type === "from" && isInsufficentFund
+                                ? "#7B61FF"
+                                : undefined
+                    }}
                     onChange={e =>
                         props.onChangeValue &&
                         props.onChangeValue(e.target.value)
@@ -115,12 +135,14 @@ const SwapAmount = (props: Props) => {
                     <span>Balance: </span>
                     <span
                         className={`text-earn ${
-                            balances[props.token.id] && props.type === 'from'
+                            balances[props.token.id] && props.type === "from"
                                 ? "select-none cursor-pointer"
                                 : ""
                         }`}
                         onClick={() => {
-                            props.type === 'from' && props.onChangeValue && props.onChangeValue(balance);
+                            props.type === "from" &&
+                                props.onChangeValue &&
+                                props.onChangeValue(balance);
                         }}
                     >
                         {balance} {props.token.name}

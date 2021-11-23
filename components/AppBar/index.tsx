@@ -100,6 +100,7 @@ const AppBar = () => {
                     leftIcon={<Wallet />}
                     bottomRightCorner
                     onClick={connectExtension}
+                    glowOnHover
                 >
                     Connect wallet
                 </Button>

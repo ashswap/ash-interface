@@ -17,6 +17,22 @@
     cursor: pointer;
 }
 
+.bottomRightCorner:active {
+    border-left: theme("colors.pink.800") 4px solid;
+    border-top: theme("colors.pink.800") 4px solid;
+    background: linear-gradient(
+                to left,
+                theme("colors.pink.800") 5px,
+                transparent 5px
+            )
+            100% 0,
+        linear-gradient(to top, theme("colors.pink.800") 5px, transparent 5px) 0
+            100%;
+
+    background-repeat: no-repeat;
+    background-size: calc(100% - 4px) calc(100% - 4px);
+}
+
 .disable .bottomRightCorner {
     border-left: theme("colors.ash-dark.500") 4px solid;
     border-top: theme("colors.ash-dark.500") 4px solid;
@@ -49,7 +65,12 @@
 .dark .bottomRightCorner {
     border-left: theme("colors.bg") 4px solid;
     border-top: theme("colors.bg") 4px solid;
-    background: linear-gradient(to left, theme("colors.bg") 5px, transparent 5px) 100% 0,
+    background: linear-gradient(
+                to left,
+                theme("colors.bg") 5px,
+                transparent 5px
+            )
+            100% 0,
         linear-gradient(to top, theme("colors.bg") 5px, transparent 5px) 0 100%;
 
     background-repeat: no-repeat;
@@ -59,8 +80,18 @@
 .dark600 .bottomRightCorner {
     border-left: theme("colors.ash-dark.600") 4px solid;
     border-top: theme("colors.ash-dark.600") 4px solid;
-    background: linear-gradient(to left, theme("colors.ash-dark.600") 5px, transparent 5px) 100% 0,
-        linear-gradient(to top, theme("colors.ash-dark.600") 5px, transparent 5px) 0 100%;
+    background: linear-gradient(
+                to left,
+                theme("colors.ash-dark.600") 5px,
+                transparent 5px
+            )
+            100% 0,
+        linear-gradient(
+                to top,
+                theme("colors.ash-dark.600") 5px,
+                transparent 5px
+            )
+            0 100%;
 
     background-repeat: no-repeat;
     background-size: calc(100% - 4px) calc(100% - 4px);
@@ -69,8 +100,14 @@
 .yellow700 .bottomRightCorner {
     border-left: theme("colors.yellow.700") 4px solid;
     border-top: theme("colors.yellow.700") 4px solid;
-    background: linear-gradient(to left, theme("colors.yellow.700") 5px, transparent 5px) 100% 0,
-        linear-gradient(to top, theme("colors.yellow.700") 5px, transparent 5px) 0 100%;
+    background: linear-gradient(
+                to left,
+                theme("colors.yellow.700") 5px,
+                transparent 5px
+            )
+            100% 0,
+        linear-gradient(to top, theme("colors.yellow.700") 5px, transparent 5px)
+            0 100%;
 
     background-repeat: no-repeat;
     background-size: calc(100% - 4px) calc(100% - 4px);
@@ -131,8 +168,14 @@
 .dark .topLeftCorner {
     border-right: theme("colors.bg") 4px solid;
     border-bottom: theme("colors.bg") 4px solid;
-    background: linear-gradient(to right, theme("colors.bg") 5px, transparent 5px) 0 100%,
-        linear-gradient(to bottom, theme("colors.bg") 5px, transparent 5px) 100% 0;
+    background: linear-gradient(
+                to right,
+                theme("colors.bg") 5px,
+                transparent 5px
+            )
+            0 100%,
+        linear-gradient(to bottom, theme("colors.bg") 5px, transparent 5px) 100%
+            0;
     background-repeat: no-repeat;
     background-size: calc(100% - 4px) calc(100% - 4px);
 }
@@ -140,8 +183,18 @@
 .dark600 .topLeftCorner {
     border-right: theme("colors.ash-dark.600") 4px solid;
     border-bottom: theme("colors.ash-dark.600") 4px solid;
-    background: linear-gradient(to right, theme("colors.ash-dark.600") 5px, transparent 5px) 0 100%,
-        linear-gradient(to bottom, theme("colors.ash-dark.600") 5px, transparent 5px) 100% 0;
+    background: linear-gradient(
+                to right,
+                theme("colors.ash-dark.600") 5px,
+                transparent 5px
+            )
+            0 100%,
+        linear-gradient(
+                to bottom,
+                theme("colors.ash-dark.600") 5px,
+                transparent 5px
+            )
+            100% 0;
     background-repeat: no-repeat;
     background-size: calc(100% - 4px) calc(100% - 4px);
 }
@@ -149,8 +202,18 @@
 .yellow700 .topLeftCorner {
     border-right: theme("colors.yellow.700") 4px solid;
     border-bottom: theme("colors.yellow.700") 4px solid;
-    background: linear-gradient(to right, theme("colors.yellow.700") 5px, transparent 5px) 0 100%,
-        linear-gradient(to bottom, theme("colors.yellow.700") 5px, transparent 5px) 100% 0;
+    background: linear-gradient(
+                to right,
+                theme("colors.yellow.700") 5px,
+                transparent 5px
+            )
+            0 100%,
+        linear-gradient(
+                to bottom,
+                theme("colors.yellow.700") 5px,
+                transparent 5px
+            )
+            100% 0;
     background-repeat: no-repeat;
     background-size: calc(100% - 4px) calc(100% - 4px);
 }
@@ -192,4 +255,9 @@
 
 .yellow700 .content {
     @apply bg-yellow-700 text-white;
+}
+
+.glowHover {
+    /* TODO */
+    /* box-shadow: 0px 8px 30px rgba(255, 0, 92, 0.75); */
 }

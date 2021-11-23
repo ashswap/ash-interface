@@ -13,6 +13,7 @@ interface Props {
     disable?: boolean;
     className?: string | undefined;
     textClassName?: string | undefined;
+    glowOnHover?: boolean;
     onClick?: () => void;
 }
 
@@ -21,7 +22,7 @@ const Button = (props: Props) => {
         <div
             className={`${props.disable ? styles.disable : ""} ${
                 props.outline ? styles.outline : ""
-            } ${
+            } ${props.glowOnHover ? styles.glowHover : ""} ${
                 props.primaryColor === "white"
                     ? styles.white
                     : props.primaryColor === "dark-600"

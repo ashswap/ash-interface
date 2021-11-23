@@ -35,4 +35,4 @@ jobs:
           push: true
           context: .
           platforms: linux/amd64
-          tags: ghcr.io/bicarus-labs/ashswap-interface:${{ steps.get_version.outputs.VERSION }}
+          tags: ghcr.io/ashswap/interface:${{ steps.get_version.outputs.VERSION }}

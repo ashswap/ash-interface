@@ -174,7 +174,7 @@ const Swap = () => {
     return (
         <div className="flex flex-col items-center pt-3.5">
             <Panel>
-                <PanelContent style={{paddingRight: showSetting ? 48 : 30}}>
+                <PanelContent style={{ paddingRight: showSetting ? 48 : 30 }}>
                     <div className={styles.fire}>
                         <Image src={Fire} width={151} height={230} alt="Ash" />
                     </div>
@@ -202,14 +202,15 @@ const Swap = () => {
                             value={valueFrom}
                             onChangeValue={setValueFrom}
                             resetPivotToken={() => setTokenTo(undefined)}
-                        >
+                        />
+                        <div style={{height: 4, position: "relative"}}>
                             <div
                                 className={styles.revert}
                                 onClick={revertToken}
                             >
                                 <Revert />
                             </div>
-                        </SwapAmount>
+                        </div>
                         <SwapAmount
                             bottomRightCorner
                             token={tokenTo}
@@ -241,6 +242,7 @@ const Swap = () => {
                         className="mt-12"
                         outline
                         onClick={provider ? swap : connectExtension}
+                        glowOnHover
                     >
                         {provider ? "SWAP" : "CONNECT WALLET"}
                     </Button>
