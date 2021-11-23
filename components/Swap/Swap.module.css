@@ -45,3 +45,13 @@
 .revert:hover {
     background-color: #292540;
 }
+
+.swapResultLabel {
+    @apply text-text-input-3;
+    font-size: 10px;
+}
+
+.swapResultValue {
+    color: #ffffff;
+    font-size: 14px;
+}

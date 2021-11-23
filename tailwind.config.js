@@ -22,6 +22,7 @@ module.exports = {
                     2: "#8C8A94",
                     3: "#757391",
                 },
+                "insufficent-fund": "#7B61FF",
                 "slider": {
                     "rail": "#757391",
                     "track": "#FFC10D",

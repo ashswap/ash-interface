@@ -6,70 +6,118 @@ import pools from "const/pool";
 import { useWallet } from "context/wallet";
 import { IToken } from "interface/token";
 import styles from "./SwapAmount.module.css";
+import { useSwap } from "context/swap";
+import { theme } from "tailwind.config";
 
 interface Props {
     topLeftCorner?: boolean;
     bottomRightCorner?: boolean;
     showQuickSelect?: boolean;
     disableInput?: boolean;
-    token?: IToken;
-    onChangeToken?: (t: IToken) => void;
-    onChangeValue?: (t: string) => void;
-    value?: any;
     children?: any;
     type: "from" | "to";
-    poolWithToken?: IToken;
     resetPivotToken: () => any;
 }
 
 const SwapAmount = (props: Props) => {
     const { balances } = useWallet();
-    const onSelectToken = (t: IToken) => {
-        if (props.onChangeToken) {
-            props.onChangeToken(t);
+    const {
+        isInsufficentFund,
+        setInsufficentFund,
+        tokenFrom,
+        tokenTo,
+        setTokenFrom,
+        setTokenTo,
+        valueFrom,
+        valueTo,
+        setValueFrom,
+        setValueTo
+    } = useSwap();
+
+    const value = useMemo(() => {
+        if (props.type === "from") {
+            return valueFrom;
         }
-    };
+
+        return valueTo;
+    }, [valueTo, valueFrom, props.type]);
+
+    const onChangeValue = useMemo(() => {
+        if (props.type === "from") {
+            return setValueFrom;
+        }
+
+        return setValueTo;
+    }, [setValueFrom, setValueTo, props.type]);
+
+    const token = useMemo(() => {
+        if (props.type === "from") {
+            return tokenFrom;
+        }
+
+        return tokenTo;
+    }, [tokenFrom, tokenTo, props.type]);
+
+    const poolWithToken = useMemo(() => {
+        if (props.type === "from") {
+            return tokenTo;
+        }
+
+        return tokenFrom;
+    }, [tokenFrom, tokenTo, props.type]);
+
+    const onChangeToken = useMemo(() => {
+        if (props.type === "from") {
+            return setTokenFrom;
+        }
+
+        return setTokenTo;
+    }, [setTokenFrom, setTokenTo, props.type]);
 
     let validPools = useMemo(() => {
-        if (!props.poolWithToken) {
+        if (!poolWithToken) {
             return undefined;
         }
 
         return pools.filter(
-            p => p.tokens.findIndex(t => t.id == props.poolWithToken?.id) !== -1
+            p => p.tokens.findIndex(t => t.id == poolWithToken?.id) !== -1
         );
-    }, [props.poolWithToken]);
+    }, [poolWithToken]);
 
     let suggestedTokens = useMemo(() => {
         let tokens: IToken[] = [];
 
         validPools?.map(p => {
             p.tokens.forEach(t => {
-                if (t.id !== props.poolWithToken?.id) {
+                if (t.id !== poolWithToken?.id) {
                     tokens.push(t);
                 }
             });
         });
 
         return tokens;
-    }, [validPools, props.poolWithToken]);
+    }, [validPools, poolWithToken]);
 
     const balance = useMemo(() => {
-        if (!props.token) {
+        if (!token) {
             return "0";
         }
 
-        return balances[props.token.id]
-            ? balances[props.token.id].balance
-                  .div(new BigNumber(10).exponentiatedBy(props.token.decimals))
+        return balances[token.id]
+            ? balances[token.id].balance
+                  .div(new BigNumber(10).exponentiatedBy(token.decimals))
                   .toFixed(3)
                   .toString()
             : "0";
-    }, [props.token, balances]);
+    }, [token, balances]);
 
-    const isInsufficentFund = useMemo(() => {
-        return new BigNumber(balance).lt(new BigNumber(props.value));
-    }, [balance, props.value]);
+    useEffect(() => {
+        if (props.type === "from") {
+            setInsufficentFund(
+                new BigNumber(balance).lt(new BigNumber(value || "0"))
+            );
+        }
+    }, [balance, value, props.type, setInsufficentFund]);
 
     return (
         <div
@@ -96,10 +144,10 @@ const SwapAmount = (props: Props) => {
             >
                 <TokenSelect
                     modalTitle={props.type === "from" ? "Swap from" : "Swap to"}
-                    value={props.token}
-                    onChange={onSelectToken}
+                    value={token}
+                    onChange={onChangeToken}
                     validPools={validPools}
-                    pivotToken={props.poolWithToken}
+                    pivotToken={poolWithToken}
                     type={props.type}
                     resetPivotToken={props.resetPivotToken}
                 />
@@ -108,44 +156,39 @@ const SwapAmount = (props: Props) => {
                     type="number"
                     disabled={props.disableInput}
                     placeholder="0.00"
-                    value={props.value}
+                    value={value}
                     style={{
                         color:
                             props.type === "from" && isInsufficentFund
-                                ? "#7B61FF"
+                                ? theme.extend.colors["insufficent-fund"]
                                 : undefined
                     }}
-                    onChange={e =>
-                        props.onChangeValue &&
-                        props.onChangeValue(e.target.value)
-                    }
+                    onChange={e => onChangeValue(e.target.value)}
                 />
             </div>
             {props.showQuickSelect && (
                 <QuickSelect
                     className={styles.quickSelectContainer}
                     tokens={suggestedTokens}
-                    onChange={onSelectToken}
+                    onChange={onChangeToken}
                 />
             )}
-            {props.token && (
+            {token && (
                 <div
                     className={`${styles.balanceContainer} bg-bg px-2.5 pb-3.5 text-sm text-text-input-3`}
                 >
                     <span>Balance: </span>
                     <span
                         className={`text-earn ${
-                            balances[props.token.id] && props.type === "from"
+                            balances[token.id] && props.type === "from"
                                 ? "select-none cursor-pointer"
                                 : ""
                         }`}
                         onClick={() => {
-                            props.type === "from" &&
-                                props.onChangeValue &&
-                                props.onChangeValue(balance);
+                            props.type === "from" && onChangeValue(balance);
                         }}
                     >
-                        {balance} {props.token.name}
+                        {balance} {token.name}
                     </span>
                 </div>
             )}
