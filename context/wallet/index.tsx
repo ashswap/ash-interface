@@ -27,19 +27,20 @@ import BigNumber from "bignumber.js";
 import pools from "const/pool";
 import { ITokenMap } from "interface/token";
 import { TokenBalancesMap } from "interface/tokenBalance";
+import { emptyFunc, fetcher } from "helper/common";
+import useSWR from "swr";
 
 export interface State {
     provider?: ExtensionProvider;
     proxy: ProxyProvider;
     apiProvider: ApiProvider;
-    slippage: number;
     connectExtension: () => void;
     disconnectExtension: () => void;
-    setSlippage: (slippage: number) => void;
     fetchBalances: () => void;
     callContract: (addr: Address, arg: CallArguments) => Promise<Transaction>;
     balances: TokenBalancesMap;
     tokens: ITokenMap;
+    transactionsHistory: any[];
 }
 
 const emptyTx = new Transaction({
@@ -48,17 +49,16 @@ const emptyTx = new Transaction({
 });
 
 export const initState: State = {
-    slippage: 0.001,
     proxy: new ProxyProvider(network.gatewayAddress, { timeout: 10000 }),
     apiProvider: new ApiProvider(network.apiAddress, { timeout: 10000 }),
-    connectExtension: () => {},
-    disconnectExtension: () => {},
-    setSlippage: () => {},
-    fetchBalances: () => {},
+    connectExtension: emptyFunc,
+    disconnectExtension: emptyFunc,
+    fetchBalances: emptyFunc,
     callContract: (addr: Address, arg: CallArguments) =>
         Promise.resolve(emptyTx),
     balances: {},
-    tokens: {}
+    tokens: {},
+    transactionsHistory: []
 };
 
 export const WalletContext = createContext<State>(initState);
@@ -73,10 +73,10 @@ export function WalletProvider({ children }: Props) {
     const [provider, setProvider] = useState<ExtensionProvider | undefined>(
         undefined
     );
-    const [slippage, setSlippage] = useState<number>(initState.slippage);
     const [balances, setBalances] = useState<TokenBalancesMap>(
         initState.balances
     );
+    const [transactionsHistory, setTransactionsHistory] = useState<any>([]);
 
     const tokens = useMemo(() => {
         let tokens: ITokenMap = {};
@@ -217,7 +217,7 @@ export function WalletProvider({ children }: Props) {
                 gasLimit: new GasLimit(gasLimit),
                 version: tx.getVersion()
             });
-            
+
             return await provider?.sendTransaction(tx);
         },
         [provider]
@@ -226,15 +226,51 @@ export function WalletProvider({ children }: Props) {
     const disconnectExtension = useCallback(() => {
         provider?.logout();
         setProvider(undefined);
-    }, [provider])
+    }, [provider]);
+
+    const historyQuery = useMemo(() => {
+        if (!provider) {
+            return "";
+        }
+
+        const parrams = new URLSearchParams();
+        parrams.append("sender", provider.account.address);
+        parrams.append("size", "12");
+
+        const condition = {
+            query: {
+                bool: {
+                    should: pools.map(pool => ({
+                        term: {
+                            receiver: pool.address
+                        }
+                    }))
+                }
+            }
+        };
+
+        parrams.append("condition", JSON.stringify(condition));
+
+        return parrams.toString();
+    }, [provider]);
+
+    const { data } = useSWR(
+        provider ? network.apiAddress + "/transactions?" + historyQuery : null,
+        fetcher
+    );
+
+    useEffect(() => {
+        if (data) {
+            setTransactionsHistory(data);
+        }
+    }, [data]);
 
     const value: State = {
         ...initState,
         tokens,
         balances,
         provider,
-        slippage,
-        setSlippage,
+        transactionsHistory,
         connectExtension,
         disconnectExtension,
         fetchBalances,

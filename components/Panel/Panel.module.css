@@ -28,6 +28,7 @@
     @apply relative text-white;
     width: 460px;
     padding: 30px;
+    transition: 0s;
 }
 
 .dark700 .topLeftCorner {

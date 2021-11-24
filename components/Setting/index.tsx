@@ -3,14 +3,14 @@ import IconButton from "components/IconButton";
 import SlippageSelect from "components/SlippageSelect";
 import styles from "./Setting.module.css";
 import Input from "components/Input";
-import { useWallet } from "context/wallet";
+import { useSwap } from "context/swap";
 
 interface Props {
     onClose?: () => void;
 }
 
 const Setting = (props: Props) => {
-    const { slippage, setSlippage } = useWallet();
+    const { slippage, setSlippage } = useSwap();
 
     return (
         <div className={styles.container}>
@@ -52,6 +52,11 @@ const Setting = (props: Props) => {
                     setSlippage(parseFloat(e.target.value) / 100);
                 }}
             />
+            {slippage < 0.005 && (
+                <div className="text-insufficent-fund text-xs mt-12">
+                    Your transactions may be failed.
+                </div>
+            )}
         </div>
     );
 };

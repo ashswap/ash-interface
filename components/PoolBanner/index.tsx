@@ -64,16 +64,6 @@ const PoolBanner = () => {
                             <div>IN 2022</div>
                         </div>
                     </div>
-                    <Button
-                        leftIcon={<IconNext />}
-                        bottomRightCorner
-                        primaryColor="dark-700"
-                        style={{ height: 64, marginLeft: 75 }}
-                        className="z-50"
-                        textClassName="text-xs"
-                    >
-                        Your joined pools
-                    </Button>
                 </div>
             </PanelContent>
         </Panel>

@@ -102,6 +102,29 @@ const TokenSelect = ({
         }
     }, [validPools]);
 
+    const renderPivotToken = () => {
+        if (!pivotToken) {
+            return null;
+        }
+
+        return (
+            <>
+                {type === "from" && <div className="mx-2">-</div>}
+                <div
+                    className="flex flex-row items-center justify-center gap-3.5 bg-bg h-12 rounded-lg"
+                    style={{ padding: "18px 12px 18px 18px" }}
+                >
+                    <Token token={pivotToken} />
+                    <IconClose
+                        className="cursor-pointer"
+                        onClick={resetPivotToken}
+                    />
+                </div>
+                {type === "to" && <div className="mx-2">-</div>}
+            </>
+        );
+    };
+
     return (
         <>
             <div
@@ -119,21 +142,7 @@ const TokenSelect = ({
             <Modal open={open} onClose={() => setOpen(false)}>
                 <div className="font-bold text-lg">{modalTitle}</div>
                 <div className="flex flex-row items-center my-8 w-full">
-                    {pivotToken && (
-                        <>
-                            <div
-                                className="flex flex-row items-center justify-center gap-3.5 bg-bg h-12 rounded-lg"
-                                style={{ padding: "18px 12px 18px 18px" }}
-                            >
-                                <Token token={pivotToken} />
-                                <IconClose
-                                    className="cursor-pointer"
-                                    onClick={resetPivotToken}
-                                />
-                            </div>
-                            <div className="mx-2">-</div>
-                        </>
-                    )}
+                    {pivotToken && type === "to" && renderPivotToken()}
                     <Input
                         placeholder="Search or try usdt-usdc"
                         suffix={<Search />}
@@ -144,10 +153,17 @@ const TokenSelect = ({
                         textClassName="text-sm"
                         className="flex-1"
                     />
+                    {pivotToken && type === "from" && renderPivotToken()}
                 </div>
-                <div className="font-normal text-xs text-white ml-2">
-                    {validPools ? "Supported pairs" : "Owned"}
-                </div>
+                {validPools && filtedValidPools.length === 0 ? (
+                    <div className="text-insufficent-fund text-xs">
+                        That doesn&apos;t look like a supported swap!
+                    </div>
+                ) : (
+                    <div className="font-normal text-xs text-white">
+                        {validPools ? "Supported pairs" : "Owned"}
+                    </div>
+                )}
 
                 {validPools ? (
                     <ListSwapPool

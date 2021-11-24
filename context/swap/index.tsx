@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useMemo } from "react";
 import BigNumber from "bignumber.js";
 import pools from "const/pool";
-import { IToken, ITokenMap } from "interface/token";
+import { IToken } from "interface/token";
 import IPool from "interface/pool";
 import { emptyFunc } from "helper/common";
 
@@ -13,6 +13,8 @@ export interface State {
     pool?: IPool;
     rates?: BigNumber[];
     isInsufficentFund: boolean;
+    slippage: number;
+    setSlippage: (slippage: number) => void;
     setInsufficentFund: (v: boolean) => void;
     setValueFrom: (v: string) => void;
     setValueTo: (v: string) => void;
@@ -22,7 +24,9 @@ export interface State {
 }
 
 export const initState: State = {
+    slippage: 0.01,
     isInsufficentFund: false,
+    setSlippage: emptyFunc,
     setInsufficentFund: emptyFunc,
     setValueFrom: emptyFunc,
     setValueTo: emptyFunc,
@@ -43,7 +47,7 @@ interface Props {
 export function SwapProvider({ children }: Props) {
     const [tokenFrom, setTokenFrom] = useState<IToken | undefined>(undefined);
     const [valueFrom, setValueFrom] = useState<string>("");
-    
+    const [slippage, setSlippage] = useState<number>(initState.slippage);
     const [tokenTo, setTokenTo] = useState<IToken | undefined>(undefined);
     const [valueTo, setValueTo] = useState<string>("");
     
@@ -74,6 +78,8 @@ export function SwapProvider({ children }: Props) {
         pool,
         rates,
         isInsufficentFund,
+        slippage,
+        setSlippage,
         setValueFrom,
         setValueTo,
         setTokenFrom,

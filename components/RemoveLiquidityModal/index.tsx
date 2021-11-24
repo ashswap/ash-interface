@@ -27,6 +27,7 @@ import { notification } from "antd";
 import { Slider } from "antd";
 import { theme } from "tailwind.config";
 import { useDebounce } from "use-debounce";
+import { useSwap } from "context/swap";
 
 interface Props {
     open?: boolean;
@@ -45,9 +46,9 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
         callContract,
         fetchBalances,
         balances,
-        slippage,
         proxy
     } = useWallet();
+    const { slippage } = useSwap();
 
     const ownLiquidity = useMemo(() => {
         return balances[pool.lpToken.id]
@@ -111,8 +112,6 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
                 })
             )
             .then(({ returnData }) => {
-                console.log(returnData);
-
                 let resultHex = Buffer.from(returnData[0], "base64").toString(
                     "hex"
                 );
@@ -155,18 +154,21 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
                 new BigUIntValue(toWei(pool.lpToken, liquidity)),
                 new TokenIdentifierValue(Buffer.from("removeLiquidity")),
                 new BigUIntValue(
-                    new BigNumber(toWei(pool.tokens[0], value0).multipliedBy(1 - slippage).toFixed(0))
+                    new BigNumber(
+                        toWei(pool.tokens[0], value0)
+                            .multipliedBy(1 - slippage)
+                            .toFixed(0)
+                    )
                 ),
                 new BigUIntValue(
-                    new BigNumber(toWei(pool.tokens[1], value1).multipliedBy(1 - slippage).toFixed(0))
+                    new BigNumber(
+                        toWei(pool.tokens[1], value1)
+                            .multipliedBy(1 - slippage)
+                            .toFixed(0)
+                    )
                 )
             ]
         });
-
-        console.log(new BigNumber(toWei(pool.tokens[0], value0).multipliedBy(1 - slippage).toFixed(0)).toString());
-        console.log(new BigNumber(toWei(pool.tokens[1], value1).multipliedBy(1 - slippage).toFixed(0)).toString());
-        
-        
 
         fetchBalances();
 

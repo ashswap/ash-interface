@@ -1,3 +1,4 @@
+import { CSSProperties } from "react";
 import Panel, { PanelContent } from "components/Panel";
 import IconButton from "components/IconButton";
 import IconClose from "assets/svg/close.svg";
@@ -8,6 +9,7 @@ interface Props {
     children?: any;
     contentClassName?: string | undefined;
     dark?: "600" | "650" | "700";
+    contentStyle?: CSSProperties | undefined;
 }
 
 const Modal = (props: Props) => {
@@ -22,10 +24,11 @@ const Modal = (props: Props) => {
                 onClick={props.onClose}
             />
             <Panel dark={props.dark} style={{marginTop: 100}}>
-                <PanelContent className={props.contentClassName}>
+                <PanelContent className={props.contentClassName} style={props.contentStyle}>
                     <div className="absolute top-4 right-4">
                         <IconButton
                             icon={<IconClose />}
+                            iconSize="small"
                             onClick={props.onClose}
                             className="bg-ash-dark-700"
                         />

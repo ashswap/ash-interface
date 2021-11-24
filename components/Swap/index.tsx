@@ -28,6 +28,7 @@ import BigNumber from "bignumber.js";
 import { notification } from "antd";
 import { toEGLD, toWei } from "helper/balance";
 import { useSwap } from "context/swap";
+import HistoryModal from "components/HistoryModal";
 
 const Swap = () => {
     const {
@@ -41,16 +42,17 @@ const Swap = () => {
         pool,
         rates,
         setRates,
-        isInsufficentFund
+        isInsufficentFund,
+        slippage
     } = useSwap();
     const [showSetting, setShowSetting] = useState<boolean>(false);
+    const [isOpenHistoryModal, openHistoryModal] = useState<boolean>(false);
     const [fee, setFee] = useState<number>(0)
 
     const {
         provider,
         proxy,
         connectExtension,
-        slippage,
         callContract,
         fetchBalances
     } = useWallet();
@@ -272,7 +274,7 @@ const Swap = () => {
     }, [tokenTo, rawValueTo, slippage]);
 
     return (
-        <div className="flex flex-col items-center pt-3.5">
+        <div className="flex flex-col items-center pt-3.5 pb-12">
             <Panel>
                 <PanelContent style={{ paddingRight: showSetting ? 48 : 30 }}>
                     <div className={styles.fire}>
@@ -281,7 +283,7 @@ const Swap = () => {
                     <div className="flex flex-row justify-between pl-4">
                         <div className="font-bold text-2xl">Swap</div>
                         <div className="flex flex-row gap-2">
-                            <IconButton icon={<Clock />} />
+                            <IconButton icon={<Clock />} onClick={() => provider && openHistoryModal(!isOpenHistoryModal)}  />
                             <IconButton
                                 icon={<SettingIcon />}
                                 activeIcon={<SettingActiveIcon />}
@@ -344,7 +346,7 @@ const Swap = () => {
                         </div>
                     )}
 
-                    {pool && (
+                    {pool && rawValueFrom.gt(new BigNumber(0)) && (
                         <>
                             <div className="bg-black flex flex-row items-center justify-between h-10 pl-5 pr-6">
                                 <div className={styles.swapResultLabel}>
@@ -421,6 +423,7 @@ const Swap = () => {
                     <Setting onClose={() => setShowSetting(false)} />
                 )}
             </Panel>
+            <HistoryModal open={isOpenHistoryModal} onClose={() => openHistoryModal(false)} />
         </div>
     );
 };

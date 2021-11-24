@@ -9,6 +9,6 @@ export const network = {
     egldLabel: "xEGLD",
     walletAddress: "https://testnet-wallet.elrond.com",
     apiAddress: "https://testnet-api.elrond.com",
-    gatewayAddress: "https://testnet-api.elrond.com",
+    gatewayAddress: "https://testnet-gateway.elrond.com",
     explorerAddress: "http://testnet-explorer.elrond.com"
 };
