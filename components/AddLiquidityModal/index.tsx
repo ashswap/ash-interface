@@ -4,7 +4,8 @@ import {
     GasLimit,
     TokenIdentifierValue,
     BigUIntValue,
-    AddressValue
+    AddressValue,
+    Query
 } from "@elrondnetwork/erdjs";
 import BigNumber from "bignumber.js";
 import Button from "components/Button";
@@ -15,7 +16,7 @@ import Modal from "components/Modal";
 import Token from "components/Token";
 import { gasLimit, network } from "const/network";
 import { useWallet } from "context/wallet";
-import { toWei } from "helper/balance";
+import { toEGLD, toWei } from "helper/balance";
 import IPool from "interface/pool";
 import IconRight from "assets/svg/right-white.svg";
 import { useEffect, useState, useCallback } from "react";
@@ -33,7 +34,8 @@ const AddLiquidityModal = ({open, onClose, pool}: Props) => {
     const [isAgree, setAgree] = useState<boolean>(false);
     const [value0, setValue0] = useState<string>("");
     const [value1, setValue1] = useState<string>("");
-    const { provider, callContract, fetchBalances, balances } = useWallet();
+    const { provider, proxy, callContract, fetchBalances, balances } = useWallet();
+    const [rates, setRates] = useState<BigNumber[] | undefined>(undefined);
 
     // reset when open modal
     useEffect(() => {
@@ -82,6 +84,89 @@ const AddLiquidityModal = ({open, onClose, pool}: Props) => {
         }
     }, [provider, value0, value1, pool, onClose, callContract, fetchBalances]);
 
+    // find pools + fetch reserves
+    useEffect(() => {
+        if (!pool) {
+            return;
+        }
+
+        Promise.all([
+            proxy.queryContract(
+                new Query({
+                    address: new Address(pool?.address),
+                    func: new ContractFunction("getAmountOut"),
+                    args: [
+                        new TokenIdentifierValue(
+                            Buffer.from(pool!.tokens[0].id)
+                        ),
+                        new TokenIdentifierValue(
+                            Buffer.from(pool!.tokens[1].id)
+                        ),
+                        new BigUIntValue(
+                            new BigNumber(10).exponentiatedBy(
+                                pool!.tokens[0].decimals
+                            )
+                        )
+                    ]
+                })
+            ),
+            proxy.queryContract(
+                new Query({
+                    address: new Address(pool?.address),
+                    func: new ContractFunction("getAmountOut"),
+                    args: [
+                        new TokenIdentifierValue(
+                            Buffer.from(pool!.tokens[1].id)
+                        ),
+                        new TokenIdentifierValue(
+                            Buffer.from(pool!.tokens[0].id)
+                        ),
+                        new BigUIntValue(
+                            new BigNumber(10).exponentiatedBy(
+                                pool!.tokens[1].decimals
+                            )
+                        )
+                    ]
+                })
+            ),
+        ]).then(results => {
+            let rates = results.slice(0, 2).map(result => {
+                return new BigNumber(
+                    "0x" +
+                        Buffer.from(result.returnData[0], "base64").toString(
+                            "hex"
+                        )
+                );
+            });
+
+            setRates(rates);
+        });
+    }, [pool, proxy, setRates]);
+
+    const onChangeValue0 = useCallback(
+        (value: string) => {
+            if (!rates) {
+                return
+            }
+
+            setValue0(value)
+            setValue1(toEGLD(pool.tokens[1], rates[0].multipliedBy(new BigNumber(value)).toString()).toFixed(3))
+        },
+        [rates, pool],
+    )
+
+    const onChangeValue1 = useCallback(
+        (value: string) => {
+            if (!rates) {
+                return
+            }
+
+            setValue1(value)
+            setValue0(toEGLD(pool.tokens[0], rates[1].multipliedBy(new BigNumber(value)).toString()).toFixed(3))
+        },
+        [rates, pool],
+    )
+
     return (
         <Modal
             open={open}
@@ -129,7 +214,7 @@ const AddLiquidityModal = ({open, onClose, pool}: Props) => {
                                 textAlign="right"
                                 textClassName="text-lg"
                                 value={value0}
-                                onChange={e => setValue0(e.target.value)}
+                                onChange={e => onChangeValue0(e.target.value)}
                             />
                         </div>
                         <div className="bg-bg py-2 text-sm text-text-input-3 text-right">
@@ -165,7 +250,7 @@ const AddLiquidityModal = ({open, onClose, pool}: Props) => {
                                 textAlign="right"
                                 textClassName="text-lg"
                                 value={value1}
-                                onChange={e => setValue1(e.target.value)}
+                                onChange={e => onChangeValue1(e.target.value)}
                             />
                         </div>
                         <div className="bg-bg py-2 text-sm text-text-input-3 text-right">

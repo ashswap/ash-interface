@@ -41,6 +41,7 @@ export interface State {
     balances: TokenBalancesMap;
     tokens: ITokenMap;
     transactionsHistory: any[];
+    lpTokens: ITokenMap;
 }
 
 const emptyTx = new Transaction({
@@ -58,6 +59,7 @@ export const initState: State = {
         Promise.resolve(emptyTx),
     balances: {},
     tokens: {},
+    lpTokens: {},
     transactionsHistory: []
 };
 
@@ -271,6 +273,7 @@ export function WalletProvider({ children }: Props) {
         balances,
         provider,
         transactionsHistory,
+        lpTokens,
         connectExtension,
         disconnectExtension,
         fetchBalances,

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Panel, { PanelContent } from "components/Panel";
 import IPool from "interface/pool";
 import Down from "assets/svg/down-white.svg";
@@ -7,6 +7,20 @@ import Button from "components/Button";
 import AddLiquidityModal from "components/AddLiquidityModal";
 import { theme } from "tailwind.config";
 import RemoveLiquidityModal from "components/RemoveLiquidityModal";
+import { useWallet } from "context/wallet";
+import BigNumber from "bignumber.js";
+import {
+    Address,
+    ArgSerializer,
+    BigUIntValue,
+    ContractFunction,
+    EndpointParameterDefinition,
+    Query,
+    TokenIdentifierValue,
+    TypeExpressionParser,
+    TypeMapper
+} from "@elrondnetwork/erdjs/out";
+import { toEGLD, toWei } from "helper/balance";
 
 interface Props {
     pool: IPool;
@@ -17,7 +31,65 @@ interface Props {
 const PoolCard = (props: Props) => {
     const [isExpand, setIsExpand] = useState<boolean>(false);
     const [openAddLiquidity, setOpenAddLiquidity] = useState<boolean>(false);
-    const [openRemoveLiquidity, setOpenRemoveLiquidity] = useState<boolean>(false);
+    const [openRemoveLiquidity, setOpenRemoveLiquidity] = useState<boolean>(
+        false
+    );
+    const [value0, setValue0] = useState<string>("");
+    const [value1, setValue1] = useState<string>("");
+    const { balances, proxy, lpTokens } = useWallet();
+
+    const ownLiquidity = useMemo(() => {
+        return balances[props.pool.lpToken.id]
+            ? balances[props.pool.lpToken.id].balance
+            : new BigNumber(0);
+    }, [balances, props.pool]);
+
+    useEffect(() => {
+        proxy
+            .queryContract(
+                new Query({
+                    address: new Address(props.pool.address),
+                    func: new ContractFunction("getRemoveLiquidityTokens"),
+                    args: [
+                        new BigUIntValue(ownLiquidity),
+                        new BigUIntValue(new BigNumber(0)),
+                        new BigUIntValue(new BigNumber(0))
+                    ]
+                })
+            )
+            .then(({ returnData }) => {
+                let resultHex = Buffer.from(returnData[0], "base64").toString(
+                    "hex"
+                );
+                let parser = new TypeExpressionParser();
+                let mapper = new TypeMapper();
+                let serializer = new ArgSerializer();
+
+                let type = parser.parse("tuple2<BigUint,BigUint>");
+                let mappedType = mapper.mapType(type);
+
+                let endpointDefinitions = [
+                    new EndpointParameterDefinition("foo", "bar", mappedType)
+                ];
+                let values = serializer.stringToValues(
+                    resultHex,
+                    endpointDefinitions
+                );
+
+                setValue0(
+                    toEGLD(
+                        props.pool.tokens[0],
+                        values[0].valueOf().field0.toString()
+                    ).toFixed(2)
+                );
+                setValue1(
+                    toEGLD(
+                        props.pool.tokens[1],
+                        values[0].valueOf().field1.toString()
+                    ).toFixed(2)
+                );
+            });
+    }, [ownLiquidity, props.pool.address, props.pool.tokens, proxy]);
 
     return (
         <Panel className={`${props.className || ""}`} topRightCorner>
@@ -41,7 +113,7 @@ const PoolCard = (props: Props) => {
                                     {props.pool.tokens[0].name}
                                 </div>
                                 <div className="text-earn font-bold text-lg">
-                                    1.52
+                                    {value0}
                                 </div>
                             </>
                         )}
@@ -70,24 +142,15 @@ const PoolCard = (props: Props) => {
                                     APR Earn
                                 </div>
                                 <div className="text-yellow-600 font-bold text-lg">
-                                    921%
+                                    _%
                                 </div>
                             </div>
                             <div>
                                 <div className="text-text-input-3 text-xs mb-4">
                                     Farming per day
                                 </div>
-                                <div>
-                                    <span className="text-earn font-bold text-lg">
-                                        0.52
-                                    </span>
-                                    <span className="text-xs font-normal">
-                                        {" "}
-                                        <span className="text-earn">
-                                            {props.pool.tokens[0].name}
-                                        </span>{" "}
-                                        per 1,000 {props.pool.tokens[1].name}
-                                    </span>
+                                <div className="text-earn font-normal text-xs">
+                                    Coming soon in 2022
                                 </div>
                             </div>
                         </div>
@@ -108,7 +171,7 @@ const PoolCard = (props: Props) => {
                                     {props.pool.tokens[1].name}
                                 </div>
                                 <div className="text-earn font-bold text-lg">
-                                    1.52
+                                    {value1}
                                 </div>
                             </div>
                             <div>
@@ -116,7 +179,7 @@ const PoolCard = (props: Props) => {
                                     Your capacity
                                 </div>
                                 <div className="text-white font-bold text-lg">
-                                    0.002%
+                                    {toEGLD(props.pool.lpToken, ownLiquidity.toString()).multipliedBy(100).div(lpTokens[props.pool.lpToken.id].totalSupply!).toFixed(2)}%
                                 </div>
                             </div>
                         </div>
@@ -129,7 +192,12 @@ const PoolCard = (props: Props) => {
                                         theme.extend.colors.yellow[600]
                                 }}
                             >
-                                <span className="cursor-pointer" onClick={() => setOpenRemoveLiquidity(true)}>Withdraw</span>
+                                <span
+                                    className="cursor-pointer"
+                                    onClick={() => setOpenRemoveLiquidity(true)}
+                                >
+                                    Withdraw
+                                </span>
                             </div>
                             <div
                                 className="text-pink-600 underline select-none"
@@ -138,7 +206,10 @@ const PoolCard = (props: Props) => {
                                         theme.extend.colors.pink[600]
                                 }}
                             >
-                                <span className="cursor-pointer" onClick={() => setOpenAddLiquidity(true)}>
+                                <span
+                                    className="cursor-pointer"
+                                    onClick={() => setOpenAddLiquidity(true)}
+                                >
                                     Deposit more
                                 </span>
                             </div>
