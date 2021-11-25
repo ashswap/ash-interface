@@ -33,9 +33,10 @@ interface Props {
     open?: boolean;
     onClose?: () => void;
     pool: IPool;
+    capacityPercent: string;
 }
 
-const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
+const RemoveLiquidityModal = ({ open, onClose, pool, capacityPercent }: Props) => {
     const [liquidity, setLiquidity] = useState<string>("");
     const [liquidityPercent, setLiquidityPercent] = useState<number>(0);
     const [value0, setValue0] = useState<string>("");
@@ -233,7 +234,7 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
                         <div className="flex flex-row items-center">
                             <div className="flex flex-row items-center font-bold w-1/3">
                                 <IconRight className="mr-4" />
-                                <span>TOTAL</span>
+                                <span>Liquidity</span>
                             </div>
                             <Input
                                 className="flex-1"
@@ -373,7 +374,7 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
                     <div className="flex flex-row flex-wrap text-xs my-8 gap-y-9">
                         <div className="w-1/2">
                             <div className="mb-4">Your Capacity</div>
-                            <div>-</div>
+                            <div>{capacityPercent}%</div>
                         </div>
                         <div className="w-full">
                             <div className="mb-4">Farm per day</div>

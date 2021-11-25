@@ -91,6 +91,10 @@ const PoolCard = (props: Props) => {
             });
     }, [ownLiquidity, props.pool.address, props.pool.tokens, proxy]);
 
+    const capacityPercent = useMemo(() => {
+        return toEGLD(props.pool.lpToken, ownLiquidity.toString()).multipliedBy(100).div(lpTokens[props.pool.lpToken.id].totalSupply!).toFixed(2)
+    }, [props.pool, ownLiquidity])
+
     return (
         <Panel className={`${props.className || ""}`} topRightCorner>
             <PanelContent className={`${styles.content}`}>
@@ -179,7 +183,7 @@ const PoolCard = (props: Props) => {
                                     Your capacity
                                 </div>
                                 <div className="text-white font-bold text-lg">
-                                    {toEGLD(props.pool.lpToken, ownLiquidity.toString()).multipliedBy(100).div(lpTokens[props.pool.lpToken.id].totalSupply!).toFixed(2)}%
+                                    {capacityPercent}%
                                 </div>
                             </div>
                         </div>
@@ -268,11 +272,15 @@ const PoolCard = (props: Props) => {
                     open={openAddLiquidity}
                     onClose={() => setOpenAddLiquidity(false)}
                     pool={props.pool}
+                    tokenValue0={value0}
+                    tokenValue1={value1}
+                    capacityPercent={capacityPercent}
                 />
                 <RemoveLiquidityModal
                     open={openRemoveLiquidity}
                     onClose={() => setOpenRemoveLiquidity(false)}
                     pool={props.pool}
+                    capacityPercent={capacityPercent}
                 />
             </PanelContent>
         </Panel>
