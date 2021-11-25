@@ -163,7 +163,7 @@ const PoolCard = (props: Props) => {
                         <div className={styles.poolInfoLabel}>
                             Total Liquidity
                         </div>
-                        <div className="text-sm">${valueUsd.toFixed(3)}</div>
+                        <div className="text-sm">${valueUsd.toNumber().toLocaleString("en-US")}</div>
                     </div>
                     <div className="flex flex-row justify-between items-center p-4">
                         <div className={styles.poolInfoLabel}>24H Volume</div>

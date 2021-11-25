@@ -78,7 +78,7 @@ const ListPoolItemDeposit = (props: Props) => {
                 <div className="w-2/12 flex flex-col justify-center">
                     <div className="flex flex-row items-center justify-end bg-bg w-36 h-12 text-xs text-right py-4 pr-3">
                         <span className="text-text-input-3">$</span>
-                        <span>{valueUsd.toFixed(3)}</span>
+                        <span>{valueUsd.toNumber().toLocaleString("en-US")}</span>
                     </div>
                 </div>
                 <div className="w-2/12 flex flex-col justify-center">
