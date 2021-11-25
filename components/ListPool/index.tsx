@@ -7,6 +7,7 @@ import { useRouter } from "next/router";
 import IPool from "interface/pool";
 import styles from "./ListPool.module.css";
 import ListPoolItemWithdraw from "components/ListPoolItemWithdraw";
+import ListPoolItem from "components/ListPoolItem";
 
 interface Props {
     items: IPool[];
@@ -73,35 +74,7 @@ const ListPool = (props: Props) => {
                 )
             ) : null}
             {pools.map((pool, i) => {
-                if (props.view == ViewType.Card) {
-                    return (
-                        <PoolCard
-                            key={pool.address}
-                            pool={pool}
-                            type={
-                                poolType === "my-pool" ? "withdraw" : "deposit"
-                            }
-                        />
-                    );
-                } else {
-                    if (poolType === "my-pool") {
-                        return (
-                            <ListPoolItemWithdraw
-                                key={pool.address}
-                                pool={pool}
-                                dark={i % 2 === 0}
-                            />
-                        );
-                    } else {
-                        return (
-                            <ListPoolItemDeposit
-                                key={pool.address}
-                                pool={pool}
-                                dark={i % 2 === 0}
-                            />
-                        );
-                    }
-                }
+                return <ListPoolItem key={pool.address} dark={i % 2 === 0} pool={pool} view={props.view} />;
             })}
         </div>
     );

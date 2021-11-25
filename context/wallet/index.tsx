@@ -42,6 +42,7 @@ export interface State {
     tokens: ITokenMap;
     transactionsHistory: any[];
     lpTokens: ITokenMap;
+    tokenPrices: any;
 }
 
 const emptyTx = new Transaction({
@@ -60,7 +61,8 @@ export const initState: State = {
     balances: {},
     tokens: {},
     lpTokens: {},
-    transactionsHistory: []
+    transactionsHistory: [],
+    tokenPrices: {}
 };
 
 export const WalletContext = createContext<State>(initState);
@@ -92,6 +94,25 @@ export function WalletProvider({ children }: Props) {
 
         return tokens;
     }, pools);
+
+    let tokenPrices: any = {};
+    for (const tokenId in tokens) {
+        if (Object.prototype.hasOwnProperty.call(tokens, tokenId)) {
+            const token = tokens[tokenId];
+            const tokenPriceResponse = useSWR(
+                tokens
+                    ? "https://api.coingecko.com/api/v3/coins/" +
+                          token.coingeckoId
+                    : null,
+                fetcher
+            );
+            if (tokenPriceResponse.data) {
+                tokenPrices[tokenId] =
+                    tokenPriceResponse.data.market_data.current_price.usd;
+                tokenPrices = { ...tokenPrices };
+            }
+        }
+    }
 
     const lpTokens = useMemo(() => {
         let tokens: ITokenMap = {};
@@ -274,6 +295,7 @@ export function WalletProvider({ children }: Props) {
         provider,
         transactionsHistory,
         lpTokens,
+        tokenPrices,
         connectExtension,
         disconnectExtension,
         fetchBalances,

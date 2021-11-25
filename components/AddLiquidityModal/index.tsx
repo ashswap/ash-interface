@@ -24,24 +24,15 @@ import styles from "./AddLiquidity.module.css";
 import { IToken } from "interface/token";
 import { notification } from "antd";
 import { useDebounce } from "use-debounce";
+import { usePool } from "components/ListPoolItem";
 
 interface Props {
     open?: boolean;
     onClose?: () => void;
     pool: IPool;
-    tokenValue0: string;
-    tokenValue1: string;
-    capacityPercent: string;
 }
 
-const AddLiquidityModal = ({
-    open,
-    onClose,
-    pool,
-    tokenValue0,
-    tokenValue1,
-    capacityPercent
-}: Props) => {
+const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
     const [isAgree, setAgree] = useState<boolean>(false);
     const [value0, setValue0] = useState<string>("");
     const [value0Debounce] = useDebounce(value0, 500);
@@ -52,15 +43,20 @@ const AddLiquidityModal = ({
         proxy,
         callContract,
         fetchBalances,
-        balances
+        balances,
+        tokenPrices
     } = useWallet();
     const [rates, setRates] = useState<BigNumber[] | undefined>(undefined);
     const [liquidity, setLiquidity] = useState<string>("");
+    const poolContext = usePool();
 
     // reset when open modal
     useEffect(() => {
         if (open) {
             setAgree(false);
+            setValue0("");
+            setValue1("");
+            setLiquidity("");
         }
     }, [open]);
 
@@ -106,6 +102,8 @@ const AddLiquidityModal = ({
 
     // find pools + fetch reserves
     useEffect(() => {
+        let isMounted = true;
+
         if (!pool) {
             return;
         }
@@ -159,8 +157,14 @@ const AddLiquidityModal = ({
                 );
             });
 
-            setRates(rates);
+            if (isMounted) {
+                setRates(rates);
+            }
         });
+
+        return () => {
+            isMounted = false;
+        };
     }, [pool, proxy, setRates]);
 
     const onChangeValue0 = useCallback(
@@ -219,38 +223,64 @@ const AddLiquidityModal = ({
             : "0";
     }, [balances, pool]);
 
+    // useEffect(() => {
+    //     if (value0Debounce === "" || value1Debounce === "") {
+    //         return;
+    //     }
+
+    //     proxy
+    //         .queryContract(
+    //             new Query({
+    //                 address: new Address(pool.address),
+    //                 func: new ContractFunction("getAddLiquidityTokens"),
+    //                 args: [
+    //                     new BigUIntValue(
+    //                         new BigNumber(toWei(pool.tokens[0], value0Debounce))
+    //                     ),
+    //                     new BigUIntValue(
+    //                         new BigNumber(toWei(pool.tokens[1], value1Debounce))
+    //                     )
+    //                 ]
+    //             })
+    //         )
+    //         .then(({ returnData }) => {
+
+    //             let liquidity = new BigNumber(
+    //                 "0x" + Buffer.from(returnData[0], "base64").toString("hex")
+    //             );
+
+    //             setLiquidity(
+    //                 toEGLD(pool.lpToken, liquidity.toString()).toFixed(3)
+    //             );
+    //         });
+    // }, [value0Debounce, value1Debounce, pool, proxy]);
+
     useEffect(() => {
-        if (value0Debounce === "" || value1Debounce === "") {
+        if (!value0Debounce || !value1Debounce) {
             return;
         }
 
-        proxy
-            .queryContract(
-                new Query({
-                    address: new Address(pool.address),
-                    func: new ContractFunction("getAddLiquidityTokens"),
-                    args: [
-                        new BigUIntValue(
-                            new BigNumber(toWei(pool.tokens[0], value0Debounce))
-                        ),
-                        new BigUIntValue(
-                            new BigNumber(toWei(pool.tokens[1], value1Debounce))
-                        )
-                    ]
-                })
-            )
-            .then(({ returnData }) => {
-                console.log(returnData);
+        let token0 = pool.tokens[0];
+        let token1 = pool.tokens[1];
 
-                let liquidity = new BigNumber(
-                    "0x" + Buffer.from(returnData[0], "base64").toString("hex")
-                );
+        let balance0 = new BigNumber(value0Debounce);
+        let balance1 = new BigNumber(value1Debounce);
 
-                setLiquidity(
-                    toEGLD(pool.lpToken, liquidity.toString()).toFixed(3)
-                );
-            });
-    }, [value0Debounce, value1Debounce, pool, proxy]);
+        const valueUsd0 = balance0.multipliedBy(
+            tokenPrices[token0.id]
+        );
+        const valueUsd1 = balance1.multipliedBy(
+            tokenPrices[token1.id]
+        );
+
+        setLiquidity(valueUsd0.plus(valueUsd1).toFixed(3));
+    }, [
+        pool,
+        tokenPrices,
+        poolContext.tokenBalances,
+        value0Debounce,
+        value1Debounce
+    ]);
 
     return (
         <Modal
@@ -298,7 +328,11 @@ const AddLiquidityModal = ({
                                         {pool.tokens[0].name}
                                     </div>
                                     <div className="text-text-input-3 text-xs">
-                                        {tokenValue0} in pool
+                                        {toEGLD(
+                                            pool.tokens[0],
+                                            poolContext.value0.toString()
+                                        ).toFixed(2)}{" "}
+                                        in pool
                                     </div>
                                 </div>
                             </div>
@@ -339,7 +373,11 @@ const AddLiquidityModal = ({
                                         {pool.tokens[1].name}
                                     </div>
                                     <div className="text-text-input-3 text-xs">
-                                        {tokenValue1} in pool
+                                        {toEGLD(
+                                            pool.tokens[1],
+                                            poolContext.value0.toString()
+                                        ).toFixed(2)}{" "}
+                                        in pool
                                     </div>
                                 </div>
                             </div>
@@ -369,7 +407,7 @@ const AddLiquidityModal = ({
                     <div className="flex flex-row items-center">
                         <div className="flex flex-row items-center font-bold w-1/3">
                             <IconRight className="mr-4" />
-                            <span>Liquidity</span>
+                            <span>TOTAL</span>
                         </div>
                         <Input
                             className="flex-1"
@@ -428,7 +466,7 @@ const AddLiquidityModal = ({
                             <div>
                                 <div className="mb-2">Your Capacity</div>
                                 <div style={{ color: "#00FF75" }}>
-                                    {capacityPercent}%
+                                    {poolContext.capacityPercent.toFixed(2)}%
                                 </div>
                             </div>
                         </div>

@@ -6,6 +6,7 @@ export interface IToken {
     name: string;
     decimals: number;
     totalSupply?: BigNumber;
+    coingeckoId?: string;
 }
 
 export interface ITokenMap {

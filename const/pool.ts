@@ -15,14 +15,16 @@ const pools: IPool[] = [
                 id: "USDC-cefb49",
                 icon: "#FFC10D",
                 name: "USDC",
-                decimals: 6
+                decimals: 6,
+                coingeckoId: "usd-coin"
             },
             {
                 id: "USDT-194acc",
                 icon: "#FF005C",
                 name: "USDT",
-                decimals: 6
-            },
+                decimals: 6,
+                coingeckoId: "tether"
+            }
         ]
     },
     {
@@ -39,13 +41,15 @@ const pools: IPool[] = [
                 id: "USDC-cefb49",
                 icon: "#FFC10D",
                 name: "USDC",
-                decimals: 6
+                decimals: 6,
+                coingeckoId: "usd-coin"
             },
             {
                 id: "WUSDC-b3b87f",
                 icon: "#54C8EA",
                 name: "wUSDC",
-                decimals: 6
+                decimals: 6,
+                coingeckoId: "usd-coin"
             }
         ]
     },
@@ -63,13 +67,15 @@ const pools: IPool[] = [
                 id: "BTC-a34f8c",
                 icon: "#FFC10D",
                 name: "BTC",
-                decimals: 6
+                decimals: 6,
+                coingeckoId: "bitcoin"
             },
             {
                 id: "WBTC-472f92",
                 icon: "#54C8EA",
                 name: "wBTC",
-                decimals: 6
+                decimals: 6,
+                coingeckoId: "wrapped-bitcoin",
             }
         ]
     }

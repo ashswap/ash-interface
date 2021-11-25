@@ -28,71 +28,83 @@ import { Slider } from "antd";
 import { theme } from "tailwind.config";
 import { useDebounce } from "use-debounce";
 import { useSwap } from "context/swap";
+import { usePool } from "components/ListPoolItem";
 
 interface Props {
     open?: boolean;
     onClose?: () => void;
     pool: IPool;
-    capacityPercent: string;
 }
 
-const RemoveLiquidityModal = ({ open, onClose, pool, capacityPercent }: Props) => {
-    const [liquidity, setLiquidity] = useState<string>("");
+const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
+    const [liquidity, setLiquidity] = useState<BigNumber>(new BigNumber(0));
+    const [totalUsd, setTotalUsd] = useState<string>("");
     const [liquidityPercent, setLiquidityPercent] = useState<number>(0);
     const [value0, setValue0] = useState<string>("");
     const [value1, setValue1] = useState<string>("");
     const [liquidityDebounce] = useDebounce(liquidity, 500);
     const {
-        provider,
         callContract,
         fetchBalances,
         balances,
-        proxy
+        proxy,
+        lpTokens
     } = useWallet();
     const { slippage } = useSwap();
+    const { capacityPercent, valueUsd, ownLiquidity } = usePool();
 
-    const ownLiquidity = useMemo(() => {
-        return balances[pool.lpToken.id]
-            ? balances[pool.lpToken.id].balance
-            : new BigNumber(0);
-    }, [balances, pool]);
+    const pricePerLP = useMemo(() => {
+        if (!valueUsd || !lpTokens[pool.lpToken.id].totalSupply) {
+            return new BigNumber(0);
+        }
 
-    const onChangeLiquidityNumber = useCallback(
-        l => {
-            let totalOwnLiquid = toEGLD(pool.lpToken, ownLiquidity.toString());
-            if (new BigNumber(l).gt(totalOwnLiquid)) {
-                l = totalOwnLiquid.toString();
-            }
+        return valueUsd.div(lpTokens[pool.lpToken.id].totalSupply!.toString());
+    }, [valueUsd, lpTokens, pool]);
 
-            setLiquidity(l);
-            setLiquidityPercent(
-                toWei(pool.lpToken, l)
-                    .multipliedBy(100)
-                    .div(ownLiquidity)
-                    .toNumber()
-            );
-        },
-        [pool.lpToken, ownLiquidity]
-    );
+    // input $ => calculate how many LP tokens
+    useEffect(() => {
+        if (totalUsd === "") {
+            return;
+        }
+
+        let lp = new BigNumber(totalUsd).div(pricePerLP);
+        lp = toWei(pool.lpToken, lp.toString());
+
+        setLiquidity(lp);
+    }, [totalUsd, pool, pricePerLP]);
+
+    // update slider when input change
+    useEffect(() => {
+        setLiquidityPercent(
+            liquidity
+                .multipliedBy(100)
+                .div(ownLiquidity)
+                .toNumber()
+        );
+    }, [ownLiquidity, liquidity]);
 
     const onChangeLiquidityPercent = useCallback(
         (percent: number) => {
-            setLiquidity(
-                toEGLD(
-                    pool.lpToken,
-                    ownLiquidity
-                        .multipliedBy(percent)
-                        .div(100)
-                        .toString(10)
-                ).toString(10)
+            let liquidity = new BigNumber(
+                ownLiquidity
+                    .multipliedBy(percent)
+                    .div(100)
+                    .toFixed(0)
             );
+
+            let shortLiquidity = toEGLD(pool.lpToken, liquidity.toString(10));
+
+            let totalUsd = shortLiquidity.multipliedBy(pricePerLP);
+
+            setTotalUsd(totalUsd.toFixed(5))
+            setLiquidity(liquidity);
             setLiquidityPercent(percent);
         },
-        [ownLiquidity, pool.lpToken]
+        [pricePerLP, ownLiquidity, pool.lpToken]
     );
 
     useEffect(() => {
-        if (!liquidityDebounce) {
+        if (liquidityDebounce.eq(new BigNumber(0))) {
             return;
         }
 
@@ -103,9 +115,7 @@ const RemoveLiquidityModal = ({ open, onClose, pool, capacityPercent }: Props) =
                     func: new ContractFunction("getRemoveLiquidityTokens"),
                     args: [
                         new BigUIntValue(
-                            new BigNumber(
-                                toWei(pool.lpToken, liquidityDebounce)
-                            )
+                            new BigNumber(liquidityDebounce.toString())
                         ),
                         new BigUIntValue(new BigNumber(0)),
                         new BigUIntValue(new BigNumber(0))
@@ -152,7 +162,7 @@ const RemoveLiquidityModal = ({ open, onClose, pool, capacityPercent }: Props) =
             gasLimit: new GasLimit(gasLimit),
             args: [
                 new TokenIdentifierValue(Buffer.from(pool.lpToken.id)),
-                new BigUIntValue(toWei(pool.lpToken, liquidity)),
+                new BigUIntValue(liquidity),
                 new TokenIdentifierValue(Buffer.from("removeLiquidity")),
                 new BigUIntValue(
                     new BigNumber(
@@ -234,7 +244,7 @@ const RemoveLiquidityModal = ({ open, onClose, pool, capacityPercent }: Props) =
                         <div className="flex flex-row items-center">
                             <div className="flex flex-row items-center font-bold w-1/3">
                                 <IconRight className="mr-4" />
-                                <span>Liquidity</span>
+                                <span>TOTAL</span>
                             </div>
                             <Input
                                 className="flex-1"
@@ -244,10 +254,8 @@ const RemoveLiquidityModal = ({ open, onClose, pool, capacityPercent }: Props) =
                                 type="number"
                                 textAlign="right"
                                 textClassName="text-lg"
-                                value={liquidity}
-                                onChange={e =>
-                                    onChangeLiquidityNumber(e.target.value)
-                                }
+                                value={totalUsd}
+                                onChange={e => setTotalUsd(e.target.value)}
                                 style={{ height: 72 }}
                             />
                         </div>
@@ -374,7 +382,7 @@ const RemoveLiquidityModal = ({ open, onClose, pool, capacityPercent }: Props) =
                     <div className="flex flex-row flex-wrap text-xs my-8 gap-y-9">
                         <div className="w-1/2">
                             <div className="mb-4">Your Capacity</div>
-                            <div>{capacityPercent}%</div>
+                            <div>{capacityPercent.toFixed(2)}%</div>
                         </div>
                         <div className="w-full">
                             <div className="mb-4">Farm per day</div>

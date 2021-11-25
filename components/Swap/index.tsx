@@ -11,6 +11,7 @@ import Clock from "assets/svg/clock.svg";
 import SettingIcon from "assets/svg/setting.svg";
 import SettingActiveIcon from "assets/svg/setting-active.svg";
 import IconDown from "assets/svg/down-green.svg";
+import IconNewTab from "assets/svg/new-tab-green.svg";
 import Revert from "assets/svg/revert.svg";
 import IconWallet from "assets/svg/wallet.svg";
 import IconRight from "assets/svg/right-white.svg";
@@ -47,7 +48,7 @@ const Swap = () => {
     } = useSwap();
     const [showSetting, setShowSetting] = useState<boolean>(false);
     const [isOpenHistoryModal, openHistoryModal] = useState<boolean>(false);
-    const [fee, setFee] = useState<number>(0)
+    const [fee, setFee] = useState<number>(0);
 
     const {
         provider,
@@ -162,9 +163,9 @@ const Swap = () => {
             proxy.queryContract(
                 new Query({
                     address: new Address(pool?.address),
-                    func: new ContractFunction("getTotalFeePercent"),
+                    func: new ContractFunction("getTotalFeePercent")
                 })
-            ),
+            )
         ]).then(results => {
             let rates = results.slice(0, 2).map(result => {
                 return new BigNumber(
@@ -177,7 +178,6 @@ const Swap = () => {
 
             setRates(rates);
 
-            
             const fee = new BigNumber(
                 "0x" +
                     Buffer.from(results[2].returnData[0], "base64").toString(
@@ -185,7 +185,7 @@ const Swap = () => {
                     )
             );
 
-            setFee(fee.isNaN() ? 0 : fee.toNumber())
+            setFee(fee.isNaN() ? 0 : fee.toNumber());
         });
     }, [pool, proxy, setRates]);
 
@@ -212,8 +212,10 @@ const Swap = () => {
 
         fetchBalances();
 
-        notification.success({
-            message: `Successfully swap ${valueFrom} ${tokenFrom.name} to ${valueTo} ${tokenTo.name}`,
+        notification.open({
+            message: `Swap succeed ${valueFrom} ${tokenFrom.name} to ${valueTo} ${tokenTo.name}`,
+            duration: 12,
+            icon: <IconNewTab />,
             onClick: () =>
                 window.open(
                     network.explorerAddress +
@@ -283,7 +285,13 @@ const Swap = () => {
                     <div className="flex flex-row justify-between pl-4">
                         <div className="font-bold text-2xl">Swap</div>
                         <div className="flex flex-row gap-2">
-                            <IconButton icon={<Clock />} onClick={() => provider && openHistoryModal(!isOpenHistoryModal)}  />
+                            <IconButton
+                                icon={<Clock />}
+                                onClick={() =>
+                                    provider &&
+                                    openHistoryModal(!isOpenHistoryModal)
+                                }
+                            />
                             <IconButton
                                 icon={<SettingIcon />}
                                 activeIcon={<SettingActiveIcon />}
@@ -380,7 +388,15 @@ const Swap = () => {
                                     Swap fees
                                 </div>
                                 <div className={styles.swapResultValue}>
-                                    {(tokenTo && rawValueTo) ? toEGLD(tokenTo, rawValueTo.multipliedBy(fee).toString()).toFixed(3) : "0"} {tokenTo?.name}
+                                    {tokenTo && rawValueTo
+                                        ? toEGLD(
+                                              tokenTo,
+                                              rawValueTo
+                                                  .multipliedBy(fee)
+                                                  .toString()
+                                          ).toFixed(3)
+                                        : "0"}{" "}
+                                    {tokenTo?.name}
                                 </div>
                             </div>
                         </>
@@ -423,7 +439,10 @@ const Swap = () => {
                     <Setting onClose={() => setShowSetting(false)} />
                 )}
             </Panel>
-            <HistoryModal open={isOpenHistoryModal} onClose={() => openHistoryModal(false)} />
+            <HistoryModal
+                open={isOpenHistoryModal}
+                onClose={() => openHistoryModal(false)}
+            />
         </div>
     );
 };

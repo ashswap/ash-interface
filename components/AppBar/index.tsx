@@ -55,12 +55,13 @@ const AppBar = () => {
     return (
         <div className="flex justify-between items-center px-12 py-5">
             <Link href="/" passHref>
-                <div>
+                <div className="cursor-pointer">
                     <Image
                         src="/logo.png"
                         alt="Ashswap logo"
                         height={54}
                         width={124}
+                        quality={100}
                     />
                 </div>
             </Link>
