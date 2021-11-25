@@ -10,10 +10,8 @@ import {
 import BigNumber from "bignumber.js";
 import Button from "components/Button";
 import Checkbox from "components/Checkbox";
-import IconButton from "components/IconButton";
 import Input from "components/Input";
 import Modal from "components/Modal";
-import Token from "components/Token";
 import { gasLimit, network } from "const/network";
 import { useWallet } from "context/wallet";
 import { toEGLD, toWei } from "helper/balance";
@@ -21,7 +19,7 @@ import IPool from "interface/pool";
 import IconRight from "assets/svg/right-white.svg";
 import { useEffect, useState, useCallback, useMemo } from "react";
 import styles from "./AddLiquidity.module.css";
-import { IToken } from "interface/token";
+import IconNewTab from "assets/svg/new-tab-green.svg";
 import { notification } from "antd";
 import { useDebounce } from "use-debounce";
 import { usePool } from "components/ListPoolItem";
@@ -84,8 +82,10 @@ const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
 
         fetchBalances();
 
-        notification.success({
-            message: "Successfully add liquidity",
+        notification.open({
+            message: `Add liquidity succeed ${value0} ${pool.tokens[0].name} to ${value1} ${pool.tokens[1].name}`,
+            duration: 12,
+            icon: <IconNewTab />,
             onClick: () =>
                 window.open(
                     network.explorerAddress +
@@ -452,13 +452,13 @@ const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
                                     <li className="mb-2">
                                         Emissions APR:{" "}
                                         <span className="text-pink-600">
-                                            500%
+                                            _%
                                         </span>
                                     </li>
                                     <li>
                                         Trading APR:{" "}
                                         <span className="text-pink-600">
-                                            12%
+                                            _%
                                         </span>
                                     </li>
                                 </ul>

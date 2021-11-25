@@ -22,6 +22,7 @@ import { useWallet } from "context/wallet";
 import { toEGLD, toWei } from "helper/balance";
 import IPool from "interface/pool";
 import IconRight from "assets/svg/right-yellow.svg";
+import IconNewTab from "assets/svg/new-tab-green.svg";
 import styles from "./RemoveLiquidityModal.module.css";
 import { notification } from "antd";
 import { Slider } from "antd";
@@ -183,8 +184,10 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
 
         fetchBalances();
 
-        notification.success({
-            message: "Successfully remove liquidity",
+        notification.open({
+            message: `Remove liquidity succeed ${value0} ${pool.tokens[0].name} to ${value1} ${pool.tokens[1].name}`,
+            duration: 12,
+            icon: <IconNewTab />,
             onClick: () =>
                 window.open(
                     network.explorerAddress +
