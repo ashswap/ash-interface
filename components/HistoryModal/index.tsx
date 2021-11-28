@@ -24,7 +24,7 @@ const HistoryModal = ({ open, onClose }: Props) => {
         >
             <div className="font-bold text-2xl">History</div>
             {transactionsHistory.map((d: any, i: number) => {
-                if (!d.action.arguments) {
+                if (!d.action || !d.action.arguments) {
                     return null;
                 }
 
