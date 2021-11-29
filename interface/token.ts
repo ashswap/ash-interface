@@ -2,7 +2,7 @@ import BigNumber from "bignumber.js";
 
 export interface IToken {
     id: string;
-    icon: string;
+    icon: string | StaticImageData;
     name: string;
     decimals: number;
     totalSupply?: BigNumber;

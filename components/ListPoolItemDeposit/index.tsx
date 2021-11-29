@@ -1,22 +1,10 @@
+import Image from "next/image";
 import IPool from "interface/pool";
 import styles from "./ListPoolItemDeposit.module.css";
-import { useState, useEffect, useMemo } from "react";
+import { useState } from "react";
 import IconDown from "assets/svg/down-white.svg";
 import Button from "components/Button";
 import AddLiquidityModal from "components/AddLiquidityModal";
-import {
-    Address,
-    ArgSerializer,
-    BigUIntValue,
-    ContractFunction,
-    EndpointParameterDefinition,
-    Query,
-    TypeExpressionParser,
-    TypeMapper
-} from "@elrondnetwork/erdjs/out";
-import { useWallet } from "context/wallet";
-import BigNumber from "bignumber.js";
-import { toEGLD } from "helper/balance";
 import { usePool } from "components/ListPoolItem";
 
 interface Props {
@@ -39,19 +27,17 @@ const ListPoolItemDeposit = (props: Props) => {
             <div className="flex flex-row text-white w-full">
                 <div className="w-2/12 flex flex-row items-center">
                     <div className="flex flex-row justify-between items-center">
+                        <div className={styles.tokenIcon}>
+                            <Image src={props.pool.tokens[0].icon} alt="token icon" />
+                        </div>
                         <div
                             className={styles.tokenIcon}
                             style={{
-                                backgroundColor: props.pool.tokens[0].icon
-                            }}
-                        ></div>
-                        <div
-                            className={styles.tokenIcon}
-                            style={{
-                                backgroundColor: props.pool.tokens[1].icon,
                                 marginLeft: "-10px"
                             }}
-                        ></div>
+                        >
+                            <Image src={props.pool.tokens[1].icon} alt="token icon" />
+                        </div>
                     </div>
                     <div style={{ fontSize: 10 }} className="px-3 font-bold">
                         &
@@ -78,7 +64,9 @@ const ListPoolItemDeposit = (props: Props) => {
                 <div className="w-2/12 flex flex-col justify-center">
                     <div className="flex flex-row items-center justify-end bg-bg w-36 h-12 text-xs text-right py-4 pr-3">
                         <span className="text-text-input-3">$</span>
-                        <span>{valueUsd.toNumber().toLocaleString("en-US")}</span>
+                        <span>
+                            {valueUsd.toNumber().toLocaleString("en-US")}
+                        </span>
                     </div>
                 </div>
                 <div className="w-2/12 flex flex-col justify-center">

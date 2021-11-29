@@ -27,7 +27,7 @@ const selectStyles: StylesConfig<MyOptionType, IsMulti> = {
     menu: (provided, state) => ({
         ...provided,
         backgroundColor: "#0D0B15",
-        width: 191
+        width: 250,
     }),
 
     option: (provided, state) => ({
@@ -42,7 +42,7 @@ const selectStyles: StylesConfig<MyOptionType, IsMulti> = {
 
     control: provided => ({
         ...provided,
-        width: 191,
+        width: 250,
         backgroundColor: "#12101D",
         border: "none",
         borderRadius: 0

@@ -52,6 +52,7 @@
 
 .dark700 .topRightCorner {
     border-left: theme("colors.ash-dark.600") 16px solid;
+    border-bottom: theme("colors.ash-dark.600") 16px solid;
     background: linear-gradient(
             to left,
             theme("colors.ash-dark.600") 18px,
@@ -68,6 +69,7 @@
 
 .dark600 .topLeftCorner {
     border-right: theme("colors.ash-dark.600") 16px solid;
+    border-bottom: theme("colors.ash-dark.600") 16px solid;
     background: linear-gradient(
                 to right,
                 theme("colors.ash-dark.600") 18px,
@@ -86,6 +88,7 @@
 
 .dark600 .topRightCorner {
     border-left: theme("colors.ash-dark.600") 16px solid;
+    border-bottom: theme("colors.ash-dark.600") 16px solid;
     background: linear-gradient(
             to left,
             theme("colors.ash-dark.600") 18px,
@@ -100,6 +103,7 @@
 
 .dark650 .topLeftCorner {
     border-right: theme("colors.bg") 16px solid;
+    border-bottom: theme("colors.bg") 16px solid;
     background: linear-gradient(
                 to right,
                 theme("colors.bg") 18px,
@@ -114,6 +118,7 @@
 
 .dark650 .topRightCorner {
     border-left: theme("colors.bg") 16px solid;
+    border-bottom: theme("colors.bg") 16px solid;
     background: linear-gradient(
             to left,
             theme("colors.bg") 18px,

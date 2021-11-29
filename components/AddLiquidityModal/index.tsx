@@ -7,6 +7,8 @@ import {
     AddressValue,
     Query
 } from "@elrondnetwork/erdjs";
+import Link from "next/link";
+import Image from "next/image";
 import BigNumber from "bignumber.js";
 import Button from "components/Button";
 import Checkbox from "components/Checkbox";
@@ -23,6 +25,7 @@ import IconNewTab from "assets/svg/new-tab-green.svg";
 import { notification } from "antd";
 import { useDebounce } from "use-debounce";
 import { usePool } from "components/ListPoolItem";
+import { theme } from "tailwind.config";
 
 interface Props {
     open?: boolean;
@@ -223,6 +226,28 @@ const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
             : "0";
     }, [balances, pool]);
 
+    const isInsufficentFund0 = useMemo(() => {
+        if (value0 === "" || balance0 === "") {
+            return false;
+        }
+
+        const v0 = new BigNumber(value0);
+        const b0 = new BigNumber(balance0);
+
+        return v0.gt(b0);
+    }, [value0, balance0]);
+
+    const isInsufficentFund1 = useMemo(() => {
+        if (value1 === "" || balance1 === "") {
+            return false;
+        }
+
+        const v1 = new BigNumber(value1);
+        const b1 = new BigNumber(balance1);
+
+        return v1.gt(b1);
+    }, [value1, balance1]);
+
     // useEffect(() => {
     //     if (value0Debounce === "" || value1Debounce === "") {
     //         return;
@@ -266,12 +291,8 @@ const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
         let balance0 = new BigNumber(value0Debounce);
         let balance1 = new BigNumber(value1Debounce);
 
-        const valueUsd0 = balance0.multipliedBy(
-            tokenPrices[token0.id]
-        );
-        const valueUsd1 = balance1.multipliedBy(
-            tokenPrices[token1.id]
-        );
+        const valueUsd0 = balance0.multipliedBy(tokenPrices[token0.id]);
+        const valueUsd1 = balance1.multipliedBy(tokenPrices[token1.id]);
 
         setLiquidity(valueUsd0.plus(valueUsd1).toFixed(3));
     }, [
@@ -299,17 +320,27 @@ const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
                     </div>
                 </div>
                 <div className="flex flex-row justify-between items-center">
-                    <div
-                        className={styles.tokenIcon}
-                        style={{ backgroundColor: pool.tokens[0].icon }}
-                    ></div>
+                    <div className={styles.tokenIcon}>
+                        <Image
+                            src={pool.tokens[0].icon}
+                            width={52}
+                            height={52}
+                            alt="token icon"
+                        />
+                    </div>
                     <div
                         className={styles.tokenIcon}
                         style={{
-                            backgroundColor: pool.tokens[1].icon,
                             marginLeft: "-10px"
                         }}
-                    ></div>
+                    >
+                        <Image
+                            src={pool.tokens[1].icon}
+                            width={52}
+                            height={52}
+                            alt="token icon"
+                        />
+                    </div>
                 </div>
             </div>
             <div className="flex flex-row my-10 gap-8">
@@ -317,12 +348,12 @@ const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
                     <div className="my-1.5">
                         <div className="flex flex-row">
                             <div className={`flex flex-row items-center w-1/3`}>
-                                <div
-                                    style={{
-                                        backgroundColor: pool.tokens[0].icon
-                                    }}
-                                    className={styles.smallTokenIcon}
-                                />
+                                <div className={styles.smallTokenIcon}>
+                                    <Image
+                                        src={pool.tokens[0].icon}
+                                        alt="token icon"
+                                    />
+                                </div>
                                 <div>
                                     <div className={styles.smallTokenName}>
                                         {pool.tokens[0].name}
@@ -339,35 +370,57 @@ const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
                             <Input
                                 className="flex-1"
                                 backgroundClassName="bg-ash-dark-700"
-                                textColorClassName="text-input-3"
+                                textColorClassName="text-white"
                                 placeholder="0"
                                 type="number"
                                 textAlign="right"
                                 textClassName="text-lg"
                                 value={value0}
+                                style={{
+                                    border: isInsufficentFund0
+                                        ? `1px solid ${theme.extend.colors["insufficent-fund"]}`
+                                        : ""
+                                }}
                                 onChange={e => onChangeValue0(e.target.value)}
                             />
                         </div>
-                        <div className="bg-bg py-2 text-sm text-text-input-3 text-right">
-                            <span>Balance: </span>
-                            <span
-                                className="text-earn select-none cursor-pointer"
-                                onClick={() => onChangeValue1(balance0)}
-                            >
-                                {balance0} {pool.tokens[0].name}
-                            </span>
+                        <div
+                            className="flex flex-row justify-between bg-bg py-2 text-text-input-3 text-right"
+                            style={{ fontSize: 10 }}
+                        >
+                            <div style={{ marginLeft: "33.333%" }}>
+                                {isInsufficentFund0 ? (
+                                    <>
+                                        Insufficient fund -{" "}
+                                        <Link href="/swap" passHref>
+                                            <span className="text-insufficent-fund select-none cursor-pointer">
+                                                Go trade!
+                                            </span>
+                                        </Link>
+                                    </>
+                                ) : null}
+                            </div>
+                            <div>
+                                <span>Balance: </span>
+                                <span
+                                    className="text-earn select-none cursor-pointer"
+                                    onClick={() => onChangeValue1(balance0)}
+                                >
+                                    {balance0} {pool.tokens[0].name}
+                                </span>
+                            </div>
                         </div>
                     </div>
 
                     <div className="my-1.5">
                         <div className="flex flex-row">
                             <div className={`flex flex-row items-center w-1/3`}>
-                                <div
-                                    style={{
-                                        backgroundColor: pool.tokens[1].icon
-                                    }}
-                                    className={styles.smallTokenIcon}
-                                />
+                                <div className={styles.smallTokenIcon}>
+                                    <Image
+                                        src={pool.tokens[1].icon}
+                                        alt="token icon"
+                                    />
+                                </div>
                                 <div>
                                     <div className={styles.smallTokenName}>
                                         {pool.tokens[1].name}
@@ -384,23 +437,45 @@ const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
                             <Input
                                 className="flex-1"
                                 backgroundClassName="bg-ash-dark-700"
-                                textColorClassName="text-input-3"
+                                textColorClassName="text-white"
                                 placeholder="0"
                                 type="number"
                                 textAlign="right"
                                 textClassName="text-lg"
                                 value={value1}
+                                style={{
+                                    border: isInsufficentFund1
+                                        ? `1px solid ${theme.extend.colors["insufficent-fund"]}`
+                                        : ""
+                                }}
                                 onChange={e => onChangeValue1(e.target.value)}
                             />
                         </div>
-                        <div className="bg-bg py-2 text-sm text-text-input-3 text-right">
-                            <span>Balance: </span>
-                            <span
-                                className="text-earn select-none cursor-pointer"
-                                onClick={() => onChangeValue1(balance1)}
-                            >
-                                {balance1} {pool.tokens[1].name}
-                            </span>
+                        <div
+                            className="flex flex-row justify-between bg-bg py-2 text-text-input-3 text-right"
+                            style={{ fontSize: 10 }}
+                        >
+                            <div style={{ marginLeft: "33.333%" }}>
+                                {isInsufficentFund1 ? (
+                                    <>
+                                        Insufficient fund -{" "}
+                                        <Link href="/swap" passHref>
+                                            <span className="text-insufficent-fund select-none cursor-pointer">
+                                                Go trade!
+                                            </span>
+                                        </Link>
+                                    </>
+                                ) : null}
+                            </div>
+                            <div>
+                                <span>Balance: </span>
+                                <span
+                                    className="text-earn select-none cursor-pointer"
+                                    onClick={() => onChangeValue1(balance1)}
+                                >
+                                    {balance1} {pool.tokens[1].name}
+                                </span>
+                            </div>
                         </div>
                     </div>
 

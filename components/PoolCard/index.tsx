@@ -1,4 +1,5 @@
-import { useState, useMemo, useEffect } from "react";
+import Image from "next/image";
+import { useState } from "react";
 import Panel, { PanelContent } from "components/Panel";
 import IPool from "interface/pool";
 import Down from "assets/svg/down-white.svg";
@@ -9,8 +10,6 @@ import { theme } from "tailwind.config";
 import RemoveLiquidityModal from "components/RemoveLiquidityModal";
 import { toEGLD } from "helper/balance";
 import { usePool } from "components/ListPoolItem";
-import { useWallet } from "context/wallet";
-import BigNumber from "bignumber.js";
 
 interface Props {
     pool: IPool;
@@ -57,19 +56,17 @@ const PoolCard = (props: Props) => {
                         )}
                     </div>
                     <div className="flex flex-row justify-between items-center">
+                        <div className={styles.tokenIcon}>
+                            <Image src={props.pool.tokens[0].icon} alt="token icon" />
+                        </div>
                         <div
                             className={styles.tokenIcon}
                             style={{
-                                backgroundColor: props.pool.tokens[0].icon
-                            }}
-                        ></div>
-                        <div
-                            className={styles.tokenIcon}
-                            style={{
-                                backgroundColor: props.pool.tokens[1].icon,
                                 marginLeft: "-10px"
                             }}
-                        ></div>
+                        >
+                            <Image src={props.pool.tokens[1].icon} alt="token icon" />
+                        </div>
                     </div>
                 </div>
                 {props.type === "deposit" ? (
@@ -163,7 +160,9 @@ const PoolCard = (props: Props) => {
                         <div className={styles.poolInfoLabel}>
                             Total Liquidity
                         </div>
-                        <div className="text-sm">${valueUsd.toNumber().toLocaleString("en-US")}</div>
+                        <div className="text-sm">
+                            ${valueUsd.toNumber().toLocaleString("en-US")}
+                        </div>
                     </div>
                     <div className="flex flex-row justify-between items-center p-4">
                         <div className={styles.poolInfoLabel}>24H Volume</div>

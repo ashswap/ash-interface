@@ -1,4 +1,9 @@
 import IPool from "interface/pool";
+import IconBTC from "assets/images/btc-icon.png";
+import IconWBTC from "assets/images/wbtc-icon.png";
+import IconUSDC from "assets/images/usdc-icon.png";
+import IconWUSDC from "assets/images/wusdc-icon.png";
+import IconUSDT from "assets/images/usdt-icon.png";
 
 const pools: IPool[] = [
     {
@@ -13,14 +18,14 @@ const pools: IPool[] = [
         tokens: [
             {
                 id: "USDC-cefb49",
-                icon: "#FFC10D",
+                icon: IconUSDC,
                 name: "USDC",
                 decimals: 6,
                 coingeckoId: "usd-coin"
             },
             {
                 id: "USDT-194acc",
-                icon: "#FF005C",
+                icon: IconUSDT,
                 name: "USDT",
                 decimals: 6,
                 coingeckoId: "tether"
@@ -39,14 +44,14 @@ const pools: IPool[] = [
         tokens: [
             {
                 id: "USDC-cefb49",
-                icon: "#FFC10D",
+                icon: IconUSDC,
                 name: "USDC",
                 decimals: 6,
                 coingeckoId: "usd-coin"
             },
             {
                 id: "WUSDC-b3b87f",
-                icon: "#54C8EA",
+                icon: IconWUSDC,
                 name: "wUSDC",
                 decimals: 6,
                 coingeckoId: "usd-coin"
@@ -65,14 +70,14 @@ const pools: IPool[] = [
         tokens: [
             {
                 id: "BTC-a34f8c",
-                icon: "#FFC10D",
+                icon: IconBTC,
                 name: "BTC",
                 decimals: 6,
                 coingeckoId: "bitcoin"
             },
             {
                 id: "WBTC-472f92",
-                icon: "#54C8EA",
+                icon: IconWBTC,
                 name: "wBTC",
                 decimals: 6,
                 coingeckoId: "wrapped-bitcoin",

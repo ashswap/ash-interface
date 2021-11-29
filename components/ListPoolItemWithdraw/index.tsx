@@ -1,13 +1,9 @@
+import Image from "next/image";
 import IPool from "interface/pool";
 import styles from "./ListPoolItemWithdraw.module.css";
-import { useState, useMemo, useEffect } from "react";
-import IconDown from "assets/svg/down-white.svg";
-import Button from "components/Button";
+import { useState } from "react";
 import AddLiquidityModal from "components/AddLiquidityModal";
 import RemoveLiquidityModal from "components/RemoveLiquidityModal";
-import { useWallet } from "context/wallet";
-import BigNumber from "bignumber.js";
-import { Address, ArgSerializer, BigUIntValue, ContractFunction, EndpointParameterDefinition, Query, TypeExpressionParser, TypeMapper } from "@elrondnetwork/erdjs/out";
 import { toEGLD } from "helper/balance";
 import { usePool } from "components/ListPoolItem";
 
@@ -22,7 +18,7 @@ const ListPoolItemWithdraw = (props: Props) => {
     const [openRemoveLiquidity, setOpenRemoveLiquidity] = useState<boolean>(
         false
     );
-    const {value0, value1, capacityPercent} =usePool()
+    const { value0, value1, capacityPercent } = usePool();
 
     return (
         <div
@@ -33,19 +29,17 @@ const ListPoolItemWithdraw = (props: Props) => {
             <div className="flex flex-row text-white w-full">
                 <div className="w-3/12 flex flex-row items-center">
                     <div className="flex flex-row justify-between items-center">
+                        <div className={styles.tokenIcon}>
+                            <Image src={props.pool.tokens[0].icon} alt="token icon" />
+                        </div>
                         <div
                             className={styles.tokenIcon}
                             style={{
-                                backgroundColor: props.pool.tokens[0].icon
-                            }}
-                        ></div>
-                        <div
-                            className={styles.tokenIcon}
-                            style={{
-                                backgroundColor: props.pool.tokens[1].icon,
                                 marginLeft: "-10px"
                             }}
-                        ></div>
+                        >
+                            <Image src={props.pool.tokens[1].icon} alt="token icon" />
+                        </div>
                     </div>
                     <div style={{ fontSize: 10 }} className="px-3 font-bold">
                         &
@@ -55,13 +49,23 @@ const ListPoolItemWithdraw = (props: Props) => {
                             <span className="w-24">
                                 {props.pool.tokens[0].name}
                             </span>
-                            <span className="text-earn text-xs">{toEGLD(props.pool.tokens[0], value0.toString()).toFixed(2)}</span>
+                            <span className="text-earn text-xs">
+                                {toEGLD(
+                                    props.pool.tokens[0],
+                                    value0.toString()
+                                ).toFixed(2)}
+                            </span>
                         </div>
                         <div className="flex flex-row items-center">
                             <span className="w-24">
                                 {props.pool.tokens[1].name}
                             </span>
-                            <span className="text-earn text-xs">{toEGLD(props.pool.tokens[1], value1.toString()).toFixed(2)}</span>
+                            <span className="text-earn text-xs">
+                                {toEGLD(
+                                    props.pool.tokens[1],
+                                    value1.toString()
+                                ).toFixed(2)}
+                            </span>
                         </div>
                     </div>
                 </div>

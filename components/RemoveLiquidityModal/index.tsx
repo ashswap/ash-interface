@@ -1,4 +1,5 @@
 import { useState, useCallback, useMemo, useEffect } from "react";
+import Image from "next/image";
 import {
     Address,
     ContractFunction,
@@ -6,7 +7,6 @@ import {
     TokenIdentifierValue,
     BigUIntValue,
     Query,
-    TupleType,
     TypeExpressionParser,
     TypeMapper,
     ArgSerializer,
@@ -97,7 +97,7 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
 
             let totalUsd = shortLiquidity.multipliedBy(pricePerLP);
 
-            setTotalUsd(totalUsd.toFixed(5))
+            setTotalUsd(totalUsd.toFixed(5));
             setLiquidity(liquidity);
             setLiquidityPercent(percent);
         },
@@ -225,17 +225,17 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
                     </div>
                 </div>
                 <div className="flex flex-row justify-between items-center">
-                    <div
-                        className={styles.tokenIcon}
-                        style={{ backgroundColor: pool.tokens[0].icon }}
-                    ></div>
+                    <div className={styles.tokenIcon}>
+                        <Image src={pool.tokens[0].icon} alt="token icon" />
+                    </div>
                     <div
                         className={styles.tokenIcon}
                         style={{
-                            backgroundColor: pool.tokens[1].icon,
                             marginLeft: "-3px"
                         }}
-                    ></div>
+                    >
+                        <Image src={pool.tokens[1].icon} alt="token icon" />
+                    </div>
                 </div>
             </div>
             <div className="flex flex-row items-baseline text-2xl font-bold text-yellow-700">
