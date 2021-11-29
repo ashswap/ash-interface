@@ -14,6 +14,15 @@ interface Props {
 const HistoryModal = ({ open, onClose }: Props) => {
     const { transactionsHistory } = useWallet();
 
+    const openTransaction = (txHash: string) => {
+        window.open(
+            network.explorerAddress +
+                "/transactions/" +
+                txHash,
+            "_blank"
+        )
+    }
+
     return (
         <Modal
             open={open}
@@ -23,7 +32,7 @@ const HistoryModal = ({ open, onClose }: Props) => {
             contentStyle={{ width: 350 }}
         >
             <div className="font-bold text-2xl">History</div>
-            {transactionsHistory.map((d: any, i: number) => {
+            {transactionsHistory.slice(0, 7).map((d: any, i: number) => {
                 if (!d.action || !d.action.arguments) {
                     return null;
                 }
@@ -77,22 +86,15 @@ const HistoryModal = ({ open, onClose }: Props) => {
                         style={{ color: "#00FF75" }}
                         className="flex flex-row justify-between items-center my-3"
                     >
-                        <div className="flex flex-row">
+                        <div className="flex flex-row select-none cursor-pointer" onClick={() => openTransaction(d.txHash)}>
                             <div
                                 className={`mt-1.5 ${styles.dot} ${styles.greenDot}`}
                             ></div>
-                            <div className="mx-4">{`Swap ${status} ${extraInfo}`}</div>
+                            <div className="mx-4 hover:underline">{`Swap ${status} ${extraInfo}`}</div>
                         </div>
                         <div
                             className="select-none cursor-pointer"
-                            onClick={() =>
-                                window.open(
-                                    network.explorerAddress +
-                                        "/transactions/" +
-                                        d.txHash,
-                                    "_blank"
-                                )
-                            }
+                            onClick={() => openTransaction(d.txHash)}
                         >
                             <IconNewTab />
                         </div>
