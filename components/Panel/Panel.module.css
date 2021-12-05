@@ -26,7 +26,7 @@
 
 .content {
     @apply relative text-white;
-    width: 460px;
+    width: 310px;
     padding: 30px;
     transition: 0s;
 }
@@ -132,3 +132,21 @@
 .dark650 .content {
     @apply bg-bg;
 }
+
+@media (min-width: 399.5px) { 
+    .content{
+        width: 334px;
+    }
+ }
+
+@media (min-width: 640px) { 
+    .content{
+        width: 460px;
+    }
+ }
+
+ @media (max-width: 640px) { 
+    .content{
+        padding: 20px 8px !important;
+    }
+ }

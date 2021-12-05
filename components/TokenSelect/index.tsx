@@ -129,7 +129,7 @@ const TokenSelect = ({
         <>
             <div
                 className={
-                    `flex flex-row items-center justify-between text-sm font-bold w-44 cursor-pointer select-none p-4 rounded-xl text-pink-600 ` +
+                    `flex flex-row items-center justify-between md:text-sm text-xs font-bold w-44 cursor-pointer select-none p-4 rounded-xl text-pink-600 ` +
                     (value
                         ? "bg-ash-dark-600"
                         : `bg-bg-select hover:bg-bg-select-hover ${styles.containerHover}`)

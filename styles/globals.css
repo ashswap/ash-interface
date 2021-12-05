@@ -52,6 +52,10 @@ input[type="number"] {
     -moz-appearance: textfield;
 }
 
+body > div:first-child {
+    @apply relative;
+}
+
 .ash-slider .ant-slider-rail {
     @apply bg-slider-rail;
     height: 2px;
