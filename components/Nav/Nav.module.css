@@ -1,6 +1,8 @@
 .container {
     @apply flex flex-row justify-center select-none text-xs font-medium;
+    @apply md:static absolute;
 }
+
 
 .container > .btn {
     @apply py-3 px-6;
@@ -20,3 +22,20 @@
     @apply bg-ash-dark-600 text-white;
     cursor: default;
 }
+
+
+@media (max-width: 767.5px) {
+    .container {
+        padding: 4px;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(117, 115, 145, 0.1);
+        backdrop-filter: blur(25px);
+    }
+
+    .container > .btn {
+        @apply m-0;
+    }
+ }
+ 
