@@ -234,7 +234,10 @@
 }
 
 .content {
-    @apply flex flex-row justify-center items-center gap-2 h-full bg-pink-600 px-4 py-1.5 cursor-pointer select-none text-white font-bold leading-5;
+    @apply md:text-sm text-xs;
+    @apply flex flex-row justify-center items-center gap-2 ;
+    @apply h-full bg-pink-600 px-4 py-1.5 cursor-pointer;
+    @apply select-none text-white font-bold leading-5;
 }
 
 .disable .content {

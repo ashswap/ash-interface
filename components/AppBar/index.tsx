@@ -53,7 +53,7 @@ const AppBar = () => {
     );
 
     return (
-        <div className="flex justify-between items-center px-12 py-5">
+        <div className="flex justify-between items-center md:px-12 px-6 py-5">
             <Link href="/" passHref>
                 <div className="cursor-pointer">
                     <Image

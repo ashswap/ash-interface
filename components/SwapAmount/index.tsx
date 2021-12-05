@@ -140,7 +140,7 @@ const SwapAmount = (props: Props) => {
                 </>
             )}
             <div
-                className={`bg-bg flex flex-row px-2.5 pt-3.5 pb-5.5 ${styles.content}`}
+                className={`bg-bg flex flex-row px-2.5 py-2.5 md:pt-3.5 md:pb-5.5 ${styles.content}`}
             >
                 <TokenSelect
                     modalTitle={props.type === "from" ? "Swap from" : "Swap to"}

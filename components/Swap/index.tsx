@@ -276,14 +276,14 @@ const Swap = () => {
     }, [tokenTo, rawValueTo, slippage]);
 
     return (
-        <div className="flex flex-col items-center pt-3.5 pb-12">
+        <div className="flex flex-col items-center pt-3.5 md:pb-12 xs:pb-52 pb-32">
             <Panel>
                 <PanelContent style={{ paddingRight: showSetting ? 48 : 30 }}>
                     <div className={styles.fire}>
                         <Image src={Fire} width={151} height={230} alt="Ash" />
                     </div>
                     <div className="flex flex-row justify-between pl-4">
-                        <div className="font-bold text-2xl">Swap</div>
+                        <div className="font-bold text-lg md:text-2xl">Swap</div>
                         <div className="flex flex-row gap-2">
                             <IconButton
                                 icon={<Clock />}
@@ -301,7 +301,7 @@ const Swap = () => {
                         </div>
                     </div>
 
-                    <div className="relative pt-12">
+                    <div className="relative md:pt-12 pt-4">
                         <SwapAmount
                             topLeftCorner
                             showQuickSelect={!tokenFrom && !!tokenTo}
@@ -426,7 +426,7 @@ const Swap = () => {
                             rightIcon={provider ? <IconRight /> : <></>}
                             topLeftCorner
                             style={{ height: 48 }}
-                            className="mt-12"
+                            className="md:mt-12 mt-6"
                             outline
                             onClick={provider ? swap : connectExtension}
                             glowOnHover
