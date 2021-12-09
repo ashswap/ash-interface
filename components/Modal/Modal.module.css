@@ -1,0 +1,7 @@
+.panel {
+    @apply w-full;
+}
+
+.panel > div:first-child {
+    @apply w-full;
+}
