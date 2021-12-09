@@ -3,7 +3,7 @@
 }
 
 .text{
-    @apply text-sm font-bold text-white;
+    @apply md:text-sm text-xs font-bold text-white;
 }
 
 .small .text {
