@@ -139,7 +139,7 @@ const TokenSelect = ({
                 {value ? <Token token={value} /> : <div>Select a token</div>}
                 <Down />
             </div>
-            <Modal open={open} onClose={() => setOpen(false)}>
+            <Modal open={open} onClose={() => setOpen(false)} contentClassName={styles.content}>
                 <div className="font-bold text-lg">{modalTitle}</div>
                 <div className="flex flex-row items-center my-8 w-full">
                     {pivotToken && type === "to" && renderPivotToken()}
@@ -150,7 +150,7 @@ const TokenSelect = ({
                         autoFocus
                         value={keyword}
                         onChange={e => onChangeKeyword(e.target.value)}
-                        textClassName="text-sm"
+                        textClassName="text-sm  w-full"
                         className="flex-1"
                     />
                     {pivotToken && type === "from" && renderPivotToken()}

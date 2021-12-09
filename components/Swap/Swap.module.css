@@ -29,10 +29,11 @@
 }
 
 .fire {
-    @apply absolute z-10;
+    @apply absolute z-10  md:w-auto md:h-auto;
 
-    left: -85px;
-    top: -70px;
+    width: 100px;
+    left: -61px;
+    top: -58px;
 }
 
 .revert {
@@ -54,4 +55,11 @@
 .swapResultValue {
     color: #ffffff;
     font-size: 14px;
+}
+
+@media (min-width: 768px) {
+    .fire {
+        left: -85px;
+        top: -70px;
+    }
 }
