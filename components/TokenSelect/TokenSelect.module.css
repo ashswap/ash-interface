@@ -7,7 +7,8 @@
     overflow: auto;
 }
 
-
-.content {
-    width: 100%;
+@media (max-width: 640px) {
+    .content {
+        @apply w-full;
+    }
 }
