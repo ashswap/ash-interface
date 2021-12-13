@@ -1,7 +1,7 @@
 .panel {
-    @apply w-full;
+    @apply w-full sm:w-auto;
 }
 
 .panel > div:first-child {
-    @apply w-full;
+    @apply w-full sm:w-auto;
 }
