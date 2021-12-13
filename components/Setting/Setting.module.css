@@ -1,5 +1,28 @@
-.container{
-    @apply relative w-7 bg-ash-dark-600 px-12 py-14 text-white;
+.panel{
+    @apply relative;
     width: 367px;
     border-left: #757391 0.6px solid;
+}
+
+.container{
+    @apply relative w-full h-full px-12 py-14 text-white bg-ash-dark-600 z-10;
+}
+
+
+@media (max-width: 640px) {
+    .panel {
+        @apply fixed right-0 bottom-0 left-0;
+        @apply  w-full border-none z-10;
+    }
+
+    .panel::after {
+        @apply absolute left-0 w-full h-screen z-0;
+        @apply bg-bg-overlay bg-opacity-20 backdrop-filter backdrop-blur-sm;
+
+        content: '';
+        top: -100%;
+        transform: translateY(-20%);
+        will-change: transform;
+    }
+    
 }
