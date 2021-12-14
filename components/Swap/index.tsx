@@ -108,10 +108,26 @@ const Swap = () => {
                 })
             )
             .then(({ returnData }) => {
-                let amountOut = new BigNumber(
-                    "0x" + Buffer.from(returnData[0], "base64").toString("hex")
+                let resultHex = Buffer.from(
+                    returnData[0],
+                    "base64"
+                ).toString("hex");
+                let parser = new TypeExpressionParser();
+                let mapper = new TypeMapper();
+                let serializer = new ArgSerializer();
+
+                let type = parser.parse("tuple3<BigUint, BigUint, bytes>");
+                let mappedType = mapper.mapType(type);
+
+                let endpointDefinitions = [
+                    new EndpointParameterDefinition("foo", "bar", mappedType)
+                ];
+                let values = serializer.stringToValues(
+                    resultHex,
+                    endpointDefinitions
                 );
-                amountOut = amountOut.div(
+                
+                let amountOut = values[0].valueOf().field0.div(
                     new BigNumber(10).exponentiatedBy(tokenTo.decimals)
                 );
 
