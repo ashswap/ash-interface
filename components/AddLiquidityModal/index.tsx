@@ -5,7 +5,11 @@ import {
     TokenIdentifierValue,
     BigUIntValue,
     AddressValue,
-    Query
+    Query,
+    TypeExpressionParser,
+    TypeMapper,
+    ArgSerializer,
+    EndpointParameterDefinition
 } from "@elrondnetwork/erdjs";
 import Link from "next/link";
 import Image from "next/image";
@@ -152,12 +156,26 @@ const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
             )
         ]).then(results => {
             let rates = results.slice(0, 2).map(result => {
-                return new BigNumber(
-                    "0x" +
-                        Buffer.from(result.returnData[0], "base64").toString(
-                            "hex"
-                        )
+                let resultHex = Buffer.from(
+                    result.returnData[0],
+                    "base64"
+                ).toString("hex");
+                let parser = new TypeExpressionParser();
+                let mapper = new TypeMapper();
+                let serializer = new ArgSerializer();
+
+                let type = parser.parse("tuple3<BigUint, BigUint, bytes>");
+                let mappedType = mapper.mapType(type);
+
+                let endpointDefinitions = [
+                    new EndpointParameterDefinition("foo", "bar", mappedType)
+                ];
+                let values = serializer.stringToValues(
+                    resultHex,
+                    endpointDefinitions
                 );
+
+                return values[0].valueOf().field0;
             });
 
             if (isMounted) {

@@ -23,7 +23,11 @@ import {
     Query,
     TokenIdentifierValue,
     BigUIntValue,
-    GasLimit
+    GasLimit,
+    TypeExpressionParser,
+    TypeMapper,
+    ArgSerializer,
+    EndpointParameterDefinition
 } from "@elrondnetwork/erdjs";
 import BigNumber from "bignumber.js";
 import { notification } from "antd";
@@ -168,12 +172,26 @@ const Swap = () => {
             )
         ]).then(results => {
             let rates = results.slice(0, 2).map(result => {
-                return new BigNumber(
-                    "0x" +
-                        Buffer.from(result.returnData[0], "base64").toString(
-                            "hex"
-                        )
+                let resultHex = Buffer.from(
+                    result.returnData[0],
+                    "base64"
+                ).toString("hex");
+                let parser = new TypeExpressionParser();
+                let mapper = new TypeMapper();
+                let serializer = new ArgSerializer();
+
+                let type = parser.parse("tuple3<BigUint, BigUint, bytes>");
+                let mappedType = mapper.mapType(type);
+
+                let endpointDefinitions = [
+                    new EndpointParameterDefinition("foo", "bar", mappedType)
+                ];
+                let values = serializer.stringToValues(
+                    resultHex,
+                    endpointDefinitions
                 );
+
+                return values[0].valueOf().field0;
             });
 
             setRates(rates);

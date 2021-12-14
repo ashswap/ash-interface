@@ -36,9 +36,9 @@ const pools: IPool[] = [
         address:
             "erd1qqqqqqqqqqqqqpgqa750qr0qw5jl7jd0dflxyaajnu5uhretj9ts9g5y3s",
         lpToken: {
-            id: "LPT-8842c9",
+            id: "LPT-7ee4a6",
             icon: "#fff",
-            name: "LPT-8842c9",
+            name: "LPT-7ee4a6",
             decimals: 18
         },
         tokens: [
@@ -62,9 +62,9 @@ const pools: IPool[] = [
         address:
             "erd1qqqqqqqqqqqqqpgqe2sgfvhju2zn03ts3s5v2hs0lp249cl7j9tsxxzhf8",
         lpToken: {
-            id: "LPT-8e880e",
+            id: "LPT-977258",
             icon: "#fff",
-            name: "LPT-8e880e",
+            name: "LPT-977258",
             decimals: 18
         },
         tokens: [
