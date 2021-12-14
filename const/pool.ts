@@ -8,23 +8,23 @@ import IconUSDT from "assets/images/usdt-icon.png";
 const pools: IPool[] = [
     {
         address:
-            "erd1qqqqqqqqqqqqqpgq8duuqkxu5zmd6n8qrnmsqv3sayt7dc3nj9ts97ddum",
+            "erd1qqqqqqqqqqqqqpgqqgfdej6zyct50z0lljmt9k2l02w9jvxnj9ts3xn5vz",
         lpToken: {
-            id: "LPT-e26625",
+            id: "LPT-8b37e8",
             icon: "#fff",
-            name: "LPT-e26625",
+            name: "LPT-8b37e8",
             decimals: 18
         },
         tokens: [
             {
-                id: "USDC-cefb49",
+                id: "USDC-9b5c1e",
                 icon: IconUSDC,
                 name: "USDC",
                 decimals: 6,
                 coingeckoId: "usd-coin"
             },
             {
-                id: "USDT-194acc",
+                id: "USDT-991037",
                 icon: IconUSDT,
                 name: "USDT",
                 decimals: 6,
@@ -34,7 +34,7 @@ const pools: IPool[] = [
     },
     {
         address:
-            "erd1qqqqqqqqqqqqqpgqx4r0q39p7wky6a5pe5q90p7v307xyzr7j9tsrhtlv7",
+            "erd1qqqqqqqqqqqqqpgqa750qr0qw5jl7jd0dflxyaajnu5uhretj9ts9g5y3s",
         lpToken: {
             id: "LPT-8842c9",
             icon: "#fff",
@@ -43,14 +43,14 @@ const pools: IPool[] = [
         },
         tokens: [
             {
-                id: "USDC-cefb49",
+                id: "USDC-9b5c1e",
                 icon: IconUSDC,
                 name: "USDC",
                 decimals: 6,
                 coingeckoId: "usd-coin"
             },
             {
-                id: "WUSDC-b3b87f",
+                id: "WUSDC-7dc0a2",
                 icon: IconWUSDC,
                 name: "wUSDC",
                 decimals: 6,
@@ -60,7 +60,7 @@ const pools: IPool[] = [
     },
     {
         address:
-            "erd1qqqqqqqqqqqqqpgqp6f23d64tefj95uwhey0wt3r2dwuzd5yj9tsjc4yqg",
+            "erd1qqqqqqqqqqqqqpgqe2sgfvhju2zn03ts3s5v2hs0lp249cl7j9tsxxzhf8",
         lpToken: {
             id: "LPT-8e880e",
             icon: "#fff",
@@ -69,14 +69,14 @@ const pools: IPool[] = [
         },
         tokens: [
             {
-                id: "BTC-a34f8c",
+                id: "BTC-599587",
                 icon: IconBTC,
                 name: "BTC",
                 decimals: 6,
                 coingeckoId: "bitcoin"
             },
             {
-                id: "WBTC-472f92",
+                id: "WBTC-901728",
                 icon: IconWBTC,
                 name: "wBTC",
                 decimals: 6,
