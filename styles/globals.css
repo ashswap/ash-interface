@@ -56,6 +56,10 @@ body > div:first-child {
     @apply relative;
 }
 
+.is-modal-open {
+    overflow: hidden;
+}
+
 .ash-slider .ant-slider-rail {
     @apply bg-slider-rail;
     height: 2px;
