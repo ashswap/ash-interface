@@ -8,7 +8,7 @@ import IconUSDT from "assets/images/usdt-icon.png";
 const pools: IPool[] = [
     {
         address:
-            "erd1qqqqqqqqqqqqqpgqqgfdej6zyct50z0lljmt9k2l02w9jvxnj9ts3xn5vz",
+            "erd1qqqqqqqqqqqqqpgqe5wsc8pyytptpzgauyyexzznlavn0pmqj9tsl4jc9x",
         lpToken: {
             id: "LPT-8b37e8",
             icon: "#fff",
@@ -34,7 +34,7 @@ const pools: IPool[] = [
     },
     {
         address:
-            "erd1qqqqqqqqqqqqqpgqa750qr0qw5jl7jd0dflxyaajnu5uhretj9ts9g5y3s",
+            "erd1qqqqqqqqqqqqqpgq2fpq3h66julfqgxeq9tkzsz6g3y9zr6hj9tsreq7ec",
         lpToken: {
             id: "LPT-7ee4a6",
             icon: "#fff",
@@ -60,7 +60,7 @@ const pools: IPool[] = [
     },
     {
         address:
-            "erd1qqqqqqqqqqqqqpgqe2sgfvhju2zn03ts3s5v2hs0lp249cl7j9tsxxzhf8",
+            "erd1qqqqqqqqqqqqqpgqdtfwd0hn55g6feudk4pl0z83kra34wh2j9tsr8dv9u",
         lpToken: {
             id: "LPT-977258",
             icon: "#fff",
