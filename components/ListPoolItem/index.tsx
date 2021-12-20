@@ -23,6 +23,7 @@ import ListPoolItemWithdraw from "components/ListPoolItemWithdraw";
 import PoolCard from "components/PoolCard";
 import { ViewType } from "components/PoolFilter";
 import { TokenBalancesMap } from "interface/tokenBalance";
+import result from "antd/lib/result";
 
 interface Props {
     pool: IPool;
@@ -81,26 +82,29 @@ const ListPoolItem = (props: Props) => {
                 })
             )
             .then(({ returnData }) => {
-                let resultHex = Buffer.from(returnData[0], "base64").toString(
-                    "hex"
-                );
-                let parser = new TypeExpressionParser();
-                let mapper = new TypeMapper();
-                let serializer = new ArgSerializer();
-
-                let type = parser.parse("tuple2<BigUint,BigUint>");
-                let mappedType = mapper.mapType(type);
-
-                let endpointDefinitions = [
-                    new EndpointParameterDefinition("foo", "bar", mappedType)
-                ];
-                let values = serializer.stringToValues(
-                    resultHex,
-                    endpointDefinitions
-                );
-
-                setValue0(new BigNumber(values[0].valueOf().field0.toString()));
-                setValue1(new BigNumber(values[0].valueOf().field1.toString()));
+                if (returnData.length > 0)
+                {
+                    let resultHex = Buffer.from(returnData[0], "base64").toString(
+                        "hex"
+                    );
+                    let parser = new TypeExpressionParser();
+                    let mapper = new TypeMapper();
+                    let serializer = new ArgSerializer();
+    
+                    let type = parser.parse("tuple2<BigUint,BigUint>");
+                    let mappedType = mapper.mapType(type);
+    
+                    let endpointDefinitions = [
+                        new EndpointParameterDefinition("foo", "bar", mappedType)
+                    ];
+                    let values = serializer.stringToValues(
+                        resultHex,
+                        endpointDefinitions
+                    );
+    
+                    setValue0(new BigNumber(values[0].valueOf().field0.toString()));
+                    setValue1(new BigNumber(values[0].valueOf().field1.toString()));
+                }
             });
     }, [ownLiquidity, props.pool.address, props.pool.tokens, proxy]);
 

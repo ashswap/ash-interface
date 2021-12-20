@@ -15,11 +15,15 @@ interface Props {
 
 const Modal = (props: Props) => {
     if (!props.open) {
-        document.body.classList.remove('is-modal-open')
+        if (typeof window !== 'undefined') {
+            document.body.classList.remove('is-modal-open')
+        }
         return null;
     }
 
-    document.body.classList.add('is-modal-open')
+    if (typeof window !== 'undefined') {
+        document.body.classList.add('is-modal-open')
+    }
     
     return (
         <div className="flex justify-center md:items-center items-end bg-bg-overlay fixed left-0 right-0 top-0 bottom-0 z-50 bg-opacity-20 backdrop-filter backdrop-blur-sm">
