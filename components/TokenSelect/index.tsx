@@ -14,6 +14,7 @@ import Search from "assets/svg/search.svg";
 import IconClose from "assets/svg/close-1.svg";
 import styles from "./TokenSelect.module.css";
 import { useWallet } from "context/wallet";
+import useMobileDetect from 'helper/useMobileDetect'
 
 interface Props {
     onChange?: (t: IToken) => void;
@@ -125,6 +126,8 @@ const TokenSelect = ({
         );
     };
 
+    const currentDevice = useMobileDetect()
+
     return (
         <>
             <div
@@ -147,7 +150,7 @@ const TokenSelect = ({
                         placeholder="Search or try usdt-usdc"
                         suffix={<Search />}
                         outline
-                        autoFocus
+                        autoFocus = {currentDevice.isDesktop()}
                         value={keyword}
                         onChange={e => onChangeKeyword(e.target.value)}
                         textClassName="text-sm  w-full"
