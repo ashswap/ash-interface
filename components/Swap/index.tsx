@@ -108,10 +108,9 @@ const Swap = () => {
                 })
             )
             .then(({ returnData }) => {
-                let resultHex = Buffer.from(
-                    returnData[0],
-                    "base64"
-                ).toString("hex");
+                let resultHex = Buffer.from(returnData[0], "base64").toString(
+                    "hex"
+                );
                 let parser = new TypeExpressionParser();
                 let mapper = new TypeMapper();
                 let serializer = new ArgSerializer();
@@ -126,10 +125,12 @@ const Swap = () => {
                     resultHex,
                     endpointDefinitions
                 );
-                
-                let amountOut = values[0].valueOf().field0.div(
-                    new BigNumber(10).exponentiatedBy(tokenTo.decimals)
-                );
+
+                let amountOut = values[0]
+                    .valueOf()
+                    .field0.div(
+                        new BigNumber(10).exponentiatedBy(tokenTo.decimals)
+                    );
 
                 setValueTo(amountOut.toString(10));
             });
@@ -212,12 +213,14 @@ const Swap = () => {
 
             setRates(rates);
 
-            const fee = new BigNumber(
+            let fee = new BigNumber(
                 "0x" +
                     Buffer.from(results[2].returnData[0], "base64").toString(
                         "hex"
                     )
             );
+
+            fee = fee.div(new BigNumber(100000));
 
             setFee(fee.isNaN() ? 0 : fee.toNumber());
         });
