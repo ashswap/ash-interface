@@ -12,6 +12,7 @@ import IconDisconnect from "assets/svg/disconnect.svg";
 import Avatar from "assets/images/avatar.png";
 import { Dropdown, Menu, Button as AntdButton } from "antd";
 import styles from "./AppBar.module.css";
+import useMobileDetect from "helper/useMobileDetect";
 
 const AppBar = () => {
     const { provider, connectExtension, disconnectExtension } = useWallet();
@@ -52,17 +53,28 @@ const AppBar = () => {
         </Menu>
     );
 
+    const currentDevice = useMobileDetect()
+
     return (
         <div className="flex justify-between items-center md:px-12 px-6 py-5">
             <Link href="/" passHref>
                 <div className="cursor-pointer">
-                    <Image
-                        src="/logo.png"
-                        alt="Ashswap logo"
-                        height={54}
-                        width={124}
-                        quality={100}
-                    />
+                    {currentDevice.isDesktop() ? 
+                        <Image
+                            src="/logo.png"
+                            alt="Ashswap logo"
+                            height={54}
+                            width={124}
+                            quality={100}
+                        /> :
+                        <Image
+                            src="/logo-mobile.png"
+                            alt="Ashswap logo"
+                            height={42}
+                            width={28}
+                            quality={100}
+                        />
+                    }
                 </div>
             </Link>
             <Nav />
