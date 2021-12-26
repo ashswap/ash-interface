@@ -175,7 +175,7 @@ const SwapAmount = (props: Props) => {
             )}
             {token && (
                 <div
-                    className={`${styles.balanceContainer} bg-bg px-2.5 pb-3.5 text-sm text-text-input-3`}
+                    className={`${styles.balanceContainer} bg-bg px-2.5 pb-3.5 text-xs md:text-sm text-text-input-3`}
                 >
                     <span>Balance: </span>
                     <span

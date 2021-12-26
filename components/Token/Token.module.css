@@ -6,10 +6,25 @@
     @apply md:text-sm text-xs font-bold text-white;
 }
 
+.small {
+    @apply bg-ash-dark-600 rounded-md justify-center flex-none;
+
+    min-width: 76px;
+    padding: 10px 11px;
+}
+
+.small + .small  {
+    margin-left: 8px;
+}
+
 .small .text {
     font-size: 10px;
 }
 
 .small .icon {
     @apply w-4 h-4;
+
+    margin-left: 0;
+    margin-top: 0;
+    margin-bottom: 0;
 }
