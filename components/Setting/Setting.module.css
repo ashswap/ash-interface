@@ -12,7 +12,7 @@
 @media (max-width: 640px) {
     .panel {
         @apply fixed right-0 bottom-0 left-0;
-        @apply  w-full border-none z-10;
+        @apply  w-full border-none z-50;
     }
 
     .panel::after {

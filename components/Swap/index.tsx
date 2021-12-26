@@ -310,7 +310,7 @@ const Swap = () => {
     }, [tokenTo, rawValueTo, slippage]);
 
     return (
-        <div className="flex flex-col items-center pt-3.5 md:pb-12 xs:pb-52 pb-32">
+        <div className="flex flex-col items-center md:pt-3.5 pt-7 pb-12">
             <Panel>
                 <PanelContent style={{ paddingRight: showSetting ? 48 : 30 }}>
                     <div className={styles.fire}>

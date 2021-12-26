@@ -1,6 +1,6 @@
 .container {
     @apply flex flex-row justify-center select-none text-xs font-medium;
-    @apply md:static absolute;
+    @apply md:static fixed;
 }
 
 
@@ -26,8 +26,10 @@
 
 @media (max-width: 767.5px) {
     .container {
+        @apply z-40;
+        
         padding: 4px;
-        bottom: 20px;
+        top: 664px;
         left: 50%;
         transform: translateX(-50%);
         background: rgba(117, 115, 145, 0.1);
