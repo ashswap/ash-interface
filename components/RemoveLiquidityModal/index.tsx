@@ -158,44 +158,52 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
     }, [liquidityDebounce, pool, proxy]);
 
     const removeLP = useCallback(async () => {
-        let tx = await callContract(new Address(pool.address), {
-            func: new ContractFunction("ESDTTransfer"),
-            gasLimit: new GasLimit(gasLimit),
-            args: [
-                new TokenIdentifierValue(Buffer.from(pool.lpToken.id)),
-                new BigUIntValue(liquidity),
-                new TokenIdentifierValue(Buffer.from("removeLiquidity")),
-                new BigUIntValue(
-                    new BigNumber(
-                        toWei(pool.tokens[0], value0)
-                            .multipliedBy(1 - slippage)
-                            .toFixed(0)
+        try {
+            let tx = await callContract(new Address(pool.address), {
+                func: new ContractFunction("ESDTTransfer"),
+                gasLimit: new GasLimit(gasLimit),
+                args: [
+                    new TokenIdentifierValue(Buffer.from(pool.lpToken.id)),
+                    new BigUIntValue(liquidity),
+                    new TokenIdentifierValue(Buffer.from("removeLiquidity")),
+                    new BigUIntValue(
+                        new BigNumber(
+                            toWei(pool.tokens[0], value0)
+                                .multipliedBy(1 - slippage)
+                                .toFixed(0)
+                        )
+                    ),
+                    new BigUIntValue(
+                        new BigNumber(
+                            toWei(pool.tokens[1], value1)
+                                .multipliedBy(1 - slippage)
+                                .toFixed(0)
+                        )
                     )
-                ),
-                new BigUIntValue(
-                    new BigNumber(
-                        toWei(pool.tokens[1], value1)
-                            .multipliedBy(1 - slippage)
-                            .toFixed(0)
+                ]
+            });
+    
+            fetchBalances();
+    
+            let key = `open${Date.now()}`;
+            notification.open({
+                key,
+                message: `Remove liquidity succeed ${value0} ${pool.tokens[0].name} to ${value1} ${pool.tokens[1].name}`,
+                icon: <IconNewTab />,
+                onClick: () =>
+                    window.open(
+                        network.explorerAddress +
+                            "/transactions/" +
+                            tx.getHash().toString(),
+                        "_blank"
                     )
-                )
-            ]
-        });
-
-        fetchBalances();
-
-        notification.open({
-            message: `Remove liquidity succeed ${value0} ${pool.tokens[0].name} to ${value1} ${pool.tokens[1].name}`,
-            duration: 12,
-            icon: <IconNewTab />,
-            onClick: () =>
-                window.open(
-                    network.explorerAddress +
-                        "/transactions/" +
-                        tx.getHash().toString(),
-                    "_blank"
-                )
-        });
+            });
+            setTimeout(() => {
+                notification.close(key);
+            }, 10000);
+        } catch (error) {
+            // TODO: extension close without response
+        }
 
         if (onClose) {
             onClose();

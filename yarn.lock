@@ -126,10 +126,10 @@
     assert "^2.0.0"
     perf_hooks "0.0.1"
 
-"@elrondnetwork/erdjs@8.0.1-alpha.9":
-  version "8.0.1-alpha.9"
-  resolved "https://registry.yarnpkg.com/@elrondnetwork/erdjs/-/erdjs-8.0.1-alpha.9.tgz#a04e89169972f9c8eb46fbdd5bcd36527ad1ce04"
-  integrity sha512-8tjuCEh4zBZmb8V6moNQ/Lh7WRSXdjQGzOrw66Ivs+6hm9KiN/5ns82L/RUsaAFCS304Q85bn9IwvoxrtzcHew==
+"@elrondnetwork/erdjs@^8.0.1-alpha.13":
+  version "8.0.1-alpha.13"
+  resolved "https://registry.yarnpkg.com/@elrondnetwork/erdjs/-/erdjs-8.0.1-alpha.13.tgz#9a3ee6182c50bd55ca0c4ec85bccefd6db7f9a6f"
+  integrity sha512-sCpJTD4NMQjUU54XC4yObmz6TptB6veo5TcjO3baZYiHxsdQKOMOhQzYypPHICvTvzR/VoHuHI0JbTimK1W4Vg==
   dependencies:
     "@babel/runtime" "7.11.2"
     "@elrondnetwork/bls-wasm" "0.3.3"

@@ -235,32 +235,44 @@ const Swap = () => {
             return;
         }
 
-        let tx = await callContract(new Address(pool?.address), {
-            func: new ContractFunction("ESDTTransfer"),
-            gasLimit: new GasLimit(gasLimit),
-            args: [
-                new TokenIdentifierValue(Buffer.from(tokenFrom.id)),
-                new BigUIntValue(rawValueFrom),
-                new TokenIdentifierValue(Buffer.from("exchange")),
-                new TokenIdentifierValue(Buffer.from(tokenTo.id)),
-                new BigUIntValue(new BigNumber(0))
-            ]
-        });
+        try {
+            let tx = await callContract(new Address(pool?.address), {
+                func: new ContractFunction("ESDTTransfer"),
+                gasLimit: new GasLimit(gasLimit),
+                args: [
+                    new TokenIdentifierValue(Buffer.from(tokenFrom.id)),
+                    new BigUIntValue(rawValueFrom),
+                    new TokenIdentifierValue(Buffer.from("exchange")),
+                    new TokenIdentifierValue(Buffer.from(tokenTo.id)),
+                    new BigUIntValue(new BigNumber(0))
+                ]
+            });
 
-        fetchBalances();
+            fetchBalances();
 
-        notification.open({
-            message: `Swap succeed ${valueFrom} ${tokenFrom.name} to ${valueTo} ${tokenTo.name}`,
-            duration: 12,
-            icon: <IconNewTab />,
-            onClick: () =>
-                window.open(
-                    network.explorerAddress +
-                        "/transactions/" +
-                        tx.getHash().toString(),
-                    "_blank"
-                )
-        });
+            let key = `open${Date.now()}`;
+            notification.open({
+                key,
+                message: `Swap succeed ${valueFrom} ${tokenFrom.name} to ${valueTo} ${tokenTo.name}`,
+                icon: <IconNewTab />,
+                onClick: () =>
+                    window.open(
+                        network.explorerAddress +
+                            "/transactions/" +
+                            tx.getHash().toString(),
+                        "_blank"
+                    )
+            });
+            setTimeout(() => {
+                notification.close(key);
+            }, 10000);
+        } catch (error) {
+            // TODO: extension close without response
+            // notification.warn({
+            //     message: error as string,
+            //     duration: 10
+            // });
+        }
     }, [
         provider,
         pool,
@@ -452,7 +464,7 @@ const Swap = () => {
                             <span className="text-text-input-3">
                                 INSUFFICIENT{" "}
                                 <span className="text-insufficent-fund">
-                                    USDT
+                                    {tokenFrom?.name}
                                 </span>{" "}
                                 BALANCE
                             </span>

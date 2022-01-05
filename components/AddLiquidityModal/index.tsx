@@ -66,41 +66,49 @@ const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
     }, [open]);
 
     const addLP = useCallback(async () => {
-        let tx = await callContract(new Address(provider?.account.address), {
-            func: new ContractFunction("MultiESDTNFTTransfer"),
-            gasLimit: new GasLimit(gasLimit),
-            args: [
-                new AddressValue(new Address(pool.address)),
-                new BigUIntValue(new BigNumber(2)),
-
-                new TokenIdentifierValue(Buffer.from(pool.tokens[0].id)),
-                new BigUIntValue(new BigNumber(0)),
-                new BigUIntValue(toWei(pool.tokens[0], value0)),
-
-                new TokenIdentifierValue(Buffer.from(pool.tokens[1].id)),
-                new BigUIntValue(new BigNumber(0)),
-                new BigUIntValue(toWei(pool.tokens[1], value1)),
-
-                new TokenIdentifierValue(Buffer.from("addLiquidity")),
-                new BigUIntValue(toWei(pool.tokens[0], value0)),
-                new BigUIntValue(toWei(pool.tokens[1], value1))
-            ]
-        });
-
-        fetchBalances();
-
-        notification.open({
-            message: `Add liquidity succeed ${value0} ${pool.tokens[0].name} to ${value1} ${pool.tokens[1].name}`,
-            duration: 12,
-            icon: <IconNewTab />,
-            onClick: () =>
-                window.open(
-                    network.explorerAddress +
-                        "/transactions/" +
-                        tx.getHash().toString(),
-                    "_blank"
-                )
-        });
+        try {
+            let tx = await callContract(new Address(provider?.account.address), {
+                func: new ContractFunction("MultiESDTNFTTransfer"),
+                gasLimit: new GasLimit(gasLimit),
+                args: [
+                    new AddressValue(new Address(pool.address)),
+                    new BigUIntValue(new BigNumber(2)),
+    
+                    new TokenIdentifierValue(Buffer.from(pool.tokens[0].id)),
+                    new BigUIntValue(new BigNumber(0)),
+                    new BigUIntValue(toWei(pool.tokens[0], value0)),
+    
+                    new TokenIdentifierValue(Buffer.from(pool.tokens[1].id)),
+                    new BigUIntValue(new BigNumber(0)),
+                    new BigUIntValue(toWei(pool.tokens[1], value1)),
+    
+                    new TokenIdentifierValue(Buffer.from("addLiquidity")),
+                    new BigUIntValue(toWei(pool.tokens[0], value0)),
+                    new BigUIntValue(toWei(pool.tokens[1], value1))
+                ]
+            });
+    
+            fetchBalances();
+    
+            let key = `open${Date.now()}`;
+            notification.open({
+                key,
+                message: `Add liquidity succeed ${value0} ${pool.tokens[0].name} to ${value1} ${pool.tokens[1].name}`,
+                icon: <IconNewTab />,
+                onClick: () =>
+                    window.open(
+                        network.explorerAddress +
+                            "/transactions/" +
+                            tx.getHash().toString(),
+                        "_blank"
+                    )
+            });
+            setTimeout(() => {
+                notification.close(key);
+            }, 10000);
+        } catch (error) {
+            // TODO: extension close without response
+        }
 
         if (onClose) {
             onClose();
