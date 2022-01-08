@@ -1,5 +1,5 @@
 .container{
-    @apply relative w-7 bg-ash-dark-600 px-12 py-14 text-white;
+    @apply relative w-7 px-12 py-14;
     width: 367px;
     border-left: #757391 0.6px solid;
 }

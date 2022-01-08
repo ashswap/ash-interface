@@ -1,6 +1,7 @@
 module.exports = {
     purge: ["./pages/**/*.{js,ts,jsx,tsx}", "./components/**/*.{js,ts,jsx,tsx}"],
     darkMode: "class", // or "media" or "class"
+    mode: "jit",
     theme: {
         extend: {
             spacing: {
@@ -37,6 +38,9 @@ module.exports = {
                 yellow: {
                     600: "#FFC10D",
                     700: "#E3AD12",
+                },
+                "ash-gray": {
+                    500: "#757391"
                 }
             }
         },
@@ -44,5 +48,5 @@ module.exports = {
     variants: {
         extend: {},
     },
-    plugins: [],
+    plugins: [require('./tailwindPlugins/clip-corner')],
 }
