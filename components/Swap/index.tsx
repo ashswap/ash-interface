@@ -1,41 +1,48 @@
-import { useState, useCallback, useEffect, useMemo } from "react";
-import styles from "./Swap.module.css";
+import {
+    Address,
+    ArgSerializer,
+    BigUIntValue,
+    ContractFunction,
+    EndpointParameterDefinition,
+    GasLimit,
+    Query,
+    TokenIdentifierValue,
+    TypeExpressionParser,
+    TypeMapper,
+} from "@elrondnetwork/erdjs";
+import { notification } from "antd";
 import Fire from "assets/images/fire.png";
-import Image from "next/image";
-import IconButton from "components/IconButton";
-import SwapAmount from "components/SwapAmount";
-import Button from "components/Button";
-import Setting from "components/Setting";
-import Panel, { PanelContent } from "components/Panel";
 import Clock from "assets/svg/clock.svg";
-import SettingIcon from "assets/svg/setting.svg";
-import SettingActiveIcon from "assets/svg/setting-active.svg";
+import IconClose from "assets/svg/close.svg";
 import IconDown from "assets/svg/down-green.svg";
 import IconNewTab from "assets/svg/new-tab-green.svg";
 import Revert from "assets/svg/revert.svg";
-import IconWallet from "assets/svg/wallet.svg";
 import IconRight from "assets/svg/right-white.svg";
-import { useWallet } from "context/wallet";
-import { gasLimit, network } from "const/network";
-import {
-    Address,
-    ContractFunction,
-    Query,
-    TokenIdentifierValue,
-    BigUIntValue,
-    GasLimit,
-    TypeExpressionParser,
-    TypeMapper,
-    ArgSerializer,
-    EndpointParameterDefinition
-} from "@elrondnetwork/erdjs";
+import SettingActiveIcon from "assets/svg/setting-active.svg";
+import SettingIcon from "assets/svg/setting.svg";
+import IconWallet from "assets/svg/wallet.svg";
 import BigNumber from "bignumber.js";
-import { notification } from "antd";
-import { toEGLD, toWei } from "helper/balance";
-import { useSwap } from "context/swap";
+import Button from "components/Button";
 import HistoryModal from "components/HistoryModal";
+import IconButton from "components/IconButton";
+import { PanelV2 } from "components/Panel";
+import Modal from "components/ReactModal";
+import Setting from "components/Setting";
+import SwapAmount from "components/SwapAmount";
+import { TAILWIND_BREAKPOINT } from "const/mediaQueries";
+import { gasLimit, network } from "const/network";
+import { useSwap } from "context/swap";
+import { useWallet } from "context/wallet";
+import { toEGLD, toWei } from "helper/balance";
+import useMediaQuery from "hooks/useMediaQuery";
+import Image from "next/image";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import styles from "./Swap.module.css";
 
 const Swap = () => {
+    const isSMScreen = useMediaQuery(
+        `(max-width: ${TAILWIND_BREAKPOINT.SM}px)`
+    );
     const {
         tokenFrom,
         tokenTo,
@@ -48,20 +55,19 @@ const Swap = () => {
         rates,
         setRates,
         isInsufficentFund,
-        slippage
+        slippage,
     } = useSwap();
     const [showSetting, setShowSetting] = useState<boolean>(false);
     const [isOpenHistoryModal, openHistoryModal] = useState<boolean>(false);
     const [fee, setFee] = useState<number>(0);
 
-    const {
-        provider,
-        proxy,
-        account,
-        connectExtension,
-        callContract
-    } = useWallet();
+    const { provider, proxy, account, connectExtension, callContract } =
+        useWallet();
 
+    useEffect(() => {
+        setShowSetting(false);
+        openHistoryModal(false);
+    }, [isSMScreen]);
     const revertToken = () => {
         setTokenFrom(tokenTo);
         setTokenTo(tokenFrom);
@@ -99,8 +105,8 @@ const Swap = () => {
                     args: [
                         new TokenIdentifierValue(Buffer.from(tokenFrom.id)),
                         new TokenIdentifierValue(Buffer.from(tokenTo.id)),
-                        new BigUIntValue(amountIn)
-                    ]
+                        new BigUIntValue(amountIn),
+                    ],
                 })
             )
             .then(({ returnData }) => {
@@ -115,7 +121,7 @@ const Swap = () => {
                 let mappedType = mapper.mapType(type);
 
                 let endpointDefinitions = [
-                    new EndpointParameterDefinition("foo", "bar", mappedType)
+                    new EndpointParameterDefinition("foo", "bar", mappedType),
                 ];
                 let values = serializer.stringToValues(
                     resultHex,
@@ -154,8 +160,8 @@ const Swap = () => {
                             new BigNumber(10).exponentiatedBy(
                                 pool!.tokens[0].decimals
                             )
-                        )
-                    ]
+                        ),
+                    ],
                 })
             ),
             proxy.queryContract(
@@ -173,18 +179,18 @@ const Swap = () => {
                             new BigNumber(10).exponentiatedBy(
                                 pool!.tokens[1].decimals
                             )
-                        )
-                    ]
+                        ),
+                    ],
                 })
             ),
             proxy.queryContract(
                 new Query({
                     address: new Address(pool?.address),
-                    func: new ContractFunction("getTotalFeePercent")
+                    func: new ContractFunction("getTotalFeePercent"),
                 })
-            )
-        ]).then(results => {
-            let rates = results.slice(0, 2).map(result => {
+            ),
+        ]).then((results) => {
+            let rates = results.slice(0, 2).map((result) => {
                 let resultHex = Buffer.from(
                     result.returnData[0],
                     "base64"
@@ -197,7 +203,7 @@ const Swap = () => {
                 let mappedType = mapper.mapType(type);
 
                 let endpointDefinitions = [
-                    new EndpointParameterDefinition("foo", "bar", mappedType)
+                    new EndpointParameterDefinition("foo", "bar", mappedType),
                 ];
                 let values = serializer.stringToValues(
                     resultHex,
@@ -240,8 +246,8 @@ const Swap = () => {
                     new BigUIntValue(rawValueFrom),
                     new TokenIdentifierValue(Buffer.from("exchange")),
                     new TokenIdentifierValue(Buffer.from(tokenTo.id)),
-                    new BigUIntValue(new BigNumber(0))
-                ]
+                    new BigUIntValue(new BigNumber(0)),
+                ],
             });
 
             let key = `open${Date.now()}`;
@@ -255,7 +261,7 @@ const Swap = () => {
                             "/transactions/" +
                             tx.getHash().toString(),
                         "_blank"
-                    )
+                    ),
             });
             setTimeout(() => {
                 notification.close(key);
@@ -277,7 +283,7 @@ const Swap = () => {
         tokenFrom,
         tokenTo,
         valueFrom,
-        valueTo
+        valueTo,
     ]);
 
     const priceImpact = useMemo(() => {
@@ -320,182 +326,241 @@ const Swap = () => {
     }, [tokenTo, rawValueTo, slippage]);
 
     return (
-        <div className="flex flex-col items-center pt-3.5 pb-12">
-            <Panel>
-                <PanelContent style={{ paddingRight: showSetting ? 48 : 30 }}>
-                    <div className={styles.fire}>
-                        <Image src={Fire} width={151} height={230} alt="Ash" />
-                    </div>
-                    <div className="flex flex-row justify-between pl-4">
-                        <div className="font-bold text-2xl">Swap</div>
-                        <div className="flex flex-row gap-2">
-                            <IconButton
-                                icon={<Clock />}
-                                onClick={() =>
-                                    provider &&
-                                    openHistoryModal(!isOpenHistoryModal)
-                                }
-                            />
-                            <IconButton
-                                icon={<SettingIcon />}
-                                activeIcon={<SettingActiveIcon />}
-                                onClick={() => setShowSetting(!showSetting)}
-                                active={showSetting}
-                            />
-                        </div>
-                    </div>
-
-                    <div className="relative pt-12">
-                        <SwapAmount
-                            topLeftCorner
-                            showQuickSelect={!tokenFrom && !!tokenTo}
-                            type="from"
-                            resetPivotToken={() => setTokenTo(undefined)}
-                        />
-                        <div style={{ height: 4, position: "relative" }}>
-                            <div
-                                className={styles.revert}
-                                onClick={revertToken}
-                            >
-                                <Revert />
+        <div className="flex flex-col items-center pt-3.5 pb-12 px-6">
+            <div className="flex max-w-full">
+                <div
+                    className={`w-full max-w-[28.75rem] transition-none ${
+                        showSetting && !isSMScreen && "sm:w-7/12"
+                    }`}
+                >
+                    <PanelV2 className="text-base text-ash-dark-600">
+                        <div className="px-6 py-8 sm:px-8 text-white">
+                            <div className={styles.fire}>
+                                <Image
+                                    src={Fire}
+                                    width={151}
+                                    height={230}
+                                    alt="Ash"
+                                />
                             </div>
-                        </div>
-                        <SwapAmount
-                            bottomRightCorner
-                            showQuickSelect={!!tokenFrom && !tokenTo}
-                            type="to"
-                            resetPivotToken={() => setTokenFrom(undefined)}
-                            disableInput
-                        />
-                    </div>
-
-                    {tokenFrom && tokenTo && (
-                        <div
-                            className="flex flex-row justify-between text-xs text-white my-5"
-                            style={{ color: "#00FF75" }}
-                        >
-                            <div className="opacity-50 font-bold flex flex-row items-center gap-2 select-none cursor-pointer">
-                                <div>Fair price</div>
-                                <div>
-                                    <IconDown />
+                            <div className="flex flex-row justify-between pl-4">
+                                <div className="font-bold text-2xl">Swap</div>
+                                <div className="flex flex-row gap-2">
+                                    <IconButton
+                                        icon={<Clock />}
+                                        onClick={() =>
+                                            provider &&
+                                            openHistoryModal((state) => !state)
+                                        }
+                                    />
+                                    <IconButton
+                                        icon={<SettingIcon />}
+                                        activeIcon={<SettingActiveIcon />}
+                                        onClick={() =>
+                                            setShowSetting((state) => !state)
+                                        }
+                                        active={showSetting}
+                                    />
                                 </div>
                             </div>
-                            <div>
-                                1 {tokenFrom?.name} ={" "}
-                                {pool &&
-                                    rates &&
-                                    (pool?.tokens[0].id === tokenFrom.id
-                                        ? toEGLD(
-                                              pool.tokens[1],
-                                              rates[0].toString()
-                                          ).toString()
-                                        : toEGLD(
-                                              pool.tokens[0],
-                                              rates[1].toString()
-                                          ).toString())}{" "}
-                                {tokenTo?.name}
-                            </div>
-                        </div>
-                    )}
 
-                    {pool && rawValueFrom.gt(new BigNumber(0)) && (
-                        <>
-                            <div className="bg-black flex flex-row items-center justify-between h-10 pl-5 pr-6">
-                                <div className={styles.swapResultLabel}>
-                                    Price impact
-                                </div>
+                            <div className="relative pt-12">
+                                <SwapAmount
+                                    topLeftCorner
+                                    showQuickSelect={!tokenFrom && !!tokenTo}
+                                    type="from"
+                                    resetPivotToken={() =>
+                                        setTokenTo(undefined)
+                                    }
+                                />
                                 <div
-                                    className={styles.swapResultValue}
+                                    style={{ height: 4, position: "relative" }}
+                                >
+                                    <div
+                                        className={styles.revert}
+                                        onClick={revertToken}
+                                    >
+                                        <Revert />
+                                    </div>
+                                </div>
+                                <SwapAmount
+                                    bottomRightCorner
+                                    showQuickSelect={!!tokenFrom && !tokenTo}
+                                    type="to"
+                                    resetPivotToken={() =>
+                                        setTokenFrom(undefined)
+                                    }
+                                    disableInput
+                                />
+                            </div>
+
+                            {tokenFrom && tokenTo && (
+                                <div
+                                    className="flex flex-row justify-between text-xs text-white my-5"
                                     style={{ color: "#00FF75" }}
                                 >
-                                    {priceImpact}
+                                    <div className="opacity-50 font-bold flex flex-row items-center gap-2 select-none cursor-pointer">
+                                        <div>Fair price</div>
+                                        <div>
+                                            <IconDown />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        1 {tokenFrom?.name} ={" "}
+                                        {pool &&
+                                            rates &&
+                                            (pool?.tokens[0].id === tokenFrom.id
+                                                ? toEGLD(
+                                                      pool.tokens[1],
+                                                      rates[0].toString()
+                                                  ).toString()
+                                                : toEGLD(
+                                                      pool.tokens[0],
+                                                      rates[1].toString()
+                                                  ).toString())}{" "}
+                                        {tokenTo?.name}
+                                    </div>
                                 </div>
-                            </div>
-                            <div className="bg-black flex flex-row items-center justify-between h-10 pl-5 pr-6">
-                                <div className={styles.swapResultLabel}>
-                                    Minimum received
-                                </div>
-                                <div className={styles.swapResultValue}>
-                                    {minimumReceive} {tokenTo?.name}
-                                </div>
-                            </div>
-                            <div className="bg-black flex flex-row items-center justify-between h-10 pl-5 pr-6">
-                                <div className={styles.swapResultLabel}>
-                                    Slippage
-                                </div>
-                                <div className={styles.swapResultValue}>
-                                    {slippage * 100}%
-                                </div>
-                            </div>
-                            <div className="bg-black flex flex-row items-center justify-between h-10 pl-5 pr-6">
-                                <div className={styles.swapResultLabel}>
-                                    Swap fees
-                                </div>
-                                <div className={styles.swapResultValue}>
-                                    {tokenTo && rawValueTo
-                                        ? toEGLD(
-                                              tokenTo,
-                                              rawValueTo
-                                                  .multipliedBy(fee)
-                                                  .toString()
-                                          ).toFixed(3)
-                                        : "0"}{" "}
-                                    {tokenTo?.name}
-                                </div>
-                            </div>
-                        </>
-                    )}
+                            )}
 
-                    {isInsufficentFund ||
-                    account?.balance.valueOf().lte(new BigNumber(0)) ? (
-                        <Button
-                            leftIcon={!provider ? <IconWallet /> : <></>}
-                            rightIcon={provider ? <IconRight /> : <></>}
-                            topLeftCorner
-                            style={{ height: 48 }}
-                            className="mt-12"
-                            disable
-                            outline
-                        >
-                            <span className="text-text-input-3">
-                                INSUFFICIENT{" "}
-                                <span className="text-insufficent-fund">
-                                    {account?.balance
-                                        .valueOf()
-                                        .lte(new BigNumber(0))
-                                        ? account?.balance.token.identifier
-                                        : tokenFrom?.name}
-                                </span>{" "}
-                                BALANCE
-                            </span>
-                        </Button>
-                    ) : (
-                        <Button
-                            leftIcon={!provider ? <IconWallet /> : <></>}
-                            rightIcon={provider ? <IconRight /> : <></>}
-                            topLeftCorner
-                            style={{ height: 48 }}
-                            className="mt-12"
-                            outline
-                            onClick={provider ? swap : connectExtension}
-                            glowOnHover
-                        >
-                            {provider ? "SWAP" : "CONNECT WALLET"}
-                        </Button>
-                    )}
-                    <div className="text-xs font-bold text-center" style={{marginTop: 34}}>
-                        <span className="text-text-input-3">DON&apos;T KNOW HOW TO USE IT? </span>
-                        <a href="https://docs.ashswap.io/guides/swap-trade" target={"_blank"} rel="noreferrer" style={{color: "#14E499"}}>VISIT HERE!</a>
+                            {pool && rawValueFrom.gt(new BigNumber(0)) && (
+                                <>
+                                    <div className="bg-black flex flex-row items-center justify-between h-10 pl-5 pr-6">
+                                        <div className={styles.swapResultLabel}>
+                                            Price impact
+                                        </div>
+                                        <div
+                                            className={styles.swapResultValue}
+                                            style={{ color: "#00FF75" }}
+                                        >
+                                            {priceImpact}
+                                        </div>
+                                    </div>
+                                    <div className="bg-black flex flex-row items-center justify-between h-10 pl-5 pr-6">
+                                        <div className={styles.swapResultLabel}>
+                                            Minimum received
+                                        </div>
+                                        <div className={styles.swapResultValue}>
+                                            {minimumReceive} {tokenTo?.name}
+                                        </div>
+                                    </div>
+                                    <div className="bg-black flex flex-row items-center justify-between h-10 pl-5 pr-6">
+                                        <div className={styles.swapResultLabel}>
+                                            Slippage
+                                        </div>
+                                        <div className={styles.swapResultValue}>
+                                            {slippage * 100}%
+                                        </div>
+                                    </div>
+                                    <div className="bg-black flex flex-row items-center justify-between h-10 pl-5 pr-6">
+                                        <div className={styles.swapResultLabel}>
+                                            Swap fees
+                                        </div>
+                                        <div className={styles.swapResultValue}>
+                                            {tokenTo && rawValueTo
+                                                ? toEGLD(
+                                                      tokenTo,
+                                                      rawValueTo
+                                                          .multipliedBy(fee)
+                                                          .toString()
+                                                  ).toFixed(3)
+                                                : "0"}{" "}
+                                            {tokenTo?.name}
+                                        </div>
+                                    </div>
+                                </>
+                            )}
+
+                            {isInsufficentFund ? (
+                                <Button
+                                    leftIcon={
+                                        !provider ? <IconWallet /> : <></>
+                                    }
+                                    rightIcon={provider ? <IconRight /> : <></>}
+                                    topLeftCorner
+                                    style={{ height: 48 }}
+                                    className="mt-12"
+                                    disable
+                                    outline
+                                >
+                                    <span className="text-text-input-3">
+                                        INSUFFICIENT{" "}
+                                        <span className="text-insufficent-fund">
+                                            {tokenFrom?.name}
+                                        </span>{" "}
+                                        BALANCE
+                                    </span>
+                                </Button>
+                            ) : (
+                                <Button
+                                    leftIcon={
+                                        !provider ? <IconWallet /> : <></>
+                                    }
+                                    rightIcon={provider ? <IconRight /> : <></>}
+                                    topLeftCorner
+                                    style={{ height: 48 }}
+                                    className="mt-12"
+                                    outline
+                                    onClick={provider ? swap : connectExtension}
+                                    glowOnHover
+                                >
+                                    {provider ? "SWAP" : "CONNECT WALLET"}
+                                </Button>
+                            )}
+
+                            <div
+                                className="text-xs font-bold text-center"
+                                style={{ marginTop: 34 }}
+                            >
+                                <span className="text-text-input-3">
+                                    DON&apos;T KNOW HOW TO USE IT?{" "}
+                                </span>
+                                <a
+                                    href="https://docs.ashswap.io/guides/swap-trade"
+                                    target={"_blank"}
+                                    rel="noreferrer"
+                                    style={{ color: "#14E499" }}
+                                >
+                                    VISIT HERE!
+                                </a>
+                            </div>
+                        </div>
+                    </PanelV2>
+                </div>
+                {showSetting && !isSMScreen && (
+                    <div className="relative px-12 py-14 bg-ash-dark-600 sm:w-5/12 max-w-[23rem] text-white border-l border-l-[#757391]">
+                        <div className="absolute top-4 right-4">
+                            <IconButton
+                                icon={<IconClose />}
+                                iconSize="small"
+                                onClick={() => setShowSetting(false)}
+                            />
+                        </div>
+                        <Setting />
                     </div>
-                </PanelContent>
-                {showSetting && (
-                    <Setting onClose={() => setShowSetting(false)} />
                 )}
-            </Panel>
+            </div>
             <HistoryModal
                 open={isOpenHistoryModal}
                 onClose={() => openHistoryModal(false)}
             />
+            {isSMScreen && (
+                <Modal
+                    isOpen={showSetting}
+                    onRequestClose={() => setShowSetting(false)}
+                    className="fixed bottom-0 left-0 right-0"
+                >
+                    <div className="text-white py-11 px-6">
+                        <Setting />
+                        <Button
+                            className="uppercase text-xs mt-10"
+                            textClassName="h-10"
+                        >
+                            Confirm
+                        </Button>
+                    </div>
+                </Modal>
+            )}
         </div>
     );
 };

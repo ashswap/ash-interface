@@ -127,3 +127,67 @@ input[type="number"] {
         right: 100%;
     }
 }
+
+@layer utilities {
+    /* .clip-corner-1 {
+        --tw-clip-corner-size: 0.25rem;
+    }
+    .clip-corner-2 {
+        --tw-clip-corner-size: 0.5rem;
+    }
+    .clip-corner-3 {
+        --tw-clip-corner-size: 0.75rem;
+    }
+    .clip-corner-4 {
+        --tw-clip-corner-size: 1rem;
+    } */
+    /* .clip-corner-br {
+        clip-path: polygon(
+            0 0,
+            100% 0,
+            100% calc(100% - var(--tw-clip-corner-size, 0px)),
+            calc(100% - var(--tw-clip-corner-size, 0px))
+                calc(100% - var(--tw-clip-corner-size, 0px)),
+            calc(100% - var(--tw-clip-corner-size, 0px)) 100%,
+            0% 100%
+        );
+    }
+    .clip-corner-bl {
+        clip-path: polygon(
+            0 calc(100% - var(--tw-clip-corner-size, 0px)),
+            0 0,
+            100% 0,
+            100% 100%,
+            var(--tw-clip-corner-size, 0px) 100%,
+            var(--tw-clip-corner-size, 0px)
+                calc(100% - var(--tw-clip-corner-size, 0px))
+        );
+    }
+    .clip-corner-tr {
+        clip-path: polygon(
+            0 0,
+            calc(100% - var(--tw-clip-corner-size, 0px)) 0,
+            calc(100% - var(--tw-clip-corner-size, 0px))
+                var(--tw-clip-corner-size, 0px),
+            100% var(--tw-clip-corner-size, 0px),
+            100% 100%,
+            0% 100%
+        );
+    }
+    .clip-corner-tl {
+        clip-path: polygon(
+            0 var(--tw-clip-corner-size, 0px),
+            var(--tw-clip-corner-size, 0px) var(--tw-clip-corner-size, 0px),
+            var(--tw-clip-corner-size, 0px) 0,
+            100% 0,
+            100% 100%,
+            0% 100%
+        );
+    } */
+}
+
+/* remove scrolling on the body when the modal is open */
+.ReactModal__Body--open,
+.ReactModal__Html--open {
+    overflow: hidden;
+}

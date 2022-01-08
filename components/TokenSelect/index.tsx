@@ -1,19 +1,18 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import BigNumber from "bignumber.js";
-import pools from "const/pool";
-import Modal from "components/Modal";
-import Input from "components/Input";
-import ListToken from "components/ListToken";
-import Token from "components/Token";
-import ListSwapPool from "components/ListSwapPool";
-import { TokenBalance } from "interface/tokenBalance";
-import { IToken } from "interface/token";
-import IPool from "interface/pool";
+import IconClose from "assets/svg/close-1.svg";
 import Down from "assets/svg/down.svg";
 import Search from "assets/svg/search.svg";
-import IconClose from "assets/svg/close-1.svg";
-import styles from "./TokenSelect.module.css";
+import BigNumber from "bignumber.js";
+import Input from "components/Input";
+import ListSwapPool from "components/ListSwapPool";
+import ListToken from "components/ListToken";
+import Modal from "components/ReactModal";
+import Token from "components/Token";
 import { useWallet } from "context/wallet";
+import IPool from "interface/pool";
+import { IToken } from "interface/token";
+import { TokenBalance } from "interface/tokenBalance";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import styles from "./TokenSelect.module.css";
 
 interface Props {
     onChange?: (t: IToken) => void;
@@ -136,53 +135,74 @@ const TokenSelect = ({
                 }
                 onClick={() => setOpen(true)}
             >
-                {value ? <Token token={value} /> : <div>Select a token</div>}
+                {value ? (
+                    <Token token={value} />
+                ) : (
+                    <div className="text-xs sm:text-sm">Select a token</div>
+                )}
                 <Down />
             </div>
-            <Modal open={open} onClose={() => setOpen(false)}>
-                <div className="font-bold text-lg">{modalTitle}</div>
-                <div className="flex flex-row items-center my-8 w-full">
-                    {pivotToken && type === "to" && renderPivotToken()}
-                    <Input
-                        placeholder="Search or try usdt"
-                        suffix={<Search />}
-                        outline
-                        autoFocus
-                        value={keyword}
-                        onChange={e => onChangeKeyword(e.target.value)}
-                        textClassName="text-sm"
-                        className="flex-1"
-                    />
-                    {pivotToken && type === "from" && renderPivotToken()}
-                </div>
-                {validPools && filtedValidPools.length === 0 ? (
-                    <div className="text-insufficent-fund text-xs">
-                        That doesn&apos;t look like a supported swap!
+            <Modal
+                isOpen={open}
+                onRequestClose={() => setOpen(false)}
+                className="w-full sm:w-[27.375rem] sm:mt-28 mx-auto fixed bottom-0 sm:static"
+                contentClassName="h-[36rem]"
+            >
+                <div className="flex flex-col px-6 py-11">
+                    <div className="flex-shrink-0">
+                        <div className="font-bold text-lg text-white">
+                            {modalTitle}
+                        </div>
+                        <div className="flex flex-row items-center my-8 w-full">
+                            {pivotToken && type === "to" && renderPivotToken()}
+                            <Input
+                                placeholder="Search or try usdt-usdc"
+                                suffix={<Search />}
+                                outline
+                                autoFocus
+                                value={keyword}
+                                onChange={e => onChangeKeyword(e.target.value)}
+                                textClassName="text-sm"
+                                className="w-full caret-pink-500"
+                            />
+                            {pivotToken &&
+                                type === "from" &&
+                                renderPivotToken()}
+                        </div>
+                        {validPools && filtedValidPools.length === 0 ? (
+                            <div className="text-insufficent-fund text-xs">
+                                That doesn&apos;t look like a supported swap!
+                            </div>
+                        ) : (
+                            <div className="font-normal text-xs text-white">
+                                {validPools ? "Supported pairs" : "Owned"}
+                            </div>
+                        )}
                     </div>
-                ) : (
-                    <div className="font-normal text-xs text-white">
-                        {validPools ? "Supported pairs" : "Owned"}
-                    </div>
-                )}
 
-                {validPools ? (
-                    <ListSwapPool
-                        items={filtedValidPools}
-                        pivotToken={pivotToken!}
-                        isPivotFirst={type === "to"}
-                        onSelect={p =>
-                            onSelectToken(
-                                p.tokens.filter(t => t.id !== pivotToken?.id)[0]
-                            )
-                        }
-                    />
-                ) : (
-                    <ListToken
-                        className={styles.listToken}
-                        items={filtedTokenBalances}
-                        onSelect={t => onSelectToken(t.token)}
-                    />
-                )}
+                    <div className="flex-grow overflow-auto">
+                        {validPools ? (
+                            <ListSwapPool
+                                items={filtedValidPools}
+                                pivotToken={pivotToken!}
+                                isPivotFirst={type === "to"}
+                                onSelect={p =>
+                                    onSelectToken(
+                                        p.tokens.filter(
+                                            t => t.id !== pivotToken?.id
+                                        )[0]
+                                    )
+                                }
+                            />
+                        ) : (
+                            <ListToken
+                                className={styles.listToken}
+                                items={filtedTokenBalances}
+                                onSelect={t => onSelectToken(t.token)}
+                            />
+                        )}
+                    </div>
+                </div>
             </Modal>
         </>
     );

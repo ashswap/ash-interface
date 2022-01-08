@@ -19,6 +19,7 @@
         "next-seo": "^4.28.1",
         "react": "17.0.2",
         "react-dom": "17.0.2",
+        "react-modal": "^3.14.4",
         "react-select": "^5.2.1",
         "swr": "^1.0.1",
         "use-debounce": "^7.0.1"
@@ -26,6 +27,7 @@
     "devDependencies": {
         "@types/node": "16.11.6",
         "@types/react": "17.0.33",
+        "@types/react-modal": "^3.13.1",
         "autoprefixer": "^10.4.0",
         "eslint": "7",
         "eslint-config-next": "12.0.1",

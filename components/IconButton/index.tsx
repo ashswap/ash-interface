@@ -1,11 +1,11 @@
-import { ReactElement, CSSProperties } from "react";
+import { ReactElement, CSSProperties, MouseEvent } from "react";
 import styles from "./IconButton.module.css";
 
 interface Props {
     icon?: ReactElement;
     iconSize?: "small" | "big";
     activeIcon?: ReactElement;
-    onClick?: () => void;
+    onClick?: (e: MouseEvent<Element, globalThis.MouseEvent>) => void;
     active?: boolean;
     className?: string | undefined;
     style?: CSSProperties | undefined;
