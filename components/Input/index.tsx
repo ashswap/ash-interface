@@ -31,7 +31,7 @@ const Input = (props: Props) => {
             style={props.style}
         >
             <input
-                className={`${
+                className={`overflow-auto ${
                     styles.input
                 } text-${textAlign} text-${textColorClassName} placeholder-${textColorClassName} ${props.textClassName ||
                     ""}`}

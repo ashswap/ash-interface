@@ -1,21 +1,17 @@
-import { useCallback } from "react";
+import AddressMenu from "components/AddressMenu";
+import Nav from "components/Nav";
+import { TAILWIND_BREAKPOINT } from "const/mediaQueries";
+import { useWallet } from "context/wallet";
+import useMediaQuery from "hooks/useMediaQuery";
 import Image from "next/image";
 import Link from "next/link";
-import Button from "components/Button";
-import Nav from "components/Nav";
-import Wallet from "assets/svg/wallet.svg";
-import { useWallet } from "context/wallet";
-import IconDown from "assets/svg/down-white.svg";
-import IconCopy from "assets/svg/copy.svg";
-import IconChange from "assets/svg/change.svg";
-import IconDisconnect from "assets/svg/disconnect.svg";
-import Avatar from "assets/images/avatar.png";
-import { Dropdown, Menu, Button as AntdButton } from "antd";
-import styles from "./AppBar.module.css";
+import { useCallback } from "react";
 
 const AppBar = () => {
     const { provider, connectExtension, disconnectExtension } = useWallet();
-
+    const isSMScreen = useMediaQuery(
+        `(max-width: ${TAILWIND_BREAKPOINT.SM}px)`
+    );
     const copyAddress = useCallback(() => {
         if (!provider) {
             return;
@@ -24,89 +20,44 @@ const AppBar = () => {
         navigator.clipboard.writeText(provider.account.address);
     }, [provider]);
 
-    const menu = (
-        <Menu className={styles.addressMenu}>
-            <Menu.Item
-                key="1"
-                className={styles.addressMenuItem}
-                icon={<IconCopy />}
-                onClick={copyAddress}
-            >
-                Copy address
-            </Menu.Item>
-            <Menu.Item
-                key="2"
-                className={styles.addressMenuItem}
-                icon={<IconChange />}
-            >
-                Change wallet
-            </Menu.Item>
-            <Menu.Item
-                key="3"
-                className={styles.addressMenuItem}
-                icon={<IconDisconnect />}
-                onClick={disconnectExtension}
-            >
-                Disconnect wallet
-            </Menu.Item>
-        </Menu>
-    );
+    const SMAddressMenu = () => {};
 
     return (
-        <div className="flex justify-between items-center px-12 py-5">
-            <Link href="/" passHref>
-                <div className="cursor-pointer">
-                    <Image
-                        src="/logo.png"
-                        alt="Ashswap logo"
-                        height={54}
-                        width={124}
-                        quality={100}
-                    />
-                </div>
-            </Link>
-            <Nav />
-
-            {provider && provider?.account ? (
-                <Dropdown
-                    overlay={menu}
-                    className={styles.connect}
-                    trigger={["click"]}
-                >
-                    <AntdButton
-                        icon={
+        <>
+            <div className="flex justify-between items-center px-6 sm:px-12 py-5">
+                <Link href="/" passHref>
+                    <div className="cursor-pointer">
+                        <span className="hidden sm:inline-block">
                             <Image
-                                src={Avatar}
-                                width={24}
-                                height={24}
-                                alt="avatar"
+                                src="/logo.png"
+                                alt="Ashswap logo"
+                                height={54}
+                                width={124}
+                                quality={100}
                             />
-                        }
-                        style={{ width: 160 }}
-                    >
-                        <span className={styles.address}>
-                            {provider?.account.address.slice(0, 4) +
-                                "..." +
-                                provider?.account.address.slice(
-                                    provider?.account.address.length - 4
-                                )}
                         </span>
-                        <span>
-                            <IconDown />
+                        <span className="inline-block sm:hidden">
+                            <Image
+                                src="/images/m-logo.png"
+                                alt="Ashswap logo"
+                                height={42}
+                                width={28}
+                                quality={100}
+                            />
                         </span>
-                    </AntdButton>
-                </Dropdown>
-            ) : (
-                <Button
-                    leftIcon={<Wallet />}
-                    bottomRightCorner
-                    onClick={connectExtension}
-                    glowOnHover
-                >
-                    Connect wallet
-                </Button>
-            )}
-        </div>
+                    </div>
+                </Link>
+                <div className="hidden sm:block">
+                    <Nav />
+                </div>
+                <AddressMenu />
+            </div>
+            <div className="block sm:hidden fixed z-10 bottom-6 left-1/2 transform -translate-x-1/2">
+                <div className="bg-[#757391] bg-opacity-10 backdrop-filter backdrop-blur-[25px] p-1">
+                    <Nav />
+                </div>
+            </div>
+        </>
     );
 };
 
