@@ -57,9 +57,10 @@ const Swap = () => {
     const {
         provider,
         proxy,
+        account,
         connectExtension,
         callContract,
-        fetchBalances
+        fetchBalances,
     } = useWallet();
 
     const revertToken = () => {
@@ -451,7 +452,7 @@ const Swap = () => {
                         </>
                     )}
 
-                    {isInsufficentFund ? (
+                    {isInsufficentFund || account?.balance.valueOf().lte(new BigNumber(0)) ? (
                         <Button
                             leftIcon={!provider ? <IconWallet /> : <></>}
                             rightIcon={provider ? <IconRight /> : <></>}
@@ -464,7 +465,7 @@ const Swap = () => {
                             <span className="text-text-input-3">
                                 INSUFFICIENT{" "}
                                 <span className="text-insufficent-fund">
-                                    {tokenFrom?.name}
+                                    {account?.balance.valueOf().lte(new BigNumber(0)) ? account?.balance.token.identifier : tokenFrom?.name}
                                 </span>{" "}
                                 BALANCE
                             </span>

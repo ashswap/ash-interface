@@ -1,4 +1,5 @@
 import {
+    AccountOnNetwork,
     Address,
     ApiProvider,
     CallArguments,
@@ -43,6 +44,7 @@ export interface State {
     transactionsHistory: any[];
     lpTokens: ITokenMap;
     tokenPrices: any;
+    account?: AccountOnNetwork;
 }
 
 const emptyTx = new Transaction({
@@ -62,7 +64,7 @@ export const initState: State = {
     tokens: {},
     lpTokens: {},
     transactionsHistory: [],
-    tokenPrices: {}
+    tokenPrices: {},
 };
 
 export const WalletContext = createContext<State>(initState);
@@ -77,6 +79,7 @@ export function WalletProvider({ children }: Props) {
     const [provider, setProvider] = useState<ExtensionProvider | undefined>(
         undefined
     );
+    const [account, setAccount] = useState<AccountOnNetwork | undefined>(undefined);
     const [balances, setBalances] = useState<TokenBalancesMap>(
         initState.balances
     );
@@ -159,6 +162,10 @@ export function WalletProvider({ children }: Props) {
         if (!provider) {
             return;
         }
+
+
+        initState.proxy.getAccount(new Address(provider.account.address))
+        .then(setAccount);
 
         initState.proxy
             .getAddressEsdtList(new Address(provider?.account.address))
@@ -290,6 +297,7 @@ export function WalletProvider({ children }: Props) {
 
     const value: State = {
         ...initState,
+        account,
         tokens,
         balances,
         provider,
