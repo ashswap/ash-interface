@@ -59,18 +59,13 @@ const Swap = () => {
         proxy,
         account,
         connectExtension,
-        callContract,
-        fetchBalances,
+        callContract
     } = useWallet();
 
     const revertToken = () => {
         setTokenFrom(tokenTo);
         setTokenTo(tokenFrom);
     };
-
-    useEffect(() => {
-        fetchBalances();
-    }, [fetchBalances, tokenFrom, tokenTo]);
 
     const rawValueFrom = useMemo(() => {
         if (!valueFrom || !tokenFrom) {
@@ -249,8 +244,6 @@ const Swap = () => {
                 ]
             });
 
-            fetchBalances();
-
             let key = `open${Date.now()}`;
             notification.open({
                 key,
@@ -268,6 +261,8 @@ const Swap = () => {
                 notification.close(key);
             }, 10000);
         } catch (error) {
+            console.log(error);
+
             // TODO: extension close without response
             // notification.warn({
             //     message: error as string,
@@ -281,7 +276,6 @@ const Swap = () => {
         callContract,
         tokenFrom,
         tokenTo,
-        fetchBalances,
         valueFrom,
         valueTo
     ]);
@@ -452,7 +446,8 @@ const Swap = () => {
                         </>
                     )}
 
-                    {isInsufficentFund || account?.balance.valueOf().lte(new BigNumber(0)) ? (
+                    {isInsufficentFund ||
+                    account?.balance.valueOf().lte(new BigNumber(0)) ? (
                         <Button
                             leftIcon={!provider ? <IconWallet /> : <></>}
                             rightIcon={provider ? <IconRight /> : <></>}
@@ -465,7 +460,11 @@ const Swap = () => {
                             <span className="text-text-input-3">
                                 INSUFFICIENT{" "}
                                 <span className="text-insufficent-fund">
-                                    {account?.balance.valueOf().lte(new BigNumber(0)) ? account?.balance.token.identifier : tokenFrom?.name}
+                                    {account?.balance
+                                        .valueOf()
+                                        .lte(new BigNumber(0))
+                                        ? account?.balance.token.identifier
+                                        : tokenFrom?.name}
                                 </span>{" "}
                                 BALANCE
                             </span>

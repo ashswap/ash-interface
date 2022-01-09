@@ -64,7 +64,7 @@ export const initState: State = {
     tokens: {},
     lpTokens: {},
     transactionsHistory: [],
-    tokenPrices: {},
+    tokenPrices: {}
 };
 
 export const WalletContext = createContext<State>(initState);
@@ -79,7 +79,9 @@ export function WalletProvider({ children }: Props) {
     const [provider, setProvider] = useState<ExtensionProvider | undefined>(
         undefined
     );
-    const [account, setAccount] = useState<AccountOnNetwork | undefined>(undefined);
+    const [account, setAccount] = useState<AccountOnNetwork | undefined>(
+        undefined
+    );
     const [balances, setBalances] = useState<TokenBalancesMap>(
         initState.balances
     );
@@ -163,9 +165,9 @@ export function WalletProvider({ children }: Props) {
             return;
         }
 
-
-        initState.proxy.getAccount(new Address(provider.account.address))
-        .then(setAccount);
+        initState.proxy
+            .getAccount(new Address(provider.account.address))
+            .then(setAccount);
 
         initState.proxy
             .getAddressEsdtList(new Address(provider?.account.address))
@@ -191,8 +193,11 @@ export function WalletProvider({ children }: Props) {
 
     // fetch token balance
     useEffect(() => {
-        fetchBalances();
-    }, [provider, fetchBalances]);
+        let interval = setInterval(fetchBalances, 2000);
+        return () => {
+            clearInterval(interval);
+        };
+    }, [fetchBalances]);
 
     const connectExtension = useCallback(() => {
         if (provider) {
