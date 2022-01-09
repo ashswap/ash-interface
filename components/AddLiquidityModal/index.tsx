@@ -93,7 +93,7 @@ const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
             let key = `open${Date.now()}`;
             notification.open({
                 key,
-                message: `Add liquidity succeed ${value0} ${pool.tokens[0].name} to ${value1} ${pool.tokens[1].name}`,
+                message: `Add liquidity Success ${value0} ${pool.tokens[0].name} and ${value1} ${pool.tokens[1].name}`,
                 icon: <IconNewTab />,
                 onClick: () =>
                     window.open(
@@ -565,7 +565,7 @@ const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
                                 </ul>
                             </div>
                             <div>
-                                <div className="mb-2">Your Capacity</div>
+                                <div className="mb-2">Your liquidity</div>
                                 <div style={{ color: "#00FF75" }}>
                                     {poolContext.capacityPercent.toFixed(2)}%
                                 </div>

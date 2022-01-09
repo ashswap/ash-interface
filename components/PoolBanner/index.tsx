@@ -28,7 +28,7 @@ const PoolBanner = () => {
                 </div>
                 <div>
                     <div className={styles.title}>
-                        <div style={{ color: "white" }}>Deposite to</div>
+                        <div style={{ color: "white" }}>Deposit to</div>
                         <div style={{ color: "#ffc10c" }}>Earn token</div>
                         <div style={{ color: "#55C8EA" }}>& Farm LP</div>
                     </div>
@@ -38,8 +38,7 @@ const PoolBanner = () => {
                             every completed transaction.
                         </div>
                         <div>
-                            <span style={{ color: "#55C8EA" }}>Farm</span> is
-                            everyday bounty!
+                            <span style={{ color: "#55C8EA" }}>Farm</span> from liquidity mining.
                         </div>
                     </div>
                 </div>
@@ -49,19 +48,19 @@ const PoolBanner = () => {
                     <div className={styles.blurContent}>
                         <div className="flex flex-row items-center">
                             <div className="text-lg font-bold text-white opacity-70 mr-8">
-                                Farm bounty
+                                New bounty!
                             </div>
                             <Button
                                 bottomRightCorner
                                 primaryColor="white"
                                 textClassName="text-xs"
                             >
-                                Harvest
+                                Get it!
                             </Button>
                         </div>
                         <div className={styles.blurValue}>
-                            <div>FARM IS ARRIVING</div>
-                            <div>IN 2022</div>
+                            <div>FARMS ARE ARRIVING</div>
+                            <div>SOON!</div>
                         </div>
                     </div>
                 </div>

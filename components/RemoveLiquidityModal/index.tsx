@@ -188,7 +188,7 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
             let key = `open${Date.now()}`;
             notification.open({
                 key,
-                message: `Remove liquidity succeed ${value0} ${pool.tokens[0].name} to ${value1} ${pool.tokens[1].name}`,
+                message: `Remove Liquidity Success ${value0} ${pool.tokens[0].name} and ${value1} ${pool.tokens[1].name}`,
                 icon: <IconNewTab />,
                 onClick: () =>
                     window.open(
@@ -392,7 +392,7 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
                     </div>
                     <div className="flex flex-row flex-wrap text-xs my-8 gap-y-9">
                         <div className="w-1/2">
-                            <div className="mb-4">Your Capacity</div>
+                            <div className="mb-4">Your liquidity</div>
                             <div>{capacityPercent.toFixed(2)}%</div>
                         </div>
                         <div className="w-full">
