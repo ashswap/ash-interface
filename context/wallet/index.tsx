@@ -185,7 +185,8 @@ export function WalletProvider({ children }: Props) {
                 }
 
                 setBalances(tokenBalances);
-            });
+            })
+            .catch(console.log);
     }, [provider, tokens]);
 
     // fetch token balance
