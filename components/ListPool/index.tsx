@@ -65,7 +65,7 @@ const ListPool = (props: Props) => {
                     <div
                         className={`flex flex-row bg-ash-dark-600 text-text-input-3 ${styles.listHeader}`}
                     >
-                        <div className="w-2/12">Deposite</div>
+                        <div className="w-2/12">Deposit</div>
                         <div className="w-1/12">APR Earn</div>
                         <div className="w-2/12">Farming per day</div>
                         <div className="w-2/12">Total Liquidity</div>

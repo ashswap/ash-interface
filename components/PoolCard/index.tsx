@@ -74,7 +74,7 @@ const PoolCard = (props: Props) => {
                         <div className="flex flex-row my-12 justify-between items-center">
                             <div>
                                 <div className="text-text-input-3 text-xs mb-4">
-                                    APR Earn
+                                    APR
                                 </div>
                                 <div className="text-yellow-600 font-bold text-lg">
                                     _%
@@ -82,10 +82,10 @@ const PoolCard = (props: Props) => {
                             </div>
                             <div>
                                 <div className="text-text-input-3 text-xs mb-4">
-                                    Farming per day
+                                    Distribution per day
                                 </div>
                                 <div className="text-earn font-normal text-xs">
-                                    Coming soon in 2022
+                                    Coming soon
                                 </div>
                             </div>
                         </div>
@@ -114,7 +114,7 @@ const PoolCard = (props: Props) => {
                             </div>
                             <div>
                                 <div className="text-text-input-3 text-xs mb-4">
-                                    Your capacity
+                                    Your liquidity
                                 </div>
                                 <div className="text-white font-bold text-lg">
                                     {capacityPercent.toFixed(2)}%

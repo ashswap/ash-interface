@@ -42,7 +42,7 @@ const HistoryModal = ({ open, onClose }: Props) => {
                     return null;
                 }
 
-                const status = d.status === "success" ? "succeed" : "failed";
+                const status = d.status === "success" ? "Success" : "Failure";
 
                 let extraInfo = "";
                 const pool = pools.find(pool => pool.address === d.receiver);
