@@ -144,7 +144,7 @@ const TokenSelect = ({
                 <div className="flex flex-row items-center my-8 w-full">
                     {pivotToken && type === "to" && renderPivotToken()}
                     <Input
-                        placeholder="Search or try usdt-usdc"
+                        placeholder="Search or try usdt"
                         suffix={<Search />}
                         outline
                         autoFocus
