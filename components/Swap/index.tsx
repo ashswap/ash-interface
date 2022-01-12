@@ -484,8 +484,8 @@ const Swap = () => {
                         </Button>
                     )}
                     <div className="text-xs font-bold text-center" style={{marginTop: 34}}>
-                        <span className="text-text-input-3">DON'T KNOW HOW TO USE IT? </span>
-                        <a href="https://docs.ashswap.io/guides/swap-trade" target={"_blank"} style={{color: "#14E499"}}>VISIT HERE!</a>
+                        <span className="text-text-input-3">DON&apos;T KNOW HOW TO USE IT? </span>
+                        <a href="https://docs.ashswap.io/guides/swap-trade" target={"_blank"} rel="noreferrer" style={{color: "#14E499"}}>VISIT HERE!</a>
                     </div>
                 </PanelContent>
                 {showSetting && (
