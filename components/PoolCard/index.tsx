@@ -1,15 +1,14 @@
-import Image from "next/image";
-import { useState } from "react";
-import Panel, { PanelContent } from "components/Panel";
-import IPool from "interface/pool";
 import Down from "assets/svg/down-white.svg";
-import styles from "./PoolCard.module.css";
-import Button from "components/Button";
 import AddLiquidityModal from "components/AddLiquidityModal";
-import { theme } from "tailwind.config";
+import Button from "components/Button";
+import { usePool } from "components/ListPoolItem";
 import RemoveLiquidityModal from "components/RemoveLiquidityModal";
 import { toEGLD } from "helper/balance";
-import { usePool } from "components/ListPoolItem";
+import IPool from "interface/pool";
+import Image from "next/image";
+import { useState } from "react";
+import { theme } from "tailwind.config";
+import styles from "./PoolCard.module.css";
 
 interface Props {
     pool: IPool;
@@ -26,8 +25,10 @@ const PoolCard = (props: Props) => {
     const { value0, value1, capacityPercent, valueUsd } = usePool();
 
     return (
-        <Panel className={`${props.className || ""}`} topRightCorner>
-            <PanelContent className={`${styles.content}`}>
+        <>
+            <div
+                className={`bg-ash-dark-700 clip-corner-4 clip-corner-tr py-8 px-11 text-white ${props.className}`}
+            >
                 <div className="flex flex-row justify-between items-start">
                     <div>
                         <div className="text-text-input-3 text-xs pb-2.5">
@@ -57,7 +58,10 @@ const PoolCard = (props: Props) => {
                     </div>
                     <div className="flex flex-row justify-between items-center">
                         <div className={styles.tokenIcon}>
-                            <Image src={props.pool.tokens[0].icon} alt="token icon" />
+                            <Image
+                                src={props.pool.tokens[0].icon}
+                                alt="token icon"
+                            />
                         </div>
                         <div
                             className={styles.tokenIcon}
@@ -65,7 +69,10 @@ const PoolCard = (props: Props) => {
                                 marginLeft: "-10px"
                             }}
                         >
-                            <Image src={props.pool.tokens[1].icon} alt="token icon" />
+                            <Image
+                                src={props.pool.tokens[1].icon}
+                                alt="token icon"
+                            />
                         </div>
                     </div>
                 </div>
@@ -214,8 +221,8 @@ const PoolCard = (props: Props) => {
                     onClose={() => setOpenRemoveLiquidity(false)}
                     pool={props.pool}
                 />
-            </PanelContent>
-        </Panel>
+            </div>
+        </>
     );
 };
 

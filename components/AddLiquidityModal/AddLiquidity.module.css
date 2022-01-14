@@ -1,18 +1,4 @@
 .content {
-    width: 1110px;
-}
-
-.tokenIcon {
-    @apply rounded-full;
-
-    width: 52px;
-    height: 52px;
-}
-
-.smallTokenIcon{
-    @apply w-5 h-5 rounded-full m-2;
-}
-
-.smallTokenName{
-    @apply text-sm font-bold text-white pb-1;
+    max-width: 1110px;
+    overflow: hidden;
 }

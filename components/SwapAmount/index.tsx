@@ -152,7 +152,7 @@ const SwapAmount = (props: Props) => {
                     resetPivotToken={props.resetPivotToken}
                 />
                 <input
-                    className={styles.input}
+                    className={`${styles.input} overflow-hidden`}
                     type="number"
                     disabled={props.disableInput}
                     placeholder="0.00"
