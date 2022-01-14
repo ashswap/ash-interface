@@ -1,5 +1,5 @@
 .icon{
-    @apply w-5 h-5 rounded-full m-2;
+    @apply w-5 h-5 rounded-full mr-2;
 }
 
 .text{

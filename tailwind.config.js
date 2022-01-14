@@ -4,14 +4,22 @@ module.exports = {
     mode: "jit",
     theme: {
         extend: {
+            container: {
+                center: true,
+                padding: "1.5rem"
+            },
             spacing: {
                 "5.5": "1.375rem",
+            },
+            fontSize: {
+                "2xs": "0.625rem",
             },
             colors: {
                 "bg": "#191629",
                 "bg-hover": "#211D36",
                 "bg-overlay": "#7B61FF",
                 "ash-dark": {
+                    400: "#191629",
                     500: "#212036",
                     600: "#12101D",
                     700: "#0D0B15",
@@ -41,6 +49,12 @@ module.exports = {
                 },
                 "ash-gray": {
                     500: "#757391"
+                },
+                "ash-green": {
+                    500: "#00FF75"
+                },
+                "ash-purple": {
+                    500: "#7B61FF"
                 }
             }
         },

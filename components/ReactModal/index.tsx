@@ -21,14 +21,38 @@ Modal.defaultStyles.content = {
     maxHeight: "100vh"
 };
 Modal.setAppElement("body");
-const ReactModel = (props: Props & { contentClassName?: string }) => {
+const ReactModel = (
+    props: Props & {
+        contentClassName?: string;
+        className?: string;
+        useClipCorner?: boolean;
+    }
+) => {
     return (
         <Modal {...props}>
-            <PanelV2 className="text-base text-ash-dark-600 ">
+            {!props.useClipCorner && (
+                <PanelV2 className="text-base text-ash-dark-600 ">
+                    <div
+                        className={`relative max-h-[calc(100vh-2rem)] ${props.contentClassName}`}
+                    >
+                        <div className="absolute top-0 right-0">
+                            <IconButton
+                                icon={<IconClose />}
+                                iconSize="small"
+                                onClick={props.onRequestClose}
+                                className="bg-ash-dark-700"
+                            />
+                        </div>
+                        {props.children}
+                    </div>
+                </PanelV2>
+            )}
+            {props.useClipCorner && (
                 <div
-                    className={`relative max-h-[calc(100vh-2rem)] ${props.contentClassName}`}
+                    className={`relative max-h-[calc(100vh-2rem)]`}
                 >
-                    <div className="absolute top-0 right-0">
+                    {props.children}
+                    <div className="absolute top-4 right-4">
                         <IconButton
                             icon={<IconClose />}
                             iconSize="small"
@@ -36,9 +60,8 @@ const ReactModel = (props: Props & { contentClassName?: string }) => {
                             className="bg-ash-dark-700"
                         />
                     </div>
-                    {props.children}
                 </div>
-            </PanelV2>
+            )}
         </Modal>
     );
 };

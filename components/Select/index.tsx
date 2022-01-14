@@ -1,5 +1,5 @@
+import DownIcon from "assets/svg/down.svg";
 import { ReactElement } from "react";
-import styles from "./Select.module.css";
 import Select, {
     components,
     IndicatorsContainerProps,
@@ -7,7 +7,7 @@ import Select, {
     StylesConfig,
     Theme
 } from "react-select";
-import DownIcon from "assets/svg/down.svg";
+import styles from "./Select.module.css";
 
 interface Props {
     value?: string;
@@ -27,7 +27,8 @@ const selectStyles: StylesConfig<MyOptionType, IsMulti> = {
     menu: (provided, state) => ({
         ...provided,
         backgroundColor: "#0D0B15",
-        width: 250,
+        margin: 0,
+        width: 250
     }),
 
     option: (provided, state) => ({
@@ -45,6 +46,7 @@ const selectStyles: StylesConfig<MyOptionType, IsMulti> = {
         width: 250,
         backgroundColor: "#12101D",
         border: "none",
+        boxShadow: "none",
         borderRadius: 0
     }),
 
