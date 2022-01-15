@@ -179,7 +179,7 @@ export function WalletProvider({ children }: Props) {
 
                 setBalances(tokenBalances);
             });
-    }, [provider, tokens]);
+    }, [provider, tokens, lpTokens]);
 
     // fetch token balance
     useEffect(() => {

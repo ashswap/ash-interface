@@ -83,13 +83,14 @@ const PoolBanner = () => {
                     </div>
                 </div>
             )}
-            <div
+            {/* TODO: binding data when available */}
+            {/* <div
                 className={`fixed right-0 top-56 z-10 bg-earn h-[4.625rem] md:h-[6.5rem] text-white text-xs md:text-sm flex flex-col justify-center pr-1 pl-2 md:pr-3 md:pl-3 font-bold ${show &&
                     "md:hidden"}`}
             >
                 <div>196.23</div>
                 <div>ELGD</div>
-            </div>
+            </div> */}
         </>
     );
 };
