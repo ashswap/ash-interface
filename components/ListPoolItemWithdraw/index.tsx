@@ -177,8 +177,8 @@ const ListPoolItemWithdraw = (props: Props) => {
                         </div>
                     </div>
                     <div className="block sm:hidden w-4/12 text-right pr-4 text-earn">
-                        <span className="text-2xs">ELDG&nbsp;</span>
-                        <span className="text-xs font-bold">0.52</span>
+                        {/* <span className="text-2xs">ELDG&nbsp;</span>
+                        <span className="text-xs font-bold">0.52</span> */}
                     </div>
                 </div>
                 {isExpand && (
