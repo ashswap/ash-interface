@@ -1,11 +1,13 @@
-import Select from "components/Select";
+import CardGrey from "assets/svg/card-grey.svg";
+import Card from "assets/svg/card.svg";
+import ListGrey from "assets/svg/list-grey.svg";
+import List from "assets/svg/list.svg";
+import Search from "assets/svg/search.svg";
 import IconButton from "components/IconButton";
 import Input from "components/Input";
-import Card from "assets/svg/card.svg";
-import CardGrey from "assets/svg/card-grey.svg";
-import List from "assets/svg/list.svg";
-import ListGrey from "assets/svg/list-grey.svg";
-import Search from "assets/svg/search.svg";
+import Select from "components/Select";
+import { TAILWIND_BREAKPOINT } from "const/mediaQueries";
+import useMediaQuery from "hooks/useMediaQuery";
 import { useState } from "react";
 
 export enum ViewType {
@@ -21,47 +23,77 @@ interface Props {
     onSearch: (k: string) => void;
 }
 const PoolFilter = (props: Props) => {
+    const [isLivedPool, setIsLivedPool] = useState(true);
+    const isMDScreen = useMediaQuery(
+        `(max-width: ${TAILWIND_BREAKPOINT.MD}px)`
+    );
     const options = [
         { value: "0", label: "APR" },
         { value: "1", label: "Liquidity" },
         { value: "2", label: "24h Volume" }
     ];
 
+    const SearchBox = (
+        <Input
+            className="w-full md:max-w-80"
+            backgroundClassName="bg-ash-dark-700"
+            textColorClassName="text-input-3"
+            placeholder="Search pool"
+            type="text"
+            textAlign="left"
+            textClassName="font-normal text-xs md:text-sm"
+            suffix={<Search />}
+            value={props.search}
+            onChange={e => props.onSearch(e.target.value)}
+        />
+    );
     return (
-        <div
-            className={`flex flex-row justify-between mt-3.5 ${props.className}`}
-        >
-            <div className="flex flex-row justify-center items-center">
-                <IconButton
-                    icon={<CardGrey />}
-                    activeIcon={<Card />}
-                    active={props.view == ViewType.Card}
-                    className="mr-2"
-                    onClick={() => props.onChangeView(ViewType.Card)}
-                />
-                <IconButton
-                    icon={<ListGrey />}
-                    activeIcon={<List />}
-                    active={props.view == ViewType.List}
-                    className="mr-8"
-                    onClick={() => props.onChangeView(ViewType.List)}
-                />
-                <Input
-                    className="flex-1 w-80"
-                    backgroundClassName="bg-ash-dark-700"
-                    textColorClassName="text-input-3"
-                    placeholder="Search pool"
-                    type="text"
-                    textAlign="left"
-                    textClassName="font-normal text-sm"
-                    suffix={<Search />}
-                    value={props.search}
-                    onChange={(e) => props.onSearch(e.target.value)}
-                />
+        <div>
+            <div
+                className={`flex flex-row justify-between mt-3.5 mb-4 md:mb-0 ${props.className}`}
+            >
+                <div className="flex flex-row justify-center items-center overflow-hidden mr-2">
+                    <IconButton
+                        icon={<CardGrey />}
+                        activeIcon={<Card />}
+                        active={props.view == ViewType.Card}
+                        className="mr-2 flex-shrink-0"
+                        onClick={() => props.onChangeView(ViewType.Card)}
+                    />
+                    <IconButton
+                        icon={<ListGrey />}
+                        activeIcon={<List />}
+                        active={props.view == ViewType.List}
+                        className="mr-2 lg:mr-8 flex-shrink-0"
+                        onClick={() => props.onChangeView(ViewType.List)}
+                    />
+                    {!isMDScreen && (
+                        <div className="flex-grow overflow-hidden">{SearchBox}</div>
+                    )}
+                </div>
+                <div className="flex items-center space-x-2 flex-shrink-0">
+                    <div className="flex p-1 bg-white dark:bg-ash-dark-600 text-xs sm:text-sm space-x-1 sm:space-x-2 text-ash-gray-500 font-bold">
+                        <button
+                            className={`h-8 sm:h-10 w-[4.5rem] sm:w-[6.5rem] font-bold text-center ${isLivedPool &&
+                                "bg-pink-600 text-white"}`}
+                        >
+                            Lived
+                        </button>
+                        <button
+                            className={`h-8 sm:h-10 w-[4.5rem] sm:w-[6.5rem] font-bold text-center ${!isLivedPool &&
+                                "bg-pink-600 text-white"}`}
+                        >
+                            Finished
+                        </button>
+                    </div>
+                    {props.view === ViewType.Card && (
+                        <div>
+                            <Select prefix="Sort by" options={options} />
+                        </div>
+                    )}
+                </div>
             </div>
-            <div>
-                <Select prefix="Sort by" options={options} />
-            </div>
+            {isMDScreen && SearchBox}
         </div>
     );
 };

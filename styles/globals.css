@@ -127,3 +127,15 @@ input[type="number"] {
         right: 100%;
     }
 }
+
+@layer components {
+    .ash-container {
+        @apply w-full max-w-[72.375rem] px-6 mx-auto;
+    }
+}
+
+/* remove scrolling on the body when the modal is open */
+.ReactModal__Body--open,
+.ReactModal__Html--open {
+    overflow: hidden;
+}

@@ -6,22 +6,15 @@ import Input from "components/Input";
 import { useSwap } from "context/swap";
 
 interface Props {
-    onClose?: () => void;
+
 }
 
 const Setting = (props: Props) => {
     const { slippage, setSlippage } = useSwap();
 
     return (
-        <div className={styles.container}>
-            <div className="absolute top-4 right-4">
-                <IconButton
-                    icon={<IconClose />}
-                    iconSize="small"
-                    onClick={props.onClose}
-                />
-            </div>
-            <div className="font-bold text-lg">Setting</div>
+        <div>
+            <div className="font-bold text-lg">Settings</div>
             <div className="font-normal text-xs mt-14">Slippage Tolerance</div>
             <div className="flex flex-row gap-1 my-5">
                 <SlippageSelect

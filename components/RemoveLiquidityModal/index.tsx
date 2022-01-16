@@ -1,35 +1,38 @@
-import { useState, useCallback, useMemo, useEffect } from "react";
-import Image from "next/image";
 import {
     Address,
-    ContractFunction,
-    GasLimit,
-    TokenIdentifierValue,
-    BigUIntValue,
-    Query,
-    TypeExpressionParser,
-    TypeMapper,
     ArgSerializer,
-    EndpointParameterDefinition
+    BigUIntValue,
+    ContractFunction,
+    EndpointParameterDefinition,
+    GasLimit,
+    Query,
+    TokenIdentifierValue,
+    TypeExpressionParser,
+    TypeMapper
 } from "@elrondnetwork/erdjs";
+import { notification, Slider } from "antd";
+import IconNewTab from "assets/svg/new-tab-green.svg";
+import IconRight from "assets/svg/right-yellow.svg";
 import BigNumber from "bignumber.js";
 import Button from "components/Button";
 import Input from "components/Input";
-import Modal from "components/Modal";
+import { usePool } from "components/ListPoolItem";
+import ReactModel from "components/ReactModal";
 import Token from "components/Token";
+import { TAILWIND_BREAKPOINT } from "const/mediaQueries";
 import { gasLimit, network } from "const/network";
+import { useSwap } from "context/swap";
 import { useWallet } from "context/wallet";
 import { toEGLD, toWei } from "helper/balance";
+import useMediaQuery from "hooks/useMediaQuery";
 import IPool from "interface/pool";
-import IconRight from "assets/svg/right-yellow.svg";
-import IconNewTab from "assets/svg/new-tab-green.svg";
-import styles from "./RemoveLiquidityModal.module.css";
-import { notification } from "antd";
-import { Slider } from "antd";
+import Image from "next/image";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { theme } from "tailwind.config";
 import { useDebounce } from "use-debounce";
-import { useSwap } from "context/swap";
-import { usePool } from "components/ListPoolItem";
+import styles from "./RemoveLiquidityModal.module.css";
+import ICArrowBottomRight from "assets/svg/arrow-bottom-right.svg";
+import ICArrowTopRight from "assets/svg/arrow-top-right.svg";
 
 interface Props {
     open?: boolean;
@@ -44,6 +47,7 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
     const [value0, setValue0] = useState<string>("");
     const [value1, setValue1] = useState<string>("");
     const [liquidityDebounce] = useDebounce(liquidity, 500);
+    const isSMScreen = useMediaQuery(`(max-width: ${TAILWIND_BREAKPOINT.SM}px)`);
     const {
         callContract,
         fetchBalances,
@@ -182,9 +186,9 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
                     )
                 ]
             });
-    
+
             fetchBalances();
-    
+
             let key = `open${Date.now()}`;
             notification.open({
                 key,
@@ -220,205 +224,229 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
     ]);
 
     return (
-        <Modal
-            open={open}
-            onClose={onClose}
-            contentClassName={styles.content}
-            dark="650"
+        <ReactModel
+            isOpen={!!open}
+            onRequestClose={onClose}
+            useClipCorner={true}
+            className={`sm:mt-28 sm:ash-container max-w-[51.75rem] mx-auto
+            fixed bottom-0 left-0 right-0 sm:relative
+            `}
         >
-            <div className="flex flex-row items-center mb-3">
-                <div className="mr-3">
-                    <div className="text-text-input-3 text-xs">
-                        {pool.tokens[0].name} & {pool.tokens[1].name}
-                    </div>
-                </div>
-                <div className="flex flex-row justify-between items-center">
-                    <div className={styles.tokenIcon}>
-                        <Image src={pool.tokens[0].icon} alt="token icon" />
-                    </div>
-                    <div
-                        className={styles.tokenIcon}
-                        style={{
-                            marginLeft: "-3px"
-                        }}
-                    >
-                        <Image src={pool.tokens[1].icon} alt="token icon" />
-                    </div>
-                </div>
-            </div>
-            <div className="flex flex-row items-baseline text-2xl font-bold text-yellow-700">
-                Withdraw Liquidity
-            </div>
-            <div className="flex flex-row my-10 gap-8">
-                <div className="relative w-2/3">
-                    <div>
-                        <div className="flex flex-row items-center">
-                            <div className="flex flex-row items-center font-bold w-1/3">
-                                <IconRight className="mr-4" />
-                                <span>TOTAL</span>
-                            </div>
-                            <Input
-                                className="flex-1"
-                                backgroundClassName="bg-ash-dark-700"
-                                textColorClassName="text-input-3"
-                                placeholder="0"
-                                type="number"
-                                textAlign="right"
-                                textClassName="text-lg"
-                                value={totalUsd}
-                                onChange={e => setTotalUsd(e.target.value)}
-                                style={{ height: 72 }}
-                            />
-                        </div>
-                        <div className="flex flex-row items-center">
-                            <div className="w-1/3"></div>
-                            <div className="flex flex-row items-center flex-1 gap-4">
-                                <div>0%</div>
-                                <Slider
-                                    className="ash-slider pt-4 w-full"
-                                    step={5}
-                                    marks={{
-                                        0: "",
-                                        25: "",
-                                        50: "",
-                                        75: "",
-                                        100: ""
-                                    }}
-                                    handleStyle={{
-                                        backgroundColor: "#191629",
-                                        borderRadius: 0,
-                                        border:
-                                            "2px solid " +
-                                            theme.extend.colors.slider.track,
-                                        width: 7,
-                                        height: 7
-                                    }}
-                                    min={0}
-                                    max={100}
-                                    value={liquidityPercent}
-                                    onChange={e => onChangeLiquidityPercent(e)}
-                                />
-                            </div>
+            <div className="clip-corner-4 clip-corner-tl bg-ash-dark-600 text-white px-12 pt-10 pb-20 sm:pb-11">
+                <div className="flex flex-row items-center mb-3">
+                    <div className="mr-3">
+                        <div className="text-text-input-3 text-xs">
+                            {pool.tokens[0].name} & {pool.tokens[1].name}
                         </div>
                     </div>
-                    <div className="relative">
-                        <div className="my-1.5">
-                            <div className="flex flex-row">
-                                <Token
-                                    token={pool.tokens[0]}
-                                    className="w-1/3"
-                                />
-                                <Input
-                                    className="flex-1"
-                                    backgroundClassName="bg-ash-dark-700"
-                                    textColorClassName="text-input-3"
-                                    placeholder="0"
-                                    type="number"
-                                    textAlign="right"
-                                    textClassName="text-lg"
-                                    value={value0}
-                                    disabled
-                                />
-                            </div>
-                            <div className="bg-bg py-2 text-sm text-text-input-3 text-right">
-                                <span>Available: </span>
-                                <span className="text-earn">
-                                    {balances[pool.tokens[0].id]
-                                        ? balances[pool.tokens[0].id].balance
-                                              .div(
-                                                  new BigNumber(
-                                                      10
-                                                  ).exponentiatedBy(
-                                                      pool.tokens[0].decimals
-                                                  )
-                                              )
-                                              .toFixed(3)
-                                              .toString()
-                                        : "0"}{" "}
-                                    {pool.tokens[0].name}
-                                </span>
-                            </div>
+                    <div className="flex flex-row justify-between items-center">
+                        <div className={styles.tokenIcon}>
+                            <Image src={pool.tokens[0].icon} alt="token icon" />
                         </div>
-
-                        <div className="my-1.5">
-                            <div className="flex flex-row">
-                                <Token
-                                    token={pool.tokens[1]}
-                                    className="w-1/3"
-                                />
-                                <Input
-                                    className="flex-1"
-                                    backgroundClassName="bg-ash-dark-700"
-                                    textColorClassName="text-input-3"
-                                    placeholder="0"
-                                    type="number"
-                                    textAlign="right"
-                                    textClassName="text-lg"
-                                    value={value1}
-                                    disabled
-                                />
-                            </div>
-                            <div className="bg-bg py-2 text-sm text-text-input-3 text-right">
-                                <span>Available: </span>
-                                <span className="text-earn">
-                                    {balances[pool.tokens[1].id]
-                                        ? balances[pool.tokens[1].id].balance
-                                              .div(
-                                                  new BigNumber(
-                                                      10
-                                                  ).exponentiatedBy(
-                                                      pool.tokens[1].decimals
-                                                  )
-                                              )
-                                              .toFixed(3)
-                                              .toString()
-                                        : "0"}{" "}
-                                    {pool.tokens[1].name}
-                                </span>
-                            </div>
-                        </div>
-
                         <div
-                            className="absolute left-0 ml-2"
-                            style={{ top: 62 }}
+                            className={styles.tokenIcon}
+                            style={{
+                                marginLeft: "-3px"
+                            }}
                         >
-                            &
+                            <Image src={pool.tokens[1].icon} alt="token icon" />
                         </div>
                     </div>
                 </div>
-                <div className="w-1/3 bg-ash-dark-500 p-8">
-                    <div className="text-lg font-bold text-yellow-700">
-                        Your profit will go down
-                    </div>
-                    <div className="flex flex-row flex-wrap text-xs my-8 gap-y-9">
-                        <div className="w-1/2">
-                            <div className="mb-4">Your liquidity</div>
-                            <div>{capacityPercent.toFixed(2)}%</div>
-                        </div>
-                        <div className="w-full">
-                            <div className="mb-4">Farm per day</div>
-                            <div>- ELGD</div>
-                        </div>
-                    </div>
+                <div className="flex items-baseline text-2xl font-bold text-yellow-700">
+                    Withdraw Liquidity
                 </div>
-            </div>
+                <div className="sm:flex mt-8 mb-12 sm:my-10 gap-4 md:gap-8">
+                    <div className="relative sm:w-1/2 md:w-2/3 overflow-hidden mb-11 sm:mb-0">
+                        <div>
+                            <div className="flex items-center space-x-1 bg-ash-dark-700 sm:bg-transparent pl-4 sm:pl-0">
+                                <div className="flex items-center font-bold w-24 flex-shrink-0 border-r border-r-ash-gray-500 sm:border-r-0">
+                                    <IconRight className="mr-4" />
+                                    <span>TOTAL</span>
+                                </div>
+                                <Input
+                                    className="flex-1 overflow-hidden"
+                                    backgroundClassName="bg-ash-dark-700"
+                                    textColorClassName="text-input-3"
+                                    placeholder="0"
+                                    type="number"
+                                    textAlign="right"
+                                    textClassName="text-lg"
+                                    value={totalUsd}
+                                    onChange={e => setTotalUsd(e.target.value)}
+                                    style={{ height: 72 }}
+                                />
+                            </div>
+                            <div className="flex flex-row items-center">
+                                <div className="sm:w-24"></div>
+                                <div className="flex flex-row items-center flex-1 gap-4">
+                                    <div>0%</div>
+                                    <Slider
+                                        className="ash-slider pt-4 w-full"
+                                        step={5}
+                                        marks={{
+                                            0: "",
+                                            25: "",
+                                            50: "",
+                                            75: "",
+                                            100: ""
+                                        }}
+                                        handleStyle={{
+                                            backgroundColor: "#191629",
+                                            borderRadius: 0,
+                                            border:
+                                                "2px solid " +
+                                                theme.extend.colors.slider
+                                                    .track,
+                                            width: 7,
+                                            height: 7
+                                        }}
+                                        min={0}
+                                        max={100}
+                                        value={liquidityPercent}
+                                        onChange={e =>
+                                            onChangeLiquidityPercent(e)
+                                        }
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                        <div className="relative">
+                            <div className="my-1.5">
+                                <div className="flex items-center flex-row space-x-1 bg-ash-dark-700 sm:bg-transparent pl-4 sm:pl-0">
+                                    <Token
+                                        token={pool.tokens[0]}
+                                        className="w-24 border-r border-r-ash-gray-500 sm:border-r-0"
+                                    />
+                                    <Input
+                                        className="flex-1 overflow-hidden"
+                                        backgroundClassName="bg-ash-dark-700"
+                                        textColorClassName="text-input-3"
+                                        placeholder="0"
+                                        type="number"
+                                        textAlign="right"
+                                        textClassName="text-lg"
+                                        value={value0}
+                                        disabled
+                                    />
+                                </div>
+                                <div className="py-2 text-2xs sm:text-sm text-text-input-3 text-right">
+                                    <span>Available: </span>
+                                    <span className="text-earn">
+                                        {balances[pool.tokens[0].id]
+                                            ? balances[
+                                                  pool.tokens[0].id
+                                              ].balance
+                                                  .div(
+                                                      new BigNumber(
+                                                          10
+                                                      ).exponentiatedBy(
+                                                          pool.tokens[0]
+                                                              .decimals
+                                                      )
+                                                  )
+                                                  .toFixed(3)
+                                                  .toString()
+                                            : "0"}{" "}
+                                        {pool.tokens[0].name}
+                                    </span>
+                                </div>
+                            </div>
 
-            <div className="flex flex-row gap-8">
-                <div className="w-2/3" />
-                <div className="w-1/3">
-                    <Button
-                        topLeftCorner
-                        style={{ height: 48 }}
-                        className="mt-1.5"
-                        outline
-                        onClick={removeLP}
-                        primaryColor="yellow-700"
-                    >
-                        WITHDRAW
-                    </Button>
+                            <div className="my-1.5">
+                                <div className="flex items-center flex-row space-x-1 bg-ash-dark-700 sm:bg-transparent pl-4 sm:pl-0">
+                                    <Token
+                                        token={pool.tokens[1]}
+                                        className="w-24 border-r border-r-ash-gray-500 sm:border-r-0"
+                                    />
+                                    <Input
+                                        className="flex-1 overflow-hidden"
+                                        backgroundClassName="bg-ash-dark-700"
+                                        textColorClassName="text-input-3"
+                                        placeholder="0"
+                                        type="number"
+                                        textAlign="right"
+                                        textClassName="text-lg"
+                                        value={value1}
+                                        disabled
+                                    />
+                                </div>
+                                <div className="py-2 text-2xs sm:text-sm text-text-input-3 text-right">
+                                    <span>Available: </span>
+                                    <span className="text-earn">
+                                        {balances[pool.tokens[1].id]
+                                            ? balances[
+                                                  pool.tokens[1].id
+                                              ].balance
+                                                  .div(
+                                                      new BigNumber(
+                                                          10
+                                                      ).exponentiatedBy(
+                                                          pool.tokens[1]
+                                                              .decimals
+                                                      )
+                                                  )
+                                                  .toFixed(3)
+                                                  .toString()
+                                            : "0"}{" "}
+                                        {pool.tokens[1].name}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div
+                                className="absolute left-4 sm:left-0 text-sm top-14 sm:top-[4rem]"
+                    
+                            >
+                                &
+                            </div>
+                        </div>
+                    </div>
+                    <div className="sm:w-1/2 md:w-1/3 bg-ash-dark-500 p-9 sm:p-8">
+                        <div className="text-lg font-bold text-yellow-700">
+                            Your profit will go down
+                        </div>
+                        <div className="flex flex-wrap my-8 gap-y-9">
+                            <div className="w-1/2">
+                                <div className="mb-4 text-xs">Your liquidity</div>
+                                <div className="text-lg font-bold">{capacityPercent.toFixed(2)}%</div>
+                                <div className="text-ash-purple-500 text-2xs mt-2">
+                                    <ICArrowBottomRight className="inline mr-1"/>
+                                    <span>-26%</span>
+                                </div>
+                            </div>
+                            <div className="w-1/2">
+                                <div className="mb-4 text-xs">Farm per day</div>
+                                <div className="text-lg font-bold">-15.211 <span className="text-xs font-normal">ELGD</span></div>
+                                <div className="text-ash-purple-500 text-2xs mt-2">
+                                    <ICArrowBottomRight className="inline mr-1"/>
+                                    <span>-26%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="sm:flex items-center gap-4 md:gap-8">
+                    <div className="sm:w-1/2 md:w-2/3 text-center sm:text-right mb-8 sm:mb-0 font-bold text-sm">
+                        <div className="text-white">You also receive</div>
+                        <div className="text-earn">0.005 ELGD by farming</div>
+                    </div>
+                    <div className="sm:w-1/2 md:w-1/3">
+                        <Button
+                            topLeftCorner
+                            style={{ height: 48 }}
+                            className="mt-1.5"
+                            outline
+                            onClick={removeLP}
+                            primaryColor="yellow-700"
+                        >
+                            WITHDRAW
+                        </Button>
+                    </div>
                 </div>
             </div>
-        </Modal>
+        </ReactModel>
     );
 };
 

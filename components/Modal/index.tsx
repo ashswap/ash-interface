@@ -24,8 +24,8 @@ const Modal = (props: Props) => {
                 onClick={props.onClose}
             />
             <Panel dark={props.dark} style={{marginTop: 100}}>
-                <PanelContent className={props.contentClassName} style={props.contentStyle}>
-                    <div className="absolute top-4 right-4">
+                <PanelContent className={`px-9 py-11 ${props.contentClassName}`} style={props.contentStyle}>
+                    <div className="absolute top-0 right-0">
                         <IconButton
                             icon={<IconClose />}
                             iconSize="small"

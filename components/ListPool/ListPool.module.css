@@ -1,5 +1,7 @@
 .containerCard {
-    @apply flex flex-wrap gap-7 items-baseline;
+    /* @apply flex flex-wrap gap-7 items-baseline; */
+    @apply grid gap-4 lg:gap-[1.875rem];
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
 }
 
 .containerList {

@@ -1,6 +1,4 @@
-.container {
-    padding: 26px 43px;
-}
+
 .tokenIcon {
     @apply rounded-full;
 

@@ -7,8 +7,8 @@ const BasicLayout = ({ children }: { children: any }) => {
 
     return (
         <>
+            {router.route === "/swap" ? <div className="absolute z-[-1] w-full"><BackgroundEffect /></div> : null}
             <AppBar />
-            {router.route === "/swap" ? <BackgroundEffect /> : null}
             {children}
         </>
     );
