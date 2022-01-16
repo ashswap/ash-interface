@@ -91,7 +91,6 @@ const PoolFilter = (props: Props) => {
                             <Select prefix="Sort by" options={options} />
                         </div>
                     )}
-                    }
                 </div>
             </div>
             {isMDScreen && SearchBox}
