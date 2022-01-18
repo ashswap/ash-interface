@@ -8,11 +8,11 @@ import IconUSDT from "assets/images/usdt-icon.png";
 const pools: IPool[] = [
     {
         address:
-            "erd1qqqqqqqqqqqqqpgqqgfdej6zyct50z0lljmt9k2l02w9jvxnj9ts3xn5vz",
+            "erd1qqqqqqqqqqqqqpgqe7dz06rpw9gqsehj98z8jg4nfrr8d797j9ts2sw3xu",
         lpToken: {
-            id: "LPT-8b37e8",
+            id: "LPT-be757f",
             icon: "#fff",
-            name: "LPT-8b37e8",
+            name: "LPT-be757f",
             decimals: 18
         },
         tokens: [
@@ -34,11 +34,11 @@ const pools: IPool[] = [
     },
     {
         address:
-            "erd1qqqqqqqqqqqqqpgqa750qr0qw5jl7jd0dflxyaajnu5uhretj9ts9g5y3s",
+            "erd1qqqqqqqqqqqqqpgq367a0agl7dyz24ncxapfjuzjt37nxn5ej9tshzfu0q",
         lpToken: {
-            id: "LPT-7ee4a6",
+            id: "LPT-499a71",
             icon: "#fff",
-            name: "LPT-7ee4a6",
+            name: "LPT-499a71",
             decimals: 18
         },
         tokens: [
@@ -60,11 +60,11 @@ const pools: IPool[] = [
     },
     {
         address:
-            "erd1qqqqqqqqqqqqqpgqe2sgfvhju2zn03ts3s5v2hs0lp249cl7j9tsxxzhf8",
+            "erd1qqqqqqqqqqqqqpgqd6t8hv4pxum3vx54u9x55jpxanxh7krlj9tsyx8nx7",
         lpToken: {
-            id: "LPT-977258",
+            id: "LPT-8e866f",
             icon: "#fff",
-            name: "LPT-977258",
+            name: "LPT-8e866f",
             decimals: 18
         },
         tokens: [
