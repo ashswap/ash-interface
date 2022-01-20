@@ -391,7 +391,7 @@ const ListPoolItemWithdraw = (props: Props) => {
                                     <span className="text-lg font-bold">
                                         0.52&nbsp;
                                     </span>
-                                    <span>CAKE</span>
+                                    <span>ASH</span>
                                     &nbsp;
                                 </span>
                                 <span className="text-white text-xs">
@@ -411,7 +411,7 @@ const ListPoolItemWithdraw = (props: Props) => {
                         </div>
                         <div className="flex justify-between items-center h-9 space-x-4 px-4">
                             <div className="text-2xs">LP Token</div>
-                            <div className="text-sm">3.412351 CAKE-USDT</div>
+                            <div className="text-sm">3.412351 {props.pool.tokens[0].name}-{props.pool.tokens[1].name}</div>
                         </div>
                         <div className="flex justify-between items-center h-9 space-x-4 px-4">
                             <div className="text-2xs">Performance Fee</div>

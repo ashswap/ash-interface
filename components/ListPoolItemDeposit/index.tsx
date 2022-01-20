@@ -212,7 +212,7 @@ const ListPoolItemDeposit = (props: Props) => {
                             <div>
                                 <span className="text-earn text-lg">0.52</span>
                                 <span className="text-xs">
-                                    <span className="text-earn">CAKE</span>
+                                    <span className="text-earn">ASH</span>
                                     <span> per 1,000 USDT</span>
                                 </span>
                             </div>
