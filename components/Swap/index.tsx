@@ -35,7 +35,6 @@ import { useDappContext } from "context/dapp";
 import { useSwap } from "context/swap";
 import { useWallet } from "context/wallet";
 import { toEGLD, toWei } from "helper/balance";
-import { useExtensionLogin } from "hooks/useExtension";
 import useMediaQuery from "hooks/useMediaQuery";
 import useMounted from "hooks/useMounted";
 import Image from "next/image";
@@ -65,8 +64,7 @@ const Swap = () => {
     const [isOpenHistoryModal, openHistoryModal] = useState<boolean>(false);
     const [fee, setFee] = useState<number>(0);
 
-    const { callContract } = useWallet();
-    const extensionLogin = useExtensionLogin({ callbackRoute: "/" });
+    const { callContract, connectWallet } = useWallet();
     const dapp = useDappContext();
     const { proxy } = dapp.dapp;
 
@@ -513,7 +511,7 @@ const Swap = () => {
                                     className="mt-12"
                                     outline
                                     onClick={
-                                        dapp.loggedIn ? swap : extensionLogin
+                                        dapp.loggedIn ? swap : () => connectWallet()
                                     }
                                     glowOnHover
                                 >
