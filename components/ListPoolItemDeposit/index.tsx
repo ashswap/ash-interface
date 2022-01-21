@@ -2,7 +2,7 @@ import IconDown from "assets/svg/down-white.svg";
 import AddLiquidityModal from "components/AddLiquidityModal";
 import Button from "components/Button";
 import { usePool } from "components/ListPoolItem";
-import ReactModel from "components/ReactModal";
+import ReactModal from "components/ReactModal";
 import { TAILWIND_BREAKPOINT } from "const/mediaQueries";
 import useMediaQuery from "hooks/useMediaQuery";
 import IPool from "interface/pool";
@@ -157,7 +157,7 @@ const ListPoolItemDeposit = (props: Props) => {
                     </div>
                 )}
             </div>
-            <ReactModel
+            <ReactModal
                 isOpen={mIsExpand}
                 onRequestClose={() => setMIsExpand(false)}
                 className="fixed bottom-0 left-0 right-0"
@@ -253,7 +253,7 @@ const ListPoolItemDeposit = (props: Props) => {
                         View LP Distribution
                     </div>
                 </div>
-            </ReactModel>
+            </ReactModal>
             <AddLiquidityModal
                 open={openAddLiquidity}
                 onClose={() => setOpenAddLiquidity(false)}

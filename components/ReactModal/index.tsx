@@ -21,7 +21,7 @@ Modal.defaultStyles.content = {
     maxHeight: "100vh"
 };
 Modal.setAppElement("body");
-const ReactModel = (
+const ReactModal = (
     props: Props & {
         contentClassName?: string;
         className?: string;
@@ -65,4 +65,4 @@ const ReactModel = (
         </Modal>
     );
 };
-export default ReactModel;
+export default ReactModal;

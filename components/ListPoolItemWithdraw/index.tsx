@@ -6,7 +6,7 @@ import ICMinus from "assets/svg/minus.svg";
 import ICPlus from "assets/svg/plus.svg";
 import AddLiquidityModal from "components/AddLiquidityModal";
 import { usePool } from "components/ListPoolItem";
-import ReactModel from "components/ReactModal";
+import ReactModal from "components/ReactModal";
 import RemoveLiquidityModal from "components/RemoveLiquidityModal";
 import { TAILWIND_BREAKPOINT } from "const/mediaQueries";
 import { toEGLD } from "helper/balance";
@@ -242,7 +242,7 @@ const ListPoolItemWithdraw = (props: Props) => {
                 </div>
             </div> */}
             </div>
-            <ReactModel
+            <ReactModal
                 isOpen={mIsExpand}
                 onRequestClose={() => setMIsExpand(false)}
                 className="fixed bottom-0 left-0 right-0"
@@ -430,7 +430,7 @@ const ListPoolItemWithdraw = (props: Props) => {
                         View LP Distribution
                     </div>
                 </div>
-            </ReactModel>
+            </ReactModal>
             <AddLiquidityModal
                 open={openAddLiquidity}
                 onClose={() => setOpenAddLiquidity(false)}
