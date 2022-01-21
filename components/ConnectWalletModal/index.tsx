@@ -26,6 +26,7 @@ const MAIAR_WALLET_LINK = {
 }
 
 function ConnectWalletModal() {
+    const {loggedIn} = useDappContext();
     const {
         isOpenConnectWalletModal,
         setIsOpenConnectWalletModal
@@ -53,6 +54,14 @@ function ConnectWalletModal() {
             setIsOpenQR(false);
         }
     }, [isOpenConnectWalletModal]);
+    useEffect(() => {
+        if(loggedIn){
+            setIsOpenConnectWalletModal(false);
+            setIsOpenQR(false);
+            setIsOpenDownloadApp(false);
+            setIsOpenDownloadExtension(false);
+        }
+    }, [loggedIn, setIsOpenConnectWalletModal])
     return (
         <>
             <ReactModal
