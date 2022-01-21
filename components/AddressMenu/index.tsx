@@ -122,15 +122,6 @@ function AddressMenu() {
                         </Button>
                     </>
                 ))}
-                <button className="text-white" onClick={extensionLogin}>
-                    connect extension
-                </button>
-                <button
-                    className="text-white"
-                    onClick={() => setIsOpenWalletConnect(true)}
-                >
-                    wallet connect
-                </button>
             </div>
             {isSMScreen && (
                 <Modal
