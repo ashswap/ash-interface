@@ -55,6 +55,9 @@ module.exports = {
                 },
                 "ash-purple": {
                     500: "#7B61FF"
+                },
+                "ash-blue": {
+                    500: "#2175FF"
                 }
             }
         },

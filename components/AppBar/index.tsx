@@ -1,27 +1,9 @@
 import AddressMenu from "components/AddressMenu";
 import Nav from "components/Nav";
-import { TAILWIND_BREAKPOINT } from "const/mediaQueries";
-import { useWallet } from "context/wallet";
-import useMediaQuery from "hooks/useMediaQuery";
 import Image from "next/image";
 import Link from "next/link";
-import { useCallback } from "react";
 
 const AppBar = () => {
-    const { provider, connectExtension, disconnectExtension } = useWallet();
-    const isSMScreen = useMediaQuery(
-        `(max-width: ${TAILWIND_BREAKPOINT.SM}px)`
-    );
-    const copyAddress = useCallback(() => {
-        if (!provider) {
-            return;
-        }
-
-        navigator.clipboard.writeText(provider.account.address);
-    }, [provider]);
-
-    const SMAddressMenu = () => {};
-
     return (
         <>
             <div className="flex justify-between items-center px-6 sm:px-12 py-5">

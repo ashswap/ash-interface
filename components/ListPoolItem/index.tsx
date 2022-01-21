@@ -1,9 +1,3 @@
-import IPool from "interface/pool";
-import styles from "./ListPoolItemDeposit.module.css";
-import { useState, useEffect, useMemo, useContext, createContext } from "react";
-import IconDown from "assets/svg/down-white.svg";
-import Button from "components/Button";
-import AddLiquidityModal from "components/AddLiquidityModal";
 import {
     Address,
     ArgSerializer,
@@ -14,15 +8,18 @@ import {
     TypeExpressionParser,
     TypeMapper
 } from "@elrondnetwork/erdjs/out";
-import { useWallet } from "context/wallet";
 import BigNumber from "bignumber.js";
-import { toEGLD } from "helper/balance";
-import { useRouter } from "next/router";
 import ListPoolItemDeposit from "components/ListPoolItemDeposit";
 import ListPoolItemWithdraw from "components/ListPoolItemWithdraw";
 import PoolCard from "components/PoolCard";
 import { ViewType } from "components/PoolFilter";
+import { useDappContext } from "context/dapp";
+import { useWallet } from "context/wallet";
+import { toEGLD } from "helper/balance";
+import IPool from "interface/pool";
 import { TokenBalancesMap } from "interface/tokenBalance";
+import { useRouter } from "next/router";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 interface Props {
     pool: IPool;
@@ -56,7 +53,8 @@ export function usePool() {
 const ListPoolItem = (props: Props) => {
     const router = useRouter();
     const poolType = router.query["type"];
-    const { tokenPrices, balances, proxy, lpTokens, tokens } = useWallet();
+    const { tokenPrices, balances, lpTokens, tokens } = useWallet();
+    const dapp = useDappContext();
     const [value0, setValue0] = useState<BigNumber>(initState.value0);
     const [value1, setValue1] = useState<BigNumber>(initState.value1);
     const [tokenBalances, setTokenBalances] = useState<TokenBalancesMap>({});
@@ -68,7 +66,7 @@ const ListPoolItem = (props: Props) => {
     }, [balances, props.pool]);
 
     useEffect(() => {
-        proxy
+        dapp.dapp.proxy
             .queryContract(
                 new Query({
                     address: new Address(props.pool.address),
@@ -102,23 +100,25 @@ const ListPoolItem = (props: Props) => {
                 setValue0(new BigNumber(values[0].valueOf().field0.toString()));
                 setValue1(new BigNumber(values[0].valueOf().field1.toString()));
             });
-    }, [ownLiquidity, props.pool.address, props.pool.tokens, proxy]);
+    }, [ownLiquidity, props.pool.address, props.pool.tokens, dapp.dapp.proxy]);
 
     const capacityPercent = useMemo(() => {
+        const lpToken = lpTokens[props.pool.lpToken.id];
+        if (!lpToken) return new BigNumber(0);
         return toEGLD(props.pool.lpToken, ownLiquidity.toString())
             .multipliedBy(100)
-            .div(lpTokens[props.pool.lpToken.id].totalSupply!);
+            .div(lpToken.totalSupply!);
     }, [props.pool, ownLiquidity, lpTokens]);
 
     // get token amount in pool
     useEffect(() => {
         let tokenBalances: TokenBalancesMap = {};
 
-        if (!proxy) {
+        if (!dapp.dapp.proxy) {
             return;
         }
 
-        proxy
+        dapp.dapp.proxy
             .getAddressEsdtList(new Address(props.pool.address))
             .then(resp => {
                 for (const tokenId in resp) {
@@ -134,8 +134,8 @@ const ListPoolItem = (props: Props) => {
                 }
 
                 setTokenBalances(tokenBalances);
-            })
-    }, [proxy, tokens, props.pool]);
+            });
+    }, [dapp.dapp.proxy, tokens, props.pool]);
 
     const valueUsd = useMemo(() => {
         let token0 = props.pool.tokens[0];

@@ -23,6 +23,7 @@ import Modal from "components/ReactModal";
 import Switch from "components/Switch";
 import { TAILWIND_BREAKPOINT } from "const/mediaQueries";
 import { gasLimit, network } from "const/network";
+import { useDappContext } from "context/dapp";
 import { useWallet } from "context/wallet";
 import { toEGLD, toWei } from "helper/balance";
 import useMediaQuery from "hooks/useMediaQuery";
@@ -136,13 +137,13 @@ const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
         `(max-width: ${TAILWIND_BREAKPOINT.SM}px)`
     );
     const {
-        provider,
-        proxy,
         callContract,
         fetchBalances,
         balances,
         tokenPrices
     } = useWallet();
+    const dapp = useDappContext();
+    // const provider = dapp.dapp.provider;
     const [rates, setRates] = useState<BigNumber[] | undefined>(undefined);
     const [liquidity, setLiquidity] = useState<string>("");
     const poolContext = usePool();
@@ -158,9 +159,10 @@ const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
     }, [open]);
 
     const addLP = useCallback(async () => {
+        if(!dapp.loggedIn) return;
         try {
             let tx = await callContract(
-                new Address(provider?.account.address),
+                new Address(dapp.address),
                 {
                     func: new ContractFunction("MultiESDTNFTTransfer"),
                     gasLimit: new GasLimit(gasLimit),
@@ -212,18 +214,18 @@ const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
         if (onClose) {
             onClose();
         }
-    }, [provider, value0, value1, pool, onClose, callContract, fetchBalances]);
+    }, [dapp, value0, value1, pool, onClose, callContract, fetchBalances]);
 
     // find pools + fetch reserves
     useEffect(() => {
         let isMounted = true;
 
-        if (!pool) {
+        if (!pool || !dapp.dapp.proxy) {
             return;
         }
 
         Promise.all([
-            proxy.queryContract(
+            dapp.dapp.proxy.queryContract(
                 new Query({
                     address: new Address(pool?.address),
                     func: new ContractFunction("getAmountOut"),
@@ -242,7 +244,7 @@ const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
                     ]
                 })
             ),
-            proxy.queryContract(
+            dapp.dapp.proxy.queryContract(
                 new Query({
                     address: new Address(pool?.address),
                     func: new ContractFunction("getAmountOut"),
@@ -293,7 +295,7 @@ const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
         return () => {
             isMounted = false;
         };
-    }, [pool, proxy, setRates]);
+    }, [pool, dapp.dapp.proxy, setRates]);
 
     const onChangeValue0 = useCallback(
         (value: string) => {
