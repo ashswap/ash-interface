@@ -334,12 +334,13 @@ const Swap = () => {
         <div className="flex flex-col items-center pt-3.5 pb-12 px-6">
             <div className="flex max-w-full">
                 <div
-                    className={`w-full max-w-[28.75rem] transition-none ${showSetting &&
+                    className={`w-full max-w-[28.75rem] transition-none relative ${showSetting &&
                         !isSMScreen &&
                         "sm:w-7/12"}`}
                 >
-                    <PanelV2 className="text-base text-ash-dark-600">
-                        <div className="px-6 py-8 sm:px-8 text-white">
+                    <div className="clip-corner-4 clip-corner-tl bg-ash-dark-600 absolute top-0 left-0 right-0 bottom-0 z-[-1]"></div>
+                    <div className="text-base">
+                        <div className="px-6 py-8 sm:px-12 text-white">
                             <div className={styles.fire}>
                                 <Image
                                     src={Fire}
@@ -508,7 +509,7 @@ const Swap = () => {
                                     }
                                     topLeftCorner
                                     style={{ height: 48 }}
-                                    className="mt-12"
+                                    className="mt-12 text-xs sm:text-sm"
                                     outline
                                     onClick={
                                         dapp.loggedIn ? swap : () => connectWallet()
@@ -536,7 +537,7 @@ const Swap = () => {
                                 </a>
                             </div>
                         </div>
-                    </PanelV2>
+                    </div>
                 </div>
                 {showSetting && !isSMScreen && (
                     <div className="relative px-12 py-14 bg-ash-dark-600 sm:w-5/12 max-w-[23rem] text-white border-l border-l-[#757391]">
