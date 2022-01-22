@@ -11,16 +11,18 @@ import {
     TypeMapper
 } from "@elrondnetwork/erdjs";
 import { notification, Slider } from "antd";
+import ICArrowBottomRight from "assets/svg/arrow-bottom-right.svg";
 import IconNewTab from "assets/svg/new-tab-green.svg";
 import IconRight from "assets/svg/right-yellow.svg";
 import BigNumber from "bignumber.js";
 import Button from "components/Button";
 import Input from "components/Input";
 import { usePool } from "components/ListPoolItem";
-import ReactModel from "components/ReactModal";
+import ReactModal from "components/ReactModal";
 import Token from "components/Token";
 import { TAILWIND_BREAKPOINT } from "const/mediaQueries";
 import { gasLimit, network } from "const/network";
+import { useDappContext } from "context/dapp";
 import { useSwap } from "context/swap";
 import { useWallet } from "context/wallet";
 import { toEGLD, toWei } from "helper/balance";
@@ -31,8 +33,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { theme } from "tailwind.config";
 import { useDebounce } from "use-debounce";
 import styles from "./RemoveLiquidityModal.module.css";
-import ICArrowBottomRight from "assets/svg/arrow-bottom-right.svg";
-import ICArrowTopRight from "assets/svg/arrow-top-right.svg";
 
 interface Props {
     open?: boolean;
@@ -47,19 +47,17 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
     const [value0, setValue0] = useState<string>("");
     const [value1, setValue1] = useState<string>("");
     const [liquidityDebounce] = useDebounce(liquidity, 500);
-    const isSMScreen = useMediaQuery(`(max-width: ${TAILWIND_BREAKPOINT.SM}px)`);
-    const {
-        callContract,
-        fetchBalances,
-        balances,
-        proxy,
-        lpTokens
-    } = useWallet();
+    const isSMScreen = useMediaQuery(
+        `(max-width: ${TAILWIND_BREAKPOINT.SM}px)`
+    );
+    const { callContract, fetchBalances, balances, lpTokens } = useWallet();
+    const dapp = useDappContext();
     const { slippage } = useSwap();
     const { capacityPercent, valueUsd, ownLiquidity } = usePool();
 
     const pricePerLP = useMemo(() => {
-        if (!valueUsd || !lpTokens[pool.lpToken.id].totalSupply) {
+        const lpToken = lpTokens[pool.lpToken.id];
+        if (!valueUsd || !lpToken?.totalSupply) {
             return new BigNumber(0);
         }
 
@@ -109,11 +107,11 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
     );
 
     useEffect(() => {
-        if (liquidityDebounce.eq(new BigNumber(0))) {
+        if (!dapp.dapp.proxy || liquidityDebounce.eq(new BigNumber(0))) {
             return;
         }
 
-        proxy
+        dapp.dapp.proxy
             .queryContract(
                 new Query({
                     address: new Address(pool.address),
@@ -159,7 +157,7 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
                     ).toString()
                 );
             });
-    }, [liquidityDebounce, pool, proxy]);
+    }, [liquidityDebounce, pool, dapp.dapp.proxy]);
 
     const removeLP = useCallback(async () => {
         try {
@@ -224,7 +222,7 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
     ]);
 
     return (
-        <ReactModel
+        <ReactModal
             isOpen={!!open}
             onRequestClose={onClose}
             useClipCorner={true}
@@ -394,10 +392,7 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
                                 </div>
                             </div>
 
-                            <div
-                                className="absolute left-4 sm:left-0 text-sm top-14 sm:top-[4rem]"
-                    
-                            >
+                            <div className="absolute left-4 sm:left-0 text-sm top-14 sm:top-[4rem]">
                                 &
                             </div>
                         </div>
@@ -408,18 +403,27 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
                         </div>
                         <div className="flex flex-wrap my-8 gap-y-9">
                             <div className="w-1/2">
-                                <div className="mb-4 text-xs">Your liquidity</div>
-                                <div className="text-lg font-bold">{capacityPercent.toFixed(2)}%</div>
+                                <div className="mb-4 text-xs">
+                                    Your liquidity
+                                </div>
+                                <div className="text-lg font-bold">
+                                    {capacityPercent.toFixed(2)}%
+                                </div>
                                 <div className="text-ash-purple-500 text-2xs mt-2">
-                                    <ICArrowBottomRight className="inline mr-1"/>
+                                    <ICArrowBottomRight className="inline mr-1" />
                                     <span>-26%</span>
                                 </div>
                             </div>
                             <div className="w-1/2">
                                 <div className="mb-4 text-xs">Farm per day</div>
-                                <div className="text-lg font-bold">-15.211 <span className="text-xs font-normal">ELGD</span></div>
+                                <div className="text-lg font-bold">
+                                    -15.211{" "}
+                                    <span className="text-xs font-normal">
+                                        ELGD
+                                    </span>
+                                </div>
                                 <div className="text-ash-purple-500 text-2xs mt-2">
-                                    <ICArrowBottomRight className="inline mr-1"/>
+                                    <ICArrowBottomRight className="inline mr-1" />
                                     <span>-26%</span>
                                 </div>
                             </div>
@@ -446,7 +450,7 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
                     </div>
                 </div>
             </div>
-        </ReactModel>
+        </ReactModal>
     );
 };
 

@@ -8,30 +8,42 @@ import Wallet from "assets/svg/wallet.svg";
 import Button from "components/Button";
 import Modal from "components/ReactModal";
 import { TAILWIND_BREAKPOINT } from "const/mediaQueries";
+import { useDappContext } from "context/dapp";
 import { useWallet } from "context/wallet";
+import useLogout from "hooks/useLogout";
 import useMediaQuery from "hooks/useMediaQuery";
+import useMounted from "hooks/useMounted";
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 import styles from "./AddressMenu.module.css";
 function AddressMenu() {
-    const { provider, connectExtension, disconnectExtension } = useWallet();
+    const {loggedIn, address} = useDappContext();
+    const logoutDapp = useLogout();
     const [mShowMenu, setMShowMenu] = useState(false);
     const [showMenu, setShowMenu] = useState(false);
+    const mounted = useMounted();
     const isSMScreen = useMediaQuery(
         `(max-width: ${TAILWIND_BREAKPOINT.SM}px)`
     );
+    const { connectWallet } = useWallet();
     useEffect(() => {
         setMShowMenu(false);
         setShowMenu(false);
     }, [isSMScreen]);
     const copyAddress = useCallback(() => {
-        if (!provider) {
+        if (!loggedIn) {
             return;
         }
         setMShowMenu(false);
         setShowMenu(false);
-        navigator.clipboard.writeText(provider.account.address);
-    }, [provider]);
+        navigator.clipboard.writeText(address);
+    }, [loggedIn, address]);
+    useEffect(() => {
+        if(loggedIn){
+            setShowMenu(false);
+            setMShowMenu(false);
+        }
+    }, [loggedIn]);
     const menu = (
         <Menu className={styles.addressMenu}>
             <Menu.Item
@@ -53,7 +65,7 @@ function AddressMenu() {
                 key="3"
                 className={styles.addressMenuItem}
                 icon={<IconDisconnect />}
-                onClick={disconnectExtension}
+                onClick={() => logoutDapp({})}
             >
                 Disconnect wallet
             </Menu.Item>
@@ -68,11 +80,9 @@ function AddressMenu() {
             onClick={() => isSMScreen && setMShowMenu(true)}
         >
             <span className={styles.address}>
-                {provider?.account.address.slice(0, 4) +
+                {address.slice(0, 4) +
                     "..." +
-                    provider?.account.address.slice(
-                        provider?.account.address.length - 4
-                    )}
+                    address.slice(address.length - 4)}
             </span>
             <span>
                 <IconDown />
@@ -82,29 +92,32 @@ function AddressMenu() {
     return (
         <>
             <div>
-                {provider && provider?.account ? (
-                    <Dropdown
-                        overlay={menu}
-                        trigger={["click"]}
-                        disabled={isSMScreen}
-                        visible={showMenu}
-                        onVisibleChange={() => setShowMenu(state => !state)}
-                    >
-                        <div>
-                            <DropdownBtn />
-                        </div>
-                    </Dropdown>
-                ) : (
-                    <Button
-                        leftIcon={!isSMScreen ? <Wallet /> : undefined}
-                        bottomRightCorner
-                        onClick={connectExtension}
-                        glowOnHover
-                        className="text-xs"
-                    >
-                        Connect wallet
-                    </Button>
-                )}
+                {mounted &&
+                    (loggedIn ? (
+                        <Dropdown
+                            overlay={menu}
+                            trigger={["click"]}
+                            disabled={isSMScreen}
+                            visible={showMenu}
+                            onVisibleChange={() => setShowMenu(state => !state)}
+                        >
+                            <div>
+                                <DropdownBtn />
+                            </div>
+                        </Dropdown>
+                    ) : (
+                        <>
+                            <Button
+                                leftIcon={!isSMScreen ? <Wallet /> : undefined}
+                                bottomRightCorner
+                                onClick={() => connectWallet()}
+                                glowOnHover
+                                className="text-xs"
+                            >
+                                Connect wallet
+                            </Button>
+                        </>
+                    ))}
             </div>
             {isSMScreen && (
                 <Modal
@@ -136,7 +149,7 @@ function AddressMenu() {
                                 className="bg-bg rounded-lg px-11 h-14 flex items-center w-full mt-4"
                                 onClick={() => {
                                     setMShowMenu(false);
-                                    disconnectExtension();
+                                    logoutDapp();
                                 }}
                             >
                                 <i className="mr-4">
@@ -148,6 +161,17 @@ function AddressMenu() {
                     </div>
                 </Modal>
             )}
+            {/* <Modal
+                isOpen={isOpenWalletConnect}
+                onRequestClose={() => setIsOpenWalletConnect(false)}
+                useClipCorner={true}
+            >
+                <div className="p-12">
+                    <WalletConnect
+                        onLogin={() => setIsOpenWalletConnect(false)}
+                    ></WalletConnect>
+                </div>
+            </Modal> */}
         </>
     );
 }

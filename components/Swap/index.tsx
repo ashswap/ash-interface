@@ -8,7 +8,7 @@ import {
     Query,
     TokenIdentifierValue,
     TypeExpressionParser,
-    TypeMapper,
+    TypeMapper
 } from "@elrondnetwork/erdjs";
 import { notification } from "antd";
 import Fire from "assets/images/fire.png";
@@ -31,10 +31,12 @@ import Setting from "components/Setting";
 import SwapAmount from "components/SwapAmount";
 import { TAILWIND_BREAKPOINT } from "const/mediaQueries";
 import { gasLimit, network } from "const/network";
+import { useDappContext } from "context/dapp";
 import { useSwap } from "context/swap";
 import { useWallet } from "context/wallet";
 import { toEGLD, toWei } from "helper/balance";
 import useMediaQuery from "hooks/useMediaQuery";
+import useMounted from "hooks/useMounted";
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import styles from "./Swap.module.css";
@@ -43,6 +45,7 @@ const Swap = () => {
     const isSMScreen = useMediaQuery(
         `(max-width: ${TAILWIND_BREAKPOINT.SM}px)`
     );
+    const mounted = useMounted();
     const {
         tokenFrom,
         tokenTo,
@@ -55,14 +58,15 @@ const Swap = () => {
         rates,
         setRates,
         isInsufficentFund,
-        slippage,
+        slippage
     } = useSwap();
     const [showSetting, setShowSetting] = useState<boolean>(false);
     const [isOpenHistoryModal, openHistoryModal] = useState<boolean>(false);
     const [fee, setFee] = useState<number>(0);
 
-    const { provider, proxy, account, connectExtension, callContract } =
-        useWallet();
+    const { callContract, connectWallet } = useWallet();
+    const dapp = useDappContext();
+    const { proxy } = dapp.dapp;
 
     useEffect(() => {
         setShowSetting(false);
@@ -105,8 +109,8 @@ const Swap = () => {
                     args: [
                         new TokenIdentifierValue(Buffer.from(tokenFrom.id)),
                         new TokenIdentifierValue(Buffer.from(tokenTo.id)),
-                        new BigUIntValue(amountIn),
-                    ],
+                        new BigUIntValue(amountIn)
+                    ]
                 })
             )
             .then(({ returnData }) => {
@@ -121,7 +125,7 @@ const Swap = () => {
                 let mappedType = mapper.mapType(type);
 
                 let endpointDefinitions = [
-                    new EndpointParameterDefinition("foo", "bar", mappedType),
+                    new EndpointParameterDefinition("foo", "bar", mappedType)
                 ];
                 let values = serializer.stringToValues(
                     resultHex,
@@ -160,8 +164,8 @@ const Swap = () => {
                             new BigNumber(10).exponentiatedBy(
                                 pool!.tokens[0].decimals
                             )
-                        ),
-                    ],
+                        )
+                    ]
                 })
             ),
             proxy.queryContract(
@@ -179,18 +183,18 @@ const Swap = () => {
                             new BigNumber(10).exponentiatedBy(
                                 pool!.tokens[1].decimals
                             )
-                        ),
-                    ],
+                        )
+                    ]
                 })
             ),
             proxy.queryContract(
                 new Query({
                     address: new Address(pool?.address),
-                    func: new ContractFunction("getTotalFeePercent"),
+                    func: new ContractFunction("getTotalFeePercent")
                 })
-            ),
-        ]).then((results) => {
-            let rates = results.slice(0, 2).map((result) => {
+            )
+        ]).then(results => {
+            let rates = results.slice(0, 2).map(result => {
                 let resultHex = Buffer.from(
                     result.returnData[0],
                     "base64"
@@ -203,7 +207,7 @@ const Swap = () => {
                 let mappedType = mapper.mapType(type);
 
                 let endpointDefinitions = [
-                    new EndpointParameterDefinition("foo", "bar", mappedType),
+                    new EndpointParameterDefinition("foo", "bar", mappedType)
                 ];
                 let values = serializer.stringToValues(
                     resultHex,
@@ -229,7 +233,7 @@ const Swap = () => {
     }, [pool, proxy, setRates]);
 
     const swap = useCallback(async () => {
-        if (!provider || !tokenFrom || !tokenTo) {
+        if (!dapp.loggedIn || !tokenFrom || !tokenTo) {
             return;
         }
 
@@ -246,8 +250,8 @@ const Swap = () => {
                     new BigUIntValue(rawValueFrom),
                     new TokenIdentifierValue(Buffer.from("exchange")),
                     new TokenIdentifierValue(Buffer.from(tokenTo.id)),
-                    new BigUIntValue(new BigNumber(0)),
-                ],
+                    new BigUIntValue(new BigNumber(0))
+                ]
             });
 
             let key = `open${Date.now()}`;
@@ -255,13 +259,14 @@ const Swap = () => {
                 key,
                 message: `Swap succeed ${valueFrom} ${tokenFrom.name} to ${valueTo} ${tokenTo.name}`,
                 icon: <IconNewTab />,
+            
                 onClick: () =>
                     window.open(
                         network.explorerAddress +
                             "/transactions/" +
                             tx.getHash().toString(),
                         "_blank"
-                    ),
+                    )
             });
             setTimeout(() => {
                 notification.close(key);
@@ -276,14 +281,14 @@ const Swap = () => {
             // });
         }
     }, [
-        provider,
+        dapp.loggedIn,
         pool,
         rawValueFrom,
         callContract,
         tokenFrom,
         tokenTo,
         valueFrom,
-        valueTo,
+        valueTo
     ]);
 
     const priceImpact = useMemo(() => {
@@ -329,12 +334,13 @@ const Swap = () => {
         <div className="flex flex-col items-center pt-3.5 pb-12 px-6">
             <div className="flex max-w-full">
                 <div
-                    className={`w-full max-w-[28.75rem] transition-none ${
-                        showSetting && !isSMScreen && "sm:w-7/12"
-                    }`}
+                    className={`w-full max-w-[28.75rem] transition-none relative ${showSetting &&
+                        !isSMScreen &&
+                        "sm:w-7/12"}`}
                 >
-                    <PanelV2 className="text-base text-ash-dark-600">
-                        <div className="px-6 py-8 sm:px-8 text-white">
+                    <div className="clip-corner-4 clip-corner-tl bg-ash-dark-600 absolute top-0 left-0 right-0 bottom-0 z-[-1]"></div>
+                    <div className="text-base">
+                        <div className="px-6 py-8 sm:px-12 text-white">
                             <div className={styles.fire}>
                                 <Image
                                     src={Fire}
@@ -349,15 +355,15 @@ const Swap = () => {
                                     <IconButton
                                         icon={<Clock />}
                                         onClick={() =>
-                                            provider &&
-                                            openHistoryModal((state) => !state)
+                                            dapp.loggedIn &&
+                                            openHistoryModal(state => !state)
                                         }
                                     />
                                     <IconButton
                                         icon={<SettingIcon />}
                                         activeIcon={<SettingActiveIcon />}
                                         onClick={() =>
-                                            setShowSetting((state) => !state)
+                                            setShowSetting(state => !state)
                                         }
                                         active={showSetting}
                                     />
@@ -471,12 +477,14 @@ const Swap = () => {
                                 </>
                             )}
 
-                            {isInsufficentFund ? (
+                            {mounted && (isInsufficentFund ? (
                                 <Button
                                     leftIcon={
-                                        !provider ? <IconWallet /> : <></>
+                                        !dapp.loggedIn ? <IconWallet /> : <></>
                                     }
-                                    rightIcon={provider ? <IconRight /> : <></>}
+                                    rightIcon={
+                                        dapp.loggedIn ? <IconRight /> : <></>
+                                    }
                                     topLeftCorner
                                     style={{ height: 48 }}
                                     className="mt-12"
@@ -494,19 +502,23 @@ const Swap = () => {
                             ) : (
                                 <Button
                                     leftIcon={
-                                        !provider ? <IconWallet /> : <></>
+                                        !dapp.loggedIn ? <IconWallet /> : <></>
                                     }
-                                    rightIcon={provider ? <IconRight /> : <></>}
+                                    rightIcon={
+                                        dapp.loggedIn ? <IconRight /> : <></>
+                                    }
                                     topLeftCorner
                                     style={{ height: 48 }}
-                                    className="mt-12"
+                                    className="mt-12 text-xs sm:text-sm"
                                     outline
-                                    onClick={provider ? swap : connectExtension}
+                                    onClick={
+                                        dapp.loggedIn ? swap : () => connectWallet()
+                                    }
                                     glowOnHover
                                 >
-                                    {provider ? "SWAP" : "CONNECT WALLET"}
+                                    {dapp.loggedIn ? "SWAP" : "CONNECT WALLET"}
                                 </Button>
-                            )}
+                            ))}
 
                             <div
                                 className="text-xs font-bold text-center"
@@ -525,7 +537,7 @@ const Swap = () => {
                                 </a>
                             </div>
                         </div>
-                    </PanelV2>
+                    </div>
                 </div>
                 {showSetting && !isSMScreen && (
                     <div className="relative px-12 py-14 bg-ash-dark-600 sm:w-5/12 max-w-[23rem] text-white border-l border-l-[#757391]">

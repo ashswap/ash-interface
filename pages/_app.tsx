@@ -1,25 +1,29 @@
-import { useEffect } from 'react';
-import Head from 'next/head'
-import Script from 'next/script'
-import type { AppProps } from 'next/app'
-import { NextSeo } from 'next-seo';
-import { useRouter } from 'next/router'
-import {WalletProvider} from 'context/wallet'
-import '../styles/globals.css'
-import * as gtag from '../helper/gtag'
+import Authenticate from "components/Authenticate";
+import ConnectWalletModal from "components/ConnectWalletModal";
+import { DappContextProvider } from "context/dapp";
+import { WalletProvider } from "context/wallet";
+import { NextSeo } from "next-seo";
+import { AppProps } from "next/app";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import Script from "next/script";
+import { useEffect } from "react";
+import * as dappConfig from "../dapp-config";
+import * as gtag from "../helper/gtag";
+import "../styles/globals.css";
 
 function MyApp({ Component, pageProps }: AppProps) {
-    const router = useRouter()
+    const router = useRouter();
     useEffect(() => {
         const handleRouteChange = (url: string) => {
-            gtag.pageview(url)
-        }
+            gtag.pageview(url);
+        };
 
-        router.events.on('routeChangeComplete', handleRouteChange)
+        router.events.on("routeChangeComplete", handleRouteChange);
         return () => {
-            router.events.off('routeChangeComplete', handleRouteChange)
-        }
-    }, [router.events])
+            router.events.off("routeChangeComplete", handleRouteChange);
+        };
+    }, [router.events]);
 
     return (
         <>
@@ -32,28 +36,36 @@ function MyApp({ Component, pageProps }: AppProps) {
                 id="gtag-init"
                 strategy="afterInteractive"
                 dangerouslySetInnerHTML={{
-                __html: `
+                    __html: `
                     window.dataLayer = window.dataLayer || [];
                     function gtag(){dataLayer.push(arguments);}
                     gtag('js', new Date());
                     gtag('config', '${gtag.GA_TRACKING_ID}', {
                     page_path: window.location.pathname,
                     });
-                `,
+                `
                 }}
             />
             <Head>
-                <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                <meta
+                    name="viewport"
+                    content="width=device-width, initial-scale=1.0"
+                />
             </Head>
             <NextSeo
                 title="AshSwap Interface"
                 description="Swap or provide liquidity on the AshSwap Protocol."
             />
-            <WalletProvider>
-                <Component {...pageProps} />
-            </WalletProvider>
+            <DappContextProvider config={dappConfig}>
+                <Authenticate>
+                    <WalletProvider>
+                        <Component {...pageProps} />
+                        <ConnectWalletModal/>
+                    </WalletProvider>
+                </Authenticate>
+            </DappContextProvider>
         </>
-    )
+    );
 }
 
-export default MyApp
+export default MyApp;
