@@ -6,10 +6,10 @@ import Link from "next/link";
 const AppBar = () => {
     return (
         <>
-            <div className="flex justify-between items-center px-6 sm:px-12 py-5">
+            <div className="flex justify-between items-center px-6 sm:px-12 py-5 relative z-10">
                 <Link href="/" passHref>
                     <div className="cursor-pointer">
-                        <span className="hidden sm:inline-block">
+                        <span className="hidden md:inline-block">
                             <Image
                                 src="/logo.png"
                                 alt="Ashswap logo"
@@ -18,7 +18,7 @@ const AppBar = () => {
                                 quality={100}
                             />
                         </span>
-                        <span className="inline-block sm:hidden">
+                        <span className="inline-block md:hidden">
                             <Image
                                 src="/images/m-logo.png"
                                 alt="Ashswap logo"
