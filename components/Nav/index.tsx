@@ -2,6 +2,9 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useCallback } from "react";
 import styles from "./Nav.module.css";
+import SocialMenu from "./SocialMenu";
+import ICPool from "../../assets/svg/pool.svg";
+import ICSwap from "../../assets/svg/swap.svg";
 
 const Nav = () => {
     const router = useRouter();
@@ -18,7 +21,8 @@ const Nav = () => {
                     isActive("/swap") ? styles.active : ""
                 }`}
             >
-                Swap
+                <ICSwap className="inline-block w-4 h-4 sm:mr-2 transition-none"/>
+                <span className="inline-block">Swap</span>
             </div>
         </Link>
         <Link href="/pool" passHref>
@@ -27,9 +31,11 @@ const Nav = () => {
                     isActive("/pool") ? styles.active : ""
                 }`}
             >
-                Pool
+                <ICPool className="inline-block w-4 h-4 sm:mr-2 transition-none"/>
+                <span className="inline-block">Pool</span>
             </div>
         </Link>
+        <SocialMenu />
     </div>
     );
 };
