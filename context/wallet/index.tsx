@@ -304,11 +304,19 @@ export function WalletProvider({ children }: Props) {
         }
     }, [data]);
 
-    useEffect(() => {
-        !dapp.loggedIn && isMobileOS && walletConnectInit()
-    }, [isMobileOS, dapp.loggedIn]);
+    // useEffect(() => {
+    //     !dapp.loggedIn && isMobileOS && walletConnectInit()
+    // }, [isMobileOS, dapp.loggedIn]);
     const connectWallet = useCallback((token?: string) => {
         if(dapp.loggedIn) return;
+            // open connect wallet option modal
+            setIsOpenConnectWalletModal(true);
+    }, [dapp.loggedIn]);
+
+    /**
+     * Connect directly to maiar on mobile use URI - on android and IOS only
+     */
+    const connectAppMaiarOnMobile = useCallback((token?: string) => {
         if(isMobileOS){
             
             // try to generate uri and then open it up
@@ -333,11 +341,8 @@ export function WalletProvider({ children }: Props) {
                     }
                 });
             }
-        }else{
-            // open connect wallet option modal on desktop version
-            setIsOpenConnectWalletModal(true);
         }
-    }, [isMobileOS, walletConnect, dispatch, dapp.walletConnectDeepLink, dapp.loggedIn, walletConnectInit]);
+    }, [isMobileOS, walletConnect, dispatch, dapp.walletConnectDeepLink])
 
     const value: State = {
         ...initState,
