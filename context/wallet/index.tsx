@@ -259,8 +259,8 @@ export function WalletProvider({ children }: Props) {
                 gasLimit: new GasLimit(gasLimit),
                 version: tx.getVersion()
             });
-
-            return await dapp.dapp.provider?.sendTransaction(tx);
+            const signedTx = await dapp.dapp.provider.signTransaction(tx);
+            return await dapp.dapp.proxy.sendTransaction(signedTx);
         },
         [dapp.address, dapp.dapp.proxy, dapp.dapp.provider]
     );
