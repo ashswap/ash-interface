@@ -15,6 +15,8 @@ import Fire from "assets/images/fire.png";
 import Clock from "assets/svg/clock.svg";
 import IconClose from "assets/svg/close.svg";
 import IconDown from "assets/svg/down-green.svg";
+import ICChevronDown from "assets/svg/chevron-down.svg";
+import ICChevronUp from "assets/svg/chevron-up.svg";
 import IconNewTab from "assets/svg/new-tab-green.svg";
 import Revert from "assets/svg/revert.svg";
 import IconRight from "assets/svg/right-white.svg";
@@ -63,6 +65,7 @@ const Swap = () => {
     const [showSetting, setShowSetting] = useState<boolean>(false);
     const [isOpenHistoryModal, openHistoryModal] = useState<boolean>(false);
     const [fee, setFee] = useState<number>(0);
+    const [isOpenFairPrice, setIsOpenFairPrice] = useState(false);
 
     const { callContract, connectWallet } = useWallet();
     const dapp = useDappContext();
@@ -405,10 +408,10 @@ const Swap = () => {
                                     className="flex flex-row justify-between text-xs text-white my-5"
                                     style={{ color: "#00FF75" }}
                                 >
-                                    <div className="opacity-50 font-bold flex flex-row items-center gap-2 select-none cursor-pointer">
+                                    <div className="opacity-50 font-bold flex flex-row items-center gap-2 select-none cursor-pointer" onClick={() => setIsOpenFairPrice(state => !state)}>
                                         <div>Fair price</div>
                                         <div>
-                                            <IconDown />
+                                            {isOpenFairPrice ? <ICChevronUp/> : <ICChevronDown/>}
                                         </div>
                                     </div>
                                     <div>
@@ -429,7 +432,7 @@ const Swap = () => {
                                 </div>
                             )}
 
-                            {pool && rawValueFrom.gt(new BigNumber(0)) && (
+                            {isOpenFairPrice && pool && rawValueFrom.gt(new BigNumber(0)) && (
                                 <>
                                     <div className="bg-black flex flex-row items-center justify-between h-10 pl-5 pr-6">
                                         <div className={styles.swapResultLabel}>
