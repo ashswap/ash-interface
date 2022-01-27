@@ -200,7 +200,7 @@ const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
                     window.open(
                         network.explorerAddress +
                             "/transactions/" +
-                            tx.getHash().toString(),
+                            tx.toString(),
                         "_blank"
                     )
             });
