@@ -267,7 +267,7 @@ const Swap = () => {
                     window.open(
                         network.explorerAddress +
                             "/transactions/" +
-                            tx.getHash().toString(),
+                            tx.toString(),
                         "_blank"
                     )
             });

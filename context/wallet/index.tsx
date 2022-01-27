@@ -9,7 +9,8 @@ import {
     Query,
     SmartContract,
     TokenIdentifierValue,
-    Transaction
+    Transaction,
+    TransactionHash
 } from "@elrondnetwork/erdjs";
 import BigNumber from "bignumber.js";
 import { gasLimit, gasPrice, network } from "const/network";
@@ -35,7 +36,7 @@ export interface State {
     isOpenConnectWalletModal: boolean;
     setIsOpenConnectWalletModal: (val: boolean) => void;
     fetchBalances: () => void;
-    callContract: (addr: Address, arg: CallArguments) => Promise<Transaction>;
+    callContract: (addr: Address, arg: CallArguments) => Promise<TransactionHash>;
     balances: TokenBalancesMap;
     tokens: ITokenMap;
     transactionsHistory: any[];
@@ -50,12 +51,14 @@ const emptyTx = new Transaction({
     receiver: new Address()
 });
 
+const emptyTxHash = new TransactionHash('');
+
 export const initState: State = {
     isOpenConnectWalletModal: false,
     setIsOpenConnectWalletModal: emptyFunc,
     fetchBalances: emptyFunc,
     callContract: (addr: Address, arg: CallArguments) =>
-        Promise.resolve(emptyTx),
+        Promise.resolve(emptyTxHash),
     balances: {},
     tokens: {},
     lpTokens: {},
@@ -238,7 +241,7 @@ export function WalletProvider({ children }: Props) {
     const callContract = useCallback(
         async (address: Address, arg: CallArguments) => {
             if (!dapp.address || !dapp.dapp.proxy || !dapp.dapp.provider) {
-                return emptyTx;
+                return emptyTxHash;
             }
 
             let account = await dapp.dapp.proxy.getAccount(
