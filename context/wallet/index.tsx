@@ -36,14 +36,16 @@ export interface State {
     isOpenConnectWalletModal: boolean;
     setIsOpenConnectWalletModal: (val: boolean) => void;
     fetchBalances: () => void;
-    callContract: (addr: Address, arg: CallArguments) => Promise<TransactionHash>;
+    callContract: (
+        addr: Address,
+        arg: CallArguments
+    ) => Promise<TransactionHash>;
     balances: TokenBalancesMap;
     tokens: ITokenMap;
     transactionsHistory: any[];
     lpTokens: ITokenMap;
     tokenPrices: any;
     connectWallet: (token?: string) => void;
-    
 }
 
 const emptyTx = new Transaction({
@@ -51,7 +53,7 @@ const emptyTx = new Transaction({
     receiver: new Address()
 });
 
-const emptyTxHash = new TransactionHash('');
+const emptyTxHash = new TransactionHash("");
 
 export const initState: State = {
     isOpenConnectWalletModal: false,
@@ -83,9 +85,11 @@ export function WalletProvider({ children }: Props) {
     const [balances, setBalances] = useState<TokenBalancesMap>(
         initState.balances
     );
-    const [isOpenConnectWalletModal, setIsOpenConnectWalletModal] = useState(false);
+    const [isOpenConnectWalletModal, setIsOpenConnectWalletModal] = useState(
+        false
+    );
     const [transactionsHistory, setTransactionsHistory] = useState<any>([]);
-    const {isMobileOS} = usePlatform();
+    const { isMobileOS } = usePlatform();
     const dispatch = useDappDispatch();
     const { walletConnect, walletConnectInit } = useInitWalletConnect();
 
@@ -310,42 +314,50 @@ export function WalletProvider({ children }: Props) {
     // useEffect(() => {
     //     !dapp.loggedIn && isMobileOS && walletConnectInit()
     // }, [isMobileOS, dapp.loggedIn]);
-    const connectWallet = useCallback((token?: string) => {
-        if(dapp.loggedIn) return;
+    const connectWallet = useCallback(
+        (token?: string) => {
+            if (dapp.loggedIn) return;
             // open connect wallet option modal
             setIsOpenConnectWalletModal(true);
-    }, [dapp.loggedIn]);
+        },
+        [dapp.loggedIn]
+    );
 
     /**
      * Connect directly to maiar on mobile use URI - on android and IOS only
      */
-    const connectAppMaiarOnMobile = useCallback((token?: string) => {
-        if(isMobileOS){
-            
-            // try to generate uri and then open it up
-            if(walletConnect){
-                walletConnect.login().then(walletConectUri => {
-                    let uri = '';
-                    if (token) {
-                        uri = `${walletConectUri}&token=${token}`;
-                        dispatch({
-                            type: "setTokenLogin",
-                            tokenLogin: {
-                                loginToken: token
-                            }
-                        });
-                    } else {
-                        uri = walletConectUri
-                    }
-                    if(typeof window !== "undefined"){
-                        window.open(`${dapp.walletConnectDeepLink}?wallet-connect=${encodeURIComponent(
-                            uri
-                        )}`, "_blank")
-                    }
-                });
+    const connectAppMaiarOnMobile = useCallback(
+        (token?: string) => {
+            if (isMobileOS) {
+                // try to generate uri and then open it up
+                if (walletConnect) {
+                    walletConnect.login().then(walletConectUri => {
+                        let uri = "";
+                        if (token) {
+                            uri = `${walletConectUri}&token=${token}`;
+                            dispatch({
+                                type: "setTokenLogin",
+                                tokenLogin: {
+                                    loginToken: token
+                                }
+                            });
+                        } else {
+                            uri = walletConectUri;
+                        }
+                        if (typeof window !== "undefined") {
+                            window.open(
+                                `${
+                                    dapp.walletConnectDeepLink
+                                }?wallet-connect=${encodeURIComponent(uri)}`,
+                                "_blank"
+                            );
+                        }
+                    });
+                }
             }
-        }
-    }, [isMobileOS, walletConnect, dispatch, dapp.walletConnectDeepLink])
+        },
+        [isMobileOS, walletConnect, dispatch, dapp.walletConnectDeepLink]
+    );
 
     const value: State = {
         ...initState,
