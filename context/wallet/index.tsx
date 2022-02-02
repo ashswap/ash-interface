@@ -272,7 +272,7 @@ export function WalletProvider({ children }: Props) {
         [dapp.address, dapp.dapp.proxy, dapp.dapp.provider]
     );
 
-    const historyQuery = useMemo(async () => {
+    const historyQuery = useMemo(() => {
         if (!dapp.loggedIn) {
             return "";
         }
