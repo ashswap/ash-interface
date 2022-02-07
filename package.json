@@ -9,7 +9,7 @@
         "lint": "next lint"
     },
     "dependencies": {
-        "@elrondnetwork/erdjs": "^8.0.1-alpha.13",
+        "@elrondnetwork/erdjs": "https://github.com/ashswap/elrond-sdk-erdjs#4a71b00a895c18943b7ba798bde326352f5ad220",
         "@headlessui/react": "^1.4.3",
         "antd": "^4.16.13",
         "bignumber.js": "^9.0.1",
