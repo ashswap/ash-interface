@@ -8,23 +8,23 @@ import IconUSDT from "assets/images/usdt-icon.png";
 const pools: IPool[] = [
     {
         address:
-            "erd1qqqqqqqqqqqqqpgqe7dz06rpw9gqsehj98z8jg4nfrr8d797j9ts2sw3xu",
+            "erd1qqqqqqqqqqqqqpgq6hqnzcwapvdx2wj2e58gkv77xln8k84fj9tss3pv2v",
         lpToken: {
-            id: "LPT-be757f",
+            id: "LPT-6c8a05",
             icon: "#fff",
-            name: "LPT-be757f",
+            name: "LPT-6c8a05",
             decimals: 18
         },
         tokens: [
             {
-                id: "USDC-9b5c1e",
+                id: "USDC-8faa2a",
                 icon: IconUSDC,
                 name: "USDC",
                 decimals: 6,
                 coingeckoId: "usd-coin"
             },
             {
-                id: "USDT-991037",
+                id: "USDT-c338e7",
                 icon: IconUSDT,
                 name: "USDT",
                 decimals: 6,
@@ -34,23 +34,23 @@ const pools: IPool[] = [
     },
     {
         address:
-            "erd1qqqqqqqqqqqqqpgq367a0agl7dyz24ncxapfjuzjt37nxn5ej9tshzfu0q",
+            "erd1qqqqqqqqqqqqqpgqwul8rrezd3maq2ujv2wrlckxfpesa27fj9ts4jt8vg",
         lpToken: {
-            id: "LPT-499a71",
+            id: "LPT-71249c",
             icon: "#fff",
-            name: "LPT-499a71",
+            name: "LPT-71249c",
             decimals: 18
         },
         tokens: [
             {
-                id: "USDC-9b5c1e",
+                id: "USDC-8faa2a",
                 icon: IconUSDC,
                 name: "USDC",
                 decimals: 6,
                 coingeckoId: "usd-coin"
             },
             {
-                id: "WUSDC-7dc0a2",
+                id: "WUSDC-e789ff",
                 icon: IconWUSDC,
                 name: "wUSDC",
                 decimals: 6,
@@ -60,27 +60,27 @@ const pools: IPool[] = [
     },
     {
         address:
-            "erd1qqqqqqqqqqqqqpgqd6t8hv4pxum3vx54u9x55jpxanxh7krlj9tsyx8nx7",
+            "erd1qqqqqqqqqqqqqpgqn7tfkyfev4d49wlk9zy7ucfjcqwg9jc9j9tszc6vjr",
         lpToken: {
-            id: "LPT-8e866f",
+            id: "LPT-7aeb87",
             icon: "#fff",
-            name: "LPT-8e866f",
+            name: "LPT-7aeb87",
             decimals: 18
         },
         tokens: [
             {
-                id: "BTC-599587",
+                id: "BTC-2ffd41",
                 icon: IconBTC,
                 name: "BTC",
                 decimals: 6,
                 coingeckoId: "bitcoin"
             },
             {
-                id: "WBTC-901728",
+                id: "WBTC-3a40c6",
                 icon: IconWBTC,
                 name: "wBTC",
                 decimals: 6,
-                coingeckoId: "wrapped-bitcoin",
+                coingeckoId: "wrapped-bitcoin"
             }
         ]
     }
