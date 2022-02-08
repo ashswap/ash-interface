@@ -6,7 +6,9 @@ import IconDisconnect from "assets/svg/disconnect.svg";
 import IconDown from "assets/svg/down-white.svg";
 import Wallet from "assets/svg/wallet.svg";
 import Button from "components/Button";
-import Modal from "components/ReactModal";
+import HeadlessModal, {
+    HeadlessModalDefaultHeader
+} from "components/HeadlessModal";
 import { TAILWIND_BREAKPOINT } from "const/mediaQueries";
 import { useDappContext } from "context/dapp";
 import { useWallet } from "context/wallet";
@@ -17,7 +19,7 @@ import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 import styles from "./AddressMenu.module.css";
 function AddressMenu() {
-    const {loggedIn, address} = useDappContext();
+    const { loggedIn, address } = useDappContext();
     const logoutDapp = useLogout();
     const [mShowMenu, setMShowMenu] = useState(false);
     const [showMenu, setShowMenu] = useState(false);
@@ -39,7 +41,7 @@ function AddressMenu() {
         navigator.clipboard.writeText(address);
     }, [loggedIn, address]);
     useEffect(() => {
-        if(loggedIn){
+        if (loggedIn) {
             setShowMenu(false);
             setMShowMenu(false);
         }
@@ -120,46 +122,51 @@ function AddressMenu() {
                     ))}
             </div>
             {isSMScreen && (
-                <Modal
-                    isOpen={mShowMenu}
-                    onRequestClose={() => setMShowMenu(false)}
-                    className="fixed bottom-0 left-0 right-0"
+                <HeadlessModal
+                    open={mShowMenu}
+                    onClose={() => setMShowMenu(false)}
+                    transition="btt"
                 >
-                    <div className="text-white py-11 px-6">
-                        <div className="text-lg font-bold mb-7">
-                            Wallet actions
-                        </div>
-                        <div className="text-sm">
-                            <button
-                                className="bg-bg rounded-lg px-11 h-14 flex items-center w-full mt-4"
-                                onClick={copyAddress}
-                            >
-                                <i className="mr-4">
-                                    <IconCopy className="h-7 w-7" />
-                                </i>
-                                <span>Copy address</span>
-                            </button>
-                            <button className="bg-bg rounded-lg px-11 h-14 flex items-center w-full mt-4">
-                                <i className="mr-4">
-                                    <IconChange className="h-7 w-7" />
-                                </i>
-                                <span>Change wallet</span>
-                            </button>
-                            <button
-                                className="bg-bg rounded-lg px-11 h-14 flex items-center w-full mt-4"
-                                onClick={() => {
-                                    setMShowMenu(false);
-                                    logoutDapp();
-                                }}
-                            >
-                                <i className="mr-4">
-                                    <IconDisconnect className="h-7 w-7" />
-                                </i>
-                                <span>Disconnect wallet</span>
-                            </button>
+                    <div className="clip-corner-4 clip-corner-tl bg-ash-dark-600 p-4 fixed bottom-0 inset-x-0 text-white">
+                        <HeadlessModalDefaultHeader
+                            onClose={() => setMShowMenu(false)}
+                        />
+                        <div className="mt-1 px-6 pb-4">
+                            <div className="text-lg font-bold mb-7">
+                                Wallet actions
+                            </div>
+                            <div className="text-sm">
+                                <button
+                                    className="bg-bg rounded-lg px-11 h-14 flex items-center w-full mt-4"
+                                    onClick={copyAddress}
+                                >
+                                    <i className="mr-4">
+                                        <IconCopy className="h-7 w-7" />
+                                    </i>
+                                    <span>Copy address</span>
+                                </button>
+                                <button className="bg-bg rounded-lg px-11 h-14 flex items-center w-full mt-4">
+                                    <i className="mr-4">
+                                        <IconChange className="h-7 w-7" />
+                                    </i>
+                                    <span>Change wallet</span>
+                                </button>
+                                <button
+                                    className="bg-bg rounded-lg px-11 h-14 flex items-center w-full mt-4"
+                                    onClick={() => {
+                                        setMShowMenu(false);
+                                        logoutDapp();
+                                    }}
+                                >
+                                    <i className="mr-4">
+                                        <IconDisconnect className="h-7 w-7" />
+                                    </i>
+                                    <span>Disconnect wallet</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </Modal>
+                </HeadlessModal>
             )}
             {/* <Modal
                 isOpen={isOpenWalletConnect}

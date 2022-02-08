@@ -17,16 +17,17 @@ import IconRight from "assets/svg/right-white.svg";
 import BigNumber from "bignumber.js";
 import Button from "components/Button";
 import Checkbox from "components/Checkbox";
+import HeadlessModal, {
+    HeadlessModalDefaultHeader
+} from "components/HeadlessModal";
 import Input from "components/Input";
 import { usePool } from "components/ListPoolItem";
-import Modal from "components/ReactModal";
 import Switch from "components/Switch";
-import { TAILWIND_BREAKPOINT } from "const/mediaQueries";
 import { gasLimit, network } from "const/network";
 import { useDappContext } from "context/dapp";
 import { useWallet } from "context/wallet";
 import { toEGLD, toWei } from "helper/balance";
-import useMediaQuery from "hooks/useMediaQuery";
+import { useScreenSize } from "hooks/useScreenSize";
 import IPool from "interface/pool";
 import { IToken } from "interface/token";
 import Image from "next/image";
@@ -133,15 +134,8 @@ const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
     const [value1, setValue1] = useState<string>("");
     const [value1Debounce] = useDebounce(value1, 500);
     const [isProMode, setIsProMode] = useState(false);
-    const isSMScreen = useMediaQuery(
-        `(max-width: ${TAILWIND_BREAKPOINT.SM}px)`
-    );
-    const {
-        callContract,
-        fetchBalances,
-        balances,
-        tokenPrices
-    } = useWallet();
+    const screenSize = useScreenSize();
+    const { callContract, fetchBalances, balances, tokenPrices } = useWallet();
     const dapp = useDappContext();
     // const provider = dapp.dapp.provider;
     const [rates, setRates] = useState<BigNumber[] | undefined>(undefined);
@@ -159,35 +153,28 @@ const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
     }, [open]);
 
     const addLP = useCallback(async () => {
-        if(!dapp.loggedIn) return;
+        if (!dapp.loggedIn) return;
         try {
-            let tx = await callContract(
-                new Address(dapp.address),
-                {
-                    func: new ContractFunction("MultiESDTNFTTransfer"),
-                    gasLimit: new GasLimit(gasLimit),
-                    args: [
-                        new AddressValue(new Address(pool.address)),
-                        new BigUIntValue(new BigNumber(2)),
+            let tx = await callContract(new Address(dapp.address), {
+                func: new ContractFunction("MultiESDTNFTTransfer"),
+                gasLimit: new GasLimit(gasLimit),
+                args: [
+                    new AddressValue(new Address(pool.address)),
+                    new BigUIntValue(new BigNumber(2)),
 
-                        new TokenIdentifierValue(
-                            Buffer.from(pool.tokens[0].id)
-                        ),
-                        new BigUIntValue(new BigNumber(0)),
-                        new BigUIntValue(toWei(pool.tokens[0], value0)),
+                    new TokenIdentifierValue(Buffer.from(pool.tokens[0].id)),
+                    new BigUIntValue(new BigNumber(0)),
+                    new BigUIntValue(toWei(pool.tokens[0], value0)),
 
-                        new TokenIdentifierValue(
-                            Buffer.from(pool.tokens[1].id)
-                        ),
-                        new BigUIntValue(new BigNumber(0)),
-                        new BigUIntValue(toWei(pool.tokens[1], value1)),
+                    new TokenIdentifierValue(Buffer.from(pool.tokens[1].id)),
+                    new BigUIntValue(new BigNumber(0)),
+                    new BigUIntValue(toWei(pool.tokens[1], value1)),
 
-                        new TokenIdentifierValue(Buffer.from("addLiquidity")),
-                        new BigUIntValue(toWei(pool.tokens[0], value0)),
-                        new BigUIntValue(toWei(pool.tokens[1], value1))
-                    ]
-                }
-            );
+                    new TokenIdentifierValue(Buffer.from("addLiquidity")),
+                    new BigUIntValue(toWei(pool.tokens[0], value0)),
+                    new BigUIntValue(toWei(pool.tokens[1], value1))
+                ]
+            });
 
             fetchBalances();
 
@@ -431,210 +418,222 @@ const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
     ]);
 
     return (
-        <Modal
-            isOpen={!!open}
-            onRequestClose={onClose}
-            useClipCorner={true}
-            className={`sm:mt-28 sm:ash-container ${
-                isProMode ? "" : "max-w-[51.75rem] mx-auto"
-            }
-            fixed bottom-0 left-0 right-0 sm:relative
-            `}
+        <HeadlessModal
+            open={!!open}
+            onClose={() => onClose && onClose()}
+            transition={screenSize.sm ? "btt" : "center"}
         >
-            <div className="clip-corner-4 clip-corner-tl bg-ash-dark-600 text-white px-12 pt-10 pb-20 sm:pb-11">
-                <div className="mb-14">
-                    <Switch
-                        checked={isProMode}
-                        onChange={setIsProMode}
-                        className="flex items-center space-x-2"
-                    >
-                        <span className={`${isProMode && "text-pink-600"}`}>
-                            Pro-mode
-                        </span>
-                    </Switch>
-                </div>
-
-                <div className="inline-flex justify-between items-center">
-                    <div className="mr-2">
-                        {/* <div className="text-text-input-3 text-xs">Deposit</div> */}
-                        <div className="flex flex-row items-baseline text-lg sm:text-2xl font-bold">
-                            <span>{pool.tokens[0].name}</span>
-                            <span className="text-sm px-3">&</span>
-                            <span>{pool.tokens[1].name}</span>
-                        </div>
-                    </div>
-                    <div className="flex flex-row justify-between items-center">
-                        <div className="w-6 h-6 sm:w-9 sm:h-9 rounded-full">
-                            <Image
-                                src={pool.tokens[0].icon}
-                                width={52}
-                                height={52}
-                                alt="token icon"
-                            />
-                        </div>
-                        <div className="w-6 h-6 sm:w-9 sm:h-9 rounded-full -ml-1 sm:ml-[-0.375rem]">
-                            <Image
-                                src={pool.tokens[1].icon}
-                                width={52}
-                                height={52}
-                                alt="token icon"
-                            />
-                        </div>
-                    </div>
-                </div>
-                <div className="sm:flex my-10 sm:space-x-4 lg:space-x-8">
-                    <div className="relative sm:w-6/12 lg:w-7/12 overflow-hidden">
-                        <div className="py-1.5">
-                            <TokenInput
-                                token={pool.tokens[0]}
-                                tokenInPool={toEGLD(
-                                    pool.tokens[0],
-                                    poolContext.value0.toString()
-                                ).toFixed(2)}
-                                value={value0}
-                                onChangeValue={val => onChangeValue0(val)}
-                                isInsufficentFund={isInsufficentFund0}
-                                balance={balance0}
-                            />
-                        </div>
-                        <div className="py-1.5">
-                            <TokenInput
-                                token={pool.tokens[1]}
-                                tokenInPool={toEGLD(
-                                    pool.tokens[1],
-                                    poolContext.value1.toString()
-                                ).toFixed(2)}
-                                value={value1}
-                                onChangeValue={val => onChangeValue1(val)}
-                                isInsufficentFund={isInsufficentFund1}
-                                balance={balance1}
-                            />
-                        </div>
-
-                        <div className="flex items-center space-x-1 bg-ash-dark-700 sm:bg-transparent mb-11 sm:mb-0">
-                            <div className="flex items-center font-bold w-24 sm:w-1/3 px-4 sm:px-0 border-r border-r-ash-gray-500 sm:border-r-0">
-                                <IconRight className="mr-4" />
-                                <span>TOTAL</span>
-                            </div>
-                            <Input
-                                className="flex-1 overflow-hidden"
-                                backgroundClassName="bg-ash-dark-700"
-                                textColorClassName="text-input-3"
-                                placeholder="0"
-                                type="number"
-                                textAlign="right"
-                                textClassName="text-lg"
-                                value={liquidity}
-                                disabled
-                                style={{ height: 72 }}
-                            />
-                        </div>
-
-                        <div
-                            className="absolute left-0 ml-2"
-                            style={{ top: 62 }}
+            <div
+                className={`clip-corner-4 clip-corner-tl bg-ash-dark-600 text-white p-4 fixed bottom-0 inset-x-0 sm:static sm:mt-28 sm:ash-container flex flex-col max-h-full ${
+                    isProMode ? "" : "max-w-[51.75rem] mx-auto"
+                }`}
+            >
+                <HeadlessModalDefaultHeader
+                    onClose={() => onClose && onClose()}
+                />
+                <div className="px-8 mt-6 pb-16 sm:pb-7 flex-grow overflow-auto">
+                    <div className="mb-14">
+                        <Switch
+                            checked={isProMode}
+                            onChange={setIsProMode}
+                            className="flex items-center space-x-2"
                         >
-                            &
+                            <span className={`${isProMode && "text-pink-600"}`}>
+                                Pro-mode
+                            </span>
+                        </Switch>
+                    </div>
+
+                    <div className="inline-flex justify-between items-center">
+                        <div className="mr-2">
+                            {/* <div className="text-text-input-3 text-xs">Deposit</div> */}
+                            <div className="flex flex-row items-baseline text-lg sm:text-2xl font-bold">
+                                <span>{pool.tokens[0].name}</span>
+                                <span className="text-sm px-3">&</span>
+                                <span>{pool.tokens[1].name}</span>
+                            </div>
+                        </div>
+                        <div className="flex flex-row justify-between items-center">
+                            <div className="w-6 h-6 sm:w-9 sm:h-9 rounded-full">
+                                <Image
+                                    src={pool.tokens[0].icon}
+                                    width={52}
+                                    height={52}
+                                    alt="token icon"
+                                />
+                            </div>
+                            <div className="w-6 h-6 sm:w-9 sm:h-9 rounded-full -ml-1 sm:ml-[-0.375rem]">
+                                <Image
+                                    src={pool.tokens[1].icon}
+                                    width={52}
+                                    height={52}
+                                    alt="token icon"
+                                />
+                            </div>
                         </div>
                     </div>
-                    <div className="sm:w-6/12 lg:w-5/12 bg-ash-dark-500 p-8 sm:p-4 lg:p-8 text-ash-gray-500 sm:text-white">
-                        <div className="text-lg font-bold">Estimate value</div>
-                        <div className="flex flex-col text-xs mt-8 gap-y-9">
-                            <div
-                                className={`flex space-x-1 ${
-                                    isProMode
-                                        ? "sm:flex-wrap sm:space-x-0"
-                                        : "sm:space-y-8 sm:block"
-                                }`}
-                            >
-                                <div
-                                    className={`w-6/12 ${isProMode &&
-                                        "sm:w-8/12"}`}
-                                >
-                                    <div className="mb-2">Earn per month</div>
-                                    <div>-</div>
-                                </div>
-                                <div
-                                    className={`w-6/12 ${isProMode &&
-                                        "sm:w-4/12"}`}
-                                >
-                                    <div className="mb-2">Farm per day</div>
-                                    <div>-</div>
-                                </div>
+                    <div className="sm:flex my-10 sm:space-x-4 lg:space-x-8">
+                        <div className="relative sm:w-6/12 lg:w-7/12 overflow-hidden">
+                            <div className="py-1.5">
+                                <TokenInput
+                                    token={pool.tokens[0]}
+                                    tokenInPool={toEGLD(
+                                        pool.tokens[0],
+                                        poolContext.value0.toString()
+                                    ).toFixed(2)}
+                                    value={value0}
+                                    onChangeValue={val => onChangeValue0(val)}
+                                    isInsufficentFund={isInsufficentFund0}
+                                    balance={balance0}
+                                />
                             </div>
-                            {isProMode && (
-                                <div className="flex flex-col sm:flex-row gap-10 flex-wrap">
-                                    <div className="flex gap-10">
-                                        <div>
-                                            <div className="mb-2">APR</div>
-                                            <div className="text-pink-600 font-bold">
-                                                _%
+                            <div className="py-1.5">
+                                <TokenInput
+                                    token={pool.tokens[1]}
+                                    tokenInPool={toEGLD(
+                                        pool.tokens[1],
+                                        poolContext.value1.toString()
+                                    ).toFixed(2)}
+                                    value={value1}
+                                    onChangeValue={val => onChangeValue1(val)}
+                                    isInsufficentFund={isInsufficentFund1}
+                                    balance={balance1}
+                                />
+                            </div>
+
+                            <div className="flex items-center space-x-1 bg-ash-dark-700 sm:bg-transparent mb-11 sm:mb-0">
+                                <div className="flex items-center font-bold w-24 sm:w-1/3 px-4 sm:px-0 border-r border-r-ash-gray-500 sm:border-r-0">
+                                    <IconRight className="mr-4" />
+                                    <span>TOTAL</span>
+                                </div>
+                                <Input
+                                    className="flex-1 overflow-hidden"
+                                    backgroundClassName="bg-ash-dark-700"
+                                    textColorClassName="text-input-3"
+                                    placeholder="0"
+                                    type="number"
+                                    textAlign="right"
+                                    textClassName="text-lg"
+                                    value={liquidity}
+                                    disabled
+                                    style={{ height: 72 }}
+                                />
+                            </div>
+
+                            <div
+                                className="absolute left-0 ml-2"
+                                style={{ top: 62 }}
+                            >
+                                &
+                            </div>
+                        </div>
+                        <div className="sm:w-6/12 lg:w-5/12 bg-ash-dark-500 p-8 sm:p-4 lg:p-8 text-ash-gray-500 sm:text-white">
+                            <div className="text-lg font-bold">
+                                Estimate value
+                            </div>
+                            <div className="flex flex-col text-xs mt-8 gap-y-9">
+                                <div
+                                    className={`flex space-x-1 ${
+                                        isProMode
+                                            ? "sm:flex-wrap sm:space-x-0"
+                                            : "sm:space-y-8 sm:block"
+                                    }`}
+                                >
+                                    <div
+                                        className={`w-6/12 ${isProMode &&
+                                            "sm:w-8/12"}`}
+                                    >
+                                        <div className="mb-2">
+                                            Earn per month
+                                        </div>
+                                        <div>-</div>
+                                    </div>
+                                    <div
+                                        className={`w-6/12 ${isProMode &&
+                                            "sm:w-4/12"}`}
+                                    >
+                                        <div className="mb-2">Farm per day</div>
+                                        <div>-</div>
+                                    </div>
+                                </div>
+                                {isProMode && (
+                                    <div className="flex flex-col sm:flex-row gap-10 flex-wrap">
+                                        <div className="flex gap-10">
+                                            <div>
+                                                <div className="mb-2">APR</div>
+                                                <div className="text-pink-600 font-bold">
+                                                    _%
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <ul
+                                                    style={{
+                                                        listStyle: "disc"
+                                                    }}
+                                                >
+                                                    <li className="mb-2">
+                                                        Emissions APR:{" "}
+                                                        <span className="text-pink-600">
+                                                            _%
+                                                        </span>
+                                                    </li>
+                                                    <li>
+                                                        Trading APR:{" "}
+                                                        <span className="text-pink-600">
+                                                            _%
+                                                        </span>
+                                                    </li>
+                                                </ul>
                                             </div>
                                         </div>
                                         <div>
-                                            <ul style={{ listStyle: "disc" }}>
-                                                <li className="mb-2">
-                                                    Emissions APR:{" "}
-                                                    <span className="text-pink-600">
-                                                        _%
-                                                    </span>
-                                                </li>
-                                                <li>
-                                                    Trading APR:{" "}
-                                                    <span className="text-pink-600">
-                                                        _%
-                                                    </span>
-                                                </li>
-                                            </ul>
+                                            <div className="mb-2">
+                                                Your Capacity
+                                            </div>
+                                            <div style={{ color: "#00FF75" }}>
+                                                {poolContext.capacityPercent.toFixed(
+                                                    2
+                                                )}
+                                                %
+                                            </div>
                                         </div>
                                     </div>
-                                    <div>
-                                        <div className="mb-2">
-                                            Your Capacity
-                                        </div>
-                                        <div style={{ color: "#00FF75" }}>
-                                            {poolContext.capacityPercent.toFixed(
-                                                2
-                                            )}
-                                            %
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="sm:flex gap-8">
+                        <Checkbox
+                            className="w-full mb-12 sm:mb-0 sm:w-2/3"
+                            checked={isAgree}
+                            onChange={setAgree}
+                            text={
+                                <span>
+                                    I verify that I have read the{" "}
+                                    <b>
+                                        <u>AshSwap Pools Guide</u>
+                                    </b>{" "}
+                                    and understand the risks of providing
+                                    liquidity, including impermanent loss.
+                                </span>
+                            }
+                        />
+                        <div className="w-full sm:w-1/3">
+                            <Button
+                                topLeftCorner
+                                style={{ height: 48 }}
+                                outline
+                                disable={!isAgree}
+                                onClick={isAgree ? addLP : () => {}}
+                            >
+                                DEPOSIT
+                            </Button>
                         </div>
                     </div>
                 </div>
-
-                <div className="sm:flex gap-8">
-                    <Checkbox
-                        className="w-full mb-12 sm:mb-0 sm:w-2/3"
-                        checked={isAgree}
-                        onChange={setAgree}
-                        text={
-                            <span>
-                                I verify that I have read the{" "}
-                                <b>
-                                    <u>AshSwap Pools Guide</u>
-                                </b>{" "}
-                                and understand the risks of providing liquidity,
-                                including impermanent loss.
-                            </span>
-                        }
-                    />
-                    <div className="w-full sm:w-1/3">
-                        <Button
-                            topLeftCorner
-                            style={{ height: 48 }}
-                            outline
-                            disable={!isAgree}
-                            onClick={isAgree ? addLP : () => {}}
-                        >
-                            DEPOSIT
-                        </Button>
-                    </div>
-                </div>
             </div>
-        </Modal>
+        </HeadlessModal>
     );
 };
 

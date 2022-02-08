@@ -1,5 +1,7 @@
 import { WalletConnectProvider } from "@elrondnetwork/erdjs/out";
-import ReactModal from "components/ReactModal";
+import HeadlessModal, {
+    HeadlessModalDefaultHeader
+} from "components/HeadlessModal";
 import { useDappContext, useDappDispatch } from "context/dapp";
 import { useWallet } from "context/wallet";
 import storage from "helper/storage";
@@ -65,80 +67,97 @@ function ConnectWalletModal() {
     }, [loggedIn, setIsOpenConnectWalletModal]);
     return (
         <>
-            <ReactModal
-                isOpen={isOpenConnectWalletModal}
-                onRequestClose={() => setIsOpenConnectWalletModal(false)}
-                useClipCorner={true}
+            <HeadlessModal
+                open={isOpenConnectWalletModal}
+                onClose={() =>
+                    setIsOpenConnectWalletModal(
+                        isOpenDownloadExtension || isOpenDownloadApp
+                    )
+                }
+                static={true}
             >
-                <div className="clip-corner-4 clip-corner-tl bg-ash-dark-400 py-12 px-7 w-[33.75rem] max-w-[100vw] text-white transition-none">
-                    <div
-                        className="flex justify-center bg-no-repeat bg-left bg-contain py-8 overflow-hidden"
-                        style={{
-                            backgroundImage: `url(${connectWalletBg.src})`
-                        }}
-                    >
-                        {isOpenQR ? (
-                            <div>
-                                <WalletConnect />
-                                <div
-                                    className="text-ash-purple-500 uppercase text-xs sm:text-sm text-center font-bold cursor-pointer"
-                                    onClick={() => setIsOpenDownloadApp(true)}
-                                >
-                                    I DON’T HAVE MAIAR MOBILE APP
-                                </div>
-                            </div>
-                        ) : (
-                            <div className="flex flex-col pb-16 overflow-hidden">
-                                <div className="font-bold text-2xl mb-20 text-center">
-                                    <span>Connect to </span>
-                                    <span className="text-ash-blue-500">
-                                        Maiar Wallet
-                                    </span>
-                                </div>
-                                <div
-                                    className="max-w-full w-[21.875rem] h-24 bg-ash-dark-600 cursor-pointer flex items-center px-6 mb-4"
-                                    onClick={extensionLogin}
-                                >
-                                    <div className="mr-[1.625rem]">
-                                        <ICConnectExtension
-                                            className={`${styles.connectIcon} w-16 inline text-ash-blue-500`}
-                                        />
+                <div className="clip-corner-4 clip-corner-tl bg-ash-dark-400 p-4 w-[33.75rem] max-w-[100vw] text-white mx-auto absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+                    <HeadlessModalDefaultHeader
+                        onClose={() =>
+                            setIsOpenConnectWalletModal(
+                                isOpenDownloadExtension || isOpenDownloadApp
+                            )
+                        }
+                    />
+                    <div className="px-3 py-8">
+                        <div
+                            className="flex justify-center bg-no-repeat bg-left bg-contain py-8 overflow-hidden"
+                            style={{
+                                backgroundImage: `url(${connectWalletBg.src})`
+                            }}
+                        >
+                            {isOpenQR ? (
+                                <div>
+                                    <WalletConnect />
+                                    <div
+                                        className="text-ash-purple-500 uppercase text-xs sm:text-sm text-center font-bold cursor-pointer"
+                                        onClick={() =>
+                                            setIsOpenDownloadApp(true)
+                                        }
+                                    >
+                                        I DON’T HAVE MAIAR MOBILE APP
                                     </div>
-                                    <div className="text-sm font-bold uppercase">
-                                        <span>Maiar </span>
+                                </div>
+                            ) : (
+                                <div className="flex flex-col pb-16 overflow-hidden">
+                                    <div className="font-bold text-2xl mb-20 text-center">
+                                        <span>Connect to </span>
                                         <span className="text-ash-blue-500">
-                                            web extension
+                                            Maiar Wallet
                                         </span>
                                     </div>
-                                </div>
-                                <div
-                                    className="max-w-full w-[21.875rem] h-24 bg-ash-dark-600 cursor-pointer flex items-center px-6"
-                                    onClick={() => setIsOpenQR(true)}
-                                >
-                                    <div className="mr-[1.625rem] w-16 text-center">
-                                        <ICConnectApp
-                                            className={`${styles.connectIcon} h-16 inline text-ash-blue-500`}
-                                        />
+                                    <div
+                                        className="max-w-full w-[21.875rem] h-24 bg-ash-dark-600 cursor-pointer flex items-center px-6 mb-4"
+                                        onClick={extensionLogin}
+                                    >
+                                        <div className="mr-[1.625rem]">
+                                            <ICConnectExtension
+                                                className={`${styles.connectIcon} w-16 inline text-ash-blue-500`}
+                                            />
+                                        </div>
+                                        <div className="text-sm font-bold uppercase">
+                                            <span>Maiar </span>
+                                            <span className="text-ash-blue-500">
+                                                web extension
+                                            </span>
+                                        </div>
                                     </div>
-                                    <div className="text-sm font-bold uppercase">
-                                        <span>Maiar </span>
-                                        <span className="text-ash-blue-500">
-                                            mobile app
-                                        </span>
+                                    <div
+                                        className="max-w-full w-[21.875rem] h-24 bg-ash-dark-600 cursor-pointer flex items-center px-6"
+                                        onClick={() => setIsOpenQR(true)}
+                                    >
+                                        <div className="mr-[1.625rem] w-16 text-center">
+                                            <ICConnectApp
+                                                className={`${styles.connectIcon} h-16 inline text-ash-blue-500`}
+                                            />
+                                        </div>
+                                        <div className="text-sm font-bold uppercase">
+                                            <span>Maiar </span>
+                                            <span className="text-ash-blue-500">
+                                                mobile app
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        )}
+                            )}
+                        </div>
                     </div>
                 </div>
-            </ReactModal>
-            <ReactModal
-                isOpen={isOpenDownloadApp}
-                onRequestClose={() => setIsOpenDownloadApp(false)}
-                useClipCorner={true}
+            </HeadlessModal>
+            <HeadlessModal
+                open={isOpenDownloadApp}
+                onClose={() => setIsOpenDownloadApp(false)}
             >
-                <div className="clip-corner-4 clip-corner-tl bg-ash-dark-400 pt-20 pb-14 px-10 text-white w-[38.75rem] max-w-[100vw]">
-                    <div className="flex flex-col items-center text-center">
+                <div className="clip-corner-4 clip-corner-tl bg-ash-dark-400 p-4 text-white w-[38.75rem] max-w-[100vw] mx-auto absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+                    <HeadlessModalDefaultHeader
+                        onClose={() => setIsOpenDownloadApp(false)}
+                    />
+                    <div className="flex flex-col items-center text-center py-10 px-6">
                         <div className="text-lg sm:text-2xl font-bold mb-9">
                             Install{" "}
                             <span className="text-ash-blue-500">
@@ -225,14 +244,16 @@ function ConnectWalletModal() {
                         </span>
                     </div>
                 </div>
-            </ReactModal>
-            <ReactModal
-                isOpen={isOpenDownloadExtension}
-                onRequestClose={() => setIsOpenDownloadExtension(false)}
-                useClipCorner={true}
+            </HeadlessModal>
+            <HeadlessModal
+                open={isOpenDownloadExtension}
+                onClose={() => setIsOpenDownloadExtension(false)}
             >
-                <div className="clip-corner-4 clip-corner-tl bg-ash-dark-400 pt-20 pb-14 px-6 sm:px-10 text-white w-[38.75rem] max-w-[100vw]">
-                    <div className="flex flex-col items-center text-center overflow-hidden">
+                <div className="clip-corner-4 clip-corner-tl bg-ash-dark-400 p-4 text-white w-[38.75rem] max-w-[100vw] absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+                    <HeadlessModalDefaultHeader
+                        onClose={() => setIsOpenDownloadExtension(false)}
+                    />
+                    <div className="flex flex-col items-center text-center overflow-hidden pt-6 pb-10 px-2 sm:px-6">
                         <div className="text-lg sm:text-2xl font-bold mb-9">
                             Install{" "}
                             <span className="text-ash-blue-500">
@@ -287,7 +308,7 @@ function ConnectWalletModal() {
                         </span>
                     </div>
                 </div>
-            </ReactModal>
+            </HeadlessModal>
         </>
     );
 }

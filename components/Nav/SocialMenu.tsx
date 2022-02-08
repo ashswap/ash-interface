@@ -1,5 +1,7 @@
 import { Menu, Transition } from "@headlessui/react";
-import ReactModal from "components/ReactModal";
+import HeadlessModal, {
+    HeadlessModalDefaultHeader
+} from "components/HeadlessModal";
 import { TAILWIND_BREAKPOINT } from "const/mediaQueries";
 import useMediaQuery from "hooks/useMediaQuery";
 import Image from "next/image";
@@ -138,14 +140,16 @@ function SocialMenu() {
                             <ICChervonDown className="inline w-2 ml-1 transition-none" />
                         </span>
                     </div>
-                    <ReactModal
-                        isOpen={mIsOpen}
-                        onRequestClose={() => setMIsOpen(false)}
-                        useClipCorner={true}
-                        className="fixed bottom-0 left-0 right-0"
+                    <HeadlessModal
+                        open={mIsOpen}
+                        onClose={() => setMIsOpen(false)}
+                        transition="btt"
                     >
-                        <div className="clip-corner-4 clip-corner-tl bg-ash-dark-600 px-10 py-[4.75rem] text-white">
-                            <div>
+                        <div className="clip-corner-4 clip-corner-tl bg-ash-dark-600 p-4 fixed inset-x-0 bottom-0 text-white max-h-screen overflow-auto">
+                            <HeadlessModalDefaultHeader
+                                onClose={() => setMIsOpen(false)}
+                            />
+                            <div className="px-6 py-[3.75rem]">
                                 <div className="mb-9 text-2xl font-bold">
                                     Social
                                 </div>
@@ -178,7 +182,7 @@ function SocialMenu() {
                                 </div>
                             </div>
                         </div>
-                    </ReactModal>
+                    </HeadlessModal>
                 </>
             )}
         </>

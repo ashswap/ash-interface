@@ -12,11 +12,10 @@ import {
 } from "@elrondnetwork/erdjs";
 import { notification } from "antd";
 import Fire from "assets/images/fire.png";
-import Clock from "assets/svg/clock.svg";
-import IconClose from "assets/svg/close.svg";
-import IconDown from "assets/svg/down-green.svg";
 import ICChevronDown from "assets/svg/chevron-down.svg";
 import ICChevronUp from "assets/svg/chevron-up.svg";
+import Clock from "assets/svg/clock.svg";
+import IconClose from "assets/svg/close.svg";
 import IconNewTab from "assets/svg/new-tab-green.svg";
 import Revert from "assets/svg/revert.svg";
 import IconRight from "assets/svg/right-white.svg";
@@ -25,10 +24,11 @@ import SettingIcon from "assets/svg/setting.svg";
 import IconWallet from "assets/svg/wallet.svg";
 import BigNumber from "bignumber.js";
 import Button from "components/Button";
+import HeadlessModal, {
+    HeadlessModalDefaultHeader
+} from "components/HeadlessModal";
 import HistoryModal from "components/HistoryModal";
 import IconButton from "components/IconButton";
-import { PanelV2 } from "components/Panel";
-import Modal from "components/ReactModal";
 import Setting from "components/Setting";
 import SwapAmount from "components/SwapAmount";
 import { TAILWIND_BREAKPOINT } from "const/mediaQueries";
@@ -262,7 +262,7 @@ const Swap = () => {
                 key,
                 message: `Swap succeed ${valueFrom} ${tokenFrom.name} to ${valueTo} ${tokenTo.name}`,
                 icon: <IconNewTab />,
-            
+
                 onClick: () =>
                     window.open(
                         network.explorerAddress +
@@ -408,10 +408,19 @@ const Swap = () => {
                                     className="flex flex-row justify-between text-xs text-white my-5"
                                     style={{ color: "#00FF75" }}
                                 >
-                                    <div className="opacity-50 font-bold flex flex-row items-center gap-2 select-none cursor-pointer" onClick={() => setIsOpenFairPrice(state => !state)}>
+                                    <div
+                                        className="opacity-50 font-bold flex flex-row items-center gap-2 select-none cursor-pointer"
+                                        onClick={() =>
+                                            setIsOpenFairPrice(state => !state)
+                                        }
+                                    >
                                         <div>Fair price</div>
                                         <div>
-                                            {isOpenFairPrice ? <ICChevronUp/> : <ICChevronDown/>}
+                                            {isOpenFairPrice ? (
+                                                <ICChevronUp />
+                                            ) : (
+                                                <ICChevronDown />
+                                            )}
                                         </div>
                                     </div>
                                     <div>
@@ -432,96 +441,149 @@ const Swap = () => {
                                 </div>
                             )}
 
-                            {isOpenFairPrice && pool && rawValueFrom.gt(new BigNumber(0)) && (
-                                <>
-                                    <div className="bg-black flex flex-row items-center justify-between h-10 pl-5 pr-6">
-                                        <div className={styles.swapResultLabel}>
-                                            Price impact
+                            {isOpenFairPrice &&
+                                pool &&
+                                rawValueFrom.gt(new BigNumber(0)) && (
+                                    <>
+                                        <div className="bg-black flex flex-row items-center justify-between h-10 pl-5 pr-6">
+                                            <div
+                                                className={
+                                                    styles.swapResultLabel
+                                                }
+                                            >
+                                                Price impact
+                                            </div>
+                                            <div
+                                                className={
+                                                    styles.swapResultValue
+                                                }
+                                                style={{ color: "#00FF75" }}
+                                            >
+                                                {priceImpact}
+                                            </div>
                                         </div>
-                                        <div
-                                            className={styles.swapResultValue}
-                                            style={{ color: "#00FF75" }}
-                                        >
-                                            {priceImpact}
+                                        <div className="bg-black flex flex-row items-center justify-between h-10 pl-5 pr-6">
+                                            <div
+                                                className={
+                                                    styles.swapResultLabel
+                                                }
+                                            >
+                                                Minimum received
+                                            </div>
+                                            <div
+                                                className={
+                                                    styles.swapResultValue
+                                                }
+                                            >
+                                                {minimumReceive} {tokenTo?.name}
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div className="bg-black flex flex-row items-center justify-between h-10 pl-5 pr-6">
-                                        <div className={styles.swapResultLabel}>
-                                            Minimum received
+                                        <div className="bg-black flex flex-row items-center justify-between h-10 pl-5 pr-6">
+                                            <div
+                                                className={
+                                                    styles.swapResultLabel
+                                                }
+                                            >
+                                                Slippage
+                                            </div>
+                                            <div
+                                                className={
+                                                    styles.swapResultValue
+                                                }
+                                            >
+                                                {slippage * 100}%
+                                            </div>
                                         </div>
-                                        <div className={styles.swapResultValue}>
-                                            {minimumReceive} {tokenTo?.name}
+                                        <div className="bg-black flex flex-row items-center justify-between h-10 pl-5 pr-6">
+                                            <div
+                                                className={
+                                                    styles.swapResultLabel
+                                                }
+                                            >
+                                                Swap fees
+                                            </div>
+                                            <div
+                                                className={
+                                                    styles.swapResultValue
+                                                }
+                                            >
+                                                {tokenTo && rawValueTo
+                                                    ? toEGLD(
+                                                          tokenTo,
+                                                          rawValueTo
+                                                              .multipliedBy(fee)
+                                                              .toString()
+                                                      ).toFixed(3)
+                                                    : "0"}{" "}
+                                                {tokenTo?.name}
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div className="bg-black flex flex-row items-center justify-between h-10 pl-5 pr-6">
-                                        <div className={styles.swapResultLabel}>
-                                            Slippage
-                                        </div>
-                                        <div className={styles.swapResultValue}>
-                                            {slippage * 100}%
-                                        </div>
-                                    </div>
-                                    <div className="bg-black flex flex-row items-center justify-between h-10 pl-5 pr-6">
-                                        <div className={styles.swapResultLabel}>
-                                            Swap fees
-                                        </div>
-                                        <div className={styles.swapResultValue}>
-                                            {tokenTo && rawValueTo
-                                                ? toEGLD(
-                                                      tokenTo,
-                                                      rawValueTo
-                                                          .multipliedBy(fee)
-                                                          .toString()
-                                                  ).toFixed(3)
-                                                : "0"}{" "}
-                                            {tokenTo?.name}
-                                        </div>
-                                    </div>
-                                </>
-                            )}
+                                    </>
+                                )}
 
-                            {mounted && (isInsufficentFund ? (
-                                <Button
-                                    leftIcon={
-                                        !dapp.loggedIn ? <IconWallet /> : <></>
-                                    }
-                                    rightIcon={
-                                        dapp.loggedIn ? <IconRight /> : <></>
-                                    }
-                                    topLeftCorner
-                                    style={{ height: 48 }}
-                                    className="mt-12"
-                                    disable
-                                    outline
-                                >
-                                    <span className="text-text-input-3">
-                                        INSUFFICIENT{" "}
-                                        <span className="text-insufficent-fund">
-                                            {tokenFrom?.name}
-                                        </span>{" "}
-                                        BALANCE
-                                    </span>
-                                </Button>
-                            ) : (
-                                <Button
-                                    leftIcon={
-                                        !dapp.loggedIn ? <IconWallet /> : <></>
-                                    }
-                                    rightIcon={
-                                        dapp.loggedIn ? <IconRight /> : <></>
-                                    }
-                                    topLeftCorner
-                                    style={{ height: 48 }}
-                                    className="mt-12 text-xs sm:text-sm"
-                                    outline
-                                    onClick={
-                                        dapp.loggedIn ? swap : () => connectWallet()
-                                    }
-                                    glowOnHover
-                                >
-                                    {dapp.loggedIn ? "SWAP" : "CONNECT WALLET"}
-                                </Button>
-                            ))}
+                            {mounted &&
+                                (isInsufficentFund ? (
+                                    <Button
+                                        leftIcon={
+                                            !dapp.loggedIn ? (
+                                                <IconWallet />
+                                            ) : (
+                                                <></>
+                                            )
+                                        }
+                                        rightIcon={
+                                            dapp.loggedIn ? (
+                                                <IconRight />
+                                            ) : (
+                                                <></>
+                                            )
+                                        }
+                                        topLeftCorner
+                                        style={{ height: 48 }}
+                                        className="mt-12"
+                                        disable
+                                        outline
+                                    >
+                                        <span className="text-text-input-3">
+                                            INSUFFICIENT{" "}
+                                            <span className="text-insufficent-fund">
+                                                {tokenFrom?.name}
+                                            </span>{" "}
+                                            BALANCE
+                                        </span>
+                                    </Button>
+                                ) : (
+                                    <Button
+                                        leftIcon={
+                                            !dapp.loggedIn ? (
+                                                <IconWallet />
+                                            ) : (
+                                                <></>
+                                            )
+                                        }
+                                        rightIcon={
+                                            dapp.loggedIn ? (
+                                                <IconRight />
+                                            ) : (
+                                                <></>
+                                            )
+                                        }
+                                        topLeftCorner
+                                        style={{ height: 48 }}
+                                        className="mt-12 text-xs sm:text-sm"
+                                        outline
+                                        onClick={
+                                            dapp.loggedIn
+                                                ? swap
+                                                : () => connectWallet()
+                                        }
+                                        glowOnHover
+                                    >
+                                        {dapp.loggedIn
+                                            ? "SWAP"
+                                            : "CONNECT WALLET"}
+                                    </Button>
+                                ))}
 
                             <div
                                 className="text-xs font-bold text-center"
@@ -560,12 +622,14 @@ const Swap = () => {
                 onClose={() => openHistoryModal(false)}
             />
             {isSMScreen && (
-                <Modal
-                    isOpen={showSetting}
-                    onRequestClose={() => setShowSetting(false)}
-                    className="fixed bottom-0 left-0 right-0"
+                <HeadlessModal
+                    open={showSetting}
+                    onClose={() => setShowSetting(false)}
                 >
-                    <div className="text-white py-11 px-6">
+                    <div className="clip-corner-4 clip-corner-tl bg-ash-dark-600 p-4 text-white flex flex-col fixed bottom-0">
+                        <HeadlessModalDefaultHeader
+                            onClose={() => setShowSetting(false)}
+                        />
                         <Setting />
                         <Button
                             className="uppercase text-xs mt-10"
@@ -574,7 +638,7 @@ const Swap = () => {
                             Confirm
                         </Button>
                     </div>
-                </Modal>
+                </HeadlessModal>
             )}
         </div>
     );

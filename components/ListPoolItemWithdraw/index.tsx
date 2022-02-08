@@ -5,8 +5,10 @@ import ICChevronUp from "assets/svg/chevron-up.svg";
 import ICMinus from "assets/svg/minus.svg";
 import ICPlus from "assets/svg/plus.svg";
 import AddLiquidityModal from "components/AddLiquidityModal";
+import HeadlessModal, {
+    HeadlessModalDefaultHeader
+} from "components/HeadlessModal";
 import { usePool } from "components/ListPoolItem";
-import ReactModal from "components/ReactModal";
 import RemoveLiquidityModal from "components/RemoveLiquidityModal";
 import { TAILWIND_BREAKPOINT } from "const/mediaQueries";
 import { toEGLD } from "helper/balance";
@@ -242,195 +244,202 @@ const ListPoolItemWithdraw = (props: Props) => {
                 </div>
             </div> */}
             </div>
-            <ReactModal
-                isOpen={mIsExpand}
-                onRequestClose={() => setMIsExpand(false)}
-                className="fixed bottom-0 left-0 right-0"
-                useClipCorner={true}
+            <HeadlessModal
+                open={mIsExpand}
+                onClose={() => setMIsExpand(false)}
+                transition="btt"
             >
-                <div className="bg-ash-dark-600 clip-corner-4 clip-corner-tr px-10 pt-20 pb-11 text-white">
-                    <div className="grid grid-cols-2 gap-1 items-end mb-8">
-                        <div>
-                            <div className="font-bold mb-8">
-                                <div className="text-2xl">USDC</div>
-                                <div className="flex items-center">
-                                    <div className="text-earn text-lg mr-3">
-                                        1.52
-                                    </div>
-                                    <div className="text-2xs text-ash-green-500">
-                                        <ICArrowTopRight className="inline mr-1" />
-                                        <span>+0.00005</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="font-bold mb-9">
-                                <div className="text-2xl">USDC</div>
-                                <div className="flex items-center">
-                                    <div className="text-earn text-lg mr-3">
-                                        1.52
-                                    </div>
-                                    <div className="text-2xs text-ash-purple-500">
-                                        <ICArrowBottomRight className="inline mr-1" />
-                                        <span>+0.00005</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="flex items-center">
-                                <button
-                                    className="w-14 h-14 bg-ash-dark-400 clip-corner-1 clip-corner-bl text-pink-600 mr-[0.125rem] flex justify-center items-center"
-                                    onClick={() => {
-                                        setMIsExpand(false);
-                                        setOpenAddLiquidity(true);
-                                    }}
-                                >
-                                    <ICPlus />
-                                </button>
-                                <button
-                                    className="w-14 h-14 bg-ash-dark-400 clip-corner-1 clip-corner-br text-yellow-600 mr-[0.125rem] flex justify-center items-center"
-                                    onClick={() => {
-                                        setMIsExpand(false);
-                                        setOpenRemoveLiquidity(true);
-                                    }}
-                                >
-                                    <ICMinus />
-                                </button>
-                            </div>
-                        </div>
-                        <div>
+                <div className="bg-ash-dark-600 clip-corner-4 clip-corner-tr p-4 fixed inset-x-0 bottom-0 text-white max-h-screen overflow-auto">
+                    <HeadlessModalDefaultHeader
+                        onClose={() => setMIsExpand(false)}
+                    />
+                    <div className="px-6 pt-16 pb-7">
+                        <div className="grid grid-cols-2 gap-1 items-end mb-8">
                             <div>
-                                <div className="flex items-center justify-end mb-14">
-                                    <div className="w-[3.25rem] h-[3.25rem] rounded-full">
-                                        <Image
-                                            src={props.pool.tokens[0].icon}
-                                            alt="token icon"
-                                        />
-                                    </div>
-                                    <div className="w-[3.25rem] h-[3.25rem] rounded-full ml-[-0.375rem]">
-                                        <Image
-                                            src={props.pool.tokens[1].icon}
-                                            alt="token icon"
-                                        />
-                                    </div>
-                                </div>
-                                <div className="mb-9">
-                                    <div className="text-ash-gray-500 text-xs mb-4">
-                                        Estimate in USD
-                                    </div>
-                                    <div className="flex items-center space-x-4">
-                                        <div className="text-lg">
-                                            <span className="text-ash-gray-500">
-                                                $
-                                            </span>
-                                            <span className="font-bold">
-                                                351.21
-                                            </span>
+                                <div className="font-bold mb-8">
+                                    <div className="text-2xl">USDC</div>
+                                    <div className="flex items-center">
+                                        <div className="text-earn text-lg mr-3">
+                                            1.52
                                         </div>
                                         <div className="text-2xs text-ash-green-500">
                                             <ICArrowTopRight className="inline mr-1" />
-                                            <span className="font-bold">
-                                                +0.00005
-                                            </span>
+                                            <span>+0.00005</span>
                                         </div>
                                     </div>
                                 </div>
+                                <div className="font-bold mb-9">
+                                    <div className="text-2xl">USDC</div>
+                                    <div className="flex items-center">
+                                        <div className="text-earn text-lg mr-3">
+                                            1.52
+                                        </div>
+                                        <div className="text-2xs text-ash-purple-500">
+                                            <ICArrowBottomRight className="inline mr-1" />
+                                            <span>+0.00005</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="flex items-center">
+                                    <button
+                                        className="w-14 h-14 bg-ash-dark-400 clip-corner-1 clip-corner-bl text-pink-600 mr-[0.125rem] flex justify-center items-center"
+                                        onClick={() => {
+                                            setMIsExpand(false);
+                                            setOpenAddLiquidity(true);
+                                        }}
+                                    >
+                                        <ICPlus />
+                                    </button>
+                                    <button
+                                        className="w-14 h-14 bg-ash-dark-400 clip-corner-1 clip-corner-br text-yellow-600 mr-[0.125rem] flex justify-center items-center"
+                                        onClick={() => {
+                                            setMIsExpand(false);
+                                            setOpenRemoveLiquidity(true);
+                                        }}
+                                    >
+                                        <ICMinus />
+                                    </button>
+                                </div>
+                            </div>
+                            <div>
                                 <div>
-                                    <div className="text-ash-gray-500 text-xs mb-4">
-                                        Estimate in USD
-                                    </div>
-                                    <div className="flex items-center space-x-4">
-                                        <div className="text-lg">
-                                            <span className="text-ash-gray-500">
-                                                $
-                                            </span>
-                                            <span className="font-bold">
-                                                351.21
-                                            </span>
+                                    <div className="flex items-center justify-end mb-14">
+                                        <div className="w-[3.25rem] h-[3.25rem] rounded-full">
+                                            <Image
+                                                src={props.pool.tokens[0].icon}
+                                                alt="token icon"
+                                            />
                                         </div>
-                                        <div className="text-2xs text-ash-green-500">
-                                            <ICArrowTopRight className="inline mr-1" />
-                                            <span className="font-bold">
-                                                +0.00005
-                                            </span>
+                                        <div className="w-[3.25rem] h-[3.25rem] rounded-full ml-[-0.375rem]">
+                                            <Image
+                                                src={props.pool.tokens[1].icon}
+                                                alt="token icon"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="mb-9">
+                                        <div className="text-ash-gray-500 text-xs mb-4">
+                                            Estimate in USD
+                                        </div>
+                                        <div className="flex items-center space-x-4">
+                                            <div className="text-lg">
+                                                <span className="text-ash-gray-500">
+                                                    $
+                                                </span>
+                                                <span className="font-bold">
+                                                    351.21
+                                                </span>
+                                            </div>
+                                            <div className="text-2xs text-ash-green-500">
+                                                <ICArrowTopRight className="inline mr-1" />
+                                                <span className="font-bold">
+                                                    +0.00005
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div className="text-ash-gray-500 text-xs mb-4">
+                                            Estimate in USD
+                                        </div>
+                                        <div className="flex items-center space-x-4">
+                                            <div className="text-lg">
+                                                <span className="text-ash-gray-500">
+                                                    $
+                                                </span>
+                                                <span className="font-bold">
+                                                    351.21
+                                                </span>
+                                            </div>
+                                            <div className="text-2xs text-ash-green-500">
+                                                <ICArrowTopRight className="inline mr-1" />
+                                                <span className="font-bold">
+                                                    +0.00005
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div className="py-8 border-t border-b border-dashed border-ash-gray-500 grid grid-cols-2 gap-1">
-                        <div className="flex flex-col justify-between">
-                            <div className="text-xs text-ash-gray-500">
-                                Total Farm
-                            </div>
-                            <div className="text-earn">
-                                <span className="font-bold text-lg">
-                                    0.52&nbsp;
-                                </span>
-                                <span className="text-xs">ELGD</span>
-                            </div>
-                        </div>
-                        <button className="h-14 bg-earn clip-corner-1 clip-corner-br flex items-center justify-center text-center text-white font-bold text-sm">
-                            Harvest
-                        </button>
-                    </div>
-                    <div className="grid grid-cols-2 gap-1 py-8">
-                        <div className="flex flex-col justify-between space-y-4">
-                            <div className="text-xs text-ash-gray-500">
-                                APR Earn
-                            </div>
-                            <div className="text-pink-600 font-bold text-lg">
-                                921%
-                            </div>
-                        </div>
-                        <div className="flex flex-col justify-between space-y-4">
-                            <div className="text-xs text-ash-gray-500">
-                                Farming per day
-                            </div>
-                            <div>
-                                <span className="inline-block text-earn text-xs">
-                                    <span className="text-lg font-bold">
+                        <div className="py-8 border-t border-b border-dashed border-ash-gray-500 grid grid-cols-2 gap-1">
+                            <div className="flex flex-col justify-between">
+                                <div className="text-xs text-ash-gray-500">
+                                    Total Farm
+                                </div>
+                                <div className="text-earn">
+                                    <span className="font-bold text-lg">
                                         0.52&nbsp;
                                     </span>
-                                    <span>ASH</span>
-                                    &nbsp;
-                                </span>
-                                <span className="text-white text-xs">
-                                    per 1,000 USD
-                                </span>
+                                    <span className="text-xs">ELGD</span>
+                                </div>
+                            </div>
+                            <button className="h-14 bg-earn clip-corner-1 clip-corner-br flex items-center justify-center text-center text-white font-bold text-sm">
+                                Harvest
+                            </button>
+                        </div>
+                        <div className="grid grid-cols-2 gap-1 py-8">
+                            <div className="flex flex-col justify-between space-y-4">
+                                <div className="text-xs text-ash-gray-500">
+                                    APR Earn
+                                </div>
+                                <div className="text-pink-600 font-bold text-lg">
+                                    921%
+                                </div>
+                            </div>
+                            <div className="flex flex-col justify-between space-y-4">
+                                <div className="text-xs text-ash-gray-500">
+                                    Farming per day
+                                </div>
+                                <div>
+                                    <span className="inline-block text-earn text-xs">
+                                        <span className="text-lg font-bold">
+                                            0.52&nbsp;
+                                        </span>
+                                        <span>ASH</span>
+                                        &nbsp;
+                                    </span>
+                                    <span className="text-white text-xs">
+                                        per 1,000 USD
+                                    </span>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div className="bg-ash-dark-400 text-ash-gray-500 mb-6">
-                        <div className="flex justify-between items-center h-9 space-x-4 px-4">
-                            <div className="text-2xs">Total Liquidity</div>
-                            <div className="text-sm">$512,913,133</div>
+                        <div className="bg-ash-dark-400 text-ash-gray-500 mb-6">
+                            <div className="flex justify-between items-center h-9 space-x-4 px-4">
+                                <div className="text-2xs">Total Liquidity</div>
+                                <div className="text-sm">$512,913,133</div>
+                            </div>
+                            <div className="flex justify-between items-center h-9 space-x-4 px-4">
+                                <div className="text-2xs">24H Volume</div>
+                                <div className="text-sm">$512,913,133</div>
+                            </div>
+                            <div className="flex justify-between items-center h-9 space-x-4 px-4">
+                                <div className="text-2xs">LP Token</div>
+                                <div className="text-sm">
+                                    3.412351 {props.pool.tokens[0].name}-
+                                    {props.pool.tokens[1].name}
+                                </div>
+                            </div>
+                            <div className="flex justify-between items-center h-9 space-x-4 px-4">
+                                <div className="text-2xs">Performance Fee</div>
+                                <div className="text-sm">2%</div>
+                            </div>
+                            <div className="flex justify-between items-center h-9 space-x-4 px-4">
+                                <div className="text-2xs">Trading APR</div>
+                                <div className="text-sm">32%</div>
+                            </div>
+                            <div className="flex justify-between items-center h-9 space-x-4 px-4">
+                                <div className="text-2xs">Emissions APR</div>
+                                <div className="text-sm">51%</div>
+                            </div>
                         </div>
-                        <div className="flex justify-between items-center h-9 space-x-4 px-4">
-                            <div className="text-2xs">24H Volume</div>
-                            <div className="text-sm">$512,913,133</div>
+                        <div className="text-center text-earn underline text-2xs">
+                            View LP Distribution
                         </div>
-                        <div className="flex justify-between items-center h-9 space-x-4 px-4">
-                            <div className="text-2xs">LP Token</div>
-                            <div className="text-sm">3.412351 {props.pool.tokens[0].name}-{props.pool.tokens[1].name}</div>
-                        </div>
-                        <div className="flex justify-between items-center h-9 space-x-4 px-4">
-                            <div className="text-2xs">Performance Fee</div>
-                            <div className="text-sm">2%</div>
-                        </div>
-                        <div className="flex justify-between items-center h-9 space-x-4 px-4">
-                            <div className="text-2xs">Trading APR</div>
-                            <div className="text-sm">32%</div>
-                        </div>
-                        <div className="flex justify-between items-center h-9 space-x-4 px-4">
-                            <div className="text-2xs">Emissions APR</div>
-                            <div className="text-sm">51%</div>
-                        </div>
-                    </div>
-                    <div className="text-center text-earn underline text-2xs">
-                        View LP Distribution
                     </div>
                 </div>
-            </ReactModal>
+            </HeadlessModal>
             <AddLiquidityModal
                 open={openAddLiquidity}
                 onClose={() => setOpenAddLiquidity(false)}

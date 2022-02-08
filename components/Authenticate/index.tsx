@@ -42,7 +42,6 @@ const Authenticate = ({ children }: { children: ReactNode }) => {
 
         if (getItem("walletLogin")) {
             setLoading(true);
-            console.log('net', network);
             const provider = newWalletProvider(network);
             getAddress()
                 .then(address => {
