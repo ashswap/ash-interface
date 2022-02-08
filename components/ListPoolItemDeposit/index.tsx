@@ -1,8 +1,10 @@
 import IconDown from "assets/svg/down-white.svg";
 import AddLiquidityModal from "components/AddLiquidityModal";
 import Button from "components/Button";
+import HeadlessModal, {
+    HeadlessModalDefaultHeader
+} from "components/HeadlessModal";
 import { usePool } from "components/ListPoolItem";
-import ReactModal from "components/ReactModal";
 import { TAILWIND_BREAKPOINT } from "const/mediaQueries";
 import useMediaQuery from "hooks/useMediaQuery";
 import IPool from "interface/pool";
@@ -157,103 +159,115 @@ const ListPoolItemDeposit = (props: Props) => {
                     </div>
                 )}
             </div>
-            <ReactModal
-                isOpen={mIsExpand}
-                onRequestClose={() => setMIsExpand(false)}
-                className="fixed bottom-0 left-0 right-0"
-                useClipCorner={true}
+            <HeadlessModal
+                open={mIsExpand}
+                onClose={() => setMIsExpand(false)}
+                transition="btt"
             >
-                <div className="bg-ash-dark-600 clip-corner-4 clip-corner-tr px-10 pt-20 pb-11 text-white">
-                    <div className="flex justify-between mb-12">
-                        <div>
-                            <div className="text-ash-gray-500 text-xs mb-[0.625rem]">
-                                Deposit
+                <div className="bg-ash-dark-600 clip-corner-4 clip-corner-tr p-4 fixed inset-x-0 bottom-0 text-white max-h-screen overflow-auto">
+                    <HeadlessModalDefaultHeader
+                        onClose={() => setMIsExpand(false)}
+                    />
+                    <div className="pt-16 px-6 pb-7">
+                        <div className="flex justify-between mb-12">
+                            <div>
+                                <div className="text-ash-gray-500 text-xs mb-[0.625rem]">
+                                    Deposit
+                                </div>
+                                <div className="flex items-baseline">
+                                    <div className="text-2xl font-bold">
+                                        {props.pool.tokens[0].name}
+                                    </div>
+                                    <div className="text-sm font-bold">
+                                        &nbsp;&&nbsp;
+                                    </div>
+                                    <div className="text-2xl font-bold">
+                                        {props.pool.tokens[1].name}
+                                    </div>
+                                </div>
                             </div>
-                            <div className="flex items-baseline">
-                                <div className="text-2xl font-bold">
-                                    {props.pool.tokens[0].name}
+                            <div className="flex">
+                                <div className="h-[3.25rem] w-[3.25rem] rounded-full">
+                                    <Image
+                                        src={props.pool.tokens[0].icon}
+                                        alt="token icon"
+                                    />
                                 </div>
-                                <div className="text-sm font-bold">
-                                    &nbsp;&&nbsp;
-                                </div>
-                                <div className="text-2xl font-bold">
-                                    {props.pool.tokens[1].name}
+                                <div className="h-[3.25rem] w-[3.25rem] rounded-full -ml-2">
+                                    <Image
+                                        src={props.pool.tokens[1].icon}
+                                        alt="token icon"
+                                    />
                                 </div>
                             </div>
                         </div>
-                        <div className="flex">
-                            <div className="h-[3.25rem] w-[3.25rem] rounded-full">
-                                <Image
-                                    src={props.pool.tokens[0].icon}
-                                    alt="token icon"
-                                />
-                            </div>
-                            <div className="h-[3.25rem] w-[3.25rem] rounded-full -ml-2">
-                                <Image
-                                    src={props.pool.tokens[1].icon}
-                                    alt="token icon"
-                                />
-                            </div>
-                        </div>
-                    </div>
-                    <div className="flex justify-between mb-12">
-                        <div>
-                            <div className="text-ash-gray-500 mb-4 text-xs">
-                                APR Earn
-                            </div>
-                            <div className="font-bold text-lg text-yellow-600">
-                                _%
-                            </div>
-                        </div>
-                        <div>
-                            <div className="text-ash-gray-500 mb-4 text-xs">
-                                Farming per day
+                        <div className="flex justify-between mb-12">
+                            <div>
+                                <div className="text-ash-gray-500 mb-4 text-xs">
+                                    APR Earn
+                                </div>
+                                <div className="font-bold text-lg text-yellow-600">
+                                    _%
+                                </div>
                             </div>
                             <div>
-                                <span className="text-earn text-lg">0.52</span>
-                                <span className="text-xs">
-                                    <span className="text-earn">ASH</span>
-                                    <span> per 1,000 USDT</span>
-                                </span>
+                                <div className="text-ash-gray-500 mb-4 text-xs">
+                                    Farming per day
+                                </div>
+                                <div>
+                                    <span className="text-earn text-lg">
+                                        0.52
+                                    </span>
+                                    <span className="text-xs">
+                                        <span className="text-earn">ASH</span>
+                                        <span> per 1,000 USDT</span>
+                                    </span>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <button
-                        className="w-full h-14 bg-pink-600 clip-corner-1 clip-corner-br text-white mb-4 font-bold text-sm"
-                        onClick={() => {
-                            setOpenAddLiquidity(true);
-                            setMIsExpand(false);
-                        }}
-                    >
-                        Deposit
-                    </button>
-                    <div className="bg-ash-dark-400 text-ash-gray-500 mb-6">
-                        <div className="flex justify-between items-center h-9 px-4">
-                            <div className="text-2xs mr-4">Total Liquidity</div>
-                            <div className="text-sm">$512,913,133</div>
+                        <button
+                            className="w-full h-14 bg-pink-600 clip-corner-1 clip-corner-br text-white mb-4 font-bold text-sm"
+                            onClick={() => {
+                                setOpenAddLiquidity(true);
+                                setMIsExpand(false);
+                            }}
+                        >
+                            Deposit
+                        </button>
+                        <div className="bg-ash-dark-400 text-ash-gray-500 mb-6">
+                            <div className="flex justify-between items-center h-9 px-4">
+                                <div className="text-2xs mr-4">
+                                    Total Liquidity
+                                </div>
+                                <div className="text-sm">$512,913,133</div>
+                            </div>
+                            <div className="flex justify-between items-center h-9 px-4">
+                                <div className="text-2xs mr-4">24H Volume</div>
+                                <div className="text-sm">$12,913,133</div>
+                            </div>
+                            <div className="flex justify-between items-center h-9 px-4">
+                                <div className="text-2xs mr-4">
+                                    Performance Fee
+                                </div>
+                                <div className="text-sm">2%</div>
+                            </div>
+                            <div className="flex justify-between items-center h-9 px-4">
+                                <div className="text-2xs mr-4">Trading APR</div>
+                                <div className="text-sm">32%</div>
+                            </div>
+                            <div className="flex justify-between items-center h-9 px-4">
+                                <div className="text-2xs mr-4">
+                                    Emissions APR
+                                </div>
+                                <div className="text-sm">51%</div>
+                            </div>
                         </div>
-                        <div className="flex justify-between items-center h-9 px-4">
-                            <div className="text-2xs mr-4">24H Volume</div>
-                            <div className="text-sm">$12,913,133</div>
+                        <div className="text-center text-earn underline text-2xs">
+                            View LP Distribution
                         </div>
-                        <div className="flex justify-between items-center h-9 px-4">
-                            <div className="text-2xs mr-4">Performance Fee</div>
-                            <div className="text-sm">2%</div>
-                        </div>
-                        <div className="flex justify-between items-center h-9 px-4">
-                            <div className="text-2xs mr-4">Trading APR</div>
-                            <div className="text-sm">32%</div>
-                        </div>
-                        <div className="flex justify-between items-center h-9 px-4">
-                            <div className="text-2xs mr-4">Emissions APR</div>
-                            <div className="text-sm">51%</div>
-                        </div>
-                    </div>
-                    <div className="text-center text-earn underline text-2xs">
-                        View LP Distribution
                     </div>
                 </div>
-            </ReactModal>
+            </HeadlessModal>
             <AddLiquidityModal
                 open={openAddLiquidity}
                 onClose={() => setOpenAddLiquidity(false)}

@@ -17,7 +17,8 @@ import { gasLimit, gasPrice, network } from "const/network";
 import pools from "const/pool";
 import { useDappContext, useDappDispatch } from "context/dapp";
 import { emptyFunc, fetcher } from "helper/common";
-import useSetProvider from "hooks/useSetProvider";
+import useInitWalletConnect from "hooks/useInitWalletConnect";
+import { usePlatform } from "hooks/usePlatform";
 import { ITokenMap } from "interface/token";
 import { TokenBalancesMap } from "interface/tokenBalance";
 import {
@@ -29,9 +30,6 @@ import {
     useState
 } from "react";
 import useSWR from "swr";
-import platform from "platform";
-import { usePlatform } from "hooks/usePlatform";
-import useInitWalletConnect from "hooks/useInitWalletConnect";
 export interface State {
     isOpenConnectWalletModal: boolean;
     setIsOpenConnectWalletModal: (val: boolean) => void;

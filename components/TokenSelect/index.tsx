@@ -2,12 +2,15 @@ import IconClose from "assets/svg/close-1.svg";
 import Down from "assets/svg/down.svg";
 import Search from "assets/svg/search.svg";
 import BigNumber from "bignumber.js";
+import HeadlessModal, {
+    HeadlessModalDefaultHeader
+} from "components/HeadlessModal";
 import Input from "components/Input";
 import ListSwapPool from "components/ListSwapPool";
 import ListToken from "components/ListToken";
-import Modal from "components/ReactModal";
 import Token from "components/Token";
 import { useWallet } from "context/wallet";
+import { useScreenSize } from "hooks/useScreenSize";
 import IPool from "interface/pool";
 import { IToken } from "interface/token";
 import { TokenBalance } from "interface/tokenBalance";
@@ -40,6 +43,7 @@ const TokenSelect = ({
     const [filtedValidPools, setFiltedValidPools] = useState<IPool[]>([]);
     const [keyword, setKeyword] = useState<string>("");
     const { tokens, balances } = useWallet();
+    const screenSize = useScreenSize();
 
     const tokenBalances = useMemo(() => {
         let tokenBalances: TokenBalance[] = [];
@@ -142,14 +146,12 @@ const TokenSelect = ({
                 )}
                 <Down />
             </div>
-            <Modal
-                isOpen={open}
-                onRequestClose={() => setOpen(false)}
-                className="w-full sm:w-[27.375rem] sm:mt-28 mx-auto fixed bottom-0 sm:static"
-                contentClassName="h-[36rem]"
-            >
-                <div className="flex flex-col px-6 py-11">
-                    <div className="flex-shrink-0">
+            <HeadlessModal open={open} onClose={() => setOpen(false)} transition={screenSize.sm ? 'btt' : 'center'}>
+                <div className="clip-corner-4 clip-corner-tl bg-ash-dark-600 flex flex-col p-4 w-full sm:w-[27.375rem] mx-auto sm:mt-28 fixed bottom-0 max-h-full sm:static sm:min-h-[38.5rem]">
+                    <HeadlessModalDefaultHeader
+                        onClose={() => setOpen(false)}
+                    />
+                    <div className="flex-shrink-0 px-6 pt-1 pb-6">
                         <div className="font-bold text-lg text-white">
                             {modalTitle}
                         </div>
@@ -180,7 +182,7 @@ const TokenSelect = ({
                         )}
                     </div>
 
-                    <div className="flex-grow overflow-auto">
+                    <div className="overflow-auto px-6 pb-7 min-h-[35vh] sm:min-h-[initial]">
                         {validPools ? (
                             <ListSwapPool
                                 items={filtedValidPools}
@@ -196,14 +198,14 @@ const TokenSelect = ({
                             />
                         ) : (
                             <ListToken
-                                className={styles.listToken}
+                                className=""
                                 items={filtedTokenBalances}
                                 onSelect={t => onSelectToken(t.token)}
                             />
                         )}
                     </div>
                 </div>
-            </Modal>
+            </HeadlessModal>
         </>
     );
 };

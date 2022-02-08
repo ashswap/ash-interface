@@ -79,9 +79,10 @@ const ListPoolItem = (props: Props) => {
                 })
             )
             .then(({ returnData }) => {
-                let resultHex = Buffer.from(returnData[0], "base64").toString(
-                    "hex"
-                );
+                let resultHex = Buffer.from(
+                    returnData[0],
+                    "base64"
+                ).toString("hex");
                 let parser = new TypeExpressionParser();
                 let mapper = new TypeMapper();
                 let serializer = new ArgSerializer();
