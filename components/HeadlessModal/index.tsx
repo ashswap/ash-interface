@@ -1,7 +1,7 @@
 import { Dialog, Transition } from "@headlessui/react";
 import IconClose from "assets/svg/close.svg";
 import IconButton from "components/IconButton";
-import {useRouter} from "next/router";
+import { useRouter } from "next/router";
 import React, {
     ElementType,
     Fragment,
@@ -58,7 +58,7 @@ function HeadlessModal({
     const trans = TRANSITIONS[transition || "center"];
     const [animating, setAnimating] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
-    const {events} = useRouter();
+    const { events } = useRouter();
     useEffect(() => {
         const onRouteChange = () => onClose(false);
         events.on("routeChangeComplete", onRouteChange);
@@ -96,9 +96,6 @@ function HeadlessModal({
                             }`}
                             ref={containerRef}
                             onClick={e => {
-                                e.preventDefault();
-                                e.stopPropagation();
-
                                 e.target === containerRef.current &&
                                     onClose(false);
                             }}
@@ -112,7 +109,6 @@ function HeadlessModal({
                                 afterLeave={() => setAnimating(false)}
                             >
                                 {children}
-                                {/* <div className="clip-corner-4 clip-corner-tl bg-ash-dark-600 flex flex-col p-4 w-full sm:w-[27.375rem] mx-auto sm:mt-28 absolute bottom-0 max-h-full sm:static sm:min-h-[38.5rem] h-[30rem]"></div> */}
                             </Transition.Child>
                         </div>
                     </div>
