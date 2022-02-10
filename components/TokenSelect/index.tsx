@@ -165,7 +165,7 @@ const TokenSelect = ({
                                 value={keyword}
                                 onChange={e => onChangeKeyword(e.target.value)}
                                 textClassName="text-sm"
-                                className="w-full caret-pink-500 overflow-hidden"
+                                className="w-full caret-pink-500 overflow-hidden h-12 px-5"
                             />
                             {pivotToken &&
                                 type === "from" &&

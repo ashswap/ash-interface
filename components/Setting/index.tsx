@@ -41,6 +41,7 @@ const Setting = (props: Props) => {
                 placeholder="Custom"
                 type="number"
                 textClassName="text-sm"
+                className="h-12 px-5"
                 onChange={e => {
                     setSlippage(parseFloat(e.target.value) / 100);
                 }}

@@ -81,7 +81,7 @@ const TokenInput = ({
                 </div>
 
                 <Input
-                    className="flex-1 overflow-hidden"
+                    className="flex-1 overflow-hidden h-12 px-5"
                     backgroundClassName="bg-ash-dark-700"
                     textColorClassName="text-white"
                     placeholder="0"
@@ -507,7 +507,7 @@ const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
                                     <span>TOTAL</span>
                                 </div>
                                 <Input
-                                    className="flex-1 overflow-hidden"
+                                    className="flex-1 overflow-hidden h-12 px-5"
                                     backgroundClassName="bg-ash-dark-700"
                                     textColorClassName="text-input-3"
                                     placeholder="0"

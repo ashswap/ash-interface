@@ -273,7 +273,7 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
                                         <span>TOTAL</span>
                                     </div>
                                     <Input
-                                        className="flex-1 overflow-hidden"
+                                        className="flex-1 overflow-hidden h-12 px-5"
                                         backgroundClassName="bg-ash-dark-700"
                                         textColorClassName="text-input-3"
                                         placeholder="0"
@@ -329,7 +329,7 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
                                             className="w-24 border-r border-r-ash-gray-500 sm:border-r-0"
                                         />
                                         <Input
-                                            className="flex-1 overflow-hidden"
+                                            className="flex-1 overflow-hidden h-12 px-5"
                                             backgroundClassName="bg-ash-dark-700"
                                             textColorClassName="text-input-3"
                                             placeholder="0"
@@ -370,7 +370,7 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
                                             className="w-24 border-r border-r-ash-gray-500 sm:border-r-0"
                                         />
                                         <Input
-                                            className="flex-1 overflow-hidden"
+                                            className="flex-1 overflow-hidden h-12 px-5"
                                             backgroundClassName="bg-ash-dark-700"
                                             textColorClassName="text-input-3"
                                             placeholder="0"
