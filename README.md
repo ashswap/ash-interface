@@ -7,8 +7,8 @@ This repository contains the code for the User Interface of AshSwap. The contrac
 ## Run
 
 ```javascript
-yarn
-yarn start
+docker-compose up install
+docker-compose up dev
 ```
 
 ## Links
