@@ -1,5 +1,35 @@
 version: '3.2'
 services:
-  app:
-    build: .
+  start:
+    build:
+      dockerfile: Dockerfile.runtime
+      context: .
+    platform: linux/amd64
+    command: sh -c "yarn start"
     working_dir: /app
+    volumes:
+      - ./:/app
+    ports:
+      - 3000:3000
+  
+  install:
+    build:
+      dockerfile: Dockerfile.runtime
+      context: .
+    platform: linux/amd64
+    command: sh -c "yarn install"
+    working_dir: /app
+    volumes:
+      - ./:/app
+
+  dev:
+    build:
+      dockerfile: Dockerfile.runtime
+      context: .
+    platform: linux/amd64
+    command: sh -c "yarn dev"
+    working_dir: /app
+    volumes:
+      - ./:/app
+    ports:
+      - 3000:3000
