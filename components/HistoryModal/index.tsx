@@ -29,7 +29,7 @@ const HistoryModal = ({ open, onClose }: Props) => {
         <HeadlessModal
             open={open}
             onClose={() => onClose && onClose()}
-            transition={screenSize.sm ? "btt" : "center"}
+            transition={screenSize.msm ? "btt" : "center"}
         >
             <div className="clip-corner-4 clip-corner-tl bg-ash-dark-600 p-4 text-white max-h-[36rem] w-full sm:w-[21.875rem] sm:mt-28 mx-auto fixed bottom-0 sm:static">
                 <HeadlessModalDefaultHeader

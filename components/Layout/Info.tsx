@@ -110,10 +110,10 @@ function InfoLayout({ children }: any) {
         [router]
     );
     // desktop
-    if (!screenSizes.sm) {
+    if (!screenSizes.msm) {
         return (
-            <div className="flex">
-                <aside className="sticky top-0 left-0 h-screen overflow-hidden w-52 md:w-60 bg-ash-dark-600 pl-4 md:pl-12 py-9 flex flex-col space-y-5">
+            <div className="flex overflow-x-hidden">
+                <aside className="flex-shrink-0 fixed top-0 left-0 h-screen overflow-hidden w-52 md:w-60 bg-ash-dark-600 pl-4 md:pl-12 py-9 flex flex-col space-y-5">
                     <div className="w-14 h-14 relative flex-shrink-0">
                         <Image
                             src={ImgLogo}
@@ -185,8 +185,8 @@ function InfoLayout({ children }: any) {
                         </div>
                     </div>
                 </aside>
-                <div className="flex-grow px-9 py-6 relative">
-                    <div className="fixed top-6 right-[10.25rem]">
+                <div className="flex-grow px-4 lg:px-9 lg:py-6 relative overflow-x-hidden ml-52 md:ml-60 mr-32">
+                    <div className="fixed top-6 right-[10.25rem] z-10">
                         <Input
                             backgroundClassName="bg-ash-dark-700/70 h-12 px-5"
                             className="text-white text-2xs"
@@ -196,7 +196,7 @@ function InfoLayout({ children }: any) {
                     </div>
                     {children}
                 </div>
-                <aside className="sticky top-0 right-0 h-screen overflow-auto w-32 bg-ash-dark-600 px-4 py-6 text-white">
+                <aside className="flex-shrink-0 fixed top-0 right-0 h-screen overflow-auto w-32 bg-ash-dark-600 px-4 py-6 text-white">
                     <div className="bg-ash-dark-400 p-2 flex flex-col items-center mb-4">
                         <Image
                             src={ImgAvatar}
@@ -221,7 +221,7 @@ function InfoLayout({ children }: any) {
     // mobile
     return (
         <div>
-            <header className="sticky top-0 left-0 right-0 w-full h-[4.5rem] flex items-center justify-between px-6 text-white bg-ash-dark-400">
+            <header className="sticky top-0 left-0 right-0 z-10 w-full h-[4.5rem] flex items-center justify-between px-6 text-white bg-ash-dark-400">
                 <div className="mr-5 flex-shrink-0">
                     <Image
                         src={ImgLogo}

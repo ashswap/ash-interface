@@ -146,7 +146,7 @@ const TokenSelect = ({
                 )}
                 <Down />
             </div>
-            <HeadlessModal open={open} onClose={() => setOpen(false)} transition={screenSize.sm ? 'btt' : 'center'}>
+            <HeadlessModal open={open} onClose={() => setOpen(false)} transition={screenSize.msm ? 'btt' : 'center'}>
                 <div className="clip-corner-4 clip-corner-tl bg-ash-dark-600 flex flex-col p-4 w-full sm:w-[27.375rem] mx-auto sm:mt-28 fixed bottom-0 max-h-full sm:static sm:min-h-[38.5rem]">
                     <HeadlessModalDefaultHeader
                         onClose={() => setOpen(false)}
