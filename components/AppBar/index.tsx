@@ -6,7 +6,7 @@ import Link from "next/link";
 const AppBar = () => {
     return (
         <>
-            <div className="flex justify-between items-center px-6 sm:px-12 py-5 relative z-10">
+            <div className="flex justify-between items-center px-6 sm:px-12 py-5 relative z-20">
                 <Link href="/" passHref>
                     <div className="cursor-pointer">
                         <span className="hidden md:inline-block">

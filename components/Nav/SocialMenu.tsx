@@ -1,6 +1,6 @@
 import { Menu, Transition } from "@headlessui/react";
 import HeadlessModal, {
-    HeadlessModalDefaultHeader
+    HeadlessModalDefaultHeader,
 } from "components/HeadlessModal";
 import { TAILWIND_BREAKPOINT } from "const/mediaQueries";
 import useMediaQuery from "hooks/useMediaQuery";
@@ -20,26 +20,28 @@ const SOCIALS = [
     {
         name: "Discord",
         url: "https://discord.gg/zHWmvbzubW",
-        image: discordImage
+        image: discordImage,
     },
     { name: "Telegram", url: "https://t.me/ash_swap", image: telegramImage },
     {
         name: "Twitter",
         url: "https://twitter.com/@ash_swap",
-        image: twitterImage
+        image: twitterImage,
     },
     { name: "Medium", url: "https://medium.com/@ashswap", image: mediumImage },
     {
         name: "Reddit",
         url: "https://www.reddit.com/r/AshSwap",
-        image: redditImage
+        image: redditImage,
     },
     {
         name: "Gmail",
         url:
-            "mailto:helloATashswapDOTio?subject=AshSwap Contact&cc=helloATbicarusDOTio",
-        image: gmailImage
-    }
+            typeof window === "undefined"
+                ? "mailto:helloATashswapDOTio?subject=AshSwap Contact&cc=helloATbicarusDOTio"
+                : "mailto:hello@ashswap.io?subject=AshSwap Contact&cc=hello@bicarus.io",
+        image: gmailImage,
+    },
 ];
 function HeadlessLink(
     props: React.DetailedHTMLProps<
@@ -53,7 +55,7 @@ function HeadlessLink(
             <a {...rest}>{children}</a>
         </Link>
     ) : (
-        <a {...rest}>{children}</a>
+        <>{children}</>
     );
 }
 function SocialMenu() {
@@ -70,8 +72,9 @@ function SocialMenu() {
                 {({ open }) => (
                     <>
                         <Menu.Button
-                            className={`${styles.btn} outline-none ${open &&
-                                styles.active}`}
+                            className={`${styles.btn} outline-none ${
+                                open && styles.active
+                            }`}
                         >
                             <ICSocial className="inline-block w-4 h-4 md:mr-2 transition-none" />
                             <span className="inline-block">
@@ -129,9 +132,9 @@ function SocialMenu() {
                 <>
                     <div
                         role="button"
-                        className={`${
-                            styles.btn
-                        } sm:hidden outline-none ${mIsOpen && styles.active}`}
+                        className={`${styles.btn} sm:hidden outline-none ${
+                            mIsOpen && styles.active
+                        }`}
                         onClick={() => setMIsOpen(true)}
                     >
                         <ICSocial className="inline-block w-4 h-4 md:mr-2" />
@@ -156,27 +159,26 @@ function SocialMenu() {
                                 <div className="grid grid-cols-2 gap-4">
                                     {SOCIALS.map(({ image, name, url }) => {
                                         return (
-                                            <Link key={name} href={url}>
-                                                <a
-                                                    href={url}
-                                                    target="_blank"
-                                                    rel="noreferrer"
-                                                >
-                                                    <div className="bg-ash-dark-400 px-6 h-12 flex items-center text-xs font-bold text-white">
-                                                        <span className="flex-shrink-0 rounded">
-                                                            <Image
-                                                                src={image}
-                                                                alt={name}
-                                                                width={20}
-                                                                height={20}
-                                                            />
-                                                        </span>
-                                                        <span className="capitalize ml-3.5 truncate">
-                                                            {name}
-                                                        </span>
-                                                    </div>
-                                                </a>
-                                            </Link>
+                                            <HeadlessLink
+                                                key={name}
+                                                href={url}
+                                                target="_blank"
+                                                rel="noreferrer"
+                                            >
+                                                <div className="bg-ash-dark-400 px-6 h-12 flex items-center text-xs font-bold text-white">
+                                                    <span className="flex-shrink-0 rounded">
+                                                        <Image
+                                                            src={image}
+                                                            alt={name}
+                                                            width={20}
+                                                            height={20}
+                                                        />
+                                                    </span>
+                                                    <span className="capitalize ml-3.5 truncate">
+                                                        {name}
+                                                    </span>
+                                                </div>
+                                            </HeadlessLink>
                                         );
                                     })}
                                 </div>
