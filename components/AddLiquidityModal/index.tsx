@@ -611,9 +611,12 @@ const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
                             text={
                                 <span>
                                     I verify that I have read the{" "}
-                                    <b>
+                                    <a href="https://docs.ashswap.io/guides/add-remove-liquidity" target="_blank" rel="noreferrer">
+                                    <b className="text-white">
                                         <u>AshSwap Pools Guide</u>
-                                    </b>{" "}
+                                    </b>
+                                    </a>
+                                    {" "}
                                     and understand the risks of providing
                                     liquidity, including impermanent loss.
                                 </span>
