@@ -43,7 +43,7 @@ interface Props {
 
 const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
     const [liquidity, setLiquidity] = useState<BigNumber>(new BigNumber(0));
-    const [totalUsd, setTotalUsd] = useState<string>("");
+    const [totalUsd, setTotalUsd] = useState<BigNumber>(new BigNumber(0));
     const [liquidityPercent, setLiquidityPercent] = useState<number>(0);
     const [value0, setValue0] = useState<string>("");
     const [value1, setValue1] = useState<string>("");
@@ -59,50 +59,42 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
         if (!valueUsd || !lpToken?.totalSupply) {
             return new BigNumber(0);
         }
-
         return valueUsd.div(lpTokens[pool.lpToken.id].totalSupply!.toString());
     }, [valueUsd, lpTokens, pool]);
 
-    // input $ => calculate how many LP tokens
+    // real LP
+    const shortOwnLP = useMemo(() => {
+        return toEGLD(pool.lpToken, ownLiquidity.toString());
+    }, [pool.lpToken, ownLiquidity]);
+
+    // verify input $ and set the new valid $ value
+    const setValidTotalUsd = useCallback((val: BigNumber) => {
+        const validVal = val.div(pricePerLP).div(shortOwnLP).gte(0.998) ? shortOwnLP.multipliedBy(pricePerLP) : val;
+        setTotalUsd(validVal);
+    }, [pricePerLP, shortOwnLP]);
+
+    // re-validate totalUSD on pricePerLP, ownLp changes
     useEffect(() => {
-        if (totalUsd === "") {
-            return;
-        }
+        setTotalUsd(val => val.div(pricePerLP).div(shortOwnLP).gte(0.998) ? shortOwnLP.multipliedBy(pricePerLP) : val);
+    }, [pricePerLP, shortOwnLP])
 
-        let lp = new BigNumber(totalUsd).div(pricePerLP);
-        lp = toWei(pool.lpToken, lp.toString());
-
-        setLiquidity(lp);
-    }, [totalUsd, pool, pricePerLP]);
-
-    // update slider when input change
+    // calculate % LP tokens - source of truth: totalUsd
     useEffect(() => {
-        setLiquidityPercent(
-            liquidity
-                .multipliedBy(100)
-                .div(ownLiquidity)
-                .toNumber()
-        );
-    }, [ownLiquidity, liquidity]);
+        const pct = totalUsd.div(pricePerLP).div(shortOwnLP).multipliedBy(100).toNumber();
+        setLiquidityPercent(pct);
+    }, [pricePerLP, totalUsd, shortOwnLP]);
 
+    // only set liquidty base on liquidity percent - source of truth: liquidityPercent
+    useEffect(() => {
+        setLiquidity(new BigNumber(ownLiquidity.multipliedBy(liquidityPercent).div(100).toFixed(0)));
+    }, [ownLiquidity, liquidityPercent]);
+
+    // set liquidityPercent indirectly through totalUsd
     const onChangeLiquidityPercent = useCallback(
         (percent: number) => {
-            let liquidity = new BigNumber(
-                ownLiquidity
-                    .multipliedBy(percent)
-                    .div(100)
-                    .toFixed(0)
-            );
-
-            let shortLiquidity = toEGLD(pool.lpToken, liquidity.toString(10));
-
-            let totalUsd = shortLiquidity.multipliedBy(pricePerLP);
-
-            setTotalUsd(totalUsd.toFixed(5));
-            setLiquidity(liquidity);
-            setLiquidityPercent(percent);
+            setValidTotalUsd(shortOwnLP.multipliedBy(percent).div(100).multipliedBy(pricePerLP));
         },
-        [pricePerLP, ownLiquidity, pool.lpToken]
+        [pricePerLP, shortOwnLP, setValidTotalUsd]
     );
 
     useEffect(() => {
@@ -280,9 +272,9 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
                                         type="number"
                                         textAlign="right"
                                         textClassName="text-lg"
-                                        value={totalUsd}
+                                        value={totalUsd.toFixed(5)}
                                         onChange={e =>
-                                            setTotalUsd(e.target.value)
+                                            setValidTotalUsd(new BigNumber(e.target.value))
                                         }
                                         style={{ height: 72 }}
                                     />

@@ -71,7 +71,7 @@ const TokenInput = ({
                             {token.name}
                         </div>
                         <div className="text-text-input-3 text-xs truncate leading-tight">
-                            {tokenInPool}
+                            {tokenInPool}&nbsp;
                             in pool
                         </div>
                     </div>
