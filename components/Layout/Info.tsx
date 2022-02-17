@@ -16,7 +16,11 @@ import Link, { LinkProps } from "next/link";
 import { useRouter } from "next/router";
 import ImgLogo from "public/images/m-logo.png";
 import React, { useCallback, useState } from "react";
-
+type NavLinkProps = {
+    active: boolean;
+    name: string;
+    Icon: React.FunctionComponent<React.SVGAttributes<SVGElement>>;
+} & LinkProps;
 const SwitchThemeBtn = () => {
     const [dark, setDark] = useState(true);
     return (
@@ -24,7 +28,7 @@ const SwitchThemeBtn = () => {
             role="switch"
             aria-checked={dark}
             className="relative w-20 flex items-center mt-[1.125rem] mb-3"
-            onClick={() => setDark(val => !val)}
+            onClick={() => setDark((val) => !val)}
         >
             <svg
                 // width="80"
@@ -44,7 +48,7 @@ const SwitchThemeBtn = () => {
                     className="absolute w-full h-full rotate-45 bg-ash-purple-500"
                     style={{
                         boxShadow: "0px 4px 20px #7B61FF",
-                        opacity: dark ? "1" : "0"
+                        opacity: dark ? "1" : "0",
                     }}
                 ></div>
                 <ICMoon
@@ -58,7 +62,7 @@ const SwitchThemeBtn = () => {
                     className="absolute w-full h-full rotate-45 bg-ash-purple-500"
                     style={{
                         boxShadow: "0px 4px 20px #7B61FF",
-                        opacity: !dark ? "1" : "0"
+                        opacity: !dark ? "1" : "0",
                     }}
                 ></div>
                 <ICSun
@@ -70,23 +74,39 @@ const SwitchThemeBtn = () => {
         </button>
     );
 };
-const MNavLink = ({
-    active,
-    name,
-    Icon,
-    ...linkProps
-}: {
-    active: boolean;
-    name: string;
-    Icon: React.FunctionComponent<React.SVGAttributes<SVGElement>>;
-} & LinkProps) => {
+const NavLink = ({ active, name, Icon, ...linkProps }: NavLinkProps) => {
+    return (
+        <Link {...linkProps}>
+            <a>
+                <div className={`flex relative py-3 font-bold text-sm ${active ? 'text-white' : 'text-ash-gray-500'}`}>
+                    <Icon
+                        className={`inline w-5 h-5 mr-4 ${
+                            active ? "text-pink-600" : ""
+                        }`}
+                    />
+                    <span>{name}</span>
+                    <span
+                        className={`w-0.5 h-5 absolute right-0 ${
+                            active ? "bg-pink-600" : "bg-transparent"
+                        }`}
+                    ></span>
+                </div>
+            </a>
+        </Link>
+    );
+};
+const MNavLink = ({ active, name, Icon, ...linkProps }: NavLinkProps) => {
     return (
         <li className={`flex-1`}>
             <Link {...linkProps}>
                 <a>
                     <div
                         className={`h-[4.5rem] flex flex-col items-center justify-center text-center
-                                    ${active ? "text-white" : "text-ash-gray-500"}`}
+                                    ${
+                                        active
+                                            ? "text-white"
+                                            : "text-ash-gray-500"
+                                    }`}
                     >
                         <Icon
                             className={`w-5 h-5 mb-1 ${
@@ -125,47 +145,47 @@ function InfoLayout({ children }: any) {
                     <div className="flex-grow overflow-auto">
                         <ul>
                             <li>
-                                <Link href="/info">
-                                    <a>
-                                        <div className="flex relative text-white py-3 font-bold text-sm">
-                                            <ICHomeTrendUp className="inline text-pink-600 w-5 h-5 mr-4" />
-                                            <span>Overview</span>
-                                            <span className="w-0.5 h-5 bg-pink-600 absolute right-0"></span>
-                                        </div>
-                                    </a>
-                                </Link>
+                                <NavLink
+                                    href={{ pathname: "/info" }}
+                                    name="Overview"
+                                    Icon={ICHomeTrendUp}
+                                    active={isActive("/info", true)}
+                                />
                             </li>
                             <li>
-                                <Link href="/info/tokens">
-                                    <a>
-                                        <div className="flex relative text-ash-gray-500 py-3 font-bold text-sm">
-                                            <ICToken className="inline w-5 h-5 mr-4" />
-                                            <span>Tokens</span>
-                                            <span className="w-0.5 h-5 bg-transparent absolute right-0"></span>
-                                        </div>
-                                    </a>
-                                </Link>
+                                <NavLink
+                                    href="/info/tokens"
+                                    name="Tokens"
+                                    Icon={ICToken}
+                                    active={isActive("/info/tokens", true)}
+                                />
                             </li>
                             <li>
-                                <div className="flex relative text-ash-gray-500 py-3 font-bold text-sm">
-                                    <ICDrop className="inline w-5 h-5 mr-4" />
-                                    <span>Pool - Pairs</span>
-                                    <span className="w-0.5 h-5 bg-transparent absolute right-0"></span>
-                                </div>
+                                <NavLink
+                                    href="/info/pools"
+                                    name="Pools"
+                                    Icon={ICDrop}
+                                    active={isActive("/info/pools", true)}
+                                />
                             </li>
                             <li>
-                                <div className="flex relative text-ash-gray-500 py-3 font-bold text-sm">
-                                    <ICWallet className="inline w-5 h-5 mr-4" />
-                                    <span>User & Wallet</span>
-                                    <span className="w-0.5 h-5 bg-transparent absolute right-0"></span>
-                                </div>
+                                <NavLink
+                                    href="/info/wallet"
+                                    name="Wallets"
+                                    Icon={ICWallet}
+                                    active={isActive("/info/wallet", true)}
+                                />
                             </li>
                             <li>
-                                <div className="flex relative text-ash-gray-500 py-3 font-bold text-sm">
-                                    <ICRepeat className="inline w-5 h-5 mr-4" />
-                                    <span>Transaction & Fees</span>
-                                    <span className="w-0.5 h-5 bg-transparent absolute right-0"></span>
-                                </div>
+                                <NavLink
+                                    href="/info/transactions"
+                                    name="Trans"
+                                    Icon={ICRepeat}
+                                    active={isActive(
+                                        "/info/transactions",
+                                        true
+                                    )}
+                                />
                             </li>
                         </ul>
                     </div>
@@ -186,7 +206,7 @@ function InfoLayout({ children }: any) {
                     </div>
                 </aside>
                 <div className="flex-grow px-4 lg:px-9 lg:py-6 relative overflow-x-hidden ml-52 md:ml-60 mr-32">
-                    <div className="fixed top-6 right-[10.25rem] z-10">
+                    <div className="fixed top-6 right-[10.25rem] z-20">
                         <Input
                             backgroundClassName="bg-ash-dark-700/70 h-12 px-5"
                             className="text-white text-2xs"
@@ -221,7 +241,7 @@ function InfoLayout({ children }: any) {
     // mobile
     return (
         <div>
-            <header className="sticky top-0 left-0 right-0 z-10 w-full h-[4.5rem] flex items-center justify-between px-6 text-white bg-ash-dark-400">
+            <header className="sticky top-0 left-0 right-0 z-20 w-full h-[4.5rem] flex items-center justify-between px-6 text-white bg-ash-dark-400">
                 <div className="mr-5 flex-shrink-0">
                     <Image
                         src={ImgLogo}
@@ -253,7 +273,7 @@ function InfoLayout({ children }: any) {
                     </div>
                 </div>
             </header>
-            <div className="mb-[4.5rem]">{children}</div>
+            <div className="pb-[4.5rem]">{children}</div>
             <nav className="fixed bottom-0 left-0 right-0 w-full text-white bg-black/40 backdrop-filter backdrop-blur-xl">
                 <ul className="flex">
                     <MNavLink

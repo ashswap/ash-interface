@@ -20,7 +20,6 @@ function TokensPage() {
                     <FeeByTokensChart />
                     <h4 className="font-bold text-lg mb-7 text-white mt-[3.625rem]">Top Tokens</h4>
                     <TokenTable/>
-                    <div className="h-[2000px] w-full"></div>
                 </div>
             </div>
         </div>

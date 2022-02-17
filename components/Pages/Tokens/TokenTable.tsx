@@ -19,7 +19,7 @@ type TokenRecord = {
     volume: number;
 } & Partial<IToken>;
 const currencyFormater = new Intl.NumberFormat("en-US", {
-    maximumFractionDigits: 0,
+    maximumFractionDigits: 2,
 });
 const TokenRecord = ({
     active,
