@@ -157,7 +157,7 @@ function InfoLayout({ children }: any) {
                                     href="/info/tokens"
                                     name="Tokens"
                                     Icon={ICToken}
-                                    active={isActive("/info/tokens", true)}
+                                    active={isActive("/info/tokens", false)}
                                 />
                             </li>
                             <li>
@@ -165,7 +165,7 @@ function InfoLayout({ children }: any) {
                                     href="/info/pools"
                                     name="Pools"
                                     Icon={ICDrop}
-                                    active={isActive("/info/pools", true)}
+                                    active={isActive("/info/pools", false)}
                                 />
                             </li>
                             <li>
@@ -173,7 +173,7 @@ function InfoLayout({ children }: any) {
                                     href="/info/wallet"
                                     name="Wallets"
                                     Icon={ICWallet}
-                                    active={isActive("/info/wallet", true)}
+                                    active={isActive("/info/wallet", false)}
                                 />
                             </li>
                             <li>

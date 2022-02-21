@@ -119,7 +119,7 @@ const HistoryModal = ({ open, onClose }: Props) => {
                                             openTransaction(d.txHash)
                                         }
                                     >
-                                        <IconNewTab />
+                                        <IconNewTab className="text-white" />
                                     </div>
                                 </div>
                             );

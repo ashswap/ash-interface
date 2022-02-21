@@ -51,7 +51,7 @@ function AddressMenu() {
             <Menu.Item
                 key="1"
                 className={styles.addressMenuItem}
-                icon={<IconCopy />}
+                icon={<IconCopy className="text-ash-gray-500" />}
                 onClick={copyAddress}
             >
                 Copy address
@@ -141,7 +141,7 @@ function AddressMenu() {
                                     onClick={copyAddress}
                                 >
                                     <i className="mr-4">
-                                        <IconCopy className="h-7 w-7" />
+                                        <IconCopy className="h-7 w-7 text-ash-gray-500" />
                                     </i>
                                     <span>Copy address</span>
                                 </button>
