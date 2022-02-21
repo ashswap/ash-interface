@@ -6,147 +6,156 @@ import storage from "../../helper/storage";
 export type DispatchType = (action: ActionType) => void;
 
 export type ActionType =
-  | {
-      type: "login";
-      address: StateType["address"];
-      loginMethod: StateType["loginMethod"];
-    }
-  | { type: "ledgerLogin"; ledgerLogin: StateType["ledgerLogin"] }
-  | { type: "logout" }
-  | { type: "setProvider"; provider: StateType["dapp"]["provider"] }
-  | { type: "setAccount"; account: StateType["account"] }
-  | { type: "setAccountLoading"; accountLoading: StateType["accountLoading"] }
-  | { type: "setAccountError"; accountError: StateType["accountError"] }
-  | { type: "setAccountNonce"; nonce: number }
-  | { type: "setAccountShard"; shard: StateType["shard"] }
-  | { type: "setChainId"; chainId: StateType["chainId"] }
-  | { type: "setLedgerAccount"; ledgerAccount: StateType["ledgerAccount"] }
-  | {
-      type: "setWalletConnectLogin";
-      walletConnectLogin: StateType["walletConnectLogin"];
-    }
-  | {
-      type: "setTokenLogin";
-      tokenLogin: StateType["tokenLogin"];
-    };
+    | {
+          type: "login";
+          address: StateType["address"];
+          loginMethod: StateType["loginMethod"];
+      }
+    | { type: "ledgerLogin"; ledgerLogin: StateType["ledgerLogin"] }
+    | { type: "logout" }
+    | { type: "setProvider"; provider: StateType["dapp"]["provider"] }
+    | { type: "setAccount"; account: StateType["account"] }
+    | { type: "setAccountLoading"; accountLoading: StateType["accountLoading"] }
+    | { type: "setAccountError"; accountError: StateType["accountError"] }
+    | { type: "setAccountNonce"; nonce: number }
+    | { type: "setAccountShard"; shard: StateType["shard"] }
+    | { type: "setChainId"; chainId: StateType["chainId"] }
+    | { type: "setLedgerAccount"; ledgerAccount: StateType["ledgerAccount"] }
+    | {
+          type: "setWalletConnectLogin";
+          walletConnectLogin: StateType["walletConnectLogin"];
+      }
+    | {
+          type: "setTokenLogin";
+          tokenLogin: StateType["tokenLogin"];
+      };
 
 export function reducer(state: StateType, action: ActionType): StateType {
-  const in1hour = moment().add(1, "hours").unix();
-  const in1day = moment().add(1, "day").unix();
-  switch (action.type) {
-    case "login": {
-      storage.local.removeItem("nonce");
-      const { address, loginMethod } = action;
-      let loggedIn = address || address !== "" ? true : false;
-      storage.local.setItem({
-        key: "loginMethod",
-        data: loginMethod,
-        expires: in1day,
-      });
-      storage.local.setItem({
-        key: "address",
-        data: address,
-        expires: in1day,
-      });
-      return {
-        ...state,
-        address,
-        loggedIn,
-        loginMethod,
-      };
-    }
-    case "ledgerLogin": {
-      storage.local.removeItem("nonce");
-      if (action.ledgerLogin) {
-        storage.local.setItem({
-          key: "ledgerLogin",
-          data: action.ledgerLogin,
-          expires: in1day,
-        });
-      }
-      return { ...state, ledgerLogin: action.ledgerLogin };
-    }
+    const in1hour = moment()
+        .add(1, "hours")
+        .unix();
+    const in1day = moment()
+        .add(1, "day")
+        .unix();
+    switch (action.type) {
+        case "login": {
+            storage.local.removeItem("nonce");
+            const { address, loginMethod } = action;
+            let loggedIn = address ? true : false;
 
-    case "setProvider": {
-      return {
-        ...state,
-        dapp: { ...state.dapp, provider: action.provider },
-      };
-    }
+            storage.local.setItem({
+                key: "loginMethod",
+                data: loginMethod,
+                expires: in1day
+            });
+            storage.local.setItem({
+                key: "address",
+                data: address,
+                expires: in1day
+            });
+            return {
+                ...state,
+                address,
+                loggedIn,
+                loginMethod
+            };
+        }
+        case "ledgerLogin": {
+            storage.local.removeItem("nonce");
+            if (action.ledgerLogin) {
+                storage.local.setItem({
+                    key: "ledgerLogin",
+                    data: action.ledgerLogin,
+                    expires: in1day
+                });
+            }
+            return { ...state, ledgerLogin: action.ledgerLogin };
+        }
 
-    case "setAccount": {
-      return { ...state, account: action.account };
-    }
+        case "setProvider": {
+            return {
+                ...state,
+                dapp: { ...state.dapp, provider: action.provider }
+            };
+        }
 
-    case "setAccountLoading": {
-      return { ...state, accountLoading: action.accountLoading };
-    }
+        case "setAccount": {
+            return { ...state, account: action.account };
+        }
 
-    case "setAccountError": {
-      return { ...state, accountError: action.accountError };
-    }
+        case "setAccountLoading": {
+            return { ...state, accountLoading: action.accountLoading };
+        }
 
-    case "setAccountNonce": {
-      return {
-        ...state,
-        account: {
-          ...state.account,
-          nonce: new Nonce(action.nonce),
-        },
-      };
-    }
+        case "setAccountError": {
+            return { ...state, accountError: action.accountError };
+        }
 
-    case "setAccountShard": {
-      return {
-        ...state,
-        shard: action.shard,
-      };
-    }
+        case "setAccountNonce": {
+            return {
+                ...state,
+                account: {
+                    ...state.account,
+                    nonce: new Nonce(action.nonce)
+                }
+            };
+        }
 
-    case "setChainId": {
-      return { ...state, chainId: action.chainId };
-    }
+        case "setAccountShard": {
+            return {
+                ...state,
+                shard: action.shard
+            };
+        }
 
-    case "setLedgerAccount": {
-      return { ...state, ledgerAccount: action.ledgerAccount };
-    }
+        case "setChainId": {
+            return { ...state, chainId: action.chainId };
+        }
 
-    case "setWalletConnectLogin": {
-      if (action.walletConnectLogin) {
-        storage.session.setItem({
-          key: "walletConnectLogin",
-          data: action.walletConnectLogin,
-          expires: in1hour,
-        });
-      }
-      return { ...state, walletConnectLogin: action.walletConnectLogin };
-    }
+        case "setLedgerAccount": {
+            return { ...state, ledgerAccount: action.ledgerAccount };
+        }
 
-    case "setTokenLogin": {
-      if (action.tokenLogin) {
-        storage.session.setItem({
-          key: "tokenLogin",
-          data: action.tokenLogin,
-          expires: in1hour,
-        });
-      }
-      return { ...state, tokenLogin: action.tokenLogin };
-    }
+        case "setWalletConnectLogin": {
+            if (action.walletConnectLogin) {
+                storage.session.setItem({
+                    key: "walletConnectLogin",
+                    data: action.walletConnectLogin,
+                    expires: in1hour
+                });
+            }
+            return { ...state, walletConnectLogin: action.walletConnectLogin };
+        }
 
-    case "logout": {
-      const { network, walletConnectBridge, walletConnectDeepLink } = state;
-      const initialState = createInitialState({
-        network,
-        walletConnectBridge,
-        walletConnectDeepLink,
-      });
-      return initialState;
-    }
+        case "setTokenLogin": {
+            if (action.tokenLogin) {
+                storage.session.setItem({
+                    key: "tokenLogin",
+                    data: action.tokenLogin,
+                    expires: in1hour
+                });
+            }
+            return { ...state, tokenLogin: action.tokenLogin };
+        }
 
-    default: {
-      throw new Error(
-        `Unhandled action type: ${action ? (action as any).type : ""}`
-      );
+        case "logout": {
+            const {
+                network,
+                walletConnectBridge,
+                walletConnectDeepLink
+            } = state;
+            const initialState = createInitialState({
+                network,
+                walletConnectBridge,
+                walletConnectDeepLink
+            });
+            return initialState;
+        }
+
+        default: {
+            throw new Error(
+                `Unhandled action type: ${action ? (action as any).type : ""}`
+            );
+        }
     }
-  }
 }
