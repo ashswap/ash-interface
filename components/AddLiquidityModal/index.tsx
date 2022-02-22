@@ -9,7 +9,7 @@ import {
     Query,
     TokenIdentifierValue,
     TypeExpressionParser,
-    TypeMapper
+    TypeMapper,
 } from "@elrondnetwork/erdjs";
 import { notification } from "antd";
 import IconNewTab from "assets/svg/new-tab-green.svg";
@@ -18,9 +18,9 @@ import BigNumber from "bignumber.js";
 import Button from "components/Button";
 import Checkbox from "components/Checkbox";
 import HeadlessModal, {
-    HeadlessModalDefaultHeader
+    HeadlessModalDefaultHeader,
 } from "components/HeadlessModal";
-import Input from "components/Input";
+import InputCurrency from "components/InputCurrency";
 import { usePool } from "components/ListPoolItem";
 import Switch from "components/Switch";
 import { gasLimit, network } from "const/network";
@@ -55,7 +55,7 @@ const TokenInput = ({
     isInsufficentFund,
     onChangeValue,
     balance,
-    tokenInPool
+    tokenInPool,
 }: TokenInputProps) => {
     return (
         <>
@@ -71,8 +71,7 @@ const TokenInput = ({
                             {token.name}
                         </div>
                         <div className="text-text-input-3 text-xs truncate leading-tight">
-                            {tokenInPool}&nbsp;
-                            in pool
+                            {tokenInPool}&nbsp; in pool
                         </div>
                     </div>
                     <div className="block sm:hidden text-xs font-bold text-white">
@@ -80,21 +79,16 @@ const TokenInput = ({
                     </div>
                 </div>
 
-                <Input
-                    className="flex-1 overflow-hidden"
-                    backgroundClassName="bg-ash-dark-700"
-                    textColorClassName="text-white"
+                <InputCurrency
+                    className="flex-1 overflow-hidden bg-ash-dark-700 text-white text-right text-lg outline-none px-5 h-12"
                     placeholder="0"
-                    type="number"
-                    textAlign="right"
-                    textClassName="text-lg"
                     value={value}
                     style={{
                         border: isInsufficentFund
                             ? `1px solid ${theme.extend.colors["insufficent-fund"]}`
-                            : ""
+                            : "",
                     }}
-                    onChange={e => onChangeValue(e.target.value)}
+                    onChange={(e) => onChangeValue(e.target.value)}
                 />
             </div>
             <div
@@ -172,8 +166,8 @@ const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
 
                     new TokenIdentifierValue(Buffer.from("addLiquidity")),
                     new BigUIntValue(toWei(pool.tokens[0], value0)),
-                    new BigUIntValue(toWei(pool.tokens[1], value1))
-                ]
+                    new BigUIntValue(toWei(pool.tokens[1], value1)),
+                ],
             });
 
             fetchBalances();
@@ -189,7 +183,7 @@ const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
                             "/transactions/" +
                             tx.toString(),
                         "_blank"
-                    )
+                    ),
             });
             setTimeout(() => {
                 notification.close(key);
@@ -227,8 +221,8 @@ const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
                             new BigNumber(10).exponentiatedBy(
                                 pool!.tokens[0].decimals
                             )
-                        )
-                    ]
+                        ),
+                    ],
                 })
             ),
             dapp.dapp.proxy.queryContract(
@@ -246,12 +240,12 @@ const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
                             new BigNumber(10).exponentiatedBy(
                                 pool!.tokens[1].decimals
                             )
-                        )
-                    ]
+                        ),
+                    ],
                 })
-            )
-        ]).then(results => {
-            let rates = results.slice(0, 2).map(result => {
+            ),
+        ]).then((results) => {
+            let rates = results.slice(0, 2).map((result) => {
                 let resultHex = Buffer.from(
                     result.returnData[0],
                     "base64"
@@ -264,7 +258,7 @@ const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
                 let mappedType = mapper.mapType(type);
 
                 let endpointDefinitions = [
-                    new EndpointParameterDefinition("foo", "bar", mappedType)
+                    new EndpointParameterDefinition("foo", "bar", mappedType),
                 ];
                 let values = serializer.stringToValues(
                     resultHex,
@@ -414,7 +408,7 @@ const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
         tokenPrices,
         poolContext.tokenBalances,
         value0Debounce,
-        value1Debounce
+        value1Debounce,
     ]);
 
     return (
@@ -482,7 +476,7 @@ const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
                                         poolContext.value0.toString()
                                     ).toFixed(2)}
                                     value={value0}
-                                    onChangeValue={val => onChangeValue0(val)}
+                                    onChangeValue={(val) => onChangeValue0(val)}
                                     isInsufficentFund={isInsufficentFund0}
                                     balance={balance0}
                                 />
@@ -495,7 +489,7 @@ const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
                                         poolContext.value1.toString()
                                     ).toFixed(2)}
                                     value={value1}
-                                    onChangeValue={val => onChangeValue1(val)}
+                                    onChangeValue={(val) => onChangeValue1(val)}
                                     isInsufficentFund={isInsufficentFund1}
                                     balance={balance1}
                                 />
@@ -506,17 +500,11 @@ const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
                                     <IconRight className="mr-4" />
                                     <span>TOTAL</span>
                                 </div>
-                                <Input
-                                    className="flex-1 overflow-hidden"
-                                    backgroundClassName="bg-ash-dark-700"
-                                    textColorClassName="text-input-3"
+                                <InputCurrency
+                                    className="flex-1 overflow-hidden bg-ash-dark-700 text-right text-lg h-[4.5rem] px-5 outline-none"
                                     placeholder="0"
-                                    type="number"
-                                    textAlign="right"
-                                    textClassName="text-lg"
                                     value={liquidity}
                                     disabled
-                                    style={{ height: 72 }}
                                 />
                             </div>
 
@@ -540,8 +528,9 @@ const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
                                     }`}
                                 >
                                     <div
-                                        className={`w-6/12 ${isProMode &&
-                                            "sm:w-8/12"}`}
+                                        className={`w-6/12 ${
+                                            isProMode && "sm:w-8/12"
+                                        }`}
                                     >
                                         <div className="mb-2">
                                             Earn per month
@@ -549,8 +538,9 @@ const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
                                         <div>-</div>
                                     </div>
                                     <div
-                                        className={`w-6/12 ${isProMode &&
-                                            "sm:w-4/12"}`}
+                                        className={`w-6/12 ${
+                                            isProMode && "sm:w-4/12"
+                                        }`}
                                     >
                                         <div className="mb-2">Farm per day</div>
                                         <div>-</div>
@@ -568,7 +558,7 @@ const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
                                             <div>
                                                 <ul
                                                     style={{
-                                                        listStyle: "disc"
+                                                        listStyle: "disc",
                                                     }}
                                                 >
                                                     <li className="mb-2">
@@ -611,12 +601,15 @@ const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
                             text={
                                 <span>
                                     I verify that I have read the{" "}
-                                    <a href="https://docs.ashswap.io/guides/add-remove-liquidity" target="_blank" rel="noreferrer">
-                                    <b className="text-white">
-                                        <u>AshSwap Pools Guide</u>
-                                    </b>
-                                    </a>
-                                    {" "}
+                                    <a
+                                        href="https://docs.ashswap.io/guides/add-remove-liquidity"
+                                        target="_blank"
+                                        rel="noreferrer"
+                                    >
+                                        <b className="text-white">
+                                            <u>AshSwap Pools Guide</u>
+                                        </b>
+                                    </a>{" "}
                                     and understand the risks of providing
                                     liquidity, including impermanent loss.
                                 </span>

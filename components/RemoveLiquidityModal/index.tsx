@@ -1,14 +1,9 @@
 import {
     Address,
-    ArgSerializer,
     BigUIntValue,
     ContractFunction,
-    EndpointParameterDefinition,
     GasLimit,
-    Query,
     TokenIdentifierValue,
-    TypeExpressionParser,
-    TypeMapper
 } from "@elrondnetwork/erdjs";
 import { notification, Slider } from "antd";
 import ICArrowBottomRight from "assets/svg/arrow-bottom-right.svg";
@@ -17,9 +12,9 @@ import IconRight from "assets/svg/right-yellow.svg";
 import BigNumber from "bignumber.js";
 import Button from "components/Button";
 import HeadlessModal, {
-    HeadlessModalDefaultHeader
+    HeadlessModalDefaultHeader,
 } from "components/HeadlessModal";
-import Input from "components/Input";
+import InputCurrency from "components/InputCurrency";
 import { usePool } from "components/ListPoolItem";
 import Token from "components/Token";
 import { gasLimit, network } from "const/network";
@@ -68,31 +63,53 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
     }, [pool.lpToken, ownLiquidity]);
 
     // verify input $ and set the new valid $ value
-    const setValidTotalUsd = useCallback((val: BigNumber) => {
-        const validVal = val.div(pricePerLP).div(shortOwnLP).gte(0.998) ? shortOwnLP.multipliedBy(pricePerLP) : val;
-        setTotalUsd(validVal);
-    }, [pricePerLP, shortOwnLP]);
+    const setValidTotalUsd = useCallback(
+        (val: BigNumber) => {
+            const validVal = val.div(pricePerLP).div(shortOwnLP).gte(0.998)
+                ? shortOwnLP.multipliedBy(pricePerLP)
+                : val;
+            setTotalUsd(validVal);
+        },
+        [pricePerLP, shortOwnLP]
+    );
 
     // re-validate totalUSD on pricePerLP, ownLp changes
     useEffect(() => {
-        setTotalUsd(val => val.div(pricePerLP).div(shortOwnLP).gte(0.998) ? shortOwnLP.multipliedBy(pricePerLP) : val);
-    }, [pricePerLP, shortOwnLP])
+        setTotalUsd((val) =>
+            val.div(pricePerLP).div(shortOwnLP).gte(0.998)
+                ? shortOwnLP.multipliedBy(pricePerLP)
+                : val
+        );
+    }, [pricePerLP, shortOwnLP]);
 
     // calculate % LP tokens - source of truth: totalUsd
     useEffect(() => {
-        const pct = totalUsd.div(pricePerLP).div(shortOwnLP).multipliedBy(100).toNumber();
+        const pct = totalUsd
+            .div(pricePerLP)
+            .div(shortOwnLP)
+            .multipliedBy(100)
+            .toNumber();
         setLiquidityPercent(pct);
     }, [pricePerLP, totalUsd, shortOwnLP]);
 
     // only set liquidty base on liquidity percent - source of truth: liquidityPercent
     useEffect(() => {
-        setLiquidity(new BigNumber(ownLiquidity.multipliedBy(liquidityPercent).div(100).toFixed(0)));
+        setLiquidity(
+            new BigNumber(
+                ownLiquidity.multipliedBy(liquidityPercent).div(100).toFixed(0)
+            )
+        );
     }, [ownLiquidity, liquidityPercent]);
 
     // set liquidityPercent indirectly through totalUsd
     const onChangeLiquidityPercent = useCallback(
         (percent: number) => {
-            setValidTotalUsd(shortOwnLP.multipliedBy(percent).div(100).multipliedBy(pricePerLP));
+            setValidTotalUsd(
+                shortOwnLP
+                    .multipliedBy(percent)
+                    .div(100)
+                    .multipliedBy(pricePerLP)
+            );
         },
         [pricePerLP, shortOwnLP, setValidTotalUsd]
     );
@@ -172,8 +189,8 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
                                 .multipliedBy(1 - slippage)
                                 .toFixed(0)
                         )
-                    )
-                ]
+                    ),
+                ],
             });
 
             fetchBalances();
@@ -189,7 +206,7 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
                             "/transactions/" +
                             tx.toString(),
                         "_blank"
-                    )
+                    ),
             });
             setTimeout(() => {
                 notification.close(key);
@@ -209,7 +226,7 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
         onClose,
         callContract,
         fetchBalances,
-        liquidity
+        liquidity,
     ]);
 
     return (
@@ -243,7 +260,7 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
                             <div
                                 className={styles.tokenIcon}
                                 style={{
-                                    marginLeft: "-3px"
+                                    marginLeft: "-3px",
                                 }}
                             >
                                 <Image
@@ -264,19 +281,15 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
                                         <IconRight className="mr-4" />
                                         <span>TOTAL</span>
                                     </div>
-                                    <Input
-                                        className="flex-1 overflow-hidden"
-                                        backgroundClassName="bg-ash-dark-700"
-                                        textColorClassName="text-input-3"
+                                    <InputCurrency
+                                        className="flex-1 overflow-hidden bg-ash-dark-700 text-right text-lg h-[4.5rem] px-5 outline-none"
                                         placeholder="0"
-                                        type="number"
-                                        textAlign="right"
-                                        textClassName="text-lg"
                                         value={totalUsd.toFixed(5)}
-                                        onChange={e =>
-                                            setValidTotalUsd(new BigNumber(e.target.value))
+                                        onChange={(e) =>
+                                            setValidTotalUsd(
+                                                new BigNumber(e.target.value)
+                                            )
                                         }
-                                        style={{ height: 72 }}
                                     />
                                 </div>
                                 <div className="flex flex-row items-center">
@@ -291,7 +304,7 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
                                                 25: "",
                                                 50: "",
                                                 75: "",
-                                                100: ""
+                                                100: "",
                                             }}
                                             handleStyle={{
                                                 backgroundColor: "#191629",
@@ -301,12 +314,12 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
                                                     theme.extend.colors.slider
                                                         .track,
                                                 width: 7,
-                                                height: 7
+                                                height: 7,
                                             }}
                                             min={0}
                                             max={100}
                                             value={liquidityPercent}
-                                            onChange={e =>
+                                            onChange={(e) =>
                                                 onChangeLiquidityPercent(e)
                                             }
                                         />
@@ -320,14 +333,9 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
                                             token={pool.tokens[0]}
                                             className="w-24 border-r border-r-ash-gray-500 sm:border-r-0"
                                         />
-                                        <Input
-                                            className="flex-1 overflow-hidden"
-                                            backgroundClassName="bg-ash-dark-700"
-                                            textColorClassName="text-input-3"
+                                        <InputCurrency
+                                            className="flex-1 overflow-hidden bg-ash-dark-700 text-right text-lg h-12 px-5 outline-none"
                                             placeholder="0"
-                                            type="number"
-                                            textAlign="right"
-                                            textClassName="text-lg"
                                             value={value0}
                                             disabled
                                         />
@@ -361,14 +369,9 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
                                             token={pool.tokens[1]}
                                             className="w-24 border-r border-r-ash-gray-500 sm:border-r-0"
                                         />
-                                        <Input
-                                            className="flex-1 overflow-hidden"
-                                            backgroundClassName="bg-ash-dark-700"
-                                            textColorClassName="text-input-3"
+                                        <InputCurrency
+                                            className="flex-1 overflow-hidden bg-ash-dark-700 text-right text-lg h-12 px-5 outline-none"
                                             placeholder="0"
-                                            type="number"
-                                            textAlign="right"
-                                            textClassName="text-lg"
                                             value={value1}
                                             disabled
                                         />
