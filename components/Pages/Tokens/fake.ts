@@ -1,5 +1,3 @@
-import { TOKENS } from "const/tokens";
-
 export const FakeTokenTable = [
     {
         id: "BTC-2ffd41",
@@ -46,4 +44,57 @@ export const FakeTokenTable = [
         price: 1.001,
         volume: 163525.3033665001,
     },
-]
+];
+
+export const FakeTokenTable2 = [
+    {
+        change_percentage_day: 0.13469,
+        change_percentage_hour: 0.02258,
+        change_percentage_week: 0.23043,
+        liquidity: 1002560705806385.2,
+        price: 1.002,
+        token_id: "USDT-c338e7",
+        transaction_count: 2859,
+        volume: 563877,
+    },
+    {
+        change_percentage_day: 3.0286,
+        change_percentage_hour: -0.25602,
+        change_percentage_week: -12.6318,
+        liquidity: 77870693958365331000,
+        price: 38925,
+        token_id: "WBTC-3a40c6",
+        transaction_count: 2805,
+        volume: 17701955218,
+    },
+    {
+        change_percentage_day: 0.02764,
+        change_percentage_hour: -0.00251,
+        change_percentage_week: 0.11607,
+        liquidity: 4004770582545615.5,
+        price: 1.001,
+        token_id: "USDC-8faa2a",
+        transaction_count: 5388,
+        volume: 980750.0,
+    },
+    {
+        change_percentage_day: 2.87938,
+        change_percentage_hour: -0.24907,
+        change_percentage_week: -12.62523,
+        liquidity: 7.791469747864383e19,
+        price: 38947,
+        token_id: "BTC-2ffd41",
+        transaction_count: 2805,
+        volume: 17701955218.0,
+    },
+    {
+        change_percentage_day: 0.02764,
+        change_percentage_hour: -0.00251,
+        change_percentage_week: 0.11607,
+        liquidity: 1001446339175953.5,
+        price: 1.001,
+        token_id: "WUSDC-e789ff",
+        transaction_count: 2529,
+        volume: 416873.0,
+    },
+];

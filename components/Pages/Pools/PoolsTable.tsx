@@ -3,7 +3,7 @@ import ICArrowLeft from "assets/svg/arrow-left.svg";
 import ICArrowRight from "assets/svg/arrow-right.svg";
 import ICStar from "assets/svg/star.svg";
 import pools from "const/pool";
-import { abbreviateNumber } from "helper/number";
+import { abbreviateCurrency } from "helper/number";
 import { useScreenSize } from "hooks/useScreenSize";
 import IPool from "interface/pool";
 import Image from "next/image";
@@ -34,7 +34,7 @@ const PoolRecord = ({
             if (screenSize.xl) {
                 return currencyFormater.format(val);
             }
-            return abbreviateNumber(val).toString().toUpperCase();
+            return abbreviateCurrency(val).toString().toUpperCase();
         },
         [screenSize]
     );

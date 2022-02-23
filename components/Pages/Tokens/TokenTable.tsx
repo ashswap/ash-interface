@@ -2,26 +2,30 @@ import ICArrowLeft from "assets/svg/arrow-left.svg";
 import ICArrowRight from "assets/svg/arrow-right.svg";
 import ICStarOutline from "assets/svg/star-outline.svg";
 import ICStar from "assets/svg/star.svg";
+import { ENVIRONMENT } from "const/env";
 import { TOKENS } from "const/tokens";
-import { abbreviateNumber } from "helper/number";
+import { fetcher } from "helper/common";
+import { abbreviateCurrency, currencyFormater } from "helper/number";
 import { useScreenSize } from "hooks/useScreenSize";
 import { IToken } from "interface/token";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useCallback, useMemo, useState } from "react";
-import { FakeTokenTable } from "./fake";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import useSWR from "swr";
+import { FakeTokenTable2 } from "./fake";
 type TokenRecord = {
-    id: string;
-    "1h": number;
-    "24h": number;
-    "7d": number;
+    change_percentage_day: number;
+    change_percentage_hour: number;
+    change_percentage_week: number;
     liquidity: number;
     price: number;
+    token_id: string;
+    transaction_count: number;
     volume: number;
-} & Partial<IToken>;
-const currencyFormater = new Intl.NumberFormat("en-US", {
-    maximumFractionDigits: 2,
-});
+    // added from client
+    token?: IToken;
+};
+
 const TokenRecord = ({
     active,
     order,
@@ -38,7 +42,7 @@ const TokenRecord = ({
             if (screenSize.xl) {
                 return currencyFormater.format(val);
             }
-            return abbreviateNumber(val).toString().toUpperCase();
+            return abbreviateCurrency(val).toString().toUpperCase();
         },
         [screenSize]
     );
@@ -52,7 +56,7 @@ const TokenRecord = ({
         return format(tokenData.price);
     }, [format, tokenData]);
     return (
-        <Link href={`/info/tokens/${tokenData?.id}`}>
+        <Link href={`/info/tokens/${tokenData?.token_id}`}>
             <a>
                 <div className="flex items-center bg-ash-dark-600 hover:bg-ash-dark-700 px-4 lg:px-[1.625rem] text-ash-gray-500 space-x-2 text-xs h-14 overflow-hidden">
                     <div
@@ -72,17 +76,17 @@ const TokenRecord = ({
                     <div className="w-20 md:w-28 lg:w-44 flex items-center justify-between overflow-hidden">
                         <div className="flex items-center mr-2">
                             <Image
-                                src={tokenData.icon || ""}
+                                src={tokenData?.token?.icon || ""}
                                 alt="token"
                                 width={24}
                                 height={24}
                             />
                             <div className="ml-2.5 font-bold text-sm">
-                                {tokenData?.name}
+                                {tokenData?.token?.name}
                             </div>
                         </div>
                         <div className="hidden lg:block text-2xs text-ash-gray-500 truncate">
-                            {tokenData?.name} Coin
+                            {tokenData?.token?.name} Coin
                         </div>
                     </div>
                     <div className="flex-1 overflow-hidden text-right">
@@ -97,22 +101,24 @@ const TokenRecord = ({
                         <span className="text-ash-gray-500">$</span>
                         <span className="text-white">{price}</span>
                     </div>
-                    {[tokenData["1h"], tokenData["24h"], tokenData["7d"]].map(
-                        (val, index) => {
-                            return (
-                                <div
-                                    key={index}
-                                    className={`hidden xl:block w-14 text-right ${
-                                        val >= 0
-                                            ? "text-ash-green-500"
-                                            : "text-ash-purple-500"
-                                    }`}
-                                >
-                                    {val.toFixed(1)}%
-                                </div>
-                            );
-                        }
-                    )}
+                    {[
+                        tokenData.change_percentage_hour,
+                        tokenData.change_percentage_day,
+                        tokenData.change_percentage_week,
+                    ].map((val, index) => {
+                        return (
+                            <div
+                                key={index}
+                                className={`hidden xl:block w-14 text-right ${
+                                    val >= 0
+                                        ? "text-ash-green-500"
+                                        : "text-ash-purple-500"
+                                }`}
+                            >
+                                {val.toFixed(1)}%
+                            </div>
+                        );
+                    })}
                 </div>
             </a>
         </Link>
@@ -121,25 +127,32 @@ const TokenRecord = ({
 function TokenTable() {
     const [pageIndex, setPageIndex] = useState(0);
     const [pageSize, setPageSize] = useState(10);
-
+    const [sortBy, setSortBy] =
+        useState<keyof Omit<TokenRecord, "token" | "token_id">>("volume");
+    const { data } = useSWR(ENVIRONMENT.ASH_API + "/token", fetcher);
     const tokenRecords: TokenRecord[] = useMemo(() => {
-        return FakeTokenTable.map((val) => {
-            const token = TOKENS.find((t) => t.id === val.id);
-            const record: TokenRecord = { ...val, ...token };
+        return FakeTokenTable2.map((val) => {
+            const token = TOKENS.find((t) => t.id === val.token_id);
+            const record: TokenRecord = { ...val, token };
             return record;
         });
     }, []);
+    const displayTokenRecords: TokenRecord[] = useMemo(() => {
+        return [...tokenRecords].sort((x, y) => {
+            return y[sortBy] - x[sortBy];
+        });
+    }, [tokenRecords, sortBy]);
     const displayTokens: TokenRecord[][] = useMemo(() => {
-        const length = tokenRecords.length;
+        const length = displayTokenRecords.length;
         const nPage = Math.ceil(length / pageSize);
         const pagination: TokenRecord[][] = [];
         for (let i = 0; i < nPage; i++) {
             pagination.push(
-                tokenRecords.slice(i * pageSize, i * pageSize + pageSize)
+                displayTokenRecords.slice(i * pageSize, i * pageSize + pageSize)
             );
         }
         return pagination;
-    }, [tokenRecords, pageSize]);
+    }, [displayTokenRecords, pageSize]);
 
     return (
         <div>
@@ -148,29 +161,55 @@ function TokenTable() {
                     <div className="w-5 py-4"></div>
                     <div className="w-5 py-4">#</div>
                     <div className="w-20 md:w-28 lg:w-44 py-4">Token</div>
-                    <div className="flex-1 overflow-hidden text-right py-4">
+                    <div
+                        className={`flex-1 overflow-hidden text-right py-4 cursor-pointer ${
+                            sortBy === "volume" && "text-white"
+                        }`}
+                        onClick={() => setSortBy("volume")}
+                    >
                         Volume 24H
                     </div>
-                    <div className="flex-1 overflow-hidden text-right py-4">
+                    <div
+                        className={`flex-1 overflow-hidden text-right py-4 cursor-pointer ${
+                            sortBy === "liquidity" && "text-white"
+                        }`}
+                        onClick={() => setSortBy("liquidity")}
+                    >
                         Liquidity
                     </div>
-                    <div className="hidden md:block flex-1 overflow-hidden text-right py-4">
+                    <div
+                        className={`hidden md:block flex-1 overflow-hidden text-right py-4 cursor-pointer ${
+                            sortBy === "price" && "text-white"
+                        }`}
+                        onClick={() => setSortBy("price")}
+                    >
                         Price
                     </div>
-                    <div className="hidden xl:block w-14 text-right py-4">
+                    <div
+                        className={`hidden xl:block w-14 text-right py-4 cursor-pointer ${
+                            sortBy === "change_percentage_hour" && "text-white"
+                        }`}
+                        onClick={() => setSortBy("change_percentage_hour")}
+                    >
                         1H
                     </div>
-                    <div className="hidden xl:block w-14 text-right py-4">
+                    <div className={`hidden xl:block w-14 text-right py-4 cursor-pointer ${
+                            sortBy === "change_percentage_day" && "text-white"
+                        }`}
+                        onClick={() => setSortBy("change_percentage_day")}>
                         24H
                     </div>
-                    <div className="hidden xl:block w-14 text-right py-4">
+                    <div className={`hidden xl:block w-14 text-right py-4 cursor-pointer ${
+                            sortBy === "change_percentage_week" && "text-white"
+                        }`}
+                        onClick={() => setSortBy("change_percentage_week")}>
                         7D
                     </div>
                 </div>
                 {displayTokens[pageIndex].map((record, index) => {
                     return (
                         <TokenRecord
-                            key={record.id}
+                            key={record.token_id}
                             order={pageIndex * pageSize + index + 1}
                             tokenData={record}
                         />

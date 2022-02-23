@@ -3,7 +3,7 @@ import ICArrowBottomRight from "assets/svg/arrow-bottom-right.svg";
 
 
 
-import { abbreviateNumber } from "helper/number";
+import { abbreviateCurrency } from "helper/number";
 import { useScreenSize } from "hooks/useScreenSize";
 import { IToken } from "interface/token";
 import { ValueOf } from "interface/utilities";
@@ -97,7 +97,7 @@ function FeeByTokensChart() {
                             axisLine={false}
                             domain={["minData", (max: number) => max * 1.5]}
                             tickFormatter={(val) =>
-                                "$ " + abbreviateNumber(val).toString()
+                                "$ " + abbreviateCurrency(val).toString()
                             }
                             width={50}
                             tick={{ fontSize: "12px" }}

@@ -1,5 +1,8 @@
 const ABBR_SYMBOL = ['', 'k', 'M', 'B', 'T'] as const;
-export function abbreviateNumber(n: number, minPlus?: number): number | string {
+export const currencyFormater = new Intl.NumberFormat("en-US", {
+    maximumFractionDigits: 2,
+});
+export function abbreviateCurrency(n: number, minPlus?: number): number | string {
     if(n === 0) return n;
     if (minPlus !== undefined) {
         return n > minPlus ? `${minPlus}+` : n;
@@ -7,17 +10,16 @@ export function abbreviateNumber(n: number, minPlus?: number): number | string {
     // what tier? (determines SI symbol)
     const tier = Math.floor(Math.floor(Math.log10(Math.abs(n))) / 3);
 
-    // if zero, we don't need a suffix
-    if (tier === 0) return n;
-
     // get suffix and determine scale
-    const suffix = ABBR_SYMBOL[tier];
-    const scale = Math.pow(10, tier * 3);
+    const suffix = ABBR_SYMBOL[tier >= ABBR_SYMBOL.length ? ABBR_SYMBOL.length - 1 : tier];
+    const scale = Math.pow(10, Math.min(tier, ABBR_SYMBOL.length - 1) * 3);
 
     // scale the number
     const scaled = n / scale;
 
     // format number and add suffix
-    const fixed = scaled.toFixed(1);
-    return (fixed.endsWith('.0') ? fixed.substring(0, fixed.length - 2) : fixed) + suffix;
+    // const fixed = scaled.toFixed(1);
+
+    // return (fixed.endsWith('.0') ? fixed.substring(0, fixed.length - 2) : fixed) + suffix;
+    return currencyFormater.format(scaled) + suffix;
 }
