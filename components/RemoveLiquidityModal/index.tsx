@@ -1,9 +1,14 @@
 import {
     Address,
+    ArgSerializer,
     BigUIntValue,
     ContractFunction,
+    EndpointParameterDefinition,
     GasLimit,
+    Query,
     TokenIdentifierValue,
+    TypeExpressionParser,
+    TypeMapper,
 } from "@elrondnetwork/erdjs";
 import { notification, Slider } from "antd";
 import ICArrowBottomRight from "assets/svg/arrow-bottom-right.svg";
@@ -65,7 +70,10 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
     // verify input $ and set the new valid $ value
     const setValidTotalUsd = useCallback(
         (val: BigNumber) => {
-            const validVal = val.div(pricePerLP).div(shortOwnLP).gte(0.998)
+            const validVal = val
+                .div(pricePerLP)
+                .div(shortOwnLP)
+                .gte(0.998)
                 ? shortOwnLP.multipliedBy(pricePerLP)
                 : val;
             setTotalUsd(validVal);
@@ -75,8 +83,11 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
 
     // re-validate totalUSD on pricePerLP, ownLp changes
     useEffect(() => {
-        setTotalUsd((val) =>
-            val.div(pricePerLP).div(shortOwnLP).gte(0.998)
+        setTotalUsd(val =>
+            val
+                .div(pricePerLP)
+                .div(shortOwnLP)
+                .gte(0.998)
                 ? shortOwnLP.multipliedBy(pricePerLP)
                 : val
         );
@@ -96,7 +107,10 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
     useEffect(() => {
         setLiquidity(
             new BigNumber(
-                ownLiquidity.multipliedBy(liquidityPercent).div(100).toFixed(0)
+                ownLiquidity
+                    .multipliedBy(liquidityPercent)
+                    .div(100)
+                    .toFixed(0)
             )
         );
     }, [ownLiquidity, liquidityPercent]);
@@ -129,8 +143,8 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
                             new BigNumber(liquidityDebounce.toString())
                         ),
                         new BigUIntValue(new BigNumber(0)),
-                        new BigUIntValue(new BigNumber(0))
-                    ]
+                        new BigUIntValue(new BigNumber(0)),
+                    ],
                 })
             )
             .then(({ returnData }) => {
@@ -145,7 +159,7 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
                 let mappedType = mapper.mapType(type);
 
                 let endpointDefinitions = [
-                    new EndpointParameterDefinition("foo", "bar", mappedType)
+                    new EndpointParameterDefinition("foo", "bar", mappedType),
                 ];
                 let values = serializer.stringToValues(
                     resultHex,
@@ -285,7 +299,7 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
                                         className="flex-1 overflow-hidden bg-ash-dark-700 text-right text-lg h-[4.5rem] px-5 outline-none"
                                         placeholder="0"
                                         value={totalUsd.toFixed(5)}
-                                        onChange={(e) =>
+                                        onChange={e =>
                                             setValidTotalUsd(
                                                 new BigNumber(e.target.value)
                                             )
@@ -319,7 +333,7 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
                                             min={0}
                                             max={100}
                                             value={liquidityPercent}
-                                            onChange={(e) =>
+                                            onChange={e =>
                                                 onChangeLiquidityPercent(e)
                                             }
                                         />
