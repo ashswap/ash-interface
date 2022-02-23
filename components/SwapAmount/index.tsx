@@ -1,13 +1,14 @@
-import { useMemo, useEffect } from "react";
 import BigNumber from "bignumber.js";
+import InputCurrency from "components/InputCurrency";
 import QuickSelect from "components/QuickSelect";
 import TokenSelect from "components/TokenSelect";
 import pools from "const/pool";
+import { useSwap } from "context/swap";
 import { useWallet } from "context/wallet";
 import { IToken } from "interface/token";
-import styles from "./SwapAmount.module.css";
-import { useSwap } from "context/swap";
+import { useEffect, useMemo, useRef } from "react";
 import { theme } from "tailwind.config";
+import styles from "./SwapAmount.module.css";
 
 interface Props {
     topLeftCorner?: boolean;
@@ -20,6 +21,7 @@ interface Props {
 }
 
 const SwapAmount = (props: Props) => {
+    const inputRef = useRef<HTMLInputElement>(null);
     const { balances } = useWallet();
     const {
         isInsufficentFund,
@@ -31,7 +33,7 @@ const SwapAmount = (props: Props) => {
         valueFrom,
         valueTo,
         setValueFrom,
-        setValueTo
+        setValueTo,
     } = useSwap();
 
     const value = useMemo(() => {
@@ -80,15 +82,15 @@ const SwapAmount = (props: Props) => {
         }
 
         return pools.filter(
-            p => p.tokens.findIndex(t => t.id == poolWithToken?.id) !== -1
+            (p) => p.tokens.findIndex((t) => t.id == poolWithToken?.id) !== -1
         );
     }, [poolWithToken]);
 
     let suggestedTokens = useMemo(() => {
         let tokens: IToken[] = [];
 
-        validPools?.map(p => {
-            p.tokens.forEach(t => {
+        validPools?.map((p) => {
+            p.tokens.forEach((t) => {
                 if (t.id !== poolWithToken?.id) {
                     tokens.push(t);
                 }
@@ -151,9 +153,9 @@ const SwapAmount = (props: Props) => {
                     type={props.type}
                     resetPivotToken={props.resetPivotToken}
                 />
-                <input
+                <InputCurrency
+                    ref={inputRef}
                     className={`${styles.input} overflow-hidden`}
-                    type="number"
                     disabled={props.disableInput}
                     placeholder="0.00"
                     value={value}
@@ -161,9 +163,9 @@ const SwapAmount = (props: Props) => {
                         color:
                             props.type === "from" && isInsufficentFund
                                 ? theme.extend.colors["insufficent-fund"]
-                                : undefined
+                                : undefined,
                     }}
-                    onChange={e => onChangeValue(e.target.value)}
+                    onChange={(e) => onChangeValue(e.target.value)}
                 />
             </div>
             {props.showQuickSelect && (

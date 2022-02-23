@@ -1,4 +1,9 @@
-import { ChangeEvent, HTMLInputTypeAttribute, ReactElement, CSSProperties } from "react";
+import {
+    ChangeEvent,
+    CSSProperties,
+    HTMLInputTypeAttribute,
+    ReactElement,
+} from "react";
 import styles from "./Input.module.css";
 
 interface Props {
@@ -34,8 +39,9 @@ const Input = (props: Props) => {
             <input
                 className={`overflow-auto ${
                     styles.input
-                } text-${textAlign} text-${textColorClassName} placeholder-${textColorClassName} ${props.textClassName ||
-                    ""}`}
+                } text-${textAlign} text-${textColorClassName} placeholder-${textColorClassName} ${
+                    props.textClassName || ""
+                }`}
                 type={props.type || "text"}
                 placeholder={props.placeholder}
                 autoFocus={props.autoFocus}

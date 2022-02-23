@@ -5,9 +5,7 @@ import styles from "./Setting.module.css";
 import Input from "components/Input";
 import { useSwap } from "context/swap";
 
-interface Props {
-
-}
+interface Props {}
 
 const Setting = (props: Props) => {
     const { slippage, setSlippage } = useSwap();
@@ -45,6 +43,7 @@ const Setting = (props: Props) => {
                 onChange={e => {
                     setSlippage(parseFloat(e.target.value) / 100);
                 }}
+                value={(slippage * 100).toString()}
             />
             {slippage < 0.005 && (
                 <div className="text-insufficent-fund text-xs mt-12">

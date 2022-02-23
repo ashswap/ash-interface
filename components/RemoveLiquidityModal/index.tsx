@@ -8,7 +8,7 @@ import {
     Query,
     TokenIdentifierValue,
     TypeExpressionParser,
-    TypeMapper
+    TypeMapper,
 } from "@elrondnetwork/erdjs";
 import { notification, Slider } from "antd";
 import ICArrowBottomRight from "assets/svg/arrow-bottom-right.svg";
@@ -17,9 +17,9 @@ import IconRight from "assets/svg/right-yellow.svg";
 import BigNumber from "bignumber.js";
 import Button from "components/Button";
 import HeadlessModal, {
-    HeadlessModalDefaultHeader
+    HeadlessModalDefaultHeader,
 } from "components/HeadlessModal";
-import Input from "components/Input";
+import InputCurrency from "components/InputCurrency";
 import { usePool } from "components/ListPoolItem";
 import Token from "components/Token";
 import { gasLimit, network } from "const/network";
@@ -43,7 +43,7 @@ interface Props {
 
 const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
     const [liquidity, setLiquidity] = useState<BigNumber>(new BigNumber(0));
-    const [totalUsd, setTotalUsd] = useState<string>("");
+    const [totalUsd, setTotalUsd] = useState<BigNumber>(new BigNumber(0));
     const [liquidityPercent, setLiquidityPercent] = useState<number>(0);
     const [value0, setValue0] = useState<string>("");
     const [value1, setValue1] = useState<string>("");
@@ -59,50 +59,73 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
         if (!valueUsd || !lpToken?.totalSupply) {
             return new BigNumber(0);
         }
-
         return valueUsd.div(lpTokens[pool.lpToken.id].totalSupply!.toString());
     }, [valueUsd, lpTokens, pool]);
 
-    // input $ => calculate how many LP tokens
+    // real LP
+    const shortOwnLP = useMemo(() => {
+        return toEGLD(pool.lpToken, ownLiquidity.toString());
+    }, [pool.lpToken, ownLiquidity]);
+
+    // verify input $ and set the new valid $ value
+    const setValidTotalUsd = useCallback(
+        (val: BigNumber) => {
+            const validVal = val
+                .div(pricePerLP)
+                .div(shortOwnLP)
+                .gte(0.998)
+                ? shortOwnLP.multipliedBy(pricePerLP)
+                : val;
+            setTotalUsd(validVal);
+        },
+        [pricePerLP, shortOwnLP]
+    );
+
+    // re-validate totalUSD on pricePerLP, ownLp changes
     useEffect(() => {
-        if (totalUsd === "") {
-            return;
-        }
-
-        let lp = new BigNumber(totalUsd).div(pricePerLP);
-        lp = toWei(pool.lpToken, lp.toString());
-
-        setLiquidity(lp);
-    }, [totalUsd, pool, pricePerLP]);
-
-    // update slider when input change
-    useEffect(() => {
-        setLiquidityPercent(
-            liquidity
-                .multipliedBy(100)
-                .div(ownLiquidity)
-                .toNumber()
+        setTotalUsd(val =>
+            val
+                .div(pricePerLP)
+                .div(shortOwnLP)
+                .gte(0.998)
+                ? shortOwnLP.multipliedBy(pricePerLP)
+                : val
         );
-    }, [ownLiquidity, liquidity]);
+    }, [pricePerLP, shortOwnLP]);
 
-    const onChangeLiquidityPercent = useCallback(
-        (percent: number) => {
-            let liquidity = new BigNumber(
+    // calculate % LP tokens - source of truth: totalUsd
+    useEffect(() => {
+        const pct = totalUsd
+            .div(pricePerLP)
+            .div(shortOwnLP)
+            .multipliedBy(100)
+            .toNumber();
+        setLiquidityPercent(pct);
+    }, [pricePerLP, totalUsd, shortOwnLP]);
+
+    // only set liquidty base on liquidity percent - source of truth: liquidityPercent
+    useEffect(() => {
+        setLiquidity(
+            new BigNumber(
                 ownLiquidity
-                    .multipliedBy(percent)
+                    .multipliedBy(liquidityPercent)
                     .div(100)
                     .toFixed(0)
+            )
+        );
+    }, [ownLiquidity, liquidityPercent]);
+
+    // set liquidityPercent indirectly through totalUsd
+    const onChangeLiquidityPercent = useCallback(
+        (percent: number) => {
+            setValidTotalUsd(
+                shortOwnLP
+                    .multipliedBy(percent)
+                    .div(100)
+                    .multipliedBy(pricePerLP)
             );
-
-            let shortLiquidity = toEGLD(pool.lpToken, liquidity.toString(10));
-
-            let totalUsd = shortLiquidity.multipliedBy(pricePerLP);
-
-            setTotalUsd(totalUsd.toFixed(5));
-            setLiquidity(liquidity);
-            setLiquidityPercent(percent);
         },
-        [pricePerLP, ownLiquidity, pool.lpToken]
+        [pricePerLP, shortOwnLP, setValidTotalUsd]
     );
 
     useEffect(() => {
@@ -120,8 +143,8 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
                             new BigNumber(liquidityDebounce.toString())
                         ),
                         new BigUIntValue(new BigNumber(0)),
-                        new BigUIntValue(new BigNumber(0))
-                    ]
+                        new BigUIntValue(new BigNumber(0)),
+                    ],
                 })
             )
             .then(({ returnData }) => {
@@ -136,7 +159,7 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
                 let mappedType = mapper.mapType(type);
 
                 let endpointDefinitions = [
-                    new EndpointParameterDefinition("foo", "bar", mappedType)
+                    new EndpointParameterDefinition("foo", "bar", mappedType),
                 ];
                 let values = serializer.stringToValues(
                     resultHex,
@@ -180,8 +203,8 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
                                 .multipliedBy(1 - slippage)
                                 .toFixed(0)
                         )
-                    )
-                ]
+                    ),
+                ],
             });
 
             fetchBalances();
@@ -197,7 +220,7 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
                             "/transactions/" +
                             tx.toString(),
                         "_blank"
-                    )
+                    ),
             });
             setTimeout(() => {
                 notification.close(key);
@@ -217,7 +240,7 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
         onClose,
         callContract,
         fetchBalances,
-        liquidity
+        liquidity,
     ]);
 
     return (
@@ -251,7 +274,7 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
                             <div
                                 className={styles.tokenIcon}
                                 style={{
-                                    marginLeft: "-3px"
+                                    marginLeft: "-3px",
                                 }}
                             >
                                 <Image
@@ -272,19 +295,15 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
                                         <IconRight className="mr-4" />
                                         <span>TOTAL</span>
                                     </div>
-                                    <Input
-                                        className="flex-1 overflow-hidden h-12 px-5"
-                                        backgroundClassName="bg-ash-dark-700"
-                                        textColorClassName="text-input-3"
+                                    <InputCurrency
+                                        className="flex-1 overflow-hidden bg-ash-dark-700 text-right text-lg h-[4.5rem] px-5 outline-none"
                                         placeholder="0"
-                                        type="number"
-                                        textAlign="right"
-                                        textClassName="text-lg"
-                                        value={totalUsd}
+                                        value={totalUsd.toFixed(5)}
                                         onChange={e =>
-                                            setTotalUsd(e.target.value)
+                                            setValidTotalUsd(
+                                                new BigNumber(e.target.value)
+                                            )
                                         }
-                                        style={{ height: 72 }}
                                     />
                                 </div>
                                 <div className="flex flex-row items-center">
@@ -299,7 +318,7 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
                                                 25: "",
                                                 50: "",
                                                 75: "",
-                                                100: ""
+                                                100: "",
                                             }}
                                             handleStyle={{
                                                 backgroundColor: "#191629",
@@ -309,7 +328,7 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
                                                     theme.extend.colors.slider
                                                         .track,
                                                 width: 7,
-                                                height: 7
+                                                height: 7,
                                             }}
                                             min={0}
                                             max={100}
@@ -328,14 +347,9 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
                                             token={pool.tokens[0]}
                                             className="w-24 border-r border-r-ash-gray-500 sm:border-r-0"
                                         />
-                                        <Input
-                                            className="flex-1 overflow-hidden h-12 px-5"
-                                            backgroundClassName="bg-ash-dark-700"
-                                            textColorClassName="text-input-3"
+                                        <InputCurrency
+                                            className="flex-1 overflow-hidden bg-ash-dark-700 text-right text-lg h-12 px-5 outline-none"
                                             placeholder="0"
-                                            type="number"
-                                            textAlign="right"
-                                            textClassName="text-lg"
                                             value={value0}
                                             disabled
                                         />
@@ -369,14 +383,9 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
                                             token={pool.tokens[1]}
                                             className="w-24 border-r border-r-ash-gray-500 sm:border-r-0"
                                         />
-                                        <Input
-                                            className="flex-1 overflow-hidden h-12 px-5"
-                                            backgroundClassName="bg-ash-dark-700"
-                                            textColorClassName="text-input-3"
+                                        <InputCurrency
+                                            className="flex-1 overflow-hidden bg-ash-dark-700 text-right text-lg h-12 px-5 outline-none"
                                             placeholder="0"
-                                            type="number"
-                                            textAlign="right"
-                                            textClassName="text-lg"
                                             value={value1}
                                             disabled
                                         />
