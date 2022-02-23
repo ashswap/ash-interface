@@ -10,9 +10,8 @@ import { useScreenSize } from "hooks/useScreenSize";
 import { IToken } from "interface/token";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import useSWR from "swr";
-import { FakeTokenTable2 } from "./fake";
 type TokenRecord = {
     change_percentage_day: number;
     change_percentage_hour: number;
@@ -127,17 +126,29 @@ const TokenRecord = ({
 function TokenTable() {
     const [pageIndex, setPageIndex] = useState(0);
     const [pageSize, setPageSize] = useState(10);
-    const [sortBy, setSortBy] =
-        useState<keyof Omit<TokenRecord, "token" | "token_id">>("volume");
-    const { data } = useSWR(ENVIRONMENT.ASH_API + "/token", fetcher);
+    const [sortBy, setSortBy] = useState<
+        keyof Omit<TokenRecord, "token" | "token_id"> | "name"
+    >("volume");
+    const { data } = useSWR<TokenRecord[]>(
+        ENVIRONMENT.ASH_API + "/token",
+        fetcher
+    );
     const tokenRecords: TokenRecord[] = useMemo(() => {
-        return FakeTokenTable2.map((val) => {
+        if (!data) return [];
+        return data.map((val) => {
             const token = TOKENS.find((t) => t.id === val.token_id);
             const record: TokenRecord = { ...val, token };
             return record;
         });
-    }, []);
+    }, [data]);
     const displayTokenRecords: TokenRecord[] = useMemo(() => {
+        if (sortBy === "name") {
+            return [...tokenRecords].sort((x, y) => {
+                const strX = x?.token?.name || "";
+                const strY = y?.token?.name || "";
+                return strY > strX ? -1 : strX > strY ? 1 : 0;
+            });
+        }
         return [...tokenRecords].sort((x, y) => {
             return y[sortBy] - x[sortBy];
         });
@@ -160,7 +171,14 @@ function TokenTable() {
                 <div className="flex bg-ash-dark-600 px-4 lg:px-[1.625rem] text-ash-gray-500 space-x-2 text-2xs lg:text-xs">
                     <div className="w-5 py-4"></div>
                     <div className="w-5 py-4">#</div>
-                    <div className="w-20 md:w-28 lg:w-44 py-4">Token</div>
+                    <div
+                        className={`w-20 md:w-28 lg:w-44 py-4 cursor-pointer ${
+                            sortBy === "name" && "text-white"
+                        }`}
+                        onClick={() => setSortBy("name")}
+                    >
+                        Token
+                    </div>
                     <div
                         className={`flex-1 overflow-hidden text-right py-4 cursor-pointer ${
                             sortBy === "volume" && "text-white"
@@ -193,16 +211,20 @@ function TokenTable() {
                     >
                         1H
                     </div>
-                    <div className={`hidden xl:block w-14 text-right py-4 cursor-pointer ${
+                    <div
+                        className={`hidden xl:block w-14 text-right py-4 cursor-pointer ${
                             sortBy === "change_percentage_day" && "text-white"
                         }`}
-                        onClick={() => setSortBy("change_percentage_day")}>
+                        onClick={() => setSortBy("change_percentage_day")}
+                    >
                         24H
                     </div>
-                    <div className={`hidden xl:block w-14 text-right py-4 cursor-pointer ${
+                    <div
+                        className={`hidden xl:block w-14 text-right py-4 cursor-pointer ${
                             sortBy === "change_percentage_week" && "text-white"
                         }`}
-                        onClick={() => setSortBy("change_percentage_week")}>
+                        onClick={() => setSortBy("change_percentage_week")}
+                    >
                         7D
                     </div>
                 </div>
