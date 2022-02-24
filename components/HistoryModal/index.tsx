@@ -1,29 +1,148 @@
 import IconNewTab from "assets/svg/new-tab.svg";
 import HeadlessModal, {
-    HeadlessModalDefaultHeader
+    HeadlessModalDefaultHeader,
 } from "components/HeadlessModal";
 import { network } from "const/network";
 import pools from "const/pool";
-import { useWallet } from "context/wallet";
+import { useDappContext } from "context/dapp";
 import { toEGLD } from "helper/balance";
+import { fetcher } from "helper/common";
 import { useScreenSize } from "hooks/useScreenSize";
-import styles from "./HistoryModal.module.css";
+import IPool from "interface/pool";
+import { IToken } from "interface/token";
+import { useCallback, useEffect, useMemo } from "react";
+import useSWR from "swr";
 
+const getTokenFromPools = (...pools: IPool[]) => {
+    const map = new Map<string, IToken>();
+    pools.map((pool) => {
+        pool.tokens.map((token) => {
+            map.set(token.id, token);
+        });
+    });
+    return Array.from(map.values());
+};
+const TOKENS = getTokenFromPools(...pools);
 interface Props {
     open: boolean;
     onClose?: () => void;
 }
+interface TXRecord {
+    caller: string;
+    epoch: number;
+    first_token_amount?: string;
+    first_token_id?: string;
+    first_token_reserve?: string;
+    lp_supply?: string;
+    lp_token_amount?: string;
+    lp_token_id?: string;
+    name: string;
+    receiver: string;
+    second_out_reserve?: string;
+    second_token_amount?: string;
+    second_token_id?: string;
+    second_token_reserve?: string;
+    timestamp: number;
+    token_amount_in?: string;
+    token_amount_out?: string;
+    token_in?: string;
+    token_in_reserve?: string;
+    token_out?: string;
+    total_value?: string;
+    transaction_hash: string;
+}
 
 const HistoryModal = ({ open, onClose }: Props) => {
-    const { transactionsHistory } = useWallet();
+    const { address, loggedIn } = useDappContext();
+    const { data: txHistory, mutate: refresh } = useSWR<TXRecord[]>(
+        loggedIn
+            ? `https://api-devnet.ashswap.io/user/${address}/transaction`
+            : null,
+        fetcher
+    );
     const screenSize = useScreenSize();
 
-    const openTransaction = (txHash: string) => {
-        window.open(
-            network.explorerAddress + "/transactions/" + txHash,
-            "_blank"
-        );
-    };
+    const displayTx = useMemo(() => {
+        return (txHistory || []).map((record) => {
+            const { name, transaction_hash } = record;
+            switch (name) {
+                case "swap":
+                    const {
+                        token_amount_in,
+                        token_amount_out,
+                        token_in,
+                        token_out,
+                    } = record;
+                    const tokenIn = TOKENS.find((t) => t.id === token_in);
+                    const tokenOut = TOKENS.find((t) => t.id === token_out);
+
+                    if (
+                        !token_amount_in ||
+                        !token_amount_out ||
+                        !tokenIn ||
+                        !tokenOut
+                    ) {
+                        return null;
+                    }
+                    return {
+                        msg: `Swap successed ${toEGLD(
+                            tokenIn,
+                            token_amount_in
+                        ).decimalPlaces(7)} ${tokenIn.name} to ${toEGLD(
+                            tokenOut,
+                            token_amount_out
+                        ).decimalPlaces(7)} ${tokenOut.name}`,
+                        txHash: transaction_hash,
+                        status: "success",
+                    };
+                case "add_liquidity":
+                case "remove_liquidity":
+                    const {
+                        first_token_amount,
+                        first_token_id,
+                        second_token_amount,
+                        second_token_id,
+                    } = record;
+                    const token1 = TOKENS.find((t) => t.id === first_token_id);
+                    const token2 = TOKENS.find((t) => t.id === second_token_id);
+                    if (
+                        !first_token_amount ||
+                        !second_token_amount ||
+                        !token1 ||
+                        !token2
+                    )
+                        return null;
+                    return {
+                        msg: `${
+                            name === "add_liquidity" ? "Add" : "Remove"
+                        } successed ${toEGLD(
+                            token1,
+                            first_token_amount
+                        ).decimalPlaces(7)} ${token1?.name} and ${toEGLD(
+                            token2,
+                            second_token_amount
+                        ).decimalPlaces(7)} ${token2.name}`,
+                        txHash: transaction_hash,
+                        status: "success",
+                    };
+                default:
+                    return null;
+            }
+        }).filter(val => val !== null);
+    }, [txHistory]);
+    useEffect(() => {
+        if (open) {
+            refresh();
+        }
+    }, [open, refresh]);
+    const openTransaction = useCallback((txHash: string) => {
+        if (typeof window !== "undefined") {
+            window.open(
+                network.explorerAddress + "/transactions/" + txHash,
+                "_blank"
+            );
+        }
+    }, []);
 
     return (
         <HeadlessModal
@@ -35,95 +154,46 @@ const HistoryModal = ({ open, onClose }: Props) => {
                 <HeadlessModalDefaultHeader
                     onClose={() => onClose && onClose()}
                 />
-                <div className="px-6 pt-3">
-                    <div className="font-bold text-2xl">History</div>
-                    {transactionsHistory
-                        .slice(0, 7)
-                        .map((d: any, i: number) => {
-                            if (!d.action || !d.action.arguments) {
-                                return null;
-                            }
-
-                            const { functionName } = d.action.arguments;
-                            if (functionName !== "exchange") {
-                                return null;
-                            }
-
-                            const status =
-                                d.status === "success" ? "succeed" : "failed";
-
-                            let extraInfo = "";
-                            const pool = pools.find(
-                                pool => pool.address === d.receiver
-                            );
-
-                            // invalid pool
-                            if (!pool) {
-                                return null;
-                            }
-
-                            // not transfer token
-                            if (d.action.arguments.transfers.length === 0) {
-                                return null;
-                            }
-
-                            const swapFromToken =
-                                d.action.arguments.transfers[0].token;
-                            let tokenFrom = pool.tokens.find(
-                                t => t.id === swapFromToken
-                            );
-                            if (!tokenFrom) {
-                                return null;
-                            }
-                            const swapFromValue =
-                                d.action.arguments.transfers[0].value;
-
-                            const swapToValue = d.tokenValue;
-                            const swapToToken = d.tokenIdentifier;
-                            let tokenTo = pool.tokens.find(
-                                t => t.id === swapToToken
-                            );
-                            if (!tokenTo) {
-                                return null;
-                            }
-
-                            extraInfo +=
-                                toEGLD(tokenFrom, swapFromValue).toFixed(3) +
-                                " " +
-                                tokenFrom.name +
-                                " to " +
-                                toEGLD(tokenTo, swapToValue).toFixed(3) +
-                                " " +
-                                tokenTo.name;
-
-                            return (
+                <div className="px-4 pt-3">
+                    <div className="font-bold text-2xl mb-5">History</div>
+                    {displayTx.slice(0, 7).map((record) => {
+                        if (!record) {
+                            return null;
+                        }
+                        const { msg, status, txHash } = record;
+                        return (
+                            <div
+                                key={txHash}
+                                className={`flex flex-row justify-between py-3 text-xs sm:text-sm ${
+                                    status === "success"
+                                        ? "text-ash-green-500"
+                                        : "text-ash-purple-500"
+                                }`}
+                            >
                                 <div
-                                    key={i}
-                                    style={{ color: "#00FF75" }}
-                                    className="flex flex-row justify-between items-center my-3 text-xs sm:text-sm"
+                                    className="flex flex-row select-none cursor-pointer"
+                                    onClick={() => openTransaction(txHash)}
                                 >
                                     <div
-                                        className="flex flex-row select-none cursor-pointer"
-                                        onClick={() =>
-                                            openTransaction(d.txHash)
-                                        }
-                                    >
-                                        <div
-                                            className={`mt-1.5 ${styles.dot} ${styles.greenDot}`}
-                                        ></div>
-                                        <div className="mx-4 hover:underline">{`Swap ${status} ${extraInfo}`}</div>
-                                    </div>
-                                    <div
-                                        className="select-none cursor-pointer"
-                                        onClick={() =>
-                                            openTransaction(d.txHash)
-                                        }
-                                    >
-                                        <IconNewTab />
+                                        className={`flex-shrink-0 mt-1.5 h-[5px] w-[5px] ${
+                                            status === "success"
+                                                ? "bg-ash-green-500"
+                                                : "bg-ash-purple-500"
+                                        }`}
+                                    ></div>
+                                    <div className="mx-4 text-sm font-bold hover:underline">
+                                        {msg}
                                     </div>
                                 </div>
-                            );
-                        })}
+                                <div
+                                    className="select-none cursor-pointer"
+                                    onClick={() => openTransaction(txHash)}
+                                >
+                                    <IconNewTab />
+                                </div>
+                            </div>
+                        );
+                    })}
                 </div>
             </div>
         </HeadlessModal>
