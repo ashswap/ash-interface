@@ -56,7 +56,7 @@ const HistoryModal = ({ open, onClose }: Props) => {
     const { address, loggedIn } = useDappContext();
     const { data: txHistory, mutate: refresh } = useSWR<TXRecord[]>(
         loggedIn
-            ? `https://api-devnet.ashswap.io/user/${address}/transaction`
+            ? `${network.ashApiBaseUrl}/user/${address}/transaction`
             : null,
         fetcher
     );
