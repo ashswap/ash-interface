@@ -40,7 +40,6 @@ export interface State {
     ) => Promise<TransactionHash>;
     balances: TokenBalancesMap;
     tokens: ITokenMap;
-    transactionsHistory: any[];
     lpTokens: ITokenMap;
     tokenPrices: any;
     connectWallet: (token?: string) => void;
@@ -62,7 +61,6 @@ export const initState: State = {
     balances: {},
     tokens: {},
     lpTokens: {},
-    transactionsHistory: [],
     tokenPrices: {},
     connectWallet: emptyFunc
 };
@@ -86,7 +84,6 @@ export function WalletProvider({ children }: Props) {
     const [isOpenConnectWalletModal, setIsOpenConnectWalletModal] = useState(
         false
     );
-    const [transactionsHistory, setTransactionsHistory] = useState<any>([]);
     const { isMobileOS } = usePlatform();
     const dispatch = useDappDispatch();
     const { walletConnect, walletConnectInit } = useInitWalletConnect();
@@ -296,18 +293,6 @@ export function WalletProvider({ children }: Props) {
         return parrams.toString();
     }, [dapp.loggedIn, dapp.address]);
 
-    const { data } = useSWR(
-        dapp.loggedIn
-            ? network.apiAddress + "/transactions?" + historyQuery
-            : null,
-        fetcher
-    );
-
-    useEffect(() => {
-        if (data) {
-            setTransactionsHistory(data);
-        }
-    }, [data]);
 
     // useEffect(() => {
     //     !dapp.loggedIn && isMobileOS && walletConnectInit()
@@ -361,7 +346,6 @@ export function WalletProvider({ children }: Props) {
         ...initState,
         tokens,
         balances,
-        transactionsHistory,
         lpTokens,
         tokenPrices,
         fetchBalances,
