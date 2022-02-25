@@ -25,7 +25,6 @@ function InputCurrency(
 
             if (typeof onChange === "function") {
                 onChange(e);
-                console.log(e.target.value);
             }
         },
         [onChange, previousVal]
