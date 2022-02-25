@@ -53,6 +53,8 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
     const dapp = useDappContext();
     const { slippage } = useSwap();
     const { capacityPercent, valueUsd, ownLiquidity } = usePool();
+    const [displayInputLiquidity, setDisplayInputLiquidity] =
+        useState<string>("");
 
     const pricePerLP = useMemo(() => {
         const lpToken = lpTokens[pool.lpToken.id];
@@ -68,30 +70,22 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
     }, [pool.lpToken, ownLiquidity]);
 
     // verify input $ and set the new valid $ value
-    const setValidTotalUsd = useCallback(
+    const computeValidTotalUsd = useCallback(
         (val: BigNumber) => {
-            const validVal = val
-                .div(pricePerLP)
-                .div(shortOwnLP)
-                .gte(0.998)
-                ? shortOwnLP.multipliedBy(pricePerLP)
-                : val;
-            setTotalUsd(validVal);
+            if (val.div(pricePerLP).div(shortOwnLP).gte(0.998)) {
+                const validVal = shortOwnLP.multipliedBy(pricePerLP);
+                setDisplayInputLiquidity(validVal.toString(10));
+                return validVal;
+            }
+            return val;
         },
         [pricePerLP, shortOwnLP]
     );
 
     // re-validate totalUSD on pricePerLP, ownLp changes
     useEffect(() => {
-        setTotalUsd(val =>
-            val
-                .div(pricePerLP)
-                .div(shortOwnLP)
-                .gte(0.998)
-                ? shortOwnLP.multipliedBy(pricePerLP)
-                : val
-        );
-    }, [pricePerLP, shortOwnLP]);
+        setTotalUsd((val) => computeValidTotalUsd(val));
+    }, [computeValidTotalUsd]);
 
     // calculate % LP tokens - source of truth: totalUsd
     useEffect(() => {
@@ -107,10 +101,7 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
     useEffect(() => {
         setLiquidity(
             new BigNumber(
-                ownLiquidity
-                    .multipliedBy(liquidityPercent)
-                    .div(100)
-                    .toFixed(0)
+                ownLiquidity.multipliedBy(liquidityPercent).div(100).toFixed(0)
             )
         );
     }, [ownLiquidity, liquidityPercent]);
@@ -118,14 +109,16 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
     // set liquidityPercent indirectly through totalUsd
     const onChangeLiquidityPercent = useCallback(
         (percent: number) => {
-            setValidTotalUsd(
+            const valid = computeValidTotalUsd(
                 shortOwnLP
                     .multipliedBy(percent)
                     .div(100)
                     .multipliedBy(pricePerLP)
             );
+            setDisplayInputLiquidity(valid.toString(10));
+            setTotalUsd(valid);
         },
-        [pricePerLP, shortOwnLP, setValidTotalUsd]
+        [pricePerLP, shortOwnLP, computeValidTotalUsd]
     );
 
     useEffect(() => {
@@ -298,12 +291,20 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
                                     <InputCurrency
                                         className="flex-1 overflow-hidden bg-ash-dark-700 text-right text-lg h-[4.5rem] px-5 outline-none"
                                         placeholder="0"
-                                        value={totalUsd.toFixed(5)}
-                                        onChange={e =>
-                                            setValidTotalUsd(
-                                                new BigNumber(e.target.value)
-                                            )
-                                        }
+                                        value={displayInputLiquidity}
+                                        onChange={(e) => {
+                                            const value = e.target.value || "";
+                                            setDisplayInputLiquidity(value);
+                                            setTotalUsd(
+                                                computeValidTotalUsd(
+                                                    new BigNumber(
+                                                        value.startsWith(".")
+                                                            ? "0" + value
+                                                            : value || "0"
+                                                    )
+                                                )
+                                            );
+                                        }}
                                     />
                                 </div>
                                 <div className="flex flex-row items-center">
@@ -333,7 +334,7 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
                                             min={0}
                                             max={100}
                                             value={liquidityPercent}
-                                            onChange={e =>
+                                            onChange={(e) =>
                                                 onChangeLiquidityPercent(e)
                                             }
                                         />
