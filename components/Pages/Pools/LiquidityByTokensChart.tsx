@@ -1,18 +1,37 @@
+import { network } from "const/network";
+import pools from "const/pool";
 import { TOKENS } from "const/tokens";
+import { randomHexColor } from "helper/color";
+import { fetcher } from "helper/common";
 import { IToken } from "interface/token";
 import Image from "next/image";
-import React from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
-import TokensSelectorForChart from "../components/TokensSelectorForChart";
+import useSWR from "swr";
+import TokensSelectorForChart, {
+    TokenOptionChart,
+} from "../components/TokensSelectorForChart";
 
-const data = [
-    { name: "Group A", value: 400, token: TOKENS[0] },
-    { name: "Group B", value: 300, token: TOKENS[1] },
-    { name: "Group C", value: 300, token: TOKENS[2] },
-    { name: "Group D", value: 200, token: TOKENS[3] },
-];
+type RawChartRecord = {
+    liquidity: number;
+    // token id
+    token: string;
+};
+type ChartRecord = {
+    value: number;
+    percent: number;
+    token: IToken;
+};
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
-const TokenLegend = ({ color, token }: { color: string; token: IToken }) => {
+const TokenLegend = ({
+    color,
+    token,
+    percent,
+}: {
+    color: string;
+    token: IToken;
+    percent: number;
+}) => {
     return (
         <div className="flex items-center py-1.5">
             <div
@@ -23,7 +42,7 @@ const TokenLegend = ({ color, token }: { color: string; token: IToken }) => {
                 className="font-bold text-sm w-9 text-right mr-9 flex-shrink-0"
                 style={{ color }}
             >
-                10%
+                {percent}%
             </div>
             <div className="mr-1 flex-shrink-0">
                 <Image
@@ -38,6 +57,59 @@ const TokenLegend = ({ color, token }: { color: string; token: IToken }) => {
     );
 };
 function LiquidityByTokensChart() {
+    const [selectedPools, setSelectedPools] = useState<Set<string>>(
+        new Set(pools.map((p) => p.address))
+    );
+    const { data } = useSWR<RawChartRecord[]>(
+        selectedPools.size > 0
+            ? `${
+                  network.ashApiBaseUrl
+              }/pool/liquidity-distribution?pool=${Array.from(
+                  selectedPools
+              ).join(",")}`
+            : null,
+        fetcher
+    );
+    const chartData: ChartRecord[] = useMemo(() => {
+        if (!data?.length) return [];
+        const total = data.reduce((t, { liquidity }) => (t += liquidity), 0);
+        let spct = 0;
+        return data.map(({ liquidity, token: tokenId }, index) => {
+            const pct = +((liquidity * 100) / total).toFixed(2);
+            const record: ChartRecord = {
+                value: liquidity,
+                token: TOKENS.find((t) => t.id === tokenId) as IToken,
+                percent:
+                    index === data.length - 1
+                        ? (100 * 1000 - spct * 1000) / 1000
+                        : pct,
+            };
+            spct = (spct * 1000 + pct * 1000) / 1000;
+            return record;
+        });
+    }, [data]);
+    const themeColors = useMemo(() => {
+        const nToken = TOKENS.length;
+        if (nToken <= COLORS.length) {
+            return COLORS;
+        } else {
+            const result = [...COLORS];
+            while (nToken > result.length) {
+                result.push(randomHexColor());
+            }
+            return result;
+        }
+    }, []);
+    const onSelectPool = useCallback((select: boolean, address: string) => {
+        setSelectedPools((set) => {
+            if (select) {
+                set.add(address);
+            } else {
+                set.delete(address);
+            }
+            return new Set(set);
+        });
+    }, []);
     return (
         <div
             className="bg-ash-dark-600 px-4 lg:px-[1.675rem] py-6 w-full overflow-hidden relative"
@@ -51,17 +123,17 @@ function LiquidityByTokensChart() {
                         <ResponsiveContainer>
                             <PieChart>
                                 <Pie
-                                    data={data}
+                                    data={chartData}
                                     innerRadius={60}
                                     outerRadius={80}
                                     stroke="transparent"
                                     dataKey="value"
-                                    isAnimationActive={false}
+                                    isAnimationActive={true}
                                 >
-                                    {data.map((entry, index) => (
+                                    {chartData?.map((entry, index) => (
                                         <Cell
                                             key={`cell-${index}`}
-                                            fill={COLORS[index % COLORS.length]}
+                                            fill={themeColors[index]}
                                         />
                                     ))}
                                 </Pie>
@@ -72,10 +144,11 @@ function LiquidityByTokensChart() {
                 <div className="px-5.5 mb-8 flex-1">
                     {/* w-full lg:w-auto  */}
                     <div className="h-40 overflow-x-hidden overflow-y-auto">
-                        {data.map((entry, index) => (
+                        {chartData?.map((entry, index) => (
                             <TokenLegend
                                 key={index}
-                                color={COLORS[index % COLORS.length]}
+                                percent={entry.percent}
+                                color={themeColors[index]}
                                 token={entry.token}
                             />
                         ))}
@@ -83,7 +156,25 @@ function LiquidityByTokensChart() {
                 </div>
             </div>
             <div className="flex h-9">
-                <TokensSelectorForChart />
+                <TokensSelectorForChart
+                    label={
+                        selectedPools.size !== 0
+                            ? `${selectedPools.size} pools selected`
+                            : "Select pools to view"
+                    }
+                >
+                    {pools.map((p, i) => {
+                        return (
+                            <TokenOptionChart
+                                key={p.address}
+                                pool={p}
+                                checked={selectedPools.has(p.address)}
+                                label={p.tokens.map((t) => t.name).join("-")}
+                                onChange={(val) => onSelectPool(val, p.address)}
+                            />
+                        );
+                    })}
+                </TokensSelectorForChart>
             </div>
         </div>
     );

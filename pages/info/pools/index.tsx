@@ -1,6 +1,6 @@
 import ICArrowRight from "assets/svg/arrow-right.svg";
 import InfoLayout from "components/Layout/Info";
-import AprByTokensChart from "components/Pages/Pools/AprByTokensChart";
+import AprByPoolsChart from "components/Pages/Pools/AprByPoolsChart";
 import LiquidityByTokensChart from "components/Pages/Pools/LiquidityByTokensChart";
 import PoolsTable from "components/Pages/Pools/PoolsTable";
 import React, { ReactElement } from "react";
@@ -22,9 +22,9 @@ function PoolsPage() {
                     </h1>
                     <div className="flex flex-wrap 2xl:flex-nowrap">
                         <div className="w-full 2xl:w-[56%] 2xl:mr-4 mb-[3.625rem]">
-                            <AprByTokensChart />
+                            <AprByPoolsChart />
                         </div>
-                        <div className="max-w-full w-full lg:w-auto 2xl:w-[44%] mb-[3.625rem]">
+                        <div className="max-w-full w-full lg:w-[26rem] 2xl:w-[44%] mb-[3.625rem]">
                             <LiquidityByTokensChart/>
                         </div>
                     </div>

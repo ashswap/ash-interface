@@ -9,6 +9,7 @@ import ICStar from "assets/svg/star.svg";
 import ICSun from "assets/svg/sun.svg";
 import ICToken from "assets/svg/token.svg";
 import ICWallet from "assets/svg/wallet.svg";
+import AddressMenu from "components/AddressMenu";
 import Input from "components/Input";
 import { useScreenSize } from "hooks/useScreenSize";
 import Image from "next/image";
@@ -78,7 +79,11 @@ const NavLink = ({ active, name, Icon, ...linkProps }: NavLinkProps) => {
     return (
         <Link {...linkProps}>
             <a>
-                <div className={`flex relative py-3 font-bold text-sm ${active ? 'text-white' : 'text-ash-gray-500'}`}>
+                <div
+                    className={`flex relative py-3 font-bold text-sm ${
+                        active ? "text-white" : "text-ash-gray-500"
+                    }`}
+                >
                     <Icon
                         className={`inline w-5 h-5 mr-4 ${
                             active ? "text-pink-600" : ""
@@ -217,17 +222,60 @@ function InfoLayout({ children }: any) {
                     {children}
                 </div>
                 <aside className="flex-shrink-0 fixed top-0 right-0 h-screen overflow-auto w-32 bg-ash-dark-600 px-4 py-6 text-white">
-                    <div className="bg-ash-dark-400 p-2 flex flex-col items-center mb-4">
-                        <Image
+                    <div className="bg-ash-dark-400 p-2 flex flex-col mb-4">
+                        {/* <Image
                             src={ImgAvatar}
                             alt="avatar"
                             width={32}
                             height={32}
                         />
+                        
                         <div className="mt-2 flex items-center justify-between font-bold text-xs w-full">
                             <span>4a51...PHFA</span>
                             <ICChevronDown className="inline w-2 h-2" />
-                        </div>
+                        </div> */}
+                        <AddressMenu
+                            connectBtn={(connect) => {
+                                return (
+                                    <button
+                                        className="text-xs w-full py-2 font-bold text-white"
+                                        onClick={() => connect()}
+                                    >
+                                        Connect
+                                    </button>
+                                );
+                            }}
+                            dropdownBtn={(address, setMDrawer) => {
+                                return (
+                                    <button
+                                        className="flex flex-col items-center"
+                                        onClick={() =>
+                                            screenSizes.isMobile &&
+                                            setMDrawer(true)
+                                        }
+                                    >
+                                        <Image
+                                            src={ImgAvatar}
+                                            alt="avatar"
+                                            width={32}
+                                            height={32}
+                                        />
+
+                                        <div className="mt-2 flex items-center justify-between font-bold text-xs w-full">
+                                            <span className="mr-2">
+                                                {address?.slice(0, 4) +
+                                                    "..." +
+                                                    address?.slice(
+                                                        address.length - 4
+                                                    )}
+                                            </span>
+                                            <ICChevronDown className="inline w-2 h-2" />
+                                        </div>
+                                    </button>
+                                );
+                            }}
+                        />
+
                         <SwitchThemeBtn />
                     </div>
                     <button className="bg-ash-dark-400 h-10 w-full flex items-center justify-center">
@@ -262,14 +310,38 @@ function InfoLayout({ children }: any) {
                         <ICStar className="inline text-[#FFC10D] w-4 h-4 mr-3" />
                         <span className="text-2xs font-bold">Saved</span>
                     </button>
-                    <div className="flex items-center bg-ash-dark-600 h-10 px-3 flex-shrink-0">
-                        <Image
-                            src={ImgAvatar}
-                            alt="account avatar"
-                            width={14}
-                            height={14}
+                    <div>
+                        <AddressMenu
+                            connectBtn={(connect) => {
+                                return (
+                                    <button
+                                        className="text-2xs w-full py-2 px-4 font-bold text-white bg-pink-600 h-10"
+                                        onClick={() => connect()}
+                                    >
+                                        Connect
+                                    </button>
+                                );
+                            }}
+                            dropdownBtn={(address, setMDrawer) => {
+                                return (
+                                    <button
+                                        className="flex items-center bg-ash-dark-600 h-10 px-3 flex-shrink-0"
+                                        onClick={() =>
+                                            screenSizes.isMobile &&
+                                            setMDrawer(true)
+                                        }
+                                    >
+                                        <Image
+                                            src={ImgAvatar}
+                                            alt="account avatar"
+                                            width={14}
+                                            height={14}
+                                        />
+                                        <ICChevronDown className="inline w-2 h-2 ml-2.5" />
+                                    </button>
+                                );
+                            }}
                         />
-                        <ICChevronDown className="inline w-2 h-2 ml-2.5" />
                     </div>
                 </div>
             </header>

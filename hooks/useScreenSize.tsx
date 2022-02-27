@@ -7,5 +7,5 @@ export const useScreenSize = () => {
     const lg = useMediaQuery(`(min-width: ${TAILWIND_BREAKPOINT.LG}px)`);
     const xl = useMediaQuery(`(min-width: ${TAILWIND_BREAKPOINT.XL}px)`);
     const xl2 = useMediaQuery(`(min-width: ${TAILWIND_BREAKPOINT["2XL"]}px)`);
-    return { msm, sm, md, lg, xl, xl2 };
+    return { msm, sm, md, lg, xl, xl2, isMobile: msm };
 };

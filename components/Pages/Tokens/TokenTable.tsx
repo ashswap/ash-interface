@@ -141,7 +141,7 @@ function TokenTable() {
             return record;
         });
     }, [data]);
-    const displayTokenRecords: TokenRecord[] = useMemo(() => {
+    const sortedTokenRecords: TokenRecord[] = useMemo(() => {
         if (sortBy === "name") {
             return [...tokenRecords].sort((x, y) => {
                 const strX = x?.token?.name || "";
@@ -154,16 +154,16 @@ function TokenTable() {
         });
     }, [tokenRecords, sortBy]);
     const displayTokens: TokenRecord[][] = useMemo(() => {
-        const length = displayTokenRecords.length;
+        const length = sortedTokenRecords.length;
         const nPage = Math.ceil(length / pageSize);
         const pagination: TokenRecord[][] = [];
         for (let i = 0; i < nPage; i++) {
             pagination.push(
-                displayTokenRecords.slice(i * pageSize, i * pageSize + pageSize)
+                sortedTokenRecords.slice(i * pageSize, i * pageSize + pageSize)
             );
         }
         return pagination;
-    }, [displayTokenRecords, pageSize]);
+    }, [sortedTokenRecords, pageSize]);
 
     return (
         <div>
@@ -228,7 +228,7 @@ function TokenTable() {
                         7D
                     </div>
                 </div>
-                {displayTokens[pageIndex].map((record, index) => {
+                {displayTokens[pageIndex]?.map((record, index) => {
                     return (
                         <TokenRecord
                             key={record.token_id}
