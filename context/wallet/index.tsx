@@ -10,7 +10,7 @@ import {
     SmartContract,
     TokenIdentifierValue,
     Transaction,
-    TransactionHash
+    TransactionHash,
 } from "@elrondnetwork/erdjs";
 import BigNumber from "bignumber.js";
 import { gasLimit, gasPrice, network } from "const/network";
@@ -27,7 +27,7 @@ import {
     useContext,
     useEffect,
     useMemo,
-    useState
+    useState,
 } from "react";
 import useSWR from "swr";
 export interface State {
@@ -47,7 +47,7 @@ export interface State {
 
 const emptyTx = new Transaction({
     nonce: new Nonce(0),
-    receiver: new Address()
+    receiver: new Address(),
 });
 
 const emptyTxHash = new TransactionHash("");
@@ -62,7 +62,7 @@ export const initState: State = {
     tokens: {},
     lpTokens: {},
     tokenPrices: {},
-    connectWallet: emptyFunc
+    connectWallet: emptyFunc,
 };
 
 export const WalletContext = createContext<State>(initState);
@@ -185,8 +185,8 @@ export function WalletProvider({ children }: Props) {
                             ),
                             func: new ContractFunction("getTokenProperties"),
                             args: [
-                                new TokenIdentifierValue(Buffer.from(tokenId))
-                            ]
+                                new TokenIdentifierValue(Buffer.from(tokenId)),
+                            ],
                         })
                     )
                 );
@@ -220,7 +220,7 @@ export function WalletProvider({ children }: Props) {
                     ) {
                         tokenBalances[tokenId] = {
                             balance: new BigNumber(resp[tokenId].balance),
-                            token: tokens[tokenId]
+                            token: tokens[tokenId],
                         };
                     }
                 }
@@ -248,7 +248,7 @@ export function WalletProvider({ children }: Props) {
             );
 
             let contract = new SmartContract({
-                address
+                address,
             });
 
             let tx = contract.call(arg);
@@ -259,7 +259,7 @@ export function WalletProvider({ children }: Props) {
                 receiver: address,
                 gasPrice: new GasPrice(gasPrice),
                 gasLimit: new GasLimit(gasLimit),
-                version: tx.getVersion()
+                version: tx.getVersion(),
             });
             const signedTx = await dapp.dapp.provider.signTransaction(tx);
             return await dapp.dapp.proxy.sendTransaction(signedTx);
@@ -281,18 +281,17 @@ export function WalletProvider({ children }: Props) {
                 bool: {
                     should: pools.map(pool => ({
                         term: {
-                            receiver: pool.address
-                        }
-                    }))
-                }
-            }
+                            receiver: pool.address,
+                        },
+                    })),
+                },
+            },
         };
 
         parrams.append("condition", JSON.stringify(condition));
 
         return parrams.toString();
     }, [dapp.loggedIn, dapp.address]);
-
 
     // useEffect(() => {
     //     !dapp.loggedIn && isMobileOS && walletConnectInit()
@@ -321,8 +320,8 @@ export function WalletProvider({ children }: Props) {
                             dispatch({
                                 type: "setTokenLogin",
                                 tokenLogin: {
-                                    loginToken: token
-                                }
+                                    loginToken: token,
+                                },
                             });
                         } else {
                             uri = walletConectUri;
@@ -352,7 +351,7 @@ export function WalletProvider({ children }: Props) {
         callContract,
         isOpenConnectWalletModal,
         setIsOpenConnectWalletModal,
-        connectWallet
+        connectWallet,
     };
 
     return (

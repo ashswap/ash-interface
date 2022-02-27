@@ -53,8 +53,9 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
     const dapp = useDappContext();
     const { slippage } = useSwap();
     const { capacityPercent, valueUsd, ownLiquidity } = usePool();
-    const [displayInputLiquidity, setDisplayInputLiquidity] =
-        useState<string>("");
+    const [displayInputLiquidity, setDisplayInputLiquidity] = useState<string>(
+        ""
+    );
 
     const pricePerLP = useMemo(() => {
         const lpToken = lpTokens[pool.lpToken.id];
@@ -72,7 +73,12 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
     // verify input $ and set the new valid $ value
     const computeValidTotalUsd = useCallback(
         (val: BigNumber) => {
-            if (val.div(pricePerLP).div(shortOwnLP).gte(0.998)) {
+            if (
+                val
+                    .div(pricePerLP)
+                    .div(shortOwnLP)
+                    .gte(0.998)
+            ) {
                 const validVal = shortOwnLP.multipliedBy(pricePerLP);
                 setDisplayInputLiquidity(validVal.toString(10));
                 return validVal;
@@ -84,7 +90,7 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
 
     // re-validate totalUSD on pricePerLP, ownLp changes
     useEffect(() => {
-        setTotalUsd((val) => computeValidTotalUsd(val));
+        setTotalUsd(val => computeValidTotalUsd(val));
     }, [computeValidTotalUsd]);
 
     // calculate % LP tokens - source of truth: totalUsd
@@ -101,7 +107,10 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
     useEffect(() => {
         setLiquidity(
             new BigNumber(
-                ownLiquidity.multipliedBy(liquidityPercent).div(100).toFixed(0)
+                ownLiquidity
+                    .multipliedBy(liquidityPercent)
+                    .div(100)
+                    .toFixed(0)
             )
         );
     }, [ownLiquidity, liquidityPercent]);
@@ -292,7 +301,7 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
                                         className="flex-1 overflow-hidden bg-ash-dark-700 text-right text-lg h-[4.5rem] px-5 outline-none"
                                         placeholder="0"
                                         value={displayInputLiquidity}
-                                        onChange={(e) => {
+                                        onChange={e => {
                                             const value = e.target.value || "";
                                             setDisplayInputLiquidity(value);
                                             setTotalUsd(
@@ -334,7 +343,7 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
                                             min={0}
                                             max={100}
                                             value={liquidityPercent}
-                                            onChange={(e) =>
+                                            onChange={e =>
                                                 onChangeLiquidityPercent(e)
                                             }
                                         />
@@ -471,7 +480,9 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
                                 onClick={removeLP}
                                 primaryColor="yellow-700"
                             >
-                                WITHDRAW
+                                {dapp.account.balance === "0"
+                                    ? "INSUFFICIENT EGLD BALANCE"
+                                    : "WITHDRAW"}
                             </Button>
                         </div>
                     </div>

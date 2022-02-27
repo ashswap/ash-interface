@@ -8,7 +8,7 @@ import {
     Query,
     TokenIdentifierValue,
     TypeExpressionParser,
-    TypeMapper
+    TypeMapper,
 } from "@elrondnetwork/erdjs";
 import { notification } from "antd";
 import Fire from "assets/images/fire.png";
@@ -25,7 +25,7 @@ import IconWallet from "assets/svg/wallet.svg";
 import BigNumber from "bignumber.js";
 import Button from "components/Button";
 import HeadlessModal, {
-    HeadlessModalDefaultHeader
+    HeadlessModalDefaultHeader,
 } from "components/HeadlessModal";
 import HistoryModal from "components/HistoryModal";
 import IconButton from "components/IconButton";
@@ -60,7 +60,7 @@ const Swap = () => {
         rates,
         setRates,
         isInsufficentFund,
-        slippage
+        slippage,
     } = useSwap();
     const [showSetting, setShowSetting] = useState<boolean>(false);
     const [isOpenHistoryModal, openHistoryModal] = useState<boolean>(false);
@@ -112,8 +112,8 @@ const Swap = () => {
                     args: [
                         new TokenIdentifierValue(Buffer.from(tokenFrom.id)),
                         new TokenIdentifierValue(Buffer.from(tokenTo.id)),
-                        new BigUIntValue(amountIn)
-                    ]
+                        new BigUIntValue(amountIn),
+                    ],
                 })
             )
             .then(({ returnData }) => {
@@ -128,7 +128,7 @@ const Swap = () => {
                 let mappedType = mapper.mapType(type);
 
                 let endpointDefinitions = [
-                    new EndpointParameterDefinition("foo", "bar", mappedType)
+                    new EndpointParameterDefinition("foo", "bar", mappedType),
                 ];
                 let values = serializer.stringToValues(
                     resultHex,
@@ -167,8 +167,8 @@ const Swap = () => {
                             new BigNumber(10).exponentiatedBy(
                                 pool!.tokens[0].decimals
                             )
-                        )
-                    ]
+                        ),
+                    ],
                 })
             ),
             proxy.queryContract(
@@ -186,16 +186,16 @@ const Swap = () => {
                             new BigNumber(10).exponentiatedBy(
                                 pool!.tokens[1].decimals
                             )
-                        )
-                    ]
+                        ),
+                    ],
                 })
             ),
             proxy.queryContract(
                 new Query({
                     address: new Address(pool?.address),
-                    func: new ContractFunction("getTotalFeePercent")
+                    func: new ContractFunction("getTotalFeePercent"),
                 })
-            )
+            ),
         ]).then(results => {
             let rates = results.slice(0, 2).map(result => {
                 let resultHex = Buffer.from(
@@ -210,7 +210,7 @@ const Swap = () => {
                 let mappedType = mapper.mapType(type);
 
                 let endpointDefinitions = [
-                    new EndpointParameterDefinition("foo", "bar", mappedType)
+                    new EndpointParameterDefinition("foo", "bar", mappedType),
                 ];
                 let values = serializer.stringToValues(
                     resultHex,
@@ -253,8 +253,8 @@ const Swap = () => {
                     new BigUIntValue(rawValueFrom),
                     new TokenIdentifierValue(Buffer.from("exchange")),
                     new TokenIdentifierValue(Buffer.from(tokenTo.id)),
-                    new BigUIntValue(new BigNumber(0))
-                ]
+                    new BigUIntValue(new BigNumber(0)),
+                ],
             });
 
             let key = `open${Date.now()}`;
@@ -269,7 +269,7 @@ const Swap = () => {
                             "/transactions/" +
                             tx.toString(),
                         "_blank"
-                    )
+                    ),
             });
             setTimeout(() => {
                 notification.close(key);
@@ -291,7 +291,7 @@ const Swap = () => {
         tokenFrom,
         tokenTo,
         valueFrom,
-        valueTo
+        valueTo,
     ]);
 
     const priceImpact = useMemo(() => {
@@ -522,7 +522,8 @@ const Swap = () => {
                                 )}
 
                             {mounted &&
-                                (isInsufficentFund ? (
+                                (isInsufficentFund ||
+                                dapp.account.balance === "0" ? (
                                     <Button
                                         leftIcon={
                                             !dapp.loggedIn ? (
@@ -547,7 +548,9 @@ const Swap = () => {
                                         <span className="text-text-input-3">
                                             INSUFFICIENT{" "}
                                             <span className="text-insufficent-fund">
-                                                {tokenFrom?.name}
+                                                {dapp.account.balance === "0"
+                                                    ? "EGLD"
+                                                    : tokenFrom?.name}
                                             </span>{" "}
                                             BALANCE
                                         </span>

@@ -88,7 +88,7 @@ const TokenInput = ({
                             ? `1px solid ${theme.extend.colors["insufficent-fund"]}`
                             : "",
                     }}
-                    onChange={(e) => onChangeValue(e.target.value)}
+                    onChange={e => onChangeValue(e.target.value)}
                 />
             </div>
             <div
@@ -244,8 +244,8 @@ const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
                     ],
                 })
             ),
-        ]).then((results) => {
-            let rates = results.slice(0, 2).map((result) => {
+        ]).then(results => {
+            let rates = results.slice(0, 2).map(result => {
                 let resultHex = Buffer.from(
                     result.returnData[0],
                     "base64"
@@ -476,7 +476,7 @@ const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
                                         poolContext.value0.toString()
                                     ).toFixed(2)}
                                     value={value0}
-                                    onChangeValue={(val) => onChangeValue0(val)}
+                                    onChangeValue={val => onChangeValue0(val)}
                                     isInsufficentFund={isInsufficentFund0}
                                     balance={balance0}
                                 />
@@ -489,7 +489,7 @@ const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
                                         poolContext.value1.toString()
                                     ).toFixed(2)}
                                     value={value1}
-                                    onChangeValue={(val) => onChangeValue1(val)}
+                                    onChangeValue={val => onChangeValue1(val)}
                                     isInsufficentFund={isInsufficentFund1}
                                     balance={balance1}
                                 />
@@ -528,9 +528,8 @@ const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
                                     }`}
                                 >
                                     <div
-                                        className={`w-6/12 ${
-                                            isProMode && "sm:w-8/12"
-                                        }`}
+                                        className={`w-6/12 ${isProMode &&
+                                            "sm:w-8/12"}`}
                                     >
                                         <div className="mb-2">
                                             Earn per month
@@ -538,9 +537,8 @@ const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
                                         <div>-</div>
                                     </div>
                                     <div
-                                        className={`w-6/12 ${
-                                            isProMode && "sm:w-4/12"
-                                        }`}
+                                        className={`w-6/12 ${isProMode &&
+                                            "sm:w-4/12"}`}
                                     >
                                         <div className="mb-2">Farm per day</div>
                                         <div>-</div>
@@ -620,10 +618,17 @@ const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
                                 topLeftCorner
                                 style={{ height: 48 }}
                                 outline
-                                disable={!isAgree}
+                                disable={
+                                    !isAgree ||
+                                    dapp.account.balance === "0" ||
+                                    isInsufficentFund0 ||
+                                    isInsufficentFund1
+                                }
                                 onClick={isAgree ? addLP : () => {}}
                             >
-                                DEPOSIT
+                                {dapp.account.balance === "0"
+                                    ? "INSUFFICIENT EGLD BALANCE"
+                                    : "DEPOSIT"}
                             </Button>
                         </div>
                     </div>
