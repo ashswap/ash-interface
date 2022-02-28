@@ -33,25 +33,6 @@
     background-size: calc(100% - 4px) calc(100% - 4px);
 }
 
-.disable .bottomRightCorner {
-    border-left: theme("colors.ash-dark.500") 4px solid;
-    border-top: theme("colors.ash-dark.500") 4px solid;
-    background: linear-gradient(
-                to left,
-                theme("colors.ash-dark.500") 5px,
-                transparent 5px
-            )
-            100% 0,
-        linear-gradient(
-                to top,
-                theme("colors.ash-dark.500") 5px,
-                transparent 5px
-            )
-            0 100%;
-    background-repeat: no-repeat;
-    background-size: calc(100% - 4px) calc(100% - 4px);
-}
-
 .white .bottomRightCorner {
     border-left: #fff 4px solid;
     border-top: #fff 4px solid;
@@ -136,26 +117,6 @@
     cursor: pointer;
 }
 
-.disable .topLeftCorner {
-    border-right: theme("colors.ash-dark.500") 4px solid;
-    border-bottom: theme("colors.ash-dark.500") 4px solid;
-    background: linear-gradient(
-                to right,
-                theme("colors.ash-dark.500") 5px,
-                transparent 5px
-            )
-            0 100%,
-        linear-gradient(
-                to bottom,
-                theme("colors.ash-dark.500") 5px,
-                transparent 5px
-            )
-            100% 0;
-
-    background-repeat: no-repeat;
-    background-size: calc(100% - 4px) calc(100% - 4px);
-}
-
 .white .topLeftCorner {
     border-right: #fff 4px solid;
     border-bottom: #fff 4px solid;
@@ -237,10 +198,6 @@
     @apply flex flex-row justify-center items-center gap-2 h-full bg-pink-600 px-4 py-1.5 cursor-pointer select-none text-white font-bold leading-5;
 }
 
-.disable .content {
-    @apply bg-ash-dark-500;
-}
-
 .white .content {
     @apply bg-white text-bg;
 }
@@ -257,7 +214,50 @@
     @apply bg-yellow-700 text-white;
 }
 
+.disable .content {
+    @apply bg-ash-dark-500;
+}
+
 .glowHover {
     /* TODO */
     /* box-shadow: 0px 8px 30px rgba(255, 0, 92, 0.75); */
+}
+
+.disable .bottomRightCorner {
+    border-left: theme("colors.ash-dark.500") 4px solid;
+    border-top: theme("colors.ash-dark.500") 4px solid;
+    background: linear-gradient(
+                to left,
+                theme("colors.ash-dark.500") 5px,
+                transparent 5px
+            )
+            100% 0,
+        linear-gradient(
+                to top,
+                theme("colors.ash-dark.500") 5px,
+                transparent 5px
+            )
+            0 100%;
+    background-repeat: no-repeat;
+    background-size: calc(100% - 4px) calc(100% - 4px);
+}
+
+.disable .topLeftCorner {
+    border-right: theme("colors.ash-dark.500") 4px solid;
+    border-bottom: theme("colors.ash-dark.500") 4px solid;
+    background: linear-gradient(
+                to right,
+                theme("colors.ash-dark.500") 5px,
+                transparent 5px
+            )
+            0 100%,
+        linear-gradient(
+                to bottom,
+                theme("colors.ash-dark.500") 5px,
+                transparent 5px
+            )
+            100% 0;
+
+    background-repeat: no-repeat;
+    background-size: calc(100% - 4px) calc(100% - 4px);
 }

@@ -66,6 +66,7 @@ const Swap = () => {
     const [isOpenHistoryModal, openHistoryModal] = useState<boolean>(false);
     const [fee, setFee] = useState<number>(0);
     const [isOpenFairPrice, setIsOpenFairPrice] = useState(false);
+    const [swapping, setSwapping] = useState(false);
 
     const { callContract, connectWallet } = useWallet();
     const dapp = useDappContext();
@@ -236,14 +237,14 @@ const Swap = () => {
     }, [pool, proxy, setRates]);
 
     const swap = useCallback(async () => {
-        if (!dapp.loggedIn || !tokenFrom || !tokenTo) {
+        if (!dapp.loggedIn || !tokenFrom || !tokenTo || swapping) {
             return;
         }
 
         if (rawValueFrom.lte(0)) {
             return;
         }
-
+        setSwapping(true);
         try {
             let tx = await callContract(new Address(pool?.address), {
                 func: new ContractFunction("ESDTTransfer"),
@@ -275,14 +276,14 @@ const Swap = () => {
                 notification.close(key);
             }, 10000);
         } catch (error) {
-            console.log(error);
-
+            console.log(error);                      
             // TODO: extension close without response
             // notification.warn({
             //     message: error as string,
             //     duration: 10
             // });
         }
+        setSwapping(false);
     }, [
         dapp.loggedIn,
         pool,
@@ -292,6 +293,7 @@ const Swap = () => {
         tokenTo,
         valueFrom,
         valueTo,
+        swapping
     ]);
 
     const priceImpact = useMemo(() => {
@@ -575,6 +577,7 @@ const Swap = () => {
                                         style={{ height: 48 }}
                                         className="mt-12 text-xs sm:text-sm"
                                         outline
+                                        disable={swapping}
                                         onClick={
                                             dapp.loggedIn
                                                 ? swap

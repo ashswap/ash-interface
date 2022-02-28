@@ -128,6 +128,7 @@ const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
     const [value1, setValue1] = useState<string>("");
     const [value1Debounce] = useDebounce(value1, 500);
     const [isProMode, setIsProMode] = useState(false);
+    const [adding, setAdding] = useState(false);
     const screenSize = useScreenSize();
     const { callContract, fetchBalances, balances, tokenPrices } = useWallet();
     const dapp = useDappContext();
@@ -147,8 +148,9 @@ const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
     }, [open]);
 
     const addLP = useCallback(async () => {
-        if (!dapp.loggedIn) return;
-        try {
+        if (!dapp.loggedIn || adding) return;
+        setAdding(true);
+        try {           
             let tx = await callContract(new Address(dapp.address), {
                 func: new ContractFunction("MultiESDTNFTTransfer"),
                 gasLimit: new GasLimit(gasLimit),
@@ -190,12 +192,14 @@ const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
             }, 10000);
         } catch (error) {
             // TODO: extension close without response
+            console.log(error)
         }
+        setAdding(false);
 
         if (onClose) {
             onClose();
         }
-    }, [dapp, value0, value1, pool, onClose, callContract, fetchBalances]);
+    }, [dapp, value0, value1, pool, onClose, callContract, fetchBalances, adding]);
 
     // find pools + fetch reserves
     useEffect(() => {
@@ -622,7 +626,7 @@ const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
                                     !isAgree ||
                                     dapp.account.balance === "0" ||
                                     isInsufficentFund0 ||
-                                    isInsufficentFund1
+                                    isInsufficentFund1 || adding
                                 }
                                 onClick={isAgree ? addLP : () => {}}
                             >

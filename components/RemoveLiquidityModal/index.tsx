@@ -56,6 +56,7 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
     const [displayInputLiquidity, setDisplayInputLiquidity] = useState<string>(
         ""
     );
+    const [removing, setRemoving] = useState(false);
 
     const pricePerLP = useMemo(() => {
         const lpToken = lpTokens[pool.lpToken.id];
@@ -184,6 +185,8 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
     }, [liquidityDebounce, pool, dapp.dapp.proxy]);
 
     const removeLP = useCallback(async () => {
+        if(removing) return;
+        setRemoving(true);
         try {
             let tx = await callContract(new Address(pool.address), {
                 func: new ContractFunction("ESDTTransfer"),
@@ -230,7 +233,7 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
         } catch (error) {
             // TODO: extension close without response
         }
-
+        setRemoving(false);
         if (onClose) {
             onClose();
         }
@@ -243,6 +246,7 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
         callContract,
         fetchBalances,
         liquidity,
+        removing
     ]);
 
     return (
@@ -478,6 +482,7 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
                                 className="mt-1.5"
                                 outline
                                 onClick={removeLP}
+                                disable={removing}
                                 primaryColor="yellow-700"
                             >
                                 {dapp.account.balance === "0"
