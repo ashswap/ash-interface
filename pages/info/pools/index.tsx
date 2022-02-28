@@ -1,8 +1,8 @@
 import ICArrowRight from "assets/svg/arrow-right.svg";
 import InfoLayout from "components/Layout/Info";
-import AprByPoolsChart from "components/Pages/Pools/AprByPoolsChart";
-import LiquidityByTokensChart from "components/Pages/Pools/LiquidityByTokensChart";
-import PoolsTable from "components/Pages/Pools/PoolsTable";
+import AprByPoolsChart from "views/info/Pools/AprByPoolsChart";
+import LiquidityByTokensChart from "views/info/Pools/LiquidityByTokensChart";
+import PoolsTable from "views/info/Pools/PoolsTable";
 import React, { ReactElement } from "react";
 
 function PoolsPage() {

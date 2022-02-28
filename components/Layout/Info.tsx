@@ -1,14 +1,10 @@
 import ImgAvatar from "assets/images/avatar.png";
 import ICChevronDown from "assets/svg/chevron-down.svg";
 import ICDrop from "assets/svg/drop.svg";
-import ICHomeTrendUp from "assets/svg/home-trend-up.svg";
 import ICMoon from "assets/svg/moon.svg";
-import ICRepeat from "assets/svg/repeat-music.svg";
 import ICSearch from "assets/svg/search.svg";
-import ICStar from "assets/svg/star.svg";
 import ICSun from "assets/svg/sun.svg";
 import ICToken from "assets/svg/token.svg";
-import ICWallet from "assets/svg/wallet.svg";
 import AddressMenu from "components/AddressMenu";
 import Input from "components/Input";
 import { useScreenSize } from "hooks/useScreenSize";
@@ -149,14 +145,14 @@ function InfoLayout({ children }: any) {
                     </div>
                     <div className="flex-grow overflow-auto">
                         <ul>
-                            <li>
+                            {/* <li>
                                 <NavLink
                                     href={{ pathname: "/info" }}
                                     name="Overview"
                                     Icon={ICHomeTrendUp}
                                     active={isActive("/info", true)}
                                 />
-                            </li>
+                            </li> */}
                             <li>
                                 <NavLink
                                     href="/info/tokens"
@@ -173,15 +169,15 @@ function InfoLayout({ children }: any) {
                                     active={isActive("/info/pools", false)}
                                 />
                             </li>
-                            <li>
+                            {/* <li>
                                 <NavLink
                                     href="/info/wallet"
                                     name="Wallets"
                                     Icon={ICWallet}
                                     active={isActive("/info/wallet", false)}
                                 />
-                            </li>
-                            <li>
+                            </li> */}
+                            {/* <li>
                                 <NavLink
                                     href="/info/transactions"
                                     name="Trans"
@@ -191,10 +187,10 @@ function InfoLayout({ children }: any) {
                                         true
                                     )}
                                 />
-                            </li>
+                            </li> */}
                         </ul>
                     </div>
-                    <div className="flex-shrink-0 flex flex-col space-y-2">
+                    {/* <div className="flex-shrink-0 flex flex-col space-y-2">
                         <div className="text-ash-gray-500 text-xs mb-8">
                             <span className="inline-block rounded-full bg-ash-green-500 w-2 h-2 mr-2"></span>
                             <span>Updated 4 mins ago</span>
@@ -208,7 +204,7 @@ function InfoLayout({ children }: any) {
                         <div className="text-ash-gray-500 text-xs">
                             Wallet count (24H): 21
                         </div>
-                    </div>
+                    </div> */}
                 </aside>
                 <div className="flex-grow px-4 lg:px-9 lg:py-6 relative overflow-x-hidden ml-52 md:ml-60 mr-32">
                     <div className="fixed top-6 right-[10.25rem] z-20">
@@ -278,10 +274,10 @@ function InfoLayout({ children }: any) {
 
                         <SwitchThemeBtn />
                     </div>
-                    <button className="bg-ash-dark-400 h-10 w-full flex items-center justify-center">
+                    {/* <button className="bg-ash-dark-400 h-10 w-full flex items-center justify-center">
                         <ICStar className="inline text-[#FFC10D] w-4 h-4 mr-3" />
                         <span className="text-xs font-bold">Saved</span>
-                    </button>
+                    </button> */}
                 </aside>
             </div>
         );
@@ -306,10 +302,10 @@ function InfoLayout({ children }: any) {
                         placeholder="Search token, pair"
                         size={5}
                     />
-                    <button className="bg-ash-dark-600 h-10 w-24 flex items-center justify-center flex-shrink-0">
+                    {/* <button className="bg-ash-dark-600 h-10 w-24 flex items-center justify-center flex-shrink-0">
                         <ICStar className="inline text-[#FFC10D] w-4 h-4 mr-3" />
                         <span className="text-2xs font-bold">Saved</span>
-                    </button>
+                    </button> */}
                     <div>
                         <AddressMenu
                             connectBtn={(connect) => {
@@ -348,12 +344,12 @@ function InfoLayout({ children }: any) {
             <div className="pb-[4.5rem]">{children}</div>
             <nav className="fixed bottom-0 left-0 right-0 w-full text-white bg-black/40 backdrop-filter backdrop-blur-xl">
                 <ul className="flex">
-                    <MNavLink
+                    {/* <MNavLink
                         href={{ pathname: "/info" }}
                         name="Overview"
                         Icon={ICHomeTrendUp}
                         active={isActive("/info", true)}
-                    />
+                    /> */}
                     <MNavLink
                         href="/info/tokens"
                         name="Tokens"
@@ -366,7 +362,7 @@ function InfoLayout({ children }: any) {
                         Icon={ICDrop}
                         active={isActive("/info/pools", true)}
                     />
-                    <MNavLink
+                    {/* <MNavLink
                         href="/info/wallet"
                         name="Wallets"
                         Icon={ICWallet}
@@ -377,7 +373,7 @@ function InfoLayout({ children }: any) {
                         name="Trans"
                         Icon={ICRepeat}
                         active={isActive("/info/transactions", true)}
-                    />
+                    /> */}
                 </ul>
             </nav>
         </div>

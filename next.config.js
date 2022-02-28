@@ -10,4 +10,13 @@ module.exports = withReactSvg(withFonts({
         locales: ["en"],
         defaultLocale: "en",
     },
+    async redirects() {
+        return [
+            {
+                source: '/info',
+                destination: '/info/tokens',
+                permanent: true,
+            },
+        ]
+    },
 }))

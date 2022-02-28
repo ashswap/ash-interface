@@ -45,7 +45,7 @@ const Nav = () => {
             >
                 <ICChart className="inline-block w-4 h-4 md:mr-2 transition-none"/>
                 <div>
-                <span className="inline-block mr-1">Pool</span>
+                <span className="inline-block mr-1">Analytic</span>
                 <ICNewTab className="inline-block w-2.5 h-2.5 transition-none"/>
                 </div>
             </div>

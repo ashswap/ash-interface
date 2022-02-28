@@ -1,15 +1,9 @@
-import { Popover, Transition } from "@headlessui/react";
 import ICArrowBottomRight from "assets/svg/arrow-bottom-right.svg";
-
-
-
 import { abbreviateCurrency } from "helper/number";
 import { useScreenSize } from "hooks/useScreenSize";
-import { IToken } from "interface/token";
 import { ValueOf } from "interface/utilities";
 import moment from "moment";
 import React, { useMemo, useState } from "react";
-import { usePopper } from "react-popper";
 import {
     Bar,
     BarChart,
@@ -55,16 +49,11 @@ const TIME_UNIT = {
     MONTH: "M",
 } as const;
 
-
 function FeeByTokensChart() {
     const screenSize = useScreenSize();
     const [timeUnit, setTimeUnit] = useState<ValueOf<typeof TIME_UNIT>>("D");
     const xAxisPr = useMemo(() => {
-        const pr = screenSize?.xl
-            ? 80
-            : screenSize?.lg
-            ? 20
-            : 10;
+        const pr = screenSize?.xl ? 80 : screenSize?.lg ? 20 : 10;
         return pr;
     }, [screenSize]);
     const ticks = useMemo(() => {
@@ -75,7 +64,10 @@ function FeeByTokensChart() {
         return Array.from(temp);
     }, []);
     return (
-        <div className="bg-ash-dark-600 px-4 lg:px-[1.675rem] py-6 w-full overflow-hidden relative" style={{boxShadow: "0px 50px 50px rgba(18, 16, 29, 0.5)"}}>
+        <div
+            className="bg-ash-dark-600 px-4 lg:px-[1.675rem] py-6 w-full overflow-hidden relative"
+            style={{ boxShadow: "0px 50px 50px rgba(18, 16, 29, 0.5)" }}
+        >
             <div className="h-[320px] sm:h-[200px] lg:h-[370px]">
                 <ResponsiveContainer>
                     <BarChart data={fakeData}>

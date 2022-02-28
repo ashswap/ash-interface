@@ -12,7 +12,7 @@ import { GetServerSideProps, NextPage } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import React, { ReactElement } from "react";
-import TokenChart from "components/Pages/Tokens/[id]/TokenChart";
+import TokenChart from "views/info/Tokens/[id]/TokenChart";
 
 type Page<P = {}> = NextPage<P> & {
     getLayout?: (page: ReactElement) => ReactElement;
@@ -140,7 +140,7 @@ TokenDetailPage.getLayout = function getLayout(page: ReactElement) {
     return <InfoLayout>{page}</InfoLayout>;
 };
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
-    const { id: tokenId } = params;
+    const { id: tokenId } = params || {};
     const token = TOKENS.find((t) => t.id === tokenId);
     if (token) {
         return {

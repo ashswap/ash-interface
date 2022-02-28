@@ -53,21 +53,21 @@ const PoolRecord = ({
         },
         [screenSize.xl]
     );
-    const volumn = useMemo(() => {
-        return format(poolData.volume);
-    }, [format, poolData.volume]);
+    const volume = useMemo(() => {
+        return format(poolData.usd_volume);
+    }, [format, poolData.usd_volume]);
     const liquidity = useMemo(() => {
         return format(poolData.total_value_locked);
     }, [format, poolData.total_value_locked]);
     return (
         <div className="flex items-center bg-ash-dark-600 px-4 lg:px-[1.625rem] text-ash-gray-500 space-x-2 text-xs h-14 overflow-hidden">
-            <div className="w-5">
+            {/* <div className="w-5">
                 {active ? (
                     <ICStar className="w-4 h-4 text-pink-600" />
                 ) : (
                     <ICStarOutline className="w-4 h-4 text-ash-gray-500" />
                 )}
-            </div>
+            </div> */}
             <div className="w-5">{order}</div>
             <div className="flex-1 overflow-hidden">
                 <div className="flex items-center mr-2 overflow-hidden">
@@ -96,7 +96,7 @@ const PoolRecord = ({
             </div>
             <div className="w-16 lg:w-24 xl:w-32 text-xs text-right">
                 <span className="text-ash-gray-500">$</span>
-                <span className="text-white">{volumn}</span>
+                <span className="text-white">{volume}</span>
             </div>
             <div className="w-16 lg:w-24 xl:w-32 text-xs text-right">
                 <span className="text-ash-gray-500">$</span>
@@ -116,8 +116,8 @@ function PoolsTable() {
     const [pageIndex, setPageIndex] = useState(0);
     const [pageSize, setPageSize] = useState(10);
     const [sortBy, setSortBy] = useState<
-        "volume" | "total_value_locked" | "apr_day"
-    >("volume");
+        "usd_volume" | "total_value_locked" | "apr_day"
+    >("usd_volume");
     const poolRecords: PoolRecord[] = useMemo(() => {
         if (!data?.length) return [];
         return data.map((record) => {
@@ -147,14 +147,14 @@ function PoolsTable() {
     return (
         <div className="flex flex-col space-y-[1px]">
             <div className="flex bg-ash-dark-600 px-4 lg:px-[1.625rem] text-ash-gray-500 space-x-2 text-2xs lg:text-xs">
-                <div className="w-5 py-4"></div>
+                {/* <div className="w-5 py-4"></div> */}
                 <div className="w-5 py-4">#</div>
                 <div className="flex-1 py-4 overflow-hidden">Token</div>
                 <div
                     className={`w-16 lg:w-24 xl:w-32 text-right py-4 cursor-pointer ${
-                        sortBy === "volume" && "text-white"
+                        sortBy === "usd_volume" && "text-white"
                     }`}
-                    onClick={() => setSortBy("volume")}
+                    onClick={() => setSortBy("usd_volume")}
                 >
                     Volume 24H
                 </div>
@@ -167,7 +167,7 @@ function PoolsTable() {
                     Liquidity
                 </div>
                 <div
-                    className={`hidden md:block w-16 lg:w-24 xl:w-32 text-right py-4 ${
+                    className={`hidden md:block w-16 lg:w-24 xl:w-32 text-right py-4 cursor-pointer ${
                         sortBy === "apr_day" && "text-white"
                     }`}
                     onClick={() => setSortBy("apr_day")}
