@@ -11,6 +11,7 @@ import { ReactElement, ReactNode, useEffect } from "react";
 import * as dappConfig from "../dapp-config";
 import * as gtag from "../helper/gtag";
 import "../styles/globals.css";
+import {NextPage} from "next";
 
 type NextPageWithLayout = NextPage & {
     getLayout?: (page: ReactElement) => ReactNode
