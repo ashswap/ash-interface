@@ -253,7 +253,7 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
         <HeadlessModal
             open={!!open}
             onClose={() => onClose && onClose()}
-            transition={screenSize.sm ? "btt" : "center"}
+            transition={screenSize.msm ? "btt" : "center"}
         >
             <div
                 className="clip-corner-4 clip-corner-tl bg-ash-dark-600 p-4

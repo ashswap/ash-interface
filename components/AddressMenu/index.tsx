@@ -1,13 +1,9 @@
-import { Button as AntdButton, Dropdown, Menu } from "antd";
-import Avatar from "assets/images/avatar.png";
+import { Dropdown, Menu } from "antd";
 import IconChange from "assets/svg/change.svg";
 import IconCopy from "assets/svg/copy.svg";
 import IconDisconnect from "assets/svg/disconnect.svg";
-import IconDown from "assets/svg/down-white.svg";
-import Wallet from "assets/svg/wallet.svg";
-import Button from "components/Button";
 import HeadlessModal, {
-    HeadlessModalDefaultHeader
+    HeadlessModalDefaultHeader,
 } from "components/HeadlessModal";
 import { TAILWIND_BREAKPOINT } from "const/mediaQueries";
 import { useDappContext } from "context/dapp";
@@ -15,10 +11,25 @@ import { useWallet } from "context/wallet";
 import useLogout from "hooks/useLogout";
 import useMediaQuery from "hooks/useMediaQuery";
 import useMounted from "hooks/useMounted";
-import Image from "next/image";
-import { useCallback, useEffect, useState } from "react";
+import {
+    Dispatch,
+    SetStateAction,
+    useCallback,
+    useEffect,
+    useState,
+} from "react";
 import styles from "./AddressMenu.module.css";
-function AddressMenu() {
+type AddressMenuProp = {
+    infoLayout?: boolean;
+    dropdownBtn: (
+        address: string,
+        setMShowMenu: Dispatch<SetStateAction<boolean>>
+    ) => JSX.Element;
+    connectBtn: (
+        connectWallet: (token?: string | undefined) => void
+    ) => JSX.Element;
+};
+function AddressMenu({ infoLayout, dropdownBtn, connectBtn }: AddressMenuProp) {
     const { loggedIn, address } = useDappContext();
     const logoutDapp = useLogout();
     const [mShowMenu, setMShowMenu] = useState(false);
@@ -51,7 +62,7 @@ function AddressMenu() {
             <Menu.Item
                 key="1"
                 className={styles.addressMenuItem}
-                icon={<IconCopy />}
+                icon={<IconCopy className="text-ash-gray-500" />}
                 onClick={copyAddress}
             >
                 Copy address
@@ -74,23 +85,6 @@ function AddressMenu() {
         </Menu>
     );
 
-    const DropdownBtn = () => (
-        <AntdButton
-            icon={<Image src={Avatar} width={24} height={24} alt="avatar" />}
-            style={{ width: 160 }}
-            className={styles.connect}
-            onClick={() => isSMScreen && setMShowMenu(true)}
-        >
-            <span className={styles.address}>
-                {address.slice(0, 4) +
-                    "..." +
-                    address.slice(address.length - 4)}
-            </span>
-            <span>
-                <IconDown />
-            </span>
-        </AntdButton>
-    );
     return (
         <>
             <div>
@@ -101,24 +95,14 @@ function AddressMenu() {
                             trigger={["click"]}
                             disabled={isSMScreen}
                             visible={showMenu}
-                            onVisibleChange={() => setShowMenu(state => !state)}
+                            onVisibleChange={() =>
+                                setShowMenu((state) => !state)
+                            }
                         >
-                            <div>
-                                <DropdownBtn />
-                            </div>
+                            <div>{dropdownBtn(address, setMShowMenu)}</div>
                         </Dropdown>
                     ) : (
-                        <>
-                            <Button
-                                leftIcon={!isSMScreen ? <Wallet /> : undefined}
-                                bottomRightCorner
-                                onClick={() => connectWallet()}
-                                glowOnHover
-                                className="text-xs"
-                            >
-                                Connect wallet
-                            </Button>
-                        </>
+                        <>{connectBtn(connectWallet)}</>
                     ))}
             </div>
             {isSMScreen && (
@@ -141,7 +125,7 @@ function AddressMenu() {
                                     onClick={copyAddress}
                                 >
                                     <i className="mr-4">
-                                        <IconCopy className="h-7 w-7" />
+                                        <IconCopy className="h-7 w-7 text-ash-gray-500" />
                                     </i>
                                     <span>Copy address</span>
                                 </button>

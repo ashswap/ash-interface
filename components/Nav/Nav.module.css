@@ -7,9 +7,12 @@
     cursor: pointer;
 }
 
-.container .btn:hover {
-    @apply bg-ash-dark-600 text-white;
+@media (hover: hover){
+    .container .btn:hover {
+        @apply bg-ash-dark-600 text-white;
+    }
 }
+
 
 .container .btn:active {
     @apply bg-transparent;

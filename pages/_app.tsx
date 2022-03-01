@@ -7,13 +7,24 @@ import { AppProps } from "next/app";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import Script from "next/script";
-import { useEffect } from "react";
+import { ReactElement, ReactNode, useEffect } from "react";
 import * as dappConfig from "../dapp-config";
 import * as gtag from "../helper/gtag";
 import "../styles/globals.css";
+import {NextPage} from "next";
 
-function MyApp({ Component, pageProps }: AppProps) {
+type NextPageWithLayout = NextPage & {
+    getLayout?: (page: ReactElement) => ReactNode
+  }
+  
+  type AppPropsWithLayout = AppProps & {
+    Component: NextPageWithLayout
+  }
+
+function MyApp({ Component, pageProps }: AppPropsWithLayout) {
     const router = useRouter();
+    const getLayout = Component.getLayout ?? ((page) => page)
+    
     useEffect(() => {
         const handleRouteChange = (url: string) => {
             gtag.pageview(url);
@@ -59,7 +70,8 @@ function MyApp({ Component, pageProps }: AppProps) {
             <DappContextProvider config={dappConfig}>
                 <Authenticate>
                     <WalletProvider>
-                        <Component {...pageProps} />
+                        {/* <Component {...pageProps} /> */}
+                        {getLayout(<Component {...pageProps} />)}
                         <ConnectWalletModal/>
                     </WalletProvider>
                 </Authenticate>

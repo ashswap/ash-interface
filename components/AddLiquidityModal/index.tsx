@@ -419,7 +419,7 @@ const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
         <HeadlessModal
             open={!!open}
             onClose={() => onClose && onClose()}
-            transition={screenSize.sm ? "btt" : "center"}
+            transition={screenSize.msm ? "btt" : "center"}
         >
             <div
                 className={`clip-corner-4 clip-corner-tl bg-ash-dark-600 text-white p-4 fixed bottom-0 inset-x-0 sm:static sm:mt-28 sm:ash-container flex flex-col max-h-full ${

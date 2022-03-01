@@ -21,6 +21,7 @@ interface Props {
     textColorClassName?: string | undefined;
     textClassName?: string | undefined;
     style?: CSSProperties | undefined;
+    size?: number;
 }
 
 const Input = (props: Props) => {
@@ -47,6 +48,7 @@ const Input = (props: Props) => {
                 value={props.value}
                 onChange={props.onChange}
                 disabled={props.disabled}
+                size={props.size}
             />
             {props.suffix && <span className="ml-3">{props.suffix}</span>}
         </div>

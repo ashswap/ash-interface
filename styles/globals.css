@@ -37,7 +37,7 @@ a {
 
 * {
     box-sizing: border-box;
-    transition: all 0.3s ease;
+    /* transition: all 0.3s ease; */
 }
 
 /* Chrome, Safari, Edge, Opera */
@@ -138,4 +138,14 @@ input[type="number"] {
 .ReactModal__Body--open,
 .ReactModal__Html--open {
     overflow: hidden;
+}
+
+@media (pointer: fine) and (hover: hover){
+    ::-webkit-scrollbar{
+        @apply w-1.5 h-1.5 bg-transparent;
+    }
+    ::-webkit-scrollbar-thumb{
+        @apply bg-ash-gray-500/80 rounded-full hover:bg-ash-gray-500/50 border border-solid border-transparent bg-clip-padding;
+    
+    }
 }

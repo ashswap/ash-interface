@@ -1,7 +1,5 @@
 .container {
     @apply flex items-center justify-center flex-row;
-    padding: 0px 22px;
-    height: 48px;
 }
 
 .input {
