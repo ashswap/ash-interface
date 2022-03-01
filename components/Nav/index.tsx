@@ -37,7 +37,8 @@ const Nav = () => {
                 <span className="inline-block">Pool</span>
             </div>
         </Link>
-        <a href="/info" target="_blank">
+        <Link href="/info" passHref>
+        <a target="_blank">
             <div
                 className={`transition ${styles.btn} ${
                     isActive("/info") ? styles.active : ""
@@ -50,6 +51,7 @@ const Nav = () => {
                 </div>
             </div>
         </a>
+        </Link>
         <SocialMenu />
     </div>
     );

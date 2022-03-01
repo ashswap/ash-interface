@@ -134,7 +134,7 @@ function FeeByTokensChart() {
                 </div>
             </div>
             <div className="flex space-x-2 text-xs">
-                <TokensSelectorForChart />
+                {/* <TokensSelectorForChart /> */}
                 <button
                     className={`w-9 h-9 bg-ash-dark-400 ${
                         timeUnit === TIME_UNIT.DAY
