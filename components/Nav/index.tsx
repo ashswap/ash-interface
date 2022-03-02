@@ -7,13 +7,14 @@ import ICPool from "assets/svg/pool.svg";
 import ICSwap from "assets/svg/swap.svg";
 import ICChart from "assets/svg/chart.svg";
 import ICNewTab from "assets/svg/new-tab.svg";
+import ICStake from "assets/svg/stake.svg";
 
 const Nav = () => {
     const router = useRouter();
 
-    const isActive = useCallback((path: string) => router.route === path, [
-        router
-    ]);
+    const isActive = useCallback((path: string, exact = true) => {
+        return exact ? router.route === path : router.route.startsWith(path);
+    }, [router]);
 
     return (
         <div className={`${styles.container} text-black dark:text-white space-x-[0.375rem]`}>
@@ -35,6 +36,16 @@ const Nav = () => {
             >
                 <ICPool className="inline-block w-4 h-4 md:mr-2 transition-none"/>
                 <span className="inline-block">Pool</span>
+            </div>
+        </Link>
+        <Link href="/stake" passHref>
+            <div
+                className={`transition ${styles.btn} ${
+                    isActive("/stake", false) ? styles.active : ""
+                }`}
+            >
+                <ICStake className="inline-block w-4 h-4 md:mr-2 transition-none"/>
+                <span className="inline-block">Stake</span>
             </div>
         </Link>
         <Link href="/info" passHref>

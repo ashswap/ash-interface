@@ -48,6 +48,8 @@ module.exports = {
                     700: "#E3AD12",
                 },
                 "ash-gray": {
+                    300: "#C4C4C4",
+                    400: "#B7B7B7",
                     500: "#757391"
                 },
                 "ash-green": {
@@ -58,7 +60,20 @@ module.exports = {
                 },
                 "ash-blue": {
                     500: "#2175FF"
+                },
+                "ash-cyan": {
+                    500: "#00FFFF"
+                },
+                "stake-dark": {
+                    400: "#2B2C44"
+                },
+                "stake-green": {
+                    500: "#14E499"
+                },
+                "stake-gray": {
+                    500: "#B7B7D7"
                 }
+
             }
         },
     },
