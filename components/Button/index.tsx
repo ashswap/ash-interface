@@ -9,7 +9,7 @@ interface Props {
     topLeftCorner?: boolean;
     bottomRightCorner?: boolean;
     outline?: boolean;
-    primaryColor?: "dark-600" | "dark-700" | "white" | "yellow-700";
+    primaryColor?: "dark-600" | "dark-700" | "white" | "yellow-700" | "stake-green-500";
     disable?: boolean;
     className?: string | undefined;
     textClassName?: string | undefined;
