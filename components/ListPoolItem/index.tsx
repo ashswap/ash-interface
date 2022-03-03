@@ -60,8 +60,8 @@ const ListPoolItem = (props: Props) => {
     const [tokenBalances, setTokenBalances] = useState<TokenBalancesMap>({});
 
     const ownLiquidity = useMemo(() => {
-        return balances[props.pool.lpToken.id]
-            ? balances[props.pool.lpToken.id].balance
+        return balances?.[props.pool.lpToken.id]
+            ? balances?.[props.pool.lpToken.id].balance
             : new BigNumber(0);
     }, [balances, props.pool]);
 
@@ -147,7 +147,7 @@ const ListPoolItem = (props: Props) => {
         if (!balance0 || !balance1) {
             return new BigNumber(0);
         }
-
+        
         const valueUsd0 = toEGLD(
             token0,
             balance0.balance.toString()

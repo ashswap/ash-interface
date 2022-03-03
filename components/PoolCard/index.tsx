@@ -19,9 +19,8 @@ interface Props {
 const PoolCard = (props: Props) => {
     const [isExpand, setIsExpand] = useState<boolean>(false);
     const [openAddLiquidity, setOpenAddLiquidity] = useState<boolean>(false);
-    const [openRemoveLiquidity, setOpenRemoveLiquidity] = useState<boolean>(
-        false
-    );
+    const [openRemoveLiquidity, setOpenRemoveLiquidity] =
+        useState<boolean>(false);
     const { value0, value1, capacityPercent, valueUsd } = usePool();
 
     return (
@@ -66,7 +65,7 @@ const PoolCard = (props: Props) => {
                         <div
                             className={styles.tokenIcon}
                             style={{
-                                marginLeft: "-10px"
+                                marginLeft: "-10px",
                             }}
                         >
                             <Image
@@ -124,7 +123,10 @@ const PoolCard = (props: Props) => {
                                     Your liquidity
                                 </div>
                                 <div className="text-white font-bold text-lg">
-                                    {capacityPercent.toFixed(2)}%
+                                    {capacityPercent.lt(0.01)
+                                        ? "< 0.01"
+                                        : capacityPercent.toString()}
+                                    %
                                 </div>
                             </div>
                         </div>
@@ -134,7 +136,7 @@ const PoolCard = (props: Props) => {
                                 style={{
                                     paddingRight: 42,
                                     textDecorationColor:
-                                        theme.extend.colors.yellow[600]
+                                        theme.extend.colors.yellow[600],
                                 }}
                             >
                                 <span
@@ -148,7 +150,7 @@ const PoolCard = (props: Props) => {
                                 className="text-pink-600 underline select-none"
                                 style={{
                                     textDecorationColor:
-                                        theme.extend.colors.pink[600]
+                                        theme.extend.colors.pink[600],
                                 }}
                             >
                                 <span
@@ -206,7 +208,7 @@ const PoolCard = (props: Props) => {
                     <div className="font-bold text-sm mr-2">Detail</div>
                     <Down
                         style={{
-                            transform: `rotate(${isExpand ? "180" : "0"}deg)`
+                            transform: `rotate(${isExpand ? "180" : "0"}deg)`,
                         }}
                     />
                 </div>
