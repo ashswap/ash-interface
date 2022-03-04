@@ -31,22 +31,19 @@ import HistoryModal from "components/HistoryModal";
 import IconButton from "components/IconButton";
 import Setting from "components/Setting";
 import SwapAmount from "components/SwapAmount";
-import { TAILWIND_BREAKPOINT } from "const/mediaQueries";
 import { gasLimit, network } from "const/network";
 import { useDappContext } from "context/dapp";
 import { useSwap } from "context/swap";
 import { useWallet } from "context/wallet";
 import { toEGLD, toWei } from "helper/balance";
-import useMediaQuery from "hooks/useMediaQuery";
 import useMounted from "hooks/useMounted";
+import { useScreenSize } from "hooks/useScreenSize";
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import styles from "./Swap.module.css";
 
 const Swap = () => {
-    const isSMScreen = useMediaQuery(
-        `(max-width: ${TAILWIND_BREAKPOINT.SM}px)`
-    );
+    const screenSize = useScreenSize();
     const mounted = useMounted();
     const {
         tokenFrom,
@@ -75,7 +72,7 @@ const Swap = () => {
     useEffect(() => {
         setShowSetting(false);
         openHistoryModal(false);
-    }, [isSMScreen]);
+    }, [screenSize.isMobile]);
     const revertToken = () => {
         setTokenFrom(tokenTo);
         setTokenTo(tokenFrom);
@@ -340,7 +337,7 @@ const Swap = () => {
             <div className="flex max-w-full">
                 <div
                     className={`w-full max-w-[28.75rem] transition-none relative ${showSetting &&
-                        !isSMScreen &&
+                        !screenSize.isMobile &&
                         "sm:w-7/12"}`}
                 >
                     <div className="clip-corner-4 clip-corner-tl bg-ash-dark-600 absolute top-0 left-0 right-0 bottom-0 z-[-1]"></div>
@@ -610,7 +607,7 @@ const Swap = () => {
                         </div>
                     </div>
                 </div>
-                {showSetting && !isSMScreen && (
+                {showSetting && !screenSize.isMobile && (
                     <div className="relative px-12 py-14 bg-ash-dark-600 sm:w-5/12 max-w-[23rem] text-white border-l border-l-[#757391]">
                         <div className="absolute top-4 right-4">
                             <IconButton
@@ -627,12 +624,13 @@ const Swap = () => {
                 open={isOpenHistoryModal}
                 onClose={() => openHistoryModal(false)}
             />
-            {isSMScreen && (
+            {screenSize.isMobile && (
                 <HeadlessModal
                     open={showSetting}
                     onClose={() => setShowSetting(false)}
+                    transition="btt"
                 >
-                    <div className="clip-corner-4 clip-corner-tl bg-ash-dark-600 p-4 text-white flex flex-col fixed bottom-0">
+                    <div className="clip-corner-4 clip-corner-tl bg-ash-dark-600 p-4 text-white flex flex-col fixed bottom-0 inset-x-0">
                         <HeadlessModalDefaultHeader
                             onClose={() => setShowSetting(false)}
                         />
