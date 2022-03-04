@@ -224,7 +224,6 @@ export function WalletProvider({ children }: Props) {
                         };
                     }
                 }
-
                 setBalances(tokenBalances);
             });
     }, [tokens, lpTokens, dapp.loggedIn, dapp.dapp.proxy, dapp.address]);

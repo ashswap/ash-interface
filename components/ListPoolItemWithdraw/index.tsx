@@ -12,6 +12,7 @@ import { usePool } from "components/ListPoolItem";
 import RemoveLiquidityModal from "components/RemoveLiquidityModal";
 import { TAILWIND_BREAKPOINT } from "const/mediaQueries";
 import { toEGLD } from "helper/balance";
+import { abbreviateCurrency, currencyFormater } from "helper/number";
 import useMediaQuery from "hooks/useMediaQuery";
 import IPool from "interface/pool";
 import Image from "next/image";
@@ -31,7 +32,7 @@ const ListPoolItemWithdraw = (props: Props) => {
     const isSMScreen = useMediaQuery(
         `(max-width: ${TAILWIND_BREAKPOINT.SM}px)`
     );
-    const { value0, value1, capacityPercent } = usePool();
+    const { value0, value1, capacityPercent, valueUsd } = usePool();
     useEffect(() => {
         if (isSMScreen) {
             setIsExpand(false);
@@ -114,7 +115,7 @@ const ListPoolItemWithdraw = (props: Props) => {
                                 {/* {capacityPercent.toFixed(3)}% */}
                                 <span className="inline-block mr-1">
                                     <span className="text-ash-gray-500">$</span>
-                                    <span>351.21</span>
+                                    <span>{abbreviateCurrency(valueUsd.toNumber())}</span>
                                 </span>
                                 {isExpand && (
                                     <span className="inline-block text-ash-green-500 font-bold text-2xs">
@@ -133,7 +134,7 @@ const ListPoolItemWithdraw = (props: Props) => {
                                 </span>
                             </div> */}
                                 <span className="inline-block mr-1 text-sm">
-                                    0.0051%
+                                    {capacityPercent.lt(0.01) ? "< 0.01" : capacityPercent.toString()}%
                                 </span>
                                 {isExpand && (
                                     <span className="inline-block text-ash-green-500 font-bold text-2xs">
