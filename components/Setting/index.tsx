@@ -16,19 +16,28 @@ const Setting = (props: Props) => {
             <div className="flex flex-row gap-1 my-5">
                 <SlippageSelect
                     active={slippage === 0.001}
-                    onClick={() => setSlippage(0.001)}
+                    onClick={() => {
+                        setSlippage(0.001);
+                        setDisplaySlip("0.1");
+                    }}
                 >
                     0.1%
                 </SlippageSelect>
                 <SlippageSelect
                     active={slippage === 0.005}
-                    onClick={() => setSlippage(0.005)}
+                    onClick={() => {
+                        setSlippage(0.005);
+                        setDisplaySlip("0.5");
+                    }}
                 >
                     0.5%
                 </SlippageSelect>
                 <SlippageSelect
                     active={slippage === 0.01}
-                    onClick={() => setSlippage(0.01)}
+                    onClick={() => {
+                        setSlippage(0.01);
+                        setDisplaySlip("1");
+                    }}
                 >
                     1%
                 </SlippageSelect>
