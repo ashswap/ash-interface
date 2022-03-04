@@ -27,7 +27,7 @@ const PoolBanner = () => {
                         <div className="sm:pt-4 md:pt-8 lg:pt-11">
                             <div className="mb-5 text-[2rem] lg:text-5xl leading-tight font-bold">
                                 <div style={{ color: "white" }}>
-                                    Deposite to
+                                    Deposit to
                                 </div>
                                 <div style={{ color: "#ffc10c" }}>
                                     Earn token

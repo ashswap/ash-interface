@@ -77,7 +77,7 @@ const PoolFilter = (props: Props) => {
                             className={`h-8 sm:h-10 w-[4.5rem] sm:w-[6.5rem] font-bold text-center ${isLivedPool &&
                                 "bg-pink-600 text-white"}`}
                         >
-                            Lived
+                            Live
                         </button>
                         <button
                             className={`h-8 sm:h-10 w-[4.5rem] sm:w-[6.5rem] font-bold text-center ${!isLivedPool &&

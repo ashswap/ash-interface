@@ -80,7 +80,7 @@ const ListPool = (props: Props) => {
                             className={`flex text-text-input-3 h-12 items-center w-full sm:w-[80%] space-x-1`}
                         >
                             <div className="hidden sm:block w-3/12">
-                                Deposite
+                                Deposit
                             </div>
                             <div className="sm:hidden w-[45%]">#Pool</div>
                             <div className="w-[18%] sm:w-2/12 text-white">

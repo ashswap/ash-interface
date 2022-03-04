@@ -85,7 +85,7 @@ const HistoryModal = ({ open, onClose }: Props) => {
                         return null;
                     }
                     return {
-                        msg: `Swap successed ${toEGLD(
+                        msg: `Swap Success ${toEGLD(
                             tokenIn,
                             token_amount_in
                         ).decimalPlaces(7)} ${tokenIn.name} to ${toEGLD(
@@ -115,7 +115,7 @@ const HistoryModal = ({ open, onClose }: Props) => {
                     return {
                         msg: `${
                             name === "add_liquidity" ? "Add" : "Remove"
-                        } successed ${toEGLD(
+                        } Success ${toEGLD(
                             token1,
                             first_token_amount
                         ).decimalPlaces(7)} ${token1?.name} and ${toEGLD(
