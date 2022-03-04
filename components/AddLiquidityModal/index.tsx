@@ -88,7 +88,7 @@ const TokenInput = ({
                             ? `1px solid ${theme.extend.colors["insufficent-fund"]}`
                             : "",
                     }}
-                    onChange={e => onChangeValue(e.target.value)}
+                    onChange={(e) => onChangeValue(e.target.value)}
                 />
             </div>
             <div
@@ -150,7 +150,7 @@ const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
     const addLP = useCallback(async () => {
         if (!dapp.loggedIn || adding) return;
         setAdding(true);
-        try {           
+        try {
             let tx = await callContract(new Address(dapp.address), {
                 func: new ContractFunction("MultiESDTNFTTransfer"),
                 gasLimit: new GasLimit(gasLimit),
@@ -169,6 +169,7 @@ const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
                     new TokenIdentifierValue(Buffer.from("addLiquidity")),
                     new BigUIntValue(toWei(pool.tokens[0], value0)),
                     new BigUIntValue(toWei(pool.tokens[1], value1)),
+                    new AddressValue(Address.Zero()),
                 ],
             });
 
@@ -192,14 +193,23 @@ const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
             }, 10000);
         } catch (error) {
             // TODO: extension close without response
-            console.log(error)
+            console.log(error);
         }
         setAdding(false);
 
         if (onClose) {
             onClose();
         }
-    }, [dapp, value0, value1, pool, onClose, callContract, fetchBalances, adding]);
+    }, [
+        dapp,
+        value0,
+        value1,
+        pool,
+        onClose,
+        callContract,
+        fetchBalances,
+        adding,
+    ]);
 
     // find pools + fetch reserves
     useEffect(() => {
@@ -248,8 +258,8 @@ const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
                     ],
                 })
             ),
-        ]).then(results => {
-            let rates = results.slice(0, 2).map(result => {
+        ]).then((results) => {
+            let rates = results.slice(0, 2).map((result) => {
                 let resultHex = Buffer.from(
                     result.returnData[0],
                     "base64"
@@ -480,7 +490,7 @@ const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
                                         poolContext.value0.toString()
                                     ).toFixed(2)}
                                     value={value0}
-                                    onChangeValue={val => onChangeValue0(val)}
+                                    onChangeValue={(val) => onChangeValue0(val)}
                                     isInsufficentFund={isInsufficentFund0}
                                     balance={balance0}
                                 />
@@ -493,7 +503,7 @@ const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
                                         poolContext.value1.toString()
                                     ).toFixed(2)}
                                     value={value1}
-                                    onChangeValue={val => onChangeValue1(val)}
+                                    onChangeValue={(val) => onChangeValue1(val)}
                                     isInsufficentFund={isInsufficentFund1}
                                     balance={balance1}
                                 />
@@ -532,8 +542,9 @@ const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
                                     }`}
                                 >
                                     <div
-                                        className={`w-6/12 ${isProMode &&
-                                            "sm:w-8/12"}`}
+                                        className={`w-6/12 ${
+                                            isProMode && "sm:w-8/12"
+                                        }`}
                                     >
                                         <div className="mb-2">
                                             Earn per month
@@ -541,8 +552,9 @@ const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
                                         <div>-</div>
                                     </div>
                                     <div
-                                        className={`w-6/12 ${isProMode &&
-                                            "sm:w-4/12"}`}
+                                        className={`w-6/12 ${
+                                            isProMode && "sm:w-4/12"
+                                        }`}
                                     >
                                         <div className="mb-2">Farm per day</div>
                                         <div>-</div>
@@ -626,7 +638,8 @@ const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
                                     !isAgree ||
                                     dapp.account.balance === "0" ||
                                     isInsufficentFund0 ||
-                                    isInsufficentFund1 || adding
+                                    isInsufficentFund1 ||
+                                    adding
                                 }
                                 onClick={isAgree ? addLP : () => {}}
                             >
