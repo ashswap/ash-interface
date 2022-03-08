@@ -215,12 +215,6 @@ const ListPoolItemWithdraw = (props: Props) => {
                                     </div>
                                     <div className="text-sm">$512,913,133</div>
                                 </div>
-                                <div className="bg-ash-dark-400 h-12 px-4 flex justify-between items-center">
-                                    <div className="text-2xs">
-                                        Performance Fee
-                                    </div>
-                                    <div className="text-sm">$512,913,133</div>
-                                </div>
                             </div>
                         </div>
 
@@ -421,10 +415,6 @@ const ListPoolItemWithdraw = (props: Props) => {
                                     3.412351 {props.pool.tokens[0].name}-
                                     {props.pool.tokens[1].name}
                                 </div>
-                            </div>
-                            <div className="flex justify-between items-center h-9 space-x-4 px-4">
-                                <div className="text-2xs">Performance Fee</div>
-                                <div className="text-sm">2%</div>
                             </div>
                             <div className="flex justify-between items-center h-9 space-x-4 px-4">
                                 <div className="text-2xs">Trading APR</div>

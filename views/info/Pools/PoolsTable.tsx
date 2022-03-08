@@ -8,6 +8,7 @@ import { fetcher } from "helper/common";
 import { abbreviateCurrency } from "helper/number";
 import { useScreenSize } from "hooks/useScreenSize";
 import IPool from "interface/pool";
+import { PoolStatsRecord } from "interface/poolStats";
 import Image from "next/image";
 import React, { useCallback, useMemo, useState } from "react";
 import useSWR from "swr";
@@ -15,23 +16,8 @@ const currencyFormater = new Intl.NumberFormat("en-US", {
     maximumFractionDigits: 2,
 });
 
-type PoolRecord = {
-    apr_day: number;
-    apr_month: number;
-    apr_week: number;
-    pool_address: string;
-    ratio: number;
-    timestamp: number;
-    token_1_amount: number;
-    token_1_value_locked: number;
-    token_2_amount: number;
-    token_2_value_locked: number;
-    total_value_locked: number;
-    usd_volume: number;
-    volume: number;
-    // added from client
-    pool?: IPool;
-};
+
+type PoolWithStatsRecords = PoolStatsRecord & {pool?: IPool};
 const PoolRecord = ({
     active,
     order,
@@ -39,7 +25,7 @@ const PoolRecord = ({
 }: {
     active: boolean;
     order: number;
-    poolData: PoolRecord;
+    poolData: PoolWithStatsRecords;
 }) => {
     const screenSize = useScreenSize();
     const [token1, token2] = poolData?.pool?.tokens || [];
@@ -109,7 +95,7 @@ const PoolRecord = ({
     );
 };
 function PoolsTable() {
-    const { data } = useSWR<PoolRecord[]>(
+    const { data } = useSWR<PoolStatsRecord[]>(
         `${network.ashApiBaseUrl}/pool`,
         fetcher
     );
@@ -118,7 +104,7 @@ function PoolsTable() {
     const [sortBy, setSortBy] = useState<
         "usd_volume" | "total_value_locked" | "apr_day"
     >("usd_volume");
-    const poolRecords: PoolRecord[] = useMemo(() => {
+    const poolRecords: PoolWithStatsRecords[] = useMemo(() => {
         if (!data?.length) return [];
         return data.map((record) => {
             return {
@@ -127,15 +113,15 @@ function PoolsTable() {
             };
         });
     }, [data]);
-    const sortedPoolRecords: PoolRecord[] = useMemo(() => {
+    const sortedPoolRecords: PoolWithStatsRecords[] = useMemo(() => {
         return [...poolRecords].sort((x, y) => {
             return y[sortBy] - x[sortBy];
         });
     }, [poolRecords, sortBy]);
-    const displayPoolRecords: PoolRecord[][] = useMemo(() => {
+    const displayPoolRecords: PoolWithStatsRecords[][] = useMemo(() => {
         const length = sortedPoolRecords.length;
         const nPage = Math.ceil(length / pageSize);
-        const pagination: PoolRecord[][] = [];
+        const pagination: PoolWithStatsRecords[][] = [];
         for (let i = 0; i < nPage; i++) {
             pagination.push(
                 sortedPoolRecords.slice(i * pageSize, i * pageSize + pageSize)
