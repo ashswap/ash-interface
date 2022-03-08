@@ -22,7 +22,7 @@ type ChartRecord = {
     percent: number;
     token: IToken;
 };
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
+const COLORS = ["#EC223A", "#00FFFF", "#FF4C8D", "#2502FD", "#14E499", "#FFC700", "#166BF7", "#F9A243", "#7B61FF", "#180C60"];
 const TokenLegend = ({
     color,
     token,
@@ -119,7 +119,7 @@ function LiquidityByTokensChart() {
             {/* flex-col space-y-11 lg:flex-row lg: */}
             <div className="flex flex-wrap items-center -mx-5.5">
                 <div className="px-5.5 mb-8 flex-1 2xl:flex-initial">
-                    <div className="w-40 h-40 mx-auto">
+                    <div className="w-40 h-40">
                         <ResponsiveContainer>
                             <PieChart>
                                 <Pie
