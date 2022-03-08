@@ -82,5 +82,8 @@ module.exports = {
     variants: {
         extend: {},
     },
-    plugins: [require('./tailwindPlugins/clip-corner')],
+    plugins: [
+        require('@tailwindcss/line-clamp'),
+        require('./tailwindPlugins/clip-corner')
+    ],
 }
