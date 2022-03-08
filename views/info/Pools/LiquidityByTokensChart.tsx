@@ -22,7 +22,7 @@ type ChartRecord = {
     percent: number;
     token: IToken;
 };
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
+const COLORS = ["#EC223A", "#00FFFF", "#FF4C8D", "#2502FD", "#14E499", "#FFC700", "#166BF7", "#F9A243", "#7B61FF", "#180C60"];
 const TokenLegend = ({
     color,
     token,
