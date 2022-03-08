@@ -1,7 +1,7 @@
 FROM node:14.18.0 AS builder
 WORKDIR /app
 COPY package.json yarn.lock ./
-RUN yarn install --frozen-lockfile
+RUN yarn install --frozen-lockfile --network-concurrency 1
 COPY . .
 RUN yarn build && yarn install --production --ignore-scripts --prefer-offline
 

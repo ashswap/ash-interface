@@ -326,7 +326,7 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
                                         <div>0%</div>
                                         <Slider
                                             className="ash-slider pt-4 w-full"
-                                            step={5}
+                                            step={1}
                                             marks={{
                                                 0: "",
                                                 25: "",
