@@ -42,7 +42,7 @@ export const TokenOptionChart = ({
                             }`}
                         />
                     </div>
-                    <div className="w-4 h-4 rounded-full mr-1.5" style={{backgroundColor: color}}></div>
+                    {color && <div className="w-4 h-4 rounded-full mr-1.5" style={{backgroundColor: color}}></div>}
                     <div className="font-bold">{label}</div>
                 </div>
                 <div>

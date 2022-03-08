@@ -119,7 +119,7 @@ function LiquidityByTokensChart() {
             {/* flex-col space-y-11 lg:flex-row lg: */}
             <div className="flex flex-wrap items-center -mx-5.5">
                 <div className="px-5.5 mb-8 flex-1 2xl:flex-initial">
-                    <div className="w-40 h-40 mx-auto">
+                    <div className="w-40 h-40">
                         <ResponsiveContainer>
                             <PieChart>
                                 <Pie

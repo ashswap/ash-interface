@@ -2,6 +2,10 @@ const ABBR_SYMBOL = ['', 'k', 'M', 'B', 'T'] as const;
 export const currencyFormater = new Intl.NumberFormat("en-US", {
     maximumFractionDigits: 2,
 });
+export const fractionFormat = (val: number, maximumFractionDigits = 2) => {
+    if(typeof val !== "number") return "";
+    return val.toLocaleString("en-US", {maximumFractionDigits});
+}
 export function abbreviateCurrency(n: number, minPlus?: number): number | string {
     if(n === 0) return n;
     if (minPlus !== undefined) {
