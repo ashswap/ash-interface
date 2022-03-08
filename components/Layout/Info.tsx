@@ -207,14 +207,14 @@ function InfoLayout({ children }: any) {
                     </div> */}
                 </aside>
                 <div className="flex-grow px-4 lg:px-9 lg:py-6 relative overflow-x-hidden ml-52 md:ml-60 mr-32">
-                    <div className="fixed top-6 right-[10.25rem] z-20">
+                    {/* <div className="fixed top-6 right-[10.25rem] z-20">
                         <Input
                             backgroundClassName="bg-ash-dark-700/70 h-12 px-5"
                             className="text-white text-2xs"
                             suffix={<ICSearch />}
                             placeholder="Search token, pair"
                         />
-                    </div>
+                    </div> */}
                     {children}
                 </div>
                 <aside className="flex-shrink-0 fixed top-0 right-0 h-screen overflow-auto w-32 bg-ash-dark-600 px-4 py-6 text-white">
@@ -272,7 +272,7 @@ function InfoLayout({ children }: any) {
                             }}
                         />
 
-                        <SwitchThemeBtn />
+                        {/* <SwitchThemeBtn /> */}
                     </div>
                     {/* <button className="bg-ash-dark-400 h-10 w-full flex items-center justify-center">
                         <ICStar className="inline text-[#FFC10D] w-4 h-4 mr-3" />

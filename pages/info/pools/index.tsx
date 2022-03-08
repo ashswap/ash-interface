@@ -20,14 +20,17 @@ function PoolsPage() {
                     <h1 className="text-4xl font-bold mb-[3.625rem] text-white">
                         Pools
                     </h1>
-                    <div className="flex flex-wrap 2xl:flex-nowrap">
+                    {/* <div className="flex flex-wrap 2xl:flex-nowrap">
                         <div className="w-full 2xl:w-[56%] 2xl:mr-4 mb-[3.625rem]">
                             <AprByPoolsChart />
                         </div>
                         <div className="max-w-full w-full lg:w-[26rem] 2xl:w-[44%] mb-[3.625rem]">
                             <LiquidityByTokensChart/>
                         </div>
-                    </div>
+                    </div> */}
+                    <div className="max-w-full w-full lg:w-[31.625rem] 2xl:w-[44%] mb-[3.625rem]">
+                            <LiquidityByTokensChart/>
+                        </div>
                     <h2 className="text-lg font-bold text-white mb-7">Top Pools - Pairs</h2>
                     <PoolsTable/>
                 </div>

@@ -46,7 +46,7 @@ const PoolRecord = ({
         return format(poolData.total_value_locked);
     }, [format, poolData.total_value_locked]);
     return (
-        <div className="flex items-center bg-ash-dark-600 px-4 lg:px-[1.625rem] text-ash-gray-500 space-x-2 text-xs h-14 overflow-hidden">
+        <div className="flex items-center bg-ash-dark-600 hover:bg-ash-dark-700 px-4 lg:px-[1.625rem] text-ash-gray-500 space-x-2 text-xs h-14 overflow-hidden">
             {/* <div className="w-5">
                 {active ? (
                     <ICStar className="w-4 h-4 text-pink-600" />
@@ -68,7 +68,7 @@ const PoolRecord = ({
                         </div>
                         <div className="w-4 h-4 lg:w-6 lg:h-6 -ml-1">
                             <Image
-                                src={token1?.icon || ""}
+                                src={token2?.icon || ""}
                                 alt="token"
                                 width={24}
                                 height={24}
@@ -88,8 +88,11 @@ const PoolRecord = ({
                 <span className="text-ash-gray-500">$</span>
                 <span className="text-white">{liquidity}</span>
             </div>
-            <div className="hidden md:block w-16 lg:w-24 xl:w-32 text-xs text-right text-white">
-                {poolData.apr_day}%
+            <div className="hidden lg:block w-16 lg:w-24 xl:w-32 text-xs text-right text-white">
+                {poolData.apr_day ? poolData.apr_day?.toLocaleString("en-US") : "_"}%
+            </div>
+            <div className="hidden lg:block w-16 lg:w-24 xl:w-32 text-xs text-right text-white">
+                {poolData.emission_apr ? poolData.emission_apr.toLocaleString("en-US") : "_"}%
             </div>
         </div>
     );
@@ -102,7 +105,7 @@ function PoolsTable() {
     const [pageIndex, setPageIndex] = useState(0);
     const [pageSize, setPageSize] = useState(10);
     const [sortBy, setSortBy] = useState<
-        "usd_volume" | "total_value_locked" | "apr_day"
+        "usd_volume" | "total_value_locked" | "apr_day" | "emission_apr"
     >("usd_volume");
     const poolRecords: PoolWithStatsRecords[] = useMemo(() => {
         if (!data?.length) return [];
@@ -153,12 +156,20 @@ function PoolsTable() {
                     Liquidity
                 </div>
                 <div
-                    className={`hidden md:block w-16 lg:w-24 xl:w-32 text-right py-4 cursor-pointer ${
+                    className={`hidden lg:block w-16 lg:w-24 xl:w-32 text-right py-4 cursor-pointer ${
                         sortBy === "apr_day" && "text-white"
                     }`}
                     onClick={() => setSortBy("apr_day")}
                 >
-                    APR
+                    Trading APR
+                </div>
+                <div
+                    className={`hidden lg:block w-16 lg:w-24 xl:w-32 text-right py-4 cursor-pointer ${
+                        sortBy === "emission_apr" && "text-white"
+                    }`}
+                    onClick={() => setSortBy("emission_apr")}
+                >
+                    Emission APR
                 </div>
             </div>
             {displayPoolRecords[pageIndex]?.map((val, index) => {
