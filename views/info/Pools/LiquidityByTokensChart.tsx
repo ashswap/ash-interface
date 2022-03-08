@@ -22,7 +22,18 @@ type ChartRecord = {
     percent: number;
     token: IToken;
 };
-const COLORS = ["#EC223A", "#00FFFF", "#FF4C8D", "#2502FD", "#14E499", "#FFC700", "#166BF7", "#F9A243", "#7B61FF", "#180C60"];
+const COLORS = [
+    "#EC223A",
+    "#2502FD",
+    "#00FFFF",
+    "#FF4C8D",
+    "#166BF7",
+    "#14E499",
+    "#FFC700",
+    "#7B61FF",
+    "#1EF026",
+    "#F9A243",
+];
 const TokenLegend = ({
     color,
     token,
@@ -74,19 +85,21 @@ function LiquidityByTokensChart() {
         if (!data?.length) return [];
         const total = data.reduce((t, { liquidity }) => (t += liquidity), 0);
         let spct = 0;
-        return data.map(({ liquidity, token: tokenId }, index) => {
-            const pct = +((liquidity * 100) / total).toFixed(2);
-            const record: ChartRecord = {
-                value: liquidity,
-                token: TOKENS.find((t) => t.id === tokenId) as IToken,
-                percent:
-                    index === data.length - 1
-                        ? (100 * 1000 - spct * 1000) / 1000
-                        : pct,
-            };
-            spct = (spct * 1000 + pct * 1000) / 1000;
-            return record;
-        });
+        return data
+            .map(({ liquidity, token: tokenId }, index) => {
+                const pct = +((liquidity * 100) / total).toFixed(2);
+                const record: ChartRecord = {
+                    value: liquidity,
+                    token: TOKENS.find((t) => t.id === tokenId) as IToken,
+                    percent:
+                        index === data.length - 1
+                            ? (100 * 1000 - spct * 1000) / 1000
+                            : pct,
+                };
+                spct = (spct * 1000 + pct * 1000) / 1000;
+                return record;
+            })
+            .sort((x, y) => y.percent - x.percent);
     }, [data]);
     const themeColors = useMemo(() => {
         const nToken = TOKENS.length;
