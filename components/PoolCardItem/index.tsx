@@ -1,13 +1,14 @@
 import { PoolsState } from "context/pools";
 import { toEGLD } from "helper/balance";
 import { Unarray } from "interface/utilities";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Button from "components/Button";
 import { theme } from "tailwind.config";
 import AddLiquidityModal from "components/AddLiquidityModal";
 import RemoveLiquidityModal from "components/RemoveLiquidityModal";
 import Down from "assets/svg/down-white.svg";
+import { fractionFormat } from "helper/number";
 
 function PoolCardItem({
     poolData,
@@ -17,8 +18,27 @@ function PoolCardItem({
     const { pool, poolStats } = poolData;
     const [isExpand, setIsExpand] = useState<boolean>(false);
     const [openAddLiquidity, setOpenAddLiquidity] = useState<boolean>(false);
-    const [openRemoveLiquidity, setOpenRemoveLiquidity] =
-        useState<boolean>(false);
+    const { apr_day, emission_apr, total_value_locked, usd_volume } =
+        poolStats || {};
+    useEffect(() => {
+        console.log(emission_apr ? true : false, emission_apr?.toLocaleString("en-US", {maximumFractionDigits: 2}));
+    }, [emission_apr])
+    const tradingAPR = useMemo(
+        () => (apr_day ? fractionFormat(apr_day) : "_"),
+        [apr_day]
+    );
+    const emissionAPR = useMemo(
+        () => (emission_apr ? fractionFormat(emission_apr) : "_"),
+        [emission_apr]
+    );
+    const TVL = useMemo(
+        () => (total_value_locked ? fractionFormat(total_value_locked) : "_"),
+        [total_value_locked]
+    );
+    const volumn24h = useMemo(
+        () => (usd_volume ? fractionFormat(usd_volume) : "_"),
+        [usd_volume]
+    );
     return (
         <div
             className={`bg-ash-dark-700 clip-corner-4 clip-corner-tr pt-8 pb-5 px-11 text-white`}
@@ -46,16 +66,18 @@ function PoolCardItem({
             <div className="flex flex-row my-12 justify-between items-center">
                 <div>
                     <div className="text-text-input-3 text-xs mb-4 underline">
-                        APR
+                        Trading APR
                     </div>
-                    <div className="text-yellow-600 font-bold text-lg leading-tight">_%</div>
+                    <div className="text-yellow-600 font-bold text-lg leading-tight">
+                        {tradingAPR}%
+                    </div>
                 </div>
                 <div>
                     <div className="text-text-input-3 text-xs mb-4 underline">
-                        Distribution per day
+                        Emission APR
                     </div>
-                    <div className="text-earn font-normal text-lg leading-tight">
-                        Coming soon
+                    <div className="text-earn font-bold text-lg leading-tight">
+                        {emissionAPR}%
                     </div>
                 </div>
             </div>
@@ -69,23 +91,25 @@ function PoolCardItem({
             <div className="bg-bg my-4 text-text-input-3">
                 <div className="flex flex-row justify-between items-center h-12 px-4">
                     <div className="underline text-2xs">Total Liquidity</div>
-                    <div className="text-sm">
-                        ${poolStats?.total_value_locked?.toLocaleString('en-US')}
-                    </div>
+                    <div className="text-sm">${TVL}</div>
                 </div>
                 <div className="flex flex-row justify-between items-center h-12 px-4">
                     <div className="underline text-2xs">24H Volume</div>
-                    <div className="text-sm">${poolStats?.usd_volume?.toLocaleString('en-US')}</div>
+                    <div className="text-sm">${volumn24h}</div>
                 </div>
                 {isExpand && (
                     <>
                         <div className="flex flex-row justify-between items-center h-12 px-4">
-                            <div className="underline text-2xs">Trading APR</div>
-                            <div className="text-sm">_</div>
+                            <div className="underline text-2xs">
+                                Trading APR
+                            </div>
+                            <div className="text-sm">{tradingAPR}%</div>
                         </div>
                         <div className="flex flex-row justify-between items-center h-12 px-4">
-                            <div className="underline text-2xs">Emissions APR</div>
-                            <div className="text-sm">_</div>
+                            <div className="underline text-2xs">
+                                Emissions APR
+                            </div>
+                            <div className="text-sm">{emissionAPR}%</div>
                         </div>
                     </>
                 )}

@@ -3,11 +3,12 @@ import PoolCardItem from "components/PoolCardItem";
 import { ViewType } from "components/PoolFilter";
 import PoolListItem from "components/PoolListItem";
 import StakedPoolCardItem from "components/StakedPoolCardItem";
+import StakedPoolListItem from "components/StakedPoolListItem";
 import { usePools } from "context/pools";
 import { useWallet } from "context/wallet";
 import IPool from "interface/pool";
 import { useRouter } from "next/router";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import styles from "./ListPool.module.css";
 
 interface Props {
@@ -21,7 +22,7 @@ const ListPool = (props: Props) => {
     const { balances } = useWallet();
     const router = useRouter();
     const poolType = router.query["type"];
-    const { poolToDisplay } = usePools();
+    const { poolToDisplay, setStakedOnly } = usePools();
 
     const pools = useMemo(() => {
         let pools = [];
@@ -47,6 +48,10 @@ const ListPool = (props: Props) => {
         return pools;
     }, [props.items, props.search, balances, poolType]);
 
+    const stakedOnly = useMemo(() => {
+        return poolType === "my-pool";
+    }, [poolType]);
+
     const stakedPools = useMemo(() => {
         return poolToDisplay.filter((p) => !!p.stakedData);
     }, [poolToDisplay]);
@@ -60,7 +65,7 @@ const ListPool = (props: Props) => {
             {props.view === ViewType.Card ? (
                 <>
                     <div className={`${styles.containerCard}`}>
-                        {poolToDisplay.map((p) => {
+                        {!stakedOnly && poolToDisplay.map((p) => {
                             return (
                                 <div key={p.pool.address}>
                                     {!!p.stakedData ? (
@@ -71,6 +76,7 @@ const ListPool = (props: Props) => {
                                 </div>
                             );
                         })}
+                        {stakedOnly && stakedPools.map(p => <StakedPoolCardItem key={p.pool.address} poolData={p}/>)}
                     </div>
                 </>
             ) : (
@@ -101,17 +107,23 @@ const ListPool = (props: Props) => {
                                     Farming
                                 </div>
                             </div>
-                            {stakedPools.map((p) => {
+                            {stakedPools.map((p, i) => {
                                 return (
-                                    <PoolListItem
+                                    <div
                                         key={p.pool.address}
-                                        poolData={p}
-                                    />
+                                        className={`${
+                                            i % 2 === 0
+                                                ? "bg-ash-dark-600"
+                                                : "bg-black"
+                                        }`}
+                                    >
+                                        <StakedPoolListItem poolData={p} />
+                                    </div>
                                 );
                             })}
                         </div>
                     )}
-                    {nonStakedPools?.length > 0 && (
+                    {!stakedOnly && nonStakedPools?.length > 0 && (
                         <div className={`${styles.containerList}`}>
                             <div className="bg-ash-dark-600 px-4 lg:pl-11 lg:pr-3 text-2xs sm:text-xs border-b border-ash-dark-400">
                                 <div
@@ -137,12 +149,18 @@ const ListPool = (props: Props) => {
                                     </div>
                                 </div>
                             </div>
-                            {nonStakedPools.map((p) => {
+                            {nonStakedPools.map((p, i) => {
                                 return (
-                                    <PoolListItem
+                                    <div
                                         key={p.pool.address}
-                                        poolData={p}
-                                    />
+                                        className={`${
+                                            i % 2 === 0
+                                                ? "bg-ash-dark-600"
+                                                : "bg-black"
+                                        }`}
+                                    >
+                                        <PoolListItem poolData={p} />
+                                    </div>
                                 );
                             })}
                         </div>

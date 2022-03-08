@@ -22,7 +22,7 @@ function PoolListItem({poolData}: {poolData: Unarray<PoolsState["poolToDisplay"]
     return (
         <>
             <div
-                className={`flex flex-col bg-ash-dark-600 py-2 sm:py-7 px-4 lg:pl-11 lg:pr-3`}
+                className={`flex flex-col py-2 sm:py-7 px-4 lg:pl-11 lg:pr-3`}
                 onClick={() => isMobile && mOpenDetail()}
             >
                 <div className="flex w-full text-white">

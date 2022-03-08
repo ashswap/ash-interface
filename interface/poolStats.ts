@@ -1,7 +1,11 @@
 export type PoolStatsRecord = {
+    /** trading apr base on 24h period*/ 
     apr_day: number;
+    /** trading apr base on 30days period*/
     apr_month: number;
+    /** trading apr base on 7days period*/
     apr_week: number;
+    emission_apr: number;
     pool_address: string;
     ratio: number;
     timestamp: number;
