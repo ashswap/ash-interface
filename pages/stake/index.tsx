@@ -64,21 +64,21 @@ function StakePage() {
                                 className={`transition-all ease-in-out duration-200 h-1 ${
                                     activeIndex === 0
                                         ? "w-4 bg-ash-cyan-500"
-                                        : "w-1 bg-ash-gray-300"
+                                        : "w-1 bg-ash-gray-400"
                                 }`}
                             ></div>
                             <div
                                 className={`transition-all ease-in-out duration-200 h-1 ${
                                     activeIndex === 1
                                         ? "w-4 bg-stake-green-500"
-                                        : "w-1 bg-ash-gray-300"
+                                        : "w-1 bg-ash-gray-400"
                                 }`}
                             ></div>
                             <div
                                 className={`transition-all ease-in-out duration-200 h-1 ${
                                     activeIndex === 2
                                         ? "w-4 bg-pink-600"
-                                        : "w-1 bg-ash-gray-300"
+                                        : "w-1 bg-ash-gray-400"
                                 }`}
                             ></div>
                         </div>

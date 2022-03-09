@@ -13,7 +13,7 @@ function VoteStakeCard() {
                         Governance Stake
                     </div>
                     <div className="mb-12">
-                        <div className="text-ash-gray-400 text-sm font-bold mb-3">
+                        <div className="text-ash-gray-500 text-sm font-bold mb-3">
                             APR
                         </div>
                         <div className="text-pink-600 text-lg font-bold">
@@ -21,28 +21,41 @@ function VoteStakeCard() {
                         </div>
                     </div>
                     <div className="mb-12">
-                        <div className="text-ash-gray-400 text-sm font-bold mb-2">
+                        <div className="text-ash-gray-500 text-sm font-bold mb-2">
                             RISK
                         </div>
                         <div className="flex items-center justify-between h-12">
                             <div className="text-lg font-bold">Low</div>
                             <div>
-                                <Image src={ImgVoteStakeRisk} width={145} height={48} alt="risk"/>
+                                <Image
+                                    src={ImgVoteStakeRisk}
+                                    width={145}
+                                    height={48}
+                                    alt="risk"
+                                />
                             </div>
                         </div>
                     </div>
                     <div>
-                        <div className="text-ash-gray-400 text-sm font-bold mb-4">
+                        <div className="text-ash-gray-500 text-sm font-bold mb-4">
                             TIPS
                         </div>
-                        <div className="text-ash-gray-400 text-sm leading-6 h-[8.5rem]">
-                        Stake for Voting!
+                        <div className="text-ash-gray-500 text-sm leading-6 h-[8.5rem]">
+                            Stake for Voting!
                         </div>
                     </div>
                 </div>
-                <div className="h-0.5 blur-[2px]" style={{backgroundImage: "radial-gradient(50% 50% at 50% 50%, rgba(183, 183, 215, 0.5) 0%, rgba(183, 183, 215, 0) 100%)"}}></div>
+                <div
+                    className="h-0.5 blur-[2px]"
+                    style={{
+                        backgroundImage:
+                            "radial-gradient(50% 50% at 50% 50%, rgba(183, 183, 215, 0.5) 0%, rgba(183, 183, 215, 0) 100%)",
+                    }}
+                ></div>
                 <div className="px-9 py-8">
-                    <button className="h-14 px-4 bg-ash-dark-400 text-center flex items-center justify-center text-white text-sm font-bold w-full">Coming Soon</button>
+                    <button className="h-14 px-4 bg-ash-dark-400 text-center flex items-center justify-center text-white text-sm font-bold w-full">
+                        Coming Soon
+                    </button>
                 </div>
             </div>
         </MetalCard>

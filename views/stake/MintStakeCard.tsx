@@ -14,7 +14,7 @@ function MintStakeCard() {
                         Mint Stake
                     </div>
                     <div className="mb-12">
-                        <div className="text-ash-gray-400 text-sm font-bold mb-3">
+                        <div className="text-ash-gray-500 text-sm font-bold mb-3">
                             APR
                         </div>
                         <div className="text-stake-green-500 text-lg font-bold">
@@ -22,7 +22,7 @@ function MintStakeCard() {
                         </div>
                     </div>
                     <div className="mb-12">
-                        <div className="text-ash-gray-400 text-sm font-bold mb-2">
+                        <div className="text-ash-gray-500 text-sm font-bold mb-2">
                             RISK
                         </div>
                         <div className="flex items-center justify-between h-12">
@@ -38,10 +38,10 @@ function MintStakeCard() {
                         </div>
                     </div>
                     <div>
-                        <div className="text-ash-gray-400 text-sm font-bold mb-4">
+                        <div className="text-ash-gray-500 text-sm font-bold mb-4">
                             TIPS
                         </div>
-                        <div className="text-ash-gray-400 text-sm leading-6 h-[8.5rem]">
+                        <div className="text-ash-gray-500 text-sm leading-6 h-[8.5rem]">
                             Stake to{" "}
                             <span className="text-white underline font-bold">
                                 mint $AOC
