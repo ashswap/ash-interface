@@ -8,44 +8,45 @@ import AddLiquidityModal from "components/AddLiquidityModal";
 import HeadlessModal, {
     HeadlessModalDefaultHeader
 } from "components/HeadlessModal";
-import { usePool } from "components/ListPoolItem";
 import RemoveLiquidityModal from "components/RemoveLiquidityModal";
-import { TAILWIND_BREAKPOINT } from "const/mediaQueries";
+import { PoolsState } from "context/pools";
 import { toEGLD } from "helper/balance";
 import { abbreviateCurrency, currencyFormater } from "helper/number";
-import useMediaQuery from "hooks/useMediaQuery";
-import IPool from "interface/pool";
+import usePoolDataFormat from "hooks/usePoolDataFormat";
+import { useScreenSize } from "hooks/useScreenSize";
+import { Unarray } from "interface/utilities";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
-interface Props {
-    pool: IPool;
-    className?: string | undefined;
-    dark?: boolean;
-}
-
-const ListPoolItemWithdraw = (props: Props) => {
+const StakedPoolListItem = ({poolData}: {poolData: Unarray<PoolsState["poolToDisplay"]>}) => {
     const [openAddLiquidity, setOpenAddLiquidity] = useState(false);
     const [openRemoveLiquidity, setOpenRemoveLiquidity] = useState(false);
     const [isExpand, setIsExpand] = useState(false);
     const [mIsExpand, setMIsExpand] = useState(false);
-    const isSMScreen = useMediaQuery(
-        `(max-width: ${TAILWIND_BREAKPOINT.SM}px)`
-    );
-    const { value0, value1, capacityPercent, valueUsd } = usePool();
+    const {isMobile} = useScreenSize();
+    const {pool, poolStats, stakedData} = poolData;
+    const {
+        formatedStats: { TVL, emissionAPR, tradingAPR, volumn24h },
+        formatedStakedData: {
+            fCapacityPercent,
+            fLpValueUsd,
+            fOwnLiquidity,
+            fValue0,
+            fValue1,
+        }
+    } = usePoolDataFormat(poolData);
     useEffect(() => {
-        if (isSMScreen) {
+        if (isMobile) {
             setIsExpand(false);
         }
-    }, [isSMScreen]);
+    }, [isMobile]);
+    if(!stakedData) return null;
 
     return (
         <>
             <div
-                className={`${props.className || ""} flex flex-col ${
-                    props.dark ? "bg-ash-dark-600" : "bg-black"
-                } py-6`}
-                onClick={() => isSMScreen && setMIsExpand(true)}
+                className={`flex flex-col py-6`}
+                onClick={() => isMobile && setMIsExpand(true)}
             >
                 <div className="flex flex-row text-white w-full">
                     <div className="w-8/12 px-4 sm:px-11 flex items-center">
@@ -55,58 +56,51 @@ const ListPoolItemWithdraw = (props: Props) => {
                                     <div className="flex items-center mr-2 sm:mr-0">
                                         <div className="h-4 w-4 sm:h-6 sm:w-6 lg:h-9 lg:w-9 rounded-full">
                                             <Image
-                                                src={props.pool.tokens[0].icon}
+                                                src={pool.tokens[0].icon}
                                                 alt="token icon"
                                             />
                                         </div>
                                         <div className="h-4 w-4 sm:h-6 sm:w-6 lg:h-9 lg:w-9 rounded-full -ml-1 lg:ml-[-0.375rem]">
                                             <Image
-                                                src={props.pool.tokens[1].icon}
+                                                src={pool.tokens[1].icon}
                                                 alt="token icon"
                                             />
                                         </div>
                                     </div>
                                     <div
-                                        style={{ fontSize: 10 }}
-                                        className="hidden sm:block px-3 font-bold"
+                                        className="text-2xs hidden sm:block px-3 font-bold"
                                     >
                                         &
                                     </div>
                                     <div className="sm:flex sm:flex-col font-bold text-xs lg:text-lg truncate">
                                         <span className="sm:flex flex-row items-center">
                                             <span className="w-20">
-                                                {props.pool.tokens[0].name}
+                                                {pool.tokens[0].name}
                                             </span>
                                             <span className="hidden sm:inline text-earn text-xs">
-                                                {toEGLD(
-                                                    props.pool.tokens[0],
-                                                    value0.toString()
-                                                ).toFixed(2)}
+                                                {fValue0}
                                             </span>
-                                            {isExpand && (
+                                            {/* {isExpand && (
                                                 <span className="inline-block text-ash-green-500 font-bold text-2xs ml-1">
                                                     <ICArrowTopRight className="inline mr-1" />
                                                     <span>+0.00005</span>
                                                 </span>
-                                            )}
+                                            )} */}
                                         </span>
                                         {/* <span>&nbsp;&&nbsp;</span> */}
                                         <span className="sm:flex flex-row items-center">
                                             <span className="w-20">
-                                                {props.pool.tokens[1].name}
+                                                {pool.tokens[1].name}
                                             </span>
                                             <span className="hidden sm:inline text-earn text-xs">
-                                                {toEGLD(
-                                                    props.pool.tokens[1],
-                                                    value1.toString()
-                                                ).toFixed(2)}
+                                                {fValue1}
                                             </span>
-                                            {isExpand && (
+                                            {/* {isExpand && (
                                                 <span className="inline-block text-ash-purple-500 font-bold text-2xs ml-1">
                                                     <ICArrowBottomRight className="inline mr-1" />
                                                     <span>-0.00005</span>
                                                 </span>
-                                            )}
+                                            )} */}
                                         </span>
                                     </div>
                                 </div>
@@ -115,14 +109,14 @@ const ListPoolItemWithdraw = (props: Props) => {
                                 {/* {capacityPercent.toFixed(3)}% */}
                                 <span className="inline-block mr-1">
                                     <span className="text-ash-gray-500">$</span>
-                                    <span>{abbreviateCurrency(valueUsd.toNumber())}</span>
+                                    <span>{abbreviateCurrency(stakedData.lpValueUsd.toNumber())}</span>
                                 </span>
-                                {isExpand && (
+                                {/* {isExpand && (
                                     <span className="inline-block text-ash-green-500 font-bold text-2xs">
                                         <ICArrowTopRight className="w-2 h-2 inline mr-1" />
                                         +0.00005
                                     </span>
-                                )}
+                                )} */}
                             </div>
                             <div className="hidden sm:flex w-1/4 flex-wrap items-center font-bold">
                                 {/* <div className="w-2/12 flex flex-col justify-center">
@@ -134,14 +128,14 @@ const ListPoolItemWithdraw = (props: Props) => {
                                 </span>
                             </div> */}
                                 <span className="inline-block mr-1 text-sm">
-                                    {capacityPercent.lt(0.01) ? "< 0.01" : capacityPercent.toString()}%
+                                    {fCapacityPercent}%
                                 </span>
-                                {isExpand && (
+                                {/* {isExpand && (
                                     <span className="inline-block text-ash-green-500 font-bold text-2xs">
                                         <ICArrowTopRight className="w-2 h-2 inline mr-1" />
                                         +0.00005
                                     </span>
-                                )}
+                                )} */}
                             </div>
                         </div>
                         <div className="hidden sm:flex items-center">
@@ -161,8 +155,9 @@ const ListPoolItemWithdraw = (props: Props) => {
                     </div>
                     <div className="hidden w-4/12 pl-11 pr-1 border-l border-l-ash-gray-500 sm:flex items-center space-x-4">
                         <div className="text-earn flex-grow flex items-center">
-                            <span>ELDG&nbsp;</span>
-                            <span className="text-lg font-bold">0.52</span>
+                            {/* <span>ELDG&nbsp;</span>
+                            <span className="text-lg font-bold">0.52</span> */}
+                            Comming soon
                         </div>
                         <button className="h-12 w-28 bg-earn clip-corner-1 clip-corner-br text-xs flex items-center justify-center text-center">
                             Harvest
@@ -195,25 +190,25 @@ const ListPoolItemWithdraw = (props: Props) => {
                                     <div className="text-2xs">
                                         Total Liquidity
                                     </div>
-                                    <div className="text-sm">$512,913,133</div>
+                                    <div className="text-sm">${TVL}</div>
                                 </div>
                                 <div className="bg-ash-dark-400 h-12 px-4 flex justify-between items-center">
                                     <div className="text-2xs">24H Volume</div>
-                                    <div className="text-sm">$512,913,133</div>
+                                    <div className="text-sm">${volumn24h}</div>
                                 </div>
                                 <div className="bg-ash-dark-400 h-12 px-4 flex justify-between items-center">
                                     <div className="text-2xs">LP Tokens</div>
-                                    <div className="text-sm">$512,913,133</div>
+                                    <div className="text-sm">{fOwnLiquidity}</div>
                                 </div>
                                 <div className="bg-ash-dark-400 h-12 px-4 flex justify-between items-center">
                                     <div className="text-2xs">Trading APR</div>
-                                    <div className="text-sm">$512,913,133</div>
+                                    <div className="text-sm">{tradingAPR}%</div>
                                 </div>
                                 <div className="bg-ash-dark-400 h-12 px-4 flex justify-between items-center">
                                     <div className="text-2xs">
                                         Emissions APR
                                     </div>
-                                    <div className="text-sm">$512,913,133</div>
+                                    <div className="text-sm">{emissionAPR}%</div>
                                 </div>
                             </div>
                         </div>
@@ -252,27 +247,27 @@ const ListPoolItemWithdraw = (props: Props) => {
                         <div className="grid grid-cols-2 gap-1 items-end mb-8">
                             <div>
                                 <div className="font-bold mb-8">
-                                    <div className="text-2xl">USDC</div>
+                                    <div className="text-2xl">{pool.tokens[0].name}</div>
                                     <div className="flex items-center">
                                         <div className="text-earn text-lg mr-3">
-                                            1.52
+                                            {fValue0}
                                         </div>
-                                        <div className="text-2xs text-ash-green-500">
+                                        {/* <div className="text-2xs text-ash-green-500">
                                             <ICArrowTopRight className="inline mr-1" />
                                             <span>+0.00005</span>
-                                        </div>
+                                        </div> */}
                                     </div>
                                 </div>
                                 <div className="font-bold mb-9">
-                                    <div className="text-2xl">USDC</div>
+                                    <div className="text-2xl">{pool.tokens[1].name}</div>
                                     <div className="flex items-center">
                                         <div className="text-earn text-lg mr-3">
-                                            1.52
+                                            {fValue1}
                                         </div>
-                                        <div className="text-2xs text-ash-purple-500">
+                                        {/* <div className="text-2xs text-ash-purple-500">
                                             <ICArrowBottomRight className="inline mr-1" />
                                             <span>+0.00005</span>
-                                        </div>
+                                        </div> */}
                                     </div>
                                 </div>
                                 <div className="flex items-center">
@@ -301,13 +296,13 @@ const ListPoolItemWithdraw = (props: Props) => {
                                     <div className="flex items-center justify-end mb-14">
                                         <div className="w-[3.25rem] h-[3.25rem] rounded-full">
                                             <Image
-                                                src={props.pool.tokens[0].icon}
+                                                src={pool.tokens[0].icon}
                                                 alt="token icon"
                                             />
                                         </div>
                                         <div className="w-[3.25rem] h-[3.25rem] rounded-full ml-[-0.375rem]">
                                             <Image
-                                                src={props.pool.tokens[1].icon}
+                                                src={pool.tokens[1].icon}
                                                 alt="token icon"
                                             />
                                         </div>
@@ -322,36 +317,31 @@ const ListPoolItemWithdraw = (props: Props) => {
                                                     $
                                                 </span>
                                                 <span className="font-bold">
-                                                    351.21
+                                                    {fLpValueUsd}
                                                 </span>
                                             </div>
-                                            <div className="text-2xs text-ash-green-500">
+                                            {/* <div className="text-2xs text-ash-green-500">
                                                 <ICArrowTopRight className="inline mr-1" />
                                                 <span className="font-bold">
                                                     +0.00005
                                                 </span>
-                                            </div>
+                                            </div> */}
                                         </div>
                                     </div>
                                     <div>
                                         <div className="text-ash-gray-500 text-xs mb-4">
-                                            Estimate in USD
+                                            Your capacity
                                         </div>
                                         <div className="flex items-center space-x-4">
-                                            <div className="text-lg">
-                                                <span className="text-ash-gray-500">
-                                                    $
-                                                </span>
-                                                <span className="font-bold">
-                                                    351.21
-                                                </span>
+                                            <div className="text-lg text-white">
+                                                {fCapacityPercent}%
                                             </div>
-                                            <div className="text-2xs text-ash-green-500">
+                                            {/* <div className="text-2xs text-ash-green-500">
                                                 <ICArrowTopRight className="inline mr-1" />
                                                 <span className="font-bold">
                                                     +0.00005
                                                 </span>
-                                            </div>
+                                            </div> */}
                                         </div>
                                     </div>
                                 </div>
@@ -363,10 +353,11 @@ const ListPoolItemWithdraw = (props: Props) => {
                                     Total Farm
                                 </div>
                                 <div className="text-earn">
-                                    <span className="font-bold text-lg">
+                                    {/* <span className="font-bold text-lg">
                                         0.52&nbsp;
                                     </span>
-                                    <span className="text-xs">ELGD</span>
+                                    <span className="text-xs">ELGD</span> */}
+                                    Comming soon
                                 </div>
                             </div>
                             <button className="h-14 bg-earn clip-corner-1 clip-corner-br flex items-center justify-center text-center text-white font-bold text-sm">
@@ -376,53 +367,44 @@ const ListPoolItemWithdraw = (props: Props) => {
                         <div className="grid grid-cols-2 gap-1 py-8">
                             <div className="flex flex-col justify-between space-y-4">
                                 <div className="text-xs text-ash-gray-500">
-                                    APR Earn
+                                    Trading APR
                                 </div>
                                 <div className="text-pink-600 font-bold text-lg">
-                                    921%
+                                    {tradingAPR}%
                                 </div>
                             </div>
                             <div className="flex flex-col justify-between space-y-4">
                                 <div className="text-xs text-ash-gray-500">
-                                    Farming per day
+                                    Emission APR
                                 </div>
-                                <div>
-                                    <span className="inline-block text-earn text-xs">
-                                        <span className="text-lg font-bold">
-                                            0.52&nbsp;
-                                        </span>
-                                        <span>ASH</span>
-                                        &nbsp;
-                                    </span>
-                                    <span className="text-white text-xs">
-                                        per 1,000 USD
-                                    </span>
+                                <div className="text-earn text-lg font-bold">
+                                    {emissionAPR}%
                                 </div>
                             </div>
                         </div>
                         <div className="bg-ash-dark-400 text-ash-gray-500 mb-6">
                             <div className="flex justify-between items-center h-9 space-x-4 px-4">
                                 <div className="text-2xs">Total Liquidity</div>
-                                <div className="text-sm">$512,913,133</div>
+                                <div className="text-sm">${TVL}</div>
                             </div>
                             <div className="flex justify-between items-center h-9 space-x-4 px-4">
                                 <div className="text-2xs">24H Volume</div>
-                                <div className="text-sm">$512,913,133</div>
+                                <div className="text-sm">${volumn24h}</div>
                             </div>
                             <div className="flex justify-between items-center h-9 space-x-4 px-4">
                                 <div className="text-2xs">LP Token</div>
                                 <div className="text-sm">
-                                    3.412351 {props.pool.tokens[0].name}-
-                                    {props.pool.tokens[1].name}
+                                    {fOwnLiquidity} {pool.tokens[0].name}-
+                                    {pool.tokens[1].name}
                                 </div>
                             </div>
                             <div className="flex justify-between items-center h-9 space-x-4 px-4">
                                 <div className="text-2xs">Trading APR</div>
-                                <div className="text-sm">32%</div>
+                                <div className="text-sm">{tradingAPR}%</div>
                             </div>
                             <div className="flex justify-between items-center h-9 space-x-4 px-4">
                                 <div className="text-2xs">Emissions APR</div>
-                                <div className="text-sm">51%</div>
+                                <div className="text-sm">{emissionAPR}%</div>
                             </div>
                         </div>
                         <div className="text-center text-earn underline text-2xs">
@@ -434,15 +416,15 @@ const ListPoolItemWithdraw = (props: Props) => {
             <AddLiquidityModal
                 open={openAddLiquidity}
                 onClose={() => setOpenAddLiquidity(false)}
-                pool={props.pool}
+                pool={pool}
             />
             <RemoveLiquidityModal
                 open={openRemoveLiquidity}
                 onClose={() => setOpenRemoveLiquidity(false)}
-                pool={props.pool}
+                pool={pool}
             />
         </>
     );
 };
 
-export default ListPoolItemWithdraw;
+export default StakedPoolListItem;

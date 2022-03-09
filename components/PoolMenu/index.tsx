@@ -1,35 +1,24 @@
-import { useCallback } from "react";
-import { useRouter } from "next/router";
 import styles from "./PoolMenu.module.css";
+import { usePools } from "context/pools";
 
 const PoolMenu = () => {
-    const router = useRouter();
-
-    const isActive = useCallback((t: string) => router.query["type"] === t, [
-        router
-    ]);
+    const {stakedOnly, setStakedOnly} = usePools();
 
     return (
         <div className={`${styles.container} text-black dark:text-text-input-3`}>
             <div
                 className={`${styles.btn} ${
-                    !isActive("my-pool") ? styles.active : ""
+                    !stakedOnly ? styles.active : ""
                 }`}
-                onClick={() =>
-                    router.push("/pool", undefined, { shallow: true })
-                }
+                onClick={() => setStakedOnly(false)}
             >
                 All Pools
             </div>
             <div
                 className={`${styles.btn} ${
-                    isActive("my-pool") ? styles.active : ""
+                    stakedOnly ? styles.active : ""
                 }`}
-                onClick={() =>
-                    router.push("/pool?type=my-pool", undefined, {
-                        shallow: true
-                    })
-                }
+                onClick={() => setStakedOnly(true)}
             >
                 Your Pools
             </div>

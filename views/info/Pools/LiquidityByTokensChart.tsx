@@ -22,7 +22,18 @@ type ChartRecord = {
     percent: number;
     token: IToken;
 };
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
+const COLORS = [
+    "#EC223A",
+    "#2502FD",
+    "#00FFFF",
+    "#FF4C8D",
+    "#166BF7",
+    "#14E499",
+    "#FFC700",
+    "#7B61FF",
+    "#1EF026",
+    "#F9A243",
+];
 const TokenLegend = ({
     color,
     token,
@@ -74,19 +85,21 @@ function LiquidityByTokensChart() {
         if (!data?.length) return [];
         const total = data.reduce((t, { liquidity }) => (t += liquidity), 0);
         let spct = 0;
-        return data.map(({ liquidity, token: tokenId }, index) => {
-            const pct = +((liquidity * 100) / total).toFixed(2);
-            const record: ChartRecord = {
-                value: liquidity,
-                token: TOKENS.find((t) => t.id === tokenId) as IToken,
-                percent:
-                    index === data.length - 1
-                        ? (100 * 1000 - spct * 1000) / 1000
-                        : pct,
-            };
-            spct = (spct * 1000 + pct * 1000) / 1000;
-            return record;
-        });
+        return data
+            .map(({ liquidity, token: tokenId }, index) => {
+                const pct = +((liquidity * 100) / total).toFixed(2);
+                const record: ChartRecord = {
+                    value: liquidity,
+                    token: TOKENS.find((t) => t.id === tokenId) as IToken,
+                    percent:
+                        index === data.length - 1
+                            ? (100 * 1000 - spct * 1000) / 1000
+                            : pct,
+                };
+                spct = (spct * 1000 + pct * 1000) / 1000;
+                return record;
+            })
+            .sort((x, y) => y.percent - x.percent);
     }, [data]);
     const themeColors = useMemo(() => {
         const nToken = TOKENS.length;
@@ -119,7 +132,7 @@ function LiquidityByTokensChart() {
             {/* flex-col space-y-11 lg:flex-row lg: */}
             <div className="flex flex-wrap items-center -mx-5.5">
                 <div className="px-5.5 mb-8 flex-1 2xl:flex-initial">
-                    <div className="w-40 h-40 mx-auto">
+                    <div className="w-40 h-40">
                         <ResponsiveContainer>
                             <PieChart>
                                 <Pie
