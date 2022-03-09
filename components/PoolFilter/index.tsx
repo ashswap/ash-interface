@@ -9,6 +9,7 @@ import Select from "components/Select";
 import { TAILWIND_BREAKPOINT } from "const/mediaQueries";
 import { PoolsState, usePools } from "context/pools";
 import useMediaQuery from "hooks/useMediaQuery";
+import { useScreenSize } from "hooks/useScreenSize";
 import { useMemo, useState } from "react";
 
 export enum ViewType {
@@ -18,10 +19,7 @@ export enum ViewType {
 
 interface Props {
     view?: ViewType;
-    className?: string | undefined;
-    search: string;
     onChangeView: (view: ViewType) => void;
-    onSearch: (k: string) => void;
 }
 const options: {value: PoolsState["sortOption"], label: any}[] = [
     { value: "apr", label: "APR" },
@@ -30,11 +28,9 @@ const options: {value: PoolsState["sortOption"], label: any}[] = [
 ];
 const PoolFilter = (props: Props) => {
     const [isLivedPool, setIsLivedPool] = useState(true);
-    const isMDScreen = useMediaQuery(
-        `(max-width: ${TAILWIND_BREAKPOINT.MD}px)`
-    );
+    const screenSize = useScreenSize();
 
-    const {inactive, setInactive, keyword, setKeyword, sortOption, setSortOption} = usePools();
+    const {keyword, setKeyword, sortOption, setSortOption} = usePools();
     const selectOpt = useMemo(() => {
         return options.find(o => o.value === sortOption);
     }, [sortOption])
@@ -58,7 +54,7 @@ const PoolFilter = (props: Props) => {
     return (
         <div>
             <div
-                className={`flex flex-row justify-between mt-3.5 mb-4 md:mb-0 ${props.className}`}
+                className={`flex flex-row justify-between mt-3.5 mb-4 md:mb-0`}
             >
                 <div className="flex flex-row justify-center items-center overflow-hidden mr-2">
                     <IconButton
@@ -75,7 +71,7 @@ const PoolFilter = (props: Props) => {
                         className="mr-2 lg:mr-8 flex-shrink-0"
                         onClick={() => props.onChangeView(ViewType.List)}
                     />
-                    {!isMDScreen && (
+                    {screenSize.md && (
                         <div className="flex-grow overflow-hidden">
                             {SearchBox}
                         </div>
@@ -105,7 +101,7 @@ const PoolFilter = (props: Props) => {
                     )}
                 </div>
             </div>
-            {isMDScreen && SearchBox}
+            {!screenSize.md && SearchBox}
         </div>
     );
 };

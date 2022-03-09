@@ -214,6 +214,10 @@
     @apply bg-yellow-700 text-white;
 }
 
+.disable{
+    pointer-events: none;
+}
+
 .disable .content {
     @apply bg-ash-dark-500;
 }

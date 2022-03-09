@@ -33,7 +33,7 @@ const Button = (props: Props) => {
                     ? styles.yellow700
                     : ""
             } ${props.className || ""}`}
-            onClick={props.onClick}
+            onClick={props.disable ? undefined : props.onClick}
         >
             <div
                 className={

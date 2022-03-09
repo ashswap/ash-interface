@@ -12,7 +12,6 @@ interface Props {
     items: IPool[];
     className?: string | undefined;
     view?: ViewType;
-    search?: string;
 }
 
 const ListPool = (props: Props) => {
@@ -27,7 +26,6 @@ const ListPool = (props: Props) => {
 
     return (
         <div className={props.className}>
-            <div className="text-white text-xl">test new context</div>
             {props.view === ViewType.Card ? (
                 <>
                     <div className={`${styles.containerCard}`}>
