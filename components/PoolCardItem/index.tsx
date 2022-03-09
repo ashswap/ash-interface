@@ -9,36 +9,19 @@ import AddLiquidityModal from "components/AddLiquidityModal";
 import RemoveLiquidityModal from "components/RemoveLiquidityModal";
 import Down from "assets/svg/down-white.svg";
 import { fractionFormat } from "helper/number";
+import usePoolDataFormat from "hooks/usePoolDataFormat";
 
 function PoolCardItem({
     poolData,
 }: {
     poolData: Unarray<PoolsState["poolToDisplay"]>;
 }) {
-    const { pool, poolStats } = poolData;
+    const { pool } = poolData;
     const [isExpand, setIsExpand] = useState<boolean>(false);
     const [openAddLiquidity, setOpenAddLiquidity] = useState<boolean>(false);
-    const { apr_day, emission_apr, total_value_locked, usd_volume } =
-        poolStats || {};
-    useEffect(() => {
-        console.log(emission_apr ? true : false, emission_apr?.toLocaleString("en-US", {maximumFractionDigits: 2}));
-    }, [emission_apr])
-    const tradingAPR = useMemo(
-        () => (apr_day ? fractionFormat(apr_day) : "_"),
-        [apr_day]
-    );
-    const emissionAPR = useMemo(
-        () => (emission_apr ? fractionFormat(emission_apr) : "_"),
-        [emission_apr]
-    );
-    const TVL = useMemo(
-        () => (total_value_locked ? fractionFormat(total_value_locked) : "_"),
-        [total_value_locked]
-    );
-    const volumn24h = useMemo(
-        () => (usd_volume ? fractionFormat(usd_volume) : "_"),
-        [usd_volume]
-    );
+    const {
+        formatedStats: { TVL, emissionAPR, tradingAPR, volumn24h },
+    } = usePoolDataFormat(poolData);
     return (
         <div
             className={`bg-ash-dark-700 clip-corner-4 clip-corner-tr pt-8 pb-5 px-11 text-white`}

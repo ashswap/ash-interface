@@ -4,14 +4,16 @@ import Select, {
     components,
     IndicatorsContainerProps,
     OptionsOrGroups,
+    PropsValue,
+    SingleValue,
     StylesConfig,
     Theme
 } from "react-select";
 import styles from "./Select.module.css";
 
 interface Props {
-    value?: string;
-    onChange?: (v: string) => void;
+    value?: PropsValue<MyOptionType>;
+    onChange?: (v?: SingleValue<MyOptionType>) => void;
     children?: any;
     options: OptionsOrGroups<any, any>;
     prefix?: ReactElement | string;
@@ -69,7 +71,7 @@ const selectStyles: StylesConfig<MyOptionType, IsMulti> = {
     }
 };
 
-const MySelect = ({ prefix, options }: Props) => {
+const MySelect = ({ prefix, options, onChange, value }: Props) => {
     return (
         <div className={styles.container}>
             <Select
@@ -111,6 +113,8 @@ const MySelect = ({ prefix, options }: Props) => {
                         </div>
                     )
                 }}
+                value={value}
+                onChange={onChange}
             />
         </div>
     );

@@ -1,14 +1,11 @@
-import ListPoolItem from "components/ListPoolItem";
 import PoolCardItem from "components/PoolCardItem";
 import { ViewType } from "components/PoolFilter";
 import PoolListItem from "components/PoolListItem";
 import StakedPoolCardItem from "components/StakedPoolCardItem";
 import StakedPoolListItem from "components/StakedPoolListItem";
 import { usePools } from "context/pools";
-import { useWallet } from "context/wallet";
 import IPool from "interface/pool";
-import { useRouter } from "next/router";
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import styles from "./ListPool.module.css";
 
 interface Props {
@@ -19,38 +16,7 @@ interface Props {
 }
 
 const ListPool = (props: Props) => {
-    const { balances } = useWallet();
-    const router = useRouter();
-    const poolType = router.query["type"];
-    const { poolToDisplay, setStakedOnly } = usePools();
-
-    const pools = useMemo(() => {
-        let pools = [];
-        if (poolType !== "my-pool") {
-            pools = props.items;
-        } else {
-            pools = props.items.filter((p) =>
-                Object.prototype.hasOwnProperty.call(balances, p.lpToken.id)
-            );
-        }
-
-        if (!!props.search) {
-            pools = pools.filter(
-                (p) =>
-                    p.tokens.findIndex((t) =>
-                        t.name
-                            .toLowerCase()
-                            .includes(props.search!.toLowerCase())
-                    ) !== -1
-            );
-        }
-
-        return pools;
-    }, [props.items, props.search, balances, poolType]);
-
-    const stakedOnly = useMemo(() => {
-        return poolType === "my-pool";
-    }, [poolType]);
+    const { poolToDisplay, stakedOnly } = usePools();
 
     const stakedPools = useMemo(() => {
         return poolToDisplay.filter((p) => !!p.stakedData);
@@ -136,10 +102,10 @@ const ListPool = (props: Props) => {
                                         #Pool
                                     </div>
                                     <div className="w-[18%] sm:w-2/12 text-white">
-                                        APR Earn
+                                        Trading APR
                                     </div>
                                     <div className="hidden sm:block w-3/12">
-                                        Farming per day
+                                        Emission APR
                                     </div>
                                     <div className="hidden sm:block w-2/12 text-right sm:mr-1">
                                         Total Liquidity

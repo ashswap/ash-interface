@@ -28,6 +28,7 @@ import {
     useState,
 } from "react";
 import useSWR from "swr";
+import { useDebounce } from "use-debounce";
 const emptyFunc = () => {};
 type PoolRecord = {
     pool: IPool;
@@ -36,24 +37,24 @@ type PoolRecord = {
     stakedData?: {
         /** number of own LP token*/
         ownLiquidity: BigNumber;
-        /** number of token 0 in own LP*/ 
+        /** number of token 0 in own LP*/
         value0: BigNumber;
-        /** number of token 1 in own LP*/ 
+        /** number of token 1 in own LP*/
         value1: BigNumber;
-        /** own LP over total LP*/ 
+        /** own LP over total LP*/
         capacityPercent: BigNumber;
-        /** total liquidity in USD value*/ 
+        /** total liquidity in USD value*/
         lpValueUsd: BigNumber;
     };
 };
 export type PoolsState = {
     poolRecords: PoolRecord[];
     poolToDisplay: PoolRecord[];
-    sortOption: 'apr' | 'liquidity' | 'volumn';
+    sortOption: "apr" | "liquidity" | "volume";
     keyword: string;
     stakedOnly: boolean;
     inactive: boolean;
-    setSortOption: Dispatch<SetStateAction<"apr" | "liquidity" | "volumn">>;
+    setSortOption: Dispatch<SetStateAction<"apr" | "liquidity" | "volume">>;
     setKeyword: Dispatch<SetStateAction<string>>;
     setStakedOnly: Dispatch<SetStateAction<boolean>>;
     setInactive: Dispatch<SetStateAction<boolean>>;
@@ -61,14 +62,14 @@ export type PoolsState = {
 const initState: PoolsState = {
     poolRecords: [],
     poolToDisplay: [],
-    sortOption: 'apr',
-    keyword: '',
+    sortOption: "apr",
+    keyword: "",
     stakedOnly: false,
     inactive: false,
     setSortOption: emptyFunc,
     setKeyword: emptyFunc,
     setStakedOnly: emptyFunc,
-    setInactive: emptyFunc
+    setInactive: emptyFunc,
 };
 const PoolsContext = createContext<PoolsState>(initState);
 export const usePools = () => {
@@ -76,8 +77,10 @@ export const usePools = () => {
 };
 const PoolsProvider = ({ children }: any) => {
     const [poolRecords, setPoolRecords] = useState<PoolRecord[]>([]);
-    const [sortOption, setSortOption] = useState<PoolsState["sortOption"]>('apr');
-    const [keyword, setKeyword] = useState<string>('');
+    const [sortOption, setSortOption] =
+        useState<PoolsState["sortOption"]>("apr");
+    const [keyword, setKeyword] = useState<string>("");
+    const [deboundKeyword] = useDebounce(keyword, 500);
     const [stakedOnly, setStakedOnly] = useState(false);
     const [inactive, setInactive] = useState(false);
     const { balances } = useWallet();
@@ -160,14 +163,12 @@ const PoolsProvider = ({ children }: any) => {
                 return new BigNumber(0);
             }
 
-            const valueUsd0 = toEGLD(
-                token0,
-                balance0.toString()
-            ).multipliedBy(tokenPrices[token0.id]);
-            const valueUsd1 = toEGLD(
-                token1,
-                balance1.toString()
-            ).multipliedBy(tokenPrices[token1.id]);
+            const valueUsd0 = toEGLD(token0, balance0.toString()).multipliedBy(
+                tokenPrices[token0.id]
+            );
+            const valueUsd1 = toEGLD(token1, balance1.toString()).multipliedBy(
+                tokenPrices[token1.id]
+            );
 
             return valueUsd0.plus(valueUsd1);
         },
@@ -180,7 +181,9 @@ const PoolsProvider = ({ children }: any) => {
             const p = pools[i];
             let record: PoolRecord = {
                 pool: p,
-                poolStats: poolStatsRecords?.find(stats => stats.pool_address === p.address),
+                poolStats: poolStatsRecords?.find(
+                    (stats) => stats.pool_address === p.address
+                ),
             };
             const ownLP = balances?.[p.lpToken.id]
                 ? balances?.[p.lpToken.id].balance
@@ -205,8 +208,30 @@ const PoolsProvider = ({ children }: any) => {
     }, [getPoolRecords]);
 
     const poolToDisplay = useMemo(() => {
-        return poolRecords;
-    }, [poolRecords]);
+        let result: PoolRecord[] = [...poolRecords];
+        if(deboundKeyword.trim()){
+            result = poolRecords.filter((p) =>
+            p.pool.tokens.some((t) =>
+                t.name
+                    .toLowerCase()
+                    .includes(deboundKeyword.trim().toLowerCase())
+            )
+        )
+        }
+        switch(sortOption){
+            case "apr":
+                result = result.sort((x, y) => (y.poolStats?.emission_apr || 0) - (x.poolStats?.emission_apr || 0));
+                break;
+            case "liquidity":
+                result = result.sort((x, y) => (y.poolStats?.total_value_locked || 0) - (x.poolStats?.total_value_locked || 0));
+                break;
+            case "volume":
+                result = result.sort((x, y) => (y.poolStats?.usd_volume || 0) - (x.poolStats?.usd_volume || 0));
+                break;
+            default:        
+        }
+        return result;
+    }, [poolRecords, deboundKeyword, sortOption]);
 
     return (
         <PoolsContext.Provider

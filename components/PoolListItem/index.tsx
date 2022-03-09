@@ -1,24 +1,33 @@
-import { PoolsState } from 'context/pools';
-import { useScreenSize } from 'hooks/useScreenSize';
-import { Unarray } from 'interface/utilities';
-import React, { useState } from 'react'
+import { PoolsState } from "context/pools";
+import { useScreenSize } from "hooks/useScreenSize";
+import { Unarray } from "interface/utilities";
+import React, { useState } from "react";
 import Image from "next/image";
-import Button from 'components/Button';
+import Button from "components/Button";
 import IconDown from "assets/svg/down-white.svg";
-import HeadlessModal, { HeadlessModalDefaultHeader } from 'components/HeadlessModal';
-import AddLiquidityModal from 'components/AddLiquidityModal';
+import HeadlessModal, {
+    HeadlessModalDefaultHeader,
+} from "components/HeadlessModal";
+import AddLiquidityModal from "components/AddLiquidityModal";
+import usePoolDataFormat from "hooks/usePoolDataFormat";
 
-function PoolListItem({poolData}: {poolData: Unarray<PoolsState["poolToDisplay"]>}) {
+function PoolListItem({
+    poolData,
+}: {
+    poolData: Unarray<PoolsState["poolToDisplay"]>;
+}) {
     const [isExpand, setIsExpand] = useState<boolean>(false);
     const [mIsExpand, setMIsExpand] = useState<boolean>(false);
     const [openAddLiquidity, setOpenAddLiquidity] = useState<boolean>(false);
-    const {isMobile} = useScreenSize();
-    const {pool, poolStats, stakedData} = poolData;
+    const { isMobile } = useScreenSize();
+    const { pool } = poolData;
 
     const mOpenDetail = () => {
         setMIsExpand(true);
     };
-
+    const {
+        formatedStats: { TVL, emissionAPR, tradingAPR, volumn24h },
+    } = usePoolDataFormat(poolData);
     return (
         <>
             <div
@@ -42,10 +51,7 @@ function PoolListItem({poolData}: {poolData: Unarray<PoolsState["poolToDisplay"]
                                     />
                                 </div>
                             </div>
-                            <div
-                                style={{ fontSize: 10 }}
-                                className="hidden sm:block px-3 font-bold"
-                            >
+                            <div className="text-2xs hidden sm:block px-3 font-bold">
                                 &
                             </div>
                             <div className="sm:flex sm:flex-col font-bold text-xs lg:text-lg truncate">
@@ -57,31 +63,18 @@ function PoolListItem({poolData}: {poolData: Unarray<PoolsState["poolToDisplay"]
                             </div>
                         </div>
                         <div className="w-[18%] sm:w-2/12 text-xs sm:text-sm flex flex-row items-center text-yellow-600">
-                            _%
+                            {tradingAPR}%
                         </div>
-                        <div className="hidden w-3/12 sm:flex flex-col justify-center">
-                            <div className="text-earn">
-                                <span className="font-bold text-sm">_ </span>
-                                <span
-                                    className="font-normal"
-                                    style={{ fontSize: 10 }}
-                                >
-                                    {pool.tokens[0].name}
-                                </span>
-                            </div>
-                            <div style={{ fontSize: 10 }}>
-                                per 1,000 {pool.tokens[1].name}
-                            </div>
+                        <div className="hidden w-3/12 sm:flex text-earn">
+                            {emissionAPR}%
                         </div>
                         <div className="hidden w-2/12 sm:flex items-center justify-end bg-bg h-12 text-xs text-right px-3">
                             <span className="text-text-input-3">$</span>
-                            <span>
-                                {poolStats?.total_value_locked.toLocaleString("en-US")}
-                            </span>
+                            <span>{TVL}</span>
                         </div>
                         <div className="w-[37%] sm:w-2/12 flex items-center justify-end bg-bg h-8 sm:h-12 text-xs text-right px-3">
                             <span className="text-text-input-3">$</span>
-                            <span>_</span>
+                            <span>{volumn24h}</span>
                         </div>
                     </div>
                     <div className="hidden sm:flex items-center w-[20%] pl-4">
@@ -117,15 +110,16 @@ function PoolListItem({poolData}: {poolData: Unarray<PoolsState["poolToDisplay"]
                         <div className="w-3/12">
                             <div className="flex flex-row items-center justify-between bg-bg w-full h-12 text-xs text-right p-4">
                                 <span>Trading APR</span>
-                                <span>32%</span>
+                                <span>{tradingAPR}%</span>
                             </div>
                         </div>
                         <div className="w-3/12">
                             <div className="flex flex-row items-center justify-between bg-bg w-full h-12 text-xs text-right p-4">
                                 <span>Emissions APR</span>
-                                <span>51%</span>
+                                <span>{emissionAPR}%</span>
                             </div>
                         </div>
+                        <div className="w-3/12"></div>
                         <div
                             className="w-24 h-12 flex flex-row items-center justify-center gap-2 select-none cursor-pointer text-white text-xs"
                             onClick={() => setIsExpand(false)}
@@ -133,7 +127,7 @@ function PoolListItem({poolData}: {poolData: Unarray<PoolsState["poolToDisplay"]
                             <span>Hide</span>
                             <IconDown
                                 style={{
-                                    transform: `rotate(180deg)`
+                                    transform: `rotate(180deg)`,
                                 }}
                             />
                         </div>
@@ -185,24 +179,18 @@ function PoolListItem({poolData}: {poolData: Unarray<PoolsState["poolToDisplay"]
                         <div className="flex justify-between mb-12">
                             <div>
                                 <div className="text-ash-gray-500 mb-4 text-xs">
-                                    APR Earn
+                                    Trading APR
                                 </div>
                                 <div className="font-bold text-lg text-yellow-600">
-                                    _%
+                                    {tradingAPR}%
                                 </div>
                             </div>
                             <div>
                                 <div className="text-ash-gray-500 mb-4 text-xs">
                                     Farming per day
                                 </div>
-                                <div>
-                                    <span className="text-earn text-lg">
-                                        0.52
-                                    </span>
-                                    <span className="text-xs">
-                                        <span className="text-earn">ASH</span>
-                                        <span> per 1,000 USDT</span>
-                                    </span>
+                                <div className="text-earn text-lg font-bold">
+                                    {emissionAPR}%
                                 </div>
                             </div>
                         </div>
@@ -220,21 +208,21 @@ function PoolListItem({poolData}: {poolData: Unarray<PoolsState["poolToDisplay"]
                                 <div className="text-2xs mr-4">
                                     Total Liquidity
                                 </div>
-                                <div className="text-sm">$512,913,133</div>
+                                <div className="text-sm">${TVL}</div>
                             </div>
                             <div className="flex justify-between items-center h-9 px-4">
                                 <div className="text-2xs mr-4">24H Volume</div>
-                                <div className="text-sm">$12,913,133</div>
+                                <div className="text-sm">${volumn24h}</div>
                             </div>
                             <div className="flex justify-between items-center h-9 px-4">
                                 <div className="text-2xs mr-4">Trading APR</div>
-                                <div className="text-sm">32%</div>
+                                <div className="text-sm">{tradingAPR}%</div>
                             </div>
                             <div className="flex justify-between items-center h-9 px-4">
                                 <div className="text-2xs mr-4">
                                     Emissions APR
                                 </div>
-                                <div className="text-sm">51%</div>
+                                <div className="text-sm">{emissionAPR}%</div>
                             </div>
                         </div>
                         <div className="text-center text-earn underline text-2xs">
@@ -252,4 +240,4 @@ function PoolListItem({poolData}: {poolData: Unarray<PoolsState["poolToDisplay"]
     );
 }
 
-export default PoolListItem
+export default PoolListItem;

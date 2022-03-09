@@ -12,6 +12,7 @@ import RemoveLiquidityModal from "components/RemoveLiquidityModal";
 import { PoolsState } from "context/pools";
 import { toEGLD } from "helper/balance";
 import { abbreviateCurrency, currencyFormater } from "helper/number";
+import usePoolDataFormat from "hooks/usePoolDataFormat";
 import { useScreenSize } from "hooks/useScreenSize";
 import { Unarray } from "interface/utilities";
 import Image from "next/image";
@@ -24,7 +25,16 @@ const StakedPoolListItem = ({poolData}: {poolData: Unarray<PoolsState["poolToDis
     const [mIsExpand, setMIsExpand] = useState(false);
     const {isMobile} = useScreenSize();
     const {pool, poolStats, stakedData} = poolData;
-
+    const {
+        formatedStats: { TVL, emissionAPR, tradingAPR, volumn24h },
+        formatedStakedData: {
+            fCapacityPercent,
+            fLpValueUsd,
+            fOwnLiquidity,
+            fValue0,
+            fValue1,
+        }
+    } = usePoolDataFormat(poolData);
     useEffect(() => {
         if (isMobile) {
             setIsExpand(false);
@@ -68,10 +78,7 @@ const StakedPoolListItem = ({poolData}: {poolData: Unarray<PoolsState["poolToDis
                                                 {pool.tokens[0].name}
                                             </span>
                                             <span className="hidden sm:inline text-earn text-xs">
-                                                {toEGLD(
-                                                    pool.tokens[0],
-                                                    stakedData.value0.toString()
-                                                ).toFixed(2)}
+                                                {fValue0}
                                             </span>
                                             {/* {isExpand && (
                                                 <span className="inline-block text-ash-green-500 font-bold text-2xs ml-1">
@@ -86,10 +93,7 @@ const StakedPoolListItem = ({poolData}: {poolData: Unarray<PoolsState["poolToDis
                                                 {pool.tokens[1].name}
                                             </span>
                                             <span className="hidden sm:inline text-earn text-xs">
-                                                {toEGLD(
-                                                    pool.tokens[1],
-                                                    stakedData.value1.toString()
-                                                ).toFixed(2)}
+                                                {fValue1}
                                             </span>
                                             {/* {isExpand && (
                                                 <span className="inline-block text-ash-purple-500 font-bold text-2xs ml-1">
@@ -124,7 +128,7 @@ const StakedPoolListItem = ({poolData}: {poolData: Unarray<PoolsState["poolToDis
                                 </span>
                             </div> */}
                                 <span className="inline-block mr-1 text-sm">
-                                    {stakedData.capacityPercent.lt(0.01) ? "< 0.01" : stakedData.capacityPercent.toFixed(2)}%
+                                    {fCapacityPercent}%
                                 </span>
                                 {/* {isExpand && (
                                     <span className="inline-block text-ash-green-500 font-bold text-2xs">
@@ -186,25 +190,25 @@ const StakedPoolListItem = ({poolData}: {poolData: Unarray<PoolsState["poolToDis
                                     <div className="text-2xs">
                                         Total Liquidity
                                     </div>
-                                    <div className="text-sm">${poolStats?.total_value_locked.toLocaleString('en-US')}</div>
+                                    <div className="text-sm">${TVL}</div>
                                 </div>
                                 <div className="bg-ash-dark-400 h-12 px-4 flex justify-between items-center">
                                     <div className="text-2xs">24H Volume</div>
-                                    <div className="text-sm">${poolStats?.usd_volume.toLocaleString('en-US')}</div>
+                                    <div className="text-sm">${volumn24h}</div>
                                 </div>
                                 <div className="bg-ash-dark-400 h-12 px-4 flex justify-between items-center">
                                     <div className="text-2xs">LP Tokens</div>
-                                    <div className="text-sm">{pool.lpToken.totalSupply?.toNumber().toLocaleString('en-US')}</div>
+                                    <div className="text-sm">{fOwnLiquidity}</div>
                                 </div>
                                 <div className="bg-ash-dark-400 h-12 px-4 flex justify-between items-center">
                                     <div className="text-2xs">Trading APR</div>
-                                    <div className="text-sm">$512,913,133</div>
+                                    <div className="text-sm">{tradingAPR}%</div>
                                 </div>
                                 <div className="bg-ash-dark-400 h-12 px-4 flex justify-between items-center">
                                     <div className="text-2xs">
                                         Emissions APR
                                     </div>
-                                    <div className="text-sm">$512,913,133</div>
+                                    <div className="text-sm">{emissionAPR}%</div>
                                 </div>
                             </div>
                         </div>
@@ -243,10 +247,10 @@ const StakedPoolListItem = ({poolData}: {poolData: Unarray<PoolsState["poolToDis
                         <div className="grid grid-cols-2 gap-1 items-end mb-8">
                             <div>
                                 <div className="font-bold mb-8">
-                                    <div className="text-2xl">USDC</div>
+                                    <div className="text-2xl">{pool.tokens[0].name}</div>
                                     <div className="flex items-center">
                                         <div className="text-earn text-lg mr-3">
-                                            1.52
+                                            {fValue0}
                                         </div>
                                         {/* <div className="text-2xs text-ash-green-500">
                                             <ICArrowTopRight className="inline mr-1" />
@@ -255,10 +259,10 @@ const StakedPoolListItem = ({poolData}: {poolData: Unarray<PoolsState["poolToDis
                                     </div>
                                 </div>
                                 <div className="font-bold mb-9">
-                                    <div className="text-2xl">USDC</div>
+                                    <div className="text-2xl">{pool.tokens[1].name}</div>
                                     <div className="flex items-center">
                                         <div className="text-earn text-lg mr-3">
-                                            1.52
+                                            {fValue1}
                                         </div>
                                         {/* <div className="text-2xs text-ash-purple-500">
                                             <ICArrowBottomRight className="inline mr-1" />
@@ -313,7 +317,7 @@ const StakedPoolListItem = ({poolData}: {poolData: Unarray<PoolsState["poolToDis
                                                     $
                                                 </span>
                                                 <span className="font-bold">
-                                                    351.21
+                                                    {fLpValueUsd}
                                                 </span>
                                             </div>
                                             {/* <div className="text-2xs text-ash-green-500">
@@ -326,16 +330,11 @@ const StakedPoolListItem = ({poolData}: {poolData: Unarray<PoolsState["poolToDis
                                     </div>
                                     <div>
                                         <div className="text-ash-gray-500 text-xs mb-4">
-                                            Estimate in USD
+                                            Your capacity
                                         </div>
                                         <div className="flex items-center space-x-4">
-                                            <div className="text-lg">
-                                                <span className="text-ash-gray-500">
-                                                    $
-                                                </span>
-                                                <span className="font-bold">
-                                                    351.21
-                                                </span>
+                                            <div className="text-lg text-white">
+                                                {fCapacityPercent}%
                                             </div>
                                             {/* <div className="text-2xs text-ash-green-500">
                                                 <ICArrowTopRight className="inline mr-1" />
@@ -354,10 +353,11 @@ const StakedPoolListItem = ({poolData}: {poolData: Unarray<PoolsState["poolToDis
                                     Total Farm
                                 </div>
                                 <div className="text-earn">
-                                    <span className="font-bold text-lg">
+                                    {/* <span className="font-bold text-lg">
                                         0.52&nbsp;
                                     </span>
-                                    <span className="text-xs">ELGD</span>
+                                    <span className="text-xs">ELGD</span> */}
+                                    Comming soon
                                 </div>
                             </div>
                             <button className="h-14 bg-earn clip-corner-1 clip-corner-br flex items-center justify-center text-center text-white font-bold text-sm">
@@ -367,53 +367,44 @@ const StakedPoolListItem = ({poolData}: {poolData: Unarray<PoolsState["poolToDis
                         <div className="grid grid-cols-2 gap-1 py-8">
                             <div className="flex flex-col justify-between space-y-4">
                                 <div className="text-xs text-ash-gray-500">
-                                    APR Earn
+                                    Trading APR
                                 </div>
                                 <div className="text-pink-600 font-bold text-lg">
-                                    921%
+                                    {tradingAPR}%
                                 </div>
                             </div>
                             <div className="flex flex-col justify-between space-y-4">
                                 <div className="text-xs text-ash-gray-500">
-                                    Farming per day
+                                    Emission APR
                                 </div>
-                                <div>
-                                    <span className="inline-block text-earn text-xs">
-                                        <span className="text-lg font-bold">
-                                            0.52&nbsp;
-                                        </span>
-                                        <span>ASH</span>
-                                        &nbsp;
-                                    </span>
-                                    <span className="text-white text-xs">
-                                        per 1,000 USD
-                                    </span>
+                                <div className="text-earn text-lg font-bold">
+                                    {emissionAPR}%
                                 </div>
                             </div>
                         </div>
                         <div className="bg-ash-dark-400 text-ash-gray-500 mb-6">
                             <div className="flex justify-between items-center h-9 space-x-4 px-4">
                                 <div className="text-2xs">Total Liquidity</div>
-                                <div className="text-sm">${poolStats?.total_value_locked.toLocaleString('en-US')}</div>
+                                <div className="text-sm">${TVL}</div>
                             </div>
                             <div className="flex justify-between items-center h-9 space-x-4 px-4">
                                 <div className="text-2xs">24H Volume</div>
-                                <div className="text-sm">${poolStats?.usd_volume.toLocaleString('en-US')}</div>
+                                <div className="text-sm">${volumn24h}</div>
                             </div>
                             <div className="flex justify-between items-center h-9 space-x-4 px-4">
                                 <div className="text-2xs">LP Token</div>
                                 <div className="text-sm">
-                                    {pool.lpToken.totalSupply?.toFixed(2)} {pool.tokens[0].name}-
+                                    {fOwnLiquidity} {pool.tokens[0].name}-
                                     {pool.tokens[1].name}
                                 </div>
                             </div>
                             <div className="flex justify-between items-center h-9 space-x-4 px-4">
                                 <div className="text-2xs">Trading APR</div>
-                                <div className="text-sm">32%</div>
+                                <div className="text-sm">{tradingAPR}%</div>
                             </div>
                             <div className="flex justify-between items-center h-9 space-x-4 px-4">
                                 <div className="text-2xs">Emissions APR</div>
-                                <div className="text-sm">51%</div>
+                                <div className="text-sm">{emissionAPR}%</div>
                             </div>
                         </div>
                         <div className="text-center text-earn underline text-2xs">
