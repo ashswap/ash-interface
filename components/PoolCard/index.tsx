@@ -50,7 +50,7 @@ const PoolCard = (props: Props) => {
                                     {toEGLD(
                                         props.pool.tokens[0],
                                         value0.toString()
-                                    ).toFixed(2)}
+                                    ).toFixed(2)}xxxx
                                 </div>
                             </>
                         )}
@@ -179,12 +179,6 @@ const PoolCard = (props: Props) => {
                     </div>
                     {isExpand && (
                         <>
-                            <div className="flex flex-row justify-between items-center p-4">
-                                <div className={styles.poolInfoLabel}>
-                                    Performance Fee
-                                </div>
-                                <div className="text-sm">_</div>
-                            </div>
                             <div className="flex flex-row justify-between items-center p-4">
                                 <div className={styles.poolInfoLabel}>
                                     Trading APR

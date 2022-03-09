@@ -147,7 +147,7 @@ const ListPoolItem = (props: Props) => {
         if (!balance0 || !balance1) {
             return new BigNumber(0);
         }
-        
+
         const valueUsd0 = toEGLD(
             token0,
             balance0.balance.toString()

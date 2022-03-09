@@ -1,42 +1,38 @@
-import IconDown from "assets/svg/down-white.svg";
-import AddLiquidityModal from "components/AddLiquidityModal";
-import Button from "components/Button";
-import HeadlessModal, {
-    HeadlessModalDefaultHeader
-} from "components/HeadlessModal";
-import { usePool } from "components/ListPoolItem";
-import { TAILWIND_BREAKPOINT } from "const/mediaQueries";
-import useMediaQuery from "hooks/useMediaQuery";
-import IPool from "interface/pool";
+import { PoolsState } from "context/pools";
+import { useScreenSize } from "hooks/useScreenSize";
+import { Unarray } from "interface/utilities";
+import React, { useState } from "react";
 import Image from "next/image";
-import { useState } from "react";
+import Button from "components/Button";
+import IconDown from "assets/svg/down-white.svg";
+import HeadlessModal, {
+    HeadlessModalDefaultHeader,
+} from "components/HeadlessModal";
+import AddLiquidityModal from "components/AddLiquidityModal";
+import usePoolDataFormat from "hooks/usePoolDataFormat";
 
-interface Props {
-    pool: IPool;
-    className?: string | undefined;
-    dark?: boolean;
-}
-
-const ListPoolItemDeposit = (props: Props) => {
+function PoolListItem({
+    poolData,
+}: {
+    poolData: Unarray<PoolsState["poolToDisplay"]>;
+}) {
     const [isExpand, setIsExpand] = useState<boolean>(false);
     const [mIsExpand, setMIsExpand] = useState<boolean>(false);
     const [openAddLiquidity, setOpenAddLiquidity] = useState<boolean>(false);
-    const { valueUsd } = usePool();
-    const isSMScreen = useMediaQuery(
-        `(max-width: ${TAILWIND_BREAKPOINT.SM}px)`
-    );
+    const { isMobile } = useScreenSize();
+    const { pool } = poolData;
 
     const mOpenDetail = () => {
         setMIsExpand(true);
     };
-
+    const {
+        formatedStats: { TVL, emissionAPR, tradingAPR, volumn24h },
+    } = usePoolDataFormat(poolData);
     return (
         <>
             <div
-                className={`${props.className || ""} flex flex-col ${
-                    props.dark ? "bg-ash-dark-600" : "bg-black"
-                } py-2 sm:py-7 px-4 lg:pl-11 lg:pr-3`}
-                onClick={() => isSMScreen && mOpenDetail()}
+                className={`flex flex-col py-2 sm:py-7 px-4 lg:pl-11 lg:pr-3`}
+                onClick={() => isMobile && mOpenDetail()}
             >
                 <div className="flex w-full text-white">
                     <div className="flex items-center overflow-hidden w-full sm:w-[80%] space-x-1">
@@ -44,57 +40,41 @@ const ListPoolItemDeposit = (props: Props) => {
                             <div className="flex flex-row justify-between items-center mr-2 sm:mr-0">
                                 <div className="h-4 w-4 sm:h-6 sm:w-6 lg:h-9 lg:w-9 rounded-full">
                                     <Image
-                                        src={props.pool.tokens[0].icon}
+                                        src={pool.tokens[0].icon}
                                         alt="token icon"
                                     />
                                 </div>
                                 <div className="h-4 w-4 sm:h-6 sm:w-6 lg:h-9 lg:w-9 rounded-full -ml-1 lg:ml-[-0.375rem]">
                                     <Image
-                                        src={props.pool.tokens[1].icon}
+                                        src={pool.tokens[1].icon}
                                         alt="token icon"
                                     />
                                 </div>
                             </div>
-                            <div
-                                style={{ fontSize: 10 }}
-                                className="hidden sm:block px-3 font-bold"
-                            >
+                            <div className="text-2xs hidden sm:block px-3 font-bold">
                                 &
                             </div>
                             <div className="sm:flex sm:flex-col font-bold text-xs lg:text-lg truncate">
-                                <span>{props.pool.tokens[0].name}</span>
+                                <span>{pool.tokens[0].name}</span>
                                 <span className="inline sm:hidden">
                                     &nbsp;&&nbsp;
                                 </span>
-                                <span>{props.pool.tokens[1].name}</span>
+                                <span>{pool.tokens[1].name}</span>
                             </div>
                         </div>
                         <div className="w-[18%] sm:w-2/12 text-xs sm:text-sm flex flex-row items-center text-yellow-600">
-                            _%
+                            {tradingAPR}%
                         </div>
-                        <div className="hidden w-3/12 sm:flex flex-col justify-center">
-                            <div className="text-earn">
-                                <span className="font-bold text-sm">_ </span>
-                                <span
-                                    className="font-normal"
-                                    style={{ fontSize: 10 }}
-                                >
-                                    {props.pool.tokens[0].name}
-                                </span>
-                            </div>
-                            <div style={{ fontSize: 10 }}>
-                                per 1,000 {props.pool.tokens[1].name}
-                            </div>
+                        <div className="hidden w-3/12 sm:flex text-earn">
+                            {emissionAPR}%
                         </div>
                         <div className="hidden w-2/12 sm:flex items-center justify-end bg-bg h-12 text-xs text-right px-3">
                             <span className="text-text-input-3">$</span>
-                            <span>
-                                {valueUsd.toNumber().toLocaleString("en-US")}
-                            </span>
+                            <span>{TVL}</span>
                         </div>
                         <div className="w-[37%] sm:w-2/12 flex items-center justify-end bg-bg h-8 sm:h-12 text-xs text-right px-3">
                             <span className="text-text-input-3">$</span>
-                            <span>_</span>
+                            <span>{volumn24h}</span>
                         </div>
                     </div>
                     <div className="hidden sm:flex items-center w-[20%] pl-4">
@@ -122,7 +102,7 @@ const ListPoolItemDeposit = (props: Props) => {
                     </div>
                 </div>
 
-                {isExpand && !isSMScreen && (
+                {isExpand && !isMobile && (
                     <div className="flex flex-row items-center text-text-input-3 w-full mt-7 py-1 gap-1">
                         <div className="w-2/12 text-earn underline text-[0.625rem]">
                             View LP Distribution
@@ -130,15 +110,16 @@ const ListPoolItemDeposit = (props: Props) => {
                         <div className="w-3/12">
                             <div className="flex flex-row items-center justify-between bg-bg w-full h-12 text-xs text-right p-4">
                                 <span>Trading APR</span>
-                                <span>32%</span>
+                                <span>{tradingAPR}%</span>
                             </div>
                         </div>
                         <div className="w-3/12">
                             <div className="flex flex-row items-center justify-between bg-bg w-full h-12 text-xs text-right p-4">
                                 <span>Emissions APR</span>
-                                <span>51%</span>
+                                <span>{emissionAPR}%</span>
                             </div>
                         </div>
+                        <div className="w-3/12"></div>
                         <div
                             className="w-24 h-12 flex flex-row items-center justify-center gap-2 select-none cursor-pointer text-white text-xs"
                             onClick={() => setIsExpand(false)}
@@ -146,7 +127,7 @@ const ListPoolItemDeposit = (props: Props) => {
                             <span>Hide</span>
                             <IconDown
                                 style={{
-                                    transform: `rotate(180deg)`
+                                    transform: `rotate(180deg)`,
                                 }}
                             />
                         </div>
@@ -170,26 +151,26 @@ const ListPoolItemDeposit = (props: Props) => {
                                 </div>
                                 <div className="flex items-baseline">
                                     <div className="text-2xl font-bold">
-                                        {props.pool.tokens[0].name}
+                                        {pool.tokens[0].name}
                                     </div>
                                     <div className="text-sm font-bold">
                                         &nbsp;&&nbsp;
                                     </div>
                                     <div className="text-2xl font-bold">
-                                        {props.pool.tokens[1].name}
+                                        {pool.tokens[1].name}
                                     </div>
                                 </div>
                             </div>
                             <div className="flex">
                                 <div className="h-[3.25rem] w-[3.25rem] rounded-full">
                                     <Image
-                                        src={props.pool.tokens[0].icon}
+                                        src={pool.tokens[0].icon}
                                         alt="token icon"
                                     />
                                 </div>
                                 <div className="h-[3.25rem] w-[3.25rem] rounded-full -ml-2">
                                     <Image
-                                        src={props.pool.tokens[1].icon}
+                                        src={pool.tokens[1].icon}
                                         alt="token icon"
                                     />
                                 </div>
@@ -198,24 +179,18 @@ const ListPoolItemDeposit = (props: Props) => {
                         <div className="flex justify-between mb-12">
                             <div>
                                 <div className="text-ash-gray-500 mb-4 text-xs">
-                                    APR Earn
+                                    Trading APR
                                 </div>
                                 <div className="font-bold text-lg text-yellow-600">
-                                    _%
+                                    {tradingAPR}%
                                 </div>
                             </div>
                             <div>
                                 <div className="text-ash-gray-500 mb-4 text-xs">
                                     Farming per day
                                 </div>
-                                <div>
-                                    <span className="text-earn text-lg">
-                                        0.52
-                                    </span>
-                                    <span className="text-xs">
-                                        <span className="text-earn">ASH</span>
-                                        <span> per 1,000 USDT</span>
-                                    </span>
+                                <div className="text-earn text-lg font-bold">
+                                    {emissionAPR}%
                                 </div>
                             </div>
                         </div>
@@ -233,21 +208,21 @@ const ListPoolItemDeposit = (props: Props) => {
                                 <div className="text-2xs mr-4">
                                     Total Liquidity
                                 </div>
-                                <div className="text-sm">$512,913,133</div>
+                                <div className="text-sm">${TVL}</div>
                             </div>
                             <div className="flex justify-between items-center h-9 px-4">
                                 <div className="text-2xs mr-4">24H Volume</div>
-                                <div className="text-sm">$12,913,133</div>
+                                <div className="text-sm">${volumn24h}</div>
                             </div>
                             <div className="flex justify-between items-center h-9 px-4">
                                 <div className="text-2xs mr-4">Trading APR</div>
-                                <div className="text-sm">32%</div>
+                                <div className="text-sm">{tradingAPR}%</div>
                             </div>
                             <div className="flex justify-between items-center h-9 px-4">
                                 <div className="text-2xs mr-4">
                                     Emissions APR
                                 </div>
-                                <div className="text-sm">51%</div>
+                                <div className="text-sm">{emissionAPR}%</div>
                             </div>
                         </div>
                         <div className="text-center text-earn underline text-2xs">
@@ -259,10 +234,10 @@ const ListPoolItemDeposit = (props: Props) => {
             <AddLiquidityModal
                 open={openAddLiquidity}
                 onClose={() => setOpenAddLiquidity(false)}
-                pool={props.pool}
+                pool={pool}
             />
         </>
     );
-};
+}
 
-export default ListPoolItemDeposit;
+export default PoolListItem;
