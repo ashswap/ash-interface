@@ -29,11 +29,11 @@ module.exports = {
                 "text-input": {
                     1: "#74738e",
                     2: "#8C8A94",
-                    3: "#757391",
+                    3: "#B7B7D7",
                 },
                 "insufficent-fund": "#7B61FF",
                 "slider": {
-                    "rail": "#757391",
+                    "rail": "#B7B7D7",
                     "track": "#FFC10D",
                 },
                 "earn": "#54C8EA",
@@ -48,7 +48,7 @@ module.exports = {
                     700: "#E3AD12",
                 },
                 "ash-gray": {
-                    500: "#757391"
+                    500: "#B7B7D7"
                 },
                 "ash-green": {
                     500: "#00FF75"
