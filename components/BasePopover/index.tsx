@@ -4,7 +4,7 @@ import ICChevronDown from "assets/svg/chevron-down.svg";
 import ICHexagonDuo from "assets/svg/hexagon-duo.svg";
 import IPool from "interface/pool";
 import { IToken } from "interface/token";
-import { useState } from "react";
+import { MutableRefObject, useState } from "react";
 import { usePopper } from "react-popper";
 export const TokenOptionChart = ({
     token,
@@ -42,7 +42,10 @@ export const TokenOptionChart = ({
                             }`}
                         />
                     </div>
-                    <div className="w-4 h-4 rounded-full mr-1.5" style={{backgroundColor: color}}></div>
+                    <div
+                        className="w-4 h-4 rounded-full mr-1.5"
+                        style={{ backgroundColor: color }}
+                    ></div>
                     <div className="font-bold">{label}</div>
                 </div>
                 <div>
@@ -54,20 +57,31 @@ export const TokenOptionChart = ({
     );
 };
 type PopperOptions = Parameters<typeof usePopper>[2];
-const BasePopover = ({children, options, button, className}: {children: any, options?: PopperOptions, button: any, className?: string}) => {
+type props = {
+    children: (ctx: {
+        open: boolean;
+        close: (
+            focusableElement?:
+                | HTMLElement
+                | MutableRefObject<HTMLElement | null>
+                | undefined
+        ) => void;
+    }) => any;
+    options?: PopperOptions;
+    button: (ctx: { open: boolean }) => any;
+    className?: string;
+};
+const BasePopover = ({ children, options, button, className }: props) => {
     const [referenceElement, setReferenceElement] = useState<any>();
     const [popperElement, setPopperElement] = useState<any>();
     const { styles, attributes } = usePopper(referenceElement, popperElement, {
-        ...options
+        ...options,
         // modifiers: [{ name: "offset", options: { offset: [0, 10] } }],
     });
     return (
         <Popover className="relative">
-            <Popover.Button
-                as="div"
-                ref={setReferenceElement}
-            >
-                {button}
+            <Popover.Button as="div" ref={setReferenceElement}>
+                {(ctx) => button(ctx)}
             </Popover.Button>
 
             <Popover.Panel
@@ -76,16 +90,18 @@ const BasePopover = ({children, options, button, className}: {children: any, opt
                 {...attributes.popper}
                 className={`transition-none z-10 ${className}`}
             >
-                <Transition
-                    enter="transition duration-200 ease-out"
-                    enterFrom="transform scale-95 opacity-0"
-                    enterTo="transform scale-100 opacity-100"
-                    leave="transition duration-75 ease-out"
-                    leaveFrom="transform scale-100 opacity-100"
-                    leaveTo="transform scale-95 opacity-0"
-                >
-                    {children}
-                </Transition>
+                {(ctx) => 
+                    <Transition
+                        enter="transition duration-200 ease-out"
+                        enterFrom="transform scale-95 opacity-0"
+                        enterTo="transform scale-100 opacity-100"
+                        leave="transition duration-75 ease-out"
+                        leaveFrom="transform scale-100 opacity-100"
+                        leaveTo="transform scale-95 opacity-0"
+                    >
+                        {children(ctx)}
+                    </Transition>
+                }
             </Popover.Panel>
         </Popover>
     );

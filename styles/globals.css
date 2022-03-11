@@ -1,7 +1,16 @@
+/* @import "~antd/lib/style/index.css";
+@import "~antd/lib/slider/style/index.css";
+@import "~antd/lib/dropdown/style/index.css";
+@import "~antd/lib/menu/style/index.css";
+@import "~antd/lib/notification/style/index.css";
+@import "~antd/lib/popover/style/index.css";
+@import "~antd/lib/date-picker/style/index.css"; */
+/* @import "~antd/dist/antd.css"; */
+@import "~antd/dist/antd.dark.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-@import "~antd/dist/antd.css";
 
 @font-face {
     font-family: "SamsungSharpSans";
@@ -55,7 +64,10 @@ input[type="number"] {
     --ash-slider-theme: theme("colors.slider.track");
 }
 .ash-slider-green {
-    --ash-slider-theme: theme("colors.stake-green.500")
+    --ash-slider-theme: theme("colors.stake-green.500");
+}
+.ash-slider-pink{
+    --ash-slider-theme: theme("colors.pink.600");
 }
 .ash-slider .ant-slider-rail {
     @apply bg-slider-rail;

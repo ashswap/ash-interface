@@ -9,9 +9,11 @@ import ImgUsdt from "assets/images/usdt-icon.png";
 import Image from "next/image";
 import ImgMintRisk from "assets/images/mint-stake-risk.png";
 import MintAOCModal from "components/MintAOCModal";
+import GOVStakeModal from "components/GOVStakeModal";
 
 function GovStats() {
     const [isQAExpand, setIsQAExpand] = useState(false);
+    const [openStakeGov, setOpenStakeGov] = useState(false);
     return (
         <>
             <div className="flex flex-col md:flex-row">
@@ -98,7 +100,7 @@ function GovStats() {
                             </div>
                         </div>
                     </div>
-                    <button className="bg-pink-600 text-white text-lg font-bold w-full h-[4.5rem] flex items-center justify-center mt-3">
+                    <button className="bg-pink-600 text-white text-lg font-bold w-full h-[4.5rem] flex items-center justify-center mt-3" onClick={(() => setOpenStakeGov(true))}>
                         Start staking
                     </button>
                 </div>
@@ -252,6 +254,7 @@ function GovStats() {
                     </div>
                 </div>
             </div>
+            <GOVStakeModal open={openStakeGov} onClose={() => setOpenStakeGov(false)}/>
         </>
     );
 }

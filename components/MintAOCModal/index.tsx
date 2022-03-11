@@ -43,7 +43,7 @@ function MintAOCModal({ open, onClose }: props) {
                                     <div>
                                         <BasePopover
                                             className="w-full"
-                                            button={
+                                            button={() =>
                                                 <button className="w-full h-18 flex items-center justify-between px-7 bg-ash-dark-600">
                                                     <div className="flex items-center">
                                                         <div>
@@ -58,7 +58,7 @@ function MintAOCModal({ open, onClose }: props) {
                                                 </button>
                                             }
                                         >
-                                            <div className="">content</div>
+                                            {() => <div className="">content</div>}
                                         </BasePopover>
                                     </div>
                                 </div>
