@@ -21,15 +21,15 @@ import HeadlessModal, {
     HeadlessModalDefaultHeader,
 } from "components/HeadlessModal";
 import InputCurrency from "components/InputCurrency";
-import { usePool } from "components/ListPoolItem";
 import Switch from "components/Switch";
 import { gasLimit, network } from "const/network";
 import { useDappContext } from "context/dapp";
+import { PoolsState } from "context/pools";
 import { useWallet } from "context/wallet";
 import { toEGLD, toWei } from "helper/balance";
 import { useScreenSize } from "hooks/useScreenSize";
-import IPool from "interface/pool";
 import { IToken } from "interface/token";
+import { Unarray } from "interface/utilities";
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -39,7 +39,7 @@ import { useDebounce } from "use-debounce";
 interface Props {
     open?: boolean;
     onClose?: () => void;
-    pool: IPool;
+    poolData: Unarray<PoolsState["poolToDisplay"]>;
 }
 interface TokenInputProps {
     token: IToken;
@@ -121,7 +121,7 @@ const TokenInput = ({
     );
 };
 
-const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
+const AddLiquidityModal = ({ open, onClose, poolData }: Props) => {
     const [isAgree, setAgree] = useState<boolean>(false);
     const [value0, setValue0] = useState<string>("");
     const [value0Debounce] = useDebounce(value0, 500);
@@ -135,7 +135,7 @@ const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
     // const provider = dapp.dapp.provider;
     const [rates, setRates] = useState<BigNumber[] | undefined>(undefined);
     const [liquidity, setLiquidity] = useState<string>("");
-    const poolContext = usePool();
+    const {pool, poolStats, stakedData} = poolData;
 
     // reset when open modal
     useEffect(() => {
@@ -420,7 +420,6 @@ const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
     }, [
         pool,
         tokenPrices,
-        poolContext.tokenBalances,
         value0Debounce,
         value1Debounce,
     ]);
@@ -487,7 +486,7 @@ const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
                                     token={pool.tokens[0]}
                                     tokenInPool={toEGLD(
                                         pool.tokens[0],
-                                        poolContext.value0.toString()
+                                        stakedData?.value0?.toString() || "0"
                                     ).toFixed(2)}
                                     value={value0}
                                     onChangeValue={(val) => onChangeValue0(val)}
@@ -500,7 +499,7 @@ const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
                                     token={pool.tokens[1]}
                                     tokenInPool={toEGLD(
                                         pool.tokens[1],
-                                        poolContext.value1.toString()
+                                        stakedData?.value1?.toString() || "0"
                                     ).toFixed(2)}
                                     value={value1}
                                     onChangeValue={(val) => onChangeValue1(val)}
@@ -595,9 +594,9 @@ const AddLiquidityModal = ({ open, onClose, pool }: Props) => {
                                                 Your Capacity
                                             </div>
                                             <div style={{ color: "#00FF75" }}>
-                                                {poolContext.capacityPercent.toFixed(
+                                                {stakedData?.capacityPercent.toFixed(
                                                     2
-                                                )}
+                                                ) || "_"}
                                                 %
                                             </div>
                                         </div>

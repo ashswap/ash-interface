@@ -1,14 +1,9 @@
 import { PoolsState } from "context/pools";
-import { toEGLD } from "helper/balance";
 import { Unarray } from "interface/utilities";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useState } from "react";
 import Image from "next/image";
-import Button from "components/Button";
-import { theme } from "tailwind.config";
 import AddLiquidityModal from "components/AddLiquidityModal";
-import RemoveLiquidityModal from "components/RemoveLiquidityModal";
 import Down from "assets/svg/down-white.svg";
-import { fractionFormat } from "helper/number";
 import usePoolDataFormat from "hooks/usePoolDataFormat";
 
 function PoolCardItem({
@@ -113,7 +108,7 @@ function PoolCardItem({
             <AddLiquidityModal
                 open={openAddLiquidity}
                 onClose={() => setOpenAddLiquidity(false)}
-                pool={pool}
+                poolData={poolData}
             />
         </div>
     );

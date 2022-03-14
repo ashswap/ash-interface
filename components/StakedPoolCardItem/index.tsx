@@ -162,12 +162,12 @@ function StakedPoolCardItem({
             <AddLiquidityModal
                 open={openAddLiquidity}
                 onClose={() => setOpenAddLiquidity(false)}
-                pool={pool}
+                poolData={poolData}
             />
             <RemoveLiquidityModal
                 open={openRemoveLiquidity}
                 onClose={() => setOpenRemoveLiquidity(false)}
-                pool={pool}
+                poolData={poolData}
             />
         </div>
     );
