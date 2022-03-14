@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import ICMinus from "assets/svg/minus.svg";
 import ICPlus from "assets/svg/plus.svg";
 import ICLock from "assets/svg/lock.svg";
@@ -10,10 +10,22 @@ import Image from "next/image";
 import ImgMintRisk from "assets/images/mint-stake-risk.png";
 import MintAOCModal from "components/MintAOCModal";
 import GOVStakeModal from "components/GOVStakeModal";
+import { useStakeGov } from "context/gov";
+import { toEGLD, toEGLDD } from "helper/balance";
+import { ASH_TOKEN, VE_ASH_DECIMALS } from "const/tokens";
+import { fractionFormat } from "helper/number";
 
 function GovStats() {
     const [isQAExpand, setIsQAExpand] = useState(false);
     const [openStakeGov, setOpenStakeGov] = useState(false);
+    const {lockedAmt, veASH} = useStakeGov();
+    const fLockedAmt = useMemo(() => {
+        return fractionFormat(toEGLDD(ASH_TOKEN.decimals, lockedAmt).toNumber())
+    }, [lockedAmt]);
+    const fVEASHAmt = useMemo(() => {
+        // console.log(toEGLDD(VE_ASH_DECIMALS, veASH).toNumber())
+        return fractionFormat(toEGLDD(VE_ASH_DECIMALS, veASH).toNumber())
+    }, [veASH]);
     return (
         <>
             <div className="flex flex-col md:flex-row">
@@ -55,7 +67,7 @@ function GovStats() {
                                         <Image src={ImgUsdt} alt="token icon" />
                                     </div>
                                     <div className="text-lg text-white font-bold">
-                                        0
+                                        {fLockedAmt}
                                     </div>
                                 </div>
                             </div>
@@ -74,7 +86,7 @@ function GovStats() {
                                         <Image src={ImgUsdt} alt="token icon" />
                                     </div>
                                     <div className="text-lg text-white font-bold">
-                                        0
+                                        {fVEASHAmt}
                                     </div>
                                 </div>
                             </div>

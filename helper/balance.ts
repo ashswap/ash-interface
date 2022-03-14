@@ -21,16 +21,20 @@ export const toWei = (token: IToken, valueStr: string) => {
 };
 
 export const toEGLD = (token: IToken, valueStr: string) => {
-    if (valueStr === "") {
+    return toEGLDD(token.decimals, valueStr);
+};
+
+export const toEGLDD = (decimals: number, num: string | BigNumber) => {
+    if (num === "") {
         return new BigNumber(0);
     }
 
-    let amount = new BigNumber(valueStr);
-    amount = amount.div(new BigNumber(10).exponentiatedBy(token.decimals));
+    let amount = new BigNumber(num);
+    amount = amount.div(new BigNumber(10).exponentiatedBy(decimals));
 
     if (amount.lt(0)) {
         return new BigNumber(0);
     }
 
     return amount;
-};
+}

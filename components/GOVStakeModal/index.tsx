@@ -7,7 +7,7 @@ type props = {
     onClose: () => void;
 };
 function GOVStakeModal({ open, onClose }: props) {
-    const [isStaked, setIsStaked] = useState(true);
+    const [isStaked, setIsStaked] = useState(false);
     return (
         <>
             {isStaked ? (

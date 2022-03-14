@@ -5,10 +5,16 @@ import HeadlessModal, {
 } from "components/HeadlessModal";
 import InputCurrency from "components/InputCurrency";
 import { useDappContext } from "context/dapp";
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { theme } from "tailwind.config";
 import LockPeriod from "./LockPeriod";
 import ICChevronRight from "assets/svg/chevron-right.svg";
+import { ASH_TOKEN } from "const/tokens";
+import { useWallet } from "context/wallet";
+import { toEGLD, toWei } from "helper/balance";
+import BigNumber from "bignumber.js";
+import moment from "moment";
+import { useStakeGov } from "context/gov";
 type props = {
     open: boolean;
     onClose: () => void;
@@ -21,13 +27,30 @@ const predefinedLockPeriod = [
     { value: 365 * 3, label: "3 year" },
     { value: 365 * 4, label: "4 year" },
 ];
+const maxLock = 4 * 365;
+const minLock = 7;
 function FirstStakeModal({ open, onClose }: props) {
-    const isFirstTime = true;
-    const maxLock = 4 * 365;
-    const minLock = 7;
+
     const [lockPeriod, setLockPeriod] = useState(7);
     const [isAgree, setIsAgree] = useState(false);
     const dapp = useDappContext();
+    const {balances, insufficientEGLD} = useWallet();
+    const {lockASH} = useStakeGov();
+    const ASHBalance = useMemo(() => balances[ASH_TOKEN.id], [balances]);
+    const [lockAmt, setLockAmt] = useState<BigNumber>(new BigNumber(0));
+    const [rawLockAmt, setRawLockAmt] = useState("");
+    const setMaxLockAmt = useCallback(() => {
+        setLockAmt(ASHBalance.balance); setRawLockAmt(toEGLD(ASH_TOKEN, ASHBalance.balance.toString()).toString(10))
+    }, [ASHBalance]);
+    const canStake = useMemo(() => {
+        return !insufficientEGLD && lockAmt.gt(0) && lockPeriod >= minLock && lockPeriod <= maxLock && isAgree;
+    }, [insufficientEGLD, lockAmt, lockPeriod, isAgree]);
+    const lock = useCallback(async () => {
+        const tx = await lockASH(lockAmt, new BigNumber(moment().add(lockPeriod, "days").unix()));
+        if(tx){
+            onClose();
+        }
+    }, [lockASH, lockAmt, lockPeriod, onClose])
     return (
         <>
             <HeadlessModal open={open} onClose={() => onClose()}>
@@ -47,7 +70,7 @@ function FirstStakeModal({ open, onClose }: props) {
                                         <div className="bg-ash-dark-400/30 h-18 px-7 flex items-center">
                                             <div className="w-7 h-7 bg-pink-600 rounded-full mr-3"></div>
                                             <div className="text-white text-lg font-bold">
-                                                ASH
+                                                {ASH_TOKEN.name}
                                             </div>
                                         </div>
                                     </div>
@@ -55,13 +78,23 @@ function FirstStakeModal({ open, onClose }: props) {
                                         <div className="text-ash-gray-500 text-sm font-bold mb-4">
                                             Input Amount
                                         </div>
-                                        <InputCurrency className="w-full text-white text-lg font-bold bg-ash-dark-400 h-18 px-6 flex items-center text-right outline-none" />
+                                        <InputCurrency className="w-full text-white text-lg font-bold bg-ash-dark-400 h-18 px-6 flex items-center text-right outline-none" value={rawLockAmt} onChange={(e) => {
+                                            const raw = e.target.value.trim();
+                                            const lockAmt = toWei(ASH_TOKEN, raw);
+                                            if(lockAmt.gt(ASHBalance.balance)){
+                                                setMaxLockAmt();
+                                            }else{
+                                                setRawLockAmt(raw);
+                                                setLockAmt(lockAmt);
+                                            }
+                                            
+                                        }} />
                                         <div className="text-right text-xs mt-2">
                                             <span className="text-ash-gray-500">
                                                 Balance:{" "}
                                             </span>
-                                            <span className="text-earn">
-                                                341.311 ASH
+                                            <span className="text-earn cursor-pointer" onClick={() => setMaxLockAmt()}>
+                                                {ASHBalance ? toEGLD(ASH_TOKEN, ASHBalance.balance.toString()).toFixed(2) : "_"} {ASH_TOKEN.name}
                                             </span>
                                         </div>
                                     </div>
@@ -144,7 +177,7 @@ function FirstStakeModal({ open, onClose }: props) {
                                             Unlock Time
                                         </div>
                                         <div className="text-white text-lg font-bold min-h-[3rem]">
-                                            _
+                                            {moment().add(lockPeriod, "days").format("DD MMM, yyyy")}
                                         </div>
                                     </div>
                                 </div>
@@ -177,14 +210,15 @@ function FirstStakeModal({ open, onClose }: props) {
                             <div className="w-full sm:w-[17.8125rem] flex-shrink-0">
                                 <div className="border-notch">
                                     <button
-                                        className={`clip-corner-1 clip-corner-tl transition w-full h-12 flex items-center justify-center text-sm font-bold ${
-                                            dapp.account.balance === "0"
-                                                ? "bg-pink-600 text-ash-dark-600"
-                                                : "bg-ash-dark-500 text-white"
+                                        className={`clip-corner-1 clip-corner-tl transition w-full h-12 flex items-center justify-center text-sm font-bold text-white ${
+                                            canStake
+                                                ? "bg-pink-600"
+                                                : "bg-ash-dark-500"
                                         }`}
-                                        disabled={dapp.account.balance === "0"}
+                                        disabled={!canStake}
+                                        onClick={() => canStake && lock()}
                                     >
-                                        {dapp.account.balance === "0" ? (
+                                        {insufficientEGLD ? (
                                             "INSUFFICIENT EGLD BALANCE"
                                         ) : (
                                             <div className="flex items-center">

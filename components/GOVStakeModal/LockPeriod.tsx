@@ -10,11 +10,18 @@ type props = {
     currentLock?: number;
     min?: number;
     max?: number;
-    options: {value: number; label: string}[];
+    options: { value: number; label: string }[];
     lockDayChange: (val: number) => void;
 };
 
-function LockPeriod({ lockDay, min, max, currentLock = 0, options, lockDayChange }: props) {
+function LockPeriod({
+    lockDay,
+    min,
+    max,
+    currentLock = 0,
+    options,
+    lockDayChange,
+}: props) {
     const datePickerRef = useRef<HTMLDivElement>(null);
     const [openDatePicker, setOpenDatePicker] = useState(false);
     const onClickOutside = useCallback(() => {
@@ -42,17 +49,38 @@ function LockPeriod({ lockDay, min, max, currentLock = 0, options, lockDayChange
                     suffixIcon={undefined}
                     inputReadOnly={true}
                     showToday={false}
-                    disabledDate={(current) => current && (min && min > 0 && (current.endOf("days") < moment().add(min, "days").endOf("days")) || (min && max && max > min && max > 0 && current.endOf("days") > moment().add(max, "days").endOf("day")))}
+                    disabledDate={(current) => {
+                        if (!current) return false;
+                        const checkMin =
+                            !!min &&
+                            min > 0 &&
+                            current.endOf("days") <
+                                moment().add(min, "days").endOf("days");
+                        const checkMax =
+                            !!min &&
+                            !!max &&
+                            max > min &&
+                            max > 0 &&
+                            current.endOf("days") >
+                                moment().add(max, "days").endOf("day");
+                        return current && (checkMin || checkMax);
+                    }}
                     getPopupContainer={(el) => {
                         return el.parentElement as any;
                     }}
                     value={moment().endOf("days").add(lockDay, "days")}
-                    onChange={(val) => val && lockDayChange(val.endOf("days").diff(moment().endOf("days"), "days"))}
+                    onChange={(val) =>
+                        val &&
+                        lockDayChange(
+                            val
+                                .endOf("days")
+                                .diff(moment().endOf("days"), "days")
+                        )
+                    }
                 />
                 <div
-                    
                     onClick={() => setOpenDatePicker(true)}
-                    className="text-white text-2xl font-bold"
+                    className="text-white text-lg lg:text-2xl font-bold"
                 >
                     {fUnlockDate}
                 </div>
@@ -62,13 +90,13 @@ function LockPeriod({ lockDay, min, max, currentLock = 0, options, lockDayChange
                     className="absolute w-full text-white left-0"
                     button={({ open }) => (
                         <button
-                            className={`transition ease-in-out duration-200 w-[12.5rem] h-14 px-7 flex items-center justify-between ${
+                            className={`transition ease-in-out duration-200 w-40 lg:w-[12.5rem] h-14 px-7 flex items-center justify-between ${
                                 open
                                     ? "bg-ash-dark-700 text-white"
                                     : "bg-ash-gray-500/10 text-ash-gray-500"
                             }`}
                         >
-                            <span className="font-bold text-sm mr-2">
+                            <span className="font-bold text-xs lg:text-sm mr-2">
                                 {open ? "LOCK PERIOD" : fSelectedDate}
                             </span>
                             <ICChevronDown className="w-2 h-auto" />
