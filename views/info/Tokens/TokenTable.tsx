@@ -73,12 +73,12 @@ const TokenRecord = ({
             <div className="w-5">{order}</div>
             <div className="w-20 md:w-28 lg:w-44 flex items-center justify-between overflow-hidden">
                 <div className="flex items-center mr-2">
-                    <Image
+                    {/* <Image
                         src={tokenData?.token?.icon || ""}
                         alt="token"
                         width={24}
                         height={24}
-                    />
+                    /> */}
                     <div className="ml-2.5 font-bold text-sm">
                         {tokenData?.token?.name}
                     </div>

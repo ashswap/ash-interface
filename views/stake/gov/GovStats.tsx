@@ -23,7 +23,7 @@ import useMounted from "hooks/useMounted";
 function GovStats() {
     const [isQAExpand, setIsQAExpand] = useState(false);
     const [openStakeGov, setOpenStakeGov] = useState(false);
-    const { lockedAmt, veASH, unlockTS } = useStakeGov();
+    const { lockedAmt, veASH, unlockTS, totalSupplyVeASH, totalLockedAmt, rewardLPAmt, rewardLPToken, claimReward } = useStakeGov();
     const dapp = useDappContext();
     const mounted = useMounted();
     const { connectWallet } = useWallet();
@@ -33,9 +33,25 @@ function GovStats() {
         );
     }, [lockedAmt]);
     const fVEASHAmt = useMemo(() => {
-        // console.log(toEGLDD(VE_ASH_DECIMALS, veASH).toNumber())
         return fractionFormat(toEGLDD(VE_ASH_DECIMALS, veASH).toNumber());
     }, [veASH]);
+    const fTotalVeASH = useMemo(() => {
+        return fractionFormat(toEGLDD(VE_ASH_DECIMALS, totalSupplyVeASH).toNumber());
+    }, [totalSupplyVeASH]);
+    const capacityPct = useMemo(() => {
+        if(totalSupplyVeASH.eq(0)) return "_";
+        return veASH.multipliedBy(100).div(totalSupplyVeASH).toFixed(2);
+    }, [veASH, totalSupplyVeASH]);
+    const fTotalLockedAmt = useMemo(() => {
+        return fractionFormat(toEGLDD(ASH_TOKEN.decimals, totalLockedAmt).toNumber());
+    }, [totalLockedAmt]);
+    const fRewardValue = useMemo(() => {
+        if(!rewardLPToken) return "_";
+        return fractionFormat(toEGLDD(rewardLPToken.lpToken.decimals, rewardLPAmt).toNumber());
+    }, [rewardLPAmt, rewardLPToken]);
+    const canClaim = useMemo(() => {
+        return rewardLPAmt && rewardLPAmt.gt(0);
+    }, [rewardLPAmt]);
     return (
         <>
             <div className="flex flex-col md:flex-row">
@@ -50,20 +66,25 @@ function GovStats() {
                                     your reward
                                 </div>
                                 <div className="flex items-center">
-                                    <div className="w-[1.125rem] h-[1.125rem] mr-2">
-                                        <Image src={ImgUsdt} alt="token icon" />
+                                    {rewardLPToken && <div className="flex items-center">
+                                        <div className="w-[1.125rem] h-[1.125rem]">
+                                        <Image src={rewardLPToken.tokens[0].icon} alt="token icon" />
                                     </div>
+                                    <div className="w-[1.125rem] h-[1.125rem] -ml-1 mr-2">
+                                        <Image src={rewardLPToken.tokens[1].icon} alt="token icon" />
+                                    </div>
+                                    </div>}
                                     <div className="text-lg">
                                         <span className="text-ash-gray-500">
                                             $
                                         </span>
                                         <span className="text-white font-bold">
-                                            0
+                                            {fRewardValue}
                                         </span>
                                     </div>
                                 </div>
                             </div>
-                            <button className="bg-ash-cyan-500 text-ash-dark-400 text-sm font-bold w-full h-[3.375rem] flex items-center justify-center">
+                            <button className={`text-sm font-bold w-full h-[3.375rem] flex items-center justify-center ${canClaim ? "bg-ash-cyan-500 text-ash-dark-400" : "bg-ash-dark-400 text-white"}`} disabled={!canClaim} onClick={() => canClaim && claimReward()}>
                                 Harvest
                             </button>
                         </div>
@@ -121,7 +142,7 @@ function GovStats() {
                                             Capacity
                                         </span>
                                     </div>
-                                    <div className="text-xs font-bold">_</div>
+                                    <div className="text-xs font-bold">{capacityPct}%</div>
                                 </div>
                             </div>
                         </div>
@@ -174,7 +195,7 @@ function GovStats() {
                                     <Image src={ImgUsdt} alt="token icon" />
                                 </div>
                                 <div className="text-white text-lg font-bold">
-                                    1,091,291.012512
+                                    {fTotalLockedAmt}
                                 </div>
                             </div>
                         </div>
@@ -187,7 +208,7 @@ function GovStats() {
                                     <Image src={ImgUsdt} alt="token icon" />
                                 </div>
                                 <div className="text-white text-lg font-bold">
-                                    1,091,291.012512
+                                    {fTotalVeASH}
                                 </div>
                             </div>
                         </div>

@@ -3,7 +3,7 @@ import IPool from 'interface/pool';
 import { IToken } from 'interface/token';
 import pools from './pool';
 export const ASH_TOKEN: IToken = {
-    id: "ASH-550f13",
+    id: "ASH-76f082",
     name: "ASH",
     decimals: 18,
     icon: ""

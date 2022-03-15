@@ -1,6 +1,6 @@
 export const gasPrice = 1000000000;
 export const version = 1;
-export const gasLimit = 400000000;
+export const gasLimit = 600000000;
 export const gasPerDataByte = 1500;
 export const shardId = 1;
 export const blockTimeMs = 6000;
@@ -17,6 +17,6 @@ export const network = {
     
 };
 export const dappContract = {
-    voteEscrowedContract: "erd1qqqqqqqqqqqqqpgq4gh2cqud9jhjz2g3menhc6ydl8h0xa3gj9tsjwkdrw",
-    feeDistributor: "erd1qqqqqqqqqqqqqpgqnceynuplsjcw9pghld888qzeeq5z5sc0j9ts78c8tz"
+    voteEscrowedContract: "erd1qqqqqqqqqqqqqpgq064fmmta5sdth3jrarfftnd3q6795qd2j9tsjnkswk",
+    feeDistributor: "erd1qqqqqqqqqqqqqpgqkv6t43ntxtprfl7w3emjwjazc7crzkzfj9ts2jmujn"
 }

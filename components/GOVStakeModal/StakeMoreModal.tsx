@@ -91,6 +91,23 @@ function StakeMoreModal({ open, onClose }: props) {
         isExtend,
     ]);
 
+    const lockMore = useCallback(async () => {
+        await lockMoreASH({
+            weiAmt: lockAmt,
+            unlockTimestamp: isExtend
+                ? new BigNumber(
+                      moment
+                          .unix(unlockTS.toNumber())
+                          .add(extendLockPeriod, "days")
+                          .unix()
+                  )
+                : undefined,
+        });
+        if(onClose){
+            onClose()
+        }
+    }, [lockMoreASH, isExtend, extendLockPeriod, unlockTS, lockAmt, onClose]);
+
     return (
         <>
             <HeadlessModal
@@ -332,25 +349,7 @@ function StakeMoreModal({ open, onClose }: props) {
                                                 : "bg-ash-dark-500"
                                         }`}
                                         disabled={!canStake}
-                                        onClick={() =>
-                                            canStake &&
-                                            lockMoreASH({
-                                                weiAmt: lockAmt,
-                                                unlockTimestamp: isExtend
-                                                    ? new BigNumber(
-                                                          moment
-                                                              .unix(
-                                                                  unlockTS.toNumber()
-                                                              )
-                                                              .add(
-                                                                  extendLockPeriod,
-                                                                  "days"
-                                                              )
-                                                              .unix()
-                                                      )
-                                                    : undefined,
-                                            })
-                                        }
+                                        onClick={() => canStake && lockMore()}
                                     >
                                         {insufficientEGLD ? (
                                             "INSUFFICIENT EGLD BALANCE"

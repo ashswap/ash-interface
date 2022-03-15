@@ -4,7 +4,7 @@ export const currencyFormater = new Intl.NumberFormat("en-US", {
 });
 export const fractionFormat = (val: number, maximumFractionDigits = 2) => {
     if(typeof val !== "number") return "";
-    return val.toLocaleString("en-US", {maximumFractionDigits});
+    return val.toLocaleString("en-US", {maximumFractionDigits: val > 1 ? maximumFractionDigits : undefined});
 }
 export function abbreviateCurrency(n: number, minPlus?: number): number | string {
     if(n === 0) return n;
