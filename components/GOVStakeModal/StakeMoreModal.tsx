@@ -5,13 +5,19 @@ import HeadlessModal, {
 } from "components/HeadlessModal";
 import InputCurrency from "components/InputCurrency";
 import { useDappContext } from "context/dapp";
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { theme } from "tailwind.config";
 import LockPeriod from "./LockPeriod";
 import ICChevronRight from "assets/svg/chevron-right.svg";
 import moment from "moment";
 import Switch from "components/Switch";
 import { useScreenSize } from "hooks/useScreenSize";
+import { useStakeGov } from "context/gov";
+import { fractionFormat } from "helper/number";
+import { toEGLDD, toWei } from "helper/balance";
+import { ASH_TOKEN } from "const/tokens";
+import { useWallet } from "context/wallet";
+import BigNumber from "bignumber.js";
 type props = {
     open: boolean;
     onClose: () => void;
@@ -22,14 +28,24 @@ const EXTEND_OPTS = [
     { value: 365, label: "+ 1 year" },
 ];
 const MAX_LOCK = 4 * 365;
+const maxLock = 4 * 365;
+const minLock = 7;
 function StakeMoreModal({ open, onClose }: props) {
-    const maxLock = 4 * 365;
-    const minLock = 7;
-    const currentLockDays = 30;
-    const [extendLockPeriod, setExtendLockPeriod] = useState(7);
+    const { lockedAmt, unlockTS, lockMoreASH } = useStakeGov();
+    const { balances, insufficientEGLD } = useWallet();
+    const ASHBalance = useMemo(() => balances[ASH_TOKEN.id], [balances]);
+    const [lockAmt, setLockAmt] = useState<BigNumber>(new BigNumber(0));
+    const [rawLockAmt, setRawLockAmt] = useState("");
+    const currentLockDays = useMemo(() => {
+        return moment
+            .unix(unlockTS.toNumber())
+            .endOf("days")
+            .diff(moment().endOf("days"), "days");
+    }, [unlockTS]);
+    const [extendLockPeriod, setExtendLockPeriod] = useState(minLock);
     const [isAgree, setIsAgree] = useState(false);
     const [isExtend, setIsExtend] = useState(false);
-    const {isMobile} = useScreenSize();
+    const { isMobile } = useScreenSize();
     const dapp = useDappContext();
     const remaining = useMemo(() => {
         let years = Math.floor(currentLockDays / 365);
@@ -44,10 +60,44 @@ function StakeMoreModal({ open, onClose }: props) {
             ...EXTEND_OPTS.filter((opt) => opt.value < max),
             { value: max, label: `max: ${max.toLocaleString("en-US")} days` },
         ];
-    }, []);
+    }, [currentLockDays]);
+    const fLockedAmt = useMemo(() => {
+        return fractionFormat(
+            toEGLDD(ASH_TOKEN.decimals, lockedAmt).toNumber()
+        );
+    }, [lockedAmt]);
+    const setMaxLockAmt = useCallback(() => {
+        setLockAmt(ASHBalance.balance);
+        setRawLockAmt(
+            toEGLDD(ASH_TOKEN.decimals, ASHBalance.balance).toString(10)
+        );
+    }, [ASHBalance]);
+
+    const canStake = useMemo(() => {
+        return (
+            !insufficientEGLD &&
+            isAgree &&
+            (lockAmt.gt(0) ||
+                (isExtend &&
+                    extendLockPeriod >= minLock &&
+                    extendLockPeriod + currentLockDays <= maxLock))
+        );
+    }, [
+        insufficientEGLD,
+        extendLockPeriod,
+        isAgree,
+        currentLockDays,
+        lockAmt,
+        isExtend,
+    ]);
+
     return (
         <>
-            <HeadlessModal open={open} onClose={() => onClose()} transition={`${isMobile ? "btt" : "center"}`}>
+            <HeadlessModal
+                open={open}
+                onClose={() => onClose()}
+                transition={`${isMobile ? "btt" : "center"}`}
+            >
                 <div className="bg-stake-dark-400 p-4 fixed bottom-0 inset-x-0 sm:static sm:mt-28 sm:ash-container flex flex-col max-h-[calc(100%-2.75rem)] sm:max-h-full">
                     <HeadlessModalDefaultHeader onClose={() => onClose()} />
                     <div className="mt-4 px-6 lg:px-20 pb-12 overflow-auto">
@@ -59,15 +109,47 @@ function StakeMoreModal({ open, onClose }: props) {
                                 <div className="w-full grid grid-cols-2 gap-x-4 lg:gap-x-7.5 mb-16 lg:mb-12">
                                     <div>
                                         <div className="text-ash-gray-500 text-xs lg:text-sm font-bold mb-2 lg:mb-4">
-                                            {isMobile ? "Added Amount" : "I want to stake more!"}
+                                            {isMobile
+                                                ? "Added Amount"
+                                                : "I want to stake more!"}
                                         </div>
-                                        <InputCurrency className="w-full text-white text-lg font-bold bg-ash-dark-400 h-14 lg:h-18 px-6 flex items-center text-right outline-none" />
+                                        <InputCurrency
+                                            className="w-full text-white text-lg font-bold bg-ash-dark-400 h-14 lg:h-18 px-6 flex items-center text-right outline-none"
+                                            value={rawLockAmt}
+                                            onChange={(e) => {
+                                                const raw =
+                                                    e.target.value.trim();
+                                                const lockAmt = toWei(
+                                                    ASH_TOKEN,
+                                                    raw
+                                                );
+                                                if (
+                                                    lockAmt.gt(
+                                                        ASHBalance.balance
+                                                    )
+                                                ) {
+                                                    setMaxLockAmt();
+                                                } else {
+                                                    setRawLockAmt(raw);
+                                                    setLockAmt(lockAmt);
+                                                }
+                                            }}
+                                        />
                                         <div className="text-right text-2xs lg:text-xs mt-2">
                                             <span className="text-ash-gray-500">
                                                 Balance:{" "}
                                             </span>
-                                            <span className="text-earn">
-                                                341.311 ASH
+                                            <span
+                                                className="text-earn cursor-pointer"
+                                                onClick={() => setMaxLockAmt()}
+                                            >
+                                                {ASHBalance
+                                                    ? toEGLDD(
+                                                          ASH_TOKEN.decimals,
+                                                          ASHBalance.balance
+                                                      ).toFixed(2)
+                                                    : "_"}{" "}
+                                                {ASH_TOKEN.name}
                                             </span>
                                         </div>
                                     </div>
@@ -76,17 +158,25 @@ function StakeMoreModal({ open, onClose }: props) {
                                             <div className="mr-1">Current</div>
                                             <div className="flex items-center">
                                                 <div className="w-3 h-3 bg-ash-purple-500 rounded-full mr-1"></div>
-                                                <div>ASH Staked</div>
+                                                <div>
+                                                    {ASH_TOKEN.name} Staked
+                                                </div>
                                             </div>
                                         </div>
                                         <div className="bg-stake-dark-500 h-14 lg:h-18 px-6 flex items-center justify-end text-ash-gray-500">
                                             <div className="text-right text-sm lg:text-lg">
-                                                200
+                                                {fLockedAmt}
                                             </div>
                                         </div>
                                         <div className="text-right text-2xs lg:text-xs mt-2 text-ash-gray-500">
                                             <span>Total stake: </span>
-                                            <span>300 ASH</span>
+                                            <span>
+                                                {toEGLDD(
+                                                    ASH_TOKEN.decimals,
+                                                    lockedAmt.plus(lockAmt)
+                                                ).toString(10)}{" "}
+                                                ASH
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
@@ -96,8 +186,8 @@ function StakeMoreModal({ open, onClose }: props) {
                                     </div>
                                     <div className="bg-stake-dark-500 text-ash-gray-500 h-18 lg:h-20 pl-6 pr-4 flex items-center justify-between">
                                         <div className="text-lg lg:text-2xl font-bold">
-                                            {moment()
-                                                .add(currentLockDays, "days")
+                                            {moment
+                                                .unix(unlockTS.toNumber())
                                                 .format("DD MMM, yyyy")}
                                         </div>
                                         <div className="text-xs lg:text-sm underline pl-5 border-l border-l-ash-gray-500">
@@ -121,12 +211,24 @@ function StakeMoreModal({ open, onClose }: props) {
                                     {isExtend && (
                                         <div className="mt-8">
                                             <LockPeriod
-                                                lockDay={extendLockPeriod + currentLockDays}
+                                                lockDay={
+                                                    extendLockPeriod +
+                                                    currentLockDays
+                                                }
                                                 min={currentLockDays + 7}
                                                 max={MAX_LOCK}
-                                                options={extendOpts.map(opt => ({...opt, value: opt.value + currentLockDays}))}
+                                                options={extendOpts.map(
+                                                    (opt) => ({
+                                                        ...opt,
+                                                        value:
+                                                            opt.value +
+                                                            currentLockDays,
+                                                    })
+                                                )}
                                                 lockDayChange={(val) =>
-                                                    setExtendLockPeriod(val - currentLockDays)
+                                                    setExtendLockPeriod(
+                                                        val - currentLockDays
+                                                    )
                                                 }
                                             />
                                             {/* <div className="mt-4 flex space-x-2">
@@ -171,9 +273,28 @@ function StakeMoreModal({ open, onClose }: props) {
                                         <div className="text-ash-gray-500 text-xs underline mb-2">
                                             Unlock Time
                                         </div>
-                                        <div className="text-white text-lg font-bold min-h-[3rem]">
-                                            _
+                                        <div
+                                            className={`text-lg font-bold ${
+                                                isExtend
+                                                    ? "text-ash-gray-500 line-through"
+                                                    : "text-white"
+                                            }`}
+                                        >
+                                            {moment
+                                                .unix(unlockTS.toNumber())
+                                                .format("DD MMM, yyyy")}
                                         </div>
+                                        {isExtend && (
+                                            <div className="text-white text-lg font-bold">
+                                                {moment
+                                                    .unix(unlockTS.toNumber())
+                                                    .add(
+                                                        extendLockPeriod,
+                                                        "days"
+                                                    )
+                                                    .format("DD MMM, yyyy")}
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -205,14 +326,33 @@ function StakeMoreModal({ open, onClose }: props) {
                             <div className="w-full sm:w-[17.8125rem] flex-shrink-0">
                                 <div className="border-notch">
                                     <button
-                                        className={`clip-corner-1 clip-corner-tl transition w-full h-12 flex items-center justify-center text-sm font-bold ${
-                                            dapp.account.balance === "0"
-                                                ? "bg-pink-600 text-ash-dark-600"
-                                                : "bg-ash-dark-500 text-white"
+                                        className={`clip-corner-1 clip-corner-tl transition w-full h-12 flex items-center justify-center text-sm font-bold text-white ${
+                                            canStake
+                                                ? "bg-pink-600"
+                                                : "bg-ash-dark-500"
                                         }`}
-                                        disabled={dapp.account.balance === "0"}
+                                        disabled={!canStake}
+                                        onClick={() =>
+                                            canStake &&
+                                            lockMoreASH({
+                                                weiAmt: lockAmt,
+                                                unlockTimestamp: isExtend
+                                                    ? new BigNumber(
+                                                          moment
+                                                              .unix(
+                                                                  unlockTS.toNumber()
+                                                              )
+                                                              .add(
+                                                                  extendLockPeriod,
+                                                                  "days"
+                                                              )
+                                                              .unix()
+                                                      )
+                                                    : undefined,
+                                            })
+                                        }
                                     >
-                                        {dapp.account.balance === "0" ? (
+                                        {insufficientEGLD ? (
                                             "INSUFFICIENT EGLD BALANCE"
                                         ) : (
                                             <div className="flex items-center">

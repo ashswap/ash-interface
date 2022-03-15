@@ -3,7 +3,7 @@ import ICArrowRight from "assets/svg/arrow-right.svg";
 import ICStarOutline from "assets/svg/star-outline.svg";
 import ICStar from "assets/svg/star.svg";
 import { ENVIRONMENT } from "const/env";
-import { TOKENS } from "const/tokens";
+import { IN_POOL_TOKENS } from "const/tokens";
 import { fetcher } from "helper/common";
 import { abbreviateCurrency, currencyFormater } from "helper/number";
 import { useScreenSize } from "hooks/useScreenSize";
@@ -135,7 +135,7 @@ function TokenTable() {
     const tokenRecords: TokenRecord[] = useMemo(() => {
         if (!data) return [];
         return data.map((val) => {
-            const token = TOKENS.find((t) => t.id === val.token_id);
+            const token = IN_POOL_TOKENS.find((t) => t.id === val.token_id);
             const record: TokenRecord = { ...val, token };
             return record;
         });

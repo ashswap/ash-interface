@@ -17,5 +17,6 @@ export const network = {
     
 };
 export const dappContract = {
-    voteEscrowedContract: "erd1qqqqqqqqqqqqqpgq4gh2cqud9jhjz2g3menhc6ydl8h0xa3gj9tsjwkdrw"
+    voteEscrowedContract: "erd1qqqqqqqqqqqqqpgq4gh2cqud9jhjz2g3menhc6ydl8h0xa3gj9tsjwkdrw",
+    feeDistributor: "erd1qqqqqqqqqqqqqpgqnceynuplsjcw9pghld888qzeeq5z5sc0j9ts78c8tz"
 }

@@ -2,6 +2,7 @@ import React, { useMemo, useState } from "react";
 import ICMinus from "assets/svg/minus.svg";
 import ICPlus from "assets/svg/plus.svg";
 import ICLock from "assets/svg/lock.svg";
+import ICWallet from "assets/svg/wallet.svg";
 import ICCapacity from "assets/svg/capacity.svg";
 import ICChevronDown from "assets/svg/chevron-down.svg";
 import ICChevronUp from "assets/svg/chevron-up.svg";
@@ -14,17 +15,26 @@ import { useStakeGov } from "context/gov";
 import { toEGLD, toEGLDD } from "helper/balance";
 import { ASH_TOKEN, VE_ASH_DECIMALS } from "const/tokens";
 import { fractionFormat } from "helper/number";
+import moment from "moment";
+import { useDappContext } from "context/dapp";
+import { useWallet } from "context/wallet";
+import useMounted from "hooks/useMounted";
 
 function GovStats() {
     const [isQAExpand, setIsQAExpand] = useState(false);
     const [openStakeGov, setOpenStakeGov] = useState(false);
-    const {lockedAmt, veASH} = useStakeGov();
+    const { lockedAmt, veASH, unlockTS } = useStakeGov();
+    const dapp = useDappContext();
+    const mounted = useMounted();
+    const { connectWallet } = useWallet();
     const fLockedAmt = useMemo(() => {
-        return fractionFormat(toEGLDD(ASH_TOKEN.decimals, lockedAmt).toNumber())
+        return fractionFormat(
+            toEGLDD(ASH_TOKEN.decimals, lockedAmt).toNumber()
+        );
     }, [lockedAmt]);
     const fVEASHAmt = useMemo(() => {
         // console.log(toEGLDD(VE_ASH_DECIMALS, veASH).toNumber())
-        return fractionFormat(toEGLDD(VE_ASH_DECIMALS, veASH).toNumber())
+        return fractionFormat(toEGLDD(VE_ASH_DECIMALS, veASH).toNumber());
     }, [veASH]);
     return (
         <>
@@ -92,29 +102,47 @@ function GovStats() {
                             </div>
                             <div className="flex space-x-2">
                                 <div className="bg-ash-dark-400 text-stake-gray-500 px-3 py-2 w-7/12 h-[3.375rem] overflow-hidden">
-                                    <div className="flex items-center">
+                                    <div className="flex items-center mb-2">
                                         <ICLock className="w-3 h-3 mr-1" />
                                         <span className="text-2xs font-bold underline">
                                             Lock
                                         </span>
                                     </div>
-                                    <div>_</div>
+                                    <div className="text-xs font-bold">
+                                        {unlockTS.gt(0) ? moment
+                                            .unix(unlockTS.toNumber())
+                                            .format("DD MMM, yyyy") : "_"}
+                                    </div>
                                 </div>
                                 <div className="bg-ash-dark-400 text-stake-gray-500 px-3 py-2 w-5/12 h-[3.375rem] overflow-hidden">
-                                    <div className="flex items-center">
+                                    <div className="flex items-center mb-2">
                                         <ICCapacity className="w-3 h-3 mr-1" />
                                         <span className="text-2xs font-bold underline">
                                             Capacity
                                         </span>
                                     </div>
-                                    <div>_</div>
+                                    <div className="text-xs font-bold">_</div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <button className="bg-pink-600 text-white text-lg font-bold w-full h-[4.5rem] flex items-center justify-center mt-3" onClick={(() => setOpenStakeGov(true))}>
-                        Start staking
-                    </button>
+                    {mounted &&
+                        (dapp.loggedIn ? (
+                            <button
+                                className="bg-pink-600 text-white text-lg font-bold w-full h-[4.5rem] flex items-center justify-center mt-3"
+                                onClick={() => setOpenStakeGov(true)}
+                            >
+                                Add / Manage Stake
+                            </button>
+                        ) : (
+                            <button
+                                className="bg-pink-600 text-white text-lg font-bold w-full h-[4.5rem] flex items-center justify-center mt-3"
+                                onClick={() => connectWallet()}
+                            >
+                                <ICWallet className="mr-2" />
+                                <span>Connect wallet</span>
+                            </button>
+                        ))}
                 </div>
                 <div className="flex-grow px-7 lg:px-16 pt-7 lg:pt-14 pb-9 bg-stake-dark-400">
                     <h2 className="text-lg md:text-2xl mb-10 md:mb-11 font-bold text-white">
@@ -266,7 +294,10 @@ function GovStats() {
                     </div>
                 </div>
             </div>
-            <GOVStakeModal open={openStakeGov} onClose={() => setOpenStakeGov(false)}/>
+            <GOVStakeModal
+                open={openStakeGov}
+                onClose={() => setOpenStakeGov(false)}
+            />
         </>
     );
 }

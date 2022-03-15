@@ -12,6 +12,7 @@ import {
     TypeMapper,
     ArgSerializer,
     EndpointParameterDefinition,
+    Transaction,
 } from "@elrondnetwork/erdjs";
 import { notification } from "antd";
 import BigNumber from "bignumber.js";
@@ -44,12 +45,14 @@ type GovStakeState = {
         weiAmt: BigNumber,
         unlockTimestamp: BigNumber
     ) => Promise<TransactionHash | null>;
+    lockMoreASH: ({weiAmt, unlockTimestamp}?: {weiAmt?: BigNumber, unlockTimestamp?: BigNumber}) => Promise<any>
     lockedAmt: BigNumber;
     veASH: BigNumber;
     unlockTS: BigNumber;
 };
 const initState: GovStakeState = {
     lockASH: (amt, unlock) => Promise.resolve(null),
+    lockMoreASH: () => Promise.resolve(null),
     lockedAmt: new BigNumber(0),
     veASH: new BigNumber(0),
     unlockTS: new BigNumber(0),
@@ -62,9 +65,11 @@ export const useStakeGov = () => {
 const StakeGovProvider = ({ children }: any) => {
     const [currentBlock, setCurrentBlock] = useState<number>();
     const [lockedAmt, setLockedAmt] = useState<BigNumber>(new BigNumber(0));
+    const [totalLockedAmt, setTotalLockedAmt] = useState<BigNumber>(new BigNumber(0));
     const [veASH, setVEASH] = useState<BigNumber>(new BigNumber(0));
     const [unlockTS, setUnlockTS] = useState<BigNumber>(new BigNumber(0));
-    const { callContract, balances } = useWallet();
+    const [totalSupplyVeASH, setTotalSupplyVeASH] = useState<BigNumber>(new BigNumber(0));
+    const { callContract, createTransaction, balances } = useWallet();
     const dapp = useDappContext();
 
     const lockASH = useCallback(
@@ -141,8 +146,7 @@ const StakeGovProvider = ({ children }: any) => {
                     returnData,
                     "tuple1<BigUint>"
                 );
-                setVEASH(values[0].valueOf().field0)
-                console.log(`ts: ${ts}, veASH: ${values[0].valueOf().field0.toString()}`)
+                setVEASH(values[0]?.valueOf().field0 || new BigNumber(0))
             });
     }, [dapp.loggedIn, dapp.dapp, dapp.address]);
 
@@ -161,7 +165,7 @@ const StakeGovProvider = ({ children }: any) => {
                     returnData,
                     "tuple1<BigUint>"
                 );
-                setLockedAmt(values[0].valueOf().field0);
+                setLockedAmt(values[0]?.valueOf().field0 || new BigNumber(0));
             });
     }, [dapp.loggedIn, dapp.dapp, dapp.address]);
 
@@ -177,9 +181,74 @@ const StakeGovProvider = ({ children }: any) => {
             )
             .then(({ returnData }) => {
                 const values = queryContractParser(returnData, "tuple1<U64>");
-                setUnlockTS(values[0].valueOf().field0);
+                setUnlockTS(values[0]?.valueOf().field0 || new BigNumber(0));
             });
     }, [dapp.loggedIn, dapp.dapp, dapp.address]);
+
+    const getTotalSupplyVeASH = useCallback(() => {
+        if(!dapp.loggedIn) return;
+        const ts = moment().unix();
+        dapp.dapp.proxy.queryContract(
+            new Query({
+                address: new Address(dappContract.voteEscrowedContract),
+                func: new ContractFunction("totalSupplyAtTs"),
+                args: [
+                    new BigUIntValue(new BigNumber(ts))
+                ]
+            })
+        ).then(({returnData}) => {
+            const values = queryContractParser(returnData, "tuple1<BigUint>");
+            // console.log('total supply veASH ', values[0].valueOf().field0.toString());
+            setTotalSupplyVeASH(values[0]?.valueOf().field0 || new BigNumber(0))
+        })
+    }, [dapp.loggedIn, dapp.dapp]);
+
+    const getRewardAmt = useCallback(() => {
+        if(!dapp.loggedIn) return;
+        dapp.dapp.proxy.queryContract(
+            new Query({
+                address: new Address(dappContract.feeDistributor),
+                func: new ContractFunction("claim"),
+                args: [
+                    new AddressValue(new Address(dapp.address))
+                ]
+            })
+        ).then(res => {
+            console.log("claim", res);
+        })
+    }, [dapp.loggedIn, dapp.dapp, dapp.address]);
+
+    const lockMoreASH = useCallback(async ({weiAmt, unlockTimestamp}: {weiAmt?: BigNumber, unlockTimestamp?: BigNumber} = {}) => {
+        const txs: Transaction[] = [];
+        if(weiAmt && weiAmt.gt(0)){
+            const increaseAmtTx = await createTransaction(new Address(dappContract.voteEscrowedContract),
+        {
+            func: new ContractFunction("ESDTTransfer"),
+            gasLimit: new GasLimit(gasLimit),
+            args: [
+                new TokenIdentifierValue(Buffer.from(ASH_TOKEN.id)),
+                new BigUIntValue(weiAmt),
+                new TokenIdentifierValue(
+                    Buffer.from("increase_amount")
+                )
+            ],
+        });
+        txs.push(increaseAmtTx);
+        }
+        if(unlockTimestamp && unlockTimestamp.gt(unlockTS)){
+            const increaseLockTSTx = await createTransaction(new Address(dappContract.voteEscrowedContract), {
+                func: new ContractFunction("increase_unlock_time"),
+                gasLimit: new GasLimit(gasLimit),
+                args: [
+                    new U64Value(unlockTimestamp)
+                ]
+            });
+            txs.push(increaseLockTSTx);
+        }
+        const signedTxs = await dapp.dapp.provider.signTransactions(txs);
+        const data = await dapp.dapp.proxy.doPostGeneric(`transaction/send-multiple`, signedTxs.map(tx => tx.toPlainObject()), res => res.data);
+        console.log(data);
+    }, [createTransaction, dapp.dapp, unlockTS]);
 
     // update currentBlock every 6s
     useEffect(() => {
@@ -214,11 +283,30 @@ const StakeGovProvider = ({ children }: any) => {
         return () => clearInterval(interval);
     }, [getLockedAmt]);
 
+    useEffect(() => {
+        getTotalSupplyVeASH();
+        const interval = setInterval(() => {
+            getTotalSupplyVeASH();
+        }, blockTimeMs);
+        return () => clearInterval(interval);
+    }, [getTotalSupplyVeASH]);
+
+    useEffect(() => {
+        getRewardAmt();
+        const interval = setInterval(() => {
+            getRewardAmt();
+        }, blockTimeMs);
+        return () => clearInterval(interval);
+    }, [getRewardAmt]);
+
+
+
     return (
         <StakeGovContext.Provider
             value={{
                 ...initState,
                 lockASH,
+                lockMoreASH,
                 lockedAmt,
                 veASH,
                 unlockTS

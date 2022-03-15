@@ -2,6 +2,13 @@
 import IPool from 'interface/pool';
 import { IToken } from 'interface/token';
 import pools from './pool';
+export const ASH_TOKEN: IToken = {
+    id: "ASH-550f13",
+    name: "ASH",
+    decimals: 18,
+    icon: ""
+}
+export const VE_ASH_DECIMALS = 18;
 const getTokenFromPools = (...pools: IPool[]) => {
     const map = new Map<string, IToken>();
     pools.map(pool => {
@@ -11,11 +18,5 @@ const getTokenFromPools = (...pools: IPool[]) => {
     });
     return Array.from(map.values());
 }
-export const TOKENS = getTokenFromPools(...pools);
-export const ASH_TOKEN: IToken = {
-    id: "ASH-550f13",
-    name: "ASH",
-    decimals: 18,
-    icon: ""
-}
-export const VE_ASH_DECIMALS = 18;
+export const IN_POOL_TOKENS = getTokenFromPools(...pools);
+export const TOKENS = [...IN_POOL_TOKENS, ASH_TOKEN];

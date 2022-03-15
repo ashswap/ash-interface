@@ -33,7 +33,6 @@ function FirstStakeModal({ open, onClose }: props) {
 
     const [lockPeriod, setLockPeriod] = useState(7);
     const [isAgree, setIsAgree] = useState(false);
-    const dapp = useDappContext();
     const {balances, insufficientEGLD} = useWallet();
     const {lockASH} = useStakeGov();
     const ASHBalance = useMemo(() => balances[ASH_TOKEN.id], [balances]);

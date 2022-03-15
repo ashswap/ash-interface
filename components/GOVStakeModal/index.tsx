@@ -1,3 +1,4 @@
+import { useStakeGov } from "context/gov";
 import { useState } from "react";
 import FirstStakeModal from "./FirstStakeModal";
 import StakeMoreModal from "./StakeMoreModal";
@@ -7,10 +8,11 @@ type props = {
     onClose: () => void;
 };
 function GOVStakeModal({ open, onClose }: props) {
-    const [isStaked, setIsStaked] = useState(false);
+    const {lockedAmt} = useStakeGov();
+
     return (
         <>
-            {isStaked ? (
+            {lockedAmt && lockedAmt.gt(0) ? (
                 <StakeMoreModal open={open} onClose={onClose} />
             ) : (
                 <FirstStakeModal open={open} onClose={onClose} />

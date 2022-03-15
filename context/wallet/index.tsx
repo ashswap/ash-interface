@@ -39,6 +39,10 @@ export interface State {
         addr: Address,
         arg: CallArguments
     ) => Promise<TransactionHash>;
+    createTransaction: (
+        addr: Address,
+        arg: CallArguments
+    ) => Promise<Transaction>;
     balances: TokenBalancesMap;
     tokens: ITokenMap;
     lpTokens: ITokenMap;
@@ -60,6 +64,8 @@ export const initState: State = {
     fetchBalances: emptyFunc,
     callContract: (addr: Address, arg: CallArguments) =>
         Promise.resolve(emptyTxHash),
+    createTransaction: (addr: Address, arg: CallArguments) =>
+        Promise.resolve(emptyTx),
     balances: {},
     tokens: {},
     lpTokens: {},
@@ -200,9 +206,13 @@ export function WalletProvider({ children }: Props) {
 
         Promise.all(promiseLpSupply).then(results => {
             results.map((r: any, i: number) => {
-                tokens[tokenIds[i]].totalSupply = new BigNumber(
-                    Buffer.from(r.returnData[3], "base64").toString("hex")
-                );
+                const data = r.returnData[3];
+                if(data && data.length > 0){
+                    
+                    tokens[tokenIds[i]].totalSupply = new BigNumber(
+                        Buffer.from(r.returnData[3], "base64").toString("hex")
+                    );
+                }
             });
             setLpTokens(tokens);
         });
@@ -262,6 +272,35 @@ export function WalletProvider({ children }: Props) {
             });
             const signedTx = await dapp.dapp.provider.signTransaction(tx);
             return await dapp.dapp.proxy.sendTransaction(signedTx);
+        },
+        [dapp.address, dapp.dapp.proxy, dapp.dapp.provider]
+    );
+
+    const createTransaction = useCallback(
+        async (address: Address, arg: CallArguments) => {
+            if (!dapp.address || !dapp.dapp.proxy || !dapp.dapp.provider) {
+                return emptyTx;
+            }
+
+            let account = await dapp.dapp.proxy.getAccount(
+                new Address(dapp.address)
+            );
+
+            let contract = new SmartContract({
+                address,
+            });
+
+            let tx = contract.call(arg);
+            tx = new Transaction({
+                chainID: new ChainID(network.id),
+                nonce: account.nonce,
+                data: tx.getData(),
+                receiver: address,
+                gasPrice: new GasPrice(gasPrice),
+                gasLimit: new GasLimit(gasLimit),
+                version: tx.getVersion(),
+            });
+            return tx;
         },
         [dapp.address, dapp.dapp.proxy, dapp.dapp.provider]
     );
@@ -349,6 +388,7 @@ export function WalletProvider({ children }: Props) {
         insufficientEGLD,
         fetchBalances,
         callContract,
+        createTransaction,
         isOpenConnectWalletModal,
         setIsOpenConnectWalletModal,
         connectWallet,
