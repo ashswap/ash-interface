@@ -234,7 +234,7 @@ function PoolListItem({
             <AddLiquidityModal
                 open={openAddLiquidity}
                 onClose={() => setOpenAddLiquidity(false)}
-                pool={pool}
+                poolData={poolData}
             />
         </>
     );

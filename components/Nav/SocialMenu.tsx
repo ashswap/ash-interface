@@ -19,7 +19,7 @@ import styles from "./Nav.module.css";
 const SOCIALS = [
     {
         name: "Discord",
-        url: "https://discord.gg/zHWmvbzubW",
+        url: "https://discord.gg/apmhYCPDbW",
         image: discordImage,
     },
     { name: "Telegram", url: "https://t.me/ash_swap", image: telegramImage },

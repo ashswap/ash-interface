@@ -20,15 +20,15 @@ import HeadlessModal, {
     HeadlessModalDefaultHeader,
 } from "components/HeadlessModal";
 import InputCurrency from "components/InputCurrency";
-import { usePool } from "components/ListPoolItem";
 import Token from "components/Token";
 import { gasLimit, network } from "const/network";
 import { useDappContext } from "context/dapp";
+import { PoolsState } from "context/pools";
 import { useSwap } from "context/swap";
 import { useWallet } from "context/wallet";
 import { toEGLD, toWei } from "helper/balance";
 import { useScreenSize } from "hooks/useScreenSize";
-import IPool from "interface/pool";
+import { Unarray } from "interface/utilities";
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { theme } from "tailwind.config";
@@ -38,10 +38,13 @@ import styles from "./RemoveLiquidityModal.module.css";
 interface Props {
     open?: boolean;
     onClose?: () => void;
-    pool: IPool;
+    poolData: Unarray<PoolsState["poolToDisplay"]>;
 }
 
-const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
+const RemoveLiquidityModal = ({ open, onClose, poolData }: Props) => {
+    const {pool, poolStats, stakedData} = poolData;
+    const {capacityPercent, ownLiquidity} = stakedData!;
+    const {total_value_locked} = poolStats || {};
     const [liquidity, setLiquidity] = useState<BigNumber>(new BigNumber(0));
     const [totalUsd, setTotalUsd] = useState<BigNumber>(new BigNumber(0));
     const [liquidityPercent, setLiquidityPercent] = useState<number>(0);
@@ -52,19 +55,20 @@ const RemoveLiquidityModal = ({ open, onClose, pool }: Props) => {
     const { callContract, fetchBalances, balances, lpTokens } = useWallet();
     const dapp = useDappContext();
     const { slippage } = useSwap();
-    const { capacityPercent, valueUsd, ownLiquidity } = usePool();
     const [displayInputLiquidity, setDisplayInputLiquidity] = useState<string>(
         ""
     );
     const [removing, setRemoving] = useState(false);
 
     const pricePerLP = useMemo(() => {
+        // warning: mocking - change to 0 after pool analytic API success
+        if(!total_value_locked) return new BigNumber(1);
         const lpToken = lpTokens[pool.lpToken.id];
-        if (!valueUsd || !lpToken?.totalSupply) {
+        if (!total_value_locked || !lpToken?.totalSupply) {
             return new BigNumber(0);
         }
-        return valueUsd.div(lpTokens[pool.lpToken.id].totalSupply!.toString());
-    }, [valueUsd, lpTokens, pool]);
+        return new BigNumber(total_value_locked).div(lpTokens[pool.lpToken.id].totalSupply!.toString());
+    }, [total_value_locked, lpTokens, pool]);
 
     // real LP
     const shortOwnLP = useMemo(() => {

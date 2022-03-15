@@ -416,12 +416,12 @@ const StakedPoolListItem = ({poolData}: {poolData: Unarray<PoolsState["poolToDis
             <AddLiquidityModal
                 open={openAddLiquidity}
                 onClose={() => setOpenAddLiquidity(false)}
-                pool={pool}
+                poolData={poolData}
             />
             <RemoveLiquidityModal
                 open={openRemoveLiquidity}
                 onClose={() => setOpenRemoveLiquidity(false)}
-                pool={pool}
+                poolData={poolData}
             />
         </>
     );
