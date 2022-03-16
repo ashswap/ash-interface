@@ -1,3 +1,4 @@
+import BigNumber from "bignumber.js";
 import { network } from "const/network";
 import pools from "const/pool";
 import { TOKENS } from "const/tokens";
@@ -84,7 +85,7 @@ function LiquidityByTokensChart() {
     const chartData: ChartRecord[] = useMemo(() => {
         if (!data?.length) return [];
         const total = data.reduce((t, { liquidity }) => (t += liquidity), 0);
-        let spct = 0;
+        let spct = new BigNumber(0);
         return data
             .map(({ liquidity, token: tokenId }, index) => {
                 const pct = +((liquidity * 100) / total).toFixed(2);
@@ -93,10 +94,10 @@ function LiquidityByTokensChart() {
                     token: TOKENS.find((t) => t.id === tokenId) as IToken,
                     percent:
                         index === data.length - 1
-                            ? (100 * 1000 - spct * 1000) / 1000
+                            ? new BigNumber(100).minus(spct).toNumber()
                             : pct,
                 };
-                spct = (spct * 1000 + pct * 1000) / 1000;
+                spct = spct.plus(pct);
                 return record;
             })
             .sort((x, y) => y.percent - x.percent);
