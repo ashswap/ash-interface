@@ -5,6 +5,7 @@ export type PoolStatsRecord = {
     apr_month: number;
     /** trading apr base on 7days period*/
     apr_week: number;
+    /** APR base on value of reward token on 24h period - note: -1 ~ infinity */
     emission_apr: number;
     pool_address: string;
     ratio: number;

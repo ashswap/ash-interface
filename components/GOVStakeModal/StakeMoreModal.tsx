@@ -67,6 +67,7 @@ function StakeMoreModal({ open, onClose }: props) {
         );
     }, [lockedAmt]);
     const setMaxLockAmt = useCallback(() => {
+        if(!ASHBalance) return;
         setLockAmt(ASHBalance.balance);
         setRawLockAmt(
             toEGLDD(ASH_TOKEN.decimals, ASHBalance.balance).toString(10)
@@ -340,7 +341,7 @@ function StakeMoreModal({ open, onClose }: props) {
                                     }
                                 />
                             </div>
-                            <div className="w-full sm:w-[17.8125rem] flex-shrink-0">
+                            <div className="w-full sm:w-1/3 lg:w-[17.8125rem] flex-shrink-0">
                                 <div className="border-notch">
                                     <button
                                         className={`clip-corner-1 clip-corner-tl transition w-full h-12 flex items-center justify-center text-sm font-bold text-white ${
