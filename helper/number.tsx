@@ -8,6 +8,7 @@ export const fractionFormat = (val: number, maximumFractionDigits = 2) => {
 }
 export function abbreviateCurrency(n: number, minPlus?: number): number | string {
     if(n === 0) return n;
+    if(Math.abs(n) < 1) return currencyFormater.format(n);
     if (minPlus !== undefined) {
         return n > minPlus ? `${minPlus}+` : n;
     }
