@@ -2,10 +2,17 @@ const plugin = require('tailwindcss/plugin')
 const clipCornerPlugin = plugin(function ({ matchUtilities, theme, addUtilities }) {
     matchUtilities(
         {
+            'clip-corner-tl': (value) => ({'--tw-clip-corner-tl-size': value}),
+            'clip-corner-tr': (value) => ({'--tw-clip-corner-tr-size': value}),
+            'clip-corner-bl': (value) => ({'--tw-clip-corner-bl-size': value}),
+            'clip-corner-br': (value) => ({'--tw-clip-corner-br-size': value}),
             'clip-corner': (value) => ({
-                '--tw-clip-corner-size': value
+                '--tw-clip-corner-size': value,
+                '--tw-clip-corner-tl-size': value,
+                '--tw-clip-corner-tr-size': value,
+                '--tw-clip-corner-bl-size': value,
+                '--tw-clip-corner-br-size': value
             }),
-
         },
         { values: theme('clipCornerSize') }
     );
@@ -25,6 +32,10 @@ const clipCornerPlugin = plugin(function ({ matchUtilities, theme, addUtilities 
         '.clip-corner-tl': {
             '-webkit-clip-path': theme('clipCorner.tl'),
             'clip-path': theme('clipCorner.tl')
+        },
+        '.clip-corner-bevel': {
+            '-webkit-clip-path': theme('clipCornerBevel'),
+            'clip-path': theme('clipCornerBevel')
         }
     })
 }, {
@@ -71,7 +82,17 @@ const clipCornerPlugin = plugin(function ({ matchUtilities, theme, addUtilities 
                 100% 100%,
                 0% 100%
             )`
-        }
+        },
+        clipCornerBevel: `polygon(
+            0% var(--tw-clip-corner-tl-size, 0px), 
+            var(--tw-clip-corner-tl-size, 0px) 0%, 
+            calc(100% - var(--tw-clip-corner-tr-size, 0px)) 0%, 
+            100% var(--tw-clip-corner-tr-size, 0px), 
+            100% calc(100% - var(--tw-clip-corner-br-size, 0px)), 
+            calc(100% - var(--tw-clip-corner-br-size, 0px)) 100%, 
+            var(--tw-clip-corner-bl-size, 0px) 100%, 
+            0% calc(100% - var(--tw-clip-corner-bl-size, 0px))
+        )`
     }
 })
 

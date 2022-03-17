@@ -6,7 +6,7 @@ import ICSwap from "assets/svg/swap.svg";
 import ICArrowBottomRight from "assets/svg/arrow-bottom-right.svg";
 import ICArrowTopRight from "assets/svg/arrow-top-right.svg";
 import InfoLayout from "components/Layout/Info";
-import { TOKENS } from "const/tokens";
+import { IN_POOL_TOKENS } from "const/tokens";
 import { IToken } from "interface/token";
 import { GetServerSideProps, NextPage } from "next";
 import Image from "next/image";
@@ -141,7 +141,7 @@ TokenDetailPage.getLayout = function getLayout(page: ReactElement) {
 };
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
     const { id: tokenId } = params || {};
-    const token = TOKENS.find((t) => t.id === tokenId);
+    const token = IN_POOL_TOKENS.find((t) => t.id === tokenId);
     if (token) {
         return {
             props: { token },

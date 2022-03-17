@@ -1,7 +1,7 @@
 import BigNumber from "bignumber.js";
 import { network } from "const/network";
 import pools from "const/pool";
-import { TOKENS } from "const/tokens";
+import { IN_POOL_TOKENS } from "const/tokens";
 import { randomHexColor } from "helper/color";
 import { fetcher } from "helper/common";
 import { IToken } from "interface/token";
@@ -91,7 +91,7 @@ function LiquidityByTokensChart() {
                 const pct = +((liquidity * 100) / total).toFixed(2);
                 const record: ChartRecord = {
                     value: liquidity,
-                    token: TOKENS.find((t) => t.id === tokenId) as IToken,
+                    token: IN_POOL_TOKENS.find((t) => t.id === tokenId) as IToken,
                     percent:
                         index === data.length - 1
                             ? new BigNumber(100).minus(spct).toNumber()
@@ -103,7 +103,7 @@ function LiquidityByTokensChart() {
             .sort((x, y) => y.percent - x.percent);
     }, [data]);
     const themeColors = useMemo(() => {
-        const nToken = TOKENS.length;
+        const nToken = IN_POOL_TOKENS.length;
         if (nToken <= COLORS.length) {
             return COLORS;
         } else {

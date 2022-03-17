@@ -15,6 +15,7 @@ import {
 import BigNumber from "bignumber.js";
 import { gasLimit, gasPrice, network } from "const/network";
 import pools from "const/pool";
+import { ASH_TOKEN } from "const/tokens";
 import { useDappContext, useDappDispatch } from "context/dapp";
 import { emptyFunc, fetcher } from "helper/common";
 import useInitWalletConnect from "hooks/useInitWalletConnect";
@@ -38,11 +39,16 @@ export interface State {
         addr: Address,
         arg: CallArguments
     ) => Promise<TransactionHash>;
+    createTransaction: (
+        addr: Address,
+        arg: CallArguments
+    ) => Promise<Transaction>;
     balances: TokenBalancesMap;
     tokens: ITokenMap;
     lpTokens: ITokenMap;
     tokenPrices: any;
     connectWallet: (token?: string) => void;
+    insufficientEGLD: boolean;
 }
 
 const emptyTx = new Transaction({
@@ -58,11 +64,14 @@ export const initState: State = {
     fetchBalances: emptyFunc,
     callContract: (addr: Address, arg: CallArguments) =>
         Promise.resolve(emptyTxHash),
+    createTransaction: (addr: Address, arg: CallArguments) =>
+        Promise.resolve(emptyTx),
     balances: {},
     tokens: {},
     lpTokens: {},
     tokenPrices: {},
     connectWallet: emptyFunc,
+    insufficientEGLD: true
 };
 
 export const WalletContext = createContext<State>(initState);
@@ -87,6 +96,8 @@ export function WalletProvider({ children }: Props) {
     const { isMobileOS } = usePlatform();
     const dispatch = useDappDispatch();
     const { walletConnect, walletConnectInit } = useInitWalletConnect();
+
+    const insufficientEGLD = useMemo(() => dapp.account.balance === "0", [dapp.account.balance])
 
     const tokens = useMemo(() => {
         let tokens: ITokenMap = {};
@@ -195,9 +206,13 @@ export function WalletProvider({ children }: Props) {
 
         Promise.all(promiseLpSupply).then(results => {
             results.map((r: any, i: number) => {
-                tokens[tokenIds[i]].totalSupply = new BigNumber(
-                    Buffer.from(r.returnData[3], "base64").toString("hex")
-                );
+                const data = r.returnData[3];
+                if(data && data.length > 0){
+                    
+                    tokens[tokenIds[i]].totalSupply = new BigNumber(
+                        Buffer.from(r.returnData[3], "base64").toString("hex")
+                    );
+                }
             });
             setLpTokens(tokens);
         });
@@ -214,19 +229,14 @@ export function WalletProvider({ children }: Props) {
                 let tokenBalances: TokenBalancesMap = {};
 
                 for (const tokenId in resp) {
-                    if (
-                        Object.prototype.hasOwnProperty.call(resp, tokenId) &&
-                        (tokens[tokenId] || lpTokens[tokenId])
-                    ) {
-                        tokenBalances[tokenId] = {
-                            balance: new BigNumber(resp[tokenId].balance),
-                            token: tokens[tokenId],
-                        };
-                    }
+                    tokenBalances[tokenId] = {
+                        balance: new BigNumber(resp[tokenId].balance),
+                        token: tokenId === ASH_TOKEN.id ? ASH_TOKEN : tokens[tokenId],
+                    };
                 }
                 setBalances(tokenBalances);
             });
-    }, [tokens, lpTokens, dapp.loggedIn, dapp.dapp.proxy, dapp.address]);
+    }, [tokens, dapp.loggedIn, dapp.dapp.proxy, dapp.address]);
 
     // fetch token balance
     useEffect(() => {
@@ -262,6 +272,35 @@ export function WalletProvider({ children }: Props) {
             });
             const signedTx = await dapp.dapp.provider.signTransaction(tx);
             return await dapp.dapp.proxy.sendTransaction(signedTx);
+        },
+        [dapp.address, dapp.dapp.proxy, dapp.dapp.provider]
+    );
+
+    const createTransaction = useCallback(
+        async (address: Address, arg: CallArguments) => {
+            if (!dapp.address || !dapp.dapp.proxy || !dapp.dapp.provider) {
+                return emptyTx;
+            }
+
+            let account = await dapp.dapp.proxy.getAccount(
+                new Address(dapp.address)
+            );
+
+            let contract = new SmartContract({
+                address,
+            });
+
+            let tx = contract.call(arg);
+            tx = new Transaction({
+                chainID: new ChainID(network.id),
+                nonce: account.nonce,
+                data: tx.getData(),
+                receiver: address,
+                gasPrice: new GasPrice(gasPrice),
+                gasLimit: new GasLimit(gasLimit),
+                version: tx.getVersion(),
+            });
+            return tx;
         },
         [dapp.address, dapp.dapp.proxy, dapp.dapp.provider]
     );
@@ -346,8 +385,10 @@ export function WalletProvider({ children }: Props) {
         balances,
         lpTokens,
         tokenPrices,
+        insufficientEGLD,
         fetchBalances,
         callContract,
+        createTransaction,
         isOpenConnectWalletModal,
         setIsOpenConnectWalletModal,
         connectWallet,

@@ -1,7 +1,16 @@
+/* @import "~antd/lib/style/index.css";
+@import "~antd/lib/slider/style/index.css";
+@import "~antd/lib/dropdown/style/index.css";
+@import "~antd/lib/menu/style/index.css";
+@import "~antd/lib/notification/style/index.css";
+@import "~antd/lib/popover/style/index.css";
+@import "~antd/lib/date-picker/style/index.css"; */
+/* @import "~antd/dist/antd.css"; */
+@import "~antd/dist/antd.dark.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-@import "~antd/dist/antd.css";
 
 @font-face {
     font-family: "SamsungSharpSans";
@@ -51,14 +60,23 @@ input::-webkit-inner-spin-button {
 input[type="number"] {
     -moz-appearance: textfield;
 }
-
+.ash-slider {
+    --ash-slider-theme: theme("colors.slider.track");
+}
+.ash-slider-green {
+    --ash-slider-theme: theme("colors.stake-green.500");
+}
+.ash-slider-pink{
+    --ash-slider-theme: theme("colors.pink.600");
+}
 .ash-slider .ant-slider-rail {
     @apply bg-slider-rail;
     height: 2px;
 }
 
 .ash-slider .ant-slider-handle {
-    @apply bg-bg border-slider-track;
+    @apply bg-bg;
+    border-color: var(--ash-slider-theme);
     border-radius: 0;
     height: 7px;
     width: 7px;
@@ -68,13 +86,14 @@ input[type="number"] {
 
 .ash-slider .ant-slider-track,
 .ash-slider:hover .ant-slider-track {
-    @apply bg-slider-track;
+    background-color: var(--ash-slider-theme);
     height: 2px;
 }
 
 .ash-slider .ant-slider-dot,
 .ash-slider .ant-slider-dot-active {
-    @apply bg-bg border-slider-track;
+    @apply bg-bg;
+    border-color: var(--ash-slider-theme);
     border-radius: 0;
     width: 7px;
     height: 7px;
@@ -131,6 +150,18 @@ input[type="number"] {
 @layer components {
     .ash-container {
         @apply w-full max-w-[72.375rem] px-6 mx-auto;
+    }
+    .border-notch {
+        border-bottom: #88878d 0.8px solid;
+        border-top: #88878d 0.8px solid;
+        padding: 4px 4.5px;
+        background: linear-gradient(to right, #88878d 0.8px, transparent 0.8px) 0 100%,
+        linear-gradient(to right, #88878d 0.8px, transparent 0.8px) 100% 0,
+        linear-gradient(to left, #88878d 0.8px, transparent 0.8px) 0 100%,
+        linear-gradient(to left, #88878d 0.8px, transparent 0.8px) 100% 0;
+
+        background-repeat: no-repeat;
+        background-size: 100% calc(50% - 5px);
     }
 }
 

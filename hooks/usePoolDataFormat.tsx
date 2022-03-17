@@ -15,7 +15,7 @@ const usePoolDataFormat = (data: Unarray<PoolsState["poolToDisplay"]>) => {
         [apr_day]
     );
     const emissionAPR = useMemo(
-        () => (emission_apr ? fractionFormat(emission_apr) : "_"),
+        () => (emission_apr ? emission_apr === -1 ? "Infinity" : fractionFormat(emission_apr) : "_"),
         [emission_apr]
     );
     const TVL = useMemo(

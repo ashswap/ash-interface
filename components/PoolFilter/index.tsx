@@ -1,7 +1,7 @@
 import CardGrey from "assets/svg/card-grey.svg";
 import Card from "assets/svg/card.svg";
 import ListGrey from "assets/svg/list-grey.svg";
-import List from "assets/svg/list.svg";
+import ICList from "assets/svg/list.svg";
 import Search from "assets/svg/search.svg";
 import IconButton from "components/IconButton";
 import Input from "components/Input";
@@ -66,7 +66,7 @@ const PoolFilter = (props: Props) => {
                     />
                     <IconButton
                         icon={<ListGrey />}
-                        activeIcon={<List />}
+                        activeIcon={<ICList className="text-pink-600" />}
                         active={props.view == ViewType.List}
                         className="mr-2 lg:mr-8 flex-shrink-0"
                         onClick={() => props.onChangeView(ViewType.List)}

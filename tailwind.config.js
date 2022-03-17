@@ -9,7 +9,10 @@ module.exports = {
                 padding: "1.5rem"
             },
             spacing: {
+                "4.5": "1.125rem",
                 "5.5": "1.375rem",
+                "7.5": "1.875rem",
+                18: "4.5rem"
             },
             fontSize: {
                 "2xs": "0.625rem",
@@ -48,7 +51,8 @@ module.exports = {
                     700: "#E3AD12",
                 },
                 "ash-gray": {
-                    500: "#B7B7D7"
+                    400: "#C4C4C4",
+                    500: "#B7B7B7",
                 },
                 "ash-green": {
                     500: "#00FF75"
@@ -58,12 +62,29 @@ module.exports = {
                 },
                 "ash-blue": {
                     500: "#2175FF"
+                },
+                "ash-cyan": {
+                    500: "#00FFFF"
+                },
+                "stake-dark": {
+                    400: "#2B2C44",
+                    500: "#26253C"
+                },
+                "stake-green": {
+                    500: "#14E499"
+                },
+                "stake-gray": {
+                    500: "#B7B7D7"
                 }
+
             }
         },
     },
     variants: {
         extend: {},
     },
-    plugins: [require('./tailwindPlugins/clip-corner')],
+    plugins: [
+        require('@tailwindcss/line-clamp'),
+        require('./tailwindPlugins/clip-corner')
+    ],
 }

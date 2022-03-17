@@ -74,7 +74,7 @@ const AppBar = () => {
                     }}
                 />
             </div>
-            <div className="block sm:hidden fixed z-10 bottom-6 left-1/2 transform -translate-x-1/2">
+            <div className="block sm:hidden fixed z-20 bottom-6 left-1/2 transform -translate-x-1/2">
                 <div className="bg-[#757391] bg-opacity-10 backdrop-filter backdrop-blur-[25px] p-1">
                     <Nav />
                 </div>
