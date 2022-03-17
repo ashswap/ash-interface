@@ -45,10 +45,10 @@ const Nav = () => {
                     <span className="inline-block">Pool</span>
                 </div>
             </Link>
-            <Link href="/stake" passHref>
+            <Link href="/stake/gov" passHref>
                 <div
                     className={`transition ${styles.btn} ${
-                        isActive("/stake", false) ? styles.active : ""
+                        isActive("/stake/gov", false) ? styles.active : ""
                     }`}
                 >
                     <ICStake className="inline-block w-4 h-4 md:mr-2 transition-none" />

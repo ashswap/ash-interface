@@ -35,7 +35,7 @@ import {
     useState,
 } from "react";
 import IconNewTab from "assets/svg/new-tab-green.svg";
-import { toEGLD } from "helper/balance";
+import { toEGLD, toEGLDD } from "helper/balance";
 import { emptyFunc } from "helper/common";
 import { TokenBalance } from "interface/tokenBalance";
 import { useDappContext } from "context/dapp";
@@ -50,6 +50,8 @@ type GovStakeState = {
         unlockTimestamp: BigNumber
     ) => Promise<TransactionHash | null>;
     lockMoreASH: ({weiAmt, unlockTimestamp}: {weiAmt?: BigNumber, unlockTimestamp?: BigNumber}) => Promise<any>
+    claimReward: () => Promise<TransactionHash | null>;
+    unlockASH: () => Promise<TransactionHash | null>;
     lockedAmt: BigNumber;
     veASH: BigNumber;
     unlockTS: BigNumber;
@@ -57,18 +59,20 @@ type GovStakeState = {
     totalLockedAmt: BigNumber;
     rewardLPAmt: BigNumber;
     rewardLPToken?: IPool;
-    claimReward: () => Promise<TransactionHash | null>
+    rewardValue: BigNumber;
 };
 const initState: GovStakeState = {
     lockASH: (amt, unlock) => Promise.resolve(null),
     lockMoreASH: () => Promise.resolve(null),
+    claimReward: () => Promise.resolve(null),
+    unlockASH: () => Promise.resolve(null),
     lockedAmt: new BigNumber(0),
     veASH: new BigNumber(0),
     unlockTS: new BigNumber(0),
     totalSupplyVeASH: new BigNumber(0),
     totalLockedAmt: new BigNumber(0),
     rewardLPAmt: new BigNumber(0),
-    claimReward: () => Promise.resolve(null)
+    rewardValue: new BigNumber(0)
 };
 const StakeGovContext = createContext(initState);
 export const useStakeGov = () => {
@@ -82,9 +86,14 @@ const StakeGovProvider = ({ children }: any) => {
     const [unlockTS, setUnlockTS] = useState<BigNumber>(new BigNumber(0));
     const [totalSupplyVeASH, setTotalSupplyVeASH] = useState<BigNumber>(new BigNumber(0));
     const [rewardLPAmt, setRewardLPAmt] = useState<BigNumber>(new BigNumber(0));
+    const [rewardValue, setRewardValue] = useState<BigNumber>(new BigNumber(0));
     const [rewardLPToken, setRewardLPToken] = useState<IPool>();
-    const { callContract, createTransaction, balances, lpTokens } = useWallet();
+    const { callContract, createTransaction, balances, lpTokens, tokenPrices } = useWallet();
     const dapp = useDappContext();
+
+    const resetState = useCallback(() => {
+
+    }, []);
 
     const lockASH = useCallback(
         async (weiAmt: BigNumber, unlockTimestamp: BigNumber) => {
@@ -151,7 +160,7 @@ const StakeGovProvider = ({ children }: any) => {
             )
             .then(({ returnData }) => {
                 const values = queryContractParser(
-                    returnData,
+                    returnData[0],
                     "BigUint"
                 );
                 setVEASH(values[0]?.valueOf() || new BigNumber(0))
@@ -170,7 +179,7 @@ const StakeGovProvider = ({ children }: any) => {
             )
             .then(({ returnData }) => {
                 const values = queryContractParser(
-                    returnData,
+                    returnData[0],
                     "tuple2<BigUint,U64>"
                 );
                 setLockedAmt(values[0]?.valueOf().field0 || new BigNumber(0));
@@ -190,7 +199,7 @@ const StakeGovProvider = ({ children }: any) => {
                 ]
             })
         ).then(({returnData}) => {
-            const values = queryContractParser(returnData, "BigUint");
+            const values = queryContractParser(returnData[0], "BigUint");
             setTotalSupplyVeASH(values[0]?.valueOf() || new BigNumber(0))
         })
     }, [dapp.loggedIn, dapp.dapp]);
@@ -206,7 +215,7 @@ const StakeGovProvider = ({ children }: any) => {
                 ]
             })
         ).then(({returnData}) => {
-            const values = queryContractParser(returnData, "BigUint");
+            const values = queryContractParser(returnData[3], "BigUint");
             setRewardLPAmt(values[0]?.valueOf() || new BigNumber(0));
         })
     }, [dapp.loggedIn, dapp.dapp, dapp.address]);
@@ -218,7 +227,7 @@ const StakeGovProvider = ({ children }: any) => {
                 func: new ContractFunction("totalLock")
             })
         ).then(({returnData}) => {
-            const values = queryContractParser(returnData, "BigUint");
+            const values = queryContractParser(returnData[0], "BigUint");
             setTotalLockedAmt(values[0]?.valueOf() || new BigNumber(0));
         })
     }, [dapp.dapp]);
@@ -335,6 +344,115 @@ const StakeGovProvider = ({ children }: any) => {
         }
     }, [dapp.dapp, createTransaction, dapp.address, dapp.loggedIn]);
 
+    const unlockASH = useCallback(async () => {
+        if(unlockTS.minus(moment().unix()).gt(0)) return null;
+        try {
+            const tx = await callContract(new Address(dappContract.voteEscrowedContract), {
+                func: new ContractFunction("withdraw"),
+                gasLimit: new GasLimit(gasLimit)
+            });
+            notification.open({
+                message: `Unlock success ${toEGLDD(ASH_TOKEN.decimals, lockedAmt)} ${ASH_TOKEN.name}`,
+                icon: <IconNewTab />,
+                onClick: () =>
+                    window.open(
+                        network.explorerAddress +
+                            "/transactions/" +
+                            tx.toString(),
+                        "_blank"
+                    ),
+            });
+            return tx;
+        } catch (error) {
+            console.log(error);
+            return null;
+        }
+
+
+    }, [unlockTS, lockedAmt, callContract]);
+
+    // refactor these function into contract provider
+    const getTokenInLP = useCallback(
+        (ownLiquidity: BigNumber, poolAddress: string) => {
+            return dapp.dapp.proxy
+                .queryContract(
+                    new Query({
+                        address: new Address(poolAddress),
+                        func: new ContractFunction("getRemoveLiquidityTokens"),
+                        args: [
+                            new BigUIntValue(ownLiquidity),
+                            new BigUIntValue(new BigNumber(0)),
+                            new BigUIntValue(new BigNumber(0)),
+                        ],
+                    })
+                )
+                .then(({ returnData }) => {
+                    let resultHex = Buffer.from(
+                        returnData[0],
+                        "base64"
+                    ).toString("hex");
+                    let parser = new TypeExpressionParser();
+                    let mapper = new TypeMapper();
+                    let serializer = new ArgSerializer();
+
+                    let type = parser.parse("tuple2<BigUint,BigUint>");
+                    let mappedType = mapper.mapType(type);
+
+                    let endpointDefinitions = [
+                        new EndpointParameterDefinition(
+                            "foo",
+                            "bar",
+                            mappedType
+                        ),
+                    ];
+                    let values = serializer.stringToValues(
+                        resultHex,
+                        endpointDefinitions
+                    );
+
+                    return {
+                        value0: new BigNumber(
+                            values[0].valueOf().field0.toString()
+                        ),
+                        value1: new BigNumber(
+                            values[0].valueOf().field1.toString()
+                        ),
+                    };
+                });
+        },
+        [dapp.dapp.proxy]
+    );
+    const getLPValue = useCallback(
+        (pool: IPool, balance0, balance1) => {
+            let token0 = pool.tokens[0];
+            let token1 = pool.tokens[1];
+
+            if (!balance0 || !balance1) {
+                return new BigNumber(0);
+            }
+
+            const valueUsd0 = toEGLD(token0, balance0.toString()).multipliedBy(
+                tokenPrices[token0.id]
+            );
+            const valueUsd1 = toEGLD(token1, balance1.toString()).multipliedBy(
+                tokenPrices[token1.id]
+            );
+            return valueUsd0.plus(valueUsd1);
+        },
+        [tokenPrices]
+    );
+    const getRewardValue = useCallback(async () => {
+        if(!rewardLPAmt || rewardLPAmt.eq(0) || !rewardLPToken) return;
+        const {value0, value1} = await getTokenInLP(rewardLPAmt, rewardLPToken?.address);
+        const value = getLPValue(rewardLPToken, value0, value1);
+        setRewardValue(value || new BigNumber(0));
+    }, [rewardLPAmt, rewardLPToken, getLPValue, getTokenInLP]);
+    useEffect(() => {
+        getRewardValue();
+    }, [getRewardValue])
+    // end refactor these function into contract provider
+
+
     // update currentBlock every 6s
     useEffect(() => {
         getNetworkStatus();
@@ -397,13 +515,15 @@ const StakeGovProvider = ({ children }: any) => {
                 lockASH,
                 lockMoreASH,
                 claimReward,
+                unlockASH,
                 lockedAmt,
                 veASH,
                 unlockTS,
                 totalSupplyVeASH,
                 totalLockedAmt,
                 rewardLPAmt,
-                rewardLPToken
+                rewardLPToken,
+                rewardValue
             }}
         >
             {children}

@@ -1,8 +1,8 @@
 import { ArgSerializer, EndpointParameterDefinition, TypeExpressionParser, TypeMapper } from "@elrondnetwork/erdjs/out";
 
-export const queryContractParser = (data: string[], typeStr: string) => {
+export const queryContractParser = (data: string, typeStr: string) => {
     if(!data || !data.length) return [];
-    let resultHex = Buffer.from(data[0], "base64").toString(
+    let resultHex = Buffer.from(data, "base64").toString(
         "hex"
     );
     let parser = new TypeExpressionParser();
