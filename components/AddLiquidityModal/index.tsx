@@ -23,6 +23,7 @@ import HeadlessModal, {
 import InputCurrency from "components/InputCurrency";
 import Switch from "components/Switch";
 import { gasLimit, network } from "const/network";
+import useContracts from "context/contracts";
 import { useDappContext } from "context/dapp";
 import { PoolsState } from "context/pools";
 import { useWallet } from "context/wallet";
@@ -130,12 +131,13 @@ const AddLiquidityModal = ({ open, onClose, poolData }: Props) => {
     const [isProMode, setIsProMode] = useState(false);
     const [adding, setAdding] = useState(false);
     const screenSize = useScreenSize();
-    const { callContract, fetchBalances, balances, tokenPrices } = useWallet();
+    const { fetchBalances, balances, tokenPrices } = useWallet();
+    const { callContract } = useContracts();
     const dapp = useDappContext();
     // const provider = dapp.dapp.provider;
     const [rates, setRates] = useState<BigNumber[] | undefined>(undefined);
     const [liquidity, setLiquidity] = useState<string>("");
-    const {pool, poolStats, stakedData} = poolData;
+    const { pool, poolStats, stakedData } = poolData;
 
     // reset when open modal
     useEffect(() => {
@@ -417,12 +419,7 @@ const AddLiquidityModal = ({ open, onClose, poolData }: Props) => {
         const valueUsd1 = balance1.multipliedBy(tokenPrices[token1.id]);
 
         setLiquidity(valueUsd0.plus(valueUsd1).toFixed(3));
-    }, [
-        pool,
-        tokenPrices,
-        value0Debounce,
-        value1Debounce,
-    ]);
+    }, [pool, tokenPrices, value0Debounce, value1Debounce]);
 
     return (
         <HeadlessModal

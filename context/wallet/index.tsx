@@ -35,14 +35,6 @@ export interface State {
     isOpenConnectWalletModal: boolean;
     setIsOpenConnectWalletModal: (val: boolean) => void;
     fetchBalances: () => void;
-    callContract: (
-        addr: Address,
-        arg: CallArguments
-    ) => Promise<TransactionHash>;
-    createTransaction: (
-        addr: Address,
-        arg: CallArguments
-    ) => Promise<Transaction>;
     balances: TokenBalancesMap;
     tokens: ITokenMap;
     lpTokens: ITokenMap;
@@ -62,10 +54,6 @@ export const initState: State = {
     isOpenConnectWalletModal: false,
     setIsOpenConnectWalletModal: emptyFunc,
     fetchBalances: emptyFunc,
-    callContract: (addr: Address, arg: CallArguments) =>
-        Promise.resolve(emptyTxHash),
-    createTransaction: (addr: Address, arg: CallArguments) =>
-        Promise.resolve(emptyTx),
     balances: {},
     tokens: {},
     lpTokens: {},
@@ -246,65 +234,6 @@ export function WalletProvider({ children }: Props) {
         };
     }, [fetchBalances]);
 
-    const callContract = useCallback(
-        async (address: Address, arg: CallArguments) => {
-            if (!dapp.address || !dapp.dapp.proxy || !dapp.dapp.provider) {
-                return emptyTxHash;
-            }
-
-            let account = await dapp.dapp.proxy.getAccount(
-                new Address(dapp.address)
-            );
-
-            let contract = new SmartContract({
-                address,
-            });
-
-            let tx = contract.call(arg);
-            tx = new Transaction({
-                chainID: new ChainID(network.id),
-                nonce: account.nonce,
-                data: tx.getData(),
-                receiver: address,
-                gasPrice: new GasPrice(gasPrice),
-                gasLimit: new GasLimit(gasLimit),
-                version: tx.getVersion(),
-            });
-            const signedTx = await dapp.dapp.provider.signTransaction(tx);
-            return await dapp.dapp.proxy.sendTransaction(signedTx);
-        },
-        [dapp.address, dapp.dapp.proxy, dapp.dapp.provider]
-    );
-
-    const createTransaction = useCallback(
-        async (address: Address, arg: CallArguments) => {
-            if (!dapp.address || !dapp.dapp.proxy || !dapp.dapp.provider) {
-                return emptyTx;
-            }
-
-            let account = await dapp.dapp.proxy.getAccount(
-                new Address(dapp.address)
-            );
-
-            let contract = new SmartContract({
-                address,
-            });
-
-            let tx = contract.call(arg);
-            tx = new Transaction({
-                chainID: new ChainID(network.id),
-                nonce: account.nonce,
-                data: tx.getData(),
-                receiver: address,
-                gasPrice: new GasPrice(gasPrice),
-                gasLimit: new GasLimit(gasLimit),
-                version: tx.getVersion(),
-            });
-            return tx;
-        },
-        [dapp.address, dapp.dapp.proxy, dapp.dapp.provider]
-    );
-
     const historyQuery = useMemo(() => {
         if (!dapp.loggedIn) {
             return "";
@@ -387,8 +316,6 @@ export function WalletProvider({ children }: Props) {
         tokenPrices,
         insufficientEGLD,
         fetchBalances,
-        callContract,
-        createTransaction,
         isOpenConnectWalletModal,
         setIsOpenConnectWalletModal,
         connectWallet,
