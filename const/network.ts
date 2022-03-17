@@ -14,9 +14,10 @@ export const network = {
     gatewayAddress: "https://testnet-gateway.elrond.com",
     explorerAddress: "http://testnet-explorer.elrond.com",
     ashApiBaseUrl: "https://api-devnet.ashswap.io",
-    
 };
 export const dappContract = {
-    voteEscrowedContract: "erd1qqqqqqqqqqqqqpgqn4evzgdx2y6x2gml5u934was5wmh5fnjj9tsa4v5su",
-    feeDistributor: "erd1qqqqqqqqqqqqqpgqjlfxn3k3lmnmd2a3xr744vm4h3v06rmvj9tsrvghpl"
-}
+    voteEscrowedContract:
+        "erd1qqqqqqqqqqqqqpgqvrc0x026cf44kktc7jhw6mgtpu9d5cw2j9tsfxnjta",
+    feeDistributor:
+        "erd1qqqqqqqqqqqqqpgqsnzeqs8q2gu5plt9ge9fu9nul0g8m7d9j9tss4r9cn",
+};
