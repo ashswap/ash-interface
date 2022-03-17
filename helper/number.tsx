@@ -24,6 +24,7 @@ export function abbreviateCurrency(
     minPlus?: number
 ): number | string {
     if (n === 0) return n;
+    if(Math.abs(n) < 1) return currencyFormater.format(n);
     if (minPlus !== undefined) {
         return n > minPlus ? `${minPlus}+` : n;
     }
