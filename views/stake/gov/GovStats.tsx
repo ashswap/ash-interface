@@ -62,7 +62,7 @@ function GovStats() {
         );
     }, [totalLockedAmt]);
     const fRewardValue = useMemo(() => {
-        if (!rewardValue || rewardValue.eq(0)) return "_";
+        if (!rewardValue || rewardValue.eq(0)) return "0";
         const num = rewardValue.toNumber();
         return fractionFormat(num, { maximumFractionDigits: num < 1 ? 6 : 2 });
     }, [rewardValue]);
@@ -258,7 +258,7 @@ function GovStats() {
                                 APR
                             </div>
                             <div className="text-pink-600 text-lg font-bold leading-tight">
-                                _%
+                                On developing
                             </div>
                         </div>
                         <div className="bg-ash-dark-400/30 px-[2.375rem] py-7 flex flex-col justify-between">
@@ -266,7 +266,7 @@ function GovStats() {
                                 PERCENTAGE of total ASH Locked
                             </div>
                             <div className="text-white text-lg font-bold leading-tight">
-                                _%
+                                On developing
                             </div>
                         </div>
                         <div className="bg-ash-dark-400/30 px-[2.375rem] py-7 flex flex-col justify-between">
@@ -394,7 +394,7 @@ function GovStats() {
                                         <span className="text-pink-600 underline font-bold">
                                             extend
                                         </span>{" "}
-                                        your lock period everyday.
+                                        your lock period.
                                     </div>
                                 </div>
                             )}

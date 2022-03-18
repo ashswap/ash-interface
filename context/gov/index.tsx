@@ -35,7 +35,7 @@ import {
     useState,
 } from "react";
 import IconNewTab from "assets/svg/new-tab-green.svg";
-import { toEGLD, toEGLDD } from "helper/balance";
+import { toEGLD, toEGLDD, toWei } from "helper/balance";
 import { emptyFunc } from "helper/common";
 import { TokenBalance } from "interface/tokenBalance";
 import { useDappContext } from "context/dapp";
@@ -45,6 +45,11 @@ import { IToken } from "interface/token";
 import IPool from "interface/pool";
 import pools from "const/pool";
 import useContracts from "context/contracts";
+const estimateVeASH = (weiAmt: BigNumber, lockDays: number) => {
+    // ratio: lock 1 ASH in 1 year(365 days) -> 0.25 veASH
+    const veASHPerDay = toEGLDD(ASH_TOKEN.decimals, weiAmt).multipliedBy(new BigNumber(0.25).div(365));
+    return toWei(ASH_TOKEN, veASHPerDay.multipliedBy(lockDays).toString());
+};
 type GovStakeState = {
     lockASH: (
         weiAmt: BigNumber,
@@ -59,6 +64,7 @@ type GovStakeState = {
     }) => Promise<any>;
     claimReward: () => Promise<TransactionHash | null>;
     unlockASH: () => Promise<TransactionHash | null>;
+    estimateVeASH: (weiAmt: BigNumber, lockDays: number) => BigNumber;
     lockedAmt: BigNumber;
     veASH: BigNumber;
     unlockTS: BigNumber;
@@ -73,6 +79,7 @@ const initState: GovStakeState = {
     lockMoreASH: () => Promise.resolve(null),
     claimReward: () => Promise.resolve(null),
     unlockASH: () => Promise.resolve(null),
+    estimateVeASH,
     lockedAmt: new BigNumber(0),
     veASH: new BigNumber(0),
     unlockTS: new BigNumber(0),
@@ -232,7 +239,7 @@ const StakeGovProvider = ({ children }: any) => {
                 })
             )
             .then(({ returnData }) => {
-                const values = queryContractParser(returnData[3], "BigUint");
+                const values = queryContractParser(returnData[returnData.length - 1], "BigUint");
                 setRewardLPAmt(values[0]?.valueOf() || new BigNumber(0));
             });
     }, [dapp.loggedIn, dapp.dapp, dapp.address]);

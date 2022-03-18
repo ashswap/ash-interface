@@ -9,12 +9,13 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { theme } from "tailwind.config";
 import LockPeriod from "./LockPeriod";
 import ICChevronRight from "assets/svg/chevron-right.svg";
-import { ASH_TOKEN } from "const/tokens";
+import { ASH_TOKEN, VE_ASH_DECIMALS } from "const/tokens";
 import { useWallet } from "context/wallet";
-import { toEGLD, toWei } from "helper/balance";
+import { toEGLD, toEGLDD, toWei } from "helper/balance";
 import BigNumber from "bignumber.js";
 import moment from "moment";
 import { useStakeGov } from "context/gov";
+import { fractionFormat } from "helper/number";
 type props = {
     open: boolean;
     onClose: () => void;
@@ -34,7 +35,7 @@ function FirstStakeModal({ open, onClose }: props) {
     const [lockPeriod, setLockPeriod] = useState(7);
     const [isAgree, setIsAgree] = useState(false);
     const {balances, insufficientEGLD} = useWallet();
-    const {lockASH} = useStakeGov();
+    const {lockASH, estimateVeASH, totalSupplyVeASH} = useStakeGov();
     const ASHBalance = useMemo(() => balances[ASH_TOKEN.id], [balances]);
     const [lockAmt, setLockAmt] = useState<BigNumber>(new BigNumber(0));
     const [rawLockAmt, setRawLockAmt] = useState("");
@@ -49,7 +50,19 @@ function FirstStakeModal({ open, onClose }: props) {
         if(tx){
             onClose();
         }
-    }, [lockASH, lockAmt, lockPeriod, onClose])
+    }, [lockASH, lockAmt, lockPeriod, onClose]);
+    const estimatedVeASH = useMemo(() => {
+        return estimateVeASH(lockAmt, lockPeriod)
+    }, [estimateVeASH, lockPeriod, lockAmt]);
+    const fEstimatedVeASH = useMemo(() => {
+        const num = toEGLDD(VE_ASH_DECIMALS, estimatedVeASH).toNumber();
+        return num === 0 ? "_" : fractionFormat(num, {maximumFractionDigits: num < 1 ? 8 : 2});
+    }, [estimatedVeASH]);
+    const estimateCapacity = useMemo(() => {
+        if(estimatedVeASH.eq(0)) return "_";
+        const pct = estimatedVeASH.multipliedBy(100).div((totalSupplyVeASH.plus(estimatedVeASH)));
+        return pct.lt(0.01) ? "< 0.01" : pct.toFixed(2);
+    }, [estimatedVeASH, totalSupplyVeASH]);
     return (
         <>
             <HeadlessModal open={open} onClose={() => onClose()}>
@@ -160,7 +173,7 @@ function FirstStakeModal({ open, onClose }: props) {
                                             VeASH Receive
                                         </div>
                                         <div className="text-white text-lg font-bold">
-                                            _
+                                            {fEstimatedVeASH}
                                         </div>
                                     </div>
                                     <div>
@@ -168,7 +181,7 @@ function FirstStakeModal({ open, onClose }: props) {
                                             Your capacity
                                         </div>
                                         <div className="text-white text-lg font-bold">
-                                            _
+                                            {estimateCapacity}%
                                         </div>
                                     </div>
                                     <div>
@@ -191,12 +204,12 @@ function FirstStakeModal({ open, onClose }: props) {
                                         <span className="text-ash-gray-500">
                                             I verify that I have read the{" "}
                                             <a
-                                                href="https://docs.ashswap.io/guides/add-remove-liquidity"
+                                                href="https://docs.ashswap.io/testnet-guides/governance-staking"
                                                 target="_blank"
                                                 rel="noreferrer"
                                             >
                                                 <b className="text-white">
-                                                    <u>AshSwap Pools Guide</u>
+                                                    <u>AshSwap Stake Guide</u>
                                                 </b>
                                             </a>{" "}
                                             and understand the risks of
@@ -219,14 +232,14 @@ function FirstStakeModal({ open, onClose }: props) {
                                     >
                                         {insufficientEGLD ? (
                                             "INSUFFICIENT EGLD BALANCE"
-                                        ) : (
+                                        ) : ASHBalance?.balance?.gt(0) ? (
                                             <div className="flex items-center">
                                                 <div className="mr-2">
                                                     STAKE
                                                 </div>
                                                 <ICChevronRight className="w-2 h-auto" />
                                             </div>
-                                        )}
+                                        ) : "INSUFFICIENT ASH BALANCE"}
                                     </button>
                                 </div>
                             </div>
