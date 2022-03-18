@@ -175,7 +175,7 @@ function StakeMoreModal({ open, onClose }: props) {
                                         <div className="text-ash-gray-500 text-xs lg:text-sm font-bold mb-2 lg:mb-4 flex items-center">
                                             <div className="mr-1">Current</div>
                                             <div className="flex items-center">
-                                                <div className="w-3 h-3 bg-ash-purple-500 rounded-full mr-1"></div>
+                                                <div className="w-3 h-3 bg-pink-600 rounded-full mr-1"></div>
                                                 <div>
                                                     {ASH_TOKEN.name} Staked
                                                 </div>

@@ -186,8 +186,8 @@ function GovStats() {
                         </div>
                         <div className="bg-ash-dark-400/30 px-[1.25rem] pt-7 pb-5">
                             <div className="px-5 mb-7">
-                                <div className="text-stake-gray-500 text-sm font-bold underline uppercase mb-7">
-                                    your veASH
+                                <div className="text-stake-gray-500 text-sm font-bold underline mb-7">
+                                    YOUR veASH
                                 </div>
                                 <div className="flex items-center">
                                     {/* <div className="w-[1.125rem] h-[1.125rem] mr-2">
@@ -347,7 +347,7 @@ function GovStats() {
                                 <span className="text-stake-green-500">1</span>{" "}
                                 ASH locked for{" "}
                                 <span className="text-stake-green-500">
-                                    1 years
+                                    1 year
                                 </span>{" "}
                                 ={" "}
                                 <span className="text-stake-green-500">
