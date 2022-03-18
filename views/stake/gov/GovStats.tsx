@@ -20,10 +20,16 @@ import moment from "moment";
 import { useDappContext } from "context/dapp";
 import { useWallet } from "context/wallet";
 import useMounted from "hooks/useMounted";
+import HeadlessModal, {
+    HeadlessModalDefaultHeader,
+} from "components/HeadlessModal";
+import Link from "next/link";
+import { useScreenSize } from "hooks/useScreenSize";
 
 function GovStats() {
     const [isQAExpand, setIsQAExpand] = useState(false);
     const [openStakeGov, setOpenStakeGov] = useState(false);
+    const [openHarvestResult, setOpenHarvestResult] = useState(true);
     const {
         lockedAmt,
         veASH,
@@ -39,6 +45,7 @@ function GovStats() {
     const dapp = useDappContext();
     const mounted = useMounted();
     const { connectWallet } = useWallet();
+    const screenSize = useScreenSize();
     const fLockedAmt = useMemo(() => {
         return fractionFormat(
             toEGLDD(ASH_TOKEN.decimals, lockedAmt).toNumber()
@@ -86,12 +93,14 @@ function GovStats() {
                     {/* <button className="bg-pink-600/20 text-pink-600 h-12 px-6 flex items-center justify-center">
                             Weekly Summary
                         </button> */}
-                    {dapp.loggedIn && <button
-                        className="bg-pink-600 text-white h-12 px-6 flex items-center justify-center"
-                        onClick={() => setOpenStakeGov(true)}
-                    >
-                        Add/Manage Stake
-                    </button>}
+                    {dapp.loggedIn && (
+                        <button
+                            className="bg-pink-600 text-white h-12 px-6 flex items-center justify-center"
+                            onClick={() => setOpenStakeGov(true)}
+                        >
+                            Add/Manage Stake
+                        </button>
+                    )}
                 </div>
             </div>
             <div className="flex flex-col md:flex-row">
@@ -159,8 +168,7 @@ function GovStats() {
                                     {/* <div className="w-[1.125rem] h-[1.125rem] mr-2">
                                         <Image src={ImgUsdt} alt="token icon" />
                                     </div> */}
-                                    <div className="w-[1.125rem] h-[1.125rem] mr-2 rounded-full bg-pink-600">
-                                    </div>
+                                    <div className="w-[1.125rem] h-[1.125rem] mr-2 rounded-full bg-pink-600"></div>
                                     <div className="text-lg text-white font-bold">
                                         {fLockedAmt}
                                     </div>
@@ -180,7 +188,13 @@ function GovStats() {
                                     disabled={true}
                                 >
                                     <ICLock className="w-6 h-6 mr-2" />
-                                    <span>{lockedAmt.gt(0) ? moment.unix(unlockTS.toNumber()).format("DD MMM, yyyy") : "Lock period"}</span>
+                                    <span>
+                                        {lockedAmt.gt(0)
+                                            ? moment
+                                                  .unix(unlockTS.toNumber())
+                                                  .format("DD MMM, yyyy")
+                                            : "Lock period"}
+                                    </span>
                                 </button>
                             )}
                         </div>
@@ -193,8 +207,7 @@ function GovStats() {
                                     {/* <div className="w-[1.125rem] h-[1.125rem] mr-2">
                                         <Image src={ImgUsdt} alt="token icon" />
                                     </div> */}
-                                    <div className="w-[1.125rem] h-[1.125rem] mr-2 rounded-full bg-ash-purple-500">
-                                    </div>
+                                    <div className="w-[1.125rem] h-[1.125rem] mr-2 rounded-full bg-ash-purple-500"></div>
                                     <div className="text-lg text-white font-bold">
                                         {fVEASHAmt}
                                     </div>
@@ -277,8 +290,7 @@ function GovStats() {
                                 {/* <div className="w-[1.125rem] h-[1.125rem] mr-2">
                                     <Image src={ImgUsdt} alt="token icon" />
                                 </div> */}
-                                <div className="w-[1.125rem] h-[1.125rem] mr-2 rounded-full bg-pink-600">
-                                </div>
+                                <div className="w-[1.125rem] h-[1.125rem] mr-2 rounded-full bg-pink-600"></div>
                                 <div className="text-white text-lg font-bold">
                                     {fTotalLockedAmt}
                                 </div>
@@ -292,8 +304,7 @@ function GovStats() {
                                 {/* <div className="w-[1.125rem] h-[1.125rem] mr-2">
                                     <Image src={ImgUsdt} alt="token icon" />
                                 </div> */}
-                                <div className="w-[1.125rem] h-[1.125rem] mr-2 rounded-full bg-ash-purple-500">
-                                </div>
+                                <div className="w-[1.125rem] h-[1.125rem] mr-2 rounded-full bg-ash-purple-500"></div>
                                 <div className="text-white text-lg font-bold">
                                     {fTotalVeASH}
                                 </div>
@@ -406,6 +417,75 @@ function GovStats() {
                 open={openStakeGov}
                 onClose={() => setOpenStakeGov(false)}
             />
+            <HeadlessModal
+                open={openHarvestResult}
+                onClose={() => setOpenHarvestResult(false)}
+                transition={`${screenSize.isMobile ? "btt" : "center"}`}
+            >
+                <div className="clip-corner-4 clip-corner-tl bg-stake-dark-400 mx-auto max-w-[33.75rem] fixed bottom-0 inset-x-0 sm:static sm:mt-28 flex flex-col max-h-full">
+                    <div className="px-4 pt-4">
+                        <HeadlessModalDefaultHeader
+                            onClose={() => setOpenHarvestResult(false)}
+                        />
+                    </div>
+                    <div className="flex-grow overflow-auto pt-14">
+                        <div className="px-[3.375rem] flex flex-col items-center pb-28 border-b border-dashed border-b-ash-gray-500">
+                            <div className="text-2xl font-bold text-stake-green-500 mb-12">
+                                Harvest successfully
+                            </div>
+                            {rewardLPToken && (
+                                <>
+                                    <div className="flex items-center mb-9">
+                                        <div className="w-8 h-8">
+                                            <Image
+                                                src={
+                                                    rewardLPToken.tokens[0].icon
+                                                }
+                                                layout="responsive"
+                                                alt="token icon"
+                                            />
+                                        </div>
+                                        <div className="w-8 h-8 -ml-1 mr-2">
+                                            <Image
+                                                src={
+                                                    rewardLPToken.tokens[1].icon
+                                                }
+                                                layout="responsive"
+                                                alt="token icon"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="text-center text-ash-gray-500 text-lg font-bold">
+                                        ${fRewardValue} LP-
+                                        {rewardLPToken.tokens[0].name}
+                                        {rewardLPToken.tokens[0].name} has been
+                                        sent to your wallet
+                                    </div>
+                                </>
+                            )}
+                        </div>
+                        <div className="px-[3.375rem] pb-8">
+                            <div className="text-center text-sm text-ash-gray-500 py-7">
+                                Suggest actions
+                            </div>
+                            <Link href="/stake/farms" passHref>
+                                <a>
+                                    <button className="w-full text-center h-12 text-sm font-bold bg-ash-dark-400 text-ash-cyan-500 mb-4">
+                                        Stake for farming
+                                    </button>
+                                </a>
+                            </Link>
+                            <Link href="/pool" passHref>
+                                <a>
+                                    <button className="w-full text-center h-12 text-sm font-bold bg-ash-dark-400 text-pink-600">
+                                        Withdraw immediately
+                                    </button>
+                                </a>
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+            </HeadlessModal>
         </>
     );
 }

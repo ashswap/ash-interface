@@ -16,6 +16,7 @@ import BigNumber from "bignumber.js";
 import moment from "moment";
 import { useStakeGov } from "context/gov";
 import { fractionFormat } from "helper/number";
+import { useScreenSize } from "hooks/useScreenSize";
 type props = {
     open: boolean;
     onClose: () => void;
@@ -31,41 +32,61 @@ const predefinedLockPeriod = [
 const maxLock = 4 * 365;
 const minLock = 7;
 function FirstStakeModal({ open, onClose }: props) {
-
     const [lockPeriod, setLockPeriod] = useState(7);
     const [isAgree, setIsAgree] = useState(false);
-    const {balances, insufficientEGLD} = useWallet();
-    const {lockASH, estimateVeASH, totalSupplyVeASH} = useStakeGov();
+    const { balances, insufficientEGLD } = useWallet();
+    const { lockASH, estimateVeASH, totalSupplyVeASH } = useStakeGov();
     const ASHBalance = useMemo(() => balances[ASH_TOKEN.id], [balances]);
     const [lockAmt, setLockAmt] = useState<BigNumber>(new BigNumber(0));
     const [rawLockAmt, setRawLockAmt] = useState("");
+    const { isMobile } = useScreenSize();
     const setMaxLockAmt = useCallback(() => {
-        setLockAmt(ASHBalance.balance); setRawLockAmt(toEGLD(ASH_TOKEN, ASHBalance.balance.toString()).toString(10))
+        setLockAmt(ASHBalance.balance);
+        setRawLockAmt(
+            toEGLD(ASH_TOKEN, ASHBalance.balance.toString()).toString(10)
+        );
     }, [ASHBalance]);
     const canStake = useMemo(() => {
-        return !insufficientEGLD && lockAmt.gt(0) && lockPeriod >= minLock && lockPeriod <= maxLock && isAgree;
+        return (
+            !insufficientEGLD &&
+            lockAmt.gt(0) &&
+            lockPeriod >= minLock &&
+            lockPeriod <= maxLock &&
+            isAgree
+        );
     }, [insufficientEGLD, lockAmt, lockPeriod, isAgree]);
     const lock = useCallback(async () => {
-        const tx = await lockASH(lockAmt, new BigNumber(moment().add(lockPeriod, "days").unix()));
-        if(tx){
+        const tx = await lockASH(
+            lockAmt,
+            new BigNumber(moment().add(lockPeriod, "days").unix())
+        );
+        if (tx) {
             onClose();
         }
     }, [lockASH, lockAmt, lockPeriod, onClose]);
     const estimatedVeASH = useMemo(() => {
-        return estimateVeASH(lockAmt, lockPeriod)
+        return estimateVeASH(lockAmt, lockPeriod);
     }, [estimateVeASH, lockPeriod, lockAmt]);
     const fEstimatedVeASH = useMemo(() => {
         const num = toEGLDD(VE_ASH_DECIMALS, estimatedVeASH).toNumber();
-        return num === 0 ? "_" : fractionFormat(num, {maximumFractionDigits: num < 1 ? 8 : 2});
+        return num === 0
+            ? "_"
+            : fractionFormat(num, { maximumFractionDigits: num < 1 ? 8 : 2 });
     }, [estimatedVeASH]);
     const estimateCapacity = useMemo(() => {
-        if(estimatedVeASH.eq(0)) return "_";
-        const pct = estimatedVeASH.multipliedBy(100).div((totalSupplyVeASH.plus(estimatedVeASH)));
+        if (estimatedVeASH.eq(0)) return "_";
+        const pct = estimatedVeASH
+            .multipliedBy(100)
+            .div(totalSupplyVeASH.plus(estimatedVeASH));
         return pct.lt(0.01) ? "< 0.01" : pct.toFixed(2);
     }, [estimatedVeASH, totalSupplyVeASH]);
     return (
         <>
-            <HeadlessModal open={open} onClose={() => onClose()}>
+            <HeadlessModal
+                open={open}
+                onClose={() => onClose()}
+                transition={`${isMobile ? "btt" : "center"}`}
+            >
                 <div className="bg-stake-dark-400 p-4 fixed bottom-0 inset-x-0 sm:static sm:mt-28 sm:ash-container flex flex-col max-h-full">
                     <HeadlessModalDefaultHeader onClose={() => onClose()} />
                     <div className="pt-4 px-20 pb-12">
@@ -90,23 +111,43 @@ function FirstStakeModal({ open, onClose }: props) {
                                         <div className="text-ash-gray-500 text-sm font-bold mb-4">
                                             Input Amount
                                         </div>
-                                        <InputCurrency className="w-full text-white text-lg font-bold bg-ash-dark-400 h-18 px-6 flex items-center text-right outline-none" value={rawLockAmt} onChange={(e) => {
-                                            const raw = e.target.value.trim();
-                                            const lockAmt = toWei(ASH_TOKEN, raw);
-                                            if(lockAmt.gt(ASHBalance.balance)){
-                                                setMaxLockAmt();
-                                            }else{
-                                                setRawLockAmt(raw);
-                                                setLockAmt(lockAmt);
-                                            }
-                                            
-                                        }} />
+                                        <InputCurrency
+                                            className="w-full text-white text-lg font-bold bg-ash-dark-400 h-18 px-6 flex items-center text-right outline-none"
+                                            value={rawLockAmt}
+                                            onChange={(e) => {
+                                                const raw =
+                                                    e.target.value.trim();
+                                                const lockAmt = toWei(
+                                                    ASH_TOKEN,
+                                                    raw
+                                                );
+                                                if (
+                                                    lockAmt.gt(
+                                                        ASHBalance.balance
+                                                    )
+                                                ) {
+                                                    setMaxLockAmt();
+                                                } else {
+                                                    setRawLockAmt(raw);
+                                                    setLockAmt(lockAmt);
+                                                }
+                                            }}
+                                        />
                                         <div className="text-right text-xs mt-2">
                                             <span className="text-ash-gray-500">
                                                 Balance:{" "}
                                             </span>
-                                            <span className="text-earn cursor-pointer" onClick={() => setMaxLockAmt()}>
-                                                {ASHBalance ? toEGLD(ASH_TOKEN, ASHBalance.balance.toString()).toFixed(2) : "_"} {ASH_TOKEN.name}
+                                            <span
+                                                className="text-earn cursor-pointer"
+                                                onClick={() => setMaxLockAmt()}
+                                            >
+                                                {ASHBalance
+                                                    ? toEGLD(
+                                                          ASH_TOKEN,
+                                                          ASHBalance.balance.toString()
+                                                      ).toFixed(2)
+                                                    : "_"}{" "}
+                                                {ASH_TOKEN.name}
                                             </span>
                                         </div>
                                     </div>
@@ -189,7 +230,9 @@ function FirstStakeModal({ open, onClose }: props) {
                                             Unlock Time
                                         </div>
                                         <div className="text-white text-lg font-bold min-h-[3rem]">
-                                            {moment().add(lockPeriod, "days").format("DD MMM, yyyy")}
+                                            {moment()
+                                                .add(lockPeriod, "days")
+                                                .format("DD MMM, yyyy")}
                                         </div>
                                     </div>
                                 </div>
@@ -239,7 +282,9 @@ function FirstStakeModal({ open, onClose }: props) {
                                                 </div>
                                                 <ICChevronRight className="w-2 h-auto" />
                                             </div>
-                                        ) : "INSUFFICIENT ASH BALANCE"}
+                                        ) : (
+                                            "INSUFFICIENT ASH BALANCE"
+                                        )}
                                     </button>
                                 </div>
                             </div>
@@ -251,4 +296,4 @@ function FirstStakeModal({ open, onClose }: props) {
     );
 }
 
-export default FirstStakeModal
+export default FirstStakeModal;
