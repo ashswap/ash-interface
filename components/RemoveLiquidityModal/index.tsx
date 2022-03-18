@@ -43,8 +43,8 @@ interface Props {
 }
 
 const RemoveLiquidityModal = ({ open, onClose, poolData }: Props) => {
-    const { pool, poolStats, stakedData } = poolData;
-    const { capacityPercent, ownLiquidity } = stakedData!;
+    const { pool, poolStats, liquidityData } = poolData;
+    const { capacityPercent, ownLiquidity } = liquidityData!;
     const { total_value_locked } = poolStats || {};
     const [liquidity, setLiquidity] = useState<BigNumber>(new BigNumber(0));
     const [totalUsd, setTotalUsd] = useState<BigNumber>(new BigNumber(0));

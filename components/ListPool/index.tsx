@@ -18,10 +18,10 @@ const ListPool = (props: Props) => {
     const { poolToDisplay, stakedOnly } = usePools();
 
     const stakedPools = useMemo(() => {
-        return poolToDisplay.filter((p) => !!p.stakedData);
+        return poolToDisplay.filter((p) => !!p.liquidityData);
     }, [poolToDisplay]);
     const nonStakedPools = useMemo(() => {
-        return poolToDisplay.filter((p) => !p.stakedData);
+        return poolToDisplay.filter((p) => !p.liquidityData);
     }, [poolToDisplay]);
 
     return (
@@ -32,7 +32,7 @@ const ListPool = (props: Props) => {
                         {!stakedOnly && poolToDisplay.map((p) => {
                             return (
                                 <div key={p.pool.address}>
-                                    {!!p.stakedData ? (
+                                    {!!p.liquidityData ? (
                                         <StakedPoolCardItem poolData={p} />
                                     ) : (
                                         <PoolCardItem poolData={p} />

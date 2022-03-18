@@ -29,7 +29,7 @@ import { useScreenSize } from "hooks/useScreenSize";
 function GovStats() {
     const [isQAExpand, setIsQAExpand] = useState(false);
     const [openStakeGov, setOpenStakeGov] = useState(false);
-    const [openHarvestResult, setOpenHarvestResult] = useState(true);
+    const [openHarvestResult, setOpenHarvestResult] = useState(false);
     const {
         lockedAmt,
         veASH,
@@ -154,7 +154,7 @@ function GovStats() {
                                         : "bg-ash-dark-400 text-white"
                                 }`}
                                 disabled={!canClaim}
-                                onClick={() => canClaim && claimReward()}
+                                onClick={() => canClaim && claimReward().then(tx => setOpenHarvestResult(!!tx))}
                             >
                                 Harvest
                             </button>

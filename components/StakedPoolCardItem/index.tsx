@@ -15,7 +15,7 @@ function StakedPoolCardItem({
 }: {
     poolData: Unarray<PoolsState["poolToDisplay"]>;
 }) {
-    const { pool, poolStats, stakedData } = poolData;
+    const { pool, poolStats, liquidityData } = poolData;
     const [isExpand, setIsExpand] = useState<boolean>(false);
     const [openAddLiquidity, setOpenAddLiquidity] = useState<boolean>(false);
     const [openRemoveLiquidity, setOpenRemoveLiquidity] =
@@ -30,7 +30,7 @@ function StakedPoolCardItem({
             fValue1,
         },
     } = usePoolDataFormat(poolData);
-    if (!stakedData) return null;
+    if (!liquidityData) return null;
 
     return (
         <div

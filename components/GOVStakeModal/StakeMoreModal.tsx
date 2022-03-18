@@ -82,9 +82,15 @@ function StakeMoreModal({ open, onClose }: props) {
         );
     }, [ASHBalance]);
 
+    const insufficientASH = useMemo(() => {
+        if (!ASHBalance) return true;
+        return lockAmt.gt(ASHBalance.balance);
+    }, [ASHBalance, lockAmt]);
+
     const canStake = useMemo(() => {
         return (
             !insufficientEGLD &&
+            !insufficientASH &&
             isAgree &&
             (lockAmt.gt(0) ||
                 (isExtend &&
@@ -98,6 +104,7 @@ function StakeMoreModal({ open, onClose }: props) {
         currentLockDays,
         lockAmt,
         isExtend,
+        insufficientASH,
     ]);
 
     const lockMore = useCallback(async () => {
@@ -184,7 +191,11 @@ function StakeMoreModal({ open, onClose }: props) {
                                                 : "I want to stake more!"}
                                         </div>
                                         <InputCurrency
-                                            className="w-full text-white text-lg font-bold bg-ash-dark-400 h-14 lg:h-18 px-6 flex items-center text-right outline-none"
+                                            className={`w-full text-white text-lg font-bold bg-ash-dark-400 h-14 lg:h-18 px-6 flex items-center text-right outline-none border ${
+                                                insufficientASH
+                                                    ? "border-ash-purple-500"
+                                                    : "border-transparent"
+                                            }`}
                                             value={rawLockAmt}
                                             onChange={(e) => {
                                                 const raw =
@@ -193,16 +204,8 @@ function StakeMoreModal({ open, onClose }: props) {
                                                     ASH_TOKEN,
                                                     raw
                                                 );
-                                                if (
-                                                    lockAmt.gt(
-                                                        ASHBalance.balance
-                                                    )
-                                                ) {
-                                                    setMaxLockAmt();
-                                                } else {
-                                                    setRawLockAmt(raw);
-                                                    setLockAmt(lockAmt);
-                                                }
+                                                setRawLockAmt(raw);
+                                                setLockAmt(lockAmt);
                                             }}
                                         />
                                         <div className="text-right text-2xs lg:text-xs mt-2">
@@ -378,7 +381,11 @@ function StakeMoreModal({ open, onClose }: props) {
                                                     <div className="text-ash-green-500 flex items-center text-2xs font-bold">
                                                         <ICArrowTopRight className="mr-1.5" />
                                                         <span>
-                                                            +{diffCapacity.toFixed(2)}%
+                                                            +
+                                                            {diffCapacity.toFixed(
+                                                                2
+                                                            )}
+                                                            %
                                                         </span>
                                                     </div>
                                                 )}
@@ -452,15 +459,15 @@ function StakeMoreModal({ open, onClose }: props) {
                                     >
                                         {insufficientEGLD ? (
                                             "INSUFFICIENT EGLD BALANCE"
-                                        ) : ASHBalance?.balance?.gt(0) ? (
+                                        ) : insufficientASH ? (
+                                            "INSUFFICIENT ASH BALANCE"
+                                        ) : (
                                             <div className="flex items-center">
                                                 <div className="mr-2">
                                                     STAKE
                                                 </div>
                                                 <ICChevronRight className="w-2 h-auto" />
                                             </div>
-                                        ) : (
-                                            "INSUFFICIENT ASH BALANCE"
                                         )}
                                     </button>
                                 </div>

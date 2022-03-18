@@ -46,15 +46,20 @@ function FirstStakeModal({ open, onClose }: props) {
             toEGLD(ASH_TOKEN, ASHBalance.balance.toString()).toString(10)
         );
     }, [ASHBalance]);
+    const insufficientASH = useMemo(() => {
+        if (!ASHBalance) return true;
+        return lockAmt.gt(ASHBalance.balance);
+    }, [ASHBalance, lockAmt]);
     const canStake = useMemo(() => {
         return (
             !insufficientEGLD &&
+            !insufficientASH &&
             lockAmt.gt(0) &&
             lockPeriod >= minLock &&
             lockPeriod <= maxLock &&
             isAgree
         );
-    }, [insufficientEGLD, lockAmt, lockPeriod, isAgree]);
+    }, [insufficientEGLD, lockAmt, lockPeriod, isAgree, insufficientASH]);
     const lock = useCallback(async () => {
         const tx = await lockASH(
             lockAmt,
@@ -112,7 +117,11 @@ function FirstStakeModal({ open, onClose }: props) {
                                             Input Amount
                                         </div>
                                         <InputCurrency
-                                            className="w-full text-white text-lg font-bold bg-ash-dark-400 h-18 px-6 flex items-center text-right outline-none"
+                                            className={`w-full text-white text-lg font-bold bg-ash-dark-400 h-18 px-6 flex items-center text-right outline-none border ${
+                                                insufficientASH
+                                                    ? "border-ash-purple-500"
+                                                    : "border-transparent"
+                                            }`}
                                             value={rawLockAmt}
                                             onChange={(e) => {
                                                 const raw =
@@ -275,15 +284,15 @@ function FirstStakeModal({ open, onClose }: props) {
                                     >
                                         {insufficientEGLD ? (
                                             "INSUFFICIENT EGLD BALANCE"
-                                        ) : ASHBalance?.balance?.gt(0) ? (
+                                        ) : insufficientASH ? (
+                                            "INSUFFICIENT ASH BALANCE"
+                                        ) : (
                                             <div className="flex items-center">
                                                 <div className="mr-2">
                                                     STAKE
                                                 </div>
                                                 <ICChevronRight className="w-2 h-auto" />
                                             </div>
-                                        ) : (
-                                            "INSUFFICIENT ASH BALANCE"
                                         )}
                                     </button>
                                 </div>

@@ -24,7 +24,7 @@ type PoolRecord = {
     pool: IPool;
     poolStats?: PoolStatsRecord;
     /** if LP balance > 0 -> staked pool*/
-    stakedData?: {
+    liquidityData?: {
         /** number of own LP token*/
         ownLiquidity: BigNumber;
         /** number of token 0 in own LP*/
@@ -108,7 +108,7 @@ const PoolsProvider = ({ children }: any) => {
                 : new BigNumber(0);
             if (ownLP.gt(0)) {
                 const { value0, value1 } = await getTokenInLP(ownLP, p.address);
-                record.stakedData = {
+                record.liquidityData = {
                     ownLiquidity: ownLP,
                     capacityPercent: getPortion(p.lpToken.id, ownLP),
                     value0,

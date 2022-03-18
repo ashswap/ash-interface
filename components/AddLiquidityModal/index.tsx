@@ -137,7 +137,7 @@ const AddLiquidityModal = ({ open, onClose, poolData }: Props) => {
     // const provider = dapp.dapp.provider;
     const [rates, setRates] = useState<BigNumber[] | undefined>(undefined);
     const [liquidity, setLiquidity] = useState<string>("");
-    const { pool, poolStats, stakedData } = poolData;
+    const { pool, poolStats, liquidityData } = poolData;
 
     // reset when open modal
     useEffect(() => {
@@ -483,7 +483,7 @@ const AddLiquidityModal = ({ open, onClose, poolData }: Props) => {
                                     token={pool.tokens[0]}
                                     tokenInPool={toEGLD(
                                         pool.tokens[0],
-                                        stakedData?.value0?.toString() || "0"
+                                        liquidityData?.value0?.toString() || "0"
                                     ).toFixed(2)}
                                     value={value0}
                                     onChangeValue={(val) => onChangeValue0(val)}
@@ -496,7 +496,7 @@ const AddLiquidityModal = ({ open, onClose, poolData }: Props) => {
                                     token={pool.tokens[1]}
                                     tokenInPool={toEGLD(
                                         pool.tokens[1],
-                                        stakedData?.value1?.toString() || "0"
+                                        liquidityData?.value1?.toString() || "0"
                                     ).toFixed(2)}
                                     value={value1}
                                     onChangeValue={(val) => onChangeValue1(val)}
@@ -591,7 +591,7 @@ const AddLiquidityModal = ({ open, onClose, poolData }: Props) => {
                                                 Your Capacity
                                             </div>
                                             <div style={{ color: "#00FF75" }}>
-                                                {stakedData?.capacityPercent.toFixed(
+                                                {liquidityData?.capacityPercent.toFixed(
                                                     2
                                                 ) || "_"}
                                                 %
