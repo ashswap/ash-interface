@@ -11,20 +11,21 @@ import { ReactElement, ReactNode, useEffect } from "react";
 import * as dappConfig from "../dapp-config";
 import * as gtag from "../helper/gtag";
 import "../styles/globals.css";
-import {NextPage} from "next";
+import { NextPage } from "next";
+import { ContractsProvider } from "context/contracts";
 
 type NextPageWithLayout = NextPage & {
-    getLayout?: (page: ReactElement) => ReactNode
-  }
-  
-  type AppPropsWithLayout = AppProps & {
-    Component: NextPageWithLayout
-  }
+    getLayout?: (page: ReactElement) => ReactNode;
+};
+
+type AppPropsWithLayout = AppProps & {
+    Component: NextPageWithLayout;
+};
 
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
     const router = useRouter();
-    const getLayout = Component.getLayout ?? ((page) => page)
-    
+    const getLayout = Component.getLayout ?? ((page) => page);
+
     useEffect(() => {
         const handleRouteChange = (url: string) => {
             gtag.pageview(url);
@@ -54,7 +55,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
                     gtag('config', '${gtag.GA_TRACKING_ID}', {
                     page_path: window.location.pathname,
                     });
-                `
+                `,
                 }}
             />
             <Head>
@@ -70,9 +71,11 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
             <DappContextProvider config={dappConfig}>
                 <Authenticate>
                     <WalletProvider>
-                        {/* <Component {...pageProps} /> */}
-                        {getLayout(<Component {...pageProps} />)}
-                        <ConnectWalletModal/>
+                        <ContractsProvider>
+                            {/* <Component {...pageProps} /> */}
+                            {getLayout(<Component {...pageProps} />)}
+                            <ConnectWalletModal />
+                        </ContractsProvider>
                     </WalletProvider>
                 </Authenticate>
             </DappContextProvider>

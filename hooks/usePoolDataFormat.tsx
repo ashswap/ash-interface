@@ -5,11 +5,11 @@ import { Unarray } from "interface/utilities";
 import { useMemo } from "react";
 
 const usePoolDataFormat = (data: Unarray<PoolsState["poolToDisplay"]>) => {
-    const { pool, poolStats, stakedData } = data;
+    const { pool, poolStats, liquidityData } = data;
     const { apr_day, emission_apr, total_value_locked, usd_volume } =
         poolStats || {};
     const { capacityPercent, lpValueUsd, ownLiquidity, value0, value1 } =
-        stakedData || {};
+        liquidityData || {};
     const tradingAPR = useMemo(
         () => (apr_day ? fractionFormat(apr_day) : "_"),
         [apr_day]

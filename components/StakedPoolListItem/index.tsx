@@ -24,7 +24,7 @@ const StakedPoolListItem = ({poolData}: {poolData: Unarray<PoolsState["poolToDis
     const [isExpand, setIsExpand] = useState(false);
     const [mIsExpand, setMIsExpand] = useState(false);
     const {isMobile} = useScreenSize();
-    const {pool, poolStats, stakedData} = poolData;
+    const {pool, poolStats, liquidityData} = poolData;
     const {
         formatedStats: { TVL, emissionAPR, tradingAPR, volumn24h },
         formatedStakedData: {
@@ -40,7 +40,7 @@ const StakedPoolListItem = ({poolData}: {poolData: Unarray<PoolsState["poolToDis
             setIsExpand(false);
         }
     }, [isMobile]);
-    if(!stakedData) return null;
+    if(!liquidityData) return null;
 
     return (
         <>
@@ -109,7 +109,7 @@ const StakedPoolListItem = ({poolData}: {poolData: Unarray<PoolsState["poolToDis
                                 {/* {capacityPercent.toFixed(3)}% */}
                                 <span className="inline-block mr-1">
                                     <span className="text-ash-gray-500">$</span>
-                                    <span>{abbreviateCurrency(stakedData.lpValueUsd.toNumber())}</span>
+                                    <span>{abbreviateCurrency(liquidityData.lpValueUsd.toNumber())}</span>
                                 </span>
                                 {/* {isExpand && (
                                     <span className="inline-block text-ash-green-500 font-bold text-2xs">

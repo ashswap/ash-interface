@@ -32,6 +32,7 @@ import IconButton from "components/IconButton";
 import Setting from "components/Setting";
 import SwapAmount from "components/SwapAmount";
 import { gasLimit, network } from "const/network";
+import useContracts from "context/contracts";
 import { useDappContext } from "context/dapp";
 import { useSwap } from "context/swap";
 import { useWallet } from "context/wallet";
@@ -65,7 +66,8 @@ const Swap = () => {
     const [isOpenFairPrice, setIsOpenFairPrice] = useState(false);
     const [swapping, setSwapping] = useState(false);
 
-    const { callContract, connectWallet } = useWallet();
+    const { connectWallet } = useWallet();
+    const { callContract } = useContracts();
     const dapp = useDappContext();
     const { proxy } = dapp.dapp;
 
@@ -194,8 +196,8 @@ const Swap = () => {
                     func: new ContractFunction("getTotalFeePercent"),
                 })
             ),
-        ]).then(results => {
-            let rates = results.slice(0, 2).map(result => {
+        ]).then((results) => {
+            let rates = results.slice(0, 2).map((result) => {
                 let resultHex = Buffer.from(
                     result.returnData[0],
                     "base64"
@@ -273,7 +275,7 @@ const Swap = () => {
                 notification.close(key);
             }, 10000);
         } catch (error) {
-            console.log(error);                      
+            console.log(error);
             // TODO: extension close without response
             // notification.warn({
             //     message: error as string,
@@ -290,7 +292,7 @@ const Swap = () => {
         tokenTo,
         valueFrom,
         valueTo,
-        swapping
+        swapping,
     ]);
 
     const priceImpact = useMemo(() => {
@@ -336,9 +338,9 @@ const Swap = () => {
         <div className="flex flex-col items-center pt-3.5 pb-12 px-6">
             <div className="flex max-w-full">
                 <div
-                    className={`w-full max-w-[28.75rem] transition-none relative ${showSetting &&
-                        !screenSize.isMobile &&
-                        "sm:w-7/12"}`}
+                    className={`w-full max-w-[28.75rem] transition-none relative ${
+                        showSetting && !screenSize.isMobile && "sm:w-7/12"
+                    }`}
                 >
                     <div className="clip-corner-4 clip-corner-tl bg-ash-dark-600 absolute top-0 left-0 right-0 bottom-0 z-[-1]"></div>
                     <div className="text-base">
@@ -358,14 +360,14 @@ const Swap = () => {
                                         icon={<Clock />}
                                         onClick={() =>
                                             dapp.loggedIn &&
-                                            openHistoryModal(state => !state)
+                                            openHistoryModal((state) => !state)
                                         }
                                     />
                                     <IconButton
                                         icon={<SettingIcon />}
                                         activeIcon={<SettingActiveIcon />}
                                         onClick={() =>
-                                            setShowSetting(state => !state)
+                                            setShowSetting((state) => !state)
                                         }
                                         active={showSetting}
                                     />
@@ -410,7 +412,9 @@ const Swap = () => {
                                     <div
                                         className="opacity-50 font-bold flex flex-row items-center gap-2 select-none cursor-pointer"
                                         onClick={() =>
-                                            setIsOpenFairPrice(state => !state)
+                                            setIsOpenFairPrice(
+                                                (state) => !state
+                                            )
                                         }
                                     >
                                         <div>Fair price</div>

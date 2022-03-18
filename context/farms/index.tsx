@@ -11,6 +11,7 @@ import {
 import BigNumber from "bignumber.js";
 import { network } from "const/network";
 import pools from "const/pool";
+import useContracts from "context/contracts";
 import { useDappContext } from "context/dapp";
 import { useWallet } from "context/wallet";
 import { toEGLD } from "helper/balance";
@@ -89,63 +90,13 @@ const FarmsProvider = ({ children }: any) => {
     const [stakedOnly, setStakedOnly] = useState(false);
     const [inactive, setInactive] = useState(false);
     const { balances } = useWallet();
+    const {getTokenInLP, getLPValue} = useContracts();
     const dapp = useDappContext();
     const { lpTokens, tokenPrices } = useWallet();
     // fetch pool stats
     const { data: poolStatsRecords } = useSWR<PoolStatsRecord[]>(
         `${network.ashApiBaseUrl}/pool`,
         fetcher
-    );
-
-    const getTokenInLP = useCallback(
-        (ownLiquidity: BigNumber, poolAddress: string) => {
-            return dapp.dapp.proxy
-                .queryContract(
-                    new Query({
-                        address: new Address(poolAddress),
-                        func: new ContractFunction("getRemoveLiquidityTokens"),
-                        args: [
-                            new BigUIntValue(ownLiquidity),
-                            new BigUIntValue(new BigNumber(0)),
-                            new BigUIntValue(new BigNumber(0)),
-                        ],
-                    })
-                )
-                .then(({ returnData }) => {
-                    let resultHex = Buffer.from(
-                        returnData[0],
-                        "base64"
-                    ).toString("hex");
-                    let parser = new TypeExpressionParser();
-                    let mapper = new TypeMapper();
-                    let serializer = new ArgSerializer();
-
-                    let type = parser.parse("tuple2<BigUint,BigUint>");
-                    let mappedType = mapper.mapType(type);
-
-                    let endpointDefinitions = [
-                        new EndpointParameterDefinition(
-                            "foo",
-                            "bar",
-                            mappedType
-                        ),
-                    ];
-                    let values = serializer.stringToValues(
-                        resultHex,
-                        endpointDefinitions
-                    );
-
-                    return {
-                        value0: new BigNumber(
-                            values[0].valueOf().field0.toString()
-                        ),
-                        value1: new BigNumber(
-                            values[0].valueOf().field1.toString()
-                        ),
-                    };
-                });
-        },
-        [dapp.dapp.proxy]
     );
 
     const getPortion = useCallback(
@@ -157,27 +108,6 @@ const FarmsProvider = ({ children }: any) => {
                 .div(lpToken.totalSupply!);
         },
         [lpTokens]
-    );
-
-    const getLPValue = useCallback(
-        (pool: IPool, balance0, balance1) => {
-            let token0 = pool.tokens[0];
-            let token1 = pool.tokens[1];
-
-            if (!balance0 || !balance1) {
-                return new BigNumber(0);
-            }
-
-            const valueUsd0 = toEGLD(token0, balance0.toString()).multipliedBy(
-                tokenPrices[token0.id]
-            );
-            const valueUsd1 = toEGLD(token1, balance1.toString()).multipliedBy(
-                tokenPrices[token1.id]
-            );
-
-            return valueUsd0.plus(valueUsd1);
-        },
-        [tokenPrices]
     );
 
     const getPoolRecords = useCallback(async () => {
@@ -200,7 +130,7 @@ const FarmsProvider = ({ children }: any) => {
                     capacityPercent: getPortion(p.lpToken.id, ownLP),
                     value0,
                     value1,
-                    lpValueUsd: getLPValue(p, value0, value1),
+                    lpValueUsd: await getLPValue(ownLP, p),
                 };
             }
             records.push(record);

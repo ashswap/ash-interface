@@ -9,13 +9,14 @@ import React, { useCallback, useMemo, useState } from "react";
 import { theme } from "tailwind.config";
 import LockPeriod from "./LockPeriod";
 import ICChevronRight from "assets/svg/chevron-right.svg";
+import ICArrowTopRight from "assets/svg/arrow-top-right.svg";
 import moment from "moment";
 import Switch from "components/Switch";
 import { useScreenSize } from "hooks/useScreenSize";
 import { useStakeGov } from "context/gov";
 import { fractionFormat } from "helper/number";
 import { toEGLDD, toWei } from "helper/balance";
-import { ASH_TOKEN } from "const/tokens";
+import { ASH_TOKEN, VE_ASH_DECIMALS } from "const/tokens";
 import { useWallet } from "context/wallet";
 import BigNumber from "bignumber.js";
 type props = {
@@ -31,7 +32,14 @@ const MAX_LOCK = 4 * 365;
 const maxLock = 4 * 365;
 const minLock = 7;
 function StakeMoreModal({ open, onClose }: props) {
-    const { lockedAmt, unlockTS, lockMoreASH } = useStakeGov();
+    const {
+        lockedAmt,
+        unlockTS,
+        lockMoreASH,
+        estimateVeASH,
+        totalSupplyVeASH,
+        veASH,
+    } = useStakeGov();
     const { balances, insufficientEGLD } = useWallet();
     const ASHBalance = useMemo(() => balances[ASH_TOKEN.id], [balances]);
     const [lockAmt, setLockAmt] = useState<BigNumber>(new BigNumber(0));
@@ -67,16 +75,22 @@ function StakeMoreModal({ open, onClose }: props) {
         );
     }, [lockedAmt]);
     const setMaxLockAmt = useCallback(() => {
-        if(!ASHBalance) return;
+        if (!ASHBalance) return;
         setLockAmt(ASHBalance.balance);
         setRawLockAmt(
             toEGLDD(ASH_TOKEN.decimals, ASHBalance.balance).toString(10)
         );
     }, [ASHBalance]);
 
+    const insufficientASH = useMemo(() => {
+        if (!ASHBalance) return true;
+        return lockAmt.gt(ASHBalance.balance);
+    }, [ASHBalance, lockAmt]);
+
     const canStake = useMemo(() => {
         return (
             !insufficientEGLD &&
+            !insufficientASH &&
             isAgree &&
             (lockAmt.gt(0) ||
                 (isExtend &&
@@ -90,6 +104,7 @@ function StakeMoreModal({ open, onClose }: props) {
         currentLockDays,
         lockAmt,
         isExtend,
+        insufficientASH,
     ]);
 
     const lockMore = useCallback(async () => {
@@ -104,10 +119,54 @@ function StakeMoreModal({ open, onClose }: props) {
                   )
                 : undefined,
         });
-        if(onClose){
-            onClose()
+        if (onClose) {
+            onClose();
         }
     }, [lockMoreASH, isExtend, extendLockPeriod, unlockTS, lockAmt, onClose]);
+
+    const estimatedVeASH = useMemo(() => {
+        if (isExtend) {
+            return estimateVeASH(
+                lockedAmt.plus(lockAmt),
+                extendLockPeriod + currentLockDays
+            );
+        }
+        return estimateVeASH(lockedAmt.plus(lockAmt), currentLockDays);
+    }, [
+        estimateVeASH,
+        extendLockPeriod,
+        lockedAmt,
+        lockAmt,
+        currentLockDays,
+        isExtend,
+    ]);
+    const fEstimatedVeASH = useMemo(() => {
+        const num = toEGLDD(VE_ASH_DECIMALS, estimatedVeASH).toNumber();
+        return num === 0
+            ? "_"
+            : fractionFormat(num, { maximumFractionDigits: num < 1 ? 8 : 2 });
+    }, [estimatedVeASH]);
+    const estimatedCapacity = useMemo(() => {
+        const pct = estimatedVeASH
+            .multipliedBy(100)
+            .div(totalSupplyVeASH.plus(estimatedVeASH));
+        return pct.lt(0.01) ? "< 0.01" : pct.toFixed(2);
+    }, [estimatedVeASH, totalSupplyVeASH]);
+    const currentCapacity = useMemo(() => {
+        const pct = veASH.multipliedBy(100).div(totalSupplyVeASH);
+        return pct.lt(0.01) ? "< 0.01" : pct.toFixed(2);
+    }, [veASH, totalSupplyVeASH]);
+    const diffCapacity = useMemo(() => {
+        const c = currentCapacity.startsWith("<") ? 0 : +currentCapacity;
+        const e = estimatedCapacity.startsWith("<") ? 0 : +estimatedCapacity;
+        return new BigNumber(e).minus(c).toNumber();
+    }, [currentCapacity, estimatedCapacity]);
+    const fVeASH = useMemo(() => {
+        const num = toEGLDD(VE_ASH_DECIMALS, veASH).toNumber();
+        return num === 0
+            ? "_"
+            : fractionFormat(num, { maximumFractionDigits: num < 1 ? 8 : 2 });
+    }, [veASH]);
 
     return (
         <>
@@ -132,7 +191,11 @@ function StakeMoreModal({ open, onClose }: props) {
                                                 : "I want to stake more!"}
                                         </div>
                                         <InputCurrency
-                                            className="w-full text-white text-lg font-bold bg-ash-dark-400 h-14 lg:h-18 px-6 flex items-center text-right outline-none"
+                                            className={`w-full text-white text-lg font-bold bg-ash-dark-400 h-14 lg:h-18 px-6 flex items-center text-right outline-none border ${
+                                                insufficientASH
+                                                    ? "border-ash-purple-500"
+                                                    : "border-transparent"
+                                            }`}
                                             value={rawLockAmt}
                                             onChange={(e) => {
                                                 const raw =
@@ -141,16 +204,8 @@ function StakeMoreModal({ open, onClose }: props) {
                                                     ASH_TOKEN,
                                                     raw
                                                 );
-                                                if (
-                                                    lockAmt.gt(
-                                                        ASHBalance.balance
-                                                    )
-                                                ) {
-                                                    setMaxLockAmt();
-                                                } else {
-                                                    setRawLockAmt(raw);
-                                                    setLockAmt(lockAmt);
-                                                }
+                                                setRawLockAmt(raw);
+                                                setLockAmt(lockAmt);
                                             }}
                                         />
                                         <div className="text-right text-2xs lg:text-xs mt-2">
@@ -175,7 +230,7 @@ function StakeMoreModal({ open, onClose }: props) {
                                         <div className="text-ash-gray-500 text-xs lg:text-sm font-bold mb-2 lg:mb-4 flex items-center">
                                             <div className="mr-1">Current</div>
                                             <div className="flex items-center">
-                                                <div className="w-3 h-3 bg-ash-purple-500 rounded-full mr-1"></div>
+                                                <div className="w-3 h-3 bg-pink-600 rounded-full mr-1"></div>
                                                 <div>
                                                     {ASH_TOKEN.name} Staked
                                                 </div>
@@ -266,26 +321,76 @@ function StakeMoreModal({ open, onClose }: props) {
                                     )}
                                 </div>
                             </div>
-                            <div className="w-full sm:w-1/3 lg:w-[17.8125rem] flex-shrink-0 bg-stake-dark-500 py-[2.375rem] px-10">
+                            <div className="w-full sm:w-1/3 lg:w-[17.8125rem] flex-shrink-0 bg-stake-dark-500 py-[2.375rem] px-10 sm:px-4 lg:px-10">
                                 <div className="text-white text-lg font-bold mb-16">
                                     Estimate Staking
                                 </div>
                                 <div className="flex flex-col space-y-11">
                                     <div>
                                         <div className="text-ash-gray-500 text-xs underline mb-2">
-                                            VeASH Receive
+                                            Your total veASH
                                         </div>
-                                        <div className="text-white text-lg font-bold">
-                                            _
+                                        <div
+                                            className={`text-lg font-bold ${
+                                                lockAmt.gt(0)
+                                                    ? "text-ash-gray-500 line-through"
+                                                    : "text-white"
+                                            }`}
+                                        >
+                                            {fVeASH}
                                         </div>
+                                        {(lockAmt.gt(0) || isExtend) && (
+                                            <div className="flex items-start">
+                                                <div className="text-white text-lg font-bold mr-6">
+                                                    {fEstimatedVeASH}
+                                                </div>
+                                                <div className="text-ash-green-500 flex items-center text-2xs font-bold">
+                                                    <ICArrowTopRight className="mr-1.5" />
+                                                    <span>
+                                                        +
+                                                        {estimatedVeASH
+                                                            .minus(veASH)
+                                                            .multipliedBy(100)
+                                                            .div(veASH)
+                                                            .toFixed(2)}
+                                                        %
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
                                     <div>
                                         <div className="text-ash-gray-500 text-xs underline mb-2">
                                             Your capacity
                                         </div>
-                                        <div className="text-white text-lg font-bold">
-                                            _
+                                        <div
+                                            className={`text-lg font-bold ${
+                                                lockAmt.gt(0)
+                                                    ? "text-ash-gray-500 line-through"
+                                                    : "text-white"
+                                            }`}
+                                        >
+                                            {currentCapacity}%
                                         </div>
+                                        {(lockAmt.gt(0) || isExtend) && (
+                                            <div className="flex items-start">
+                                                <div className="text-white text-lg font-bold mr-6">
+                                                    {estimatedCapacity}%
+                                                </div>
+                                                {diffCapacity > 0 && (
+                                                    <div className="text-ash-green-500 flex items-center text-2xs font-bold">
+                                                        <ICArrowTopRight className="mr-1.5" />
+                                                        <span>
+                                                            +
+                                                            {diffCapacity.toFixed(
+                                                                2
+                                                            )}
+                                                            %
+                                                        </span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
                                     </div>
                                     <div>
                                         <div className="text-ash-gray-500 text-xs underline mb-2">
@@ -326,12 +431,12 @@ function StakeMoreModal({ open, onClose }: props) {
                                         <span className="text-ash-gray-500">
                                             I verify that I have read the{" "}
                                             <a
-                                                href="https://docs.ashswap.io/guides/add-remove-liquidity"
+                                                href="https://docs.ashswap.io/testnet-guides/governance-staking"
                                                 target="_blank"
                                                 rel="noreferrer"
                                             >
                                                 <b className="text-white">
-                                                    <u>AshSwap Pools Guide</u>
+                                                    <u>AshSwap Stake Guide</u>
                                                 </b>
                                             </a>{" "}
                                             and understand the risks of
@@ -354,6 +459,8 @@ function StakeMoreModal({ open, onClose }: props) {
                                     >
                                         {insufficientEGLD ? (
                                             "INSUFFICIENT EGLD BALANCE"
+                                        ) : insufficientASH ? (
+                                            "INSUFFICIENT ASH BALANCE"
                                         ) : (
                                             <div className="flex items-center">
                                                 <div className="mr-2">

@@ -18,7 +18,7 @@ type props = {
     farmData: Unarray<FarmsState["farmRecords"]>;
 };
 const StakeLPContent = ({ open, onClose, farmData }: props) => {
-    const { pool, poolStats, liquidityData: stakedData } = farmData;
+    const { pool, poolStats } = farmData;
     const [token0, token1] = pool.tokens;
     const [isAgree, setIsAgree] = useState(false);
     const {balances, insufficientEGLD} = useWallet();

@@ -22,6 +22,7 @@ import HeadlessModal, {
 import InputCurrency from "components/InputCurrency";
 import Token from "components/Token";
 import { gasLimit, network } from "const/network";
+import useContracts from "context/contracts";
 import { useDappContext } from "context/dapp";
 import { PoolsState } from "context/pools";
 import { useSwap } from "context/swap";
@@ -42,9 +43,9 @@ interface Props {
 }
 
 const RemoveLiquidityModal = ({ open, onClose, poolData }: Props) => {
-    const {pool, poolStats, stakedData} = poolData;
-    const {capacityPercent, ownLiquidity} = stakedData!;
-    const {total_value_locked} = poolStats || {};
+    const { pool, poolStats, liquidityData } = poolData;
+    const { capacityPercent, ownLiquidity } = liquidityData!;
+    const { total_value_locked } = poolStats || {};
     const [liquidity, setLiquidity] = useState<BigNumber>(new BigNumber(0));
     const [totalUsd, setTotalUsd] = useState<BigNumber>(new BigNumber(0));
     const [liquidityPercent, setLiquidityPercent] = useState<number>(0);
@@ -52,22 +53,24 @@ const RemoveLiquidityModal = ({ open, onClose, poolData }: Props) => {
     const [value1, setValue1] = useState<string>("");
     const [liquidityDebounce] = useDebounce(liquidity, 500);
     const screenSize = useScreenSize();
-    const { callContract, fetchBalances, balances, lpTokens } = useWallet();
+    const { fetchBalances, balances, lpTokens } = useWallet();
+    const { callContract } = useContracts();
     const dapp = useDappContext();
     const { slippage } = useSwap();
-    const [displayInputLiquidity, setDisplayInputLiquidity] = useState<string>(
-        ""
-    );
+    const [displayInputLiquidity, setDisplayInputLiquidity] =
+        useState<string>("");
     const [removing, setRemoving] = useState(false);
 
     const pricePerLP = useMemo(() => {
         // warning: mocking - change to 0 after pool analytic API success
-        if(!total_value_locked) return new BigNumber(1);
+        if (!total_value_locked) return new BigNumber(1);
         const lpToken = lpTokens[pool.lpToken.id];
         if (!total_value_locked || !lpToken?.totalSupply) {
             return new BigNumber(0);
         }
-        return new BigNumber(total_value_locked).div(lpTokens[pool.lpToken.id].totalSupply!.toString());
+        return new BigNumber(total_value_locked).div(
+            lpTokens[pool.lpToken.id].totalSupply!.toString()
+        );
     }, [total_value_locked, lpTokens, pool]);
 
     // real LP
@@ -78,12 +81,7 @@ const RemoveLiquidityModal = ({ open, onClose, poolData }: Props) => {
     // verify input $ and set the new valid $ value
     const computeValidTotalUsd = useCallback(
         (val: BigNumber) => {
-            if (
-                val
-                    .div(pricePerLP)
-                    .div(shortOwnLP)
-                    .gte(0.998)
-            ) {
+            if (val.div(pricePerLP).div(shortOwnLP).gte(0.998)) {
                 const validVal = shortOwnLP.multipliedBy(pricePerLP);
                 setDisplayInputLiquidity(validVal.toString(10));
                 return validVal;
@@ -95,7 +93,7 @@ const RemoveLiquidityModal = ({ open, onClose, poolData }: Props) => {
 
     // re-validate totalUSD on pricePerLP, ownLp changes
     useEffect(() => {
-        setTotalUsd(val => computeValidTotalUsd(val));
+        setTotalUsd((val) => computeValidTotalUsd(val));
     }, [computeValidTotalUsd]);
 
     // calculate % LP tokens - source of truth: totalUsd
@@ -112,10 +110,7 @@ const RemoveLiquidityModal = ({ open, onClose, poolData }: Props) => {
     useEffect(() => {
         setLiquidity(
             new BigNumber(
-                ownLiquidity
-                    .multipliedBy(liquidityPercent)
-                    .div(100)
-                    .toFixed(0)
+                ownLiquidity.multipliedBy(liquidityPercent).div(100).toFixed(0)
             )
         );
     }, [ownLiquidity, liquidityPercent]);
@@ -189,7 +184,7 @@ const RemoveLiquidityModal = ({ open, onClose, poolData }: Props) => {
     }, [liquidityDebounce, pool, dapp.dapp.proxy]);
 
     const removeLP = useCallback(async () => {
-        if(removing) return;
+        if (removing) return;
         setRemoving(true);
         try {
             let tx = await callContract(new Address(pool.address), {
@@ -250,7 +245,7 @@ const RemoveLiquidityModal = ({ open, onClose, poolData }: Props) => {
         callContract,
         fetchBalances,
         liquidity,
-        removing
+        removing,
     ]);
 
     return (
@@ -309,7 +304,7 @@ const RemoveLiquidityModal = ({ open, onClose, poolData }: Props) => {
                                         className="flex-1 overflow-hidden bg-ash-dark-700 text-right text-lg h-[4.5rem] px-5 outline-none"
                                         placeholder="0"
                                         value={displayInputLiquidity}
-                                        onChange={e => {
+                                        onChange={(e) => {
                                             const value = e.target.value || "";
                                             setDisplayInputLiquidity(value);
                                             setTotalUsd(
@@ -351,7 +346,7 @@ const RemoveLiquidityModal = ({ open, onClose, poolData }: Props) => {
                                             min={0}
                                             max={100}
                                             value={liquidityPercent}
-                                            onChange={e =>
+                                            onChange={(e) =>
                                                 onChangeLiquidityPercent(e)
                                             }
                                         />
