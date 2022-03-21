@@ -214,7 +214,6 @@ const StakeGovProvider = ({ children }: any) => {
     }, [dapp.loggedIn, dapp.dapp, dapp.address]);
 
     const getTotalSupplyVeASH = useCallback(() => {
-        if (!dapp.loggedIn) return;
         const ts = moment().unix();
         dapp.dapp.proxy
             .queryContract(
@@ -228,7 +227,7 @@ const StakeGovProvider = ({ children }: any) => {
                 const values = queryContractParser(returnData[0], "BigUint");
                 setTotalSupplyVeASH(values[0]?.valueOf() || new BigNumber(0));
             });
-    }, [dapp.loggedIn, dapp.dapp]);
+    }, [dapp.dapp]);
 
     const getRewardAmt = useCallback(() => {
         if (!dapp.loggedIn) return;
@@ -265,6 +264,7 @@ const StakeGovProvider = ({ children }: any) => {
             weiAmt,
             unlockTimestamp,
         }: { weiAmt?: BigNumber; unlockTimestamp?: BigNumber } = {}) => {
+            if(!dapp.loggedIn) return [];
             let txs: Transaction[] = [];
             if (weiAmt && weiAmt.gt(0)) {
                 const increaseAmtTx = await createTransaction(
@@ -331,7 +331,7 @@ const StakeGovProvider = ({ children }: any) => {
             }, 10000);
             return data;
         },
-        [createTransaction, dapp.dapp, unlockTS]
+        [createTransaction, dapp.dapp, unlockTS, dapp.loggedIn]
     );
 
     const getRewardLPID = useCallback(() => {
@@ -426,7 +426,7 @@ const StakeGovProvider = ({ children }: any) => {
     }, [dapp.dapp, createTransaction, dapp.address, dapp.loggedIn]);
 
     const unlockASH = useCallback(async () => {
-        if (unlockTS.minus(moment().unix()).gt(0)) return null;
+        if (!dapp.loggedIn || unlockTS.minus(moment().unix()).gt(0)) return null;
         try {
             const tx = await callContract(
                 new Address(dappContract.voteEscrowedContract),
@@ -454,7 +454,7 @@ const StakeGovProvider = ({ children }: any) => {
             console.log(error);
             return null;
         }
-    }, [unlockTS, lockedAmt, callContract]);
+    }, [unlockTS, lockedAmt, callContract, dapp.loggedIn]);
 
     const getRewardValue = useCallback(async () => {
         if (!rewardLPAmt || rewardLPAmt.eq(0) || !rewardLPToken){
