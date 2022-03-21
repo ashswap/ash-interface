@@ -73,6 +73,7 @@ type GovStakeState = {
     rewardLPAmt: BigNumber;
     rewardLPToken?: IPool;
     rewardValue: BigNumber;
+    totalLockedPct: number;
 };
 const initState: GovStakeState = {
     lockASH: (amt, unlock) => Promise.resolve(null),
@@ -87,6 +88,7 @@ const initState: GovStakeState = {
     totalLockedAmt: new BigNumber(0),
     rewardLPAmt: new BigNumber(0),
     rewardValue: new BigNumber(0),
+    totalLockedPct: 0
 };
 const StakeGovContext = createContext(initState);
 export const useStakeGov = () => {
@@ -106,7 +108,7 @@ const StakeGovProvider = ({ children }: any) => {
     const [rewardLPAmt, setRewardLPAmt] = useState<BigNumber>(new BigNumber(0));
     const [rewardValue, setRewardValue] = useState<BigNumber>(new BigNumber(0));
     const [rewardLPToken, setRewardLPToken] = useState<IPool>();
-    const { tokenPrices } = useWallet();
+    const [totalLockedPct, setTotalLockedPct] = useState(0);
     const { callContract, createTransaction, getLPValue } = useContracts();
     const dapp = useDappContext();
 
@@ -441,6 +443,34 @@ const StakeGovProvider = ({ children }: any) => {
         const value = await getLPValue(rewardLPAmt, rewardLPToken);
         setRewardValue(value || new BigNumber(0));
     }, [rewardLPAmt, rewardLPToken, getLPValue]);
+
+    const getASHTotalSupply = useCallback(() => {
+        return dapp.dapp.proxy.queryContract(
+            new Query({
+                address: new Address(
+                    "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u"
+                ),
+                func: new ContractFunction("getTokenProperties"),
+                args: [
+                    new TokenIdentifierValue(Buffer.from(ASH_TOKEN.id)),
+                ],
+            })
+        ).then(({returnData}) => {
+            const data = returnData[3];
+            if(data?.length > 0){
+                return new BigNumber(
+                    Buffer.from(data, "base64").toString("utf8")
+                );
+            }
+            return new BigNumber(0);
+        })
+    }, [dapp.dapp]);
+
+    const getTotalLockedASHPct = useCallback(async () => {
+        const totalSupply = await getASHTotalSupply();
+        if(totalSupply.eq(0)) setTotalLockedPct(0);
+        return setTotalLockedPct(totalLockedAmt.multipliedBy(100).div(totalSupply).toNumber());
+    }, [getASHTotalSupply, totalLockedAmt]);
     
     useEffect(() => {
         getRewardValue();
@@ -496,6 +526,14 @@ const StakeGovProvider = ({ children }: any) => {
     }, [getTotalLockedAmt]);
 
     useEffect(() => {
+        getTotalLockedASHPct();
+        const interval = setInterval(() => {
+            getTotalLockedASHPct();
+        }, blockTimeMs);
+        return () => clearInterval(interval);
+    }, [getTotalLockedASHPct]);
+
+    useEffect(() => {
         getRewardLPID();
     }, [getRewardLPID]);
 
@@ -515,6 +553,7 @@ const StakeGovProvider = ({ children }: any) => {
                 rewardLPAmt,
                 rewardLPToken,
                 rewardValue,
+                totalLockedPct
             }}
         >
             {children}
