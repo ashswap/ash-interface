@@ -457,7 +457,10 @@ const StakeGovProvider = ({ children }: any) => {
     }, [unlockTS, lockedAmt, callContract]);
 
     const getRewardValue = useCallback(async () => {
-        if (!rewardLPAmt || rewardLPAmt.eq(0) || !rewardLPToken) return;
+        if (!rewardLPAmt || rewardLPAmt.eq(0) || !rewardLPToken){
+            setRewardValue(new BigNumber(0));
+            return;
+        };
         const value = await getLPValue(rewardLPAmt, rewardLPToken);
         setRewardValue(value || new BigNumber(0));
     }, [rewardLPAmt, rewardLPToken, getLPValue]);
