@@ -4,7 +4,7 @@ import HeadlessModal, {
     HeadlessModalDefaultHeader,
 } from "components/HeadlessModal";
 import InputCurrency from "components/InputCurrency";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { theme } from "tailwind.config";
 import LockPeriod from "./LockPeriod";
 import ICChevronRight from "assets/svg/chevron-right.svg";
@@ -21,6 +21,8 @@ type props = {
     onClose: () => void;
 };
 const predefinedLockPeriod = [
+    // test purpose
+    { value: 1 / 48, label: "30 minutes" },
     { value: 7, label: "7 days" },
     { value: 30, label: "30 days" },
     { value: 365, label: "1 year" },
@@ -29,7 +31,7 @@ const predefinedLockPeriod = [
     { value: 365 * 4, label: "4 year" },
 ];
 const maxLock = 4 * 365;
-const minLock = 7;
+const minLock = 1 / 48;
 const FirstStakeContent = ({ open, onClose }: props) => {
     const [lockPeriod, setLockPeriod] = useState(7);
     const [isAgree, setIsAgree] = useState(false);
@@ -62,7 +64,9 @@ const FirstStakeContent = ({ open, onClose }: props) => {
     const lock = useCallback(async () => {
         const tx = await lockASH(
             lockAmt,
-            new BigNumber(moment().add(lockPeriod, "days").unix())
+            lockPeriod === minLock
+                ? new BigNumber(moment().add(30, "minutes").unix())
+                : new BigNumber(moment().add(lockPeriod, "days").unix())
         );
         if (tx) {
             onClose();
@@ -147,8 +151,8 @@ const FirstStakeContent = ({ open, onClose }: props) => {
                             </div>
                             <LockPeriod
                                 lockDay={lockPeriod}
-                                min={7}
-                                max={4 * 365}
+                                min={minLock}
+                                max={maxLock}
                                 options={predefinedLockPeriod}
                                 lockDayChange={(val) => setLockPeriod(val)}
                             />

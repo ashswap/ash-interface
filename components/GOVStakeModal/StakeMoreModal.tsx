@@ -21,13 +21,16 @@ type props = {
     onClose: () => void;
 };
 const EXTEND_OPTS = [
+    // test purpose
+    { value: 1 / 48, label: "30 minutes" },
     { value: 7, label: "+ 7 days" },
     { value: 30, label: "+ 30 days" },
     { value: 365, label: "+ 1 year" },
 ];
 const MAX_LOCK = 4 * 365;
 const maxLock = 4 * 365;
-const minLock = 7;
+// test purpose - change back to 7
+const minLock = 1 / 48;
 const StakeMoreContent = ({ open, onClose }: props) => {
     const {
         lockedAmt,
@@ -107,12 +110,19 @@ const StakeMoreContent = ({ open, onClose }: props) => {
         await lockMoreASH({
             weiAmt: lockAmt,
             unlockTimestamp: isExtend
-                ? new BigNumber(
-                      moment
-                          .unix(unlockTS.toNumber())
-                          .add(extendLockPeriod, "days")
-                          .unix()
-                  )
+                ? extendLockPeriod === minLock
+                    ? new BigNumber(
+                          moment
+                              .unix(unlockTS.toNumber())
+                              .add(30, "minutes")
+                              .unix()
+                      )
+                    : new BigNumber(
+                          moment
+                              .unix(unlockTS.toNumber())
+                              .add(extendLockPeriod, "days")
+                              .unix()
+                      )
                 : undefined,
         });
         if (onClose) {
@@ -269,7 +279,7 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                                         lockDay={
                                             extendLockPeriod + currentLockDays
                                         }
-                                        min={currentLockDays + 7}
+                                        min={currentLockDays + minLock}
                                         max={MAX_LOCK}
                                         options={extendOpts.map((opt) => ({
                                             ...opt,
