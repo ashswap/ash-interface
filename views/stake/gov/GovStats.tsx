@@ -39,6 +39,7 @@ function GovStats() {
         rewardLPAmt,
         rewardLPToken,
         rewardValue,
+        totalLockedPct,
         claimReward,
         unlockASH,
     } = useStakeGov();
@@ -279,7 +280,7 @@ function GovStats() {
                                 PERCENTAGE of total ASH Locked
                             </div>
                             <div className="text-white text-lg font-bold leading-tight">
-                                On developing
+                                {totalLockedPct < 0.01 ? "< 0.01" : totalLockedPct.toFixed(2)}%
                             </div>
                         </div>
                         <div className="bg-ash-dark-400/30 px-[2.375rem] py-7 flex flex-col justify-between">

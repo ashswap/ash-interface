@@ -198,7 +198,7 @@ export function WalletProvider({ children }: Props) {
                 if(data && data.length > 0){
                     
                     tokens[tokenIds[i]].totalSupply = new BigNumber(
-                        Buffer.from(r.returnData[3], "base64").toString("hex")
+                        Buffer.from(r.returnData[3], "base64").toString("utf8")
                     );
                 }
             });
