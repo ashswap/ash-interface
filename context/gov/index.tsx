@@ -371,16 +371,34 @@ const StakeGovProvider = ({ children }: any) => {
             const tx3 = await createTransaction(
                 new Address(dappContract.feeDistributor),
                 {
+                    func: new ContractFunction("checkpoint_total_supply_2"),
+                    gasLimit: new GasLimit(gasLimit),
+                }
+            );
+            tx3.setNonce(tx2.getNonce().increment());
+            const tx4 = await createTransaction(
+                new Address(dappContract.feeDistributor),
+                {
+                    func: new ContractFunction("checkpoint_total_supply_2"),
+                    gasLimit: new GasLimit(gasLimit),
+                }
+            );
+            tx4.setNonce(tx3.getNonce().increment());
+            const tx5 = await createTransaction(
+                new Address(dappContract.feeDistributor),
+                {
                     func: new ContractFunction("claim"),
                     gasLimit: new GasLimit(gasLimit),
                     args: [new AddressValue(new Address(dapp.address))],
                 }
             );
-            tx3.setNonce(tx2.getNonce().increment());
+            tx5.setNonce(tx4.getNonce().increment());
             const signedTxs = await dapp.dapp.provider.signTransactions([
                 tx1,
                 tx2,
                 tx3,
+                tx4,
+                tx5
             ]);
             const txs = await dapp.dapp.proxy.doPostGeneric(
                 `transaction/send-multiple`,
@@ -396,7 +414,7 @@ const StakeGovProvider = ({ children }: any) => {
                     window.open(
                         network.explorerAddress +
                             "/transactions/" +
-                            txs[2].toString(),
+                            txs[4].toString(),
                         "_blank"
                     ),
             });
