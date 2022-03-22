@@ -33,10 +33,14 @@ function LockPeriod({
     }, [lockDay]);
     const fSelectedDate = useMemo(() => {
         let years = Math.floor(lockDay / 365);
-        let days = lockDay % 365;
+        let days = Math.floor(lockDay % 365);
+        let minutes = Math.ceil(((lockDay % 365) - days) * 24 * 60);
         const y = years ? `${years} ${years > 1 ? "years" : "year"}` : "";
         const d = days ? `${days} ${days > 1 ? "days" : "day"}` : "";
-        return [y, d].filter((s) => !!s).join(" ");
+        const m = minutes
+            ? `${minutes} ${minutes > 1 ? "minutes" : "minute"}`
+            : "";
+        return [y, d, m].filter((s) => !!s).join(" ");
     }, [lockDay]);
     return (
         <div className="bg-ash-dark-400 h-20 flex items-center justify-between pr-3">
@@ -93,7 +97,7 @@ function LockPeriod({
                             className={`transition ease-in-out duration-200 w-40 lg:w-[12.5rem] h-14 px-7 flex items-center justify-between ${
                                 open
                                     ? "bg-ash-dark-700 text-white"
-                                    : "bg-ash-gray-500/10 text-ash-gray-500"
+                                    : "bg-ash-gray-500/10 text-stake-gray-500"
                             }`}
                         >
                             <span className="font-bold text-xs lg:text-sm mr-2">

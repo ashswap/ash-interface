@@ -3,7 +3,7 @@ import HeadlessModal, {
     HeadlessModalDefaultHeader,
 } from "components/HeadlessModal";
 import InputCurrency from "components/InputCurrency";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import LockPeriod from "./LockPeriod";
 import ICChevronRight from "assets/svg/chevron-right.svg";
 import ICArrowTopRight from "assets/svg/arrow-top-right.svg";
@@ -45,10 +45,15 @@ const StakeMoreContent = ({ open, onClose }: props) => {
     const [lockAmt, setLockAmt] = useState<BigNumber>(new BigNumber(0));
     const [rawLockAmt, setRawLockAmt] = useState("");
     const currentLockDays = useMemo(() => {
-        return moment
+        const current = moment
             .unix(unlockTS.toNumber())
             .endOf("days")
             .diff(moment().endOf("days"), "days");
+        // test purpose
+        const currentM =
+            moment.unix(unlockTS.toNumber()).diff(moment(), "seconds") /
+            (24 * 60 * 60);
+        return currentM > 0 ? currentM : 0;
     }, [unlockTS]);
     const [extendLockPeriod, setExtendLockPeriod] = useState(minLock);
     const [isAgree, setIsAgree] = useState(false);
@@ -56,10 +61,16 @@ const StakeMoreContent = ({ open, onClose }: props) => {
     const { isMobile } = useScreenSize();
     const remaining = useMemo(() => {
         let years = Math.floor(currentLockDays / 365);
-        let days = currentLockDays % 365;
+        let days = Math.floor(currentLockDays % 365);
+        // test purpose
+        let minutes = Math.ceil(((currentLockDays % 365) - days) * 24 * 60);
         const y = years ? `${years} ${years > 1 ? "years" : "year"}` : "";
         const d = days ? `${days} ${days > 1 ? "days" : "day"}` : "";
-        return [y, d].filter((s) => !!s).join(" ");
+        // test purpose
+        const m = minutes
+            ? `${minutes} ${minutes > 1 ? "minutes" : "minute"}`
+            : "";
+        return [y, d, m].filter((s) => !!s).join(" ");
     }, [currentLockDays]);
     const extendOpts = useMemo(() => {
         const max = MAX_LOCK - currentLockDays;
@@ -73,6 +84,11 @@ const StakeMoreContent = ({ open, onClose }: props) => {
             toEGLDD(ASH_TOKEN.decimals, lockedAmt).toNumber()
         );
     }, [lockedAmt]);
+    useEffect(() => {
+        if (currentLockDays === 0) {
+            setIsExtend(true);
+        }
+    }, [currentLockDays]);
     const setMaxLockAmt = useCallback(() => {
         if (!ASHBalance) return;
         setLockAmt(ASHBalance.balance);
@@ -137,7 +153,15 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                 extendLockPeriod + currentLockDays
             );
         }
-        return estimateVeASH(lockedAmt.plus(lockAmt), currentLockDays);
+        console.log(
+            "es",
+            lockedAmt.plus(lockAmt).toString(),
+            currentLockDays + 3600 / (24 * 60 * 60)
+        );
+        return estimateVeASH(
+            lockedAmt.plus(lockAmt),
+            currentLockDays + 7 / (24 * 60 * 60)
+        );
     }, [
         estimateVeASH,
         extendLockPeriod,
@@ -170,7 +194,7 @@ const StakeMoreContent = ({ open, onClose }: props) => {
     const fVeASH = useMemo(() => {
         const num = toEGLDD(VE_ASH_DECIMALS, veASH).toNumber();
         return num === 0
-            ? "_"
+            ? "0"
             : fractionFormat(num, { maximumFractionDigits: num < 1 ? 8 : 2 });
     }, [veASH]);
     return (
@@ -262,17 +286,23 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                         </div>
 
                         <div>
-                            <div className="flex items-center">
-                                <Switch
-                                    className="flex items-center"
-                                    checked={isExtend}
-                                    onChange={(val) => setIsExtend(val)}
-                                >
-                                    <span className="ml-3 text-ash-gray-500 text-sm font-bold underline">
-                                        I want to extend my lock period!
-                                    </span>
-                                </Switch>
-                            </div>
+                            {currentLockDays > 0 ? (
+                                <div className="flex items-center">
+                                    <Switch
+                                        className="flex items-center"
+                                        checked={isExtend}
+                                        onChange={(val) => setIsExtend(val)}
+                                    >
+                                        <span className="ml-3 text-ash-gray-500 text-sm font-bold underline">
+                                            I want to extend my lock period!
+                                        </span>
+                                    </Switch>
+                                </div>
+                            ) : (
+                                <span className="text-ash-gray-500 text-sm font-bold underline">
+                                    Extend lock period
+                                </span>
+                            )}
                             {isExtend && (
                                 <div className="mt-8">
                                     <LockPeriod
@@ -319,7 +349,7 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                                 </div>
                                 <div
                                     className={`text-lg font-bold ${
-                                        lockAmt.gt(0)
+                                        lockAmt.gt(0) || isExtend
                                             ? "text-ash-gray-500 line-through"
                                             : "text-white"
                                     }`}
@@ -352,7 +382,7 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                                 </div>
                                 <div
                                     className={`text-lg font-bold ${
-                                        lockAmt.gt(0)
+                                        lockAmt.gt(0) || isExtend
                                             ? "text-ash-gray-500 line-through"
                                             : "text-white"
                                     }`}
