@@ -17,6 +17,11 @@ module.exports = withReactSvg(withFonts({
                 destination: '/info/tokens',
                 permanent: true,
             },
+            {
+                source: '/stake/farms',
+                destination: '/swap',
+                permanent: true,
+            },
         ]
     },
 }))
