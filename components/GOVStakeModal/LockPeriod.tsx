@@ -42,6 +42,9 @@ function LockPeriod({
             : "";
         return [y, d, m].filter((s) => !!s).join(" ");
     }, [lockDay]);
+    const dateValue = useMemo(() => {
+        return moment().endOf("days").add(lockDay, "days")
+    }, [lockDay]);
     return (
         <div className="bg-ash-dark-400 h-20 flex items-center justify-between pr-3">
             <div ref={datePickerRef} className="pl-6 py-3 relative">
@@ -72,7 +75,7 @@ function LockPeriod({
                     getPopupContainer={(el) => {
                         return el.parentElement as any;
                     }}
-                    value={moment().endOf("days").add(lockDay, "days")}
+                    value={dateValue}
                     onChange={(val) =>
                         val &&
                         lockDayChange(

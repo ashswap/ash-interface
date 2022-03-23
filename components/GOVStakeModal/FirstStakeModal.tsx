@@ -154,7 +154,7 @@ const FirstStakeContent = ({ open, onClose }: props) => {
                                 min={minLock}
                                 max={maxLock}
                                 options={predefinedLockPeriod}
-                                lockDayChange={(val) => setLockPeriod(val)}
+                                lockDayChange={(val) => setLockPeriod(val > 0 ? val : minLock)}
                             />
                             <div className="overflow-hidden mt-8">
                                 <Slider
