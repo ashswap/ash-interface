@@ -389,11 +389,11 @@ const FarmsProvider = ({ children }: any) => {
 
     const exitFarm = useCallback(
         async (lpAmt: BigNumber, farm: IFarm) => {
-            if(!dapp.loggedIn) return [];
+            if(!dapp.loggedIn) return {};
             const farmRecord = farmRecords.find(
                 (val) => val.farm.farm_address === farm.farm_address
             );
-            if (!farmRecord || !farmRecord.stakedData) return;
+            if (!farmRecord || !farmRecord.stakedData) return {};
             const { stakedData } = farmRecord;
             const farmTokens = stakedData.farmTokens || [];
             let txs: Transaction[] = [];

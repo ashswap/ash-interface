@@ -20,12 +20,12 @@ export interface ContractsState {
         addr: Address,
         arg: CallArguments
     ) => Promise<TransactionHash>;
-    sendMultipleTxs: (txs: Transaction[]) => Promise<string[]>
+    sendMultipleTxs: (txs: Transaction[]) => Promise<{[key: number]: string}>
 }
 export const initContractsState: ContractsState = {
     getTokenInLP: () => Promise.resolve({value0: bigZero, value1: bigZero}),
     getLPValue: () => Promise.resolve(bigZero),
     createTransaction: () => Promise.resolve(emptyTx),
     callContract: () => Promise.resolve(emptyTxHash),
-    sendMultipleTxs: () => Promise.resolve([])
+    sendMultipleTxs: () => Promise.resolve({})
 }
