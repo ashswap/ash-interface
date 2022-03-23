@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import ImgMetalCardBg from "assets/images/metal-card-bg.png";
-import { FarmsState } from "context/farms";
+import { FarmsState, useFarms } from "context/farms";
 import { Unarray } from "interface/utilities";
 import useFarmDataFormat from "hooks/useFarmDataFormat";
 import Image from "next/image";
@@ -18,10 +18,11 @@ type props = {
     viewType: ViewType;
 };
 function FarmCard({ farmData, viewType }: props) {
-    const { pool, poolStats, liquidityData, stakedData } = farmData;
+    const { pool, poolStats, liquidityData, stakedData, farm } = farmData;
     const [isExpand, setIsExpand] = useState<boolean>(false);
     const [openStakeLP, setOpenStakeLP] = useState<boolean>(false);
     const [openUnstakeLP, setOpenUnstakeLP] = useState<boolean>(false);
+    const {claimReward} = useFarms();
     const {
         formatedStats: { TVL, emissionAPR, tradingAPR, volumn24h },
         formatedStakedData: {
@@ -33,13 +34,20 @@ function FarmCard({ farmData, viewType }: props) {
         },
     } = useFarmDataFormat(farmData);
     const [token0, token1] = farmData.pool.tokens;
-    const displayOwnLP = useMemo(() => {
-        if (!liquidityData?.ownLiquidity || liquidityData?.ownLiquidity.eq(0))
+    const displayStakedLP = useMemo(() => {
+        if (!stakedData?.totalStakedLP || stakedData?.totalStakedLP.eq(0))
             return "0.00";
-        const bal = toEGLDD(pool.lpToken.decimals, liquidityData.ownLiquidity);
+        const bal = toEGLDD(farm.farm_token_decimal, stakedData.totalStakedLP);
         if (bal.lt(0.01)) return "< 0.01";
         return fractionFormat(bal.toNumber());
-    }, [pool, liquidityData]);
+    }, [farm, stakedData]);
+    const fTotalRewardAmt = useMemo(() => {
+        if (!stakedData || !stakedData?.totalRewardAmt) return "0.00";
+        const num = toEGLDD(ASH_TOKEN.decimals, stakedData.totalRewardAmt);
+        return fractionFormat(num.toNumber(), {
+            maximumFractionDigits: num.lt(0.01) ? 6 : 2,
+        });
+    }, [stakedData]);
 
     return (
         <>
@@ -110,13 +118,22 @@ function FarmCard({ farmData, viewType }: props) {
                                         {ASH_TOKEN.name} Earned
                                     </div>
                                     <div
-                                        className={`text-lg font-bold text-ash-gray-500`}
+                                        className={`text-lg font-bold ${
+                                            stakedData?.totalRewardAmt.gt(0)
+                                                ? "text-white"
+                                                : "text-ash-gray-500"
+                                        }`}
                                     >
-                                        0.00
+                                        {fTotalRewardAmt}
                                     </div>
                                 </div>
                                 <button
-                                    className={`clip-corner-1 clip-corner-br w-[7.25rem] h-14 text-center flex items-center justify-center text-sm font-bold opacity-30 bg-ash-dark-400`}
+                                    className={`clip-corner-1 clip-corner-br w-[7.25rem] h-14 text-center flex items-center justify-center text-sm font-bold ${
+                                        stakedData?.totalRewardAmt.gt(0)
+                                            ? "bg-ash-cyan-500 text-ash-dark-400"
+                                            : "bg-ash-dark-400 opacity-30"
+                                    }`}
+                                    onClick={() => claimReward(farm)}
                                 >
                                     Harvest
                                 </button>
@@ -128,17 +145,17 @@ function FarmCard({ farmData, viewType }: props) {
                                     </div>
                                     <div
                                         className={`text-lg font-bold ${
-                                            displayOwnLP === "0.00"
+                                            displayStakedLP === "0.00"
                                                 ? "text-ash-gray-500"
                                                 : "text-white"
                                         }`}
                                     >
-                                        {displayOwnLP}
+                                        {displayStakedLP}
                                     </div>
                                 </div>
                                 <div>
-                                    {!stakedData ? (
-                                        <div className="flex space-x-2 py-0.5">
+                                    {stakedData ? (
+                                        <div className="flex space-x-2 h-14 items-center">
                                             <button
                                                 className="w-[3.375rem] h-[3.375rem] clip-corner-1 clip-corner-br bg-ash-dark-400 flex items-center justify-center"
                                                 onClick={() =>
@@ -179,18 +196,18 @@ function FarmCard({ farmData, viewType }: props) {
                 </div>
             )}
             {viewType === ViewType.List && (
-                <div className="px-10 py-7.5 flex items-center space-x-7.5">
+                <div className="px-4 lg:px-10 py-2 md:py-7.5 flex items-center space-x-2 lg:space-x-7.5">
                     <div className="flex-grow flex items-center space-x-2">
-                        <div className="flex space-x-6 flex-grow overflow-hidden">
+                        <div className="flex space-x-2 md:space-x-6 flex-grow overflow-hidden">
                             <div className="flex">
-                                <div className="w-9 h-9">
+                                <div className="w-4 h-4 md:w-6 md:h-6 lg:w-9 lg:h-9">
                                     <Image
                                         src={token0.icon}
                                         alt={`${token0.name} icon`}
                                         layout="responsive"
                                     />
                                 </div>
-                                <div className="w-9 h-9 -ml-4.5 mt-4.5">
+                                <div className="w-4 h-4 -ml-1 md:w-6 md:h-6 lg:w-9 lg:h-9 md:-ml-3 lg:-ml-4.5 md:mt-3 lg:mt-4.5">
                                     <Image
                                         src={token1.icon}
                                         alt={`${token1.name} icon`}
@@ -198,44 +215,45 @@ function FarmCard({ farmData, viewType }: props) {
                                     />
                                 </div>
                             </div>
-                            <div className="flex flex-col text-lg font-bold space-y-2 leading-tight">
+                            <div className="flex md:flex-col text-xs lg:text-lg font-bold md:space-y-2 leading-tight">
                                 <div>{token0.name}</div>
+                                <div className="md:hidden"> & </div>
                                 <div>{token1.name}</div>
                             </div>
                         </div>
                         {/* emission APR */}
-                        <div className="flex-shrink-0 w-[18%] text-ash-cyan-500 text-lg font-bold">
+                        <div className="flex-shrink-0 w-[18%] text-ash-cyan-500 text-xs lg:text-lg font-bold">
                             {emissionAPR}%
                         </div>
                         {/* ash Earned */}
-                        <div className="flex-shrink-0 w-[18%] bg-stake-dark-500 h-12 px-3.5 flex items-center justify-end text-right text-white text-lg font-bold">
-                            Comming soon
+                        <div className="flex-shrink-0 w-1/5 lg:w-[18%] bg-stake-dark-500 h-8 sm:h-10 lg:h-12 px-3.5 hidden md:flex items-center justify-end text-right text-white text-xs lg:text-lg font-bold">
+                            {fTotalRewardAmt}
                         </div>
                         {/* LP staked */}
-                        <div className="flex-shrink-0 w-[18%] bg-stake-dark-500 h-12 px-3.5 flex items-center justify-end text-right text-white text-lg font-bold">
-                            LP staked
+                        <div className="flex-shrink-0 w-1/5 lg:w-[18%] bg-stake-dark-500 h-8 sm:h-10 lg:h-12 px-3.5 hidden md:flex items-center justify-end text-right text-white text-xs lg:text-lg font-bold">
+                            {displayStakedLP}
                         </div>
                         {/* Total liquidity */}
-                        <div className="flex-shrink-0 w-[18%] bg-stake-dark-500 h-12 px-3.5 flex items-center justify-end text-right text-white text-xs font-bold">
+                        <div className="flex-shrink-0 w-1/3 md:w-1/5 lg:w-[18%] bg-stake-dark-500 h-8 sm:h-10 lg:h-12 px-3.5 flex items-center justify-end text-right text-white text-xs font-bold">
                             ${TVL}
                         </div>
                     </div>
-                    <div className="flex items-center space-x-2">
+                    <div className="hidden sm:flex items-center space-x-2">
                         <button
-                            className={`clip-corner-1 clip-corner-br h-12 w-[6.5rem] flex items-center justify-center text-center font-bold underline text-ash-cyan-500 bg-ash-dark-400`}
+                            className={`clip-corner-1 clip-corner-br h-10 lg:h-12 w-[5.5rem] lg:w-[6.5rem] flex items-center justify-center text-center font-bold underline text-ash-cyan-500 bg-ash-dark-400 text-xs`}
                         >
                             Harvest
                         </button>
                         {stakedData ? (
                             <div className="flex space-x-2 py-0.5">
                                 <button
-                                    className="w-12 h-12 clip-corner-1 clip-corner-br bg-ash-dark-400 flex items-center justify-center"
+                                    className="w-10 lg:w-12 h-10 lg:h-12 clip-corner-1 clip-corner-br bg-ash-dark-400 flex items-center justify-center"
                                     onClick={() => setOpenUnstakeLP(true)}
                                 >
                                     <ICMinus className="w-3 h-auto text-yellow-600" />
                                 </button>
                                 <button
-                                    className="w-12 h-12 clip-corner-1 clip-corner-bl bg-ash-dark-400 flex items-center justify-center"
+                                    className="w-10 lg:w-12 h-10 lg:h-12 clip-corner-1 clip-corner-bl bg-ash-dark-400 flex items-center justify-center"
                                     onClick={() => setOpenStakeLP(true)}
                                 >
                                     <ICPlus className="w-3 h-auto text-ash-cyan-500" />
@@ -243,7 +261,7 @@ function FarmCard({ farmData, viewType }: props) {
                             </div>
                         ) : (
                             <button
-                                className={`clip-corner-1 clip-corner-br h-12 w-[6.5rem] flex items-center justify-center text-center font-bold underline bg-ash-cyan-500 text-ash-dark-400`}
+                                className={`clip-corner-1 clip-corner-br h-10 lg:h-12 w-[5.5rem] lg:w-[6.5rem] flex items-center justify-center text-center font-bold underline bg-ash-cyan-500 text-ash-dark-400 text-xs`}
                             >
                                 Stake LP
                             </button>

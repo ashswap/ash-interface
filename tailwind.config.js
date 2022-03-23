@@ -53,6 +53,7 @@ module.exports = {
                 "ash-gray": {
                     400: "#C4C4C4",
                     500: "#B7B7B7",
+                    600: "#757391"
                 },
                 "ash-green": {
                     500: "#00FF75"

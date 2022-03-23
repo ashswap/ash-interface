@@ -1,7 +1,7 @@
 import HeadlessModal, {
     HeadlessModalDefaultHeader,
 } from "components/HeadlessModal";
-import { FarmsState } from "context/farms";
+import { FarmsState, useFarms } from "context/farms";
 import { useScreenSize } from "hooks/useScreenSize";
 import { Unarray } from "interface/utilities";
 import React, { useCallback, useMemo, useState } from "react";
@@ -18,26 +18,33 @@ type props = {
     farmData: Unarray<FarmsState["farmRecords"]>;
 };
 const StakeLPContent = ({ open, onClose, farmData }: props) => {
-    const { pool, poolStats } = farmData;
+    const { pool, poolStats, farm } = farmData;
     const [token0, token1] = pool.tokens;
     const [isAgree, setIsAgree] = useState(false);
     const {balances, insufficientEGLD} = useWallet();
     const [stakeAmt, setStakeAmt] = useState<BigNumber>(new BigNumber(0));
     const [rawStakeAmt, setRawStakeAmt] = useState("");
+    const {enterFarm} = useFarms();
     const LPBalance = useMemo(() => balances[pool.lpToken.id], [balances, pool.lpToken]);
     const setMaxStakeAmt = useCallback(() => {
         if(!LPBalance) return;
-        setStakeAmt(LPBalance.balance); setRawStakeAmt(toEGLDD(pool.lpToken.decimals, LPBalance.balance.toString()).toString(10))
+        setStakeAmt(LPBalance.balance); setRawStakeAmt(toEGLDD(pool.lpToken.decimals, LPBalance.balance).toString(10))
     }, [LPBalance, pool]);
     const lpName = useMemo(() => {
         return `LP-${token0.name}${token1.name}`;
     }, [token0.name, token1.name]);
+    const insufficientLP = useMemo(() => {
+        return !LPBalance || LPBalance.balance.eq(0) || stakeAmt.gt(LPBalance.balance);
+    }, [LPBalance, stakeAmt]);
     const canStake = useMemo(() => {
-        return isAgree && stakeAmt.gt(0);
-    }, [isAgree, stakeAmt]);
-    const stake = useCallback(() => {
-
-    }, []);
+        return isAgree && stakeAmt.gt(0) && !insufficientLP && !insufficientEGLD;
+    }, [isAgree, stakeAmt, insufficientLP, insufficientEGLD]);
+    const stake = useCallback(async() => {
+        const tx = await enterFarm(stakeAmt, farm);
+        if(tx && onClose){
+            onClose()
+        }
+    }, [enterFarm, stakeAmt, farm, onClose]);
     return <div className="mt-3.5 px-6 lg:px-20 pb-12 overflow-auto">
     <div className="text-2xl font-bold text-ash-cyan-500 mb-9 lg:mb-14">
         Stake {lpName}
@@ -76,7 +83,7 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
                         Input Amount
                     </div>
                     <InputCurrency
-                        className="w-full text-white text-lg font-bold bg-ash-dark-400 h-14 lg:h-18 px-6 flex items-center text-right outline-none"
+                        className={`w-full text-white text-lg font-bold bg-ash-dark-400 h-14 lg:h-18 px-6 flex items-center text-right outline-none border ${insufficientLP ? "border-ash-purple-500" : "border-transparent"}`}
                         value={rawStakeAmt}
                         onChange={(e) => {
                             if(!LPBalance) return;
@@ -85,14 +92,8 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
                                 pool.lpToken,
                                 raw
                             );
-                            if (
-                                lockAmt.gt(LPBalance.balance)
-                            ) {
-                                setMaxStakeAmt();
-                            } else {
-                                setRawStakeAmt(raw);
+                            setRawStakeAmt(raw);
                                 setStakeAmt(lockAmt);
-                            }
                         }}
                     />
                     <div className="text-right text-2xs lg:text-xs mt-2">
@@ -165,10 +166,10 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
         <div className="w-full sm:w-1/3 lg:w-[17.8125rem] flex-shrink-0">
             <div className="border-notch">
                 <button
-                    className={`clip-corner-1 clip-corner-tl transition w-full h-12 flex items-center justify-center text-sm font-bold text-stake-dark-400 ${
+                    className={`clip-corner-1 clip-corner-tl transition w-full h-12 flex items-center justify-center text-sm font-bold ${
                         canStake
-                            ? "bg-ash-cyan-500"
-                            : "bg-ash-dark-500"
+                            ? "bg-ash-cyan-500 text-stake-dark-400"
+                            : "bg-ash-dark-500 text-white"
                     }`}
                     disabled={!canStake}
                     onClick={() => canStake && stake()}
@@ -202,7 +203,7 @@ function StakeLPModal(props: props) {
                 <HeadlessModalDefaultHeader
                     onClose={() => onClose && onClose()}
                 />
-                {open && <StakeLPContent {...props}/>}
+                <StakeLPContent {...props}/>
             </div>
         </HeadlessModal>
     );

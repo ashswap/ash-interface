@@ -114,13 +114,21 @@ export const ContractsProvider = ({children}: any) => {
         },
         [dapp.address, dapp.dapp.proxy, dapp.dapp.provider, createTransaction]
     );
+    const sendMultipleTxs = useCallback(async (txs: Transaction[]) => {
+        return await dapp.dapp.proxy.doPostGeneric(
+            `transaction/send-multiple`,
+            txs.map((tx) => tx.toPlainObject()),
+            (res) => res?.txsHashes || []
+        );
+    }, [dapp.dapp.proxy]);
 
     return <context.Provider value={{
         ...initContractsState,
         getTokenInLP,
         getLPValue,
         createTransaction,
-        callContract
+        callContract,
+        sendMultipleTxs
 
     }}>
         {children}

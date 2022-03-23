@@ -3,8 +3,8 @@ import React, { ReactElement } from "react";
 import ICArrowRight from "assets/svg/arrow-right.svg";
 import GovStats from "views/stake/gov/GovStats";
 import FarmsProvider from "context/farms";
-import FarmStats from "views/stake/farm/FarmStats";
-import FarmLayout from "views/stake/farm/FarmLayout";
+import FarmStats from "views/stake/farms/FarmStats";
+import FarmLayout from "views/stake/farms/FarmLayout";
 
 function FarmsPage() {
     return (
