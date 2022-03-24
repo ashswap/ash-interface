@@ -22,7 +22,7 @@ import {
 import { notification } from "antd";
 import BigNumber from "bignumber.js";
 import { FARMS } from "const/farms";
-import { gasLimit, network } from "const/network";
+import { blockTimeMs, gasLimit, network } from "const/network";
 import pools from "const/pool";
 import useContracts from "context/contracts";
 import { useDappContext } from "context/dapp";
@@ -82,6 +82,10 @@ type FarmRecord = {
         totalStakedLP: BigNumber;
         totalRewardAmt: BigNumber;
     };
+    ashPerBlock: BigNumber;
+    farmTokenSupply: BigNumber;
+    totalLiquidityValue: BigNumber;
+    emissionAPR: BigNumber;
     /** own LP tokens*/
     liquidityData?: {
         /** number of own LP token*/
@@ -111,7 +115,7 @@ export type FarmsState = {
         amtWei: BigNumber,
         farm: IFarm
     ) => Promise<TransactionHash | null>;
-    claimReward: (farm: IFarm) => void;
+    claimReward: (farm: IFarm) => Promise<void>;
     exitFarm: (
         lpAmt: BigNumber,
         farm: IFarm
@@ -130,9 +134,9 @@ const initState: FarmsState = {
     setStakedOnly: emptyFunc,
     setInactive: emptyFunc,
     enterFarm: () => Promise.resolve(null),
-    claimReward: emptyFunc,
+    claimReward: () => Promise.resolve(),
     exitFarm: () => Promise.resolve({}),
-    estimateRewardOnExit: () => Promise.resolve(new BigNumber(0))
+    estimateRewardOnExit: () => Promise.resolve(new BigNumber(0)),
 };
 const FarmsContext = createContext<FarmsState>(initState);
 export const useFarms = () => {
@@ -150,7 +154,11 @@ const FarmsProvider = ({ children }: any) => {
     const [deboundKeyword] = useDebounce(keyword, 500);
     const [stakedOnly, setStakedOnly] = useState(false);
     const [inactive, setInactive] = useState(false);
-    const { getTokenInLP, getLPValue, createTransaction, sendMultipleTxs } = useContracts();
+    const [blockRewardMap, setBlockRewardMap] = useState<
+        Record<string, BigNumber>
+    >({});
+    const { getTokenInLP, getLPValue, createTransaction, sendMultipleTxs } =
+        useContracts();
     const dapp = useDappContext();
     const { lpTokens, tokenPrices, balances } = useWallet();
     // fetch pool stats
@@ -183,6 +191,62 @@ const FarmsProvider = ({ children }: any) => {
         [dapp.loggedIn, dapp.dapp, dapp.address]
     );
 
+    const getBlockReward = useCallback(
+        async (farmAddress: string) => {
+            return await dapp.dapp.proxy
+                .queryContract(
+                    new Query({
+                        address: new Address(farmAddress),
+                        func: new ContractFunction("getPerBlockRewardAmount"),
+                    })
+                )
+                .then(({ returnData }) => {
+                    return new BigNumber(
+                        Buffer.from(returnData[0], "base64").toString("hex"),
+                        16
+                    );
+                })
+                .catch(() => new BigNumber(0));
+        },
+        [dapp.dapp.proxy]
+    );
+
+    const getFarmBlockRewardMap = useCallback(async () => {
+        const rewards = await Promise.all(
+            FARMS.map((f) => getBlockReward(f.farm_address))
+        );
+        const entries: [string, BigNumber][] = rewards.map((reward, i) => [
+            FARMS[i].farm_address,
+            reward,
+        ]);
+        const map = Object.fromEntries(entries);
+        setBlockRewardMap(map);
+    }, [getBlockReward]);
+
+    const getFarmTokenSupply = useCallback(
+        (farmAddress: string) => {
+            return dapp.dapp.proxy
+                .queryContract(
+                    new Query({
+                        address: new Address(farmAddress),
+                        func: new ContractFunction("getFarmTokenSupply"),
+                    })
+                )
+                .then(({ returnData }) => {
+                    return returnData[0]
+                        ? new BigNumber(
+                              Buffer.from(returnData[0], "base64").toString(
+                                  "hex"
+                              ),
+                              16
+                          )
+                        : new BigNumber(0);
+                })
+                .catch(() => new BigNumber(0));
+        },
+        [dapp.dapp.proxy]
+    );
+
     const getReward = useCallback(
         async (
             farm: IFarm,
@@ -190,7 +254,6 @@ const FarmsProvider = ({ children }: any) => {
             collection: string,
             nonce: number
         ) => {
-            
             if (!dapp.loggedIn) return new BigNumber(0);
             const data = await getSNFTAttrs(collection, nonce);
             if (!data?.attributes) return new BigNumber(0);
@@ -207,12 +270,15 @@ const FarmsProvider = ({ children }: any) => {
                 })
             );
             return new BigNumber(
-                res.returnData[0] ? Buffer.from(res.returnData[0], "base64").toString("hex") : 0,
+                res.returnData[0]
+                    ? Buffer.from(res.returnData[0], "base64").toString("hex")
+                    : 0,
                 16
             );
         },
         [dapp.loggedIn, getSNFTAttrs, dapp.dapp]
     );
+
     const getFarmRecords = useCallback(async () => {
         const records: FarmRecord[] = [];
         for (let i = 0; i < FARMS.length; i++) {
@@ -221,12 +287,35 @@ const FarmsProvider = ({ children }: any) => {
                 (val) => val.lpToken.id === f.farming_token_id
             );
             if (p) {
+                const farmTokenSupply = await getFarmTokenSupply(
+                    f.farm_address
+                );
+                const totalLiquidityValue = await getLPValue(
+                    farmTokenSupply,
+                    p
+                );
+                const ashPerBlock =
+                    blockRewardMap[f.farm_address] || new BigNumber(0);
+                const totalASH = toEGLDD(
+                    ASH_TOKEN.decimals,
+                    ashPerBlock
+                        .multipliedBy(365 * 24 * 60 * 60)
+                        .div(blockTimeMs / 1000)
+                );
+                const emissionAPR = totalASH
+                    .multipliedBy(tokenPrices[ASH_TOKEN.id] || 0)
+                    .multipliedBy(100)
+                    .div(totalLiquidityValue);
                 const record: FarmRecord = {
                     pool: p,
                     farm: f,
                     poolStats: poolStatsRecords?.find(
                         (stats) => stats.pool_address === p.address
                     ),
+                    ashPerBlock,
+                    farmTokenSupply,
+                    totalLiquidityValue,
+                    emissionAPR,
                 };
                 const ownLP = balances?.[p.lpToken.id]
                     ? balances?.[p.lpToken.id].balance
@@ -292,6 +381,9 @@ const FarmsProvider = ({ children }: any) => {
         getPortion,
         poolStatsRecords,
         getReward,
+        blockRewardMap,
+        getFarmTokenSupply,
+        tokenPrices,
     ]);
 
     const enterFarm = useCallback(
@@ -389,7 +481,7 @@ const FarmsProvider = ({ children }: any) => {
 
     const exitFarm = useCallback(
         async (lpAmt: BigNumber, farm: IFarm) => {
-            if(!dapp.loggedIn) return {};
+            if (!dapp.loggedIn) return {};
             const farmRecord = farmRecords.find(
                 (val) => val.farm.farm_address === farm.farm_address
             );
@@ -398,14 +490,11 @@ const FarmsProvider = ({ children }: any) => {
             const farmTokens = stakedData.farmTokens || [];
             let txs: Transaction[] = [];
             const entries = calcUnstakeEntries(lpAmt, farmTokens);
-            const exitFarmTxCreators = entries.map(({farmToken: {collection, nonce}, unstakeAmt}) => createExitFarmTx(unstakeAmt, collection, nonce, farm))
+            const exitFarmTxCreators = entries.map(
+                ({ farmToken: { collection, nonce }, unstakeAmt }) =>
+                    createExitFarmTx(unstakeAmt, collection, nonce, farm)
+            );
             txs = await Promise.all(exitFarmTxCreators);
-            for(let i = 1; i< txs.length; i++){
-                const tx = txs[i];
-                tx.setNonce(
-                    txs[i - 1].getNonce().increment()
-                );
-            }
             const signedTxs = await dapp.dapp.provider.signTransactions(
                 txs.filter((tx) => !!tx) as Transaction[]
             );
@@ -421,7 +510,13 @@ const FarmsProvider = ({ children }: any) => {
             });
             return sentTxs;
         },
-        [createExitFarmTx, farmRecords, dapp.dapp, dapp.loggedIn, sendMultipleTxs]
+        [
+            createExitFarmTx,
+            farmRecords,
+            dapp.dapp,
+            dapp.loggedIn,
+            sendMultipleTxs,
+        ]
     );
 
     const estimateRewardOnExit = useCallback(
@@ -429,7 +524,8 @@ const FarmsProvider = ({ children }: any) => {
             const farmRecord = farmRecords.find(
                 (val) => val.farm.farm_address === farm.farm_address
             );
-            if(!farmRecord?.stakedData?.farmTokens.length) return new BigNumber(0);
+            if (!farmRecord?.stakedData?.farmTokens.length)
+                return new BigNumber(0);
             const entries = calcUnstakeEntries(
                 lpAmt,
                 farmRecord.stakedData.farmTokens
@@ -474,6 +570,7 @@ const FarmsProvider = ({ children }: any) => {
         },
         [createTransaction, dapp.address, dapp.loggedIn]
     );
+
     const claimReward = useCallback(
         async (farm: IFarm) => {
             const farmRecord = farmRecords.find(
@@ -492,9 +589,6 @@ const FarmsProvider = ({ children }: any) => {
                     t.nonce,
                     farm
                 );
-                tx.setNonce(
-                    txs[i - 1]?.getNonce().increment() || tx.getNonce()
-                );
                 txs.push(tx);
             }
             const signedTxs = await dapp.dapp.provider.signTransactions(txs);
@@ -511,6 +605,10 @@ const FarmsProvider = ({ children }: any) => {
         },
         [createClaimRewardTx, dapp.dapp, farmRecords, sendMultipleTxs]
     );
+
+    useEffect(() => {
+        getFarmBlockRewardMap();
+    }, [getFarmBlockRewardMap]);
 
     useEffect(() => {
         getFarmRecords();
@@ -532,17 +630,15 @@ const FarmsProvider = ({ children }: any) => {
         }
         switch (sortOption) {
             case "apr":
-                result = result.sort(
-                    (x, y) =>
-                        (y.poolStats?.emission_apr || 0) -
-                        (x.poolStats?.emission_apr || 0)
+                result = result.sort((x, y) =>
+                    y.emissionAPR.minus(x.emissionAPR).toNumber()
                 );
                 break;
             case "liquidity":
-                result = result.sort(
-                    (x, y) =>
-                        (y.poolStats?.total_value_locked || 0) -
-                        (x.poolStats?.total_value_locked || 0)
+                result = result.sort((x, y) =>
+                    y.totalLiquidityValue
+                        .minus(x.totalLiquidityValue)
+                        .toNumber()
                 );
                 break;
             case "volume":
@@ -574,7 +670,7 @@ const FarmsProvider = ({ children }: any) => {
                 enterFarm,
                 claimReward,
                 exitFarm,
-                estimateRewardOnExit
+                estimateRewardOnExit,
             }}
         >
             {children}

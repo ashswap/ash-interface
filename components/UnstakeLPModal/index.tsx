@@ -17,13 +17,14 @@ import { theme } from "tailwind.config";
 import { useDebounce } from "use-debounce";
 import { fractionFormat } from "helper/number";
 import { ASH_TOKEN } from "const/tokens";
+import { blockTimeMs } from "const/network";
 type props = {
     open: boolean;
     onClose: () => void;
     farmData: Unarray<FarmsState["farmRecords"]>;
 };
 const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
-    const { pool, farm, stakedData } = farmData;
+    const { pool, farm, stakedData, ashPerBlock, farmTokenSupply, emissionAPR } = farmData;
     const [token0, token1] = pool.tokens;
     const [isAgree, setIsAgree] = useState(false);
     const [unStakeAmt, setUnStakeAmt] = useState<BigNumber>(new BigNumber(0));
@@ -43,6 +44,27 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
             )
         );
     }, [stakedData, farm]);
+
+    const ashPerDay = useMemo(() => {
+        if (!stakedData) return new BigNumber(0);
+        const totalAshPerDay = ashPerBlock
+            .multipliedBy(24 * 60 * 60)
+            .div(blockTimeMs / 1000);
+        const shareOfFarm = stakedData.totalStakedLP.div(farmTokenSupply);
+        return totalAshPerDay.multipliedBy(shareOfFarm);
+    }, [stakedData, farmTokenSupply, ashPerBlock]);
+
+    const afterUnstakeAshPerDay = useMemo(() => {
+        if (!stakedData) return new BigNumber(0);
+        const totalAshPerDay = ashPerBlock
+            .multipliedBy(24 * 60 * 60)
+            .div(blockTimeMs / 1000);
+        const newStaked = stakedData.totalStakedLP.minus(unStakeAmt);
+        if (newStaked.lte(0)) return new BigNumber(0);
+        const shareOfFarm = newStaked.div(farmTokenSupply.minus(unStakeAmt));
+        return totalAshPerDay.multipliedBy(shareOfFarm);
+    }, [stakedData, farmTokenSupply, ashPerBlock, unStakeAmt]);
+
     const lpName = useMemo(() => {
         return `LP-${token0.name}${token1.name}`;
     }, [token0.name, token1.name]);
@@ -67,7 +89,10 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
     const onChangePct = useCallback(
         (pct: number) => {
             if (!stakedData) return;
-            const amt = stakedData.totalStakedLP.multipliedBy(pct).div(100).integerValue();
+            const amt = stakedData.totalStakedLP
+                .multipliedBy(pct)
+                .div(100)
+                .integerValue();
             setUnStakeAmt(amt);
             setRawStakeAmt(toEGLDD(farm.farm_token_decimal, amt).toString(10));
         },
@@ -87,8 +112,10 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
     }, [unStakeAmt, stakedData]);
 
     useEffect(() => {
-        estimateRewardOnExit(deboundedUnstakeAmt, farm).then(val => setRewardOnExit(val));
-    }, [deboundedUnstakeAmt, farm, estimateRewardOnExit])
+        estimateRewardOnExit(deboundedUnstakeAmt, farm).then((val) =>
+            setRewardOnExit(val)
+        );
+    }, [deboundedUnstakeAmt, farm, estimateRewardOnExit]);
 
     return (
         <div className="mt-3.5 px-6 lg:px-20 pb-12 overflow-auto">
@@ -97,7 +124,7 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
             </div>
             <div className="sm:flex sm:space-x-8 lg:space-x-24 mb-18">
                 <div className="flex flex-col flex-grow mb-16 sm:mb-0">
-                    <div className="w-full grid grid-cols-2 gap-x-4 lg:gap-x-7.5 mb-11">
+                    <div className="w-full grid md:grid-cols-2 gap-y-6 gap-x-4 lg:gap-x-7.5 mb-11">
                         <div>
                             <div className="text-ash-gray-500 text-xs lg:text-sm font-bold mb-2 lg:mb-4">
                                 Token
@@ -136,7 +163,6 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
                                 }`}
                                 value={rawStakeAmt}
                                 onChange={(e) => {
-                                    if (!stakedData?.totalStakedLP) return;
                                     const raw = e.target.value.trim();
                                     const amt = toWei(pool.lpToken, raw);
                                     setRawStakeAmt(raw);
@@ -201,9 +227,20 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
                         <div className="h-14 lg:h-18 pl-7 pr-4.5 flex items-center justify-between bg-ash-dark-400/30 text-ash-gray-600">
                             <div className="flex items-center">
                                 <div className="bg-pink-600 w-4 h-4 rounded-full mr-2"></div>
-                                <div className="text-sm lg:text-lg font-bold">ASH</div>
+                                <div className="text-sm lg:text-lg font-bold">
+                                    ASH
+                                </div>
                             </div>
-                            <div className="text-sm lg:text-lg font-bold">{rewardOnExit.eq(0) ? "0.00" : fractionFormat(toEGLDD(ASH_TOKEN.decimals, rewardOnExit).toNumber())}</div>
+                            <div className="text-sm lg:text-lg font-bold">
+                                {rewardOnExit.eq(0)
+                                    ? "0.00"
+                                    : fractionFormat(
+                                          toEGLDD(
+                                              ASH_TOKEN.decimals,
+                                              rewardOnExit
+                                          ).toNumber()
+                                      )}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -216,16 +253,38 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
                             <div className="text-ash-gray-500 text-xs mb-2">
                                 ASH earn per day
                             </div>
-                            <div className="text-white text-lg font-bold">
-                                _
+                            <div
+                                className={`text-lg font-bold ${
+                                    unStakeAmt.gt(0)
+                                        ? "text-ash-gray-500 line-through"
+                                        : "text-white"
+                                }`}
+                            >
+                                {fractionFormat(
+                                    toEGLDD(
+                                        ASH_TOKEN.decimals,
+                                        ashPerDay
+                                    ).toNumber()
+                                )}
                             </div>
+                            {unStakeAmt.gt(0) && (
+                                <div className="text-white text-lg font-bold">
+                                    {fractionFormat(
+                                        toEGLDD(
+                                            ASH_TOKEN.decimals,
+                                            afterUnstakeAshPerDay
+                                        ).toNumber()
+                                    )}
+                                </div>
+                            )}
                         </div>
                         <div>
                             <div className="text-ash-gray-500 text-xs mb-2">
                                 Emission APR
                             </div>
                             <div className="text-white text-lg font-bold">
-                                {farmData.poolStats?.emission_apr?.toLocaleString("en-US", {maximumFractionDigits: 2}) || "0.00"}%
+                                {fractionFormat(emissionAPR.toNumber())}
+                                %
                             </div>
                         </div>
                     </div>

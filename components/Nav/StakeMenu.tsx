@@ -12,10 +12,10 @@ import ICStake from "assets/svg/stake.svg";
 import ICChevronDown from "assets/svg/chevron-down.svg";
 const SOCIALS = [
     {
-        name: "Farms",
+        name: "Liquidity Stake",
         url: "/stake/farms",
     },
-    { name: "Governance", url: "/stake/gov" },
+    { name: "Governance Stake", url: "/stake/gov" },
 ];
 function HeadlessLink(
     props: React.DetailedHTMLProps<

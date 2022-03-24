@@ -3,6 +3,7 @@ import BigNumber from "bignumber.js";
 import { gasLimit, gasPrice, network } from "const/network";
 import { useDappContext } from "context/dapp";
 import { useWallet } from "context/wallet";
+import { getLatestNonce, useGetAccount, useSetNonce } from "helper/accountMethods";
 import { toEGLDD } from "helper/balance";
 import { queryContractParser } from "helper/serializer";
 import IPool from "interface/pool";
@@ -25,6 +26,8 @@ const useContracts = () => {
 
 export const ContractsProvider = ({children}: any) => {
     const dapp = useDappContext();
+    const setNonce = useSetNonce();
+    const getAccount = useGetAccount();
     const {tokenPrices} = useWallet();
     const getTokenInLP = useCallback(
         (ownLiquidity: BigNumber, poolAddress: string) => {
@@ -80,9 +83,9 @@ export const ContractsProvider = ({children}: any) => {
                 return emptyTx;
             }
 
-            let account = await dapp.dapp.proxy.getAccount(
-                new Address(dapp.address)
-            );
+            let account = await getAccount(dapp.address);
+
+            const nonce = getLatestNonce(account);
 
             let contract = new SmartContract({
                 address,
@@ -91,16 +94,17 @@ export const ContractsProvider = ({children}: any) => {
             let tx = contract.call(arg);
             tx = new Transaction({
                 chainID: new ChainID(network.id),
-                nonce: account.nonce,
+                nonce,
                 data: tx.getData(),
                 receiver: address,
                 gasPrice: new GasPrice(gasPrice),
                 gasLimit: new GasLimit(gasLimit),
                 version: tx.getVersion(),
             });
+            setNonce(nonce.increment().valueOf());
             return tx;
         },
-        [dapp.address, dapp.dapp.proxy, dapp.dapp.provider]
+        [dapp.address, dapp.dapp.proxy, dapp.dapp.provider, getAccount, setNonce]
     );
     const callContract = useCallback(
         async (address: Address, arg: CallArguments) => {
