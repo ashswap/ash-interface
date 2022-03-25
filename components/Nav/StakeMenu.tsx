@@ -67,7 +67,7 @@ function StakeMenu() {
                             leaveFrom="transform opacity-100 scale-100"
                             leaveTo="transform opacity-0 scale-95"
                         >
-                            <Menu.Items className="absolute left-0 top-[100%] mt-2 bg-ash-dark-700 py-6 w-[10.5rem] outline-none">
+                            <Menu.Items className="absolute left-0 top-[100%] mt-2 bg-ash-dark-700 py-6 w-max min-w-[10.5rem] outline-none">
                                 {SOCIALS.map(({ url, name }) => {
                                     return (
                                         <Menu.Item key={name}>
