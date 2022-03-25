@@ -45,6 +45,11 @@ import { IToken } from "interface/token";
 import IPool from "interface/pool";
 import pools from "const/pool";
 import useContracts from "context/contracts";
+import {
+    useCreateTransaction,
+    useSendMultipleTxs,
+    useSignTransactions,
+} from "helper/transactionMethods";
 const estimateVeASH = (weiAmt: BigNumber, lockDays: number) => {
     // ratio: lock 1 ASH in 1 year(365 days) -> 0.25 veASH
     const veASHPerDay = toEGLDD(ASH_TOKEN.decimals, weiAmt).multipliedBy(
@@ -111,8 +116,10 @@ const StakeGovProvider = ({ children }: any) => {
     const [rewardValue, setRewardValue] = useState<BigNumber>(new BigNumber(0));
     const [rewardLPToken, setRewardLPToken] = useState<IPool>();
     const [totalLockedPct, setTotalLockedPct] = useState(0);
-    const { callContract, createTransaction, getLPValue, sendMultipleTxs } =
-        useContracts();
+    const { callContract, getLPValue } = useContracts();
+    const createTransaction = useCreateTransaction();
+    const sendMultipleTxs = useSendMultipleTxs();
+    const signTxs = useSignTransactions();
     const dapp = useDappContext();
 
     useEffect(() => {
@@ -301,7 +308,7 @@ const StakeGovProvider = ({ children }: any) => {
                 txs.push(increaseLockTSTx);
             }
             if (!txs.length) return [];
-            const signedTxs = await dapp.dapp.provider.signTransactions(txs);
+            const signedTxs = await signTxs(...txs);
             const data = await sendMultipleTxs(signedTxs);
 
             let key = `open${Date.now()}`;
@@ -386,13 +393,7 @@ const StakeGovProvider = ({ children }: any) => {
                     args: [new AddressValue(new Address(dapp.address))],
                 }
             );
-            const signedTxs = await dapp.dapp.provider.signTransactions([
-                tx1,
-                tx2,
-                tx3,
-                tx4,
-                tx5,
-            ]);
+            const signedTxs = await signTxs(tx1, tx2, tx3, tx4, tx5);
             const txs = await sendMultipleTxs(signedTxs);
             let key = `open${Date.now()}`;
             notification.open({

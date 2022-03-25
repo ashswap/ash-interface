@@ -31,11 +31,11 @@ const Card = ({ children }: any) => {
             }}
         >
             <div
-                className="absolute clip-corner-tr-[0.875rem] clip-corner-bevel inset-[1px] z-[-1]"
-                style={{
-                    backgroundImage:
-                        "linear-gradient(180deg, #31314E 0%, #1F2131 100%)",
-                }}
+                className="absolute clip-corner-tr-[0.875rem] clip-corner-bevel inset-[1px] z-[-1] bg-stake-dark-400"
+                // style={{
+                //     backgroundImage:
+                //         "linear-gradient(180deg, #31314E 0%, #1F2131 100%)",
+                // }}
             ></div>
 
             {children}

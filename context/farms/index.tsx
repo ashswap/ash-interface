@@ -50,6 +50,13 @@ import {
 import useSWR from "swr";
 import { useDebounce } from "use-debounce";
 import { ASH_TOKEN } from "const/tokens";
+import {
+    useCreateTransaction,
+    useSendMultipleTxs,
+    useSendTransaction,
+    useSignTransaction,
+    useSignTransactions,
+} from "helper/transactionMethods";
 const calcUnstakeEntries = (
     weiAmt: BigNumber,
     farmTokens: Required<FarmRecord>["stakedData"]["farmTokens"]
@@ -157,8 +164,12 @@ const FarmsProvider = ({ children }: any) => {
     const [blockRewardMap, setBlockRewardMap] = useState<
         Record<string, BigNumber>
     >({});
-    const { getTokenInLP, getLPValue, createTransaction, sendMultipleTxs } =
-        useContracts();
+    const { getTokenInLP, getLPValue } = useContracts();
+    const createTransaction = useCreateTransaction();
+    const signTxs = useSignTransactions();
+    const signTx = useSignTransaction();
+    const sendTx = useSendTransaction();
+    const sendMultipleTxs = useSendMultipleTxs();
     const dapp = useDappContext();
     const { lpTokens, tokenPrices, balances } = useWallet();
     // fetch pool stats
@@ -430,8 +441,8 @@ const FarmsProvider = ({ children }: any) => {
                         new TokenIdentifierValue(Buffer.from("enterFarm")),
                     ],
                 });
-                const signedTx = await dapp.dapp.provider.signTransaction(tx);
-                const hash = await dapp.dapp.proxy.sendTransaction(signedTx);
+                const signedTx = await signTx(tx);
+                const hash = await sendTx(signedTx);
                 notification.open({
                     message: `Stake succeed ${toEGLDD(
                         farm.farming_token_decimal,
@@ -453,7 +464,14 @@ const FarmsProvider = ({ children }: any) => {
             }
             return null;
         },
-        [dapp.loggedIn, dapp.dapp, dapp.address, createTransaction, farmRecords]
+        [
+            dapp.loggedIn,
+            dapp.address,
+            createTransaction,
+            farmRecords,
+            signTx,
+            sendTx,
+        ]
     );
 
     const createExitFarmTx = useCallback(
@@ -495,8 +513,8 @@ const FarmsProvider = ({ children }: any) => {
                     createExitFarmTx(unstakeAmt, collection, nonce, farm)
             );
             txs = await Promise.all(exitFarmTxCreators);
-            const signedTxs = await dapp.dapp.provider.signTransactions(
-                txs.filter((tx) => !!tx) as Transaction[]
+            const signedTxs = await signTxs(
+                ...(txs.filter((tx) => !!tx) as Transaction[])
             );
             const sentTxs = await sendMultipleTxs(signedTxs);
             notification.open({
@@ -591,7 +609,7 @@ const FarmsProvider = ({ children }: any) => {
                 );
                 txs.push(tx);
             }
-            const signedTxs = await dapp.dapp.provider.signTransactions(txs);
+            const signedTxs = await signTxs(...txs);
             await sendMultipleTxs(signedTxs);
             notification.open({
                 message: `Claim succeed ${toEGLDD(
@@ -603,7 +621,7 @@ const FarmsProvider = ({ children }: any) => {
                 onClick: () => {},
             });
         },
-        [createClaimRewardTx, dapp.dapp, farmRecords, sendMultipleTxs]
+        [signTxs, farmRecords, sendMultipleTxs, createClaimRewardTx]
     );
 
     useEffect(() => {
