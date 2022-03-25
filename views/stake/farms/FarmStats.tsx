@@ -11,9 +11,9 @@ import React, {
     useState,
 } from "react";
 
-function FarmStats() {
+function FarmStats({onClickAll}: {onClickAll?: () => void}) {
     const [harvesting, setHarvesting] = useState(false);
-    const { farmRecords, claimReward } = useFarms();
+    const { farmRecords, claimReward, setStakedOnly } = useFarms();
     const TVL = useMemo(() => {
         return farmRecords.reduce(
             (total, val) => total.plus(val.totalLiquidityValue),
@@ -52,7 +52,7 @@ function FarmStats() {
                     <h2 className="text-2xl font-bold text-white">
                         Your Summary
                     </h2>
-                    <span className="text-ash-cyan-500 text-lg font-bold">
+                    <span className="text-ash-cyan-500 text-lg font-bold cursor-pointer" onClick={() => {setStakedOnly(true); onClickAll && onClickAll()}}>
                         All
                     </span>
                 </div>
