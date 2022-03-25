@@ -305,7 +305,7 @@ const AddLiquidityModal = ({ open, onClose, poolData }: Props) => {
                     ? toEGLD(
                           pool.tokens[1],
                           rates[0].multipliedBy(new BigNumber(value)).toString()
-                      ).toFixed(3)
+                      ).toString(10)
                     : ""
             );
         },
@@ -324,7 +324,7 @@ const AddLiquidityModal = ({ open, onClose, poolData }: Props) => {
                     ? toEGLD(
                           pool.tokens[0],
                           rates[1].multipliedBy(new BigNumber(value)).toString()
-                      ).toFixed(3)
+                      ).toString(10)
                     : ""
             );
         },
@@ -422,7 +422,7 @@ const AddLiquidityModal = ({ open, onClose, poolData }: Props) => {
         const valueUsd1 = balance1.multipliedBy(tokenPrices[token1.id]);
         
         const num = valueUsd0.plus(valueUsd1).toNumber() || 0;
-        return num === 0 ? "0.000" : fractionFormat(num, {maximumFractionDigits: 3, minimumFractionDigits: 3});
+        return num === 0 ? "0.000" : fractionFormat(num, {maximumFractionDigits: 3});
     }, [pool, tokenPrices, value0Debounce, value1Debounce])
 
     return (
@@ -517,7 +517,7 @@ const AddLiquidityModal = ({ open, onClose, poolData }: Props) => {
                                 <div
                                     className="flex-1 overflow-hidden bg-ash-dark-700 text-right text-lg h-[4.5rem] px-5 outline-none flex items-center justify-end"
                                 >
-                                    {liquidityValue}
+                                    <span><span className="text-ash-gray-500">$ </span>{liquidityValue}</span>
                                 </div>
                             </div>
 
