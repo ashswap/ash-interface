@@ -123,6 +123,7 @@ export type FarmsState = {
         farm: IFarm
     ) => Promise<TransactionHash | null>;
     claimReward: (farm: IFarm) => Promise<void>;
+    claimAllReward: () => Promise<void>;
     exitFarm: (
         lpAmt: BigNumber,
         farm: IFarm
@@ -142,6 +143,7 @@ const initState: FarmsState = {
     setInactive: emptyFunc,
     enterFarm: () => Promise.resolve(null),
     claimReward: () => Promise.resolve(),
+    claimAllReward: () => Promise.resolve(),
     exitFarm: () => Promise.resolve({}),
     estimateRewardOnExit: () => Promise.resolve(new BigNumber(0)),
 };
@@ -589,6 +591,23 @@ const FarmsProvider = ({ children }: any) => {
         [createTransaction, dapp.address, dapp.loggedIn]
     );
 
+    const createClaimRewardTxs = useCallback(async (farmRecord: FarmRecord) => {
+        const { stakedData } = farmRecord;
+        const farmTokens = stakedData?.farmTokens || [];
+        const txs: Transaction[] = [];
+        for (let i = 0; i < farmTokens.length; i++) {
+            const t = farmTokens[i];
+            const tx = await createClaimRewardTx(
+                t.balance,
+                t.collection,
+                t.nonce,
+                farmRecord.farm
+            );
+            txs.push(tx);
+        }
+        return txs;
+    }, [createClaimRewardTx]);
+
     const claimReward = useCallback(
         async (farm: IFarm) => {
             const farmRecord = farmRecords.find(
@@ -597,18 +616,7 @@ const FarmsProvider = ({ children }: any) => {
             if (!farmRecord || !farmRecord.stakedData)
                 throw new Error("unable to claim reward");
             const { stakedData } = farmRecord;
-            const farmTokens = stakedData.farmTokens || [];
-            const txs: Transaction[] = [];
-            for (let i = 0; i < farmTokens.length; i++) {
-                const t = farmTokens[i];
-                const tx = await createClaimRewardTx(
-                    t.balance,
-                    t.collection,
-                    t.nonce,
-                    farm
-                );
-                txs.push(tx);
-            }
+            const txs = await createClaimRewardTxs(farmRecord);
             const signedTxs = await signTxs(...txs);
             await sendMultipleTxs(signedTxs);
             notification.open({
@@ -621,8 +629,32 @@ const FarmsProvider = ({ children }: any) => {
                 onClick: () => {},
             });
         },
-        [signTxs, farmRecords, sendMultipleTxs, createClaimRewardTx]
+        [signTxs, sendMultipleTxs, createClaimRewardTxs, farmRecords]
     );
+
+    const claimAllReward = useCallback(async () => {
+        let txs: Transaction[] = [];
+        let totalASH = new BigNumber(0);
+        for (let i = 0; i < farmRecords.length; i++) {
+            const val = farmRecords[i];
+            if (val?.stakedData?.totalRewardAmt.gt(0)) {
+                const temp = await createClaimRewardTxs(val.farm);
+                txs = [...txs, ...temp];
+                totalASH = totalASH.plus(val.stakedData.totalRewardAmt);
+            }
+        }
+        const signedTxs = await signTxs(...txs);
+        await sendMultipleTxs(signedTxs);
+        notification.open({
+            message: `Claim succeed ${toEGLDD(
+                ASH_TOKEN.decimals,
+                totalASH
+            )} ${ASH_TOKEN.name}`,
+            // icon: <IconNewTab />,
+
+            onClick: () => {},
+        });
+    }, [farmRecords, signTxs, sendMultipleTxs, createClaimRewardTxs])
 
     useEffect(() => {
         getFarmBlockRewardMap();
@@ -687,6 +719,7 @@ const FarmsProvider = ({ children }: any) => {
                 setInactive,
                 enterFarm,
                 claimReward,
+                claimAllReward,
                 exitFarm,
                 estimateRewardOnExit,
             }}
