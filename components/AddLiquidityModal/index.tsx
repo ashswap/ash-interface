@@ -28,6 +28,7 @@ import { useDappContext } from "context/dapp";
 import { PoolsState } from "context/pools";
 import { useWallet } from "context/wallet";
 import { toEGLD, toWei } from "helper/balance";
+import { fractionFormat } from "helper/number";
 import { useScreenSize } from "hooks/useScreenSize";
 import { IToken } from "interface/token";
 import { Unarray } from "interface/utilities";
@@ -97,16 +98,16 @@ const TokenInput = ({
                 style={{ fontSize: 10 }}
             >
                 <div style={{ marginLeft: "33.333%" }}>
-                    {isInsufficentFund ? (
-                        <>
+                    {isInsufficentFund && (
+                        <span>
                             Insufficient fund -{" "}
                             <Link href="/swap" passHref>
                                 <span className="text-insufficent-fund select-none cursor-pointer">
                                     Go trade!
                                 </span>
                             </Link>
-                        </>
-                    ) : null}
+                        </span>
+                    )}
                 </div>
                 <div>
                     <span>Balance: </span>
@@ -136,7 +137,6 @@ const AddLiquidityModal = ({ open, onClose, poolData }: Props) => {
     const dapp = useDappContext();
     // const provider = dapp.dapp.provider;
     const [rates, setRates] = useState<BigNumber[] | undefined>(undefined);
-    const [liquidity, setLiquidity] = useState<string>("");
     const { pool, poolStats, liquidityData } = poolData;
 
     // reset when open modal
@@ -145,7 +145,6 @@ const AddLiquidityModal = ({ open, onClose, poolData }: Props) => {
             setAgree(false);
             setValue0("");
             setValue1("");
-            setLiquidity("");
         }
     }, [open]);
 
@@ -302,10 +301,12 @@ const AddLiquidityModal = ({ open, onClose, poolData }: Props) => {
 
             setValue0(value);
             setValue1(
-                toEGLD(
-                    pool.tokens[1],
-                    rates[0].multipliedBy(new BigNumber(value)).toString()
-                ).toFixed(3)
+                value
+                    ? toEGLD(
+                          pool.tokens[1],
+                          rates[0].multipliedBy(new BigNumber(value)).toString()
+                      ).toString(10)
+                    : ""
             );
         },
         [rates, pool]
@@ -319,10 +320,12 @@ const AddLiquidityModal = ({ open, onClose, poolData }: Props) => {
 
             setValue1(value);
             setValue0(
-                toEGLD(
-                    pool.tokens[0],
-                    rates[1].multipliedBy(new BigNumber(value)).toString()
-                ).toFixed(3)
+                value
+                    ? toEGLD(
+                          pool.tokens[0],
+                          rates[1].multipliedBy(new BigNumber(value)).toString()
+                      ).toString(10)
+                    : ""
             );
         },
         [rates, pool]
@@ -404,9 +407,9 @@ const AddLiquidityModal = ({ open, onClose, poolData }: Props) => {
     //         });
     // }, [value0Debounce, value1Debounce, pool, proxy]);
 
-    useEffect(() => {
+    const liquidityValue = useMemo(() => {
         if (!value0Debounce || !value1Debounce) {
-            return;
+            return "0.000";
         }
 
         let token0 = pool.tokens[0];
@@ -417,9 +420,10 @@ const AddLiquidityModal = ({ open, onClose, poolData }: Props) => {
 
         const valueUsd0 = balance0.multipliedBy(tokenPrices[token0.id]);
         const valueUsd1 = balance1.multipliedBy(tokenPrices[token1.id]);
-
-        setLiquidity(valueUsd0.plus(valueUsd1).toFixed(3));
-    }, [pool, tokenPrices, value0Debounce, value1Debounce]);
+        
+        const num = valueUsd0.plus(valueUsd1).toNumber() || 0;
+        return num === 0 ? "0.000" : fractionFormat(num, {maximumFractionDigits: 3});
+    }, [pool, tokenPrices, value0Debounce, value1Debounce])
 
     return (
         <HeadlessModal
@@ -510,12 +514,11 @@ const AddLiquidityModal = ({ open, onClose, poolData }: Props) => {
                                     <IconRight className="mr-4" />
                                     <span>TOTAL</span>
                                 </div>
-                                <InputCurrency
-                                    className="flex-1 overflow-hidden bg-ash-dark-700 text-right text-lg h-[4.5rem] px-5 outline-none"
-                                    placeholder="0"
-                                    value={liquidity}
-                                    disabled
-                                />
+                                <div
+                                    className="flex-1 overflow-hidden bg-ash-dark-700 text-right text-lg h-[4.5rem] px-5 outline-none flex items-center justify-end"
+                                >
+                                    <span><span className="text-ash-gray-500">$ </span>{liquidityValue}</span>
+                                </div>
                             </div>
 
                             <div
