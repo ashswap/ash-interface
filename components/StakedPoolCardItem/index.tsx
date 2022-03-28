@@ -100,7 +100,7 @@ function StakedPoolCardItem({
                     </div>
                 </div>
             </div>
-            <div className="flex flex-row mt-8 justify-between items-center">
+            <div className="flex flex-row mt-6 mb-5.5 justify-between items-center">
                 <div className="mr-1">
                     <div className="text-ash-gray-500 text-xs mb-4 underline">
                         Trading APR

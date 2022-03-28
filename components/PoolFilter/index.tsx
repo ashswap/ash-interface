@@ -2,7 +2,9 @@ import CardGrey from "assets/svg/card-grey.svg";
 import Card from "assets/svg/card.svg";
 import ListGrey from "assets/svg/list-grey.svg";
 import ICList from "assets/svg/list.svg";
+import ICChevronDown from "assets/svg/chevron-down.svg";
 import Search from "assets/svg/search.svg";
+import BasePopover from "components/BasePopover";
 import IconButton from "components/IconButton";
 import Input from "components/Input";
 import Select from "components/Select";
@@ -21,7 +23,7 @@ interface Props {
     view?: ViewType;
     onChangeView: (view: ViewType) => void;
 }
-const options: {value: PoolsState["sortOption"], label: any}[] = [
+const options: { value: PoolsState["sortOption"]; label: any }[] = [
     { value: "apr", label: "APR" },
     { value: "liquidity", label: "Liquidity" },
     { value: "volume", label: "24h Volume" },
@@ -30,10 +32,10 @@ const PoolFilter = (props: Props) => {
     const [isLivedPool, setIsLivedPool] = useState(true);
     const screenSize = useScreenSize();
 
-    const {keyword, setKeyword, sortOption, setSortOption} = usePools();
+    const { keyword, setKeyword, sortOption, setSortOption } = usePools();
     const selectOpt = useMemo(() => {
-        return options.find(o => o.value === sortOption);
-    }, [sortOption])
+        return options.find((o) => o.value === sortOption);
+    }, [sortOption]);
 
     const SearchBox = (
         <Input
@@ -54,54 +56,59 @@ const PoolFilter = (props: Props) => {
     return (
         <div>
             <div
-                className={`flex flex-row justify-between mt-3.5 mb-4 md:mb-0`}
+                className={`flex mt-3.5 mb-4 md:mb-0 space-x-2 lg:space-x-7.5`}
             >
-                <div className="flex flex-row justify-center items-center overflow-hidden mr-2">
-                    <IconButton
-                        icon={<CardGrey />}
-                        activeIcon={<Card />}
-                        active={props.view == ViewType.Card}
-                        className="mr-2 flex-shrink-0"
-                        onClick={() => props.onChangeView(ViewType.Card)}
-                    />
-                    <IconButton
-                        icon={<ListGrey />}
-                        activeIcon={<ICList className="text-pink-600" />}
-                        active={props.view == ViewType.List}
-                        className="mr-2 lg:mr-8 flex-shrink-0"
-                        onClick={() => props.onChangeView(ViewType.List)}
-                    />
-                    {screenSize.md && (
-                        <div className="flex-grow overflow-hidden">
-                            {SearchBox}
-                        </div>
-                    )}
+                <div className="flex-grow overflow-hidden max-w-[21.875rem]">
+                    {SearchBox}
                 </div>
-                <div className="flex items-center space-x-2 flex-shrink-0">
-                    <div className="flex p-1 bg-white dark:bg-ash-dark-600 text-xs sm:text-sm space-x-1 sm:space-x-2 text-ash-gray-500 font-bold">
+                <BasePopover
+                    className="absolute w-full text-white left-0"
+                    button={({ open }) => (
                         <button
-                            className={`h-8 sm:h-10 w-[4.5rem] sm:w-[6.5rem] font-bold text-center ${
-                                isLivedPool && "bg-pink-600 text-white"
+                            className={`transition ease-in-out duration-200 w-44 lg:w-56 h-12 px-4 lg:px-7 flex items-center justify-between ${
+                                open
+                                    ? "bg-ash-dark-700 text-white"
+                                    : "bg-ash-dark-600 text-ash-gray-500"
                             }`}
                         >
-                            Live
+                            <span className="font-bold text-xs lg:text-sm mr-2">
+                                Sort by:{" "}
+                                <span className="text-white">
+                                    {
+                                        options.find(
+                                            (opt) => opt.value === sortOption
+                                        )?.label
+                                    }
+                                </span>
+                            </span>
+                            <ICChevronDown className="w-3 h-auto text-pink-600" />
                         </button>
-                        <button
-                            className={`h-8 sm:h-10 w-[4.5rem] sm:w-[6.5rem] font-bold text-center ${
-                                !isLivedPool && "bg-pink-600 text-white"
-                            }`}
-                        >
-                            Finished
-                        </button>
-                    </div>
-                    {props.view === ViewType.Card && (
-                        <div>
-                            <Select prefix="Sort by" options={options} value={selectOpt} onChange={(val) => {val?.value && setSortOption(val.value as any)}} />
-                        </div>
                     )}
-                </div>
+                >
+                    {({ close }) => (
+                        <ul className="bg-ash-dark-700 py-6">
+                            {options.map((opt) => {
+                                return (
+                                    <li key={opt.value} className="relative">
+                                        <button
+                                            className="w-full py-3 text-left px-6"
+                                            onClick={() => {
+                                                setSortOption(opt.value);
+                                                close();
+                                            }}
+                                        >
+                                            {opt.label}
+                                        </button>
+                                        {opt.value === sortOption && (
+                                            <span className="absolute w-[3px] h-5 bg-pink-600 top-1/2 -translate-y-1/2 left-0"></span>
+                                        )}
+                                    </li>
+                                );
+                            })}
+                        </ul>
+                    )}
+                </BasePopover>
             </div>
-            {!screenSize.md && SearchBox}
         </div>
     );
 };

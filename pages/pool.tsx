@@ -24,14 +24,14 @@ const Home: NextPage = () => {
                         <PoolMenu />
                         {/* disable change view type if the screen size is sm, and auto set view type to list on SM screen */}
                         <PoolFilter
-                            view={isMobile ? ViewType.List : view}
+                            view={view}
                             onChangeView={(view) =>
                                 !isMobile && setView(view)
                             }
                         />
                         <ListPool
                             items={pools}
-                            view={isMobile ? ViewType.List : view}
+                            view={view}
                             className="pt-2 md:pt-8"
                         />
                     </div>
