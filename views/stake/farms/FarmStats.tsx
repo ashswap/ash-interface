@@ -13,7 +13,7 @@ import React, {
 
 function FarmStats({onClickAll}: {onClickAll?: () => void}) {
     const [harvesting, setHarvesting] = useState(false);
-    const { farmRecords, claimReward, setStakedOnly } = useFarms();
+    const { farmRecords, claimReward, setStakedOnly, claimAllReward } = useFarms();
     const TVL = useMemo(() => {
         return farmRecords.reduce(
             (total, val) => total.plus(val.totalLiquidityValue),
@@ -34,17 +34,12 @@ function FarmStats({onClickAll}: {onClickAll?: () => void}) {
         if (harvesting || totalReward.eq(0)) return;
         setHarvesting(true);
         try {
-            for (let i = 0; i < farmRecords.length; i++) {
-                const val = farmRecords[i];
-                if (val?.stakedData?.totalRewardAmt.gt(0)) {
-                    await claimRewardRef.current(val.farm);
-                }
-            }
+            await claimAllReward();
             setHarvesting(false);
         } catch (error) {
             setHarvesting(false);
         }
-    }, [farmRecords, harvesting, totalReward]);
+    }, [harvesting, totalReward, claimAllReward]);
     return (
         <div className="flex flex-col md:flex-row">
             <div className="md:w-[21.875rem] flex-shrink-0 flex flex-col px-7 lg:px-9 pb-9 pt-7 lg:pt-14 bg-stake-dark-400 mb-4 md:mb-0 md:mr-[1.875rem]">
