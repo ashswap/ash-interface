@@ -179,32 +179,21 @@ export function WalletProvider({ children }: Props) {
         let tokenIds: any[] = [];
         for (const tokenId in tokens) {
             if (Object.prototype.hasOwnProperty.call(tokens, tokenId)) {
-                const lpToken = tokens[tokenId];
                 tokenIds.push(tokenId);
                 promiseLpSupply.push(
-                    dapp.dapp.proxy.queryContract(
-                        new Query({
-                            address: new Address(
-                                "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u"
-                            ),
-                            func: new ContractFunction("getTokenProperties"),
-                            args: [
-                                new TokenIdentifierValue(Buffer.from(tokenId)),
-                            ],
-                        })
-                    )
+                    dapp.dapp.proxy
+                        .doGetGeneric(
+                            `network/esdt/supply/${tokenId}`,
+                            (res) => res?.supply
+                        )
+                        .catch(() => "0")
                 );
             }
         }
 
         Promise.all(promiseLpSupply).then((results) => {
-            results.map((r: any, i: number) => {
-                const data = r.returnData[3];
-                if (data && data.length > 0) {
-                    tokens[tokenIds[i]].totalSupply = new BigNumber(
-                        Buffer.from(r.returnData[3], "base64").toString("utf8")
-                    );
-                }
+            results.map((supply: any, i: number) => {
+                tokens[tokenIds[i]].totalSupply = new BigNumber(supply);
             });
             setLpTokens(tokens);
         });

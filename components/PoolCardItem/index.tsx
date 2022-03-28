@@ -5,6 +5,7 @@ import Image from "next/image";
 import AddLiquidityModal from "components/AddLiquidityModal";
 import Down from "assets/svg/down-white.svg";
 import usePoolDataFormat from "hooks/usePoolDataFormat";
+import { network } from "const/network";
 
 function PoolCardItem({
     poolData,
@@ -15,7 +16,7 @@ function PoolCardItem({
     const [isExpand, setIsExpand] = useState<boolean>(false);
     const [openAddLiquidity, setOpenAddLiquidity] = useState<boolean>(false);
     const {
-        formatedStats: { TVL, emissionAPR, tradingAPR, volumn24h },
+        formatedStats: { TVL, tradingAPR, volumn24h },
     } = usePoolDataFormat(poolData);
     return (
         <div
@@ -44,18 +45,10 @@ function PoolCardItem({
             <div className="flex flex-row my-12 justify-between items-center">
                 <div>
                     <div className="text-text-input-3 text-xs mb-4 underline">
-                        Trading APR
+                        Trading Fee APR
                     </div>
                     <div className="text-yellow-600 font-bold text-lg leading-tight">
                         {tradingAPR}%
-                    </div>
-                </div>
-                <div>
-                    <div className="text-text-input-3 text-xs mb-4 underline">
-                        Emission APR
-                    </div>
-                    <div className="text-earn font-bold text-lg leading-tight">
-                        {emissionAPR}%
                     </div>
                 </div>
             </div>
@@ -83,21 +76,30 @@ function PoolCardItem({
                             </div>
                             <div className="text-sm">{tradingAPR}%</div>
                         </div>
-                        <div className="flex flex-row justify-between items-center h-12 px-4">
-                            <div className="underline text-2xs">
-                                Emissions APR
-                            </div>
-                            <div className="text-sm">{emissionAPR}%</div>
-                        </div>
                     </>
                 )}
             </div>
+
+            {isExpand && (
+                <div className="text-center mb-8">
+                    <a
+                        href={`${network.explorerAddress}/tokens/${pool.lpToken.id}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-earn underline text-2xs font-bold hover:text-earn hover:underline"
+                    >
+                        View LP Distribution
+                    </a>
+                </div>
+            )}
 
             <div
                 className="flex flex-row justify-center items-center select-none cursor-pointer py-2"
                 onClick={() => setIsExpand(!isExpand)}
             >
-                <div className="font-bold text-sm mr-2">Detail</div>
+                <div className="font-bold text-sm mr-2">
+                    {isExpand ? "Hide" : "Detail"}
+                </div>
                 <Down
                     style={{
                         transform: `rotate(${isExpand ? "180" : "0"}deg)`,
