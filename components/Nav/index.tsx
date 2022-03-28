@@ -8,6 +8,7 @@ import ICSwap from "assets/svg/swap.svg";
 import ICChart from "assets/svg/chart.svg";
 import ICNewTab from "assets/svg/new-tab.svg";
 import ICStake from "assets/svg/stake.svg";
+import StakeMenu from "./StakeMenu";
 
 const Nav = () => {
     const router = useRouter();
@@ -45,7 +46,7 @@ const Nav = () => {
                     <span className="inline-block">Pool</span>
                 </div>
             </Link>
-            <Link href="/stake/gov" passHref>
+            {/* <Link href="/stake/gov" passHref>
                 <div
                     className={`transition ${styles.btn} ${
                         isActive("/stake/gov", false) ? styles.active : ""
@@ -54,7 +55,8 @@ const Nav = () => {
                     <ICStake className="inline-block w-4 h-4 md:mr-2 transition-none" />
                     <span className="inline-block">Stake</span>
                 </div>
-            </Link>
+            </Link> */}
+            <StakeMenu/>
             <Link href="/info" passHref>
                 <a target="_blank">
                     <div

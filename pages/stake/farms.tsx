@@ -1,12 +1,13 @@
 import StakeLayout from "components/Layout/stake";
-import React, { ReactElement } from "react";
+import React, { ReactElement, useRef } from "react";
 import ICArrowRight from "assets/svg/arrow-right.svg";
 import GovStats from "views/stake/gov/GovStats";
 import FarmsProvider from "context/farms";
-import FarmStats from "views/stake/farm/FarmStats";
-import FarmLayout from "views/stake/farm/FarmLayout";
+import FarmStats from "views/stake/farms/FarmStats";
+import FarmLayout from "views/stake/farms/FarmLayout";
 
 function FarmsPage() {
+    const farmLayoutContainerRef = useRef<HTMLDivElement>(null);
     return (
         <FarmsProvider>
             <div className="ash-container text-white pt-[1.875rem]">
@@ -19,13 +20,15 @@ function FarmsPage() {
                 </ul>
                 <div className="flex justify-between">
                     <h1 className="text-ash-cyan-500 text-2xl md:text-5xl font-bold mb-7 md:mb-11">
-                    Liquidity Stake - Farming
+                        Liquidity Stake - Farming
                     </h1>
                 </div>
                 <div className="mb-24">
-                <FarmStats />
+                    <FarmStats onClickAll={() => farmLayoutContainerRef.current?.scrollIntoView({behavior: "smooth"})}/>
                 </div>
-                <FarmLayout/>
+                <div ref={farmLayoutContainerRef}>
+                <FarmLayout />
+                </div>
             </div>
         </FarmsProvider>
     );

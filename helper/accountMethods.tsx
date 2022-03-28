@@ -1,4 +1,5 @@
 import { AccountOnNetwork, Address, Nonce } from "@elrondnetwork/erdjs";
+import { blockTimeMs } from "const/network";
 import moment from "moment";
 import { useRouter } from "next/router";
 import { useDappContext, useDappDispatch } from "../context/dapp";
@@ -52,7 +53,7 @@ export const useSetNonce = () => {
             key: "nonce",
             data: nonce,
             expires: moment()
-                .add(1, "hours")
+                .add(blockTimeMs, "milliseconds")
                 .unix()
         });
 

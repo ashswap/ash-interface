@@ -153,11 +153,6 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                 extendLockPeriod + currentLockDays
             );
         }
-        console.log(
-            "es",
-            lockedAmt.plus(lockAmt).toString(),
-            currentLockDays + 3600 / (24 * 60 * 60)
-        );
         return estimateVeASH(
             lockedAmt.plus(lockAmt),
             currentLockDays + 7 / (24 * 60 * 60)

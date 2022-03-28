@@ -1,31 +1,41 @@
-import { Address, ContractFunction, Query, BigUIntValue, CallArguments, Transaction, Nonce, TransactionHash, SmartContract, ChainID, GasPrice, GasLimit } from "@elrondnetwork/erdjs";
+import {
+    Address,
+    ContractFunction,
+    Query,
+    BigUIntValue,
+    CallArguments,
+    TransactionHash,
+} from "@elrondnetwork/erdjs";
 import BigNumber from "bignumber.js";
-import { gasLimit, gasPrice, network } from "const/network";
 import { useDappContext } from "context/dapp";
 import { useWallet } from "context/wallet";
 import { toEGLDD } from "helper/balance";
 import { queryContractParser } from "helper/serializer";
+import {
+    useCreateTransaction,
+    useSendTransaction,
+    useSignTransaction,
+} from "helper/transactionMethods";
 import IPool from "interface/pool";
 import { createContext, useCallback, useContext } from "react";
 import { ContractsState, initContractsState } from "./state";
-const emptyTx = new Transaction({
-    nonce: new Nonce(0),
-    receiver: new Address(),
-});
 
 const emptyTxHash = new TransactionHash("");
 const context = createContext<ContractsState>(initContractsState);
 const useContracts = () => {
     const ctx = useContext(context);
     if (ctx === undefined) {
-      throw new Error("useContracts must be used within a ContractsProvider");
+        throw new Error("useContracts must be used within a ContractsProvider");
     }
     return ctx;
-}
+};
 
-export const ContractsProvider = ({children}: any) => {
+export const ContractsProvider = ({ children }: any) => {
     const dapp = useDappContext();
-    const {tokenPrices} = useWallet();
+    const createTransaction = useCreateTransaction();
+    const signTx = useSignTransaction();
+    const sendTx = useSendTransaction();
+    const { tokenPrices } = useWallet();
     const getTokenInLP = useCallback(
         (ownLiquidity: BigNumber, poolAddress: string) => {
             return dapp.dapp.proxy
@@ -41,7 +51,10 @@ export const ContractsProvider = ({children}: any) => {
                     })
                 )
                 .then(({ returnData }) => {
-                    const values = queryContractParser(returnData[0], "tuple2<BigUint,BigUint>");
+                    const values = queryContractParser(
+                        returnData[0],
+                        "tuple2<BigUint,BigUint>"
+                    );
                     return {
                         value0: new BigNumber(
                             values[0].valueOf().field0.toString()
@@ -56,7 +69,10 @@ export const ContractsProvider = ({children}: any) => {
     );
     const getLPValue = useCallback(
         async (ownLiquidity: BigNumber, pool: IPool) => {
-            const {value0, value1} = await getTokenInLP(ownLiquidity, pool.address);
+            const { value0, value1 } = await getTokenInLP(
+                ownLiquidity,
+                pool.address
+            );
             let token0 = pool.tokens[0];
             let token1 = pool.tokens[1];
 
@@ -74,34 +90,6 @@ export const ContractsProvider = ({children}: any) => {
         },
         [tokenPrices, getTokenInLP]
     );
-    const createTransaction = useCallback(
-        async (address: Address, arg: CallArguments) => {
-            if (!dapp.address || !dapp.dapp.proxy || !dapp.dapp.provider) {
-                return emptyTx;
-            }
-
-            let account = await dapp.dapp.proxy.getAccount(
-                new Address(dapp.address)
-            );
-
-            let contract = new SmartContract({
-                address,
-            });
-
-            let tx = contract.call(arg);
-            tx = new Transaction({
-                chainID: new ChainID(network.id),
-                nonce: account.nonce,
-                data: tx.getData(),
-                receiver: address,
-                gasPrice: new GasPrice(gasPrice),
-                gasLimit: new GasLimit(gasLimit),
-                version: tx.getVersion(),
-            });
-            return tx;
-        },
-        [dapp.address, dapp.dapp.proxy, dapp.dapp.provider]
-    );
     const callContract = useCallback(
         async (address: Address, arg: CallArguments) => {
             if (!dapp.address || !dapp.dapp.proxy || !dapp.dapp.provider) {
@@ -109,22 +97,31 @@ export const ContractsProvider = ({children}: any) => {
             }
 
             const tx = await createTransaction(address, arg);
-            const signedTx = await dapp.dapp.provider.signTransaction(tx);
-            return await dapp.dapp.proxy.sendTransaction(signedTx);
+            const signedTx = await signTx(tx);
+            return await sendTx(signedTx);
         },
-        [dapp.address, dapp.dapp.proxy, dapp.dapp.provider, createTransaction]
+        [
+            dapp.address,
+            dapp.dapp.proxy,
+            dapp.dapp.provider,
+            createTransaction,
+            signTx,
+            sendTx,
+        ]
     );
 
-    return <context.Provider value={{
-        ...initContractsState,
-        getTokenInLP,
-        getLPValue,
-        createTransaction,
-        callContract
-
-    }}>
-        {children}
-    </context.Provider>
-}
+    return (
+        <context.Provider
+            value={{
+                ...initContractsState,
+                getTokenInLP,
+                getLPValue,
+                callContract,
+            }}
+        >
+            {children}
+        </context.Provider>
+    );
+};
 
 export default useContracts;

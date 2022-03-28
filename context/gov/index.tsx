@@ -45,9 +45,16 @@ import { IToken } from "interface/token";
 import IPool from "interface/pool";
 import pools from "const/pool";
 import useContracts from "context/contracts";
+import {
+    useCreateTransaction,
+    useSendMultipleTxs,
+    useSignTransactions,
+} from "helper/transactionMethods";
 const estimateVeASH = (weiAmt: BigNumber, lockDays: number) => {
     // ratio: lock 1 ASH in 1 year(365 days) -> 0.25 veASH
-    const veASHPerDay = toEGLDD(ASH_TOKEN.decimals, weiAmt).multipliedBy(new BigNumber(0.25).div(365));
+    const veASHPerDay = toEGLDD(ASH_TOKEN.decimals, weiAmt).multipliedBy(
+        new BigNumber(0.25).div(365)
+    );
     return toWei(ASH_TOKEN, veASHPerDay.multipliedBy(lockDays).toString());
 };
 type GovStakeState = {
@@ -62,7 +69,7 @@ type GovStakeState = {
         weiAmt?: BigNumber;
         unlockTimestamp?: BigNumber;
     }) => Promise<any>;
-    claimReward: () => Promise<TransactionHash | null>;
+    claimReward: () => Promise<Record<number, string> | null>;
     unlockASH: () => Promise<TransactionHash | null>;
     estimateVeASH: (weiAmt: BigNumber, lockDays: number) => BigNumber;
     lockedAmt: BigNumber;
@@ -88,7 +95,7 @@ const initState: GovStakeState = {
     totalLockedAmt: new BigNumber(0),
     rewardLPAmt: new BigNumber(0),
     rewardValue: new BigNumber(0),
-    totalLockedPct: 0
+    totalLockedPct: 0,
 };
 const StakeGovContext = createContext(initState);
 export const useStakeGov = () => {
@@ -109,18 +116,21 @@ const StakeGovProvider = ({ children }: any) => {
     const [rewardValue, setRewardValue] = useState<BigNumber>(new BigNumber(0));
     const [rewardLPToken, setRewardLPToken] = useState<IPool>();
     const [totalLockedPct, setTotalLockedPct] = useState(0);
-    const { callContract, createTransaction, getLPValue } = useContracts();
+    const { callContract, getLPValue } = useContracts();
+    const createTransaction = useCreateTransaction();
+    const sendMultipleTxs = useSendMultipleTxs();
+    const signTxs = useSignTransactions();
     const dapp = useDappContext();
 
     useEffect(() => {
-        if(!dapp.loggedIn){
+        if (!dapp.loggedIn) {
             setLockedAmt(new BigNumber(0));
             setVEASH(new BigNumber(0));
             setUnlockTS(new BigNumber(0));
             setRewardLPAmt(new BigNumber(0));
             setRewardValue(new BigNumber(0));
         }
-    }, [dapp.loggedIn])
+    }, [dapp.loggedIn]);
 
     const lockASH = useCallback(
         async (weiAmt: BigNumber, unlockTimestamp: BigNumber) => {
@@ -240,7 +250,10 @@ const StakeGovProvider = ({ children }: any) => {
                 })
             )
             .then(({ returnData }) => {
-                const values = queryContractParser(returnData[returnData.length - 1], "BigUint");
+                const values = queryContractParser(
+                    returnData[returnData.length - 1],
+                    "BigUint"
+                );
                 setRewardLPAmt(values[0]?.valueOf() || new BigNumber(0));
             });
     }, [dapp.loggedIn, dapp.dapp, dapp.address]);
@@ -264,7 +277,7 @@ const StakeGovProvider = ({ children }: any) => {
             weiAmt,
             unlockTimestamp,
         }: { weiAmt?: BigNumber; unlockTimestamp?: BigNumber } = {}) => {
-            if(!dapp.loggedIn) return [];
+            if (!dapp.loggedIn) return [];
             let txs: Transaction[] = [];
             if (weiAmt && weiAmt.gt(0)) {
                 const increaseAmtTx = await createTransaction(
@@ -295,17 +308,8 @@ const StakeGovProvider = ({ children }: any) => {
                 txs.push(increaseLockTSTx);
             }
             if (!txs.length) return [];
-            let nonce = txs[0].getNonce();
-            txs.forEach((tx, i) => {
-                tx.setNonce(nonce);
-                nonce = nonce.increment();
-            });
-            const signedTxs = await dapp.dapp.provider.signTransactions(txs);
-            const data = await dapp.dapp.proxy.doPostGeneric(
-                `transaction/send-multiple`,
-                signedTxs.map((tx) => tx.toPlainObject()),
-                (res) => res?.txsHashes || []
-            );
+            const signedTxs = await signTxs(...txs);
+            const data = await sendMultipleTxs(signedTxs);
 
             let key = `open${Date.now()}`;
             notification.open({
@@ -331,7 +335,7 @@ const StakeGovProvider = ({ children }: any) => {
             }, 10000);
             return data;
         },
-        [createTransaction, dapp.dapp, unlockTS, dapp.loggedIn]
+        [createTransaction, dapp.dapp, unlockTS, dapp.loggedIn, sendMultipleTxs]
     );
 
     const getRewardLPID = useCallback(() => {
@@ -367,7 +371,6 @@ const StakeGovProvider = ({ children }: any) => {
                     gasLimit: new GasLimit(gasLimit),
                 }
             );
-            tx2.setNonce(tx1.getNonce().increment());
             const tx3 = await createTransaction(
                 new Address(dappContract.feeDistributor),
                 {
@@ -375,7 +378,6 @@ const StakeGovProvider = ({ children }: any) => {
                     gasLimit: new GasLimit(gasLimit),
                 }
             );
-            tx3.setNonce(tx2.getNonce().increment());
             const tx4 = await createTransaction(
                 new Address(dappContract.feeDistributor),
                 {
@@ -383,7 +385,6 @@ const StakeGovProvider = ({ children }: any) => {
                     gasLimit: new GasLimit(gasLimit),
                 }
             );
-            tx4.setNonce(tx3.getNonce().increment());
             const tx5 = await createTransaction(
                 new Address(dappContract.feeDistributor),
                 {
@@ -392,19 +393,8 @@ const StakeGovProvider = ({ children }: any) => {
                     args: [new AddressValue(new Address(dapp.address))],
                 }
             );
-            tx5.setNonce(tx4.getNonce().increment());
-            const signedTxs = await dapp.dapp.provider.signTransactions([
-                tx1,
-                tx2,
-                tx3,
-                tx4,
-                tx5
-            ]);
-            const txs = await dapp.dapp.proxy.doPostGeneric(
-                `transaction/send-multiple`,
-                signedTxs.map((tx) => tx.toPlainObject()),
-                (res) => res.txsHashes || []
-            );
+            const signedTxs = await signTxs(tx1, tx2, tx3, tx4, tx5);
+            const txs = await sendMultipleTxs(signedTxs);
             let key = `open${Date.now()}`;
             notification.open({
                 key,
@@ -423,10 +413,17 @@ const StakeGovProvider = ({ children }: any) => {
             console.log(error);
             return null;
         }
-    }, [dapp.dapp, createTransaction, dapp.address, dapp.loggedIn]);
+    }, [
+        dapp.dapp,
+        createTransaction,
+        dapp.address,
+        dapp.loggedIn,
+        sendMultipleTxs,
+    ]);
 
     const unlockASH = useCallback(async () => {
-        if (!dapp.loggedIn || unlockTS.minus(moment().unix()).gt(0)) return null;
+        if (!dapp.loggedIn || unlockTS.minus(moment().unix()).gt(0))
+            return null;
         try {
             const tx = await callContract(
                 new Address(dappContract.voteEscrowedContract),
@@ -457,42 +454,44 @@ const StakeGovProvider = ({ children }: any) => {
     }, [unlockTS, lockedAmt, callContract, dapp.loggedIn]);
 
     const getRewardValue = useCallback(async () => {
-        if (!rewardLPAmt || rewardLPAmt.eq(0) || !rewardLPToken){
+        if (!rewardLPAmt || rewardLPAmt.eq(0) || !rewardLPToken) {
             setRewardValue(new BigNumber(0));
             return;
-        };
+        }
         const value = await getLPValue(rewardLPAmt, rewardLPToken);
         setRewardValue(value || new BigNumber(0));
     }, [rewardLPAmt, rewardLPToken, getLPValue]);
 
     const getASHTotalSupply = useCallback(() => {
-        return dapp.dapp.proxy.queryContract(
-            new Query({
-                address: new Address(
-                    "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u"
-                ),
-                func: new ContractFunction("getTokenProperties"),
-                args: [
-                    new TokenIdentifierValue(Buffer.from(ASH_TOKEN.id)),
-                ],
-            })
-        ).then(({returnData}) => {
-            const data = returnData[3];
-            if(data?.length > 0){
-                return new BigNumber(
-                    Buffer.from(data, "base64").toString("utf8")
-                );
-            }
-            return new BigNumber(0);
-        })
+        return dapp.dapp.proxy
+            .queryContract(
+                new Query({
+                    address: new Address(
+                        "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u"
+                    ),
+                    func: new ContractFunction("getTokenProperties"),
+                    args: [new TokenIdentifierValue(Buffer.from(ASH_TOKEN.id))],
+                })
+            )
+            .then(({ returnData }) => {
+                const data = returnData[3];
+                if (data?.length > 0) {
+                    return new BigNumber(
+                        Buffer.from(data, "base64").toString("utf8")
+                    );
+                }
+                return new BigNumber(0);
+            });
     }, [dapp.dapp]);
 
     const getTotalLockedASHPct = useCallback(async () => {
         const totalSupply = await getASHTotalSupply();
-        if(totalSupply.eq(0)) setTotalLockedPct(0);
-        return setTotalLockedPct(totalLockedAmt.multipliedBy(100).div(totalSupply).toNumber());
+        if (totalSupply.eq(0)) setTotalLockedPct(0);
+        return setTotalLockedPct(
+            totalLockedAmt.multipliedBy(100).div(totalSupply).toNumber()
+        );
     }, [getASHTotalSupply, totalLockedAmt]);
-    
+
     useEffect(() => {
         getRewardValue();
     }, [getRewardValue]);
@@ -574,7 +573,7 @@ const StakeGovProvider = ({ children }: any) => {
                 rewardLPAmt,
                 rewardLPToken,
                 rewardValue,
-                totalLockedPct
+                totalLockedPct,
             }}
         >
             {children}

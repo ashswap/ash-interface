@@ -13,11 +13,11 @@ import {
     TransactionHash,
 } from "@elrondnetwork/erdjs";
 import BigNumber from "bignumber.js";
-import { gasLimit, gasPrice, network } from "const/network";
+import { blockTimeMs, gasLimit, gasPrice, network } from "const/network";
 import pools from "const/pool";
-import { ASH_TOKEN } from "const/tokens";
+import { ASH_TOKEN, TOKENS } from "const/tokens";
 import { useDappContext, useDappDispatch } from "context/dapp";
-import { emptyFunc, fetcher } from "helper/common";
+import { arrayFetcher, emptyFunc, fetcher } from "helper/common";
 import useInitWalletConnect from "hooks/useInitWalletConnect";
 import { usePlatform } from "hooks/usePlatform";
 import { ITokenMap } from "interface/token";
@@ -59,7 +59,7 @@ export const initState: State = {
     lpTokens: {},
     tokenPrices: {},
     connectWallet: emptyFunc,
-    insufficientEGLD: true
+    insufficientEGLD: true,
 };
 
 export const WalletContext = createContext<State>(initState);
@@ -78,19 +78,21 @@ export function WalletProvider({ children }: Props) {
     const [balances, setBalances] = useState<TokenBalancesMap>(
         initState.balances
     );
-    const [isOpenConnectWalletModal, setIsOpenConnectWalletModal] = useState(
-        false
-    );
+    const [isOpenConnectWalletModal, setIsOpenConnectWalletModal] =
+        useState(false);
     const { isMobileOS } = usePlatform();
     const dispatch = useDappDispatch();
     const { walletConnect, walletConnectInit } = useInitWalletConnect();
 
-    const insufficientEGLD = useMemo(() => dapp.account.balance === "0", [dapp.account.balance])
+    const insufficientEGLD = useMemo(
+        () => dapp.account.balance === "0",
+        [dapp.account.balance]
+    );
 
     const tokens = useMemo(() => {
         let tokens: ITokenMap = {};
-        pools.map(p => {
-            p.tokens.forEach(t => {
+        pools.map((p) => {
+            p.tokens.forEach((t) => {
                 if (!Object.prototype.hasOwnProperty.call(tokens, t.id)) {
                     tokens[t.id] = t;
                 }
@@ -100,24 +102,27 @@ export function WalletProvider({ children }: Props) {
         return tokens;
     }, []);
 
-    let tokenPrices: any = {};
-    for (const tokenId in tokens) {
-        if (Object.prototype.hasOwnProperty.call(tokens, tokenId)) {
-            const token = tokens[tokenId];
-            const tokenPriceResponse = useSWR(
-                tokens
-                    ? "https://api.coingecko.com/api/v3/coins/" +
-                          token.coingeckoId
-                    : null,
-                fetcher
-            );
-            if (tokenPriceResponse.data) {
-                tokenPrices[tokenId] =
-                    tokenPriceResponse.data.market_data.current_price.usd;
-                tokenPrices = { ...tokenPrices };
-            }
-        }
-    }
+    const { data: priceEntries } = useSWR(
+        TOKENS.map((token) =>
+            token.coingeckoId
+                ? `https://api.coingecko.com/api/v3/coins/${token.coingeckoId}`
+                : null
+        ),
+        arrayFetcher,
+        { refreshInterval: 60000 }
+    );
+
+    const tokenPrices = useMemo(() => {
+        const map = Object.fromEntries(
+            TOKENS.map((t, i) => [
+                t.id,
+                priceEntries?.[i]?.market_data.current_price.usd || 0,
+            ])
+        );
+        // dummy ash price = 1$ - TODO: get ash price from maiar after launching pool ash-usdt on maiar exchange
+        map[ASH_TOKEN.id] = 1;
+        return map;
+    }, [priceEntries]);
 
     // const lpTokens = useMemo(() => {
     //     console.log('change lp tokens');
@@ -164,7 +169,7 @@ export function WalletProvider({ children }: Props) {
 
     useEffect(() => {
         let tokens: ITokenMap = {};
-        pools.map(p => {
+        pools.map((p) => {
             if (!Object.prototype.hasOwnProperty.call(tokens, p.lpToken.id)) {
                 tokens[p.lpToken.id] = p.lpToken;
             }
@@ -192,11 +197,10 @@ export function WalletProvider({ children }: Props) {
             }
         }
 
-        Promise.all(promiseLpSupply).then(results => {
+        Promise.all(promiseLpSupply).then((results) => {
             results.map((r: any, i: number) => {
                 const data = r.returnData[3];
-                if(data && data.length > 0){
-                    
+                if (data && data.length > 0) {
                     tokens[tokenIds[i]].totalSupply = new BigNumber(
                         Buffer.from(r.returnData[3], "base64").toString("utf8")
                     );
@@ -213,13 +217,16 @@ export function WalletProvider({ children }: Props) {
 
         dapp.dapp.proxy
             .getAddressEsdtList(new Address(dapp.address))
-            .then(resp => {
+            .then((resp) => {
                 let tokenBalances: TokenBalancesMap = {};
 
                 for (const tokenId in resp) {
                     tokenBalances[tokenId] = {
                         balance: new BigNumber(resp[tokenId].balance),
-                        token: tokenId === ASH_TOKEN.id ? ASH_TOKEN : tokens[tokenId],
+                        token:
+                            tokenId === ASH_TOKEN.id
+                                ? ASH_TOKEN
+                                : tokens[tokenId],
                     };
                 }
                 setBalances(tokenBalances);
@@ -228,7 +235,8 @@ export function WalletProvider({ children }: Props) {
 
     // fetch token balance
     useEffect(() => {
-        let interval = setInterval(fetchBalances, 2000);
+        fetchBalances();
+        let interval = setInterval(fetchBalances, blockTimeMs);
         return () => {
             clearInterval(interval);
         };
@@ -246,7 +254,7 @@ export function WalletProvider({ children }: Props) {
         const condition = {
             query: {
                 bool: {
-                    should: pools.map(pool => ({
+                    should: pools.map((pool) => ({
                         term: {
                             receiver: pool.address,
                         },
@@ -280,7 +288,7 @@ export function WalletProvider({ children }: Props) {
             if (isMobileOS) {
                 // try to generate uri and then open it up
                 if (walletConnect) {
-                    walletConnect.login().then(walletConectUri => {
+                    walletConnect.login().then((walletConectUri) => {
                         let uri = "";
                         if (token) {
                             uri = `${walletConectUri}&token=${token}`;
