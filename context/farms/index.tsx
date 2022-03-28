@@ -638,7 +638,7 @@ const FarmsProvider = ({ children }: any) => {
         for (let i = 0; i < farmRecords.length; i++) {
             const val = farmRecords[i];
             if (val?.stakedData?.totalRewardAmt.gt(0)) {
-                const temp = await createClaimRewardTxs(val.farm);
+                const temp = await createClaimRewardTxs(val);
                 txs = [...txs, ...temp];
                 totalASH = totalASH.plus(val.stakedData.totalRewardAmt);
             }
