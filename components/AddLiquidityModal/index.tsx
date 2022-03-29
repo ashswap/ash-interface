@@ -428,18 +428,6 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
 
     return (
         <div className="px-8 mt-6 pb-16 sm:pb-7 flex-grow overflow-auto">
-            <div className="mb-14">
-                <Switch
-                    checked={isProMode}
-                    onChange={setIsProMode}
-                    className="flex items-center space-x-2"
-                >
-                    <span className={`${isProMode && "text-pink-600"}`}>
-                        Pro-mode
-                    </span>
-                </Switch>
-            </div>
-
             <div className="inline-flex justify-between items-center">
                 <div className="mr-2">
                     {/* <div className="text-text-input-3 text-xs">Deposit</div> */}
@@ -468,8 +456,8 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
                     </div>
                 </div>
             </div>
-            <div className="sm:flex my-10 sm:space-x-4 lg:space-x-8">
-                <div className="relative sm:w-6/12 lg:w-7/12 overflow-hidden">
+            <div className="my-10">
+                <div className="relative">
                     <div className="py-1.5">
                         <TokenInput
                             token={pool.tokens[0]}
@@ -512,72 +500,6 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
 
                     <div className="absolute left-0 ml-2" style={{ top: 62 }}>
                         &
-                    </div>
-                </div>
-                <div className="sm:w-6/12 lg:w-5/12 bg-ash-dark-500 p-8 sm:p-4 lg:p-8 text-ash-gray-500 sm:text-white">
-                    <div className="text-lg font-bold">Estimate value</div>
-                    <div className="flex flex-col text-xs mt-8 gap-y-9">
-                        <div
-                            className={`flex space-x-1 ${
-                                isProMode
-                                    ? "sm:flex-wrap sm:space-x-0"
-                                    : "sm:space-y-8 sm:block"
-                            }`}
-                        >
-                            <div
-                                className={`w-6/12 ${isProMode && "sm:w-8/12"}`}
-                            >
-                                <div className="mb-2">Earn per month</div>
-                                <div>-</div>
-                            </div>
-                            <div
-                                className={`w-6/12 ${isProMode && "sm:w-4/12"}`}
-                            >
-                                <div className="mb-2">Farm per day</div>
-                                <div>-</div>
-                            </div>
-                        </div>
-                        {isProMode && (
-                            <div className="flex flex-col sm:flex-row gap-10 flex-wrap">
-                                <div className="flex gap-10">
-                                    <div>
-                                        <div className="mb-2">APR</div>
-                                        <div className="text-pink-600 font-bold">
-                                            _%
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <ul
-                                            style={{
-                                                listStyle: "disc",
-                                            }}
-                                        >
-                                            <li className="mb-2">
-                                                Emissions APR:{" "}
-                                                <span className="text-pink-600">
-                                                    _%
-                                                </span>
-                                            </li>
-                                            <li>
-                                                Trading APR:{" "}
-                                                <span className="text-pink-600">
-                                                    _%
-                                                </span>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                                <div>
-                                    <div className="mb-2">Your Capacity</div>
-                                    <div style={{ color: "#00FF75" }}>
-                                        {liquidityData?.capacityPercent.toFixed(
-                                            2
-                                        ) || "_"}
-                                        %
-                                    </div>
-                                </div>
-                            </div>
-                        )}
                     </div>
                 </div>
             </div>
@@ -637,7 +559,7 @@ const AddLiquidityModal = (props: Props) => {
             transition={screenSize.msm ? "btt" : "center"}
         >
             <div
-                className={`clip-corner-4 clip-corner-tl bg-ash-dark-600 text-white p-4 fixed bottom-0 inset-x-0 sm:static sm:mt-28 sm:ash-container flex flex-col max-h-full max-w-[51.75rem] mx-auto`}
+                className={`clip-corner-4 clip-corner-tl bg-ash-dark-600 text-white p-4 fixed bottom-0 inset-x-0 sm:static sm:mt-28 flex flex-col max-h-full max-w-4xl mx-auto`}
             >
                 <HeadlessModalDefaultHeader
                     onClose={() => onClose && onClose()}
