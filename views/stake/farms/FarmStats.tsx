@@ -11,9 +11,10 @@ import React, {
     useState,
 } from "react";
 
-function FarmStats({onClickAll}: {onClickAll?: () => void}) {
+function FarmStats({ onClickAll }: { onClickAll?: () => void }) {
     const [harvesting, setHarvesting] = useState(false);
-    const { farmRecords, claimReward, setStakedOnly, claimAllReward } = useFarms();
+    const { farmRecords, claimReward, setStakedOnly, claimAllReward } =
+        useFarms();
     const TVL = useMemo(() => {
         return farmRecords.reduce(
             (total, val) => total.plus(val.totalLiquidityValue),
@@ -47,7 +48,13 @@ function FarmStats({onClickAll}: {onClickAll?: () => void}) {
                     <h2 className="text-2xl font-bold text-white">
                         Your Summary
                     </h2>
-                    <span className="text-ash-cyan-500 text-lg font-bold cursor-pointer" onClick={() => {setStakedOnly(true); onClickAll && onClickAll()}}>
+                    <span
+                        className="text-ash-cyan-500 text-lg font-bold cursor-pointer"
+                        onClick={() => {
+                            setStakedOnly(true);
+                            onClickAll && onClickAll();
+                        }}
+                    >
                         All
                     </span>
                 </div>
@@ -105,7 +112,10 @@ function FarmStats({onClickAll}: {onClickAll?: () => void}) {
                             <span className="text-white font-bold">
                                 LP-Tokens
                             </span>{" "}
-                            to earn ASH. Just lie on the bed & watch it growing!
+                            to earn ASH.
+                        </div>
+                        <div className="text-sm">
+                            Just lie on the bed & watch it growing!
                         </div>
                     </div>
                 </div>
