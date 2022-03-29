@@ -283,8 +283,9 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
                                 <IconRight className="mr-4" />
                                 <span>TOTAL</span>
                             </div>
+                            <div className="flex-1 flex items-center overflow-hidden bg-ash-dark-700 text-right text-lg h-[4.5rem] px-5 ">
                             <InputCurrency
-                                className="flex-1 overflow-hidden bg-ash-dark-700 text-right text-lg h-[4.5rem] px-5 outline-none"
+                                className="bg-transparent text-right flex-grow outline-none"
                                 placeholder="0"
                                 value={displayInputLiquidity}
                                 onChange={(e) => {
@@ -301,6 +302,8 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
                                     );
                                 }}
                             />
+                            <div className="text-ash-gray-500 ml-2">$</div>
+                            </div>
                         </div>
                         <div className="flex flex-row items-center">
                             <div className="sm:w-24"></div>
