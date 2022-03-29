@@ -414,11 +414,11 @@ const StakeGovProvider = ({ children }: any) => {
             return null;
         }
     }, [
-        dapp.dapp,
         createTransaction,
         dapp.address,
         dapp.loggedIn,
         sendMultipleTxs,
+        signTxs
     ]);
 
     const unlockASH = useCallback(async () => {
