@@ -9,6 +9,7 @@ import ICMinus from "assets/svg/minus.svg";
 import ICChevronDown from "assets/svg/chevron-down.svg";
 import ICChevronUp from "assets/svg/chevron-up.svg";
 import usePoolDataFormat from "hooks/usePoolDataFormat";
+import { network } from "const/network";
 
 function StakedPoolCardItem({
     poolData,
@@ -21,7 +22,7 @@ function StakedPoolCardItem({
     const [openRemoveLiquidity, setOpenRemoveLiquidity] =
         useState<boolean>(false);
     const {
-        formatedStats: { TVL, emissionAPR, tradingAPR, volumn24h },
+        formatedStats: { TVL, tradingAPR, volumn24h },
         formatedStakedData: {
             fCapacityPercent,
             fLpValueUsd,
@@ -99,21 +100,20 @@ function StakedPoolCardItem({
                     </div>
                 </div>
             </div>
-            <div className="flex flex-row mt-8 justify-between items-center">
+            <div className="flex flex-row mt-6 mb-5.5 justify-between items-center">
                 <div className="mr-1">
                     <div className="text-ash-gray-500 text-xs mb-4 underline">
-                        Total Farm
+                        Trading APR
                     </div>
-                    <div className="text-earn font-bold text-lg">Comming</div>
+                    <div className="text-yellow-600 font-bold text-lg">
+                        {tradingAPR}%
+                    </div>
                 </div>
-                <button className="clip-corner-1 clip-corner-br bg-earn w-40 h-14 flex items-center justify-center text-white text-sm font-bold">
-                    Harvest
-                </button>
             </div>
 
-            <div className="bg-bg my-4 text-text-input-3">
-                {isExpand && (
-                    <>
+            {isExpand && (
+                <>
+                    <div className="bg-bg my-4 text-text-input-3">
                         <div className="flex flex-row justify-between items-center h-12 px-4">
                             <div className="underline text-2xs">
                                 Total Liquidity
@@ -127,8 +127,8 @@ function StakedPoolCardItem({
                         <div className="flex flex-row justify-between items-center h-12 px-4">
                             <div className="underline text-2xs">LP Token</div>
                             <div className="text-sm">
-                                {fOwnLiquidity}{" "}
-                                {pool.tokens[0].name}-{pool.tokens[1].name}
+                                {fOwnLiquidity} {pool.tokens[0].name}-
+                                {pool.tokens[1].name}
                             </div>
                         </div>
                         <div className="flex flex-row justify-between items-center h-12 px-4">
@@ -137,21 +137,25 @@ function StakedPoolCardItem({
                             </div>
                             <div className="text-sm">{tradingAPR}%</div>
                         </div>
-                        <div className="flex flex-row justify-between items-center h-12 px-4">
-                            <div className="underline text-2xs">
-                                Emissions APR
-                            </div>
-                            <div className="text-sm">{emissionAPR}%</div>
-                        </div>
-                    </>
-                )}
-            </div>
+                    </div>
+                    <div className="text-center mb-8">
+                        <a
+                            href={`${network.explorerAddress}/tokens/${pool.lpToken.id}`} target="_blank" rel="noreferrer"
+                            className="text-earn underline text-2xs font-bold hover:text-earn hover:underline"
+                        >
+                            View LP Distribution
+                        </a>
+                    </div>
+                </>
+            )}
 
             <div
                 className="flex flex-row justify-center items-center select-none cursor-pointer py-2 text-white"
                 onClick={() => setIsExpand(!isExpand)}
             >
-                <div className="font-bold text-sm mr-2">Detail</div>
+                <div className="font-bold text-sm mr-2">
+                    {isExpand ? "Hide" : "Detail"}
+                </div>
                 {isExpand ? (
                     <ICChevronUp className="w-2 h-auto" />
                 ) : (

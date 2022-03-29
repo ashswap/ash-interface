@@ -140,8 +140,8 @@ const PoolsProvider = ({ children }: any) => {
             case "apr":
                 result = result.sort(
                     (x, y) =>
-                        (y.poolStats?.emission_apr || 0) -
-                        (x.poolStats?.emission_apr || 0)
+                        (y.poolStats?.apr_day || 0) -
+                        (x.poolStats?.apr_day || 0)
                 );
                 break;
             case "liquidity":
