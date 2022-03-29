@@ -80,18 +80,18 @@ function StakedPoolCardItem({
                         </div>
                     </div>
                     <div className="mb-8">
-                        <div className="text-ash-gray-500 text-xs underline mb-4">
+                        <div className="text-stake-gray-500 text-xs underline mb-4">
                             Estimate in USD
                         </div>
                         <div className="text-lg leading-tight">
-                            <span className="text-ash-gray-500">$</span>
+                            <span className="text-stake-gray-500">$</span>
                             <span className="text-white font-bold">
                                 {fLpValueUsd}
                             </span>
                         </div>
                     </div>
                     <div>
-                        <div className="text-ash-gray-500 text-xs underline mb-4">
+                        <div className="text-stake-gray-500 text-xs underline mb-4">
                             Your capacity
                         </div>
                         <div className="text-lg text-white font-bold leading-snug">
@@ -102,7 +102,7 @@ function StakedPoolCardItem({
             </div>
             <div className="flex flex-row mt-6 mb-5.5 justify-between items-center">
                 <div className="mr-1">
-                    <div className="text-ash-gray-500 text-xs mb-4 underline">
+                    <div className="text-stake-gray-500 text-xs mb-4 underline">
                         Trading APR
                     </div>
                     <div className="text-yellow-600 font-bold text-lg">

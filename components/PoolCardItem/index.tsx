@@ -45,7 +45,7 @@ function PoolCardItem({
             <div className="flex flex-row my-12 justify-between items-center">
                 <div>
                     <div className="text-text-input-3 text-xs mb-4 underline">
-                        Trading Fee APR
+                        Trading APR
                     </div>
                     <div className="text-yellow-600 font-bold text-lg leading-tight">
                         {tradingAPR}%
