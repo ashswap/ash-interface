@@ -469,13 +469,13 @@ function GovStats() {
                             <div className="text-center text-sm text-ash-gray-500 py-7">
                                 Suggest actions
                             </div>
-                            {/* <Link href="/stake/farms" passHref>
+                            <Link href="/stake/farms" passHref>
                                 <a>
                                     <button className="w-full text-center h-12 text-sm font-bold bg-ash-dark-400 text-ash-cyan-500 mb-4">
                                         Stake for farming
                                     </button>
                                 </a>
-                            </Link> */}
+                            </Link>
                             <Link href="/pool" passHref>
                                 <a>
                                     <button className="w-full text-center h-12 text-sm font-bold bg-ash-dark-400 text-pink-600">
