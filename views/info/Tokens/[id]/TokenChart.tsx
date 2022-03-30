@@ -1,3 +1,4 @@
+import { IToken } from "interface/token";
 import { ValueOf } from "interface/utilities";
 import React, { useState } from "react";
 import TokenLiquidityChart from "./TokenLiquidityChart";
@@ -18,7 +19,7 @@ const ChartTypeArr = Object.values(CHART_TYPES);
 const TimeUnitArr = Object.values(TIME_UNIT);
 type ChartType = ValueOf<typeof CHART_TYPES>;
 type timeUnitType = ValueOf<typeof TIME_UNIT>;
-function TokenChart() {
+function TokenChart({token}: {token: IToken}) {
     const [chartType, setChartType] = useState<ChartType>("Liquidity");
     const [timeUnit, setTimeUnit] = useState<timeUnitType>("D");
     return (
@@ -39,7 +40,7 @@ function TokenChart() {
                 })}
             </div>
             <div className="flex-grow mb-5">
-                {chartType === "Liquidity" && <TokenLiquidityChart />}
+                {chartType === "Liquidity" && <TokenLiquidityChart token={token} />}
                 {chartType === "Volumn" && <TokenVolumeChart />}
                 {chartType === "Price" && <TokenPriceChart timeUnit={timeUnit} />}
             </div>

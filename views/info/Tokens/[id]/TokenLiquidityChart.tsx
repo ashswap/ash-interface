@@ -1,3 +1,6 @@
+import { network } from "const/network";
+import { fetcher } from "helper/common";
+import { IToken } from "interface/token";
 import React, { useRef, useState } from "react";
 import {
     Area,
@@ -7,6 +10,7 @@ import {
     XAxis,
     YAxis,
 } from "recharts";
+import useSWR from "swr";
 const data = [
     {
         name: 1,
@@ -153,8 +157,10 @@ const MONTH = [
     "NOV",
     "DEC",
 ];
-function TokenLiquidityChart() {
+function TokenLiquidityChart({token}: {token: IToken}) {
+    const {data} = useSWR(token.id ? `${network.ashApiBaseUrl}/token/${token.id}/graph-statistic?type=liquidity` : null, fetcher);
     const areaRef = useRef<any>(null);
+    
     return (
         <ResponsiveContainer>
             <AreaChart data={data}>

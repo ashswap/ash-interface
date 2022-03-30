@@ -14,12 +14,35 @@ import Link from "next/link";
 import React, { ReactElement } from "react";
 import TokenChart from "views/info/Tokens/[id]/TokenChart";
 import TxsTable from "views/info/components/TxsTable";
+import { Tooltip } from "antd";
+import { useWallet } from "context/wallet";
+import useSWR from "swr";
+import { network } from "const/network";
+import { fetcher } from "helper/common";
+import { fractionFormat } from "helper/number";
 
+type TokenStats = {
+    change_percentage_day: number;
+    change_percentage_hour: number;
+    change_percentage_week: number;
+    liquidity: number;
+    price: number;
+    token_id: string;
+    transaction_count: number;
+    volume: number;
+};
 type Page<P = {}> = NextPage<P> & {
     getLayout?: (page: ReactElement) => ReactElement;
 };
 type props = { token: IToken };
 const TokenDetailPage: Page<props> = ({ token }: props) => {
+    const { data: stats } = useSWR<TokenStats>(
+        token.id
+            ? `${network.ashApiBaseUrl}/token/${token.id}/statistic`
+            : null,
+        fetcher,
+        {refreshInterval: 5 * 60 * 1000}
+    );
     return (
         <div>
             <div className="text-white py-7 max-w-6xl mx-auto px-6 sm:px-0">
@@ -57,13 +80,23 @@ const TokenDetailPage: Page<props> = ({ token }: props) => {
                             {token.id}
                         </div>
                         <div className="mx-4">|</div>
-                        <button>
-                            <ICCopy className="w-5 h-5" />
-                        </button>
+                        <Tooltip trigger={["click"]} title="copied">
+                            <button
+                                onClick={() => {
+                                    if (typeof window !== "undefined") {
+                                        window.navigator.clipboard.writeText(
+                                            token.id
+                                        );
+                                    }
+                                }}
+                            >
+                                <ICCopy className="w-5 h-5" />
+                            </button>
+                        </Tooltip>
                     </div>
                     <div className="bg-ash-dark-600 h-10 px-4 flex items-center text-sm">
                         <span className="text-ash-gray-500">$</span>
-                        <span className="text-ash-green-500">1,000002</span>
+                        <span className="text-white">{fractionFormat(stats?.price || 0)}</span>
                     </div>
                 </div>
                 <div className="flex space-x-2 mb-[4.5rem]">
@@ -76,11 +109,11 @@ const TokenDetailPage: Page<props> = ({ token }: props) => {
                             </span>
                         </a>
                     </Link>
-                    <button className="bg-ash-dark-500 h-10 flex items-center px-4 text-sm">
+                    {/* <button className="bg-ash-dark-500 h-10 flex items-center px-4 text-sm">
                         <ICStarOutline className="w-5 h-5 mr-2" />
                         <span>Save</span>
-                    </button>
-                    <a href="">
+                    </button> */}
+                    <a href={network.explorerAddress + "/tokens/" + token.id} target="_blank" rel="noreferrer">
                         <span className="bg-ash-dark-500 h-10 flex items-center px-4 text-sm text-white">
                             <ICNewTabRound className="w-5 h-5 mr-3" />
                             <span>View on Elrondscan</span>
@@ -94,12 +127,16 @@ const TokenDetailPage: Page<props> = ({ token }: props) => {
                             <div className="flex justify-between items-baseline">
                                 <div className="text-lg">
                                     <span className="text-ash-gray-500">$</span>
-                                    <span>1,000,000,000</span>
+                                    <span>{fractionFormat(stats?.liquidity || 0)}</span>
                                 </div>
-                                <div className="text-ash-purple-500 text-xs font-bold">
+                                {/* <div className="text-ash-purple-500 text-xs font-bold">
                                     <ICArrowBottomRight className="inline w-2 h-2 mr-1" />
                                     <span>-19%</span>
                                 </div>
+                                <div className="text-ash-green-500 text-xs font-bold">
+                                    <ICArrowTopRight className="inline w-2 h-2 mr-1" />
+                                    <span>%</span>
+                                </div> */}
                             </div>
                         </div>
                         <div className="h-[7.5rem] px-[1.625rem] pt-5 pb-8 bg-ash-dark-600 flex flex-col justify-between">
@@ -107,33 +144,32 @@ const TokenDetailPage: Page<props> = ({ token }: props) => {
                             <div className="flex justify-between items-baseline">
                                 <div className="text-lg">
                                     <span className="text-ash-gray-500">$</span>
-                                    <span>1,000,000,000</span>
+                                    <span>{fractionFormat(stats?.volume || 0)}</span>
                                 </div>
-                                <div className="text-ash-purple-500 text-xs font-bold">
+                                {/* <div className="text-ash-purple-500 text-xs font-bold">
                                     <ICArrowBottomRight className="inline w-2 h-2 mr-1" />
                                     <span>-19%</span>
-                                </div>
+                                </div> */}
                             </div>
                         </div>
                         <div className="h-[7.5rem] px-[1.625rem] pt-5 pb-8 bg-ash-dark-600 flex flex-col justify-between">
                             <div className="text-xs">Transactions (24h)</div>
                             <div className="flex justify-between items-baseline">
                                 <div className="text-lg">
-                                    <span className="text-ash-gray-500">$</span>
-                                    <span>512</span>
+                                    <span>{fractionFormat(stats?.transaction_count || 0)}</span>
                                 </div>
-                                <div className="text-ash-green-500 text-xs font-bold">
+                                {/* <div className="text-ash-green-500 text-xs font-bold">
                                     <ICArrowTopRight className="inline w-2 h-2 mr-1" />
                                     <span>19%</span>
-                                </div>
+                                </div> */}
                             </div>
                         </div>
                     </div>
                     <div className="flex-grow h-[23.5rem] xl:ml-4 overflow-hidden mb-[4.5rem]">
-                        <TokenChart />
+                        <TokenChart token={token} />
                     </div>
                 </div>
-                <TxsTable/>
+                <TxsTable />
             </div>
         </div>
     );
