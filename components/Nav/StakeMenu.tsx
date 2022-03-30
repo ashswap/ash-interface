@@ -119,12 +119,12 @@ function StakeMenu() {
                             />
                             <div className="px-6 py-[3.75rem]">
                                 <div className="mb-9 text-2xl font-bold">
-                                    Social
+                                    Stake
                                 </div>
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 gap-4">
                                     {SOCIALS.map(({ name, url }) => {
                                         return (
-                                            <HeadlessLink key={name} href={url}>
+                                            <HeadlessLink key={name} href={url} onClick={() => setMIsOpen(false)}>
                                                 <div className="bg-ash-dark-400 px-6 h-12 flex items-center text-xs font-bold text-white">
                                                     <span className="capitalize truncate">
                                                         {name}

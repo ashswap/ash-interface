@@ -90,30 +90,30 @@ const FirstStakeContent = ({ open, onClose }: props) => {
     }, [estimatedVeASH, totalSupplyVeASH]);
     return (
         <>
-            <div className="pt-4 px-20 pb-12">
-                <div className="text-pink-600 text-2xl font-bold mb-14">
+            <div className="mt-4 px-6 lg:px-20 pb-12 overflow-auto">
+                <div className="text-pink-600 text-2xl font-bold mb-9 lg:mb-14">
                     Governance Stake
                 </div>
                 <div className="sm:flex sm:space-x-8 lg:space-x-24 mb-24">
-                    <div className="flex flex-col flex-grow">
-                        <div className="w-full grid grid-cols-2 gap-x-7.5 mb-12">
-                            <div>
-                                <div className="text-ash-gray-500 text-sm font-bold mb-4">
+                    <div className="flex flex-col flex-grow mb-16 lg:mb-0">
+                        <div className="w-full flex sm:grid sm:grid-cols-2 sm:gap-x-4 lg:gap-x-7.5 mb-12">
+                            <div className="w-1/3 sm:w-auto mr-5 sm:mr-0">
+                                <div className="text-ash-gray-500 text-xs lg:text-sm font-bold mb-2 lg:mb-4">
                                     Token
                                 </div>
-                                <div className="bg-ash-dark-400/30 h-18 px-7 flex items-center">
-                                    <div className="w-7 h-7 bg-pink-600 rounded-full mr-3"></div>
-                                    <div className="text-white text-lg font-bold">
+                                <div className="bg-ash-dark-400/30 h-14 lg:h-18 px-4 lg:px-7 flex items-center">
+                                    <div className="w-3.5 h-3.5 lg:w-7 lg:h-7 bg-pink-600 rounded-full mr-3"></div>
+                                    <div className="text-white text-sm lg:text-lg font-bold">
                                         {ASH_TOKEN.name}
                                     </div>
                                 </div>
                             </div>
-                            <div>
-                                <div className="text-ash-gray-500 text-sm font-bold mb-4">
+                            <div className="w-2/3 sm:w-auto">
+                                <div className="text-ash-gray-500 text-xs lg:text-sm font-bold mb-2 lg:mb-4">
                                     Input Amount
                                 </div>
                                 <InputCurrency
-                                    className={`w-full text-white text-lg font-bold bg-ash-dark-400 h-18 px-6 flex items-center text-right outline-none border ${
+                                    className={`w-full text-white text-lg font-bold bg-ash-dark-400 h-14 lg:h-18 px-4.5 lg:px-6 flex items-center text-right outline-none border ${
                                         insufficientASH
                                             ? "border-ash-purple-500"
                                             : "border-transparent"
@@ -126,7 +126,7 @@ const FirstStakeContent = ({ open, onClose }: props) => {
                                         setLockAmt(lockAmt);
                                     }}
                                 />
-                                <div className="text-right text-xs mt-2">
+                                <div className="text-right text-2xs lg:text-xs mt-2">
                                     <span className="text-ash-gray-500">
                                         Balance:{" "}
                                     </span>
@@ -183,23 +183,23 @@ const FirstStakeContent = ({ open, onClose }: props) => {
                                     onChange={(e) => setLockPeriod(e)}
                                 />
                                 <div className="flex justify-between mt-1">
-                                    <div className="text-sm font-bold text-white">
+                                    <div className="text-xs lg:text-sm font-bold text-white">
                                         7 days
                                     </div>
-                                    <div className="text-sm font-bold text-pink-600">
+                                    <div className="text-xs lg:text-sm font-bold text-pink-600">
                                         Max
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div className="w-[17.8125rem] flex-shrink-0 bg-stake-dark-500 py-[2.375rem] px-10">
+                    <div className="w-full sm:w-1/3 lg:w-[17.8125rem] flex-shrink-0 bg-stake-dark-500 py-[2.375rem] px-10">
                         <div className="text-white text-lg font-bold mb-16">
                             Estimate Staking
                         </div>
                         <div className="flex flex-col space-y-11">
                             <div>
-                                <div className="text-ash-gray-500 text-xs underline mb-2">
+                                <div className="text-stake-gray-500 text-xs underline mb-2">
                                     VeASH Receive
                                 </div>
                                 <div className="text-white text-lg font-bold">
@@ -207,7 +207,7 @@ const FirstStakeContent = ({ open, onClose }: props) => {
                                 </div>
                             </div>
                             <div>
-                                <div className="text-ash-gray-500 text-xs underline mb-2">
+                                <div className="text-stake-gray-500 text-xs underline mb-2">
                                     Your capacity
                                 </div>
                                 <div className="text-white text-lg font-bold">
@@ -215,7 +215,7 @@ const FirstStakeContent = ({ open, onClose }: props) => {
                                 </div>
                             </div>
                             <div>
-                                <div className="text-ash-gray-500 text-xs underline mb-2">
+                                <div className="text-stake-gray-500 text-xs underline mb-2">
                                     Unlock Time
                                 </div>
                                 <div className="text-white text-lg font-bold min-h-[3rem]">

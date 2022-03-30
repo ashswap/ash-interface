@@ -208,7 +208,7 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                                         : "I want to stake more!"}
                                 </div>
                                 <InputCurrency
-                                    className={`w-full text-white text-lg font-bold bg-ash-dark-400 h-14 lg:h-18 px-6 flex items-center text-right outline-none border ${
+                                    className={`w-full text-white text-lg font-bold bg-ash-dark-400 h-14 lg:h-18 px-4.5 lg:px-6 flex items-center text-right outline-none border ${
                                         insufficientASH
                                             ? "border-ash-purple-500"
                                             : "border-transparent"
