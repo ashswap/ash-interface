@@ -1,25 +1,20 @@
+import { network } from "const/network";
+import { fetcher } from "helper/common";
 import { abbreviateCurrency } from "helper/number";
+import { IToken } from "interface/token";
 import moment from "moment";
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import React, { useCallback, useMemo, useRef } from "react";
 import {
     Bar,
     BarChart,
-    LabelList,
     ResponsiveContainer,
     Tooltip,
     XAxis,
     YAxis,
 } from "recharts";
+import useSWR from "swr";
+import { TokenChartTimeUnitType } from "./TokenChart";
 
-const FAKE_DATA = new Array(30)
-    .fill("")
-    .map((val, i) => {
-        return {
-            timestamp: moment().subtract(i, "days").endOf("days").unix(),
-            value: Math.floor(Math.random() * 100000) + 20000,
-        };
-    })
-    .reverse();
 const MONTH = [
     "JAN",
     "FEB",
@@ -34,7 +29,6 @@ const MONTH = [
     "NOV",
     "DEC",
 ];
-const interval = ["D", "W", "M"];
 const CustomActiveDot = ({ dotColor, ...props }: any) => {
     const { cx, cy } = props;
     return (
@@ -91,7 +85,9 @@ const CustomTooltipCursor = ({ barRef, ...rest }: any) => {
     if (!barRef.current) return null;
     const { state, props } = barRef.current;
     const { width, height } = props;
-    const y = state.curData[payloadIndex].y;
+    const data = state.curData[payloadIndex];
+    const y = data?.y || 0;
+    const value = data?.payload.value || 0;
     return (
         <>
             <line
@@ -114,26 +110,48 @@ const CustomTooltipCursor = ({ barRef, ...rest }: any) => {
                 className="transition-none"
             ></rect>
             <text
-                x={width + 17}
+                x={width + 12}
                 y={y}
                 width="62"
                 height="28"
                 fill="white"
-                textAnchor="middle"
                 alignmentBaseline="central"
+                fontSize={12}
             >
-                5k
+                {abbreviateCurrency(value)}
             </text>
+            <CustomActiveDot
+                dotColor="#FF005C"
+                cx={(data?.x || 0) + (data?.width || 0) / 2}
+                cy={data?.y || 0}
+            />
         </>
         //   <svg width="600" height="1" version="1.1" xmlns="http://www.w3.org/2000/svg">
 
         // </svg>
     );
 };
-function TokenVolumeChart() {
-    const [timeUnit, setTimeUnit] = useState("D");
+function TokenVolumeChart({
+    token,
+    timeUnit,
+}: {
+    token: IToken;
+    timeUnit: TokenChartTimeUnitType;
+}) {
+    const { data } = useSWR<[number, number][]>(
+        token.id
+            ? `${network.ashApiBaseUrl}/token/${token.id}/graph-statistic?type=volume`
+            : null,
+        fetcher
+    );
     const barRef = useRef<any>(null);
-    const chartData = useMemo(() => FAKE_DATA, []);
+    const chartData = useMemo(() => {
+        if (!data) return [];
+        return data.map(([timestamp, value]) => ({
+            timestamp,
+            value,
+        }));
+    }, [data]);
     const displayChartData = useMemo(() => {
         if (timeUnit === "D") return chartData;
         const wMap: { [key: number]: number[] } = {};
@@ -258,13 +276,19 @@ function TokenVolumeChart() {
                     orientation="right"
                     axisLine={false}
                     tickLine={false}
-                    padding={{ top: 20 }}
+                    padding={{ top: 20, bottom: 20 }}
                     domain={[0, (max: number) => max * 1.2]}
                     tickFormatter={(val: number) =>
                         abbreviateCurrency(val).toString()
                     }
                     width={50}
                     tick={{ fill: "#B7B7D7", fontSize: 12 }}
+                />
+                <Bar
+                    ref={barRef}
+                    dataKey="value"
+                    fill="url(#TVC-pattern)"
+                    maxBarSize={50}
                 />
                 <Tooltip
                     coordinate={{ x: 0, y: 0 }}
@@ -273,14 +297,6 @@ function TokenVolumeChart() {
                     cursor={<CustomTooltipCursor barRef={barRef} />}
                     content={<></>}
                 />
-                <Bar
-                    ref={barRef}
-                    dataKey="value"
-                    fill="url(#TVC-pattern)"
-                    maskContentUnits="objectBoundingBox"
-                >
-                    {/* <LabelList dataKey="value" content={e => {console.log(e); return <></>}}/> */}
-                </Bar>
             </BarChart>
         </ResponsiveContainer>
     );

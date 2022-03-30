@@ -14,44 +14,6 @@ import {
 } from "recharts";
 import useSWR from "swr";
 import { TokenChartTimeUnitType } from "./TokenChart";
-const data = [
-    {
-        name: 1,
-        uv: 4000,
-    },
-    {
-        name: 1.2,
-        uv: 2000,
-    },
-    {
-        name: 1.4,
-        uv: 2300,
-    },
-    {
-        name: 1.5,
-        uv: 1000,
-    },
-    {
-        name: 2,
-        uv: 2000,
-    },
-    {
-        name: 2.5,
-        uv: 2780,
-    },
-    {
-        name: 3,
-        uv: 1890,
-    },
-    {
-        name: 3.5,
-        uv: 2390,
-    },
-    {
-        name: 4,
-        uv: 3490,
-    },
-];
 
 const CustomActiveDot = ({ dotColor, ...props }: any) => {
     const { cx, cy } = props;
@@ -252,7 +214,7 @@ function TokenLiquidityChart({
         <ResponsiveContainer>
             <AreaChart data={displayChartData}>
                 <defs>
-                    <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
+                    <linearGradient id="TLC-colorUv" x1="0" y1="0" x2="0" y2="1">
                         <stop
                             offset="5%"
                             stopColor="#FF005C"
@@ -264,7 +226,7 @@ function TokenLiquidityChart({
                             stopOpacity={0}
                         />
                     </linearGradient>
-                    <filter id="shadowUv" height="200%">
+                    <filter id="TLC-shadowUv" height="200%">
                         <feDropShadow
                             dx="0"
                             dy="0"
@@ -311,9 +273,9 @@ function TokenLiquidityChart({
                     dataKey="value"
                     stroke="#FF005C"
                     fillOpacity={1}
-                    fill="url(#colorUv)"
+                    fill="url(#TLC-colorUv)"
                     strokeWidth={3}
-                    filter="url(#shadowUv)"
+                    filter="url(#TLC-shadowUv)"
                     activeDot={(activeDotProps) => (
                         <CustomActiveDot
                             {...activeDotProps}

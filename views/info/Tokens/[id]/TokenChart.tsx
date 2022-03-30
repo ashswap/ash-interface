@@ -36,7 +36,7 @@ function TokenChart({token}: {token: IToken}) {
             </div>
             <div className="flex-grow mb-5">
                 {chartType === "Liquidity" && <TokenLiquidityChart token={token} timeUnit={timeUnit} />}
-                {chartType === "Volumn" && <TokenVolumeChart />}
+                {chartType === "Volumn" && <TokenVolumeChart token={token} timeUnit={timeUnit}/>}
                 {chartType === "Price" && <TokenPriceChart timeUnit={timeUnit} />}
             </div>
             <div className="text-ash-gray-500 flex space-x-2 flex-shrink-0">
