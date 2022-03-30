@@ -1,7 +1,9 @@
 import { network } from "const/network";
 import { fetcher } from "helper/common";
+import { abbreviateCurrency } from "helper/number";
 import { IToken } from "interface/token";
-import React, { useRef, useState } from "react";
+import moment from "moment";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import {
     Area,
     AreaChart,
@@ -11,6 +13,7 @@ import {
     YAxis,
 } from "recharts";
 import useSWR from "swr";
+import { TokenChartTimeUnitType } from "./TokenChart";
 const data = [
     {
         name: 1,
@@ -105,6 +108,7 @@ const CustomTooltipCursor = ({ areaRef, ...props }: any) => {
     const { width, height, left, payloadIndex } = props;
     if (!areaRef.current) return null;
     const y = areaRef.current.state.curPoints[payloadIndex]?.y || 0;
+    const value = areaRef.current.state.curPoints[payloadIndex]?.payload.value || 0;
     return (
         <>
             <line
@@ -127,15 +131,16 @@ const CustomTooltipCursor = ({ areaRef, ...props }: any) => {
                 className="transition-none"
             ></rect>
             <text
-                x={width + 17}
+                x={width + 12}
                 y={y}
                 width="62"
                 height="28"
                 fill="white"
-                textAnchor="middle"
+                // textAnchor="middle"
                 alignmentBaseline="central"
+                fontSize={12}
             >
-                5k
+                {abbreviateCurrency(value)}
             </text>
         </>
         //   <svg width="600" height="1" version="1.1" xmlns="http://www.w3.org/2000/svg">
@@ -157,13 +162,95 @@ const MONTH = [
     "NOV",
     "DEC",
 ];
-function TokenLiquidityChart({token}: {token: IToken}) {
-    const {data} = useSWR(token.id ? `${network.ashApiBaseUrl}/token/${token.id}/graph-statistic?type=liquidity` : null, fetcher);
+function TokenLiquidityChart({
+    token,
+    timeUnit,
+}: {
+    token: IToken;
+    timeUnit: TokenChartTimeUnitType;
+}) {
+    const { data } = useSWR<[number, number][]>(
+        token.id
+            ? `${network.ashApiBaseUrl}/token/${token.id}/graph-statistic?type=liquidity`
+            : null,
+        fetcher
+    );
     const areaRef = useRef<any>(null);
-    
+    const chartData = useMemo(() => {
+        if (!data) return [];
+        return data.map(([timestamp, value]) => ({ timestamp, value }));
+    }, [data]);
+    const displayChartData = useMemo(() => {
+        if (timeUnit === "D") return chartData;
+        const wMap: { [key: number]: number[] } = {};
+        chartData.map((val) => {
+            // group by week or month to get the same key(timestamp)
+            const w =
+                timeUnit === "W"
+                    ? moment
+                          .unix(val.timestamp)
+                          .day(1)
+                          .hour(0)
+                          .minute(0)
+                          .second(0)
+                          .millisecond(0)
+                          .unix()
+                    : moment
+                          .unix(val.timestamp)
+                          .date(1)
+                          .hour(0)
+                          .minute(0)
+                          .second(0)
+                          .millisecond(0)
+                          .unix();
+            if (wMap[w]) {
+                wMap[w].push(val.value);
+            } else {
+                wMap[w] = [val.value];
+            }
+        });
+        const avg = Object.keys(wMap).map((k) => {
+            const sum = wMap[+k].reduce((total, value) => {
+                return total + value;
+            }, 0);
+            return {
+                timestamp: +k,
+                value: sum / wMap[+k].length,
+            };
+        });
+        return avg;
+    }, [chartData, timeUnit]);
+
+        // get displayed distinct Xaxis Tick value (timestamp)
+        const ticks = useMemo(() => {
+            const temp = new Set<number>();
+            displayChartData.map(({ timestamp }) => {
+                if (timeUnit === "D") {
+                    temp.add(timestamp);
+                } else {
+                    const time = moment.unix(timestamp);
+                    temp.add(
+                        timeUnit === "M" ? time.date(1).unix() : time.day(1).unix()
+                    );
+                }
+            });
+            return Array.from(temp);
+        }, [displayChartData, timeUnit]);
+        // Xaxis formatter
+        const tickFormatter = useCallback(
+            (val, index: number) => {
+                const time = moment.unix(val);
+                return timeUnit === "D"
+                    ? time.format("DD/MM/yyyy")
+                    : timeUnit === "M"
+                    ? MONTH[time.month()]
+                    : "week " + time.week();
+            },
+            [timeUnit]
+        );
     return (
         <ResponsiveContainer>
-            <AreaChart data={data}>
+            <AreaChart data={displayChartData}>
                 <defs>
                     <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
                         <stop
@@ -187,25 +274,27 @@ function TokenLiquidityChart({token}: {token: IToken}) {
                     </filter>
                 </defs>
                 <XAxis
-                    dataKey="name"
+                    dataKey="timestamp"
                     type="number"
                     axisLine={false}
                     tickLine={false}
                     padding={{ right: 30 }}
                     interval="preserveStart"
                     domain={["dataMin", "dataMax"]}
-                    tickFormatter={(val: number) =>
-                        MONTH[(Math.ceil(val) % MONTH.length) - 1]
-                    }
+                    tickFormatter={tickFormatter}
+                    ticks={ticks}
+                    tick={{fill: "#B7B7D7", fontSize: 12}}
                 />
                 <YAxis
+                    dataKey="value"
                     orientation="right"
                     axisLine={false}
                     tickLine={false}
-                    padding={{ top: 20 }}
+                    padding={{ top: 20, bottom: 20 }}
                     domain={[0, (max: number) => max * 1.5]}
-                    tickFormatter={(val: number) => val / 1000 + "k"}
+                    tickFormatter={(val: number) => abbreviateCurrency(val).toString()}
                     width={50}
+                    tick={{fill: "#B7B7D7", fontSize: 12}}
                 />
                 <Tooltip
                     coordinate={{ x: 0, y: 0 }}
@@ -219,7 +308,7 @@ function TokenLiquidityChart({token}: {token: IToken}) {
                 <Area
                     ref={areaRef}
                     type="linear"
-                    dataKey="uv"
+                    dataKey="value"
                     stroke="#FF005C"
                     fillOpacity={1}
                     fill="url(#colorUv)"
