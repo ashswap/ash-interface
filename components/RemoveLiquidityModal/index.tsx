@@ -186,7 +186,7 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
     }, [liquidityDebounce, pool, dapp.dapp.proxy]);
 
     const removeLP = useCallback(async () => {
-        if (removing) return;
+        if (removing || liquidity.eq(0)) return;
         setRemoving(true);
         try {
             let tx = await callContract(new Address(pool.address), {
@@ -275,16 +275,17 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
             <div className="flex items-baseline text-2xl font-bold text-yellow-700">
                 Withdraw Liquidity
             </div>
-            <div className="sm:flex mt-8 mb-12 sm:my-10 gap-4 md:gap-8">
-                <div className="relative sm:w-1/2 md:w-2/3 overflow-hidden mb-11 sm:mb-0">
+            <div className="mt-8 mb-12 sm:my-10">
+                <div className="relative mb-11 sm:mb-0">
                     <div>
                         <div className="flex items-center space-x-1 bg-ash-dark-700 sm:bg-transparent pl-4 sm:pl-0">
                             <div className="flex items-center font-bold w-24 flex-shrink-0 border-r border-r-ash-gray-500 sm:border-r-0">
                                 <IconRight className="mr-4" />
                                 <span>TOTAL</span>
                             </div>
+                            <div className="flex-1 flex items-center overflow-hidden bg-ash-dark-700 text-right text-lg h-[4.5rem] px-5 ">
                             <InputCurrency
-                                className="flex-1 overflow-hidden bg-ash-dark-700 text-right text-lg h-[4.5rem] px-5 outline-none"
+                                className="bg-transparent text-right flex-grow outline-none"
                                 placeholder="0"
                                 value={displayInputLiquidity}
                                 onChange={(e) => {
@@ -301,6 +302,8 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
                                     );
                                 }}
                             />
+                            <div className="text-ash-gray-500 ml-2">$</div>
+                            </div>
                         </div>
                         <div className="flex flex-row items-center">
                             <div className="sm:w-24"></div>
@@ -407,43 +410,9 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
                         </div>
                     </div>
                 </div>
-                <div className="sm:w-1/2 md:w-1/3 bg-ash-dark-500 p-9 sm:p-8">
-                    <div className="text-lg font-bold text-yellow-700">
-                        Your profit will go down
-                    </div>
-                    <div className="flex flex-wrap my-8 gap-y-9">
-                        <div className="w-1/2">
-                            <div className="mb-4 text-xs">Your liquidity</div>
-                            <div className="text-lg font-bold">
-                                {capacityPercent.toFixed(2)}%
-                            </div>
-                            <div className="text-ash-purple-500 text-2xs mt-2">
-                                <ICArrowBottomRight className="inline mr-1" />
-                                <span>-26%</span>
-                            </div>
-                        </div>
-                        <div className="w-1/2">
-                            <div className="mb-4 text-xs">Farm per day</div>
-                            <div className="text-lg font-bold">
-                                -15.211{" "}
-                                <span className="text-xs font-normal">
-                                    ELGD
-                                </span>
-                            </div>
-                            <div className="text-ash-purple-500 text-2xs mt-2">
-                                <ICArrowBottomRight className="inline mr-1" />
-                                <span>-26%</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
 
-            <div className="sm:flex items-center gap-4 md:gap-8">
-                <div className="sm:w-1/2 md:w-2/3 text-center sm:text-right mb-8 sm:mb-0 font-bold text-sm">
-                    <div className="text-white">You also receive</div>
-                    <div className="text-earn">0.005 ELGD by farming</div>
-                </div>
+            <div className="sm:flex justify-end md:gap-8">
                 <div className="sm:w-1/2 md:w-1/3">
                     <Button
                         topLeftCorner
@@ -451,7 +420,7 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
                         className="mt-1.5"
                         outline
                         onClick={removeLP}
-                        disable={removing}
+                        disable={removing || liquidity.eq(0)}
                         primaryColor="yellow-700"
                     >
                         {dapp.account.balance === "0"
@@ -473,7 +442,7 @@ const RemoveLiquidityModal = ({ open, onClose, poolData }: Props) => {
         >
             <div
                 className="clip-corner-4 clip-corner-tl bg-ash-dark-600 p-4
-                    sm:mt-28 sm:ash-container max-w-[51.75rem] mx-auto
+                    sm:mt-28 max-w-4xl mx-auto
                     fixed sm:relative inset-x-0 bottom-0 max-h-screen overflow-auto text-white"
             >
                 <HeadlessModalDefaultHeader

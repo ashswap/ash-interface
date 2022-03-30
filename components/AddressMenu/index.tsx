@@ -1,7 +1,7 @@
-import { Dropdown, Menu } from "antd";
 import IconChange from "assets/svg/change.svg";
 import IconCopy from "assets/svg/copy.svg";
 import IconDisconnect from "assets/svg/disconnect.svg";
+import BasePopover from "components/BasePopover";
 import HeadlessModal, {
     HeadlessModalDefaultHeader,
 } from "components/HeadlessModal";
@@ -18,7 +18,6 @@ import {
     useEffect,
     useState,
 } from "react";
-import styles from "./AddressMenu.module.css";
 type AddressMenuProp = {
     infoLayout?: boolean;
     dropdownBtn: (
@@ -38,7 +37,7 @@ function AddressMenu({ infoLayout, dropdownBtn, connectBtn }: AddressMenuProp) {
     const isSMScreen = useMediaQuery(
         `(max-width: ${TAILWIND_BREAKPOINT.SM}px)`
     );
-    const { connectWallet } = useWallet();
+    const { connectWallet, setIsOpenConnectWalletModal } = useWallet();
     useEffect(() => {
         setMShowMenu(false);
         setShowMenu(false);
@@ -57,50 +56,53 @@ function AddressMenu({ infoLayout, dropdownBtn, connectBtn }: AddressMenuProp) {
             setMShowMenu(false);
         }
     }, [loggedIn]);
-    const menu = (
-        <Menu className={styles.addressMenu}>
-            <Menu.Item
-                key="1"
-                className={styles.addressMenuItem}
-                icon={<IconCopy className="text-ash-gray-500" />}
-                onClick={copyAddress}
-            >
-                Copy address
-            </Menu.Item>
-            <Menu.Item
-                key="2"
-                className={styles.addressMenuItem}
-                icon={<IconChange />}
-            >
-                Change wallet
-            </Menu.Item>
-            <Menu.Item
-                key="3"
-                className={styles.addressMenuItem}
-                icon={<IconDisconnect />}
-                onClick={() => logoutDapp({})}
-            >
-                Disconnect wallet
-            </Menu.Item>
-        </Menu>
-    );
 
     return (
         <>
             <div>
                 {mounted &&
                     (loggedIn ? (
-                        <Dropdown
-                            overlay={menu}
-                            trigger={["click"]}
-                            disabled={isSMScreen}
-                            visible={showMenu}
-                            onVisibleChange={() =>
-                                setShowMenu((state) => !state)
-                            }
+                        <BasePopover
+                            options={{ strategy: "fixed" }}
+                            button={() => (
+                                <div>{dropdownBtn(address, setMShowMenu)}</div>
+                            )}
                         >
-                            <div>{dropdownBtn(address, setMShowMenu)}</div>
-                        </Dropdown>
+                            {({ close }) => (
+                                <div className="bg-ash-dark-700">
+                                    <button
+                                        className={`w-full py-2 px-3 flex items-center overflow-hidden text-white hover:text-white transition-all font-bold text-xs hover:bg-ash-dark-500`}
+                                        onClick={() => {
+                                            copyAddress();
+                                            close();
+                                        }}
+                                    >
+                                        <IconCopy className="w-5 h-5 text-ash-gray-600 mr-3.5" />
+                                        <span>Copy address</span>
+                                    </button>
+                                    <button
+                                        className={`w-full py-2 px-3 flex items-center overflow-hidden text-white hover:text-white transition-all font-bold text-xs hover:bg-ash-dark-500`}
+                                        onClick={() => {
+                                            setIsOpenConnectWalletModal(true);
+                                            close();
+                                        }}
+                                    >
+                                        <IconChange className="w-5 h-5 text-ash-gray-600 mr-3.5" />
+                                        <span>Change wallet</span>
+                                    </button>
+                                    <button
+                                        className={`w-full py-2 px-3 flex items-center overflow-hidden text-white hover:text-white transition-all font-bold text-xs hover:bg-ash-dark-500`}
+                                        onClick={() => {
+                                            logoutDapp();
+                                            close();
+                                        }}
+                                    >
+                                        <IconDisconnect className="w-5 h-5 text-ash-gray-600 mr-3.5" />
+                                        <span>Disconnect wallet</span>
+                                    </button>
+                                </div>
+                            )}
+                        </BasePopover>
                     ) : (
                         <>{connectBtn(connectWallet)}</>
                     ))}
