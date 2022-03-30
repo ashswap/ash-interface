@@ -13,6 +13,7 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { ReactElement } from "react";
 import TokenChart from "views/info/Tokens/[id]/TokenChart";
+import TxsTable from "views/info/components/TxsTable";
 
 type Page<P = {}> = NextPage<P> & {
     getLayout?: (page: ReactElement) => ReactElement;
@@ -96,7 +97,7 @@ const TokenDetailPage: Page<props> = ({ token }: props) => {
                                     <span>1,000,000,000</span>
                                 </div>
                                 <div className="text-ash-purple-500 text-xs font-bold">
-                                    <ICArrowBottomRight className="inline w-2 h-2 mr-1"/>
+                                    <ICArrowBottomRight className="inline w-2 h-2 mr-1" />
                                     <span>-19%</span>
                                 </div>
                             </div>
@@ -109,7 +110,7 @@ const TokenDetailPage: Page<props> = ({ token }: props) => {
                                     <span>1,000,000,000</span>
                                 </div>
                                 <div className="text-ash-purple-500 text-xs font-bold">
-                                    <ICArrowBottomRight className="inline w-2 h-2 mr-1"/>
+                                    <ICArrowBottomRight className="inline w-2 h-2 mr-1" />
                                     <span>-19%</span>
                                 </div>
                             </div>
@@ -122,16 +123,17 @@ const TokenDetailPage: Page<props> = ({ token }: props) => {
                                     <span>512</span>
                                 </div>
                                 <div className="text-ash-green-500 text-xs font-bold">
-                                    <ICArrowTopRight className="inline w-2 h-2 mr-1"/>
+                                    <ICArrowTopRight className="inline w-2 h-2 mr-1" />
                                     <span>19%</span>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div className="flex-grow h-[23.5rem] xl:ml-4 overflow-hidden mb-[4.5rem]">
-                        <TokenChart/>
+                        <TokenChart />
                     </div>
                 </div>
+                <TxsTable/>
             </div>
         </div>
     );
@@ -147,11 +149,6 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
             props: { token },
         };
     }
-    return {
-        redirect: {
-            destination: "/info",
-            permanent: true,
-        },
-    };
+    return { props: {} };
 };
 export default TokenDetailPage;

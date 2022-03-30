@@ -1,6 +1,8 @@
 import { ValueOf } from "interface/utilities";
 import React, { useState } from "react";
 import TokenLiquidityChart from "./TokenLiquidityChart";
+import TokenPriceChart from "./TokenPriceChart";
+import TokenVolumeChart from "./TokenVolumeChart";
 
 const TIME_UNIT = {
     DAY: "D",
@@ -38,6 +40,8 @@ function TokenChart() {
             </div>
             <div className="flex-grow mb-5">
                 {chartType === "Liquidity" && <TokenLiquidityChart />}
+                {chartType === "Volumn" && <TokenVolumeChart />}
+                {chartType === "Price" && <TokenPriceChart timeUnit={timeUnit} />}
             </div>
             <div className="text-ash-gray-500 flex space-x-2 flex-shrink-0">
                 {TimeUnitArr.map((unit) => {

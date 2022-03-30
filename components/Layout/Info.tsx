@@ -1,5 +1,7 @@
 import ImgAvatar from "assets/images/avatar.png";
 import ICChevronDown from "assets/svg/chevron-down.svg";
+import ICChevronRight from "assets/svg/chevron-right.svg";
+import ICChevronLeft from "assets/svg/chevron-left.svg";
 import ICDrop from "assets/svg/drop.svg";
 import ICMoon from "assets/svg/moon.svg";
 import ICSearch from "assets/svg/search.svg";
@@ -13,8 +15,10 @@ import Link, { LinkProps } from "next/link";
 import { useRouter } from "next/router";
 import ImgLogo from "public/images/m-logo.png";
 import React, { useCallback, useState } from "react";
+import { Transition } from "@headlessui/react";
 type NavLinkProps = {
     active: boolean;
+    collapsed?: boolean;
     name: string;
     Icon: React.FunctionComponent<React.SVGAttributes<SVGElement>>;
 } & LinkProps;
@@ -71,21 +75,21 @@ const SwitchThemeBtn = () => {
         </button>
     );
 };
-const NavLink = ({ active, name, Icon, ...linkProps }: NavLinkProps) => {
+const NavLink = ({ active, collapsed, name, Icon, ...linkProps }: NavLinkProps) => {
     return (
         <Link {...linkProps}>
             <a>
                 <div
                     className={`flex relative py-3 font-bold text-sm ${
                         active ? "text-white" : "text-ash-gray-500"
-                    }`}
+                    } ${collapsed ? "pr-4 justify-center" : ""}`}
                 >
                     <Icon
-                        className={`inline w-5 h-5 mr-4 ${
+                        className={`inline w-5 h-5 ${
                             active ? "text-pink-600" : ""
                         }`}
                     />
-                    <span>{name}</span>
+                    {!collapsed && <span className="ml-4">{name}</span>}
                     <span
                         className={`w-0.5 h-5 absolute right-0 ${
                             active ? "bg-pink-600" : "bg-transparent"
@@ -122,6 +126,7 @@ const MNavLink = ({ active, name, Icon, ...linkProps }: NavLinkProps) => {
     );
 };
 function InfoLayout({ children }: any) {
+    const [openSidebar, setOpenSidebar] = useState(true);
     const screenSizes = useScreenSize();
     const router = useRouter();
 
@@ -134,18 +139,47 @@ function InfoLayout({ children }: any) {
     if (!screenSizes.msm) {
         return (
             <div className="flex overflow-x-hidden">
-                <aside className="flex-shrink-0 fixed top-0 left-0 h-screen overflow-hidden w-52 md:w-60 bg-ash-dark-600 pl-4 md:pl-12 py-9 flex flex-col space-y-5">
-                    <div className="w-14 h-14 relative flex-shrink-0">
-                        <Image
-                            src={ImgLogo}
-                            alt="ashswap logo"
-                            layout="fill"
-                            objectFit="contain"
-                        ></Image>
-                    </div>
-                    <div className="flex-grow overflow-auto">
-                        <ul>
-                            {/* <li>
+                <div className="fixed z-10">
+                    <Transition
+                        show={openSidebar}
+                        enter="transition duration-200 ease"
+                        enterFrom="opacity-0"
+                        enterTo="opacity-100"
+                    >
+                        {openSidebar && !screenSizes.lg && (
+                            <div className="bg-black/30 fixed inset-0 backdrop-blur-md" onClick={() => setOpenSidebar(false)}></div>
+                        )}
+                    </Transition>
+                    <aside
+                        className={`flex-shrink-0 fixed top-0 left-0 h-screen bg-ash-dark-600 py-9 flex flex-col z-10 transition-all ${
+                            openSidebar ? "w-52 lg:w-60 pl-4 lg:pl-12" : "w-18 pl-4"
+                        }`}
+                    >
+                        <button
+                            className="absolute right-0 translate-x-2 w-6 h-6 rounded-full flex items-center justify-center bg-ash-dark-500"
+                            onClick={() => setOpenSidebar((val) => !val)}
+                        >
+                            {openSidebar ? (
+                                <ICChevronLeft className="w-2 h-2" />
+                            ) : (
+                                <ICChevronRight className="w-2 h-2" />
+                            )}
+                        </button>
+                        <div
+                            className={`relative flex-shrink-0 mb-5 ${
+                                openSidebar ? "w-14 h-14" : "w-10 h-10"
+                            }`}
+                        >
+                            <Image
+                                src={ImgLogo}
+                                alt="ashswap logo"
+                                layout="fill"
+                                objectFit="contain"
+                            ></Image>
+                        </div>
+                        <div className="flex-grow overflow-auto">
+                            <ul>
+                                {/* <li>
                                 <NavLink
                                     href={{ pathname: "/info" }}
                                     name="Overview"
@@ -153,23 +187,25 @@ function InfoLayout({ children }: any) {
                                     active={isActive("/info", true)}
                                 />
                             </li> */}
-                            <li>
-                                <NavLink
-                                    href="/info/tokens"
-                                    name="Tokens"
-                                    Icon={ICToken}
-                                    active={isActive("/info/tokens", false)}
-                                />
-                            </li>
-                            <li>
-                                <NavLink
-                                    href="/info/pools"
-                                    name="Pools"
-                                    Icon={ICDrop}
-                                    active={isActive("/info/pools", false)}
-                                />
-                            </li>
-                            {/* <li>
+                                <li>
+                                    <NavLink
+                                        href="/info/tokens"
+                                        name="Tokens"
+                                        collapsed={!openSidebar}
+                                        Icon={ICToken}
+                                        active={isActive("/info/tokens", false)}
+                                    />
+                                </li>
+                                <li>
+                                    <NavLink
+                                        href="/info/pools"
+                                        name="Pools"
+                                        collapsed={!openSidebar}
+                                        Icon={ICDrop}
+                                        active={isActive("/info/pools", false)}
+                                    />
+                                </li>
+                                {/* <li>
                                 <NavLink
                                     href="/info/wallet"
                                     name="Wallets"
@@ -177,7 +213,7 @@ function InfoLayout({ children }: any) {
                                     active={isActive("/info/wallet", false)}
                                 />
                             </li> */}
-                            {/* <li>
+                                {/* <li>
                                 <NavLink
                                     href="/info/transactions"
                                     name="Trans"
@@ -188,9 +224,9 @@ function InfoLayout({ children }: any) {
                                     )}
                                 />
                             </li> */}
-                        </ul>
-                    </div>
-                    {/* <div className="flex-shrink-0 flex flex-col space-y-2">
+                            </ul>
+                        </div>
+                        {/* <div className="flex-shrink-0 flex flex-col space-y-2">
                         <div className="text-ash-gray-500 text-xs mb-8">
                             <span className="inline-block rounded-full bg-ash-green-500 w-2 h-2 mr-2"></span>
                             <span>Updated 4 mins ago</span>
@@ -205,8 +241,10 @@ function InfoLayout({ children }: any) {
                             Wallet count (24H): 21
                         </div>
                     </div> */}
-                </aside>
-                <div className="flex-grow px-4 lg:px-9 lg:py-6 relative overflow-x-hidden ml-52 md:ml-60 mr-32">
+                    </aside>
+                </div>
+
+                <div className={`flex-grow px-4 lg:px-9 lg:py-6 relative overflow-x-hidden mr-32 ${openSidebar ? "ml-18 lg:ml-60" : "ml-18"}`}>
                     {/* <div className="fixed top-6 right-[10.25rem] z-20">
                         <Input
                             backgroundClassName="bg-ash-dark-700/70 h-12 px-5"

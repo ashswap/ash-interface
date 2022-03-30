@@ -9,6 +9,7 @@ import { abbreviateCurrency, currencyFormater } from "helper/number";
 import { useScreenSize } from "hooks/useScreenSize";
 import { IToken } from "interface/token";
 import Image from "next/image";
+import Link from "next/link";
 import React, { useCallback, useMemo, useState } from "react";
 import useSWR from "swr";
 type TokenRecord = {
@@ -54,10 +55,10 @@ const TokenRecord = ({
         return format(tokenData.price);
     }, [format, tokenData]);
     return (
-        // <Link href={`/info/tokens/${tokenData?.token_id}`}>
-        //     <a>
-        <div className="flex items-center bg-ash-dark-600 hover:bg-ash-dark-700 px-4 lg:px-[1.625rem] text-ash-gray-500 space-x-2 text-xs h-14 overflow-hidden">
-            {/* <div
+        <Link href={`/info/tokens/${tokenData?.token_id}`}>
+            <a>
+                <div className="flex items-center bg-ash-dark-600 hover:bg-ash-dark-700 px-4 lg:px-[1.625rem] text-ash-gray-500 space-x-2 text-xs h-14 overflow-hidden">
+                    {/* <div
                 className="w-5"
                 onClick={(e) => {
                     e.preventDefault();
@@ -70,56 +71,56 @@ const TokenRecord = ({
                     <ICStarOutline className="w-4 h-4 text-ash-gray-500" />
                 )}
             </div> */}
-            <div className="w-5">{order}</div>
-            <div className="w-20 md:w-28 lg:w-44 flex items-center justify-between overflow-hidden">
-                <div className="flex items-center mr-2">
-                    {/* <Image
+                    <div className="w-5">{order}</div>
+                    <div className="w-20 md:w-28 lg:w-44 flex items-center justify-between overflow-hidden">
+                        <div className="flex items-center mr-2">
+                            {/* <Image
                         src={tokenData?.token?.icon || ""}
                         alt="token"
                         width={24}
                         height={24}
                     /> */}
-                    <div className="ml-2.5 font-bold text-sm">
-                        {tokenData?.token?.name}
+                            <div className="ml-2.5 font-bold text-sm">
+                                {tokenData?.token?.name}
+                            </div>
+                        </div>
+                        <div className="hidden lg:block text-2xs text-ash-gray-500 truncate">
+                            {tokenData?.token?.name} Coin
+                        </div>
                     </div>
-                </div>
-                <div className="hidden lg:block text-2xs text-ash-gray-500 truncate">
-                    {tokenData?.token?.name} Coin
-                </div>
-            </div>
-            <div className="flex-1 overflow-hidden text-right">
-                <span className="text-ash-gray-500">$</span>
-                <span className="text-white">{volume}</span>
-            </div>
-            <div className="flex-1 overflow-hidden text-right">
-                <span className="text-ash-gray-500">$</span>
-                <span className="text-white">{liquidity}</span>
-            </div>
-            <div className="hidden md:block flex-1 overflow-hidden text-right">
-                <span className="text-ash-gray-500">$</span>
-                <span className="text-white">{price}</span>
-            </div>
-            {[
-                tokenData.change_percentage_hour,
-                tokenData.change_percentage_day,
-                tokenData.change_percentage_week,
-            ].map((val, index) => {
-                return (
-                    <div
-                        key={index}
-                        className={`hidden xl:block w-14 text-right ${
-                            val >= 0
-                                ? "text-ash-green-500"
-                                : "text-ash-purple-500"
-                        }`}
-                    >
-                        {val.toFixed(1)}%
+                    <div className="flex-1 overflow-hidden text-right">
+                        <span className="text-ash-gray-500">$</span>
+                        <span className="text-white">{volume}</span>
                     </div>
-                );
-            })}
-        </div>
-        //     </a>
-        // </Link>
+                    <div className="flex-1 overflow-hidden text-right">
+                        <span className="text-ash-gray-500">$</span>
+                        <span className="text-white">{liquidity}</span>
+                    </div>
+                    <div className="hidden md:block flex-1 overflow-hidden text-right">
+                        <span className="text-ash-gray-500">$</span>
+                        <span className="text-white">{price}</span>
+                    </div>
+                    {[
+                        tokenData.change_percentage_hour,
+                        tokenData.change_percentage_day,
+                        tokenData.change_percentage_week,
+                    ].map((val, index) => {
+                        return (
+                            <div
+                                key={index}
+                                className={`hidden xl:block w-14 text-right ${
+                                    val >= 0
+                                        ? "text-ash-green-500"
+                                        : "text-ash-purple-500"
+                                }`}
+                            >
+                                {val.toFixed(1)}%
+                            </div>
+                        );
+                    })}
+                </div>
+            </a>
+        </Link>
     );
 };
 function TokenTable() {

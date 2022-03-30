@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
     Area,
     AreaChart,
@@ -97,9 +97,10 @@ const CustomActiveDot = ({ dotColor, ...props }: any) => {
         </svg>
     );
 };
-const CustomTooltipCursor = ({ areaPoints, ...props }: any) => {
+const CustomTooltipCursor = ({ areaRef, ...props }: any) => {
     const { width, height, left, payloadIndex } = props;
-    const { x, y } = areaPoints?.[payloadIndex] || {};
+    if (!areaRef.current) return null;
+    const y = areaRef.current.state.curPoints[payloadIndex]?.y || 0;
     return (
         <>
             <line
@@ -153,9 +154,7 @@ const MONTH = [
     "DEC",
 ];
 function TokenLiquidityChart() {
-    const [cursorPoints, setCursorPoints] = useState<
-        { x: number; y: number }[]
-    >([]);
+    const areaRef = useRef<any>(null);
     return (
         <ResponsiveContainer>
             <AreaChart data={data}>
@@ -176,7 +175,7 @@ function TokenLiquidityChart() {
                         <feDropShadow
                             dx="0"
                             dy="0"
-                            stdDeviation="20"
+                            stdDeviation="10"
                             floodColor="#FF005C"
                         />
                     </filter>
@@ -206,12 +205,13 @@ function TokenLiquidityChart() {
                     coordinate={{ x: 0, y: 0 }}
                     active={true}
                     position={{ x: 0, y: 0 }}
-                    cursor={<CustomTooltipCursor areaPoints={cursorPoints} />}
+                    cursor={<CustomTooltipCursor areaRef={areaRef} />}
                     content={<></>}
                 />
                 {/* <Tooltip cursor={{}} content={<CustomTooltip/>}/> */}
                 {/* <Tooltip coordinate={{x: 0, y: 0}} active={true} position={{x: 0, y: 0}} cursor={true} content={<CustomTooltip/>}/> */}
                 <Area
+                    ref={areaRef}
                     type="linear"
                     dataKey="uv"
                     stroke="#FF005C"
@@ -225,7 +225,6 @@ function TokenLiquidityChart() {
                             dotColor="#FF005C"
                         />
                     )}
-                    onMouseMove={(e: any) => setCursorPoints(e?.points || [])}
                 />
             </AreaChart>
         </ResponsiveContainer>
