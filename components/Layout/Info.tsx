@@ -14,7 +14,7 @@ import Image from "next/image";
 import Link, { LinkProps } from "next/link";
 import { useRouter } from "next/router";
 import ImgLogo from "public/images/m-logo.png";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Transition } from "@headlessui/react";
 type NavLinkProps = {
     active: boolean;
@@ -126,7 +126,7 @@ const MNavLink = ({ active, name, Icon, ...linkProps }: NavLinkProps) => {
     );
 };
 function InfoLayout({ children }: any) {
-    const [openSidebar, setOpenSidebar] = useState(true);
+    const [openSidebar, setOpenSidebar] = useState(false);
     const screenSizes = useScreenSize();
     const router = useRouter();
 
@@ -135,6 +135,9 @@ function InfoLayout({ children }: any) {
             exact ? router.pathname === path : router.route.startsWith(path),
         [router]
     );
+    useEffect(() => {
+        setOpenSidebar(screenSizes.lg);
+    }, [screenSizes.lg]);
     // desktop
     if (!screenSizes.msm) {
         return (
@@ -152,7 +155,7 @@ function InfoLayout({ children }: any) {
                     </Transition>
                     <aside
                         className={`flex-shrink-0 fixed top-0 left-0 h-screen bg-ash-dark-600 py-9 flex flex-col z-10 transition-all ${
-                            openSidebar ? "w-52 lg:w-60 pl-4 lg:pl-12" : "w-18 pl-4"
+                            openSidebar ? "w-52 xl:w-60 pl-4 xl:pl-12" : "w-18 pl-4"
                         }`}
                     >
                         <button
@@ -244,7 +247,7 @@ function InfoLayout({ children }: any) {
                     </aside>
                 </div>
 
-                <div className={`flex-grow px-4 lg:px-9 lg:py-6 relative overflow-x-hidden mr-32 ${openSidebar ? "ml-18 lg:ml-60" : "ml-18"}`}>
+                <div className={`flex-grow px-4 lg:px-9 lg:py-6 relative overflow-x-hidden mr-32 ${openSidebar ? "ml-18 lg:ml-52 xl:ml-60" : "ml-18"}`}>
                     {/* <div className="fixed top-6 right-[10.25rem] z-20">
                         <Input
                             backgroundClassName="bg-ash-dark-700/70 h-12 px-5"

@@ -2,6 +2,7 @@ import { IToken } from "interface/token";
 import { ValueOf } from "interface/utilities";
 import React, { useState } from "react";
 import TokenLiquidityChart from "./TokenLiquidityChart";
+import TokenPriceAreaChart from "./TokenPriceAreaChart";
 import TokenPriceChart from "./TokenPriceChart";
 import TokenVolumeChart from "./TokenVolumeChart";
 
@@ -18,13 +19,13 @@ function TokenChart({token}: {token: IToken}) {
     const [chartType, setChartType] = useState<ChartType>("Liquidity");
     const [timeUnit, setTimeUnit] = useState<TokenChartTimeUnitType>("D");
     return (
-        <div className="flex flex-col px-8 pb-8 pt-7 bg-ash-dark-600 h-full">
+        <div className="flex flex-col px-4 md:px-8 py-4 md:pb-8 md:pt-7 bg-ash-dark-600 h-full overflow-hidden">
             <div className="text-ash-gray-500 flex space-x-2 flex-shrink-0">
                 {ChartTypeArr.map((type) => {
                     return (
                         <button
                             key={type}
-                            className={`bg-ash-dark-400 h-9 px-3.5 text-xs ${
+                            className={`bg-ash-dark-400 h-7 sm:h-9 px-2 sm:px-3.5 text-2xs sm:text-xs ${
                                 type === chartType && "text-white"
                             }`}
                             onClick={() => setChartType(type)}
@@ -34,10 +35,11 @@ function TokenChart({token}: {token: IToken}) {
                     );
                 })}
             </div>
-            <div className="flex-grow mb-5">
+            <div className="flex-grow mb-5 overflow-hidden">
                 {chartType === "Liquidity" && <TokenLiquidityChart token={token} timeUnit={timeUnit} />}
                 {chartType === "Volumn" && <TokenVolumeChart token={token} timeUnit={timeUnit}/>}
-                {chartType === "Price" && <TokenPriceChart timeUnit={timeUnit} />}
+                {/* {chartType === "Price" && <TokenPriceChart token={token} timeUnit={timeUnit} />} */}
+                {chartType === "Price" && <TokenPriceAreaChart token={token} timeUnit={timeUnit} />}
             </div>
             <div className="text-ash-gray-500 flex space-x-2 flex-shrink-0">
                 {interval.map((unit) => {

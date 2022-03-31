@@ -4,10 +4,10 @@ import { abbreviateCurrency } from "helper/number";
 import { useScreenSize } from "hooks/useScreenSize";
 import { IToken } from "interface/token";
 import moment from "moment";
-import React, { useCallback, useMemo, useRef } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import {
-    Bar,
-    BarChart,
+    Area,
+    AreaChart,
     ResponsiveContainer,
     Tooltip,
     XAxis,
@@ -16,20 +16,6 @@ import {
 import useSWR from "swr";
 import { TokenChartTimeUnitType } from "./TokenChart";
 
-const MONTH = [
-    "JAN",
-    "FEB",
-    "MAR",
-    "APR",
-    "MAY",
-    "JUN",
-    "JUL",
-    "AUG",
-    "SEP",
-    "OCT",
-    "NOV",
-    "DEC",
-];
 const CustomActiveDot = ({ dotColor, ...props }: any) => {
     const { cx, cy } = props;
     return (
@@ -81,14 +67,12 @@ const CustomActiveDot = ({ dotColor, ...props }: any) => {
         </svg>
     );
 };
-const CustomTooltipCursor = ({ barRef, ...rest }: any) => {
-    const { left, payloadIndex } = rest;
-    if (!barRef.current) return null;
-    const { state, props } = barRef.current;
-    const { width, height } = props;
-    const data = state.curData[payloadIndex];
-    const y = data?.y || 0;
-    const value = data?.payload.value || 0;
+const CustomTooltipCursor = ({ areaRef, ...props }: any) => {
+    const { width, height, left, payloadIndex } = props;
+    if (!areaRef.current) return null;
+    const y = areaRef.current.state.curPoints[payloadIndex]?.y || 0;
+    const value =
+        areaRef.current.state.curPoints[payloadIndex]?.payload.value || 0;
     return (
         <>
             <line
@@ -116,23 +100,33 @@ const CustomTooltipCursor = ({ barRef, ...rest }: any) => {
                 width="62"
                 height="28"
                 fill="white"
+                // textAnchor="middle"
                 alignmentBaseline="central"
                 fontSize={12}
             >
                 {abbreviateCurrency(value)}
             </text>
-            <CustomActiveDot
-                dotColor="#FF005C"
-                cx={(data?.x || 0) + (data?.width || 0) / 2}
-                cy={data?.y || 0}
-            />
         </>
         //   <svg width="600" height="1" version="1.1" xmlns="http://www.w3.org/2000/svg">
 
         // </svg>
     );
 };
-function TokenVolumeChart({
+const MONTH = [
+    "JAN",
+    "FEB",
+    "MAR",
+    "APR",
+    "MAY",
+    "JUN",
+    "JUL",
+    "AUG",
+    "SEP",
+    "OCT",
+    "NOV",
+    "DEC",
+];
+function TokenPriceAreaChart({
     token,
     timeUnit,
 }: {
@@ -141,18 +135,15 @@ function TokenVolumeChart({
 }) {
     const { data } = useSWR<[number, number][]>(
         token.id
-            ? `${network.ashApiBaseUrl}/token/${token.id}/graph-statistic?type=volume`
+            ? `${network.ashApiBaseUrl}/token/${token.id}/graph-statistic?type=price`
             : null,
         fetcher
     );
-    const barRef = useRef<any>(null);
+    const areaRef = useRef<any>(null);
     const {sm} = useScreenSize();
     const chartData = useMemo(() => {
         if (!data) return [];
-        return data.map(([timestamp, value]) => ({
-            timestamp,
-            value,
-        }));
+        return data.map(([timestampMs, value]) => ({ timestamp: timestampMs / 1000, value }));
     }, [data]);
     const displayChartData = useMemo(() => {
         if (timeUnit === "D") return chartData;
@@ -218,48 +209,40 @@ function TokenVolumeChart({
                 ? time.format("DD/MM/yyyy")
                 : timeUnit === "M"
                 ? MONTH[time.month()]
-                : "week " + time.week();
+                : "week " + time.week() + "/" + time.year();
         },
         [timeUnit]
     );
     return (
-        <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={displayChartData}>
+        <ResponsiveContainer>
+            <AreaChart data={displayChartData}>
                 <defs>
                     <linearGradient
-                        id="TVC-colorUv"
+                        id="TLC-colorUv"
                         x1="0"
                         y1="0"
                         x2="0"
                         y2="1"
                     >
                         <stop
-                            offset="16.28%"
+                            offset="5%"
                             stopColor="#FF005C"
-                            stopOpacity={1}
+                            stopOpacity={0.2}
                         />
                         <stop
-                            offset="80%"
-                            stopColor="#2F2B66"
-                            stopOpacity={0.5}
+                            offset="95%"
+                            stopColor="#FF005C"
+                            stopOpacity={0}
                         />
                     </linearGradient>
-                    <pattern
-                        id="TVC-pattern"
-                        x="0"
-                        y="10%"
-                        width="100%"
-                        height="100%"
-                        patternUnits="userSpaceOnUse"
-                    >
-                        <rect
-                            x="0"
-                            y="0"
-                            width="100%"
-                            height="100%"
-                            fill="url(#TVC-colorUv)"
+                    <filter id="TLC-shadowUv" height="200%">
+                        <feDropShadow
+                            dx="0"
+                            dy="0"
+                            stdDeviation="5"
+                            floodColor="#FF005C"
                         />
-                    </pattern>
+                    </filter>
                 </defs>
                 <XAxis
                     dataKey="timestamp"
@@ -269,8 +252,8 @@ function TokenVolumeChart({
                     padding={{ right: 30 }}
                     interval="preserveStart"
                     domain={["dataMin", "dataMax"]}
-                    ticks={ticks}
                     tickFormatter={tickFormatter}
+                    ticks={ticks}
                     tick={{ fill: "#B7B7D7", fontSize: sm ? 12 : 10 }}
                 />
                 <YAxis
@@ -279,29 +262,41 @@ function TokenVolumeChart({
                     axisLine={false}
                     tickLine={false}
                     padding={{ top: 20, bottom: 20 }}
-                    domain={[0, (max: number) => max * 1.2]}
+                    domain={[0, (max: number) => max * 1.5]}
                     tickFormatter={(val: number) =>
                         abbreviateCurrency(val).toString()
                     }
                     width={50}
                     tick={{ fill: "#B7B7D7", fontSize: sm ? 12 : 10 }}
                 />
-                <Bar
-                    ref={barRef}
-                    dataKey="value"
-                    fill="url(#TVC-pattern)"
-                    maxBarSize={50}
-                />
                 <Tooltip
                     coordinate={{ x: 0, y: 0 }}
                     active={true}
                     position={{ x: 0, y: 0 }}
-                    cursor={<CustomTooltipCursor barRef={barRef} />}
+                    cursor={<CustomTooltipCursor areaRef={areaRef} />}
                     content={<></>}
                 />
-            </BarChart>
+                {/* <Tooltip cursor={{}} content={<CustomTooltip/>}/> */}
+                {/* <Tooltip coordinate={{x: 0, y: 0}} active={true} position={{x: 0, y: 0}} cursor={true} content={<CustomTooltip/>}/> */}
+                <Area
+                    ref={areaRef}
+                    type="linear"
+                    dataKey="value"
+                    stroke="#FF005C"
+                    fillOpacity={1}
+                    fill="url(#TLC-colorUv)"
+                    strokeWidth={3}
+                    filter="url(#TLC-shadowUv)"
+                    activeDot={(activeDotProps) => (
+                        <CustomActiveDot
+                            {...activeDotProps}
+                            dotColor="#FF005C"
+                        />
+                    )}
+                />
+            </AreaChart>
         </ResponsiveContainer>
     );
 }
 
-export default TokenVolumeChart;
+export default TokenPriceAreaChart;

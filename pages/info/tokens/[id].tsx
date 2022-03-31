@@ -19,7 +19,10 @@ import { useWallet } from "context/wallet";
 import useSWR from "swr";
 import { network } from "const/network";
 import { fetcher } from "helper/common";
-import { fractionFormat } from "helper/number";
+import { formatAmount, fractionFormat } from "helper/number";
+import PoolsTable from "views/info/components/PoolsTable";
+import { PoolStatsRecord } from "interface/poolStats";
+import { TxStatsRecord } from "interface/txStats";
 
 type TokenStats = {
     change_percentage_day: number;
@@ -41,7 +44,19 @@ const TokenDetailPage: Page<props> = ({ token }: props) => {
             ? `${network.ashApiBaseUrl}/token/${token.id}/statistic`
             : null,
         fetcher,
-        {refreshInterval: 5 * 60 * 1000}
+        { refreshInterval: 5 * 60 * 1000 }
+    );
+    const { data: pools } = useSWR<PoolStatsRecord[]>(
+        token.id ? `${network.ashApiBaseUrl}/token/${token.id}/pool` : null,
+        fetcher,
+        { refreshInterval: 5 * 60 * 1000 }
+    );
+    const { data: txs } = useSWR<TxStatsRecord[]>(
+        token.id
+            ? `${network.ashApiBaseUrl}/token/${token.id}/transaction`
+            : null,
+        fetcher,
+        { refreshInterval: 5 * 60 * 1000 }
     );
     return (
         <div>
@@ -67,45 +82,58 @@ const TokenDetailPage: Page<props> = ({ token }: props) => {
                         <span className="text-ash-gray-500">{token?.name}</span>
                     </li>
                 </ul>
-                <div className="flex items-center mb-[2.375rem]">
-                    <h1 className="text-4xl font-bold text-white mr-4">
-                        {token.name}
-                    </h1>
-                    <div className="w-8 h-8 mr-5">
-                        <Image src={token.icon} alt={token.name} />
-                    </div>
-                    <div className="bg-ash-dark-600 h-10 flex items-center px-4 mr-2">
-                        <div className="mr-3 text-sm">{token.name} Coin</div>
-                        <div className="text-ash-gray-500 text-xs">
-                            {token.id}
+                <div className="flex flex-col space-y-5 lg:space-y-0 lg:flex-row items-start lg:items-center mb-[2.375rem]">
+                    <div className="flex items-center">
+                        <h1 className="text-2xl lg:text-4xl font-bold text-white mr-4">
+                            {token.name}
+                        </h1>
+                        <div className="w-6 h-6 lg:w-8 lg:h-8 mr-5">
+                            <Image src={token.icon} alt={token.name} />
                         </div>
-                        <div className="mx-4">|</div>
-                        <Tooltip trigger={["click"]} title="copied">
-                            <button
-                                onClick={() => {
-                                    if (typeof window !== "undefined") {
-                                        window.navigator.clipboard.writeText(
-                                            token.id
-                                        );
-                                    }
-                                }}
-                            >
-                                <ICCopy className="w-5 h-5" />
-                            </button>
-                        </Tooltip>
                     </div>
-                    <div className="bg-ash-dark-600 h-10 px-4 flex items-center text-sm">
-                        <span className="text-ash-gray-500">$</span>
-                        <span className="text-white">{fractionFormat(stats?.price || 0)}</span>
+                    <div className="flex items-center flex-row-reverse lg:flex-row">
+                        <div className="bg-ash-dark-600 h-10 flex items-center px-4 mr-2">
+                            <div className="mr-3 text-xs md:text-sm">
+                                {token.name} Coin
+                            </div>
+                            <div className="text-ash-gray-500 text-2xs md:text-xs">
+                                {token.id}
+                            </div>
+                            <div className="mx-4">|</div>
+                            <Tooltip trigger={["click"]} title="copied">
+                                <button
+                                    onClick={() => {
+                                        if (typeof window !== "undefined") {
+                                            window.navigator.clipboard.writeText(
+                                                token.id
+                                            );
+                                        }
+                                    }}
+                                >
+                                    <ICCopy className="w-4 h-4 lg:w-5 lg:h-5" />
+                                </button>
+                            </Tooltip>
+                        </div>
+                        <div className="bg-ash-dark-600 h-8 lg:h-10 px-2.5 lg:px-4 flex items-center text-2xs md:text-xs lg:text-sm mr-2">
+                            <span className="text-ash-gray-500">$</span>
+                            <span className="text-white">
+                                {formatAmount(stats?.price || 0, {
+                                    notation: "standard",
+                                    isInteger: true,
+                                })}
+                            </span>
+                        </div>
                     </div>
                 </div>
-                <div className="flex space-x-2 mb-[4.5rem]">
+                <div className="flex space-x-2 mb-4 md:mb-18">
                     {/* TODO: set swap pair by query params */}
                     <Link href="/swap">
                         <a>
-                            <span className="bg-pink-600 h-10 flex items-center px-4 text-sm text-white">
-                                <ICSwap className="w-5 h-5 mr-2" />
-                                <span>Swap</span>
+                            <span className="bg-pink-600 w-8 md:w-auto h-8 md:h-10 flex items-center justify-center md:px-4 text-sm text-white">
+                                <ICSwap className="w-4 h-4 md:w-5 md:h-5" />
+                                <span className="hidden md:inline-block ml-2">
+                                    Swap
+                                </span>
                             </span>
                         </a>
                     </Link>
@@ -113,21 +141,36 @@ const TokenDetailPage: Page<props> = ({ token }: props) => {
                         <ICStarOutline className="w-5 h-5 mr-2" />
                         <span>Save</span>
                     </button> */}
-                    <a href={network.explorerAddress + "/tokens/" + token.id} target="_blank" rel="noreferrer">
-                        <span className="bg-ash-dark-500 h-10 flex items-center px-4 text-sm text-white">
-                            <ICNewTabRound className="w-5 h-5 mr-3" />
-                            <span>View on Elrondscan</span>
+                    <a
+                        href={network.explorerAddress + "/tokens/" + token.id}
+                        target="_blank"
+                        rel="noreferrer"
+                    >
+                        <span className="bg-ash-dark-500 h-8 md:h-10 flex items-center px-4 text-xs md:text-sm text-white">
+                            <ICNewTabRound className="w-4 h-4 md:w-5 md:h-5 mr-2 md:mr-3" />
+                            <span>
+                                <span className="hidden md:inline">
+                                    View on{" "}
+                                </span>
+                                <span>Elrondscan</span>
+                            </span>
                         </span>
                     </a>
                 </div>
                 <div className="flex flex-wrap xl:flex-nowrap overflow-hidden">
-                    <div className="w-full xl:w-[16.625rem] flex flex-col space-y-2 mb-[4.5rem]">
-                        <div className="h-[7.5rem] px-[1.625rem] pt-5 pb-8 bg-ash-dark-600 flex flex-col justify-between">
-                            <div className="text-xs">Total Liquidity</div>
+                    <div className="w-full xl:w-[16.625rem] flex flex-col space-y-2 mb-12 md:mb-18">
+                        <div className="h-18 md:h-[7.5rem] px-4 md:px-[1.625rem] py-4 md:pt-5 md:pb-8 bg-ash-dark-600 flex flex-col justify-between">
+                            <div className="text-2xs md:text-xs">
+                                Total Liquidity
+                            </div>
                             <div className="flex justify-between items-baseline">
-                                <div className="text-lg">
+                                <div className="text-sm md:text-lg">
                                     <span className="text-ash-gray-500">$</span>
-                                    <span>{fractionFormat(stats?.liquidity || 0)}</span>
+                                    <span>
+                                        {formatAmount(stats?.liquidity || 0, {
+                                            notation: "standard",
+                                        })}
+                                    </span>
                                 </div>
                                 {/* <div className="text-ash-purple-500 text-xs font-bold">
                                     <ICArrowBottomRight className="inline w-2 h-2 mr-1" />
@@ -139,12 +182,18 @@ const TokenDetailPage: Page<props> = ({ token }: props) => {
                                 </div> */}
                             </div>
                         </div>
-                        <div className="h-[7.5rem] px-[1.625rem] pt-5 pb-8 bg-ash-dark-600 flex flex-col justify-between">
-                            <div className="text-xs">Volume (24h)</div>
+                        <div className="h-18 md:h-[7.5rem] px-4 md:px-[1.625rem] py-4 md:pt-5 md:pb-8 bg-ash-dark-600 flex flex-col justify-between">
+                            <div className="text-2xs md:text-xs">
+                                Volume (24h)
+                            </div>
                             <div className="flex justify-between items-baseline">
-                                <div className="text-lg">
+                                <div className="text-sm md:text-lg">
                                     <span className="text-ash-gray-500">$</span>
-                                    <span>{fractionFormat(stats?.volume || 0)}</span>
+                                    <span>
+                                        {formatAmount(stats?.volume || 0, {
+                                            notation: "standard",
+                                        })}
+                                    </span>
                                 </div>
                                 {/* <div className="text-ash-purple-500 text-xs font-bold">
                                     <ICArrowBottomRight className="inline w-2 h-2 mr-1" />
@@ -152,11 +201,18 @@ const TokenDetailPage: Page<props> = ({ token }: props) => {
                                 </div> */}
                             </div>
                         </div>
-                        <div className="h-[7.5rem] px-[1.625rem] pt-5 pb-8 bg-ash-dark-600 flex flex-col justify-between">
-                            <div className="text-xs">Transactions (24h)</div>
+                        <div className="h-18 md:h-[7.5rem] px-4 md:px-[1.625rem] py-4 md:pt-5 md:pb-8 bg-ash-dark-600 flex flex-col justify-between">
+                            <div className="text-2xs md:text-xs">
+                                Transactions (24h)
+                            </div>
                             <div className="flex justify-between items-baseline">
-                                <div className="text-lg">
-                                    <span>{fractionFormat(stats?.transaction_count || 0)}</span>
+                                <div className="text-sm md:text-lg">
+                                    <span>
+                                        {formatAmount(
+                                            stats?.transaction_count || 0,
+                                            { isInteger: true }
+                                        )}
+                                    </span>
                                 </div>
                                 {/* <div className="text-ash-green-500 text-xs font-bold">
                                     <ICArrowTopRight className="inline w-2 h-2 mr-1" />
@@ -165,11 +221,22 @@ const TokenDetailPage: Page<props> = ({ token }: props) => {
                             </div>
                         </div>
                     </div>
-                    <div className="flex-grow h-[23.5rem] xl:ml-4 overflow-hidden mb-[4.5rem]">
+                    <div className="flex-grow h-[23.5rem] xl:ml-4 overflow-hidden mb-12 md:mb-18">
                         <TokenChart token={token} />
                     </div>
                 </div>
-                <TxsTable />
+                <div className="mb-12 md:mb-16">
+                    <h2 className="text-lg font-bold text-white mb-5 md:mb-7">
+                        Top Pools - Pairs
+                    </h2>
+                    <PoolsTable data={pools || []} />
+                </div>
+                <div className="mb-12 md:mb-16">
+                    <h2 className="text-lg font-bold text-white mb-5 md:mb-7">
+                        Transactions
+                    </h2>
+                    <TxsTable data={txs || []} />
+                </div>
             </div>
         </div>
     );

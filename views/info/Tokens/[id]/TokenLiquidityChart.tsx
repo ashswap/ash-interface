@@ -1,6 +1,7 @@
 import { network } from "const/network";
 import { fetcher } from "helper/common";
 import { abbreviateCurrency } from "helper/number";
+import { useScreenSize } from "hooks/useScreenSize";
 import { IToken } from "interface/token";
 import moment from "moment";
 import React, { useCallback, useMemo, useRef, useState } from "react";
@@ -71,6 +72,7 @@ const CustomTooltipCursor = ({ areaRef, ...props }: any) => {
     if (!areaRef.current) return null;
     const y = areaRef.current.state.curPoints[payloadIndex]?.y || 0;
     const value = areaRef.current.state.curPoints[payloadIndex]?.payload.value || 0;
+    
     return (
         <>
             <line
@@ -138,6 +140,7 @@ function TokenLiquidityChart({
         fetcher
     );
     const areaRef = useRef<any>(null);
+    const {sm} = useScreenSize();
     const chartData = useMemo(() => {
         if (!data) return [];
         return data.map(([timestamp, value]) => ({ timestamp, value }));
@@ -245,7 +248,7 @@ function TokenLiquidityChart({
                     domain={["dataMin", "dataMax"]}
                     tickFormatter={tickFormatter}
                     ticks={ticks}
-                    tick={{fill: "#B7B7D7", fontSize: 12}}
+                    tick={{fill: "#B7B7D7", fontSize: sm ? 12 : 10}}
                 />
                 <YAxis
                     dataKey="value"
@@ -256,7 +259,7 @@ function TokenLiquidityChart({
                     domain={[0, (max: number) => max * 1.5]}
                     tickFormatter={(val: number) => abbreviateCurrency(val).toString()}
                     width={50}
-                    tick={{fill: "#B7B7D7", fontSize: 12}}
+                    tick={{fill: "#B7B7D7", fontSize: sm ? 12 : 10}}
                 />
                 <Tooltip
                     coordinate={{ x: 0, y: 0 }}

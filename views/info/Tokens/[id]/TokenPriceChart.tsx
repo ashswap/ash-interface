@@ -1,4 +1,7 @@
+import { network } from "const/network";
+import { fetcher } from "helper/common";
 import { abbreviateCurrency } from "helper/number";
+import { IToken } from "interface/token";
 import moment from "moment";
 import React, { useCallback, useMemo, useState } from "react";
 import {
@@ -9,6 +12,8 @@ import {
     XAxis,
     YAxis,
 } from "recharts";
+import useSWR from "swr";
+import { TokenChartTimeUnitType } from "./TokenChart";
 type CandleChartRecord = {
     high: number;
     low: number;
@@ -16,18 +21,6 @@ type CandleChartRecord = {
     close: number;
     timestamp: number;
 };
-const colors = [
-    "#1f77b4",
-    "#ff7f0e",
-    "#2ca02c",
-    "#d62728",
-    "#9467bd",
-    "#8c564b",
-    "#e377c2",
-    "#7f7f7f",
-    "#bcbd22",
-    "#17becf",
-];
 
 const MONTH = [
     "JAN",
@@ -134,8 +127,20 @@ const Candlestick = ({
         </g>
     );
 };
-const interval = ["D", "W", "M"] as const;
-const TokenPriceChart = ({timeUnit = "D"}: {timeUnit?: typeof interval[number]}) => {
+const TokenPriceChart = ({
+    token,
+    timeUnit,
+}: {
+    token: IToken;
+    timeUnit: TokenChartTimeUnitType;
+}) => {
+    const { data } = useSWR<[number, number][]>(
+        token.id
+            ? `${network.ashApiBaseUrl}/token/${token.id}/graph-statistic?type=price`
+            : null,
+        fetcher,
+        {refreshInterval: 5 * 60 * 1000}
+    );
     const displayChartData = useMemo(() => {
         const raw = prepareData(FAKE_DATA);
         return raw;
@@ -185,7 +190,6 @@ const TokenPriceChart = ({timeUnit = "D"}: {timeUnit?: typeof interval[number]})
         },
         [timeUnit]
     );
-    console.log(minValue, maxValue);
     return (
         <ResponsiveContainer width="100%" height="100%">
             <BarChart
@@ -225,7 +229,7 @@ const TokenPriceChart = ({timeUnit = "D"}: {timeUnit?: typeof interval[number]})
                     // label={{ position: 'top' }}
                 >
                     {displayChartData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={colors[index % 20]} />
+                        <Cell key={`cell-${index}`} />
                     ))}
                 </Bar>
             </BarChart>
