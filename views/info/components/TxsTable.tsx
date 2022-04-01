@@ -2,6 +2,7 @@ import ICArrowLeft from "assets/svg/arrow-left.svg";
 import ICArrowRight from "assets/svg/arrow-right.svg";
 import ICChevronDown from "assets/svg/chevron-down.svg";
 import BasePopover from "components/BasePopover";
+import { network } from "const/network";
 import { TOKENS_MAP } from "const/tokens";
 import { toEGLDD } from "helper/balance";
 import { formatAmount } from "helper/number";
@@ -35,8 +36,9 @@ const TxRecord = ({ txStats }: { txStats: TxStatsRecord }) => {
             const m = moment().diff(ts, "minutes");
             const s = moment().diff(ts, "seconds");
             const num = d || h || m || s;
-            const postfix = (d && "d") || (h && "h") || (m && "m") || (s && "s") || ""
-            setTime(num + postfix + " ago")
+            const postfix =
+                (d && "d") || (h && "h") || (m && "m") || (s && "s") || "";
+            setTime(num + postfix + " ago");
         };
         func();
         const interval = setInterval(() => {
@@ -46,8 +48,17 @@ const TxRecord = ({ txStats }: { txStats: TxStatsRecord }) => {
     }, [txStats]);
     return (
         <div className="px-4 lg:px-7 h-12 bg-ash-dark-600 hover:bg-ash-dark-700 text-xs grid items-center gap-x-4 grid-cols-[2fr,repeat(2,1fr)] md:grid-cols-[2fr,repeat(4,1fr)] xl:grid-cols-[2fr,0.8fr,repeat(4,1fr)]">
-            <div className="text-pink-600">
-                {label.action} {token1.name} {label.separator} {token2.name}
+            <div>
+                <a
+                    href={`${network.explorerAddress}/transactions/${txStats.transaction_hash}`}
+                    target="_blank"
+                    rel="noreferrer"
+                >
+                    <span className="text-pink-600">
+                        {label.action} {token1.name} {label.separator}{" "}
+                        {token2.name}
+                    </span>
+                </a>
             </div>
             <div className="text-right">
                 <span className="text-ash-gray-600">$ </span>
@@ -68,9 +79,16 @@ const TxRecord = ({ txStats }: { txStats: TxStatsRecord }) => {
                 </span>
             </div>
             <div className="text-right hidden xl:block">
-                <span className="text-pink-600">
-                    {txStats.caller.slice(0, 4)}...{txStats.caller.slice(-4)}
-                </span>
+                <a
+                    href={`${network.explorerAddress}/accounts/${txStats.caller}`}
+                    target="_blank"
+                    rel="noreferrer"
+                >
+                    <span className="text-pink-600">
+                        {txStats.caller.slice(0, 4)}...
+                        {txStats.caller.slice(-4)}
+                    </span>
+                </a>
             </div>
             <div className="text-right">
                 <span className="text-white">{time}</span>
@@ -110,7 +128,7 @@ function TxsTable({ data }: { data: TxStatsRecord[] }) {
     const screenSize = useScreenSize();
     useEffect(() => {
         setOrderBy(EOrderBy.TIME);
-    }, [screenSize.xl, screenSize.lg, screenSize.md, screenSize.sm])
+    }, [screenSize.xl, screenSize.lg, screenSize.md, screenSize.sm]);
     const displayDataPagination = useMemo(() => {
         if (!data) return [[]];
         const filtered =
