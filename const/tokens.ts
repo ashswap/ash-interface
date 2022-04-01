@@ -20,3 +20,4 @@ const getTokenFromPools = (...pools: IPool[]) => {
 }
 export const IN_POOL_TOKENS = getTokenFromPools(...pools);
 export const TOKENS = [...IN_POOL_TOKENS, ASH_TOKEN];
+export const TOKENS_MAP = Object.fromEntries(TOKENS.map(t => [t.id, t]));

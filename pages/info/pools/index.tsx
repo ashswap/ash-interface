@@ -2,10 +2,18 @@ import ICArrowRight from "assets/svg/arrow-right.svg";
 import InfoLayout from "components/Layout/Info";
 import AprByPoolsChart from "views/info/Pools/AprByPoolsChart";
 import LiquidityByTokensChart from "views/info/Pools/LiquidityByTokensChart";
-import PoolsTable from "views/info/Pools/PoolsTable";
+import PoolsTable from "views/info/components/PoolsTable";
 import React, { ReactElement } from "react";
+import useSWR from "swr";
+import { PoolStatsRecord } from "interface/poolStats";
+import { network } from "const/network";
+import { fetcher } from "helper/common";
 
 function PoolsPage() {
+    const { data } = useSWR<PoolStatsRecord[]>(
+        `${network.ashApiBaseUrl}/pool`,
+        fetcher
+    );
     return (
         <div>
             <div>
@@ -32,7 +40,7 @@ function PoolsPage() {
                             <LiquidityByTokensChart/>
                         </div>
                     <h2 className="text-lg font-bold text-white mb-7">Top Pools - Pairs</h2>
-                    <PoolsTable/>
+                    <PoolsTable data={data || []}/>
                 </div>
             </div>
         </div>

@@ -1,32 +1,31 @@
+import { IToken } from "interface/token";
 import { ValueOf } from "interface/utilities";
 import React, { useState } from "react";
 import TokenLiquidityChart from "./TokenLiquidityChart";
+import TokenPriceAreaChart from "./TokenPriceAreaChart";
+import TokenPriceChart from "./TokenPriceChart";
+import TokenVolumeChart from "./TokenVolumeChart";
 
-const TIME_UNIT = {
-    DAY: "D",
-    WEEK: "W",
-    MONTH: "M",
-} as const;
 const CHART_TYPES = {
     LIQUIDITY: "Liquidity",
     VOLUMN: "Volumn",
     PRICE: "Price",
 } as const;
 const ChartTypeArr = Object.values(CHART_TYPES);
-const TimeUnitArr = Object.values(TIME_UNIT);
 type ChartType = ValueOf<typeof CHART_TYPES>;
-type timeUnitType = ValueOf<typeof TIME_UNIT>;
-function TokenChart() {
+const interval = ["D", "W", "M"] as const;
+export type TokenChartTimeUnitType = typeof interval[number];
+function TokenChart({token}: {token: IToken}) {
     const [chartType, setChartType] = useState<ChartType>("Liquidity");
-    const [timeUnit, setTimeUnit] = useState<timeUnitType>("D");
+    const [timeUnit, setTimeUnit] = useState<TokenChartTimeUnitType>("D");
     return (
-        <div className="flex flex-col px-8 pb-8 pt-7 bg-ash-dark-600 h-full">
+        <div className="flex flex-col px-4 md:px-8 py-4 md:pb-8 md:pt-7 bg-ash-dark-600 h-full overflow-hidden">
             <div className="text-ash-gray-500 flex space-x-2 flex-shrink-0">
                 {ChartTypeArr.map((type) => {
                     return (
                         <button
                             key={type}
-                            className={`bg-ash-dark-400 h-9 px-3.5 text-xs ${
+                            className={`bg-ash-dark-400 h-7 sm:h-9 px-2 sm:px-3.5 text-2xs sm:text-xs ${
                                 type === chartType && "text-white"
                             }`}
                             onClick={() => setChartType(type)}
@@ -36,11 +35,14 @@ function TokenChart() {
                     );
                 })}
             </div>
-            <div className="flex-grow mb-5">
-                {chartType === "Liquidity" && <TokenLiquidityChart />}
+            <div className="flex-grow mb-5 overflow-hidden">
+                {chartType === "Liquidity" && <TokenLiquidityChart token={token} timeUnit={timeUnit} />}
+                {chartType === "Volumn" && <TokenVolumeChart token={token} timeUnit={timeUnit}/>}
+                {/* {chartType === "Price" && <TokenPriceChart token={token} timeUnit={timeUnit} />} */}
+                {chartType === "Price" && <TokenPriceAreaChart token={token} timeUnit={timeUnit} />}
             </div>
             <div className="text-ash-gray-500 flex space-x-2 flex-shrink-0">
-                {TimeUnitArr.map((unit) => {
+                {interval.map((unit) => {
                     return (
                         <button
                             key={unit}

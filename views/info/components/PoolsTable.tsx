@@ -97,11 +97,7 @@ const PoolRecord = ({
         </div>
     );
 };
-function PoolsTable() {
-    const { data } = useSWR<PoolStatsRecord[]>(
-        `${network.ashApiBaseUrl}/pool`,
-        fetcher
-    );
+function PoolsTable({data} : {data: PoolStatsRecord[]}) {
     const [pageIndex, setPageIndex] = useState(0);
     const [pageSize, setPageSize] = useState(10);
     const [sortBy, setSortBy] = useState<

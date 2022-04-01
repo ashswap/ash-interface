@@ -4,10 +4,10 @@ import { abbreviateCurrency } from "helper/number";
 import { useScreenSize } from "hooks/useScreenSize";
 import { IToken } from "interface/token";
 import moment from "moment";
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import React, { useCallback, useMemo, useRef } from "react";
 import {
-    Area,
-    AreaChart,
+    Bar,
+    BarChart,
     ResponsiveContainer,
     Tooltip,
     XAxis,
@@ -16,6 +16,20 @@ import {
 import useSWR from "swr";
 import { TokenChartTimeUnitType } from "./TokenChart";
 
+const MONTH = [
+    "JAN",
+    "FEB",
+    "MAR",
+    "APR",
+    "MAY",
+    "JUN",
+    "JUL",
+    "AUG",
+    "SEP",
+    "OCT",
+    "NOV",
+    "DEC",
+];
 const CustomActiveDot = ({ dotColor, ...props }: any) => {
     const { cx, cy } = props;
     return (
@@ -67,12 +81,14 @@ const CustomActiveDot = ({ dotColor, ...props }: any) => {
         </svg>
     );
 };
-const CustomTooltipCursor = ({ areaRef, ...props }: any) => {
-    const { width, height, left, payloadIndex } = props;
-    if (!areaRef.current) return null;
-    const y = areaRef.current.state.curPoints[payloadIndex]?.y || 0;
-    const value = areaRef.current.state.curPoints[payloadIndex]?.payload.value || 0;
-    
+const CustomTooltipCursor = ({ barRef, ...rest }: any) => {
+    const { left, payloadIndex } = rest;
+    if (!barRef.current) return null;
+    const { state, props } = barRef.current;
+    const { width, height } = props;
+    const data = state.curData[payloadIndex];
+    const y = data?.y || 0;
+    const value = data?.payload.value || 0;
     return (
         <>
             <line
@@ -100,33 +116,23 @@ const CustomTooltipCursor = ({ areaRef, ...props }: any) => {
                 width="62"
                 height="28"
                 fill="white"
-                // textAnchor="middle"
                 alignmentBaseline="central"
                 fontSize={12}
             >
                 {abbreviateCurrency(value)}
             </text>
+            <CustomActiveDot
+                dotColor="#FF005C"
+                cx={(data?.x || 0) + (data?.width || 0) / 2}
+                cy={data?.y || 0}
+            />
         </>
         //   <svg width="600" height="1" version="1.1" xmlns="http://www.w3.org/2000/svg">
 
         // </svg>
     );
 };
-const MONTH = [
-    "JAN",
-    "FEB",
-    "MAR",
-    "APR",
-    "MAY",
-    "JUN",
-    "JUL",
-    "AUG",
-    "SEP",
-    "OCT",
-    "NOV",
-    "DEC",
-];
-function TokenLiquidityChart({
+function TokenVolumeChart({
     token,
     timeUnit,
 }: {
@@ -135,15 +141,18 @@ function TokenLiquidityChart({
 }) {
     const { data } = useSWR<[number, number][]>(
         token.id
-            ? `${network.ashApiBaseUrl}/token/${token.id}/graph-statistic?type=liquidity`
+            ? `${network.ashApiBaseUrl}/token/${token.id}/graph-statistic?type=volume`
             : null,
         fetcher
     );
-    const areaRef = useRef<any>(null);
+    const barRef = useRef<any>(null);
     const {sm} = useScreenSize();
     const chartData = useMemo(() => {
         if (!data) return [];
-        return data.map(([timestamp, value]) => ({ timestamp, value }));
+        return data.map(([timestamp, value]) => ({
+            timestamp,
+            value,
+        }));
     }, [data]);
     const displayChartData = useMemo(() => {
         if (timeUnit === "D") return chartData;
@@ -186,57 +195,71 @@ function TokenLiquidityChart({
         return avg;
     }, [chartData, timeUnit]);
 
-        // get displayed distinct Xaxis Tick value (timestamp)
-        const ticks = useMemo(() => {
-            const temp = new Set<number>();
-            displayChartData.map(({ timestamp }) => {
-                if (timeUnit === "D") {
-                    temp.add(timestamp);
-                } else {
-                    const time = moment.unix(timestamp);
-                    temp.add(
-                        timeUnit === "M" ? time.date(1).unix() : time.day(1).unix()
-                    );
-                }
-            });
-            return Array.from(temp);
-        }, [displayChartData, timeUnit]);
-        // Xaxis formatter
-        const tickFormatter = useCallback(
-            (val, index: number) => {
-                const time = moment.unix(val);
-                return timeUnit === "D"
-                    ? time.format("DD/MM/yyyy")
-                    : timeUnit === "M"
-                    ? MONTH[time.month()]
-                    : "week " + time.week();
-            },
-            [timeUnit]
-        );
+    // get displayed distinct Xaxis Tick value (timestamp)
+    const ticks = useMemo(() => {
+        const temp = new Set<number>();
+        displayChartData.map(({ timestamp }) => {
+            if (timeUnit === "D") {
+                temp.add(timestamp);
+            } else {
+                const time = moment.unix(timestamp);
+                temp.add(
+                    timeUnit === "M" ? time.date(1).unix() : time.day(1).unix()
+                );
+            }
+        });
+        return Array.from(temp);
+    }, [displayChartData, timeUnit]);
+    // Xaxis formatter
+    const tickFormatter = useCallback(
+        (val, index: number) => {
+            const time = moment.unix(val);
+            return timeUnit === "D"
+                ? time.format("DD/MM/yyyy")
+                : timeUnit === "M"
+                ? MONTH[time.month()]
+                : "week " + time.week();
+        },
+        [timeUnit]
+    );
     return (
-        <ResponsiveContainer>
-            <AreaChart data={displayChartData}>
+        <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={displayChartData}>
                 <defs>
-                    <linearGradient id="TLC-colorUv" x1="0" y1="0" x2="0" y2="1">
+                    <linearGradient
+                        id="TVC-colorUv"
+                        x1="0"
+                        y1="0"
+                        x2="0"
+                        y2="1"
+                    >
                         <stop
-                            offset="5%"
+                            offset="16.28%"
                             stopColor="#FF005C"
-                            stopOpacity={0.2}
+                            stopOpacity={1}
                         />
                         <stop
-                            offset="95%"
-                            stopColor="#FF005C"
-                            stopOpacity={0}
+                            offset="80%"
+                            stopColor="#2F2B66"
+                            stopOpacity={0.5}
                         />
                     </linearGradient>
-                    <filter id="TLC-shadowUv" height="200%">
-                        <feDropShadow
-                            dx="0"
-                            dy="0"
-                            stdDeviation="10"
-                            floodColor="#FF005C"
+                    <pattern
+                        id="TVC-pattern"
+                        x="0"
+                        y="10%"
+                        width="100%"
+                        height="100%"
+                        patternUnits="userSpaceOnUse"
+                    >
+                        <rect
+                            x="0"
+                            y="0"
+                            width="100%"
+                            height="100%"
+                            fill="url(#TVC-colorUv)"
                         />
-                    </filter>
+                    </pattern>
                 </defs>
                 <XAxis
                     dataKey="timestamp"
@@ -246,9 +269,9 @@ function TokenLiquidityChart({
                     padding={{ right: 30 }}
                     interval="preserveStart"
                     domain={["dataMin", "dataMax"]}
-                    tickFormatter={tickFormatter}
                     ticks={ticks}
-                    tick={{fill: "#B7B7D7", fontSize: sm ? 12 : 10}}
+                    tickFormatter={tickFormatter}
+                    tick={{ fill: "#B7B7D7", fontSize: sm ? 12 : 10 }}
                 />
                 <YAxis
                     dataKey="value"
@@ -256,39 +279,29 @@ function TokenLiquidityChart({
                     axisLine={false}
                     tickLine={false}
                     padding={{ top: 20, bottom: 20 }}
-                    domain={[0, (max: number) => max * 1.5]}
-                    tickFormatter={(val: number) => abbreviateCurrency(val).toString()}
+                    domain={[0, (max: number) => max * 1.2]}
+                    tickFormatter={(val: number) =>
+                        abbreviateCurrency(val).toString()
+                    }
                     width={50}
-                    tick={{fill: "#B7B7D7", fontSize: sm ? 12 : 10}}
+                    tick={{ fill: "#B7B7D7", fontSize: sm ? 12 : 10 }}
+                />
+                <Bar
+                    ref={barRef}
+                    dataKey="value"
+                    fill="url(#TVC-pattern)"
+                    maxBarSize={50}
                 />
                 <Tooltip
                     coordinate={{ x: 0, y: 0 }}
                     active={true}
                     position={{ x: 0, y: 0 }}
-                    cursor={<CustomTooltipCursor areaRef={areaRef} />}
+                    cursor={<CustomTooltipCursor barRef={barRef} />}
                     content={<></>}
                 />
-                {/* <Tooltip cursor={{}} content={<CustomTooltip/>}/> */}
-                {/* <Tooltip coordinate={{x: 0, y: 0}} active={true} position={{x: 0, y: 0}} cursor={true} content={<CustomTooltip/>}/> */}
-                <Area
-                    ref={areaRef}
-                    type="linear"
-                    dataKey="value"
-                    stroke="#FF005C"
-                    fillOpacity={1}
-                    fill="url(#TLC-colorUv)"
-                    strokeWidth={3}
-                    filter="url(#TLC-shadowUv)"
-                    activeDot={(activeDotProps) => (
-                        <CustomActiveDot
-                            {...activeDotProps}
-                            dotColor="#FF005C"
-                        />
-                    )}
-                />
-            </AreaChart>
+            </BarChart>
         </ResponsiveContainer>
     );
 }
 
-export default TokenLiquidityChart;
+export default TokenVolumeChart;

@@ -71,8 +71,8 @@ const CustomTooltipCursor = ({ areaRef, ...props }: any) => {
     const { width, height, left, payloadIndex } = props;
     if (!areaRef.current) return null;
     const y = areaRef.current.state.curPoints[payloadIndex]?.y || 0;
-    const value = areaRef.current.state.curPoints[payloadIndex]?.payload.value || 0;
-    
+    const value =
+        areaRef.current.state.curPoints[payloadIndex]?.payload.value || 0;
     return (
         <>
             <line
@@ -126,7 +126,7 @@ const MONTH = [
     "NOV",
     "DEC",
 ];
-function TokenLiquidityChart({
+function TokenPriceAreaChart({
     token,
     timeUnit,
 }: {
@@ -135,7 +135,7 @@ function TokenLiquidityChart({
 }) {
     const { data } = useSWR<[number, number][]>(
         token.id
-            ? `${network.ashApiBaseUrl}/token/${token.id}/graph-statistic?type=liquidity`
+            ? `${network.ashApiBaseUrl}/token/${token.id}/graph-statistic?type=price`
             : null,
         fetcher
     );
@@ -143,7 +143,7 @@ function TokenLiquidityChart({
     const {sm} = useScreenSize();
     const chartData = useMemo(() => {
         if (!data) return [];
-        return data.map(([timestamp, value]) => ({ timestamp, value }));
+        return data.map(([timestampMs, value]) => ({ timestamp: timestampMs / 1000, value }));
     }, [data]);
     const displayChartData = useMemo(() => {
         if (timeUnit === "D") return chartData;
@@ -186,38 +186,44 @@ function TokenLiquidityChart({
         return avg;
     }, [chartData, timeUnit]);
 
-        // get displayed distinct Xaxis Tick value (timestamp)
-        const ticks = useMemo(() => {
-            const temp = new Set<number>();
-            displayChartData.map(({ timestamp }) => {
-                if (timeUnit === "D") {
-                    temp.add(timestamp);
-                } else {
-                    const time = moment.unix(timestamp);
-                    temp.add(
-                        timeUnit === "M" ? time.date(1).unix() : time.day(1).unix()
-                    );
-                }
-            });
-            return Array.from(temp);
-        }, [displayChartData, timeUnit]);
-        // Xaxis formatter
-        const tickFormatter = useCallback(
-            (val, index: number) => {
-                const time = moment.unix(val);
-                return timeUnit === "D"
-                    ? time.format("DD/MM/yyyy")
-                    : timeUnit === "M"
-                    ? MONTH[time.month()]
-                    : "week " + time.week();
-            },
-            [timeUnit]
-        );
+    // get displayed distinct Xaxis Tick value (timestamp)
+    const ticks = useMemo(() => {
+        const temp = new Set<number>();
+        displayChartData.map(({ timestamp }) => {
+            if (timeUnit === "D") {
+                temp.add(timestamp);
+            } else {
+                const time = moment.unix(timestamp);
+                temp.add(
+                    timeUnit === "M" ? time.date(1).unix() : time.day(1).unix()
+                );
+            }
+        });
+        return Array.from(temp);
+    }, [displayChartData, timeUnit]);
+    // Xaxis formatter
+    const tickFormatter = useCallback(
+        (val, index: number) => {
+            const time = moment.unix(val);
+            return timeUnit === "D"
+                ? time.format("DD/MM/yyyy")
+                : timeUnit === "M"
+                ? MONTH[time.month()]
+                : "week " + time.week() + "/" + time.year();
+        },
+        [timeUnit]
+    );
     return (
         <ResponsiveContainer>
             <AreaChart data={displayChartData}>
                 <defs>
-                    <linearGradient id="TLC-colorUv" x1="0" y1="0" x2="0" y2="1">
+                    <linearGradient
+                        id="TLC-colorUv"
+                        x1="0"
+                        y1="0"
+                        x2="0"
+                        y2="1"
+                    >
                         <stop
                             offset="5%"
                             stopColor="#FF005C"
@@ -233,7 +239,7 @@ function TokenLiquidityChart({
                         <feDropShadow
                             dx="0"
                             dy="0"
-                            stdDeviation="10"
+                            stdDeviation="5"
                             floodColor="#FF005C"
                         />
                     </filter>
@@ -248,7 +254,7 @@ function TokenLiquidityChart({
                     domain={["dataMin", "dataMax"]}
                     tickFormatter={tickFormatter}
                     ticks={ticks}
-                    tick={{fill: "#B7B7D7", fontSize: sm ? 12 : 10}}
+                    tick={{ fill: "#B7B7D7", fontSize: sm ? 12 : 10 }}
                 />
                 <YAxis
                     dataKey="value"
@@ -257,9 +263,11 @@ function TokenLiquidityChart({
                     tickLine={false}
                     padding={{ top: 20, bottom: 20 }}
                     domain={[0, (max: number) => max * 1.5]}
-                    tickFormatter={(val: number) => abbreviateCurrency(val).toString()}
+                    tickFormatter={(val: number) =>
+                        abbreviateCurrency(val).toString()
+                    }
                     width={50}
-                    tick={{fill: "#B7B7D7", fontSize: sm ? 12 : 10}}
+                    tick={{ fill: "#B7B7D7", fontSize: sm ? 12 : 10 }}
                 />
                 <Tooltip
                     coordinate={{ x: 0, y: 0 }}
@@ -291,4 +299,4 @@ function TokenLiquidityChart({
     );
 }
 
-export default TokenLiquidityChart;
+export default TokenPriceAreaChart;
