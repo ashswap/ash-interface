@@ -4,8 +4,90 @@ import IconWBTC from "assets/images/wbtc-icon.png";
 import IconUSDC from "assets/images/usdc-icon.png";
 import IconWUSDC from "assets/images/wusdc-icon.png";
 import IconUSDT from "assets/images/usdt-icon.png";
+import { ENVIRONMENT } from "./env";
 
-const pools: IPool[] = [
+const devnet: IPool[] = [
+    {
+        address:
+            "erd1qqqqqqqqqqqqqpgqj368esm9hej8xyza60ndmxvj2p6xu44ermcqwjspx8",
+        lpToken: {
+            id: "LPT-a043fb",
+            icon: "#fff",
+            name: "LPT-a043fb",
+            decimals: 18,
+        },
+        tokens: [
+            {
+                id: "USDC-98bac5",
+                icon: IconUSDC,
+                name: "USDC",
+                decimals: 6,
+                coingeckoId: "usd-coin",
+            },
+            {
+                id: "USDT-c5ce87",
+                icon: IconUSDT,
+                name: "USDT",
+                decimals: 6,
+                coingeckoId: "tether",
+            },
+        ],
+    },
+    {
+        address:
+            "erd1qqqqqqqqqqqqqpgqpz908v8rx6fjemce6jj5ca6zlg2t72ftrmcqkafq5j",
+        lpToken: {
+            id: "LPT-f11891",
+            icon: "#fff",
+            name: "LPT-f11891",
+            decimals: 18,
+        },
+        tokens: [
+            {
+                id: "USDC-98bac5",
+                icon: IconUSDC,
+                name: "USDC",
+                decimals: 6,
+                coingeckoId: "usd-coin",
+            },
+            {
+                id: "WUSDC-0142ed",
+                icon: IconWUSDC,
+                name: "wUSDC",
+                decimals: 6,
+                coingeckoId: "usd-coin",
+            },
+        ],
+    },
+    {
+        address:
+            "erd1qqqqqqqqqqqqqpgqhs8td0ywl39d0vrhqhkn8asvshcq0xymrmcqlq8gxk",
+        lpToken: {
+            id: "LPT-5b1224",
+            icon: "#fff",
+            name: "LPT-5b1224",
+            decimals: 18,
+        },
+        tokens: [
+            {
+                id: "BTC-2bcdc2",
+                icon: IconBTC,
+                name: "BTC",
+                decimals: 6,
+                coingeckoId: "bitcoin",
+            },
+            {
+                id: "WBTC-8b760d",
+                icon: IconWBTC,
+                name: "wBTC",
+                decimals: 6,
+                coingeckoId: "wrapped-bitcoin",
+            },
+        ],
+    },
+];
+
+const testnet: IPool[] = [
     {
         address:
             "erd1qqqqqqqqqqqqqpgqaphkarlvclh2c3v0hq2em73gcuxkh5yxj9ts6s5dt2",
@@ -85,5 +167,7 @@ const pools: IPool[] = [
         ],
     },
 ];
+
+const pools = ENVIRONMENT.NETWORK == "devnet" ? devnet : testnet;
 
 export default pools;
