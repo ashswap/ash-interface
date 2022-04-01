@@ -299,12 +299,12 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
                             <span className="text-ash-gray-500">
                                 I verify that I have read the{" "}
                                 <a
-                                    href="https://docs.ashswap.io/guides/add-remove-liquidity"
+                                    href="https://docs.ashswap.io/testnet-guides/liquidity-staking"
                                     target="_blank"
                                     rel="noreferrer"
                                 >
                                     <b className="text-white">
-                                        <u>AshSwap Pools Guide</u>
+                                        <u>AshSwap Liquidity Staking Guide</u>
                                     </b>
                                 </a>{" "}
                                 and understand the risks of providing liquidity,
