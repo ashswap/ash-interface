@@ -15,7 +15,7 @@ import GOVStakeModal from "components/GOVStakeModal";
 import { useStakeGov } from "context/gov";
 import { toEGLD, toEGLDD } from "helper/balance";
 import { ASH_TOKEN, VE_ASH_DECIMALS } from "const/tokens";
-import { fractionFormat } from "helper/number";
+import { formatAmount, fractionFormat } from "helper/number";
 import moment from "moment";
 import { useDappContext } from "context/dapp";
 import { useWallet } from "context/wallet";
@@ -25,8 +25,15 @@ import HeadlessModal, {
 } from "components/HeadlessModal";
 import Link from "next/link";
 import { useScreenSize } from "hooks/useScreenSize";
+import useSWR from "swr";
+import { network } from "const/network";
+import { fetcher } from "helper/common";
 
 function GovStats() {
+    const { data: adminFee24h } = useSWR<number>(
+        `${network.ashApiBaseUrl}/stake/governance/admin-fee`,
+        fetcher
+    );
     const [isQAExpand, setIsQAExpand] = useState(false);
     const [openStakeGov, setOpenStakeGov] = useState(false);
     const [openHarvestResult, setOpenHarvestResult] = useState(false);
@@ -45,7 +52,7 @@ function GovStats() {
     } = useStakeGov();
     const dapp = useDappContext();
     const mounted = useMounted();
-    const { connectWallet } = useWallet();
+    const { connectWallet, tokenPrices } = useWallet();
     const screenSize = useScreenSize();
     const fLockedAmt = useMemo(() => {
         return fractionFormat(
@@ -74,6 +81,15 @@ function GovStats() {
         const num = rewardValue.toNumber();
         return fractionFormat(num, { maximumFractionDigits: num < 1 ? 6 : 2 });
     }, [rewardValue]);
+    const apr = useMemo(() => {
+        if (!adminFee24h) return 0;
+        return (
+            (adminFee24h * 365 * 100) /
+            toEGLDD(ASH_TOKEN.decimals, totalLockedAmt)
+                .multipliedBy(tokenPrices[ASH_TOKEN.id])
+                .toNumber()
+        );
+    }, [adminFee24h, totalLockedAmt, tokenPrices]);
     const canClaim = useMemo(() => {
         return rewardLPAmt && rewardLPAmt.gt(0);
     }, [rewardLPAmt]);
@@ -155,7 +171,12 @@ function GovStats() {
                                         : "bg-ash-dark-400 text-white"
                                 }`}
                                 disabled={!canClaim}
-                                onClick={() => canClaim && claimReward().then(tx => setOpenHarvestResult(!!tx))}
+                                onClick={() =>
+                                    canClaim &&
+                                    claimReward().then((tx) =>
+                                        setOpenHarvestResult(!!tx)
+                                    )
+                                }
                             >
                                 Harvest
                             </button>
@@ -272,7 +293,7 @@ function GovStats() {
                                 APR
                             </div>
                             <div className="text-pink-600 text-lg font-bold leading-tight">
-                                On developing
+                                {formatAmount(apr)}%
                             </div>
                         </div>
                         <div className="bg-ash-dark-400/30 px-[2.375rem] py-7 flex flex-col justify-between">
@@ -280,7 +301,10 @@ function GovStats() {
                                 PERCENTAGE of total ASH Locked
                             </div>
                             <div className="text-white text-lg font-bold leading-tight">
-                                {totalLockedPct < 0.01 ? "< 0.01" : totalLockedPct.toFixed(2)}%
+                                {totalLockedPct < 0.01
+                                    ? "< 0.01"
+                                    : totalLockedPct.toFixed(2)}
+                                %
                             </div>
                         </div>
                         <div className="bg-ash-dark-400/30 px-[2.375rem] py-7 flex flex-col justify-between">
