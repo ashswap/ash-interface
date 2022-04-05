@@ -16,15 +16,15 @@ function StakePage() {
                         <span>Stake</span>
                     </li>
                 </ul>
-                <div className="mb-28">
+                <div className="mb-16 lg:mb-28">
                     <h2 className="text-2xl lg:text-4xl font-bold text-white mb-6 lg:mb-16">Liquidity Stake</h2>
                     <TVLLPChart/>
                 </div>
-                <div className="mb-28">
+                <div className="mb-16 lg:mb-28">
                     <h2 className="text-2xl lg:text-4xl font-bold text-white mb-6 lg:mb-16">Governance Stake</h2>
                     <VotePowerChart/>
                 </div>
-                <div>
+                <div className="mb-16 lg:mb-28">
                     <h2 className="text-lg font-bold text-white mb-5 lg:mb-7">Weekly Summary</h2>
                     <WeeklyFeeTable/>
                 </div>

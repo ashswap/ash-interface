@@ -428,6 +428,12 @@ function InfoLayout({ children }: any) {
                         Icon={ICDrop}
                         active={isActive("/info/pools", true)}
                     />
+                    <MNavLink
+                        href="/info/stake"
+                        name="Stake"
+                        Icon={ICStake}
+                        active={isActive("/info/stake", true)}
+                    />
                     {/* <MNavLink
                         href="/info/wallet"
                         name="Wallets"
