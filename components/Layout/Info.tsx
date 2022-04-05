@@ -6,6 +6,7 @@ import ICDrop from "assets/svg/drop.svg";
 import ICMoon from "assets/svg/moon.svg";
 import ICSearch from "assets/svg/search.svg";
 import ICSun from "assets/svg/sun.svg";
+import ICStake from "assets/svg/stake.svg";
 import ICToken from "assets/svg/token.svg";
 import AddressMenu from "components/AddressMenu";
 import Input from "components/Input";
@@ -75,12 +76,18 @@ const SwitchThemeBtn = () => {
         </button>
     );
 };
-const NavLink = ({ active, collapsed, name, Icon, ...linkProps }: NavLinkProps) => {
+const NavLink = ({
+    active,
+    collapsed,
+    name,
+    Icon,
+    ...linkProps
+}: NavLinkProps) => {
     return (
         <Link {...linkProps}>
             <a>
                 <div
-                    className={`flex relative py-3 font-bold text-sm ${
+                    className={`flex items-center relative py-3 font-bold text-sm ${
                         active ? "text-white" : "text-ash-gray-500"
                     } ${collapsed ? "pr-4 justify-center" : ""}`}
                 >
@@ -150,12 +157,17 @@ function InfoLayout({ children }: any) {
                         enterTo="opacity-100"
                     >
                         {openSidebar && !screenSizes.lg && (
-                            <div className="bg-black/30 fixed inset-0 backdrop-blur-md" onClick={() => setOpenSidebar(false)}></div>
+                            <div
+                                className="bg-black/30 fixed inset-0 backdrop-blur-md"
+                                onClick={() => setOpenSidebar(false)}
+                            ></div>
                         )}
                     </Transition>
                     <aside
                         className={`flex-shrink-0 fixed top-0 left-0 h-screen bg-ash-dark-600 py-9 flex flex-col z-10 transition-all ${
-                            openSidebar ? "w-52 xl:w-60 pl-4 xl:pl-12" : "w-18 pl-4"
+                            openSidebar
+                                ? "w-52 xl:w-60 pl-4 xl:pl-12"
+                                : "w-18 pl-4"
                         }`}
                     >
                         <button
@@ -194,8 +206,8 @@ function InfoLayout({ children }: any) {
                                     <NavLink
                                         href="/info/tokens"
                                         name="Tokens"
-                                        collapsed={!openSidebar}
                                         Icon={ICToken}
+                                        collapsed={!openSidebar}
                                         active={isActive("/info/tokens", false)}
                                     />
                                 </li>
@@ -203,9 +215,18 @@ function InfoLayout({ children }: any) {
                                     <NavLink
                                         href="/info/pools"
                                         name="Pools"
-                                        collapsed={!openSidebar}
                                         Icon={ICDrop}
+                                        collapsed={!openSidebar}
                                         active={isActive("/info/pools", false)}
+                                    />
+                                </li>
+                                <li>
+                                    <NavLink
+                                        href="/info/stake"
+                                        name="Stake"
+                                        Icon={ICStake}
+                                        collapsed={!openSidebar}
+                                        active={isActive("/info/stake", false)}
                                     />
                                 </li>
                                 {/* <li>
@@ -247,7 +268,11 @@ function InfoLayout({ children }: any) {
                     </aside>
                 </div>
 
-                <div className={`flex-grow px-4 lg:px-9 lg:py-6 relative overflow-x-hidden mr-32 ${openSidebar ? "ml-18 lg:ml-52 xl:ml-60" : "ml-18"}`}>
+                <div
+                    className={`flex-grow px-4 lg:px-9 lg:py-6 relative overflow-x-hidden mr-32 ${
+                        openSidebar ? "ml-18 lg:ml-52 xl:ml-60" : "ml-18"
+                    }`}
+                >
                     {/* <div className="fixed top-6 right-[10.25rem] z-20">
                         <Input
                             backgroundClassName="bg-ash-dark-700/70 h-12 px-5"
