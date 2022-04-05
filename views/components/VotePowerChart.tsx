@@ -1,5 +1,7 @@
 import { network } from "const/network";
 import { MONTH_SHORT } from "const/time";
+import { VE_ASH_DECIMALS } from "const/tokens";
+import { toEGLDD } from "helper/balance";
 import { fetcher } from "helper/common";
 import { formatAmount } from "helper/number";
 import { useScreenSize } from "hooks/useScreenSize";
@@ -11,9 +13,11 @@ import {
     ResponsiveContainer,
     Tooltip,
     XAxis,
-    YAxis
+    YAxis,
 } from "recharts";
 import useSWR from "swr";
+import ICArrowTopRight from "assets/svg/arrow-top-right.svg";
+import ICArrowBottomRight from "assets/svg/arrow-bottom-right.svg";
 
 const CustomActiveDot = ({ dotColor, ...props }: any) => {
     const { cx, cy } = props;
@@ -113,90 +117,52 @@ const CustomTooltipCursor = ({ areaRef, ...props }: any) => {
     );
 };
 const interval = ["D", "W", "M"];
-function TVLLPChart() {
-    const { data } = useSWR<[number, number][]>(
-        `${network.ashApiBaseUrl}/stake/farming/graph-statistic?type=liquidity`,
+function VotePowerChart() {
+    const { data } = useSWR<[number, string][]>(
+        `${network.ashApiBaseUrl}/stake/governance/voting-power`,
         fetcher,
-        { refreshInterval: 5 * 60 * 1000 }
+        { refreshInterval: 10 * 60 * 1000 }
     );
     const areaRef = useRef<any>(null);
-    const [activePayload, setActivePayload] = useState<{ timestamp: number, value: number }>();
+    const [activeIndex, setActiveIndex] = useState(-1);
 
     const { sm } = useScreenSize();
-    const [timeUnit, setTimeUnit] = useState(interval[0]);
 
     const chartData = useMemo(() => {
         if (!data) return [];
-        return data.map(([timestamp, value]) => ({ timestamp, value }));
+        return data.map(([timestamp, value]) => ({
+            timestamp,
+            value: toEGLDD(VE_ASH_DECIMALS, value).toNumber(),
+        }));
     }, [data]);
     const displayChartData = useMemo(() => {
-        if (timeUnit === "D") return chartData;
-        const wMap: { [key: number]: number[] } = {};
-        chartData.map((val) => {
-            // group by week or month to get the same key(timestamp)
-            const w =
-                timeUnit === "W"
-                    ? moment
-                          .unix(val.timestamp)
-                          .day(1)
-                          .hour(0)
-                          .minute(0)
-                          .second(0)
-                          .millisecond(0)
-                          .unix()
-                    : moment
-                          .unix(val.timestamp)
-                          .date(1)
-                          .hour(0)
-                          .minute(0)
-                          .second(0)
-                          .millisecond(0)
-                          .unix();
-            if (wMap[w]) {
-                wMap[w].push(val.value);
-            } else {
-                wMap[w] = [val.value];
-            }
-        });
-        const avg = Object.keys(wMap).map((k) => {
-            const sum = wMap[+k].reduce((total, value) => {
-                return total + value;
-            }, 0);
-            return {
-                timestamp: +k,
-                value: sum / wMap[+k].length,
-            };
-        });
-        return avg;
-    }, [chartData, timeUnit]);
+        return chartData;
+    }, [chartData]);
 
-    // get displayed distinct Xaxis Tick value (timestamp)
     const ticks = useMemo(() => {
-        const temp = new Set<number>();
-        displayChartData.map(({ timestamp }) => {
-            if (timeUnit === "D") {
-                temp.add(timestamp);
-            } else {
-                const time = moment.unix(timestamp);
-                temp.add(
-                    timeUnit === "M" ? time.date(1).unix() : time.day(1).unix()
-                );
-            }
-        });
-        return Array.from(temp);
-    }, [displayChartData, timeUnit]);
+        return displayChartData.map(({ timestamp }) => timestamp);
+    }, [displayChartData]);
     // Xaxis formatter
-    const tickFormatter = useCallback(
-        (val, index: number) => {
-            const time = moment.unix(val);
-            return timeUnit === "D"
-                ? time.format("DD/MM/yyyy")
-                : timeUnit === "M"
-                ? MONTH_SHORT[time.month()]
-                : "week " + time.week();
-        },
-        [timeUnit]
-    );
+    const tickFormatter = useCallback((val, index: number) => {
+        const time = moment.unix(val);
+        return time.format("yyyy");
+    }, []);
+    const activePayload = useMemo(() => {
+        if (activeIndex === -1)
+            return displayChartData[displayChartData.length - 1];
+        return displayChartData[activeIndex];
+    }, [displayChartData, activeIndex]);
+    const prevPayload = useMemo(() => {
+        const index = activeIndex - 1;
+        if (index === -2) return displayChartData[displayChartData.length - 2];
+        return displayChartData[index];
+    }, [displayChartData, activeIndex]);
+    const pct = useMemo(() => {
+        const activeVal = activePayload?.value || 0;
+        const prevVal = prevPayload?.value || 0;
+        if (prevVal === 0) return 0;
+        return ((activeVal - prevVal) * 100) / prevVal;
+    }, [activePayload, prevPayload]);
     return (
         <div
             className="relative bg-ash-dark-600 px-[1.625rem] py-4"
@@ -204,7 +170,13 @@ function TVLLPChart() {
         >
             <div className="h-60 mb-5">
                 <ResponsiveContainer>
-                    <AreaChart data={displayChartData} onMouseLeave={() => setActivePayload(undefined)} onMouseMove={(e) => setActivePayload(e?.activePayload?.[0])}>
+                    <AreaChart
+                        data={displayChartData}
+                        onMouseLeave={() => setActiveIndex(-1)}
+                        onMouseMove={(e) => {
+                            setActiveIndex(e?.activeTooltipIndex || -1);
+                        }}
+                    >
                         <defs>
                             <linearGradient
                                 id="TVLLP-colorUv"
@@ -241,8 +213,8 @@ function TVLLPChart() {
                             padding={{ right: 30 }}
                             interval="preserveStart"
                             domain={["dataMin", "dataMax"]}
-                            ticks={ticks}
                             tickFormatter={tickFormatter}
+                            ticks={ticks}
                             tick={{ fill: "#B7B7D7", fontSize: sm ? 12 : 10 }}
                         />
                         <YAxis
@@ -294,36 +266,29 @@ function TVLLPChart() {
             </div>
             <div className="absolute top-7.5 left-[1.625rem]">
                 <div className="text-xs text-white mb-2">
-                    Total value of locked LP
+                    Voting Power - Amount of veASH locked
                 </div>
-                <div className="text-lg leading-tight">
-                    <span className="text-ash-gray-500">$ </span>
+                <div className="text-lg flex items-start leading-tight">
                     <span>
                         {formatAmount(
-                            activePayload?.value ?? displayChartData[displayChartData.length - 1]?.value
+                            activePayload?.value ??
+                                displayChartData[displayChartData.length - 1]
+                                    ?.value
                         )}
                     </span>
+                    {pct !== 0 &&
+                        moment
+                            .unix(activePayload.timestamp)
+                            .isSame(moment(), "year") && (
+                            <div className={`flex items-center ml-4 ${pct > 0 ? "text-ash-green-500" : "text-ash-purple-500"}`}>
+                                {pct > 0 ? <ICArrowTopRight className="w-1.5 h-1.5"/> : <ICArrowBottomRight className="w-1.5 h-1.5"/>}
+                                <span className={`text-xs font-bold ml-1`}>{pct > 0 && "+"}{pct.toFixed(2)}%</span>
+                            </div>
+                        )}
                 </div>
-            </div>
-            <div className="flex space-x-2 mb-10">
-                {interval.map((val) => {
-                    return (
-                        <button
-                            key={val}
-                            className={`w-9 h-9 bg-ash-dark-400 ${
-                                timeUnit === val
-                                    ? "text-white"
-                                    : "text-ash-gray-500"
-                            }`}
-                            onClick={() => setTimeUnit(val)}
-                        >
-                            {val}
-                        </button>
-                    );
-                })}
             </div>
         </div>
     );
 }
 
-export default TVLLPChart;
+export default VotePowerChart;

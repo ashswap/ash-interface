@@ -2,6 +2,8 @@ import ICArrowRight from "assets/svg/arrow-right.svg";
 import InfoLayout from "components/Layout/Info";
 import React, { ReactElement } from "react";
 import TVLLPChart from "views/info/stake/TVLLPChart";
+import VotePowerChart from "views/components/VotePowerChart";
+import WeeklyFeeTable from "views/components/WeeklyFeeTable";
 
 function StakePage() {
     return (
@@ -14,9 +16,17 @@ function StakePage() {
                         <span>Stake</span>
                     </li>
                 </ul>
-                <div>
-                    <h2 className="text-4xl font-bold text-white mb-16">Liquidity Stake</h2>
+                <div className="mb-28">
+                    <h2 className="text-2xl lg:text-4xl font-bold text-white mb-6 lg:mb-16">Liquidity Stake</h2>
                     <TVLLPChart/>
+                </div>
+                <div className="mb-28">
+                    <h2 className="text-2xl lg:text-4xl font-bold text-white mb-6 lg:mb-16">Governance Stake</h2>
+                    <VotePowerChart/>
+                </div>
+                <div>
+                    <h2 className="text-lg font-bold text-white mb-5 lg:mb-7">Weekly Summary</h2>
+                    <WeeklyFeeTable/>
                 </div>
             </div>
         </div>
