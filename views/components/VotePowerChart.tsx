@@ -18,57 +18,12 @@ import {
 import useSWR from "swr";
 import ICArrowTopRight from "assets/svg/arrow-top-right.svg";
 import ICArrowBottomRight from "assets/svg/arrow-bottom-right.svg";
+import { ChartActiveDot } from "components/Chart/ChartActiveDot";
+import { ChartLineX } from "components/Chart/ChartLineX";
 
 const CustomActiveDot = ({ dotColor, ...props }: any) => {
     const { cx, cy } = props;
-    return (
-        <svg
-            x={cx - 20}
-            y={cy - 20}
-            width="40"
-            height="41"
-            viewBox="0 0 40 41"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-        >
-            <g filter="url(#filter0_f_2859_6154)">
-                <rect
-                    width="18.2302"
-                    height="18.2302"
-                    transform="matrix(0.694136 0.719844 -0.694136 0.719844 19.6543 7)"
-                    fill={dotColor || "currentColor"}
-                />
-            </g>
-            <path
-                opacity="0.7"
-                d="M24.8957 20.1453C24.8957 20.9771 22.5064 21.7359 22.0105 22.3105C21.437 22.9749 20.6037 25.5583 19.6761 25.5583C18.7486 25.5583 17.9153 22.9749 17.3418 22.3105C16.8459 21.7359 14.4565 20.9771 14.4565 20.1453C14.4565 19.3135 16.8459 18.5548 17.3418 17.9802C17.9153 17.3157 18.7486 14.7324 19.6761 14.7324C20.6037 14.7324 21.437 17.3157 22.0105 17.9802C22.5064 18.5548 24.8957 19.3135 24.8957 20.1453Z"
-                fill="white"
-            />
-            <defs>
-                <filter
-                    id="filter0_f_2859_6154"
-                    x="0"
-                    y="0"
-                    width="39.3086"
-                    height="40.2461"
-                    filterUnits="userSpaceOnUse"
-                    colorInterpolationFilters="sRGB"
-                >
-                    <feFlood floodOpacity="0" result="BackgroundImageFix" />
-                    <feBlend
-                        mode="normal"
-                        in="SourceGraphic"
-                        in2="BackgroundImageFix"
-                        result="shape"
-                    />
-                    <feGaussianBlur
-                        stdDeviation="3.5"
-                        result="effect1_foregroundBlur_2859_6154"
-                    />
-                </filter>
-            </defs>
-        </svg>
-    );
+    return <ChartActiveDot dotColor={dotColor} cx={cx} cy={cy} />;
 };
 const CustomTooltipCursor = ({ areaRef, ...props }: any) => {
     const { width, height, left, payloadIndex } = props;
@@ -78,42 +33,13 @@ const CustomTooltipCursor = ({ areaRef, ...props }: any) => {
         areaRef.current.state.curPoints[payloadIndex]?.payload.value || 0;
 
     return (
-        <>
-            <line
-                width={width}
-                height={height}
-                strokeDasharray="5, 5"
-                x1={left}
-                y1={y}
-                x2={width}
-                y2={y}
-                strokeWidth={1}
-                stroke="#FF005C"
-            ></line>
-            <rect
-                x={width}
-                y={y - 14}
-                width="62"
-                height="28"
-                fill="#FF005C"
-                className="transition-none"
-            ></rect>
-            <text
-                x={width + 12}
-                y={y}
-                width="62"
-                height="28"
-                fill="white"
-                // textAnchor="middle"
-                alignmentBaseline="central"
-                fontSize={12}
-            >
-                {formatAmount(value)}
-            </text>
-        </>
-        //   <svg width="600" height="1" version="1.1" xmlns="http://www.w3.org/2000/svg">
-
-        // </svg>
+        <ChartLineX
+            width={width}
+            height={height}
+            left={left}
+            y={y}
+            label={formatAmount(value) || ""}
+        />
     );
 };
 const interval = ["D", "W", "M"];
@@ -280,9 +206,22 @@ function VotePowerChart() {
                         moment
                             .unix(activePayload.timestamp)
                             .isSame(moment(), "year") && (
-                            <div className={`flex items-center ml-4 ${pct > 0 ? "text-ash-green-500" : "text-ash-purple-500"}`}>
-                                {pct > 0 ? <ICArrowTopRight className="w-1.5 h-1.5"/> : <ICArrowBottomRight className="w-1.5 h-1.5"/>}
-                                <span className={`text-xs font-bold ml-1`}>{pct > 0 && "+"}{pct.toFixed(2)}%</span>
+                            <div
+                                className={`flex items-center ml-4 ${
+                                    pct > 0
+                                        ? "text-ash-green-500"
+                                        : "text-ash-purple-500"
+                                }`}
+                            >
+                                {pct > 0 ? (
+                                    <ICArrowTopRight className="w-1.5 h-1.5" />
+                                ) : (
+                                    <ICArrowBottomRight className="w-1.5 h-1.5" />
+                                )}
+                                <span className={`text-xs font-bold ml-1`}>
+                                    {pct > 0 && "+"}
+                                    {pct.toFixed(2)}%
+                                </span>
                             </div>
                         )}
                 </div>

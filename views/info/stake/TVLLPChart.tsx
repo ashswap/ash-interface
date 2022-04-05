@@ -1,8 +1,12 @@
+import { ChartActiveDot } from "components/Chart/ChartActiveDot";
+import { ChartLineX } from "components/Chart/ChartLineX";
 import { network } from "const/network";
-import { MONTH_SHORT } from "const/time";
+import { CHART_INTERVAL, MONTH_SHORT } from "const/time";
 import { fetcher } from "helper/common";
 import { formatAmount } from "helper/number";
 import { useScreenSize } from "hooks/useScreenSize";
+import { useValueChart } from "hooks/useValueChart";
+import { ChartTimeUnitType } from "interface/chart";
 import moment from "moment";
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import {
@@ -11,60 +15,13 @@ import {
     ResponsiveContainer,
     Tooltip,
     XAxis,
-    YAxis
+    YAxis,
 } from "recharts";
 import useSWR from "swr";
 
 const CustomActiveDot = ({ dotColor, ...props }: any) => {
     const { cx, cy } = props;
-    return (
-        <svg
-            x={cx - 20}
-            y={cy - 20}
-            width="40"
-            height="41"
-            viewBox="0 0 40 41"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-        >
-            <g filter="url(#filter0_f_2859_6154)">
-                <rect
-                    width="18.2302"
-                    height="18.2302"
-                    transform="matrix(0.694136 0.719844 -0.694136 0.719844 19.6543 7)"
-                    fill={dotColor || "currentColor"}
-                />
-            </g>
-            <path
-                opacity="0.7"
-                d="M24.8957 20.1453C24.8957 20.9771 22.5064 21.7359 22.0105 22.3105C21.437 22.9749 20.6037 25.5583 19.6761 25.5583C18.7486 25.5583 17.9153 22.9749 17.3418 22.3105C16.8459 21.7359 14.4565 20.9771 14.4565 20.1453C14.4565 19.3135 16.8459 18.5548 17.3418 17.9802C17.9153 17.3157 18.7486 14.7324 19.6761 14.7324C20.6037 14.7324 21.437 17.3157 22.0105 17.9802C22.5064 18.5548 24.8957 19.3135 24.8957 20.1453Z"
-                fill="white"
-            />
-            <defs>
-                <filter
-                    id="filter0_f_2859_6154"
-                    x="0"
-                    y="0"
-                    width="39.3086"
-                    height="40.2461"
-                    filterUnits="userSpaceOnUse"
-                    colorInterpolationFilters="sRGB"
-                >
-                    <feFlood floodOpacity="0" result="BackgroundImageFix" />
-                    <feBlend
-                        mode="normal"
-                        in="SourceGraphic"
-                        in2="BackgroundImageFix"
-                        result="shape"
-                    />
-                    <feGaussianBlur
-                        stdDeviation="3.5"
-                        result="effect1_foregroundBlur_2859_6154"
-                    />
-                </filter>
-            </defs>
-        </svg>
-    );
+    return <ChartActiveDot dotColor={dotColor} cx={cx} cy={cy} />;
 };
 const CustomTooltipCursor = ({ areaRef, ...props }: any) => {
     const { width, height, left, payloadIndex } = props;
@@ -74,45 +31,15 @@ const CustomTooltipCursor = ({ areaRef, ...props }: any) => {
         areaRef.current.state.curPoints[payloadIndex]?.payload.value || 0;
 
     return (
-        <>
-            <line
-                width={width}
-                height={height}
-                strokeDasharray="5, 5"
-                x1={left}
-                y1={y}
-                x2={width}
-                y2={y}
-                strokeWidth={1}
-                stroke="#FF005C"
-            ></line>
-            <rect
-                x={width}
-                y={y - 14}
-                width="62"
-                height="28"
-                fill="#FF005C"
-                className="transition-none"
-            ></rect>
-            <text
-                x={width + 12}
-                y={y}
-                width="62"
-                height="28"
-                fill="white"
-                // textAnchor="middle"
-                alignmentBaseline="central"
-                fontSize={12}
-            >
-                {formatAmount(value)}
-            </text>
-        </>
-        //   <svg width="600" height="1" version="1.1" xmlns="http://www.w3.org/2000/svg">
-
-        // </svg>
+        <ChartLineX
+            width={width}
+            height={height}
+            left={left}
+            y={y}
+            label={formatAmount(value) || ""}
+        />
     );
 };
-const interval = ["D", "W", "M"];
 function TVLLPChart() {
     const { data } = useSWR<[number, number][]>(
         `${network.ashApiBaseUrl}/stake/farming/graph-statistic?type=liquidity`,
@@ -120,71 +47,21 @@ function TVLLPChart() {
         { refreshInterval: 5 * 60 * 1000 }
     );
     const areaRef = useRef<any>(null);
-    const [activePayload, setActivePayload] = useState<{ timestamp: number, value: number }>();
+    const [activePayload, setActivePayload] =
+        useState<{ timestamp: number; value: number }>();
 
     const { sm } = useScreenSize();
-    const [timeUnit, setTimeUnit] = useState(interval[0]);
+    const [timeUnit, setTimeUnit] = useState<ChartTimeUnitType>("D");
 
     const chartData = useMemo(() => {
         if (!data) return [];
         return data.map(([timestamp, value]) => ({ timestamp, value }));
     }, [data]);
-    const displayChartData = useMemo(() => {
-        if (timeUnit === "D") return chartData;
-        const wMap: { [key: number]: number[] } = {};
-        chartData.map((val) => {
-            // group by week or month to get the same key(timestamp)
-            const w =
-                timeUnit === "W"
-                    ? moment
-                          .unix(val.timestamp)
-                          .day(1)
-                          .hour(0)
-                          .minute(0)
-                          .second(0)
-                          .millisecond(0)
-                          .unix()
-                    : moment
-                          .unix(val.timestamp)
-                          .date(1)
-                          .hour(0)
-                          .minute(0)
-                          .second(0)
-                          .millisecond(0)
-                          .unix();
-            if (wMap[w]) {
-                wMap[w].push(val.value);
-            } else {
-                wMap[w] = [val.value];
-            }
-        });
-        const avg = Object.keys(wMap).map((k) => {
-            const sum = wMap[+k].reduce((total, value) => {
-                return total + value;
-            }, 0);
-            return {
-                timestamp: +k,
-                value: sum / wMap[+k].length,
-            };
-        });
-        return avg;
-    }, [chartData, timeUnit]);
+    const { displayChartData, timestampTicks: ticks } = useValueChart(
+        chartData,
+        timeUnit
+    );
 
-    // get displayed distinct Xaxis Tick value (timestamp)
-    const ticks = useMemo(() => {
-        const temp = new Set<number>();
-        displayChartData.map(({ timestamp }) => {
-            if (timeUnit === "D") {
-                temp.add(timestamp);
-            } else {
-                const time = moment.unix(timestamp);
-                temp.add(
-                    timeUnit === "M" ? time.date(1).unix() : time.day(1).unix()
-                );
-            }
-        });
-        return Array.from(temp);
-    }, [displayChartData, timeUnit]);
     // Xaxis formatter
     const tickFormatter = useCallback(
         (val, index: number) => {
@@ -204,7 +81,13 @@ function TVLLPChart() {
         >
             <div className="h-60 mb-5">
                 <ResponsiveContainer>
-                    <AreaChart data={displayChartData} onMouseLeave={() => setActivePayload(undefined)} onMouseMove={(e) => setActivePayload(e?.activePayload?.[0])}>
+                    <AreaChart
+                        data={displayChartData}
+                        onMouseLeave={() => setActivePayload(undefined)}
+                        onMouseMove={(e) =>
+                            setActivePayload(e?.activePayload?.[0])
+                        }
+                    >
                         <defs>
                             <linearGradient
                                 id="TVLLP-colorUv"
@@ -300,13 +183,15 @@ function TVLLPChart() {
                     <span className="text-ash-gray-500">$ </span>
                     <span>
                         {formatAmount(
-                            activePayload?.value ?? displayChartData[displayChartData.length - 1]?.value
+                            activePayload?.value ??
+                                displayChartData[displayChartData.length - 1]
+                                    ?.value
                         )}
                     </span>
                 </div>
             </div>
             <div className="flex space-x-2 mb-10">
-                {interval.map((val) => {
+                {CHART_INTERVAL.map((val) => {
                     return (
                         <button
                             key={val}

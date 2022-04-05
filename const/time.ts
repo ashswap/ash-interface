@@ -11,4 +11,5 @@ export const MONTH_SHORT = [
     "OCT",
     "NOV",
     "DEC",
-]
+];
+export const CHART_INTERVAL = ["D", "W", "M"] as const;
