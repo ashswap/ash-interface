@@ -1,30 +1,33 @@
 import moment from "moment";
 
 type ExpiresType = number | false;
-
+type LocalStorageKey =
+    | "nonce"
+    | "walletconnect"
+    | "loginMethod"
+    | "address"
+    | "ledgerLogin"
+    | "userOnboarding";
 export const setItem = ({
     key,
     data,
-    expires
+    expires,
 }: {
-    key: "nonce" | "walletconnect" | "loginMethod" | "address" | "ledgerLogin";
+    key: LocalStorageKey;
     data: any;
-    expires: ExpiresType;
+    expires?: ExpiresType;
 }) => {
     if (typeof window !== "undefined") {
         localStorage.setItem(
             String(key),
             JSON.stringify({
-                expires,
-                data
+                expires: expires ?? false,
+                data,
             })
         );
     }
 };
-
-export const getItem = (
-    key: "nonce" | "walletconnect" | "loginMethod" | "address" | "ledgerLogin"
-): any => {
+export const getItem = (key: LocalStorageKey): any => {
     if (typeof window !== "undefined") {
         const item = localStorage.getItem(String(key));
         if (!item) {
@@ -42,6 +45,7 @@ export const getItem = (
         ) {
             return null;
         }
+        if (deserializedItem.expires === false) return deserializedItem.data;
 
         const expired = moment().unix() >= deserializedItem.expires;
         if (expired) {
@@ -54,8 +58,7 @@ export const getItem = (
     return null;
 };
 
-export const removeItem = (
-    key: "nonce" | "walletconnect" | "loginMethod" | "address" | "ledgerLogin"
-) => typeof window !== "undefined" && localStorage.removeItem(String(key));
+export const removeItem = (key: LocalStorageKey) =>
+    typeof window !== "undefined" && localStorage.removeItem(String(key));
 
 export const successDescription = "successDescription";

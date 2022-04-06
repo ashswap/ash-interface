@@ -1,33 +1,28 @@
-import React, { useMemo, useState } from "react";
-import ICMinus from "assets/svg/minus.svg";
-import ICPlus from "assets/svg/plus.svg";
-import ICLock from "assets/svg/lock.svg";
-import ICUnlock from "assets/svg/unlock.svg";
-import ICWallet from "assets/svg/wallet.svg";
 import ICCapacity from "assets/svg/capacity.svg";
 import ICChevronDown from "assets/svg/chevron-down.svg";
 import ICChevronUp from "assets/svg/chevron-up.svg";
-import ImgUsdt from "assets/images/usdt-icon.png";
-import Image from "next/image";
-import ImgMintRisk from "assets/images/mint-stake-risk.png";
-import MintAOCModal from "components/MintAOCModal";
+import ICLock from "assets/svg/lock.svg";
+import ICUnlock from "assets/svg/unlock.svg";
+import ICWallet from "assets/svg/wallet.svg";
 import GOVStakeModal from "components/GOVStakeModal";
-import { useStakeGov } from "context/gov";
-import { toEGLD, toEGLDD } from "helper/balance";
-import { ASH_TOKEN, VE_ASH_DECIMALS } from "const/tokens";
-import { formatAmount, fractionFormat } from "helper/number";
-import moment from "moment";
-import { useDappContext } from "context/dapp";
-import { useWallet } from "context/wallet";
-import useMounted from "hooks/useMounted";
 import HeadlessModal, {
-    HeadlessModalDefaultHeader,
+    HeadlessModalDefaultHeader
 } from "components/HeadlessModal";
-import Link from "next/link";
-import { useScreenSize } from "hooks/useScreenSize";
-import useSWR from "swr";
 import { network } from "const/network";
+import { ASH_TOKEN, VE_ASH_DECIMALS } from "const/tokens";
+import { useDappContext } from "context/dapp";
+import { useStakeGov } from "context/gov";
+import { useWallet } from "context/wallet";
+import { toEGLDD } from "helper/balance";
 import { fetcher } from "helper/common";
+import { formatAmount, fractionFormat } from "helper/number";
+import useMounted from "hooks/useMounted";
+import { useScreenSize } from "hooks/useScreenSize";
+import moment from "moment";
+import Image from "next/image";
+import Link from "next/link";
+import React, { useMemo, useState } from "react";
+import useSWR from "swr";
 
 function GovStats() {
     const { data: adminFee24h } = useSWR<number>(

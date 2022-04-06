@@ -12,7 +12,7 @@ function GOVStakeModal({ open, onClose }: props) {
 
     return (
         <>
-            {lockedAmt && lockedAmt.gt(0) ? (
+            {lockedAmt && lockedAmt.eq(0) ? (
                 <StakeMoreModal open={open} onClose={onClose} />
             ) : (
                 <FirstStakeModal open={open} onClose={onClose} />

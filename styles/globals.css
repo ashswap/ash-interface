@@ -169,6 +169,10 @@ input[type="number"] {
 .ReactModal__Body--open,
 .ReactModal__Html--open {
     overflow: hidden;
+    
+}
+.ReactModal__Body--open{
+    padding-right: 0.375rem;
 }
 
 @media (pointer: fine) and (hover: hover){
