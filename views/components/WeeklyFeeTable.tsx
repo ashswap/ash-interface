@@ -38,8 +38,9 @@ const Row = ({ order, feeData }: { order: number; feeData: FeeRecord }) => {
     );
 };
 function WeeklyFeeTable() {
+    // testing/BoY purpose: currently calculate fee every 10 minutes -> should get x*7*24*60/10 records from server
     const { data } = useSWR<FeeRecord[]>(
-        `${network.ashApiBaseUrl}/stake/governance/summary`,
+        `${network.ashApiBaseUrl}/stake/governance/summary?offset=0&limit=${10*7*24*60/10}`,
         fetcher
     );
     const [pageIndex, setPageIndex] = useState(0);
@@ -61,7 +62,7 @@ function WeeklyFeeTable() {
                 total_admin_fee_in_usd: sum
             }
             return record;
-        });
+        }).sort((x, y) => y.from_timestamp - x.from_timestamp);
     }, [data]);
     const displayRecords: FeeRecord[][] = useMemo(() => {
         const length = records.length;
@@ -72,6 +73,7 @@ function WeeklyFeeTable() {
                 records.slice(i * pageSize, i * pageSize + pageSize)
             );
         }
+        setPageIndex((val) => (pagination.length < val + 1 ? 0 : val));
         return pagination;
     }, [records, pageSize]);
     return (

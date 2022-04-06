@@ -123,6 +123,7 @@ function PoolsTable({data} : {data: PoolStatsRecord[]}) {
                 sortedPoolRecords.slice(i * pageSize, i * pageSize + pageSize)
             );
         }
+        setPageIndex((val) => (pagination.length < val + 1 ? 0 : val));
         return pagination;
     }, [sortedPoolRecords, pageSize]);
 

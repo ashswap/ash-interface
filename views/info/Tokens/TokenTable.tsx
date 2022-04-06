@@ -162,6 +162,7 @@ function TokenTable() {
                 sortedTokenRecords.slice(i * pageSize, i * pageSize + pageSize)
             );
         }
+        setPageIndex((val) => (pagination.length < val + 1 ? 0 : val));
         return pagination;
     }, [sortedTokenRecords, pageSize]);
 
