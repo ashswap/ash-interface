@@ -10,6 +10,7 @@
     },
     "dependencies": {
         "@elrondnetwork/erdjs": "https://github.com/ashswap/elrond-sdk-erdjs#53d5b468010c49e8360da937ee89f584ddb59601",
+        "@floating-ui/react-dom-interactions": "^0.0.15",
         "@headlessui/react": "^1.4.3",
         "@popperjs/core": "^2.11.2",
         "@types/numeral": "^2.0.2",
