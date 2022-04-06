@@ -3,6 +3,8 @@ import React, { ReactElement } from "react";
 import ICArrowRight from "assets/svg/arrow-right.svg";
 import GovStats from "views/stake/gov/GovStats";
 import StakeGovProvider from "context/gov";
+import VotePowerChart from "views/components/VotePowerChart";
+import WeeklyFeeTable from "views/components/WeeklyFeeTable";
 
 function GovPage() {
     return (
@@ -15,7 +17,18 @@ function GovPage() {
                         <span>Governance Stake</span>
                     </li>
                 </ul>
+                <div className="mb-9">
                 <GovStats />
+                </div>
+                <div className="mb-14">
+                    <VotePowerChart />
+                </div>
+                <div>
+                    <h2 className="text-lg font-bold text-white mb-5 lg:mb-7">
+                        Weekly Summary
+                    </h2>
+                    <WeeklyFeeTable />
+                </div>
             </div>
         </StakeGovProvider>
     );

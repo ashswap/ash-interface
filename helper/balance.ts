@@ -24,7 +24,7 @@ export const toEGLD = (token: IToken, valueStr: string) => {
     return toEGLDD(token.decimals, valueStr);
 };
 
-export const toEGLDD = (decimals: number, num: string | BigNumber) => {
+export const toEGLDD = (decimals: number, num: string | number | BigNumber) => {
     if (num === "") {
         return new BigNumber(0);
     }

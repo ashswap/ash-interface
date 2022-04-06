@@ -88,11 +88,8 @@ const PoolRecord = ({
                 <span className="text-ash-gray-500">$</span>
                 <span className="text-white">{liquidity}</span>
             </div>
-            <div className="hidden lg:block w-16 lg:w-24 xl:w-32 text-xs text-right text-white">
+            <div className="hidden md:block w-16 lg:w-24 xl:w-32 text-xs text-right text-white">
                 {poolData.apr_day ? poolData.apr_day?.toLocaleString("en-US") : "_"}%
-            </div>
-            <div className="hidden lg:block w-16 lg:w-24 xl:w-32 text-xs text-right text-white">
-                {poolData.emission_apr ? poolData.emission_apr.toLocaleString("en-US") : "_"}%
             </div>
         </div>
     );
@@ -101,7 +98,7 @@ function PoolsTable({data} : {data: PoolStatsRecord[]}) {
     const [pageIndex, setPageIndex] = useState(0);
     const [pageSize, setPageSize] = useState(10);
     const [sortBy, setSortBy] = useState<
-        "usd_volume" | "total_value_locked" | "apr_day" | "emission_apr"
+        "usd_volume" | "total_value_locked" | "apr_day"
     >("usd_volume");
     const poolRecords: PoolWithStatsRecords[] = useMemo(() => {
         if (!data?.length) return [];
@@ -152,20 +149,12 @@ function PoolsTable({data} : {data: PoolStatsRecord[]}) {
                     Liquidity
                 </div>
                 <div
-                    className={`hidden lg:block w-16 lg:w-24 xl:w-32 text-right py-4 cursor-pointer ${
+                    className={`hidden md:block w-16 lg:w-24 xl:w-32 text-right py-4 cursor-pointer ${
                         sortBy === "apr_day" && "text-white"
                     }`}
                     onClick={() => setSortBy("apr_day")}
                 >
                     Trading APR
-                </div>
-                <div
-                    className={`hidden lg:block w-16 lg:w-24 xl:w-32 text-right py-4 cursor-pointer ${
-                        sortBy === "emission_apr" && "text-white"
-                    }`}
-                    onClick={() => setSortBy("emission_apr")}
-                >
-                    Emission APR
                 </div>
             </div>
             {displayPoolRecords[pageIndex]?.map((val, index) => {

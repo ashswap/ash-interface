@@ -1,6 +1,8 @@
 import { network } from "const/network";
+import { MONTH_SHORT } from "const/time";
 import { fetcher } from "helper/common";
 import { abbreviateCurrency } from "helper/number";
+import { ChartTimeUnitType } from "interface/chart";
 import { IToken } from "interface/token";
 import moment from "moment";
 import React, { useCallback, useMemo, useState } from "react";
@@ -13,7 +15,6 @@ import {
     YAxis,
 } from "recharts";
 import useSWR from "swr";
-import { TokenChartTimeUnitType } from "./TokenChart";
 type CandleChartRecord = {
     high: number;
     low: number;
@@ -21,21 +22,6 @@ type CandleChartRecord = {
     close: number;
     timestamp: number;
 };
-
-const MONTH = [
-    "JAN",
-    "FEB",
-    "MAR",
-    "APR",
-    "MAY",
-    "JUN",
-    "JUL",
-    "AUG",
-    "SEP",
-    "OCT",
-    "NOV",
-    "DEC",
-];
 
 const FAKE_DATA: CandleChartRecord[] = new Array(30).fill("").map((val, i) => {
     const high = Math.floor(Math.random() * 100000) + 2000;
@@ -132,7 +118,7 @@ const TokenPriceChart = ({
     timeUnit,
 }: {
     token: IToken;
-    timeUnit: TokenChartTimeUnitType;
+    timeUnit: ChartTimeUnitType;
 }) => {
     const { data } = useSWR<[number, number][]>(
         token.id
@@ -185,7 +171,7 @@ const TokenPriceChart = ({
             return timeUnit === "D"
                 ? time.format("DD/MM/yyyy")
                 : timeUnit === "M"
-                ? MONTH[time.month()]
+                ? MONTH_SHORT[time.month()]
                 : "week " + time.week();
         },
         [timeUnit]
