@@ -16,6 +16,9 @@ import { toEGLDD, toWei } from "helper/balance";
 import { ASH_TOKEN, VE_ASH_DECIMALS } from "const/tokens";
 import { useWallet } from "context/wallet";
 import BigNumber from "bignumber.js";
+import { useOnboarding } from "hooks/useOnboarding";
+import Tooltip from "components/Tooltip";
+import useMediaQuery from "hooks/useMediaQuery";
 type props = {
     open: boolean;
     onClose: () => void;
@@ -59,6 +62,12 @@ const StakeMoreContent = ({ open, onClose }: props) => {
     const [isAgree, setIsAgree] = useState(false);
     const [isExtend, setIsExtend] = useState(false);
     const { isMobile } = useScreenSize();
+    const isTouchScreen = useMediaQuery("(hover: none)");
+    const [onboardingExtendPeriod, setOnboardedExtendPeriod] = useOnboarding(
+        "stake_gov_extend_lock_time"
+    );
+    const [openOnboardingExtendTooltip, setOpenOnboardingExtendTooltip] =
+        useState(false);
     const remaining = useMemo(() => {
         let years = Math.floor(currentLockDays / 365);
         let days = Math.floor(currentLockDays % 365);
@@ -192,9 +201,14 @@ const StakeMoreContent = ({ open, onClose }: props) => {
             ? "0"
             : fractionFormat(num, { maximumFractionDigits: num < 1 ? 8 : 2 });
     }, [veASH]);
+    useEffect(() => {
+        if (isTouchScreen) {
+            setOpenOnboardingExtendTooltip(true);
+        }
+    }, [isTouchScreen]);
     return (
         <>
-            <div className="mt-4 px-6 lg:px-20 pb-12 overflow-auto">
+            <div className="mt-4 px-6 lg:px-20 pb-12 overflow-auto relative">
                 <div className="text-pink-600 text-2xl font-bold mb-9 lg:mb-14">
                     Manage Your Governance Stake
                 </div>
@@ -286,7 +300,14 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                                     <Switch
                                         className="flex items-center"
                                         checked={isExtend}
-                                        onChange={(val) => setIsExtend(val)}
+                                        onChange={(val) => {
+                                            setIsExtend(val);
+                                            if (val) {
+                                                setOpenOnboardingExtendTooltip(
+                                                    true
+                                                );
+                                            }
+                                        }}
                                     >
                                         <span className="ml-3 text-ash-gray-500 text-sm font-bold underline">
                                             I want to extend my lock period!
@@ -299,24 +320,85 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                                 </span>
                             )}
                             {isExtend && (
-                                <div className="mt-8">
-                                    <LockPeriod
-                                        lockDay={
-                                            extendLockPeriod + currentLockDays
-                                        }
-                                        min={currentLockDays + minLock}
-                                        max={MAX_LOCK}
-                                        options={extendOpts.map((opt) => ({
-                                            ...opt,
-                                            value: opt.value + currentLockDays,
-                                        }))}
-                                        lockDayChange={(val) =>
-                                            setExtendLockPeriod(
-                                                val - currentLockDays
-                                            )
-                                        }
-                                    />
-                                    {/* <div className="mt-4 flex space-x-2">
+                                <Tooltip
+                                    open={
+                                        onboardingExtendPeriod &&
+                                        openOnboardingExtendTooltip
+                                    }
+                                    onOpenChange={(val) =>
+                                        val &&
+                                        setOpenOnboardingExtendTooltip(
+                                            onboardingExtendPeriod
+                                        )
+                                    }
+                                    strategy={isMobile ? "absolute" : "fixed"}
+                                    placement="bottom"
+                                    arrowStyle={() => ({ left: 56 })}
+                                    content={
+                                        <div
+                                            style={{
+                                                filter: isMobile
+                                                    ? ""
+                                                    : "drop-shadow(0px 4px 50px rgba(0, 0, 0, 0.5))",
+                                            }}
+                                        >
+                                            <div className="clip-corner-4 clip-corner-bl bg-ash-dark-600 p-[1px] max-w-full sm:max-w-[23rem] sm:mx-6">
+                                                <div className="clip-corner-4 clip-corner-bl bg-ash-dark-400 px-12 pt-14 pb-11">
+                                                    <div className="font-bold text-lg leading-tight mb-8">
+                                                        You{" "}
+                                                        <span className="text-stake-green-500">
+                                                            can only extend
+                                                        </span>{" "}
+                                                        your lock period. If you
+                                                        do, the longer you lock,
+                                                        the more veASH you’ll
+                                                        receive.
+                                                    </div>
+                                                    <a
+                                                        href="https://docs.ashswap.io/testnet-guides/governance-staking"
+                                                        target="_blank"
+                                                        rel="noreferrer"
+                                                    >
+                                                        <span className="text-stake-green-500 underline text-sm font-bold">
+                                                            Governance Stake
+                                                            Guide
+                                                        </span>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                >
+                                    <div
+                                        className="mt-8"
+                                        onClick={() => {
+                                            if (openOnboardingExtendTooltip) {
+                                                setOpenOnboardingExtendTooltip(
+                                                    false
+                                                );
+                                                setOnboardedExtendPeriod(true);
+                                            }
+                                        }}
+                                    >
+                                        <LockPeriod
+                                            lockDay={
+                                                extendLockPeriod +
+                                                currentLockDays
+                                            }
+                                            min={currentLockDays + minLock}
+                                            max={MAX_LOCK}
+                                            options={extendOpts.map((opt) => ({
+                                                ...opt,
+                                                value:
+                                                    opt.value + currentLockDays,
+                                            }))}
+                                            lockDayChange={(val) =>
+                                                setExtendLockPeriod(
+                                                    val - currentLockDays
+                                                )
+                                            }
+                                        />
+                                        {/* <div className="mt-4 flex space-x-2">
                                                 {extendOpts.map((opt, i) => {
                                                     return (
                                                         <button
@@ -329,7 +411,8 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                                                     );
                                                 })}
                                             </div> */}
-                                </div>
+                                    </div>
+                                </Tooltip>
                             )}
                         </div>
                     </div>

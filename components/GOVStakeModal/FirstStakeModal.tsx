@@ -16,6 +16,9 @@ import moment from "moment";
 import { useStakeGov } from "context/gov";
 import { fractionFormat } from "helper/number";
 import { useScreenSize } from "hooks/useScreenSize";
+import { useOnboarding } from "hooks/useOnboarding";
+import Tooltip from "components/Tooltip";
+import useMediaQuery from "hooks/useMediaQuery";
 type props = {
     open: boolean;
     onClose: () => void;
@@ -40,6 +43,11 @@ const FirstStakeContent = ({ open, onClose }: props) => {
     const ASHBalance = useMemo(() => balances[ASH_TOKEN.id], [balances]);
     const [lockAmt, setLockAmt] = useState<BigNumber>(new BigNumber(0));
     const [rawLockAmt, setRawLockAmt] = useState("");
+    const [onboardingStakeGov, setOnboardedStakeGov] =
+        useOnboarding("stake_gov_1st");
+    const [openOnboardStakeTooltip, setOpenOnboardTooltip] = useState(false);
+    const isTouchScreen = useMediaQuery("(hover: none)");
+    const screenSize = useScreenSize();
 
     const setMaxLockAmt = useCallback(() => {
         setLockAmt(ASHBalance.balance);
@@ -88,9 +96,14 @@ const FirstStakeContent = ({ open, onClose }: props) => {
             .div(totalSupplyVeASH.plus(estimatedVeASH));
         return pct.lt(0.01) ? "< 0.01" : pct.toFixed(2);
     }, [estimatedVeASH, totalSupplyVeASH]);
+    useEffect(() => {
+        if(isTouchScreen){
+            setOpenOnboardTooltip(true);
+        }
+    }, [isTouchScreen]);
     return (
         <>
-            <div className="mt-4 px-6 lg:px-20 pb-12 overflow-auto">
+            <div className="mt-4 px-6 lg:px-20 pb-12 overflow-auto relative">
                 <div className="text-pink-600 text-2xl font-bold mb-9 lg:mb-14">
                     Governance Stake
                 </div>
@@ -145,53 +158,147 @@ const FirstStakeContent = ({ open, onClose }: props) => {
                                 </div>
                             </div>
                         </div>
-                        <div>
-                            <div className="text-sm underline font-bold text-ash-gray-500 mb-4">
-                                Lock period
-                            </div>
-                            <LockPeriod
-                                lockDay={lockPeriod}
-                                min={minLock}
-                                max={maxLock}
-                                options={predefinedLockPeriod}
-                                lockDayChange={(val) => setLockPeriod(val > 0 ? val : minLock)}
-                            />
-                            <div className="overflow-hidden mt-8">
-                                <Slider
-                                    className="ash-slider ash-slider-pink my-0"
-                                    step={1}
-                                    marks={{
-                                        [minLock]: "",
-                                        [maxLock / 4]: "",
-                                        [maxLock / 2]: "",
-                                        [(maxLock * 3) / 4]: "",
-                                        [maxLock]: "",
+                        <Tooltip
+                            open={onboardingStakeGov && openOnboardStakeTooltip}
+                            onOpenChange={(val) =>
+                                val && setOpenOnboardTooltip(onboardingStakeGov)
+                            }
+                            strategy={screenSize.isMobile ? "absolute" : "fixed"}
+                            placement="bottom"
+                            arrowStyle={() => ({ left: 56 })}
+                            content={
+                                <div
+                                    style={{
+                                        filter: screenSize.isMobile ? "" : "drop-shadow(0px 4px 50px rgba(0, 0, 0, 0.5))",
                                     }}
-                                    handleStyle={{
-                                        backgroundColor:
-                                            theme.extend.colors.pink[600],
-                                        borderRadius: 0,
-                                        border:
-                                            "2px solid " +
-                                            theme.extend.colors.pink[600],
-                                        width: 7,
-                                        height: 7,
-                                    }}
+                                    className="sm:backdrop-blur-[30px]"
+                                >
+                                    <div className="clip-corner-4 clip-corner-bl bg-ash-dark-600 p-[1px] max-w-full sm:max-w-[23rem] backdrop-blur-[30px] sm:mx-6">
+                                        <div className="clip-corner-4 clip-corner-bl bg-ash-dark-400 px-12 pt-14 pb-11">
+                                            <div className="font-bold text-lg leading-tight mb-8">
+                                                You cannot claim back your ASH
+                                                until the lock duration ends.
+                                            </div>
+                                            <ul>
+                                                <li className="text-sm font-bold">
+                                                    <span className="text-stake-green-500">
+                                                        1
+                                                    </span>{" "}
+                                                    ASH locked for{" "}
+                                                    <span className="text-stake-green-500">
+                                                        4 years
+                                                    </span>{" "}
+                                                    ={" "}
+                                                    <span className="text-stake-green-500">
+                                                        1
+                                                    </span>{" "}
+                                                    veASH
+                                                </li>
+                                                <li className="text-sm font-bold">
+                                                    <span className="text-stake-green-500">
+                                                        1
+                                                    </span>{" "}
+                                                    ASH locked for{" "}
+                                                    <span className="text-stake-green-500">
+                                                        3 years
+                                                    </span>{" "}
+                                                    ={" "}
+                                                    <span className="text-stake-green-500">
+                                                        0.75
+                                                    </span>{" "}
+                                                    veASH
+                                                </li>
+                                                <li className="text-sm font-bold">
+                                                    <span className="text-stake-green-500">
+                                                        1
+                                                    </span>{" "}
+                                                    ASH locked for{" "}
+                                                    <span className="text-stake-green-500">
+                                                        2 years
+                                                    </span>{" "}
+                                                    ={" "}
+                                                    <span className="text-stake-green-500">
+                                                        0.5
+                                                    </span>{" "}
+                                                    veASH
+                                                </li>
+                                                <li className="text-sm font-bold">
+                                                    <span className="text-stake-green-500">
+                                                        1
+                                                    </span>{" "}
+                                                    ASH locked for{" "}
+                                                    <span className="text-stake-green-500">
+                                                        1 year
+                                                    </span>{" "}
+                                                    ={" "}
+                                                    <span className="text-stake-green-500">
+                                                        0.25
+                                                    </span>{" "}
+                                                    veASH
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        >
+                            <div
+                                onClick={() => {
+                                    if (openOnboardStakeTooltip) {
+                                        setOpenOnboardTooltip(false);
+                                        setOnboardedStakeGov(true);
+                                    }
+                                }}
+                            >
+                                <div className="text-sm underline font-bold text-ash-gray-500 mb-4">
+                                    Lock period
+                                </div>
+                                <LockPeriod
+                                    lockDay={lockPeriod}
                                     min={minLock}
                                     max={maxLock}
-                                    value={lockPeriod}
-                                    onChange={(e) => setLockPeriod(e)}
+                                    options={predefinedLockPeriod}
+                                    lockDayChange={(val) =>
+                                        setLockPeriod(val > 0 ? val : minLock)
+                                    }
                                 />
-                                <div className="flex justify-between mt-1">
-                                    <div className="text-xs lg:text-sm font-bold text-white">
-                                        7 days
-                                    </div>
-                                    <div className="text-xs lg:text-sm font-bold text-pink-600">
-                                        Max
+                                <div className="overflow-hidden mt-8">
+                                    <Slider
+                                        className="ash-slider ash-slider-pink my-0"
+                                        step={1}
+                                        marks={{
+                                            [minLock]: "",
+                                            [maxLock / 4]: "",
+                                            [maxLock / 2]: "",
+                                            [(maxLock * 3) / 4]: "",
+                                            [maxLock]: "",
+                                        }}
+                                        handleStyle={{
+                                            backgroundColor:
+                                                theme.extend.colors.pink[600],
+                                            borderRadius: 0,
+                                            border:
+                                                "2px solid " +
+                                                theme.extend.colors.pink[600],
+                                            width: 7,
+                                            height: 7,
+                                        }}
+                                        min={minLock}
+                                        max={maxLock}
+                                        value={lockPeriod}
+                                        onChange={(e) => setLockPeriod(e)}
+                                    />
+                                    <div className="flex justify-between mt-1">
+                                        <div className="text-xs lg:text-sm font-bold text-white">
+                                            7 days
+                                        </div>
+                                        <div className="text-xs lg:text-sm font-bold text-pink-600">
+                                            Max
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </Tooltip>
                     </div>
                     <div className="w-full sm:w-1/3 lg:w-[17.8125rem] flex-shrink-0 bg-stake-dark-500 py-[2.375rem] px-10">
                         <div className="text-white text-lg font-bold mb-16">
