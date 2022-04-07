@@ -53,7 +53,7 @@ const TokenDetailPage: Page<props> = ({ token }: props) => {
     );
     const { data: txs } = useSWR<TxStatsRecord[]>(
         token.id
-            ? `${network.ashApiBaseUrl}/token/${token.id}/transaction`
+            ? `${network.ashApiBaseUrl}/token/${token.id}/transaction?offset=0&limit=50`
             : null,
         fetcher,
         { refreshInterval: 5 * 60 * 1000 }

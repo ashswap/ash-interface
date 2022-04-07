@@ -124,12 +124,13 @@ function TxsTable({ data }: { data: TxStatsRecord[] }) {
     const [filter, setFilter] = useState<EFilterType>(EFilterType.ALL);
     const [orderBy, setOrderBy] = useState<EOrderBy>(EOrderBy.TIME);
     const [pageIndex, setPageIndex] = useState(0);
-    const [pageSize, setPageSize] = useState(5);
+    const [pageSize, setPageSize] = useState(10);
     const screenSize = useScreenSize();
     useEffect(() => {
         setOrderBy(EOrderBy.TIME);
     }, [screenSize.xl, screenSize.lg, screenSize.md, screenSize.sm]);
     const displayDataPagination = useMemo(() => {
+        setPageIndex(0);
         if (!data) return [[]];
         const filtered =
             filter === EFilterType.ALL
@@ -176,6 +177,7 @@ function TxsTable({ data }: { data: TxStatsRecord[] }) {
                 sorted.slice(i * pageSize, i * pageSize + pageSize)
             );
         }
+        setPageIndex((val) => (pagination.length < val + 1 ? 0 : val));
         return pagination;
     }, [data, filter, orderBy, pageSize]);
     return (
