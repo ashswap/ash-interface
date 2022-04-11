@@ -35,7 +35,7 @@ function StakedPoolCardItem({
 
     return (
         <div
-            className={`bg-ash-dark-700 clip-corner-4 clip-corner-tr pt-8 pb-5 px-11 text-white`}
+            className={`bg-ash-dark-700 clip-corner-4 clip-corner-tr pt-8 pb-5 px-6 sm:px-11 text-white`}
         >
             <div className="flex flex-row pb-9 border-b border-dashed border-ash-gray-500">
                 <div className="mr-5">

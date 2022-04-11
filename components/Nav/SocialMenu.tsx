@@ -77,10 +77,10 @@ function SocialMenu() {
                             }`}
                         >
                             <ICSocial className="inline-block w-4 h-4 md:mr-2 transition-none" />
-                            <span className="inline-block">
-                                <span>Social</span>
+                            <div className="flex items-center">
+                                <span className="truncate">Social</span>
                                 <ICChervonDown className="inline w-2 ml-1 transition-none" />
-                            </span>
+                            </div>
                         </Menu.Button>
 
                         <Transition
@@ -138,10 +138,10 @@ function SocialMenu() {
                         onClick={() => setMIsOpen(true)}
                     >
                         <ICSocial className="inline-block w-4 h-4 md:mr-2" />
-                        <span className="inline-block">
-                            <span>Social</span>
+                        <div className="flex items-center">
+                            <span className="truncate">Social</span>
                             <ICChervonDown className="inline w-2 ml-1 transition-none" />
-                        </span>
+                        </div>
                     </div>
                     <HeadlessModal
                         open={mIsOpen}

@@ -24,7 +24,7 @@ const Nav = () => {
 
     return (
         <div
-            className={`${styles.container} text-black dark:text-white space-x-[0.375rem]`}
+            className={`${styles.container} text-black dark:text-white sm:space-x-[0.375rem]`}
         >
             <Link href="/swap" passHref>
                 <div
@@ -65,8 +65,8 @@ const Nav = () => {
                         }`}
                     >
                         <ICChart className="inline-block w-4 h-4 md:mr-2 transition-none" />
-                        <div>
-                            <span className="inline-block mr-1">Analytic</span>
+                        <div className="flex items-center">
+                            <span className="inline-block mr-1 truncate">Analytic</span>
                             <ICNewTab className="inline-block w-2.5 h-2.5 transition-none" />
                         </div>
                     </div>

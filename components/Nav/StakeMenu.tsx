@@ -51,10 +51,10 @@ function StakeMenu() {
                             }`}
                         >
                             <ICStake className="inline-block w-4 h-4 md:mr-2 transition-none" />
-                            <span className="inline-block">
-                                <span>Stake</span>
+                            <div className="flex items-center">
+                                <span className="truncate">Stake</span>
                                 <ICChevronDown className="inline w-2 ml-1 transition-none" />
-                            </span>
+                            </div>
                         </Menu.Button>
 
                         <Transition
@@ -103,10 +103,10 @@ function StakeMenu() {
                         onClick={() => setMIsOpen(true)}
                     >
                         <ICStake className="inline-block w-4 h-4 md:mr-2" />
-                        <span className="inline-block">
-                            <span>Stake</span>
+                        <div className="flex items-center">
+                            <span className="truncate">Stake</span>
                             <ICChevronDown className="inline w-2 ml-1 transition-none" />
-                        </span>
+                        </div>
                     </div>
                     <HeadlessModal
                         open={mIsOpen}
