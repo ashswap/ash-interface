@@ -2,6 +2,7 @@ import ICCaretLeft from "assets/svg/caret-left.svg";
 import ICCaretRight from "assets/svg/caret-right.svg";
 import ICCaretUp from "assets/svg/caret-up.svg";
 import ICCaretDown from "assets/svg/caret-down.svg";
+import ICClose from "assets/svg/close.svg";
 import React, {
     cloneElement,
     CSSProperties,
@@ -46,14 +47,17 @@ interface Props {
         centerOffset: number;
     }) => CSSProperties;
     onOpenChange?: (val: boolean) => void;
+    onArrowClick?: () => void;
 }
 const Arrow = ({
     direction,
+    onClick
 }: {
     direction?: "top" | "left" | "right" | "bottom";
+    onClick?: React.MouseEventHandler<HTMLButtonElement>
 }) => {
     return (
-        <div
+        <button
             className={`relative items-center ${
                 direction
                     ? direction === "top" || direction === "bottom"
@@ -61,6 +65,7 @@ const Arrow = ({
                         : "flex"
                     : ""
             }`}
+            onClick={onClick}
         >
             {direction === "top" && (
                 <ICCaretUp className="absolute text-stake-green-500 w-2 h-2 top-0 -translate-y-full" />
@@ -75,7 +80,9 @@ const Arrow = ({
                         "0px 4px 20px rgba(0, 255, 117, 0.5), 0px 4px 4px rgba(0, 0, 0, 0.25)",
                 }}
             >
-                <div className="bg-stake-green-500 w-2.5 h-2.5"></div>
+                <div className="group-hover:scale-[2] transition-all bg-stake-green-500 w-2.5 h-2.5 flex items-center justify-center">
+                    <ICClose className="hidden group-hover:block text-ash-dark-600 -rotate-45 w-1 h-1"/>
+                </div>
             </div>
             {direction === "bottom" && (
                 <ICCaretDown className="absolute text-stake-green-500 w-2 h-2 bottom-0 translate-y-full" />
@@ -83,7 +90,7 @@ const Arrow = ({
             {direction === "right" && (
                 <ICCaretRight className="absolute text-stake-green-500 w-2 h-2 right-0 translate-x-full" />
             )}
-        </div>
+        </button>
     );
 };
 const Tooltip = (props: Props) => {
@@ -95,6 +102,7 @@ const Tooltip = (props: Props) => {
         strategy: strategyProp = "absolute",
         arrowStyle,
         onOpenChange: onOpenChangeProp,
+        onArrowClick
     } = props;
     const [_open, _setOpen] = useState(false);
     const arrowRef = useRef(null);
@@ -182,7 +190,7 @@ const Tooltip = (props: Props) => {
             <div
                 {...getFloatingProps({
                     ref: floating,
-                    className: "Tooltip outline-none",
+                    className: "Tooltip outline-none group",
                     style: {
                         position: strategy,
                         top: y ?? "",
@@ -216,7 +224,7 @@ const Tooltip = (props: Props) => {
                             [staticSide]: "-11px",
                         }}
                     >
-                        <Arrow direction={staticSide as any} />
+                        <Arrow direction={staticSide as any} onClick={() => onArrowClick && onArrowClick()} />
                     </div>
                 </Transition>
             </div>
