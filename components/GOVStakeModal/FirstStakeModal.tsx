@@ -97,7 +97,7 @@ const FirstStakeContent = ({ open, onClose }: props) => {
         return pct.lt(0.01) ? "< 0.01" : pct.toFixed(2);
     }, [estimatedVeASH, totalSupplyVeASH]);
     useEffect(() => {
-        if(isTouchScreen){
+        if (isTouchScreen) {
             setOpenOnboardTooltip(true);
         }
     }, [isTouchScreen]);
@@ -163,13 +163,23 @@ const FirstStakeContent = ({ open, onClose }: props) => {
                             onOpenChange={(val) =>
                                 val && setOpenOnboardTooltip(onboardingStakeGov)
                             }
-                            strategy={screenSize.isMobile ? "absolute" : "fixed"}
+                            onArrowClick={() => {
+                                if (openOnboardStakeTooltip) {
+                                    setOpenOnboardTooltip(false);
+                                    setOnboardedStakeGov(true);
+                                }
+                            }}
+                            strategy={
+                                screenSize.isMobile ? "absolute" : "fixed"
+                            }
                             placement="bottom"
                             arrowStyle={() => ({ left: 56 })}
                             content={
                                 <div
                                     style={{
-                                        filter: screenSize.isMobile ? "" : "drop-shadow(0px 4px 50px rgba(0, 0, 0, 0.5))",
+                                        filter: screenSize.isMobile
+                                            ? ""
+                                            : "drop-shadow(0px 4px 50px rgba(0, 0, 0, 0.5))",
                                     }}
                                     className="sm:backdrop-blur-[30px]"
                                 >
@@ -242,14 +252,7 @@ const FirstStakeContent = ({ open, onClose }: props) => {
                                 </div>
                             }
                         >
-                            <div
-                                onClick={() => {
-                                    if (openOnboardStakeTooltip) {
-                                        setOpenOnboardTooltip(false);
-                                        setOnboardedStakeGov(true);
-                                    }
-                                }}
-                            >
+                            <div>
                                 <div className="text-sm underline font-bold text-ash-gray-500 mb-4">
                                     Lock period
                                 </div>

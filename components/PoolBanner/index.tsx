@@ -18,7 +18,7 @@ const PoolBanner = () => {
                             className="w-10 h-10 flex justify-center items-center bg-ash-dark-700"
                             onClick={() => setShow(false)}
                         >
-                            <IconClose />
+                            <IconClose className="text-white" />
                         </button>
                     </div>
                     <div className="text-2xl lg:text-5xl font-bold mb-6 text-center">

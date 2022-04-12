@@ -615,7 +615,7 @@ const Swap = () => {
                     <div className="relative px-12 py-14 bg-ash-dark-600 sm:w-5/12 max-w-[23rem] text-white border-l border-l-[#757391]">
                         <div className="absolute top-4 right-4">
                             <IconButton
-                                icon={<IconClose />}
+                                icon={<IconClose className="text-white" />}
                                 iconSize="small"
                                 onClick={() => setShowSetting(false)}
                             />

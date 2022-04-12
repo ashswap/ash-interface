@@ -104,7 +104,7 @@ const CloseBtn = () => {
             className="w-10 h-10 flex items-center justify-center text-white bg-ash-dark-700 active:bg-ash-dark-400 hover:bg-ash-dark-500"
             onClick={onRequestClose}
         >
-            <IconClose />
+            <IconClose className="text-white" />
         </button>
     );
 };

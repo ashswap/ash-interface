@@ -331,6 +331,14 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                                             onboardingExtendPeriod
                                         )
                                     }
+                                    onArrowClick={() => {
+                                        if (openOnboardingExtendTooltip) {
+                                            setOpenOnboardingExtendTooltip(
+                                                false
+                                            );
+                                            setOnboardedExtendPeriod(true);
+                                        }
+                                    }}
                                     strategy={isMobile ? "absolute" : "fixed"}
                                     placement="bottom"
                                     arrowStyle={() => ({ left: 56 })}
@@ -369,17 +377,7 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                                         </div>
                                     }
                                 >
-                                    <div
-                                        className="mt-8"
-                                        onClick={() => {
-                                            if (openOnboardingExtendTooltip) {
-                                                setOpenOnboardingExtendTooltip(
-                                                    false
-                                                );
-                                                setOnboardedExtendPeriod(true);
-                                            }
-                                        }}
-                                    >
+                                    <div className="mt-8">
                                         <LockPeriod
                                             lockDay={
                                                 extendLockPeriod +

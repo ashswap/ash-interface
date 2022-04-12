@@ -124,7 +124,7 @@ export function HeadlessModalDefaultHeader({
     return (
         <div className="flex justify-end">
             <IconButton
-                icon={<IconClose />}
+                icon={<IconClose className="text-white" />}
                 iconSize="small"
                 onClick={() => onClose(false)}
                 className="bg-ash-dark-700"
