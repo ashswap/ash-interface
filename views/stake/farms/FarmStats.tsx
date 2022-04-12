@@ -93,8 +93,8 @@ function FarmStats({ onClickAll }: { onClickAll?: () => void }) {
                 <h2 className="text-2xl font-bold text-white mb-9">
                     Overall stats
                 </h2>
-                <div className="flex items-end">
-                    <div className="bg-ash-dark-400/30 px-9 py-7 flex-1 mr-7.5">
+                <div className="sm:flex md:block lg:flex items-end sm:gap-x-7.5">
+                    <div className="bg-ash-dark-400/30 px-9 py-7 flex-1">
                         <div className="text-ash-gray-500 text-sm font-bold mb-6">
                             TOTAL VALUE OF LOCKED LP
                         </div>
@@ -105,7 +105,7 @@ function FarmStats({ onClickAll }: { onClickAll?: () => void }) {
                             </span>
                         </div>
                     </div>
-                    <div className="flex-1 text-ash-gray-500">
+                    <div className="flex-1 text-ash-gray-500 mt-8 sm:mt-0 md:mt-8 lg:mt-0">
                         <div className="text-sm font-bold mb-4">TIPS</div>
                         <div className="text-sm">
                             Stake{" "}

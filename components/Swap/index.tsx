@@ -221,7 +221,7 @@ const Swap = () => {
             });
 
             setRates(rates);
-
+            console.log(results);
             let fee = new BigNumber(
                 "0x" +
                     Buffer.from(results[2].returnData[0], "base64").toString(

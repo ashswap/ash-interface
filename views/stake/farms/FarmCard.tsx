@@ -78,11 +78,11 @@ function FarmCard({ farmData, viewType }: props) {
                 style={{
                     backgroundImage: `url(${ImgMetalCardBg.src})`,
                     backgroundSize: "54px",
-                    backgroundPosition: "calc(100% - 40px) 70px",
+                    backgroundPosition: `calc(100% - ${screenSize.sm ? 40 : 24}px) 70px`,
                 }}
             ></div>
             <div className="text-white border border-transparent">
-                <div className="px-10 pt-8 pb-18">
+                <div className="px-6 sm:px-10 pt-8 pb-18">
                     <div className="flex items-start justify-between mt-0.5 -mr-3 mb-11">
                         <div className="overflow-hidden">
                             <div className="text-ash-gray-500 text-xs mb-2.5">

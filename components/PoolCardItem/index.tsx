@@ -20,7 +20,7 @@ function PoolCardItem({
     } = usePoolDataFormat(poolData);
     return (
         <div
-            className={`bg-ash-dark-700 clip-corner-4 clip-corner-tr pt-8 pb-5 px-11 text-white`}
+            className={`bg-ash-dark-700 clip-corner-4 clip-corner-tr pt-8 pb-5 px-6 sm:px-11 text-white`}
         >
             <div className="flex flex-row justify-between items-start mb-12">
                 <div>

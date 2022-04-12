@@ -192,7 +192,7 @@ function VotePowerChart() {
             </div>
             <div className="absolute top-7.5 left-[1.625rem]">
                 <div className="text-xs text-white mb-2">
-                    Voting Power - Amount of veASH locked
+                    Amount of veASH locked
                 </div>
                 <div className="text-lg flex items-start leading-tight">
                     <span>

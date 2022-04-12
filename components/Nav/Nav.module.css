@@ -1,9 +1,9 @@
 .container {
-    @apply flex flex-row justify-center select-none text-xs font-medium;
+    @apply grid grid-cols-[repeat(auto-fit,minmax(0,1fr))] sm:flex flex-row justify-center select-none text-xs font-medium;
 }
 
 .container .btn {
-    @apply px-4 text-ash-gray-500 text-center flex flex-col md:flex-row space-y-1 items-center justify-center h-12 md:h-10 text-2xs md:text-xs min-w-[4.875rem] md:min-w-0;
+    @apply text-ash-gray-500 text-center flex flex-col md:flex-row space-y-1 items-center justify-center h-12 md:h-10 text-2xs md:text-xs flex-1 sm:min-w-[4.875rem] md:min-w-0 md:px-2 px-1 lg:px-4 overflow-hidden;
     cursor: pointer;
 }
 
