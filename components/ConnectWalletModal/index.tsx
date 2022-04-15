@@ -1,12 +1,13 @@
-import { WalletConnectProvider } from "@elrondnetwork/erdjs/out";
+import {
+    AccountInfoSliceNetworkType,
+    loginServices,
+    useGetLoginInfo,
+    useGetNetworkConfig,
+} from "@elrondnetwork/dapp-core";
 import HeadlessModal, {
-    HeadlessModalDefaultHeader
+    HeadlessModalDefaultHeader,
 } from "components/HeadlessModal";
-import { useDappContext, useDappDispatch } from "context/dapp";
 import { useWallet } from "context/wallet";
-import storage from "helper/storage";
-import { useExtensionLogin } from "hooks/useExtension";
-import useInitWalletConnect from "hooks/useInitWalletConnect";
 import Image from "next/image";
 import platform from "platform";
 import QRCode from "qrcode";
@@ -25,32 +26,19 @@ const MAIAR_WALLET_LINK = {
     APP_STORE: "https://maiar.onelink.me/HLcx/f0b7455c",
     APP_GALLERY: "https://maiar.onelink.me/HLcx/2e18b72b",
     CHROME_EXT:
-        "https://chrome.google.com/webstore/detail/maiar-defi-wallet/dngmlblcodfobpdpecaadgfbcggfjfnm"
+        "https://chrome.google.com/webstore/detail/maiar-defi-wallet/dngmlblcodfobpdpecaadgfbcggfjfnm",
 };
 
 function ConnectWalletModal() {
-    const { loggedIn } = useDappContext();
-    const {
-        isOpenConnectWalletModal,
-        setIsOpenConnectWalletModal
-    } = useWallet();
+    const { isLoggedIn: loggedIn } = useGetLoginInfo();
+    const { isOpenConnectWalletModal, setIsOpenConnectWalletModal } =
+        useWallet();
     const [isOpenQR, setIsOpenQR] = useState(false);
-    const [isOpenDownloadExtension, setIsOpenDownloadExtension] = useState(
-        false
-    );
+    const [isOpenDownloadExtension, setIsOpenDownloadExtension] =
+        useState(false);
     const [isOpenDownloadApp, setIsOpenDownloadApp] = useState(false);
-    const onLogin = useCallback(() => {
-        setIsOpenConnectWalletModal(false);
-    }, [setIsOpenConnectWalletModal]);
-    const onConnectExtInit = useCallback((success: boolean) => {
-        if (!success) {
-            // not found extension instance -> open download extension modal
-            setIsOpenDownloadExtension(true);
-        }
-    }, []);
-    const extensionLogin = useExtensionLogin({
-        onLogin,
-        onInit: onConnectExtInit
+    const [extensionLogin] = loginServices.useExtensionLogin({
+        callbackRoute: "",
     });
     useEffect(() => {
         if (!isOpenConnectWalletModal) {
@@ -88,7 +76,7 @@ function ConnectWalletModal() {
                         <div
                             className="flex justify-center bg-no-repeat bg-left bg-contain py-8 overflow-hidden"
                             style={{
-                                backgroundImage: `url(${connectWalletBg.src})`
+                                backgroundImage: `url(${connectWalletBg.src})`,
                             }}
                         >
                             {isOpenQR ? (
@@ -318,7 +306,7 @@ const WalletConnect = ({
     logoutRoute,
     token,
     onLogin,
-    onLogout
+    onLogout,
 }: {
     callbackRoute?: string;
     logoutRoute?: string;
@@ -326,57 +314,16 @@ const WalletConnect = ({
     onLogin?: () => void;
     onLogout?: () => void;
 }) => {
-    const { walletConnectDeepLink } = useDappContext();
-    const dispatch = useDappDispatch();
-
+    const [
+        initConnect,
+        { error, isLoading, isLoggedIn, loginFailed },
+        { uriDeepLink, walletConnectUri },
+    ] = loginServices.useWalletConnectLogin({
+        callbackRoute: "",
+        logoutRoute: "",
+    });
     const ref = useRef(null);
     const [qrSvg, setQrSvg] = useState<string>("");
-    const [wcUri, setWcUri] = useState<string>("");
-    const { error, walletConnectInit, walletConnect } = useInitWalletConnect({
-        callbackRoute,
-        logoutRoute,
-        onLogin,
-        onLogout
-    });
-    const walletConnectLogin = useCallback(
-        (walletConnect: WalletConnectProvider) => {
-            walletConnect.login().then(walletConectUri => {
-                if (token) {
-                    setWcUri(`${walletConectUri}&token=${token}`);
-                    dispatch({
-                        type: "setTokenLogin",
-                        tokenLogin: {
-                            loginToken: token
-                        }
-                    });
-                } else {
-                    setWcUri(walletConectUri);
-                }
-            });
-        },
-        [dispatch, token]
-    );
-
-    // only init walletConnect once
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    useEffect(walletConnectInit, []);
-
-    useEffect(() => {
-        if (walletConnect) {
-            storage.local.removeItem("walletconnect");
-            walletConnectLogin(walletConnect);
-            if (
-                "walletConnector" in walletConnect &&
-                walletConnect.walletConnector
-            ) {
-                walletConnect.walletConnector.on("disconnect", () => {
-                    if (ref.current !== null) {
-                        walletConnectLogin(walletConnect);
-                    }
-                });
-            }
-        }
-    }, [walletConnect, token, ref, walletConnectLogin]);
 
     const isMobile =
         platform?.os?.family === "iOS" || platform?.os?.family === "Android";
@@ -384,26 +331,27 @@ const WalletConnect = ({
     const svgQr: any = useMemo(() => {
         return {
             dangerouslySetInnerHTML: {
-                __html: qrSvg
+                __html: qrSvg,
             },
             style: {
                 width: "157px",
-                height: "157px"
-            }
+                height: "157px",
+            },
         };
     }, [qrSvg]);
 
     const buildQrCode = useCallback(() => {
         (async () => {
-            if (wcUri && ref.current !== null) {
-                const svg = await QRCode.toString(wcUri, {
-                    type: "svg"
+            if (walletConnectUri && ref.current !== null) {
+                const svg = await QRCode.toString(walletConnectUri, {
+                    type: "svg",
                 });
                 setQrSvg(svg);
             }
         })();
-    }, [wcUri]);
+    }, [walletConnectUri]);
 
+    useEffect(initConnect, [initConnect]);
     useEffect(buildQrCode, [buildQrCode]);
 
     return (
@@ -420,9 +368,7 @@ const WalletConnect = ({
             {isMobile && (
                 <>
                     <a
-                        href={`${walletConnectDeepLink}?wallet-connect=${encodeURIComponent(
-                            wcUri
-                        )}`}
+                        href={uriDeepLink || ""}
                         rel="noopener noreferrer nofollow"
                         target="_blank"
                         className="border border-white/50 relative inline-flex items-center p-1 cursor-pointer mb-5 max-w-full"

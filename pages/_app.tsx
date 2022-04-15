@@ -1,18 +1,19 @@
-import Authenticate from "components/Authenticate";
+import { DappProvider } from "@elrondnetwork/dapp-core";
 import ConnectWalletModal from "components/ConnectWalletModal";
-import { DappContextProvider } from "context/dapp";
+import SignTxsModal from "components/SignTxsModal";
+import TxsToastList from "components/TxsToastList";
+import { DAPP_CONFIG } from "const/dappConfig";
+import { ContractsProvider } from "context/contracts";
 import { WalletProvider } from "context/wallet";
+import { NextPage } from "next";
 import { NextSeo } from "next-seo";
 import { AppProps } from "next/app";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import Script from "next/script";
 import { ReactElement, ReactNode, useEffect } from "react";
-import * as dappConfig from "../dapp-config";
 import * as gtag from "../helper/gtag";
 import "../styles/globals.css";
-import { NextPage } from "next";
-import { ContractsProvider } from "context/contracts";
 
 type NextPageWithLayout = NextPage & {
     getLayout?: (page: ReactElement) => ReactNode;
@@ -68,17 +69,22 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
                 title="AshSwap Interface"
                 description="Swap or provide liquidity on the AshSwap Protocol."
             />
-            <DappContextProvider config={dappConfig}>
-                <Authenticate>
-                    <WalletProvider>
-                        <ContractsProvider>
-                            {/* <Component {...pageProps} /> */}
-                            {getLayout(<Component {...pageProps} />)}
-                            <ConnectWalletModal />
-                        </ContractsProvider>
-                    </WalletProvider>
-                </Authenticate>
-            </DappContextProvider>
+
+            <DappProvider
+                environment="testnet"
+                customNetworkConfig={DAPP_CONFIG}
+                completedTransactionsDelay={500}
+            >
+                <WalletProvider>
+                    <ContractsProvider>
+                        {/* <Component {...pageProps} /> */}
+                        {getLayout(<Component {...pageProps} />)}
+                        <ConnectWalletModal />
+                        <SignTxsModal />
+                        <TxsToastList />
+                    </ContractsProvider>
+                </WalletProvider>
+            </DappProvider>
         </>
     );
 }

@@ -1,14 +1,13 @@
+import { logout, useGetAccountInfo, useGetLoginInfo } from "@elrondnetwork/dapp-core";
 import IconChange from "assets/svg/change.svg";
 import IconCopy from "assets/svg/copy.svg";
 import IconDisconnect from "assets/svg/disconnect.svg";
 import BasePopover from "components/BasePopover";
 import HeadlessModal, {
-    HeadlessModalDefaultHeader,
+    HeadlessModalDefaultHeader
 } from "components/HeadlessModal";
 import { TAILWIND_BREAKPOINT } from "const/mediaQueries";
-import { useDappContext } from "context/dapp";
 import { useWallet } from "context/wallet";
-import useLogout from "hooks/useLogout";
 import useMediaQuery from "hooks/useMediaQuery";
 import useMounted from "hooks/useMounted";
 import {
@@ -16,7 +15,7 @@ import {
     SetStateAction,
     useCallback,
     useEffect,
-    useState,
+    useState
 } from "react";
 type AddressMenuProp = {
     infoLayout?: boolean;
@@ -29,8 +28,9 @@ type AddressMenuProp = {
     ) => JSX.Element;
 };
 function AddressMenu({ infoLayout, dropdownBtn, connectBtn }: AddressMenuProp) {
-    const { loggedIn, address } = useDappContext();
-    const logoutDapp = useLogout();
+    const { isLoggedIn: loggedIn } = useGetLoginInfo();
+    const { address } = useGetAccountInfo();
+    const logoutDapp = logout;
     const [mShowMenu, setMShowMenu] = useState(false);
     const [showMenu, setShowMenu] = useState(false);
     const mounted = useMounted();

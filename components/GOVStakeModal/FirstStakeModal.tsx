@@ -19,6 +19,7 @@ import { useScreenSize } from "hooks/useScreenSize";
 import { useOnboarding } from "hooks/useOnboarding";
 import Tooltip from "components/Tooltip";
 import useMediaQuery from "hooks/useMediaQuery";
+import { transactionServices } from "@elrondnetwork/dapp-core";
 type props = {
     open: boolean;
     onClose: () => void;
@@ -70,15 +71,13 @@ const FirstStakeContent = ({ open, onClose }: props) => {
         );
     }, [insufficientEGLD, lockAmt, lockPeriod, isAgree, insufficientASH]);
     const lock = useCallback(async () => {
-        const tx = await lockASH(
+        const { sessionId, error } = await lockASH(
             lockAmt,
             lockPeriod === minLock
                 ? new BigNumber(moment().add(30, "minutes").unix())
                 : new BigNumber(moment().add(lockPeriod, "days").unix())
         );
-        if (tx) {
-            onClose();
-        }
+        if (sessionId) onClose?.();
     }, [lockASH, lockAmt, lockPeriod, onClose]);
     const estimatedVeASH = useMemo(() => {
         return estimateVeASH(lockAmt, lockPeriod);

@@ -17,14 +17,22 @@ import { theme } from "tailwind.config";
 import { useDebounce } from "use-debounce";
 import { fractionFormat } from "helper/number";
 import { ASH_TOKEN } from "const/tokens";
-import { blockTimeMs } from "const/network";
+import { transactionServices } from "@elrondnetwork/dapp-core";
+import { blockTimeMs } from "const/dappConfig";
 type props = {
     open: boolean;
     onClose: () => void;
     farmData: Unarray<FarmsState["farmRecords"]>;
 };
 const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
-    const { pool, farm, stakedData, ashPerBlock, farmTokenSupply, emissionAPR } = farmData;
+    const {
+        pool,
+        farm,
+        stakedData,
+        ashPerBlock,
+        farmTokenSupply,
+        emissionAPR,
+    } = farmData;
     const [token0, token1] = pool.tokens;
     const [isAgree, setIsAgree] = useState(false);
     const [unStakeAmt, setUnStakeAmt] = useState<BigNumber>(new BigNumber(0));
@@ -81,8 +89,8 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
         );
     }, [isAgree, unStakeAmt, insufficientFarmToken, insufficientEGLD]);
     const unStake = useCallback(async () => {
-        const txsMap = await exitFarm(unStakeAmt, farm);
-        if (Object.keys(txsMap).length > 0 && onClose) {
+        const { sessionId } = await exitFarm(unStakeAmt, farm);
+        if (sessionId && onClose) {
             onClose();
         }
     }, [exitFarm, unStakeAmt, farm, onClose]);
@@ -283,8 +291,7 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
                                 Emission APR
                             </div>
                             <div className="text-white text-lg font-bold">
-                                {fractionFormat(emissionAPR.toNumber())}
-                                %
+                                {fractionFormat(emissionAPR.toNumber())}%
                             </div>
                         </div>
                     </div>

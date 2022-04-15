@@ -11,7 +11,7 @@ type ExpiresType = number | false;
 export const setItem = ({
     key,
     data,
-    expires
+    expires,
 }: {
     key: SessionKeyType;
     data: any;
@@ -22,7 +22,7 @@ export const setItem = ({
             String(key),
             JSON.stringify({
                 expires,
-                data
+                data,
             })
         );
     }
@@ -58,7 +58,17 @@ export const getItem = (key: SessionKeyType): any => {
     return null;
 };
 
+export function setToastsIdsToStorage(ids: string[]) {
+    return sessionStorage.setItem("toast_tx", JSON.stringify(ids));
+}
+
+export function getToastsIdsFromStorage() {
+    const toastsIds = sessionStorage.getItem("toast_tx");
+    return toastsIds != null ? JSON.parse(toastsIds) : [];
+}
+
 export const removeItem = (key: SessionKeyType) =>
     typeof window !== "undefined" && sessionStorage.removeItem(String(key));
 
-export const clear = () => typeof window !== "undefined" && sessionStorage.clear();
+export const clear = () =>
+    typeof window !== "undefined" && sessionStorage.clear();

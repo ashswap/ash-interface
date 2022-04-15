@@ -107,11 +107,6 @@ const Tooltip = (props: Props) => {
     const [_open, _setOpen] = useState(false);
     const arrowRef = useRef(null);
     const open = useMemo(() => {
-        console.log(
-            Object.prototype.hasOwnProperty.call(props, "open"),
-            props,
-            _open
-        );
         return Object.prototype.hasOwnProperty.call(props, "open")
             ? openProp
             : _open;

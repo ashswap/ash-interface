@@ -24,13 +24,8 @@ export interface ContractsState {
         value1: BigNumber;
     }>;
     getLPValue: (ownLiquidity: BigNumber, pool: IPool) => Promise<BigNumber>;
-    callContract: (
-        addr: Address,
-        arg: CallArguments
-    ) => Promise<TransactionHash>;
 }
 export const initContractsState: ContractsState = {
     getTokenInLP: () => Promise.resolve({ value0: bigZero, value1: bigZero }),
     getLPValue: () => Promise.resolve(bigZero),
-    callContract: () => Promise.resolve(emptyTxHash),
 };

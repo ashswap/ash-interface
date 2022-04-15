@@ -9,12 +9,13 @@
         "lint": "next lint"
     },
     "dependencies": {
-        "@elrondnetwork/erdjs": "https://github.com/ashswap/elrond-sdk-erdjs#53d5b468010c49e8360da937ee89f584ddb59601",
+        "@elrondnetwork/dapp-core": "^1.1.6",
+        "@elrondnetwork/erdjs": "9.1.0",
         "@floating-ui/react-dom-interactions": "^0.0.15",
         "@headlessui/react": "^1.4.3",
         "@popperjs/core": "^2.11.2",
-        "@types/numeral": "^2.0.2",
         "@tippyjs/react": "^4.2.6",
+        "@types/numeral": "^2.0.2",
         "antd": "^4.16.13",
         "bignumber.js": "9.0.1",
         "moment": "^2.29.1",

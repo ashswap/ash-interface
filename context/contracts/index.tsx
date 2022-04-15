@@ -1,3 +1,4 @@
+import { getProxyProvider, useGetAccountInfo, useSignTransactions } from "@elrondnetwork/dapp-core";
 import {
     Address,
     ContractFunction,
@@ -5,16 +6,15 @@ import {
     BigUIntValue,
     CallArguments,
     TransactionHash,
+    ProxyProvider,
+    IProvider,
 } from "@elrondnetwork/erdjs";
 import BigNumber from "bignumber.js";
-import { useDappContext } from "context/dapp";
 import { useWallet } from "context/wallet";
 import { toEGLDD } from "helper/balance";
 import { queryContractParser } from "helper/serializer";
 import {
     useCreateTransaction,
-    useSendTransaction,
-    useSignTransaction,
 } from "helper/transactionMethods";
 import IPool from "interface/pool";
 import { createContext, useCallback, useContext } from "react";
@@ -31,14 +31,11 @@ const useContracts = () => {
 };
 
 export const ContractsProvider = ({ children }: any) => {
-    const dapp = useDappContext();
-    const createTransaction = useCreateTransaction();
-    const signTx = useSignTransaction();
-    const sendTx = useSendTransaction();
+    const proxy: ProxyProvider = getProxyProvider();
     const { tokenPrices } = useWallet();
     const getTokenInLP = useCallback(
         (ownLiquidity: BigNumber, poolAddress: string) => {
-            return dapp.dapp.proxy
+            return proxy
                 .queryContract(
                     new Query({
                         address: new Address(poolAddress),
@@ -65,7 +62,7 @@ export const ContractsProvider = ({ children }: any) => {
                     };
                 });
         },
-        [dapp.dapp.proxy]
+        [proxy]
     );
     const getLPValue = useCallback(
         async (ownLiquidity: BigNumber, pool: IPool) => {
@@ -90,25 +87,6 @@ export const ContractsProvider = ({ children }: any) => {
         },
         [tokenPrices, getTokenInLP]
     );
-    const callContract = useCallback(
-        async (address: Address, arg: CallArguments) => {
-            if (!dapp.address || !dapp.dapp.proxy || !dapp.dapp.provider) {
-                return emptyTxHash;
-            }
-
-            const tx = await createTransaction(address, arg);
-            const signedTx = await signTx(tx);
-            return await sendTx(signedTx);
-        },
-        [
-            dapp.address,
-            dapp.dapp.proxy,
-            dapp.dapp.provider,
-            createTransaction,
-            signTx,
-            sendTx,
-        ]
-    );
 
     return (
         <context.Provider
@@ -116,7 +94,6 @@ export const ContractsProvider = ({ children }: any) => {
                 ...initContractsState,
                 getTokenInLP,
                 getLPValue,
-                callContract,
             }}
         >
             {children}

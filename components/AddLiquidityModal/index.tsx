@@ -1,4 +1,10 @@
 import {
+    getProxyProvider,
+    sendTransactions,
+    useGetAccountInfo,
+    useGetLoginInfo,
+} from "@elrondnetwork/dapp-core";
+import {
     Address,
     AddressValue,
     ArgSerializer,
@@ -22,14 +28,15 @@ import HeadlessModal, {
 } from "components/HeadlessModal";
 import InputCurrency from "components/InputCurrency";
 import Switch from "components/Switch";
-import { gasLimit, network } from "const/network";
+import { gasLimit } from "const/dappConfig";
 import useContracts from "context/contracts";
-import { useDappContext } from "context/dapp";
 import { PoolsState } from "context/pools";
 import { useWallet } from "context/wallet";
 import { toEGLD, toWei } from "helper/balance";
 import { fractionFormat } from "helper/number";
+import { useCreateTransaction } from "helper/transactionMethods";
 import { useScreenSize } from "hooks/useScreenSize";
+import { DappSendTransactionsPropsType } from "interface/dappCore";
 import { IToken } from "interface/token";
 import { Unarray } from "interface/utilities";
 import Image from "next/image";
@@ -130,10 +137,11 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
     const [value1Debounce] = useDebounce(value1, 500);
     const [isProMode, setIsProMode] = useState(false);
     const [adding, setAdding] = useState(false);
-
+    const createTx = useCreateTransaction();
     const { fetchBalances, balances, tokenPrices } = useWallet();
-    const { callContract } = useContracts();
-    const dapp = useDappContext();
+    const { isLoggedIn: loggedIn } = useGetLoginInfo();
+    const { address, account } = useGetAccountInfo();
+    const proxy = getProxyProvider();
     // const provider = dapp.dapp.provider;
     const [rates, setRates] = useState<BigNumber[] | undefined>(undefined);
     const { pool, poolStats, liquidityData } = poolData;
@@ -148,10 +156,11 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
     }, [open]);
 
     const addLP = useCallback(async () => {
-        if (!dapp.loggedIn || adding) return;
+        if (!loggedIn || adding) return;
         setAdding(true);
+        let sessionId = "";
         try {
-            let tx = await callContract(new Address(dapp.address), {
+            let tx = await createTx(new Address(address), {
                 func: new ContractFunction("MultiESDTNFTTransfer"),
                 gasLimit: new GasLimit(gasLimit),
                 args: [
@@ -172,55 +181,42 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
                     new AddressValue(Address.Zero()),
                 ],
             });
-
+            const payload: DappSendTransactionsPropsType = {
+                transactions: tx,
+                transactionsDisplayInfo: {
+                    successMessage: `Add liquidity Success ${value0} ${pool.tokens[0].name} and ${value1} ${pool.tokens[1].name}`,
+                },
+            };
+            sessionId = (await sendTransactions(payload)).sessionId || "";
             fetchBalances();
-
-            let key = `open${Date.now()}`;
-            notification.open({
-                key,
-                message: `Add liquidity Success ${value0} ${pool.tokens[0].name} and ${value1} ${pool.tokens[1].name}`,
-                icon: <IconNewTab />,
-                onClick: () =>
-                    window.open(
-                        network.explorerAddress +
-                            "/transactions/" +
-                            tx.toString(),
-                        "_blank"
-                    ),
-            });
-            setTimeout(() => {
-                notification.close(key);
-            }, 10000);
         } catch (error) {
             // TODO: extension close without response
             console.log(error);
         }
         setAdding(false);
-
-        if (onClose) {
-            onClose();
-        }
+        if (sessionId) onClose?.();
     }, [
-        dapp,
         value0,
         value1,
         pool,
         onClose,
-        callContract,
         fetchBalances,
         adding,
+        address,
+        loggedIn,
+        createTx,
     ]);
 
     // find pools + fetch reserves
     useEffect(() => {
         let isMounted = true;
 
-        if (!pool || !dapp.dapp.proxy) {
+        if (!pool || !proxy) {
             return;
         }
 
         Promise.all([
-            dapp.dapp.proxy.queryContract(
+            proxy.queryContract(
                 new Query({
                     address: new Address(pool?.address),
                     func: new ContractFunction("getAmountOut"),
@@ -239,7 +235,7 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
                     ],
                 })
             ),
-            dapp.dapp.proxy.queryContract(
+            proxy.queryContract(
                 new Query({
                     address: new Address(pool?.address),
                     func: new ContractFunction("getAmountOut"),
@@ -290,7 +286,7 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
         return () => {
             isMounted = false;
         };
-    }, [pool, dapp.dapp.proxy, setRates]);
+    }, [pool, proxy, setRates]);
 
     const onChangeValue0 = useCallback(
         (value: string) => {
@@ -533,14 +529,14 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
                         outline
                         disable={
                             !isAgree ||
-                            dapp.account.balance === "0" ||
+                            account.balance === "0" ||
                             isInsufficentFund0 ||
                             isInsufficentFund1 ||
                             adding
                         }
                         onClick={isAgree ? addLP : () => {}}
                     >
-                        {dapp.account.balance === "0"
+                        {account.balance === "0"
                             ? "INSUFFICIENT EGLD BALANCE"
                             : "DEPOSIT"}
                     </Button>

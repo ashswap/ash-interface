@@ -19,6 +19,7 @@ import BigNumber from "bignumber.js";
 import { useOnboarding } from "hooks/useOnboarding";
 import Tooltip from "components/Tooltip";
 import useMediaQuery from "hooks/useMediaQuery";
+import { transactionServices } from "@elrondnetwork/dapp-core";
 type props = {
     open: boolean;
     onClose: () => void;
@@ -132,7 +133,7 @@ const StakeMoreContent = ({ open, onClose }: props) => {
     ]);
 
     const lockMore = useCallback(async () => {
-        await lockMoreASH({
+        const { sessionId } = await lockMoreASH({
             weiAmt: lockAmt,
             unlockTimestamp: isExtend
                 ? extendLockPeriod === minLock
@@ -150,9 +151,7 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                       )
                 : undefined,
         });
-        if (onClose) {
-            onClose();
-        }
+        if (sessionId) onClose?.();
     }, [lockMoreASH, isExtend, extendLockPeriod, unlockTS, lockAmt, onClose]);
 
     const estimatedVeASH = useMemo(() => {

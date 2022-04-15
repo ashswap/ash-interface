@@ -5,7 +5,7 @@ import Image from "next/image";
 import AddLiquidityModal from "components/AddLiquidityModal";
 import Down from "assets/svg/down-white.svg";
 import usePoolDataFormat from "hooks/usePoolDataFormat";
-import { network } from "const/network";
+import { AccountInfoSliceNetworkType, useGetNetworkConfig } from "@elrondnetwork/dapp-core";
 
 function PoolCardItem({
     poolData,
@@ -15,6 +15,7 @@ function PoolCardItem({
     const { pool } = poolData;
     const [isExpand, setIsExpand] = useState<boolean>(false);
     const [openAddLiquidity, setOpenAddLiquidity] = useState<boolean>(false);
+    const network: AccountInfoSliceNetworkType = useGetNetworkConfig().network;
     const {
         formatedStats: { TVL, tradingAPR, volumn24h },
     } = usePoolDataFormat(poolData);

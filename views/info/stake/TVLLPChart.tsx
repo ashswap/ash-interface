@@ -1,6 +1,6 @@
 import { ChartActiveDot } from "components/Chart/ChartActiveDot";
 import { ChartLineX } from "components/Chart/ChartLineX";
-import { network } from "const/network";
+import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 import { CHART_INTERVAL, MONTH_SHORT } from "const/time";
 import { fetcher } from "helper/common";
 import { formatAmount } from "helper/number";
@@ -42,7 +42,7 @@ const CustomTooltipCursor = ({ areaRef, ...props }: any) => {
 };
 function TVLLPChart() {
     const { data } = useSWR<[number, number][]>(
-        `${network.ashApiBaseUrl}/stake/farming/graph-statistic?type=liquidity`,
+        `${ASHSWAP_CONFIG.ashApiBaseUrl}/stake/farming/graph-statistic?type=liquidity`,
         fetcher,
         { refreshInterval: 5 * 60 * 1000 }
     );

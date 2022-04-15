@@ -6,12 +6,12 @@ import PoolsTable from "views/info/components/PoolsTable";
 import React, { ReactElement } from "react";
 import useSWR from "swr";
 import { PoolStatsRecord } from "interface/poolStats";
-import { network } from "const/network";
 import { fetcher } from "helper/common";
+import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 
 function PoolsPage() {
     const { data } = useSWR<PoolStatsRecord[]>(
-        `${network.ashApiBaseUrl}/pool`,
+        `${ASHSWAP_CONFIG.ashApiBaseUrl}/pool`,
         fetcher
     );
     return (

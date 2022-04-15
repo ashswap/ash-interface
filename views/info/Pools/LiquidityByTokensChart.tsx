@@ -1,5 +1,5 @@
 import BigNumber from "bignumber.js";
-import { network } from "const/network";
+import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 import pools from "const/pool";
 import { IN_POOL_TOKENS } from "const/tokens";
 import { randomHexColor } from "helper/color";
@@ -75,7 +75,7 @@ function LiquidityByTokensChart() {
     const { data } = useSWR<RawChartRecord[]>(
         selectedPools.size > 0
             ? `${
-                  network.ashApiBaseUrl
+                  ASHSWAP_CONFIG.ashApiBaseUrl
               }/pool/liquidity-distribution?pool=${Array.from(
                   selectedPools
               ).join(",")}`

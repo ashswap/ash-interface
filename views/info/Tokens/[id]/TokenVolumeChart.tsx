@@ -1,6 +1,6 @@
 import { ChartActiveDot } from "components/Chart/ChartActiveDot";
 import { ChartLineX } from "components/Chart/ChartLineX";
-import { network } from "const/network";
+import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 import { MONTH_SHORT } from "const/time";
 import { fetcher } from "helper/common";
 import { abbreviateCurrency, formatAmount } from "helper/number";
@@ -54,7 +54,7 @@ function TokenVolumeChart({
 }) {
     const { data } = useSWR<[number, number][]>(
         token.id
-            ? `${network.ashApiBaseUrl}/token/${token.id}/graph-statistic?type=volume`
+            ? `${ASHSWAP_CONFIG.ashApiBaseUrl}/token/${token.id}/graph-statistic?type=volume`
             : null,
         fetcher
     );

@@ -1,42 +1,39 @@
 import {
+    AccountInfoSliceNetworkType,
+    getApiProvider,
+    getProxyProvider,
+    sendTransactions,
+    useGetAccountInfo,
+    useGetLoginInfo,
+    useGetNetworkConfig
+} from "@elrondnetwork/dapp-core";
+import { SendTransactionReturnType } from "@elrondnetwork/dapp-core/dist/services/transactions";
+import {
     Address,
     AddressValue,
-    ArgSerializer,
-    BigUIntValue,
+    ApiProvider, BigUIntValue,
     BytesValue,
-    ContractFunction,
-    EndpointParameterDefinition,
-    GasLimit,
-    PrimitiveValue,
-    Query,
-    StringValue,
-    Struct,
-    StructType,
-    TokenIdentifierValue,
-    Transaction,
-    TransactionHash,
-    TypedValue,
-    TypeExpressionParser,
-    TypeMapper,
+    ContractFunction, GasLimit, ProxyProvider,
+    Query, TokenIdentifierValue,
+    Transaction, TypedValue
 } from "@elrondnetwork/erdjs/out";
-import { notification } from "antd";
 import BigNumber from "bignumber.js";
+import { ASHSWAP_CONFIG } from "const/ashswapConfig";
+import { blockTimeMs, gasLimit } from "const/dappConfig";
 import { FARMS } from "const/farms";
-import { blockTimeMs, gasLimit, network } from "const/network";
 import pools from "const/pool";
+import { ASH_TOKEN } from "const/tokens";
 import useContracts from "context/contracts";
-import { useDappContext } from "context/dapp";
 import { useWallet } from "context/wallet";
 import { toEGLD, toEGLDD } from "helper/balance";
 import { fetcher } from "helper/common";
 import {
-    contractArgsDeserialize,
-    queryContractParser,
-} from "helper/serializer";
+    useCreateTransaction
+} from "helper/transactionMethods";
+import { DappSendTransactionsPropsType } from "interface/dappCore";
 import { IFarm } from "interface/farm";
 import IPool from "interface/pool";
 import { PoolStatsRecord } from "interface/poolStats";
-import IconNewTab from "assets/svg/new-tab-green.svg";
 import {
     createContext,
     Dispatch,
@@ -45,18 +42,10 @@ import {
     useContext,
     useEffect,
     useMemo,
-    useState,
+    useState
 } from "react";
 import useSWR from "swr";
 import { useDebounce } from "use-debounce";
-import { ASH_TOKEN } from "const/tokens";
-import {
-    useCreateTransaction,
-    useSendMultipleTxs,
-    useSendTransaction,
-    useSignTransaction,
-    useSignTransactions,
-} from "helper/transactionMethods";
 const calcUnstakeEntries = (
     weiAmt: BigNumber,
     farmTokens: Required<FarmRecord>["stakedData"]["farmTokens"]
@@ -121,13 +110,13 @@ export type FarmsState = {
     enterFarm: (
         amtWei: BigNumber,
         farm: IFarm
-    ) => Promise<TransactionHash | null>;
+    ) => Promise<SendTransactionReturnType>;
     claimReward: (farm: IFarm) => Promise<void>;
     claimAllReward: () => Promise<void>;
     exitFarm: (
         lpAmt: BigNumber,
         farm: IFarm
-    ) => Promise<{ [key: number]: string }>;
+    ) => Promise<SendTransactionReturnType>;
     estimateRewardOnExit: (lpAmt: BigNumber, farm: IFarm) => Promise<BigNumber>;
 };
 const initState: FarmsState = {
@@ -141,10 +130,10 @@ const initState: FarmsState = {
     setKeyword: emptyFunc,
     setStakedOnly: emptyFunc,
     setInactive: emptyFunc,
-    enterFarm: () => Promise.resolve(null),
+    enterFarm: () => Promise.resolve({ sessionId: "" }),
     claimReward: () => Promise.resolve(),
     claimAllReward: () => Promise.resolve(),
-    exitFarm: () => Promise.resolve({}),
+    exitFarm: () => Promise.resolve({ sessionId: "" }),
     estimateRewardOnExit: () => Promise.resolve(new BigNumber(0)),
 };
 const FarmsContext = createContext<FarmsState>(initState);
@@ -168,15 +157,15 @@ const FarmsProvider = ({ children }: any) => {
     >({});
     const { getTokenInLP, getLPValue } = useContracts();
     const createTransaction = useCreateTransaction();
-    const signTxs = useSignTransactions();
-    const signTx = useSignTransaction();
-    const sendTx = useSendTransaction();
-    const sendMultipleTxs = useSendMultipleTxs();
-    const dapp = useDappContext();
+    const { isLoggedIn: loggedIn } = useGetLoginInfo();
+    const proxy: ProxyProvider = getProxyProvider();
+    const apiProvider: ApiProvider = getApiProvider();
+    const { address } = useGetAccountInfo();
     const { lpTokens, tokenPrices, balances } = useWallet();
+    const network: AccountInfoSliceNetworkType = useGetNetworkConfig().network;
     // fetch pool stats
     const { data: poolStatsRecords } = useSWR<PoolStatsRecord[]>(
-        `${network.ashApiBaseUrl}/pool`,
+        `${ASHSWAP_CONFIG.ashApiBaseUrl}/pool`,
         fetcher
     );
 
@@ -192,21 +181,21 @@ const FarmsProvider = ({ children }: any) => {
     );
 
     const getSNFTAttrs = useCallback(
-        async (collection: string, nonce: number) => {
-            if (!dapp.loggedIn) return;
-            return await dapp.dapp.proxy.doGetGeneric(
-                `address/${new Address(
-                    dapp.address
-                ).bech32()}/nft/${collection}/nonce/${nonce}`,
-                (res) => res.tokenData
-            );
+        async (sftId: string) => {
+            if (!loggedIn) return;
+            return await apiProvider.doGetGeneric(
+                `accounts/${new Address(
+                    address
+                ).bech32()}/nfts/${sftId}`,
+                (res) => res
+            ).catch(() => {});
         },
-        [dapp.loggedIn, dapp.dapp, dapp.address]
+        [loggedIn, apiProvider, address]
     );
 
     const getBlockReward = useCallback(
         async (farmAddress: string) => {
-            return await dapp.dapp.proxy
+            return await proxy
                 .queryContract(
                     new Query({
                         address: new Address(farmAddress),
@@ -221,7 +210,7 @@ const FarmsProvider = ({ children }: any) => {
                 })
                 .catch(() => new BigNumber(0));
         },
-        [dapp.dapp.proxy]
+        [proxy]
     );
 
     const getFarmBlockRewardMap = useCallback(async () => {
@@ -238,7 +227,7 @@ const FarmsProvider = ({ children }: any) => {
 
     const getFarmTokenSupply = useCallback(
         (farmAddress: string) => {
-            return dapp.dapp.proxy
+            return proxy
                 .queryContract(
                     new Query({
                         address: new Address(farmAddress),
@@ -257,20 +246,19 @@ const FarmsProvider = ({ children }: any) => {
                 })
                 .catch(() => new BigNumber(0));
         },
-        [dapp.dapp.proxy]
+        [proxy]
     );
 
     const getReward = useCallback(
         async (
             farm: IFarm,
             amt: BigNumber,
-            collection: string,
-            nonce: number
+            sftId: string
         ) => {
-            if (!dapp.loggedIn) return new BigNumber(0);
-            const data = await getSNFTAttrs(collection, nonce);
+            if (!loggedIn) return new BigNumber(0);
+            const data = await getSNFTAttrs(sftId);
             if (!data?.attributes) return new BigNumber(0);
-            const res = await dapp.dapp.proxy.queryContract(
+            const res = await proxy.queryContract(
                 new Query({
                     address: new Address(farm.farm_address),
                     func: new ContractFunction(
@@ -289,7 +277,7 @@ const FarmsProvider = ({ children }: any) => {
                 16
             );
         },
-        [dapp.loggedIn, getSNFTAttrs, dapp.dapp]
+        [loggedIn, getSNFTAttrs, proxy]
     );
 
     const getFarmRecords = useCallback(async () => {
@@ -365,12 +353,10 @@ const FarmsProvider = ({ children }: any) => {
                         getReward(
                             f,
                             t.balance,
-                            f.farm_token_id,
-                            t.nonce.toNumber()
+                            t.tokenId
                         )
                     );
                     const totalRewards = await Promise.all(rewards);
-
                     record.stakedData = {
                         farmTokens,
                         totalStakedLP: farmTokens.reduce(
@@ -399,10 +385,10 @@ const FarmsProvider = ({ children }: any) => {
         tokenPrices,
     ]);
 
-    const enterFarm = useCallback(
+    const enterFarm: FarmsState["enterFarm"] = useCallback(
         async (amtWei: BigNumber, farm: IFarm) => {
-            if (!amtWei || amtWei.eq(0) || !dapp.loggedIn || !dapp.address)
-                return null;
+            if (!amtWei || amtWei.eq(0) || !loggedIn || !address)
+                return { sessionId: "" };
             try {
                 const farmTokenInWallet =
                     farmRecords.find(
@@ -423,7 +409,7 @@ const FarmsProvider = ({ children }: any) => {
                     },
                     []
                 );
-                const tx = await createTransaction(new Address(dapp.address), {
+                const tx = await createTransaction(new Address(address), {
                     func: new ContractFunction("MultiESDTNFTTransfer"),
                     gasLimit: new GasLimit(gasLimit),
                     args: [
@@ -443,37 +429,22 @@ const FarmsProvider = ({ children }: any) => {
                         new TokenIdentifierValue(Buffer.from("enterFarm")),
                     ],
                 });
-                const signedTx = await signTx(tx);
-                const hash = await sendTx(signedTx);
-                notification.open({
-                    message: `Stake succeed ${toEGLDD(
-                        farm.farming_token_decimal,
-                        amtWei
-                    )} ${farm.farming_token_id}`,
-                    icon: <IconNewTab />,
-
-                    onClick: () =>
-                        window.open(
-                            network.explorerAddress +
-                                "/transactions/" +
-                                hash.toString(),
-                            "_blank"
-                        ),
-                });
-                return hash;
+                const payload: DappSendTransactionsPropsType = {
+                    transactions: tx,
+                    transactionsDisplayInfo: {
+                        successMessage: `Stake succeed ${toEGLDD(
+                            farm.farming_token_decimal,
+                            amtWei
+                        )} ${farm.farming_token_id}`,
+                    },
+                };
+                return await sendTransactions(payload);
             } catch (error) {
                 console.log(error);
             }
-            return null;
+            return { sessionId: "" };
         },
-        [
-            dapp.loggedIn,
-            dapp.address,
-            createTransaction,
-            farmRecords,
-            signTx,
-            sendTx,
-        ]
+        [loggedIn, address, createTransaction, farmRecords]
     );
 
     const createExitFarmTx = useCallback(
@@ -483,8 +454,8 @@ const FarmsProvider = ({ children }: any) => {
             nonce: BigNumber,
             farm: IFarm
         ) => {
-            if (!dapp.loggedIn) throw new Error("Connect wallet to exit farm");
-            return await createTransaction(new Address(dapp.address), {
+            if (!loggedIn) throw new Error("Connect wallet to exit farm");
+            return await createTransaction(new Address(address), {
                 func: new ContractFunction("ESDTNFTTransfer"),
                 gasLimit: new GasLimit(gasLimit),
                 args: [
@@ -496,16 +467,17 @@ const FarmsProvider = ({ children }: any) => {
                 ],
             });
         },
-        [dapp.loggedIn, createTransaction, dapp.address]
+        [loggedIn, createTransaction, address]
     );
 
-    const exitFarm = useCallback(
+    const exitFarm: FarmsState["exitFarm"] = useCallback(
         async (lpAmt: BigNumber, farm: IFarm) => {
-            if (!dapp.loggedIn) return {};
+            if (!loggedIn) return { sessionId: "" };
             const farmRecord = farmRecords.find(
                 (val) => val.farm.farm_address === farm.farm_address
             );
-            if (!farmRecord || !farmRecord.stakedData) return {};
+            if (!farmRecord || !farmRecord.stakedData)
+                return { sessionId: "" };
             const { stakedData } = farmRecord;
             const farmTokens = stakedData.farmTokens || [];
             let txs: Transaction[] = [];
@@ -515,28 +487,18 @@ const FarmsProvider = ({ children }: any) => {
                     createExitFarmTx(unstakeAmt, collection, nonce, farm)
             );
             txs = await Promise.all(exitFarmTxCreators);
-            const signedTxs = await signTxs(
-                ...(txs.filter((tx) => !!tx) as Transaction[])
-            );
-            const sentTxs = await sendMultipleTxs(signedTxs);
-            notification.open({
-                message: `Unstake succeed ${toEGLDD(
-                    farm.farming_token_decimal,
-                    lpAmt
-                )} ${farm.farming_token_id}`,
-                icon: <IconNewTab />,
-
-                onClick: () => {},
-            });
-            return sentTxs;
+            const payload: DappSendTransactionsPropsType = {
+                transactions: txs.filter((tx) => !!tx) as Transaction[],
+                transactionsDisplayInfo: {
+                    successMessage: `Unstake succeed ${toEGLDD(
+                        farm.farming_token_decimal,
+                        lpAmt
+                    )} ${farm.farming_token_id}`,
+                },
+            };
+            return await sendTransactions(payload);
         },
-        [
-            createExitFarmTx,
-            farmRecords,
-            dapp.dapp,
-            dapp.loggedIn,
-            sendMultipleTxs,
-        ]
+        [createExitFarmTx, farmRecords, loggedIn]
     );
 
     const estimateRewardOnExit = useCallback(
@@ -554,8 +516,7 @@ const FarmsProvider = ({ children }: any) => {
                 getReward(
                     farm,
                     unstakeAmt,
-                    farmToken.collection,
-                    farmToken.nonce.toNumber()
+                    farmToken.tokenId
                 )
             );
             const totalRewards = await Promise.all(rewards);
@@ -574,9 +535,8 @@ const FarmsProvider = ({ children }: any) => {
             nonce: BigNumber,
             farm: IFarm
         ) => {
-            if (!dapp.loggedIn)
-                throw new Error("Connect wallet to claim reward");
-            return await createTransaction(new Address(dapp.address), {
+            if (!loggedIn) throw new Error("Connect wallet to claim reward");
+            return await createTransaction(new Address(address), {
                 func: new ContractFunction("ESDTNFTTransfer"),
                 gasLimit: new GasLimit(gasLimit),
                 args: [
@@ -588,25 +548,28 @@ const FarmsProvider = ({ children }: any) => {
                 ],
             });
         },
-        [createTransaction, dapp.address, dapp.loggedIn]
+        [createTransaction, address, loggedIn]
     );
 
-    const createClaimRewardTxs = useCallback(async (farmRecord: FarmRecord) => {
-        const { stakedData } = farmRecord;
-        const farmTokens = stakedData?.farmTokens || [];
-        const txs: Transaction[] = [];
-        for (let i = 0; i < farmTokens.length; i++) {
-            const t = farmTokens[i];
-            const tx = await createClaimRewardTx(
-                t.balance,
-                t.collection,
-                t.nonce,
-                farmRecord.farm
-            );
-            txs.push(tx);
-        }
-        return txs;
-    }, [createClaimRewardTx]);
+    const createClaimRewardTxs = useCallback(
+        async (farmRecord: FarmRecord) => {
+            const { stakedData } = farmRecord;
+            const farmTokens = stakedData?.farmTokens || [];
+            const txs: Transaction[] = [];
+            for (let i = 0; i < farmTokens.length; i++) {
+                const t = farmTokens[i];
+                const tx = await createClaimRewardTx(
+                    t.balance,
+                    t.collection,
+                    t.nonce,
+                    farmRecord.farm
+                );
+                txs.push(tx);
+            }
+            return txs;
+        },
+        [createClaimRewardTx]
+    );
 
     const claimReward = useCallback(
         async (farm: IFarm) => {
@@ -617,19 +580,18 @@ const FarmsProvider = ({ children }: any) => {
                 throw new Error("unable to claim reward");
             const { stakedData } = farmRecord;
             const txs = await createClaimRewardTxs(farmRecord);
-            const signedTxs = await signTxs(...txs);
-            await sendMultipleTxs(signedTxs);
-            notification.open({
-                message: `Claim succeed ${toEGLDD(
-                    ASH_TOKEN.decimals,
-                    stakedData.totalRewardAmt
-                )} ${ASH_TOKEN.name}`,
-                // icon: <IconNewTab />,
-
-                onClick: () => {},
-            });
+            const payload: DappSendTransactionsPropsType = {
+                transactions: txs,
+                transactionsDisplayInfo: {
+                    successMessage: `Claim succeed ${toEGLDD(
+                        ASH_TOKEN.decimals,
+                        stakedData.totalRewardAmt
+                    )} ${ASH_TOKEN.name}`,
+                },
+            };
+            await sendTransactions(payload);
         },
-        [signTxs, sendMultipleTxs, createClaimRewardTxs, farmRecords]
+        [createClaimRewardTxs, farmRecords]
     );
 
     const claimAllReward = useCallback(async () => {
@@ -643,18 +605,17 @@ const FarmsProvider = ({ children }: any) => {
                 totalASH = totalASH.plus(val.stakedData.totalRewardAmt);
             }
         }
-        const signedTxs = await signTxs(...txs);
-        await sendMultipleTxs(signedTxs);
-        notification.open({
-            message: `Claim succeed ${toEGLDD(
-                ASH_TOKEN.decimals,
-                totalASH
-            )} ${ASH_TOKEN.name}`,
-            // icon: <IconNewTab />,
-
-            onClick: () => {},
-        });
-    }, [farmRecords, signTxs, sendMultipleTxs, createClaimRewardTxs])
+        const payload: DappSendTransactionsPropsType = {
+            transactions: txs,
+            transactionsDisplayInfo: {
+                successMessage: `Claim succeed ${toEGLDD(
+                    ASH_TOKEN.decimals,
+                    totalASH
+                )} ${ASH_TOKEN.name}`,
+            },
+        };
+        await sendTransactions(payload);
+    }, [farmRecords, createClaimRewardTxs]);
 
     useEffect(() => {
         getFarmBlockRewardMap();

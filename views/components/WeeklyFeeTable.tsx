@@ -1,4 +1,3 @@
-import { network } from "const/network";
 import { fetcher } from "helper/common";
 import React, { useMemo, useState } from "react";
 import useSWR from "swr";
@@ -6,6 +5,7 @@ import ICArrowLeft from "assets/svg/arrow-left.svg";
 import ICArrowRight from "assets/svg/arrow-right.svg";
 import moment from "moment";
 import { formatAmount } from "helper/number";
+import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 type FeeRecord = {
     from_timestamp: number;
     to_timestamp: number;
@@ -40,7 +40,7 @@ const Row = ({ order, feeData }: { order: number; feeData: FeeRecord }) => {
 function WeeklyFeeTable() {
     // testing/BoY purpose: currently calculate fee every 10 minutes -> should get x*7*24*60/10 records from server
     const { data } = useSWR<FeeRecord[]>(
-        `${network.ashApiBaseUrl}/stake/governance/summary?offset=0&limit=${10*7*24*60/10}`,
+        `${ASHSWAP_CONFIG.ashApiBaseUrl}/stake/governance/summary?offset=0&limit=${10*7*24*60/10}`,
         fetcher
     );
     const [pageIndex, setPageIndex] = useState(0);

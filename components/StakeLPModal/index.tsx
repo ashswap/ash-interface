@@ -12,9 +12,9 @@ import BigNumber from "bignumber.js";
 import InputCurrency from "components/InputCurrency";
 import Checkbox from "components/Checkbox";
 import ICChevronRight from "assets/svg/chevron-right.svg";
-import { blockTimeMs } from "const/network";
 import { ASH_TOKEN } from "const/tokens";
 import { fractionFormat } from "helper/number";
+import { blockTimeMs } from "const/dappConfig";
 type props = {
     open: boolean;
     onClose: () => void;
@@ -62,8 +62,8 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
         );
     }, [isAgree, stakeAmt, insufficientLP, insufficientEGLD]);
     const stake = useCallback(async () => {
-        const tx = await enterFarm(stakeAmt, farm);
-        if (tx && onClose) {
+        const {sessionId} = await enterFarm(stakeAmt, farm);
+        if (sessionId && onClose) {
             onClose();
         }
     }, [enterFarm, stakeAmt, farm, onClose]);
