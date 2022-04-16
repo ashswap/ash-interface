@@ -15,7 +15,7 @@ const testnet = {
     apiAddress: "https://testnet-api.elrond.com",
     gatewayAddress: "https://testnet-gateway.elrond.com",
     explorerAddress: "http://testnet-explorer.elrond.com",
-    ashApiBaseUrl: "https://api-devnet.ashswap.io",
+    ashApiBaseUrl: ENVIRONMENT.ASH_API,
 };
 
 const devnet = {
@@ -26,7 +26,7 @@ const devnet = {
     apiAddress: "https://devnet-api.elrond.com",
     gatewayAddress: "https://devnet-gateway.elrond.com",
     explorerAddress: "http://devnet-explorer.elrond.com",
-    ashApiBaseUrl: "https://api-devnet.ashswap.io",
+    ashApiBaseUrl: ENVIRONMENT.ASH_API,
 };
 
 export const network = ENVIRONMENT.NETWORK == "devnet" ? devnet : testnet;
