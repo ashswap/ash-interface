@@ -200,6 +200,7 @@ export function WalletProvider({ children }: Props) {
 
     const fetchBalances = useCallback(() => {
         if (!loggedIn) {
+            setBalances({});
             return;
         }
         proxy.getAddressEsdtList(new Address(address)).then((resp) => {
@@ -209,7 +210,6 @@ export function WalletProvider({ children }: Props) {
             setBalances(Object.fromEntries(tokenBalancesEntries));
         });
     }, [loggedIn, proxy, address]);
-
     // fetch token balance
     useEffect(() => {
         fetchBalances();

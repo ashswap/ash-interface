@@ -17,7 +17,7 @@ export interface Props {
     withTxNonce?: boolean;
     pendingTransactions?: SignedTransactionsType;
     signedTransactions?: SignedTransactionsType;
-    successfulToastLifetime?: number;// in second
+    successfulToastLifetime?: number; // in second
 }
 /**
  * listen for pending transaction list, if it is not empty open the toast
@@ -57,16 +57,17 @@ function TxsToastList({
 
         const { transactions, status } = currentTx;
         return (
-            <div key={toastId}>
-                <TxToast
-                    transactions={transactions}
-                    status={status}
-                    toastId={toastId}
-                    withTxNonce={withTxNonce}
-                    lifetimeAfterSuccess={successfulToastLifetime}
-                    onClose={(id) => setToastsIds(val => val.filter(x => x !== id))}
-                />
-            </div>
+            <TxToast
+                key={toastId}
+                transactions={transactions}
+                status={status}
+                toastId={toastId}
+                withTxNonce={withTxNonce}
+                lifetimeAfterSuccess={successfulToastLifetime}
+                onClose={(id) =>
+                    setToastsIds((val) => val.filter((x) => x !== id))
+                }
+            />
         );
     });
 
@@ -114,7 +115,11 @@ function TxsToastList({
         mapPendingSignedTransactions();
     }, [mapPendingSignedTransactions]);
 
-    return <div className="fixed bottom-10 right-10">{mappedToastsList}</div>;
+    return (
+        <div className="flex flex-col sm:items-end w-full space-y-2 sm:space-y-4">
+            {mappedToastsList}
+        </div>
+    );
 }
 
 export default TxsToastList;

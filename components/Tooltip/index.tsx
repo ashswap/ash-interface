@@ -41,6 +41,13 @@ interface Props {
     children: any;
     placement?: Placement;
     strategy?: Strategy;
+    customArrow?:
+        | JSX.Element
+        | ((pos: {
+              x?: number;
+              y?: number;
+              centerOffset: number;
+          }) => JSX.Element);
     arrowStyle?: (pos: {
         x?: number;
         y?: number;
@@ -51,10 +58,10 @@ interface Props {
 }
 const Arrow = ({
     direction,
-    onClick
+    onClick,
 }: {
     direction?: "top" | "left" | "right" | "bottom";
-    onClick?: React.MouseEventHandler<HTMLButtonElement>
+    onClick?: React.MouseEventHandler<HTMLButtonElement>;
 }) => {
     return (
         <button
@@ -81,7 +88,7 @@ const Arrow = ({
                 }}
             >
                 <div className="group-hover:scale-[2] transition-all bg-stake-green-500 w-2.5 h-2.5 flex items-center justify-center">
-                    <ICClose className="hidden group-hover:block text-ash-dark-600 -rotate-45 w-1 h-1"/>
+                    <ICClose className="hidden group-hover:block text-ash-dark-600 -rotate-45 w-1 h-1" />
                 </div>
             </div>
             {direction === "bottom" && (
@@ -102,7 +109,8 @@ const Tooltip = (props: Props) => {
         strategy: strategyProp = "absolute",
         arrowStyle,
         onOpenChange: onOpenChangeProp,
-        onArrowClick
+        onArrowClick,
+        customArrow,
     } = props;
     const [_open, _setOpen] = useState(false);
     const arrowRef = useRef(null);
@@ -141,7 +149,7 @@ const Tooltip = (props: Props) => {
         middleware: [
             offset(20),
             arrow({ element: arrowRef }),
-            flip({fallbackStrategy: "initialPlacement"}),
+            flip({ fallbackStrategy: "initialPlacement" }),
             shift({ padding: 8 }),
         ],
         strategy: strategyProp,
@@ -155,7 +163,7 @@ const Tooltip = (props: Props) => {
         }),
         useFocus(context),
         useRole(context, { role: "tooltip" }),
-        useDismiss(context, {ancestorScroll: true}),
+        useDismiss(context, { ancestorScroll: true }),
         // useFocusTrap(context),
     ]);
 
@@ -219,7 +227,19 @@ const Tooltip = (props: Props) => {
                             [staticSide]: "-11px",
                         }}
                     >
-                        <Arrow direction={staticSide as any} onClick={() => onArrowClick && onArrowClick()} />
+                        {customArrow ? (
+                            typeof customArrow === "function" &&
+                            middlewareData?.arrow ? (
+                                customArrow(middlewareData.arrow)
+                            ) : (
+                                customArrow
+                            )
+                        ) : (
+                            <Arrow
+                                direction={staticSide as any}
+                                onClick={() => onArrowClick && onArrowClick()}
+                            />
+                        )}
                     </div>
                 </Transition>
             </div>

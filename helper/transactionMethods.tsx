@@ -3,7 +3,7 @@ import {
     getProxyProvider,
     useGetAccountInfo,
     useGetLoginInfo,
-    useGetNetworkConfig
+    useGetNetworkConfig,
 } from "@elrondnetwork/dapp-core";
 import {
     Address,
@@ -14,7 +14,7 @@ import {
     Nonce,
     ProxyProvider,
     SmartContract,
-    Transaction
+    Transaction,
 } from "@elrondnetwork/erdjs/out";
 import { gasLimit, gasPrice } from "const/dappConfig";
 const emptyTx = new Transaction({
@@ -39,7 +39,7 @@ export const useCreateTransaction = () => {
 
         let tx = contract.call(arg);
         tx = new Transaction({
-            chainID: new ChainID(network.id),
+            chainID: new ChainID(network.chainId),
             data: tx.getData(),
             receiver: scAddress,
             gasPrice: new GasPrice(gasPrice),
