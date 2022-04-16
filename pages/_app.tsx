@@ -4,6 +4,7 @@ import SignTxNotification from "components/SignTxNotification";
 import SignTxsModal from "components/SignTxsModal";
 import TxsToastList from "components/TxsToastList";
 import { DAPP_CONFIG } from "const/dappConfig";
+import { ENVIRONMENT } from "const/env";
 import { ContractsProvider } from "context/contracts";
 import { WalletProvider } from "context/wallet";
 import { NextPage } from "next";
@@ -72,7 +73,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
             />
 
             <DappProvider
-                environment="testnet"
+                environment={ENVIRONMENT.NETWORK}
                 customNetworkConfig={DAPP_CONFIG}
                 completedTransactionsDelay={500}
             >
