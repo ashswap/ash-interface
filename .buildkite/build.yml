@@ -1,6 +1,0 @@
-steps:
-  - label: ":docker: Build an image"
-    plugins:
-      - docker-compose#v3.9.0:
-          build: app
-          cache-from: app:ghcr.io/ashswap/interface:latest
