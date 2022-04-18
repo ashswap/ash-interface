@@ -63,10 +63,10 @@ const StatusIconMap: Record<
     ),
     success: <ICCheck className="w-4 h-4 text-stake-green-500" />,
     completed: <ICCheck className="w-4 h-4 text-stake-green-500" />,
-    fail: <IClose className="w-4 h-4 text-pink-500" />,
-    invalid: <IClose className="w-4 h-4 text-pink-500" />,
+    fail: <IClose className="w-4 h-4 text-ash-purple-500" />,
+    invalid: <IClose className="w-4 h-4 text-ash-purple-500" />,
     executed: <></>,
-    timedOut: <IClose className="w-4 h-4 text-pink-500" />,
+    timedOut: <IClose className="w-4 h-4 text-ash-purple-500" />,
 };
 const TxRecord = ({
     tx,

@@ -1,11 +1,7 @@
 import {
     getProxyProvider,
-    sendTransactions,
-    SendTransactionsPropsType,
-    transactionServices,
-    useGetAccountInfo,
-    useGetLoginInfo,
-    useSignTransactions,
+    sendTransactions, useGetAccountInfo,
+    useGetLoginInfo
 } from "@elrondnetwork/dapp-core";
 import {
     Address,
@@ -16,18 +12,14 @@ import {
     GasLimit,
     ProxyProvider,
     Query,
-    TokenIdentifierValue,
-    Transaction,
-    TypeExpressionParser,
-    TypeMapper,
+    TokenIdentifierValue, TypeExpressionParser,
+    TypeMapper
 } from "@elrondnetwork/erdjs";
-import { notification } from "antd";
 import Fire from "assets/images/fire.png";
 import ICChevronDown from "assets/svg/chevron-down.svg";
 import ICChevronUp from "assets/svg/chevron-up.svg";
 import Clock from "assets/svg/clock.svg";
 import IconClose from "assets/svg/close.svg";
-
 import Revert from "assets/svg/revert.svg";
 import IconRight from "assets/svg/right-white.svg";
 import SettingActiveIcon from "assets/svg/setting-active.svg";
@@ -36,7 +28,7 @@ import IconWallet from "assets/svg/wallet.svg";
 import BigNumber from "bignumber.js";
 import Button from "components/Button";
 import HeadlessModal, {
-    HeadlessModalDefaultHeader,
+    HeadlessModalDefaultHeader
 } from "components/HeadlessModal";
 import HistoryModal from "components/HistoryModal";
 import IconButton from "components/IconButton";
@@ -54,6 +46,7 @@ import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import styles from "./Swap.module.css";
 
+
 const Swap = () => {
     const screenSize = useScreenSize();
     const mounted = useMounted();
@@ -62,6 +55,7 @@ const Swap = () => {
         tokenTo,
         valueFrom,
         valueTo,
+        setValueFrom,
         setValueTo,
         setTokenFrom,
         setTokenTo,
@@ -281,6 +275,8 @@ const Swap = () => {
             //     duration: 10
             // });
         }
+        setValueTo("");
+        setValueFrom("");
         setSwapping(false);
     }, [
         loggedIn,
@@ -292,6 +288,8 @@ const Swap = () => {
         createTx,
         valueFrom,
         valueTo,
+        setValueTo,
+        setValueFrom
     ]);
 
     const priceImpact = useMemo(() => {
