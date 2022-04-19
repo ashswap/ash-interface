@@ -5,17 +5,24 @@ import {
     sendTransactions,
     useGetAccountInfo,
     useGetLoginInfo,
-    useGetNetworkConfig
+    useGetNetworkConfig,
+    useGetSignedTransactions,
+    useGetPendingTransactions,
 } from "@elrondnetwork/dapp-core";
 import { SendTransactionReturnType } from "@elrondnetwork/dapp-core/dist/services/transactions";
 import {
     Address,
     AddressValue,
-    ApiProvider, BigUIntValue,
+    ApiProvider,
+    BigUIntValue,
     BytesValue,
-    ContractFunction, GasLimit, ProxyProvider,
-    Query, TokenIdentifierValue,
-    Transaction, TypedValue
+    ContractFunction,
+    GasLimit,
+    ProxyProvider,
+    Query,
+    TokenIdentifierValue,
+    Transaction,
+    TypedValue,
 } from "@elrondnetwork/erdjs/out";
 import BigNumber from "bignumber.js";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
@@ -27,9 +34,7 @@ import useContracts from "context/contracts";
 import { useWallet } from "context/wallet";
 import { toEGLD, toEGLDD } from "helper/balance";
 import { fetcher } from "helper/common";
-import {
-    useCreateTransaction
-} from "helper/transactionMethods";
+import { useCreateTransaction } from "helper/transactionMethods";
 import { DappSendTransactionsPropsType } from "interface/dappCore";
 import { IFarm } from "interface/farm";
 import IPool from "interface/pool";
@@ -42,7 +47,7 @@ import {
     useContext,
     useEffect,
     useMemo,
-    useState
+    useState,
 } from "react";
 import useSWR from "swr";
 import { useDebounce } from "use-debounce";
@@ -103,6 +108,7 @@ export type FarmsState = {
     keyword: string;
     stakedOnly: boolean;
     inactive: boolean;
+    loadingMap: Record<string, boolean>;
     setSortOption: Dispatch<SetStateAction<"apr" | "liquidity" | "volume">>;
     setKeyword: Dispatch<SetStateAction<string>>;
     setStakedOnly: Dispatch<SetStateAction<boolean>>;
@@ -126,6 +132,7 @@ const initState: FarmsState = {
     keyword: "",
     stakedOnly: false,
     inactive: false,
+    loadingMap: {},
     setSortOption: emptyFunc,
     setKeyword: emptyFunc,
     setStakedOnly: emptyFunc,
@@ -155,6 +162,14 @@ const FarmsProvider = ({ children }: any) => {
     const [blockRewardMap, setBlockRewardMap] = useState<
         Record<string, BigNumber>
     >({});
+    const [loadingMap, setLoadingMap] = useState<FarmsState["loadingMap"]>({});
+    const [sessionIdsMap, setSessionIdsMap] = useState<
+        Record<string, string[]>
+    >({});
+    const signedTransactionsFromStore =
+        useGetSignedTransactions().signedTransactions;
+    const pendingTransactionsFromStore =
+        useGetPendingTransactions().pendingTransactions;
     const { getTokenInLP, getLPValue } = useContracts();
     const createTransaction = useCreateTransaction();
     const { isLoggedIn: loggedIn } = useGetLoginInfo();
@@ -183,12 +198,12 @@ const FarmsProvider = ({ children }: any) => {
     const getSNFTAttrs = useCallback(
         async (sftId: string) => {
             if (!loggedIn) return;
-            return await apiProvider.doGetGeneric(
-                `accounts/${new Address(
-                    address
-                ).bech32()}/nfts/${sftId}`,
-                (res) => res
-            ).catch(() => {});
+            return await apiProvider
+                .doGetGeneric(
+                    `accounts/${new Address(address).bech32()}/nfts/${sftId}`,
+                    (res) => res
+                )
+                .catch(() => {});
         },
         [loggedIn, apiProvider, address]
     );
@@ -250,11 +265,7 @@ const FarmsProvider = ({ children }: any) => {
     );
 
     const getReward = useCallback(
-        async (
-            farm: IFarm,
-            amt: BigNumber,
-            sftId: string
-        ) => {
+        async (farm: IFarm, amt: BigNumber, sftId: string) => {
             if (!loggedIn) return new BigNumber(0);
             const data = await getSNFTAttrs(sftId);
             if (!data?.attributes) return new BigNumber(0);
@@ -350,11 +361,7 @@ const FarmsProvider = ({ children }: any) => {
                 );
                 if (isFarmed) {
                     const rewards = farmTokens.map((t) =>
-                        getReward(
-                            f,
-                            t.balance,
-                            t.tokenId
-                        )
+                        getReward(f, t.balance, t.tokenId)
                     );
                     const totalRewards = await Promise.all(rewards);
                     record.stakedData = {
@@ -438,7 +445,16 @@ const FarmsProvider = ({ children }: any) => {
                         )} ${farm.farming_token_id}`,
                     },
                 };
-                return await sendTransactions(payload);
+                const result = await sendTransactions(payload);
+                if (result.sessionId)
+                    setSessionIdsMap((val) => ({
+                        ...val,
+                        [farm.farm_address]: [
+                            ...(val[farm.farm_address] || []),
+                            result.sessionId!,
+                        ],
+                    }));
+                return result;
             } catch (error) {
                 console.log(error);
             }
@@ -473,30 +489,44 @@ const FarmsProvider = ({ children }: any) => {
     const exitFarm: FarmsState["exitFarm"] = useCallback(
         async (lpAmt: BigNumber, farm: IFarm) => {
             if (!loggedIn) return { sessionId: "" };
-            const farmRecord = farmRecords.find(
-                (val) => val.farm.farm_address === farm.farm_address
-            );
-            if (!farmRecord || !farmRecord.stakedData)
-                return { sessionId: "" };
-            const { stakedData } = farmRecord;
-            const farmTokens = stakedData.farmTokens || [];
-            let txs: Transaction[] = [];
-            const entries = calcUnstakeEntries(lpAmt, farmTokens);
-            const exitFarmTxCreators = entries.map(
-                ({ farmToken: { collection, nonce }, unstakeAmt }) =>
-                    createExitFarmTx(unstakeAmt, collection, nonce, farm)
-            );
-            txs = await Promise.all(exitFarmTxCreators);
-            const payload: DappSendTransactionsPropsType = {
-                transactions: txs.filter((tx) => !!tx) as Transaction[],
-                transactionsDisplayInfo: {
-                    successMessage: `Unstake succeed ${toEGLDD(
-                        farm.farming_token_decimal,
-                        lpAmt
-                    )} ${farm.farming_token_id}`,
-                },
-            };
-            return await sendTransactions(payload);
+            try {
+                const farmRecord = farmRecords.find(
+                    (val) => val.farm.farm_address === farm.farm_address
+                );
+                if (!farmRecord || !farmRecord.stakedData)
+                    return { sessionId: "" };
+                const { stakedData } = farmRecord;
+                const farmTokens = stakedData.farmTokens || [];
+                let txs: Transaction[] = [];
+                const entries = calcUnstakeEntries(lpAmt, farmTokens);
+                const exitFarmTxCreators = entries.map(
+                    ({ farmToken: { collection, nonce }, unstakeAmt }) =>
+                        createExitFarmTx(unstakeAmt, collection, nonce, farm)
+                );
+                txs = await Promise.all(exitFarmTxCreators);
+                const payload: DappSendTransactionsPropsType = {
+                    transactions: txs.filter((tx) => !!tx) as Transaction[],
+                    transactionsDisplayInfo: {
+                        successMessage: `Unstake succeed ${toEGLDD(
+                            farm.farming_token_decimal,
+                            lpAmt
+                        )} ${farm.farming_token_id}`,
+                    },
+                };
+                const result = await sendTransactions(payload);
+                if (result.sessionId)
+                    setSessionIdsMap((val) => ({
+                        ...val,
+                        [farm.farm_address]: [
+                            ...(val[farm.farm_address] || []),
+                            result.sessionId!,
+                        ],
+                    }));
+                return result;
+            } catch (error) {
+                console.error(error);
+            }
+            return { sessionId: "" };
         },
         [createExitFarmTx, farmRecords, loggedIn]
     );
@@ -513,11 +543,7 @@ const FarmsProvider = ({ children }: any) => {
                 farmRecord.stakedData.farmTokens
             );
             const rewards = entries.map(({ unstakeAmt, farmToken }) =>
-                getReward(
-                    farm,
-                    unstakeAmt,
-                    farmToken.tokenId
-                )
+                getReward(farm, unstakeAmt, farmToken.tokenId)
             );
             const totalRewards = await Promise.all(rewards);
             return totalRewards.reduce(
@@ -578,18 +604,31 @@ const FarmsProvider = ({ children }: any) => {
             );
             if (!farmRecord || !farmRecord.stakedData)
                 throw new Error("unable to claim reward");
-            const { stakedData } = farmRecord;
-            const txs = await createClaimRewardTxs(farmRecord);
-            const payload: DappSendTransactionsPropsType = {
-                transactions: txs,
-                transactionsDisplayInfo: {
-                    successMessage: `Claim succeed ${toEGLDD(
-                        ASH_TOKEN.decimals,
-                        stakedData.totalRewardAmt
-                    )} ${ASH_TOKEN.name}`,
-                },
-            };
-            await sendTransactions(payload);
+
+            try {
+                const { stakedData } = farmRecord;
+                const txs = await createClaimRewardTxs(farmRecord);
+                const payload: DappSendTransactionsPropsType = {
+                    transactions: txs,
+                    transactionsDisplayInfo: {
+                        successMessage: `Claim succeed ${toEGLDD(
+                            ASH_TOKEN.decimals,
+                            stakedData.totalRewardAmt
+                        )} ${ASH_TOKEN.name}`,
+                    },
+                };
+                const result = await sendTransactions(payload);
+                if (result.sessionId)
+                    setSessionIdsMap((val) => ({
+                        ...val,
+                        [farm.farm_address]: [
+                            ...(val[farm.farm_address] || []),
+                            result.sessionId!,
+                        ],
+                    }));
+            } catch (error) {
+                console.error(error);
+            }
         },
         [createClaimRewardTxs, farmRecords]
     );
@@ -597,12 +636,14 @@ const FarmsProvider = ({ children }: any) => {
     const claimAllReward = useCallback(async () => {
         let txs: Transaction[] = [];
         let totalASH = new BigNumber(0);
+        const farmsAddress: string[] = [];
         for (let i = 0; i < farmRecords.length; i++) {
             const val = farmRecords[i];
             if (val?.stakedData?.totalRewardAmt.gt(0)) {
                 const temp = await createClaimRewardTxs(val);
                 txs = [...txs, ...temp];
                 totalASH = totalASH.plus(val.stakedData.totalRewardAmt);
+                farmsAddress.push(val.farm.farm_address);
             }
         }
         const payload: DappSendTransactionsPropsType = {
@@ -614,7 +655,17 @@ const FarmsProvider = ({ children }: any) => {
                 )} ${ASH_TOKEN.name}`,
             },
         };
-        await sendTransactions(payload);
+        const result = await sendTransactions(payload);
+        if (result.sessionId)
+            setSessionIdsMap((val) => ({
+                ...val,
+                ...Object.fromEntries(
+                    farmsAddress.map((farm_address) => [
+                        farm_address,
+                        [...(val[farm_address] || []), result.sessionId!],
+                    ])
+                ),
+            }));
     }, [farmRecords, createClaimRewardTxs]);
 
     useEffect(() => {
@@ -624,6 +675,26 @@ const FarmsProvider = ({ children }: any) => {
     useEffect(() => {
         getFarmRecords();
     }, [getFarmRecords]);
+
+    useEffect(() => {
+        if (Object.keys(sessionIdsMap).length > 0) {
+            if (Object.keys(pendingTransactionsFromStore).length > 0) {
+                const entries = Object.entries(sessionIdsMap).map(
+                    ([farm_address, sessionIds]) => {
+                        return [
+                            farm_address,
+                            sessionIds.some(
+                                (id) => id in pendingTransactionsFromStore
+                            ),
+                        ];
+                    }
+                );
+                setLoadingMap(Object.fromEntries(entries));
+            } else {
+                setLoadingMap({});
+            }
+        }
+    }, [sessionIdsMap, pendingTransactionsFromStore]);
 
     const poolToDisplay = useMemo(() => {
         let result: FarmRecord[] = [...farmRecords].filter((p) =>
@@ -674,6 +745,7 @@ const FarmsProvider = ({ children }: any) => {
                 keyword,
                 stakedOnly,
                 inactive,
+                loadingMap,
                 setSortOption,
                 setKeyword,
                 setStakedOnly,
