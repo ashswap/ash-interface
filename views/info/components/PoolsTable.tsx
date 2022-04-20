@@ -9,14 +9,14 @@ import { useScreenSize } from "hooks/useScreenSize";
 import IPool from "interface/pool";
 import { PoolStatsRecord } from "interface/poolStats";
 import Image from "next/image";
+import Link from "next/link";
 import React, { useCallback, useMemo, useState } from "react";
 import useSWR from "swr";
 const currencyFormater = new Intl.NumberFormat("en-US", {
     maximumFractionDigits: 2,
 });
 
-
-type PoolWithStatsRecords = PoolStatsRecord & {pool?: IPool};
+type PoolWithStatsRecords = PoolStatsRecord & { pool?: IPool };
 const PoolRecord = ({
     active,
     order,
@@ -45,55 +45,62 @@ const PoolRecord = ({
         return format(poolData.total_value_locked);
     }, [format, poolData.total_value_locked]);
     return (
-        <div className="flex items-center bg-ash-dark-600 hover:bg-ash-dark-700 px-4 lg:px-[1.625rem] text-ash-gray-500 space-x-2 text-xs h-14 overflow-hidden">
-            {/* <div className="w-5">
+        <Link href={`/info/pools/${poolData.pool_address}`}>
+            <a>
+                <div className="flex items-center bg-ash-dark-600 hover:bg-ash-dark-700 px-4 lg:px-[1.625rem] text-ash-gray-500 space-x-2 text-xs h-14 overflow-hidden">
+                    {/* <div className="w-5">
                 {active ? (
                     <ICStar className="w-4 h-4 text-pink-600" />
                 ) : (
                     <ICStarOutline className="w-4 h-4 text-ash-gray-500" />
                 )}
             </div> */}
-            <div className="w-5">{order}</div>
-            <div className="flex-1 overflow-hidden">
-                <div className="flex items-center mr-2 overflow-hidden">
-                    <div className="flex-shrink-0 flex">
-                        <div className="w-4 h-4 lg:w-6 lg:h-6">
-                            <Image
-                                src={token1?.icon || ""}
-                                alt="token"
-                                width={24}
-                                height={24}
-                            />
-                        </div>
-                        <div className="w-4 h-4 lg:w-6 lg:h-6 -ml-1">
-                            <Image
-                                src={token2?.icon || ""}
-                                alt="token"
-                                width={24}
-                                height={24}
-                            />
+                    <div className="w-5">{order}</div>
+                    <div className="flex-1 overflow-hidden">
+                        <div className="flex items-center mr-2 overflow-hidden">
+                            <div className="flex-shrink-0 flex">
+                                <div className="w-4 h-4 lg:w-6 lg:h-6">
+                                    <Image
+                                        src={token1?.icon || ""}
+                                        alt="token"
+                                        width={24}
+                                        height={24}
+                                    />
+                                </div>
+                                <div className="w-4 h-4 lg:w-6 lg:h-6 -ml-1">
+                                    <Image
+                                        src={token2?.icon || ""}
+                                        alt="token"
+                                        width={24}
+                                        height={24}
+                                    />
+                                </div>
+                            </div>
+                            <div className="ml-2 lg:ml-4 font-bold text-xs lg:text-sm text-white truncate">
+                                {token1?.name} & {token2?.name}
+                            </div>
                         </div>
                     </div>
-                    <div className="ml-2 lg:ml-4 font-bold text-xs lg:text-sm text-white truncate">
-                        {token1?.name} & {token2?.name}
+                    <div className="w-16 lg:w-24 xl:w-32 text-xs text-right">
+                        <span className="text-ash-gray-500">$</span>
+                        <span className="text-white">{volume}</span>
+                    </div>
+                    <div className="w-16 lg:w-24 xl:w-32 text-xs text-right">
+                        <span className="text-ash-gray-500">$</span>
+                        <span className="text-white">{liquidity}</span>
+                    </div>
+                    <div className="hidden md:block w-16 lg:w-24 xl:w-32 text-xs text-right text-white">
+                        {poolData.apr_day
+                            ? poolData.apr_day?.toLocaleString("en-US")
+                            : "_"}
+                        %
                     </div>
                 </div>
-            </div>
-            <div className="w-16 lg:w-24 xl:w-32 text-xs text-right">
-                <span className="text-ash-gray-500">$</span>
-                <span className="text-white">{volume}</span>
-            </div>
-            <div className="w-16 lg:w-24 xl:w-32 text-xs text-right">
-                <span className="text-ash-gray-500">$</span>
-                <span className="text-white">{liquidity}</span>
-            </div>
-            <div className="hidden md:block w-16 lg:w-24 xl:w-32 text-xs text-right text-white">
-                {poolData.apr_day ? poolData.apr_day?.toLocaleString("en-US") : "_"}%
-            </div>
-        </div>
+            </a>
+        </Link>
     );
 };
-function PoolsTable({data} : {data: PoolStatsRecord[]}) {
+function PoolsTable({ data }: { data: PoolStatsRecord[] }) {
     const [pageIndex, setPageIndex] = useState(0);
     const [pageSize, setPageSize] = useState(10);
     const [sortBy, setSortBy] = useState<

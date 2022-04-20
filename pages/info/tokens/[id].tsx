@@ -254,6 +254,6 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
             props: { token },
         };
     }
-    return { props: {} };
+    return { props: {}, redirect: {permanent: true, destination: "/info/tokens"} };
 };
 export default TokenDetailPage;
