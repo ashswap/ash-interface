@@ -1,12 +1,8 @@
 import {
-    AccountInfoSliceNetworkType,
     loginServices,
-    useGetLoginInfo,
-    useGetNetworkConfig,
+    useGetLoginInfo
 } from "@elrondnetwork/dapp-core";
-import HeadlessModal, {
-    HeadlessModalDefaultHeader,
-} from "components/HeadlessModal";
+import BaseModal from "components/BaseModal";
 import { useWallet } from "context/wallet";
 import Image from "next/image";
 import platform from "platform";
@@ -55,125 +51,116 @@ function ConnectWalletModal() {
     }, [loggedIn, setIsOpenConnectWalletModal]);
     return (
         <>
-            <HeadlessModal
-                open={isOpenConnectWalletModal}
-                onClose={() =>
+            <BaseModal
+                isOpen={isOpenConnectWalletModal}
+                onRequestClose={() =>
                     setIsOpenConnectWalletModal(
                         isOpenDownloadExtension || isOpenDownloadApp
                     )
                 }
-                static={true}
+                className="clip-corner-4 clip-corner-tl bg-ash-dark-400 p-4 w-[33.75rem] max-w-[100vw] text-white mx-auto flex flex-col"
             >
-                <div className="clip-corner-4 clip-corner-tl bg-ash-dark-400 p-4 w-[33.75rem] max-w-[100vw] text-white mx-auto absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-                    <HeadlessModalDefaultHeader
-                        onClose={() =>
-                            setIsOpenConnectWalletModal(
-                                isOpenDownloadExtension || isOpenDownloadApp
-                            )
-                        }
-                    />
-                    <div className="px-3 py-8">
-                        <div
-                            className="flex justify-center bg-no-repeat bg-left bg-contain py-8 overflow-hidden"
-                            style={{
-                                backgroundImage: `url(${connectWalletBg.src})`,
-                            }}
-                        >
-                            {isOpenQR ? (
-                                <div>
-                                    <WalletConnect />
-                                    <div
-                                        className="text-ash-purple-500 uppercase text-xs sm:text-sm text-center font-bold cursor-pointer"
-                                        onClick={() =>
-                                            setIsOpenDownloadApp(true)
-                                        }
-                                    >
-                                        I DON’T HAVE MAIAR MOBILE APP
-                                    </div>
+                <div className="flex justify-end">
+                    <BaseModal.CloseBtn />
+                </div>
+                <div className="flex-grow px-3 py-8 overflow-auto">
+                    <div
+                        className="flex justify-center bg-no-repeat bg-left bg-contain py-8 overflow-hidden"
+                        style={{
+                            backgroundImage: `url(${connectWalletBg.src})`,
+                        }}
+                    >
+                        {isOpenQR ? (
+                            <div>
+                                <WalletConnect />
+                                <div
+                                    className="text-ash-purple-500 uppercase text-xs sm:text-sm text-center font-bold cursor-pointer"
+                                    onClick={() => setIsOpenDownloadApp(true)}
+                                >
+                                    I DON’T HAVE MAIAR MOBILE APP
                                 </div>
-                            ) : (
-                                <div className="flex flex-col pb-16 overflow-hidden">
-                                    <div className="font-bold text-2xl mb-20 text-center">
-                                        <span>Connect to </span>
+                            </div>
+                        ) : (
+                            <div className="flex flex-col pb-16 overflow-hidden">
+                                <div className="font-bold text-2xl mb-20 text-center">
+                                    <span>Connect to </span>
+                                    <span className="text-ash-blue-500">
+                                        Maiar Wallet
+                                    </span>
+                                </div>
+                                <div
+                                    className="max-w-full w-[21.875rem] h-24 bg-ash-dark-600 cursor-pointer flex items-center px-6 mb-4"
+                                    onClick={extensionLogin}
+                                >
+                                    <div className="mr-[1.625rem]">
+                                        <ICConnectExtension
+                                            className={`${styles.connectIcon} w-16 inline text-ash-blue-500`}
+                                        />
+                                    </div>
+                                    <div className="text-sm font-bold uppercase">
+                                        <span>Maiar </span>
                                         <span className="text-ash-blue-500">
-                                            Maiar Wallet
+                                            web extension
                                         </span>
                                     </div>
-                                    <div
-                                        className="max-w-full w-[21.875rem] h-24 bg-ash-dark-600 cursor-pointer flex items-center px-6 mb-4"
-                                        onClick={extensionLogin}
-                                    >
-                                        <div className="mr-[1.625rem]">
-                                            <ICConnectExtension
-                                                className={`${styles.connectIcon} w-16 inline text-ash-blue-500`}
-                                            />
-                                        </div>
-                                        <div className="text-sm font-bold uppercase">
-                                            <span>Maiar </span>
-                                            <span className="text-ash-blue-500">
-                                                web extension
-                                            </span>
-                                        </div>
+                                </div>
+                                <div
+                                    className="max-w-full w-[21.875rem] h-24 bg-ash-dark-600 cursor-pointer flex items-center px-6"
+                                    onClick={() => setIsOpenQR(true)}
+                                >
+                                    <div className="mr-[1.625rem] w-16 text-center">
+                                        <ICConnectApp
+                                            className={`${styles.connectIcon} h-16 inline text-ash-blue-500`}
+                                        />
                                     </div>
-                                    <div
-                                        className="max-w-full w-[21.875rem] h-24 bg-ash-dark-600 cursor-pointer flex items-center px-6"
-                                        onClick={() => setIsOpenQR(true)}
-                                    >
-                                        <div className="mr-[1.625rem] w-16 text-center">
-                                            <ICConnectApp
-                                                className={`${styles.connectIcon} h-16 inline text-ash-blue-500`}
-                                            />
-                                        </div>
-                                        <div className="text-sm font-bold uppercase">
-                                            <span>Maiar </span>
-                                            <span className="text-ash-blue-500">
-                                                mobile app
-                                            </span>
-                                        </div>
+                                    <div className="text-sm font-bold uppercase">
+                                        <span>Maiar </span>
+                                        <span className="text-ash-blue-500">
+                                            mobile app
+                                        </span>
                                     </div>
                                 </div>
-                            )}
-                        </div>
+                            </div>
+                        )}
                     </div>
                 </div>
-            </HeadlessModal>
-            <HeadlessModal
-                open={isOpenDownloadApp}
-                onClose={() => setIsOpenDownloadApp(false)}
+            </BaseModal>
+            <BaseModal
+                isOpen={isOpenDownloadApp}
+                onRequestClose={() => setIsOpenDownloadApp(false)}
+                className="clip-corner-4 clip-corner-tl bg-ash-dark-400 p-4 text-white w-[38.75rem] max-w-[100vw] mx-auto flex flex-col"
             >
-                <div className="clip-corner-4 clip-corner-tl bg-ash-dark-400 p-4 text-white w-[38.75rem] max-w-[100vw] mx-auto absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-                    <HeadlessModalDefaultHeader
-                        onClose={() => setIsOpenDownloadApp(false)}
-                    />
-                    <div className="flex flex-col items-center text-center py-10 px-6">
-                        <div className="text-lg sm:text-2xl font-bold mb-9">
-                            Install{" "}
-                            <span className="text-ash-blue-500">
-                                Maiar Wallet
-                            </span>{" "}
-                            App
+                <div className="flex justify-end">
+                    <BaseModal.CloseBtn />
+                </div>
+                <div className="flex-grow flex flex-col items-center text-center py-10 px-6">
+                    <div className="text-lg sm:text-2xl font-bold mb-9">
+                        Install{" "}
+                        <span className="text-ash-blue-500">Maiar Wallet</span>{" "}
+                        App
+                    </div>
+                    <div className="flex items-center space-x-8 mb-[5.5rem]">
+                        <ICConnectApp
+                            className={`${styles.dropShadowPink} text-pink-600 h-14 sm:h-[6.75rem] w-auto`}
+                        />
+                        <div className="flex items-center space-x-1">
+                            <div className="w-1.5 h-1.5 bg-pink-600"></div>
+                            <div className="w-1.5 h-1.5 bg-[#FF00B8]"></div>
+                            <div className="w-1.5 h-1.5 bg-[#8C1AC2]"></div>
+                            <div className="w-1.5 h-1.5 bg-[#1A45C2]"></div>
                         </div>
-                        <div className="flex items-center space-x-8 mb-[5.5rem]">
-                            <ICConnectApp
-                                className={`${styles.dropShadowPink} text-pink-600 h-14 sm:h-[6.75rem] w-auto`}
-                            />
-                            <div className="flex items-center space-x-1">
-                                <div className="w-1.5 h-1.5 bg-pink-600"></div>
-                                <div className="w-1.5 h-1.5 bg-[#FF00B8]"></div>
-                                <div className="w-1.5 h-1.5 bg-[#8C1AC2]"></div>
-                                <div className="w-1.5 h-1.5 bg-[#1A45C2]"></div>
-                            </div>
-                            <div className="relative w-9 h-9 sm:w-[4.75rem] sm:h-[4.75rem] flex items-center justify-center">
-                                <div className="bg-white rounded-lg md:rounded-2xl rotate-45 absolute w-full h-full"></div>
-                                <div className="w-4 h-4 sm:w-7 sm:h-7 relative">
-                                    <Image
-                                        src={maiarLogo}
-                                        alt="maiar logo"
-                                        layout="fill"
-                                    />
-                                </div>
+                        <div className="relative w-9 h-9 sm:w-[4.75rem] sm:h-[4.75rem] flex items-center justify-center">
+                            <div className="bg-white rounded-lg md:rounded-2xl rotate-45 absolute w-full h-full"></div>
+                            <div className="w-4 h-4 sm:w-7 sm:h-7 relative">
+                                <Image
+                                    src={maiarLogo}
+                                    alt="maiar logo"
+                                    layout="fill"
+                                />
                             </div>
                         </div>
+                    </div>
+                    <div className="overflow-auto max-w-full">
                         <div className="flex space-x-2 mb-7">
                             <a
                                 href={MAIAR_WALLET_LINK.PLAY_STORE}
@@ -224,79 +211,76 @@ function ConnectWalletModal() {
                                 <div className="absolute right-[-1px] h-3 border-r border-r-ash-dark-400"></div>
                             </a>
                         </div>
-                        <span
-                            className="cursor-pointer text-ash-gray-500 text-sm uppercase font-bold"
-                            onClick={() => setIsOpenDownloadApp(false)}
-                        >
-                            BACK TO QR SCAN
-                        </span>
                     </div>
+                    <span
+                        className="cursor-pointer text-ash-gray-500 text-sm uppercase font-bold"
+                        onClick={() => setIsOpenDownloadApp(false)}
+                    >
+                        BACK TO QR SCAN
+                    </span>
                 </div>
-            </HeadlessModal>
-            <HeadlessModal
-                open={isOpenDownloadExtension}
-                onClose={() => setIsOpenDownloadExtension(false)}
+            </BaseModal>
+            <BaseModal
+                isOpen={isOpenDownloadExtension}
+                onRequestClose={() => setIsOpenDownloadExtension(false)}
+                className="clip-corner-4 clip-corner-tl bg-ash-dark-400 p-4 text-white w-[38.75rem] max-w-[100vw] mx-auto flex flex-col"
             >
-                <div className="clip-corner-4 clip-corner-tl bg-ash-dark-400 p-4 text-white w-[38.75rem] max-w-[100vw] absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-                    <HeadlessModalDefaultHeader
-                        onClose={() => setIsOpenDownloadExtension(false)}
-                    />
-                    <div className="flex flex-col items-center text-center overflow-hidden pt-6 pb-10 px-2 sm:px-6">
-                        <div className="text-lg sm:text-2xl font-bold mb-9">
-                            Install{" "}
-                            <span className="text-ash-blue-500">
-                                Maiar Wallet
-                            </span>{" "}
-                            on your Brower
-                        </div>
-                        <div className="flex items-center space-x-8 mb-[5.5rem]">
-                            <ICConnectExtension
-                                className={`${styles.dropShadowPink} text-pink-600 w-14 sm:w-[6.75rem] h-auto`}
-                            />
-                            <div className="flex items-center space-x-1">
-                                <div className="w-1.5 h-1.5 bg-pink-600"></div>
-                                <div className="w-1.5 h-1.5 bg-[#FF00B8]"></div>
-                                <div className="w-1.5 h-1.5 bg-[#8C1AC2]"></div>
-                                <div className="w-1.5 h-1.5 bg-[#1A45C2]"></div>
-                            </div>
-                            <div className="relative w-9 h-9 sm:w-[4.75rem] sm:h-[4.75rem] flex items-center justify-center">
-                                <div className="bg-white rounded-lg sm:rounded-2xl rotate-45 absolute w-full h-full"></div>
-                                <div className="w-4 h-4 sm:w-7 sm:h-7 relative">
-                                    <Image
-                                        src={maiarLogo}
-                                        alt="maiar logo"
-                                        layout="fill"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                        <a
-                            href={MAIAR_WALLET_LINK.CHROME_EXT}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="border border-white/50 relative inline-flex items-center p-1 cursor-pointer mb-5 max-w-full"
-                        >
-                            <div className="absolute left-[-1px] h-3 border-l border-l-ash-dark-400"></div>
-                            <div className="clip-corner-1 clip-corner-tl bg-ash-blue-500 uppercase font-bold text-sm h-12 flex justify-center items-center text-center w-96 max-w-full text-white px-4">
-                                <span className="truncate">
-                                    Download maiar extension
-                                </span>
-                            </div>
-                            <div className="absolute right-[-1px] h-3 border-r border-r-ash-dark-400"></div>
-                        </a>
-                        <span
-                            className="cursor-pointer text-ash-gray-500 text-xs sm:text-sm uppercase font-bold"
-                            onClick={() => {
-                                setIsOpenDownloadExtension(false);
-                                setIsOpenQR(true);
-                            }}
-                        >
-                            <span>Or, use </span>
-                            <span className="text-white">maiar mobile app</span>
-                        </span>
-                    </div>
+                <div className="flex justify-end">
+                    <BaseModal.CloseBtn />
                 </div>
-            </HeadlessModal>
+                <div className="flex-grow flex flex-col items-center text-center pt-6 pb-10 px-2 sm:px-6">
+                    <div className="text-lg sm:text-2xl font-bold mb-9">
+                        Install{" "}
+                        <span className="text-ash-blue-500">Maiar Wallet</span>{" "}
+                        on your Brower
+                    </div>
+                    <div className="flex items-center space-x-8 mb-[5.5rem]">
+                        <ICConnectExtension
+                            className={`${styles.dropShadowPink} text-pink-600 w-14 sm:w-[6.75rem] h-auto`}
+                        />
+                        <div className="flex items-center space-x-1">
+                            <div className="w-1.5 h-1.5 bg-pink-600"></div>
+                            <div className="w-1.5 h-1.5 bg-[#FF00B8]"></div>
+                            <div className="w-1.5 h-1.5 bg-[#8C1AC2]"></div>
+                            <div className="w-1.5 h-1.5 bg-[#1A45C2]"></div>
+                        </div>
+                        <div className="relative w-9 h-9 sm:w-[4.75rem] sm:h-[4.75rem] flex items-center justify-center">
+                            <div className="bg-white rounded-lg sm:rounded-2xl rotate-45 absolute w-full h-full"></div>
+                            <div className="w-4 h-4 sm:w-7 sm:h-7 relative">
+                                <Image
+                                    src={maiarLogo}
+                                    alt="maiar logo"
+                                    layout="fill"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <a
+                        href={MAIAR_WALLET_LINK.CHROME_EXT}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="border border-white/50 relative inline-flex items-center p-1 cursor-pointer mb-5 max-w-full"
+                    >
+                        <div className="absolute left-[-1px] h-3 border-l border-l-ash-dark-400"></div>
+                        <div className="clip-corner-1 clip-corner-tl bg-ash-blue-500 uppercase font-bold text-sm h-12 flex justify-center items-center text-center w-96 max-w-full text-white px-4">
+                            <span className="truncate">
+                                Download maiar extension
+                            </span>
+                        </div>
+                        <div className="absolute right-[-1px] h-3 border-r border-r-ash-dark-400"></div>
+                    </a>
+                    <span
+                        className="cursor-pointer text-ash-gray-500 text-xs sm:text-sm uppercase font-bold"
+                        onClick={() => {
+                            setIsOpenDownloadExtension(false);
+                            setIsOpenQR(true);
+                        }}
+                    >
+                        <span>Or, use </span>
+                        <span className="text-white">maiar mobile app</span>
+                    </span>
+                </div>
+            </BaseModal>
         </>
     );
 }

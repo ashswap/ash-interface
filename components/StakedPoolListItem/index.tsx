@@ -1,30 +1,29 @@
-import ICArrowBottomRight from "assets/svg/arrow-bottom-right.svg";
-import ICArrowTopRight from "assets/svg/arrow-top-right.svg";
 import ICChevronDown from "assets/svg/chevron-down.svg";
 import ICChevronUp from "assets/svg/chevron-up.svg";
 import ICMinus from "assets/svg/minus.svg";
 import ICPlus from "assets/svg/plus.svg";
 import AddLiquidityModal from "components/AddLiquidityModal";
-import HeadlessModal, {
-    HeadlessModalDefaultHeader
-} from "components/HeadlessModal";
+import BaseModal from "components/BaseModal";
 import RemoveLiquidityModal from "components/RemoveLiquidityModal";
 import { PoolsState } from "context/pools";
-import { toEGLD } from "helper/balance";
-import { abbreviateCurrency, currencyFormater } from "helper/number";
+import { abbreviateCurrency } from "helper/number";
 import usePoolDataFormat from "hooks/usePoolDataFormat";
 import { useScreenSize } from "hooks/useScreenSize";
 import { Unarray } from "interface/utilities";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
-const StakedPoolListItem = ({poolData}: {poolData: Unarray<PoolsState["poolToDisplay"]>}) => {
+const StakedPoolListItem = ({
+    poolData,
+}: {
+    poolData: Unarray<PoolsState["poolToDisplay"]>;
+}) => {
     const [openAddLiquidity, setOpenAddLiquidity] = useState(false);
     const [openRemoveLiquidity, setOpenRemoveLiquidity] = useState(false);
     const [isExpand, setIsExpand] = useState(false);
     const [mIsExpand, setMIsExpand] = useState(false);
-    const {isMobile} = useScreenSize();
-    const {pool, poolStats, liquidityData} = poolData;
+    const { isMobile } = useScreenSize();
+    const { pool, poolStats, liquidityData } = poolData;
     const {
         formatedStats: { TVL, emissionAPR, tradingAPR, volumn24h },
         formatedStakedData: {
@@ -33,14 +32,14 @@ const StakedPoolListItem = ({poolData}: {poolData: Unarray<PoolsState["poolToDis
             fOwnLiquidity,
             fValue0,
             fValue1,
-        }
+        },
     } = usePoolDataFormat(poolData);
     useEffect(() => {
         if (isMobile) {
             setIsExpand(false);
         }
     }, [isMobile]);
-    if(!liquidityData) return null;
+    if (!liquidityData) return null;
 
     return (
         <>
@@ -67,9 +66,7 @@ const StakedPoolListItem = ({poolData}: {poolData: Unarray<PoolsState["poolToDis
                                             />
                                         </div>
                                     </div>
-                                    <div
-                                        className="text-2xs hidden sm:block px-3 font-bold"
-                                    >
+                                    <div className="text-2xs hidden sm:block px-3 font-bold">
                                         &
                                     </div>
                                     <div className="sm:flex sm:flex-col font-bold text-xs lg:text-lg truncate">
@@ -109,7 +106,11 @@ const StakedPoolListItem = ({poolData}: {poolData: Unarray<PoolsState["poolToDis
                                 {/* {capacityPercent.toFixed(3)}% */}
                                 <span className="inline-block mr-1">
                                     <span className="text-ash-gray-500">$</span>
-                                    <span>{abbreviateCurrency(liquidityData.lpValueUsd.toNumber())}</span>
+                                    <span>
+                                        {abbreviateCurrency(
+                                            liquidityData.lpValueUsd.toNumber()
+                                        )}
+                                    </span>
                                 </span>
                                 {/* {isExpand && (
                                     <span className="inline-block text-ash-green-500 font-bold text-2xs">
@@ -198,7 +199,9 @@ const StakedPoolListItem = ({poolData}: {poolData: Unarray<PoolsState["poolToDis
                                 </div>
                                 <div className="bg-ash-dark-400 h-12 px-4 flex justify-between items-center">
                                     <div className="text-2xs">LP Tokens</div>
-                                    <div className="text-sm">{fOwnLiquidity}</div>
+                                    <div className="text-sm">
+                                        {fOwnLiquidity}
+                                    </div>
                                 </div>
                                 <div className="bg-ash-dark-400 h-12 px-4 flex justify-between items-center">
                                     <div className="text-2xs">Trading APR</div>
@@ -208,7 +211,9 @@ const StakedPoolListItem = ({poolData}: {poolData: Unarray<PoolsState["poolToDis
                                     <div className="text-2xs">
                                         Emissions APR
                                     </div>
-                                    <div className="text-sm">{emissionAPR}%</div>
+                                    <div className="text-sm">
+                                        {emissionAPR}%
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -234,20 +239,23 @@ const StakedPoolListItem = ({poolData}: {poolData: Unarray<PoolsState["poolToDis
                 </div>
             </div> */}
             </div>
-            <HeadlessModal
-                open={mIsExpand}
-                onClose={() => setMIsExpand(false)}
-                transition="btt"
+            <BaseModal
+                isOpen={mIsExpand}
+                onRequestClose={() => setMIsExpand(false)}
+                type="drawer_btt"
+                className="bg-ash-dark-600 clip-corner-4 clip-corner-tr p-4 text-white max-h-full flex flex-col"
             >
-                <div className="bg-ash-dark-600 clip-corner-4 clip-corner-tr p-4 fixed inset-x-0 bottom-0 text-white max-h-screen overflow-auto">
-                    <HeadlessModalDefaultHeader
-                        onClose={() => setMIsExpand(false)}
-                    />
-                    <div className="px-6 pt-16 pb-7">
+                <div className="flex justify-end mb-16">
+                    <BaseModal.CloseBtn />
+                </div>
+                <div className="flex-grow overflow-auto">
+                    <div className="px-6 pb-7">
                         <div className="grid grid-cols-2 gap-1 items-end mb-8">
                             <div>
                                 <div className="font-bold mb-8">
-                                    <div className="text-2xl">{pool.tokens[0].name}</div>
+                                    <div className="text-2xl">
+                                        {pool.tokens[0].name}
+                                    </div>
                                     <div className="flex items-center">
                                         <div className="text-earn text-lg mr-3">
                                             {fValue0}
@@ -259,7 +267,9 @@ const StakedPoolListItem = ({poolData}: {poolData: Unarray<PoolsState["poolToDis
                                     </div>
                                 </div>
                                 <div className="font-bold mb-9">
-                                    <div className="text-2xl">{pool.tokens[1].name}</div>
+                                    <div className="text-2xl">
+                                        {pool.tokens[1].name}
+                                    </div>
                                     <div className="flex items-center">
                                         <div className="text-earn text-lg mr-3">
                                             {fValue1}
@@ -412,7 +422,7 @@ const StakedPoolListItem = ({poolData}: {poolData: Unarray<PoolsState["poolToDis
                         </div>
                     </div>
                 </div>
-            </HeadlessModal>
+            </BaseModal>
             <AddLiquidityModal
                 open={openAddLiquidity}
                 onClose={() => setOpenAddLiquidity(false)}

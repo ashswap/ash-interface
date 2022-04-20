@@ -1,7 +1,5 @@
 import { Menu, Transition } from "@headlessui/react";
-import HeadlessModal, {
-    HeadlessModalDefaultHeader,
-} from "components/HeadlessModal";
+import BaseModal from "components/BaseModal";
 import { TAILWIND_BREAKPOINT } from "const/mediaQueries";
 import useMediaQuery from "hooks/useMediaQuery";
 import Image from "next/image";
@@ -64,7 +62,7 @@ function SocialMenu() {
         `(max-width: ${TAILWIND_BREAKPOINT.SM}px)`
     );
     return (
-        <>
+        <div>
             <Menu
                 as="div"
                 className="hidden sm:flex relative text-left items-center"
@@ -143,16 +141,17 @@ function SocialMenu() {
                             <ICChervonDown className="inline w-2 ml-1 transition-none" />
                         </div>
                     </div>
-                    <HeadlessModal
-                        open={mIsOpen}
-                        onClose={() => setMIsOpen(false)}
-                        transition="btt"
+                    <BaseModal
+                        isOpen={mIsOpen}
+                        onRequestClose={() => setMIsOpen(false)}
+                        type="drawer_btt"
+                        className="clip-corner-4 clip-corner-tl bg-ash-dark-600 p-4 text-white max-h-screen flex flex-col"
                     >
-                        <div className="clip-corner-4 clip-corner-tl bg-ash-dark-600 p-4 fixed inset-x-0 bottom-0 text-white max-h-screen overflow-auto">
-                            <HeadlessModalDefaultHeader
-                                onClose={() => setMIsOpen(false)}
-                            />
-                            <div className="px-6 py-[3.75rem]">
+                        <div className="flex justify-end mb-3.5">
+                            <BaseModal.CloseBtn />
+                        </div>
+                        <div className="flex-grow overflow-auto">
+                            <div className="px-6 pb-[3.75rem]">
                                 <div className="mb-9 text-2xl font-bold">
                                     Social
                                 </div>
@@ -184,10 +183,10 @@ function SocialMenu() {
                                 </div>
                             </div>
                         </div>
-                    </HeadlessModal>
+                    </BaseModal>
                 </>
             )}
-        </>
+        </div>
     );
 }
 

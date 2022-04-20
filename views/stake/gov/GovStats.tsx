@@ -5,10 +5,8 @@ import ICChevronUp from "assets/svg/chevron-up.svg";
 import ICLock from "assets/svg/lock.svg";
 import ICUnlock from "assets/svg/unlock.svg";
 import ICWallet from "assets/svg/wallet.svg";
+import BaseModal from "components/BaseModal";
 import GOVStakeModal from "components/GOVStakeModal";
-import HeadlessModal, {
-    HeadlessModalDefaultHeader,
-} from "components/HeadlessModal";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 import { ASH_TOKEN, VE_ASH_DECIMALS } from "const/tokens";
 import { useStakeGov } from "context/gov";
@@ -437,75 +435,68 @@ function GovStats() {
                 open={openStakeGov}
                 onClose={() => setOpenStakeGov(false)}
             />
-            <HeadlessModal
-                open={openHarvestResult}
-                onClose={() => setOpenHarvestResult(false)}
-                transition={`${screenSize.isMobile ? "btt" : "center"}`}
+            <BaseModal
+                isOpen={openHarvestResult}
+                onRequestClose={() => setOpenHarvestResult(false)}
+                type={`${screenSize.isMobile ? "drawer_btt" : "modal"}`}
+                className="clip-corner-4 clip-corner-tl bg-stake-dark-400 mx-auto max-w-[33.75rem] flex flex-col max-h-full"
             >
-                <div className="clip-corner-4 clip-corner-tl bg-stake-dark-400 mx-auto max-w-[33.75rem] fixed bottom-0 inset-x-0 sm:static sm:mt-28 flex flex-col max-h-full">
-                    <div className="px-4 pt-4">
-                        <HeadlessModalDefaultHeader
-                            onClose={() => setOpenHarvestResult(false)}
-                        />
+                <div className="px-4 pt-4 flex justify-end mb-4">
+                    <BaseModal.CloseBtn />
+                </div>
+                <div className="flex-grow overflow-auto pt-10">
+                    <div className="px-[3.375rem] flex flex-col items-center pb-28 border-b border-dashed border-b-ash-gray-500">
+                        <div className="text-2xl font-bold text-stake-green-500 mb-12">
+                            Harvest successfully
+                        </div>
+                        {rewardLPToken && (
+                            <>
+                                <div className="flex items-center mb-9">
+                                    <div className="w-8 h-8">
+                                        <Image
+                                            src={rewardLPToken.tokens[0].icon}
+                                            layout="responsive"
+                                            alt="token icon"
+                                        />
+                                    </div>
+                                    <div className="w-8 h-8 -ml-1 mr-2">
+                                        <Image
+                                            src={rewardLPToken.tokens[1].icon}
+                                            layout="responsive"
+                                            alt="token icon"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="text-center text-ash-gray-500 text-lg font-bold">
+                                    ${fRewardValue} LP-
+                                    {rewardLPToken.tokens[0].name}
+                                    {rewardLPToken.tokens[0].name} has been sent
+                                    to your wallet
+                                </div>
+                            </>
+                        )}
                     </div>
-                    <div className="flex-grow overflow-auto pt-14">
-                        <div className="px-[3.375rem] flex flex-col items-center pb-28 border-b border-dashed border-b-ash-gray-500">
-                            <div className="text-2xl font-bold text-stake-green-500 mb-12">
-                                Harvest successfully
-                            </div>
-                            {rewardLPToken && (
-                                <>
-                                    <div className="flex items-center mb-9">
-                                        <div className="w-8 h-8">
-                                            <Image
-                                                src={
-                                                    rewardLPToken.tokens[0].icon
-                                                }
-                                                layout="responsive"
-                                                alt="token icon"
-                                            />
-                                        </div>
-                                        <div className="w-8 h-8 -ml-1 mr-2">
-                                            <Image
-                                                src={
-                                                    rewardLPToken.tokens[1].icon
-                                                }
-                                                layout="responsive"
-                                                alt="token icon"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="text-center text-ash-gray-500 text-lg font-bold">
-                                        ${fRewardValue} LP-
-                                        {rewardLPToken.tokens[0].name}
-                                        {rewardLPToken.tokens[0].name} has been
-                                        sent to your wallet
-                                    </div>
-                                </>
-                            )}
+                    <div className="px-[3.375rem] pb-8">
+                        <div className="text-center text-sm text-ash-gray-500 py-7">
+                            Suggest actions
                         </div>
-                        <div className="px-[3.375rem] pb-8">
-                            <div className="text-center text-sm text-ash-gray-500 py-7">
-                                Suggest actions
-                            </div>
-                            <Link href="/stake/farms" passHref>
-                                <a>
-                                    <button className="w-full text-center h-12 text-sm font-bold bg-ash-dark-400 text-ash-cyan-500 mb-4">
-                                        Stake for farming
-                                    </button>
-                                </a>
-                            </Link>
-                            <Link href="/pool" passHref>
-                                <a>
-                                    <button className="w-full text-center h-12 text-sm font-bold bg-ash-dark-400 text-pink-600">
-                                        Withdraw immediately
-                                    </button>
-                                </a>
-                            </Link>
-                        </div>
+                        <Link href="/stake/farms" passHref>
+                            <a>
+                                <button className="w-full text-center h-12 text-sm font-bold bg-ash-dark-400 text-ash-cyan-500 mb-4">
+                                    Stake for farming
+                                </button>
+                            </a>
+                        </Link>
+                        <Link href="/pool" passHref>
+                            <a>
+                                <button className="w-full text-center h-12 text-sm font-bold bg-ash-dark-400 text-pink-600">
+                                    Withdraw immediately
+                                </button>
+                            </a>
+                        </Link>
                     </div>
                 </div>
-            </HeadlessModal>
+            </BaseModal>
         </>
     );
 }

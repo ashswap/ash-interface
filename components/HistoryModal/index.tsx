@@ -1,8 +1,11 @@
-import { AccountInfoSliceNetworkType, useGetAccountInfo, useGetLoginInfo, useGetNetworkConfig } from "@elrondnetwork/dapp-core";
+import {
+    AccountInfoSliceNetworkType,
+    useGetAccountInfo,
+    useGetLoginInfo,
+    useGetNetworkConfig
+} from "@elrondnetwork/dapp-core";
 import IconNewTab from "assets/svg/new-tab.svg";
-import HeadlessModal, {
-    HeadlessModalDefaultHeader,
-} from "components/HeadlessModal";
+import BaseModal from "components/BaseModal";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 import pools from "const/pool";
 import { toEGLD } from "helper/balance";
@@ -153,16 +156,17 @@ const HistoryModal = ({ open, onClose }: Props) => {
     }, []);
 
     return (
-        <HeadlessModal
-            open={open}
-            onClose={() => onClose && onClose()}
-            transition={screenSize.msm ? "btt" : "center"}
+        <BaseModal
+            isOpen={open}
+            onRequestClose={() => onClose && onClose()}
+            type={screenSize.msm ? "drawer_btt" : "modal"}
+            className="clip-corner-4 clip-corner-tl bg-ash-dark-600 p-4 text-white w-full max-h-full mx-auto flex flex-col"
         >
-            <div className="clip-corner-4 clip-corner-tl bg-ash-dark-600 p-4 text-white max-h-[36rem] w-full sm:w-[21.875rem] sm:mt-28 mx-auto fixed bottom-0 sm:static">
-                <HeadlessModalDefaultHeader
-                    onClose={() => onClose && onClose()}
-                />
-                <div className="px-4 pt-3">
+            <div className="flex justify-end mb-3">
+                <BaseModal.CloseBtn />
+            </div>
+            <div className="flex-grow overflow-auto">
+                <div className="px-4">
                     <div className="font-bold text-2xl mb-5">History</div>
                     {displayTx.slice(0, 7).map((record) => {
                         if (!record) {
@@ -204,7 +208,7 @@ const HistoryModal = ({ open, onClose }: Props) => {
                     })}
                 </div>
             </div>
-        </HeadlessModal>
+        </BaseModal>
     );
 };
 

@@ -86,6 +86,6 @@ module.exports = {
     },
     plugins: [
         require('@tailwindcss/line-clamp'),
-        require('./tailwindPlugins/clip-corner')
+        require('./tailwindPlugins/clip-corner'),
     ],
 }

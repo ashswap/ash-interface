@@ -2,7 +2,7 @@ import {
     getProxyProvider,
     sendTransactions,
     useGetAccountInfo,
-    useGetLoginInfo,
+    useGetLoginInfo
 } from "@elrondnetwork/dapp-core";
 import {
     Address,
@@ -15,21 +15,15 @@ import {
     Query,
     TokenIdentifierValue,
     TypeExpressionParser,
-    TypeMapper,
+    TypeMapper
 } from "@elrondnetwork/erdjs";
-import { notification } from "antd";
-import IconNewTab from "assets/svg/new-tab-green.svg";
 import IconRight from "assets/svg/right-white.svg";
 import BigNumber from "bignumber.js";
+import BaseModal from "components/BaseModal";
 import Button from "components/Button";
 import Checkbox from "components/Checkbox";
-import HeadlessModal, {
-    HeadlessModalDefaultHeader,
-} from "components/HeadlessModal";
 import InputCurrency from "components/InputCurrency";
-import Switch from "components/Switch";
 import { gasLimit } from "const/dappConfig";
-import useContracts from "context/contracts";
 import { PoolsState } from "context/pools";
 import { useWallet } from "context/wallet";
 import { toEGLD, toWei } from "helper/balance";
@@ -423,7 +417,7 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
     }, [pool, tokenPrices, value0Debounce, value1Debounce]);
 
     return (
-        <div className="px-8 mt-6 pb-16 sm:pb-7 flex-grow overflow-auto">
+        <div className="px-8 pb-16 sm:pb-7 flex-grow overflow-auto">
             <div className="inline-flex justify-between items-center">
                 <div className="mr-2">
                     {/* <div className="text-text-input-3 text-xs">Deposit</div> */}
@@ -549,20 +543,21 @@ const AddLiquidityModal = (props: Props) => {
     const { open, onClose, poolData } = props;
     const screenSize = useScreenSize();
     return (
-        <HeadlessModal
-            open={!!open}
-            onClose={() => onClose && onClose()}
-            transition={screenSize.msm ? "btt" : "center"}
+        <BaseModal
+            isOpen={!!open}
+            onRequestClose={() => onClose && onClose()}
+            type={screenSize.msm ? "drawer_btt" : "modal"}
+            className={`clip-corner-4 clip-corner-tl bg-ash-dark-600 text-white p-4 flex flex-col max-h-full max-w-4xl mx-auto`}
         >
-            <div
-                className={`clip-corner-4 clip-corner-tl bg-ash-dark-600 text-white p-4 fixed bottom-0 inset-x-0 sm:static sm:mt-28 flex flex-col max-h-full max-w-4xl mx-auto`}
-            >
-                <HeadlessModalDefaultHeader
-                    onClose={() => onClose && onClose()}
-                />
-                <AddLiquidityContent {...props} />
+            <div className="flex justify-end mb-6">
+                <BaseModal.CloseBtn />
             </div>
-        </HeadlessModal>
+            {open && (
+                <div className="flex-grow overflow-auto">
+                    <AddLiquidityContent {...props} />
+                </div>
+            )}
+        </BaseModal>
     );
 };
 

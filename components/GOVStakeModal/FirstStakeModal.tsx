@@ -1,25 +1,22 @@
 import { Slider } from "antd";
+import ICChevronRight from "assets/svg/chevron-right.svg";
+import BigNumber from "bignumber.js";
+import BaseModal from "components/BaseModal";
 import Checkbox from "components/Checkbox";
-import HeadlessModal, {
-    HeadlessModalDefaultHeader,
-} from "components/HeadlessModal";
 import InputCurrency from "components/InputCurrency";
+import Tooltip from "components/Tooltip";
+import { ASH_TOKEN, VE_ASH_DECIMALS } from "const/tokens";
+import { useStakeGov } from "context/gov";
+import { useWallet } from "context/wallet";
+import { toEGLD, toEGLDD, toWei } from "helper/balance";
+import { fractionFormat } from "helper/number";
+import useMediaQuery from "hooks/useMediaQuery";
+import { useOnboarding } from "hooks/useOnboarding";
+import { useScreenSize } from "hooks/useScreenSize";
+import moment from "moment";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { theme } from "tailwind.config";
 import LockPeriod from "./LockPeriod";
-import ICChevronRight from "assets/svg/chevron-right.svg";
-import { ASH_TOKEN, VE_ASH_DECIMALS } from "const/tokens";
-import { useWallet } from "context/wallet";
-import { toEGLD, toEGLDD, toWei } from "helper/balance";
-import BigNumber from "bignumber.js";
-import moment from "moment";
-import { useStakeGov } from "context/gov";
-import { fractionFormat } from "helper/number";
-import { useScreenSize } from "hooks/useScreenSize";
-import { useOnboarding } from "hooks/useOnboarding";
-import Tooltip from "components/Tooltip";
-import useMediaQuery from "hooks/useMediaQuery";
-import { transactionServices } from "@elrondnetwork/dapp-core";
 type props = {
     open: boolean;
     onClose: () => void;
@@ -102,7 +99,7 @@ const FirstStakeContent = ({ open, onClose }: props) => {
     }, [isTouchScreen]);
     return (
         <>
-            <div className="mt-4 px-6 lg:px-20 pb-12 overflow-auto relative">
+            <div className="px-6 lg:px-20 pb-12 overflow-auto relative">
                 <div className="text-pink-600 text-2xl font-bold mb-9 lg:mb-14">
                     Governance Stake
                 </div>
@@ -390,16 +387,21 @@ function FirstStakeModal({ open, onClose }: props) {
     const { isMobile } = useScreenSize();
     return (
         <>
-            <HeadlessModal
-                open={open}
-                onClose={() => onClose()}
-                transition={`${isMobile ? "btt" : "center"}`}
+            <BaseModal
+                isOpen={open}
+                onRequestClose={() => onClose()}
+                type={`${isMobile ? "drawer_btt" : "modal"}`}
+                className="bg-stake-dark-400 p-4 sm:ash-container flex flex-col max-h-full"
             >
-                <div className="bg-stake-dark-400 p-4 fixed bottom-0 inset-x-0 sm:static sm:mt-28 sm:ash-container flex flex-col max-h-full">
-                    <HeadlessModalDefaultHeader onClose={() => onClose()} />
-                    <FirstStakeContent open={open} onClose={onClose} />
+                <div className="flex justify-end mb-4">
+                    <BaseModal.CloseBtn />
                 </div>
-            </HeadlessModal>
+                {open && (
+                    <div className="flex-grow overflow-auto">
+                        <FirstStakeContent open={open} onClose={onClose} />
+                    </div>
+                )}
+            </BaseModal>
         </>
     );
 }

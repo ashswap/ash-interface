@@ -1,25 +1,22 @@
+import ICArrowTopRight from "assets/svg/arrow-top-right.svg";
+import ICChevronRight from "assets/svg/chevron-right.svg";
+import BigNumber from "bignumber.js";
+import BaseModal from "components/BaseModal";
 import Checkbox from "components/Checkbox";
-import HeadlessModal, {
-    HeadlessModalDefaultHeader,
-} from "components/HeadlessModal";
 import InputCurrency from "components/InputCurrency";
+import Switch from "components/Switch";
+import Tooltip from "components/Tooltip";
+import { ASH_TOKEN, VE_ASH_DECIMALS } from "const/tokens";
+import { useStakeGov } from "context/gov";
+import { useWallet } from "context/wallet";
+import { toEGLDD, toWei } from "helper/balance";
+import { fractionFormat } from "helper/number";
+import useMediaQuery from "hooks/useMediaQuery";
+import { useOnboarding } from "hooks/useOnboarding";
+import { useScreenSize } from "hooks/useScreenSize";
+import moment from "moment";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import LockPeriod from "./LockPeriod";
-import ICChevronRight from "assets/svg/chevron-right.svg";
-import ICArrowTopRight from "assets/svg/arrow-top-right.svg";
-import moment from "moment";
-import Switch from "components/Switch";
-import { useScreenSize } from "hooks/useScreenSize";
-import { useStakeGov } from "context/gov";
-import { fractionFormat } from "helper/number";
-import { toEGLDD, toWei } from "helper/balance";
-import { ASH_TOKEN, VE_ASH_DECIMALS } from "const/tokens";
-import { useWallet } from "context/wallet";
-import BigNumber from "bignumber.js";
-import { useOnboarding } from "hooks/useOnboarding";
-import Tooltip from "components/Tooltip";
-import useMediaQuery from "hooks/useMediaQuery";
-import { transactionServices } from "@elrondnetwork/dapp-core";
 type props = {
     open: boolean;
     onClose: () => void;
@@ -207,7 +204,7 @@ const StakeMoreContent = ({ open, onClose }: props) => {
     }, [isTouchScreen]);
     return (
         <>
-            <div className="mt-4 px-6 lg:px-20 pb-12 overflow-auto relative">
+            <div className="px-6 lg:px-20 pb-12 overflow-auto relative">
                 <div className="text-pink-600 text-2xl font-bold mb-9 lg:mb-14">
                     Manage Your Governance Stake
                 </div>
@@ -562,16 +559,21 @@ function StakeMoreModal({ open, onClose }: props) {
 
     return (
         <>
-            <HeadlessModal
-                open={open}
-                onClose={() => onClose()}
-                transition={`${isMobile ? "btt" : "center"}`}
+            <BaseModal
+                isOpen={open}
+                onRequestClose={() => onClose()}
+                type={`${isMobile ? "drawer_btt" : "modal"}`}
+                className="bg-stake-dark-400 p-4 sm:ash-container flex flex-col max-h-[calc(100%-2.75rem)] sm:max-h-full"
             >
-                <div className="bg-stake-dark-400 p-4 fixed bottom-0 inset-x-0 sm:static sm:mt-28 sm:ash-container flex flex-col max-h-[calc(100%-2.75rem)] sm:max-h-full">
-                    <HeadlessModalDefaultHeader onClose={() => onClose()} />
-                    <StakeMoreContent open={open} onClose={onClose} />
+                <div className="flex justify-end mb-4">
+                    <BaseModal.CloseBtn />
                 </div>
-            </HeadlessModal>
+                {open && (
+                    <div className="flex-grow overflow-auto">
+                        <StakeMoreContent open={open} onClose={onClose} />
+                    </div>
+                )}
+            </BaseModal>
         </>
     );
 }

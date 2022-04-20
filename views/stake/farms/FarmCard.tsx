@@ -1,23 +1,20 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { Transition } from "@headlessui/react";
 import ImgMetalCardBg from "assets/images/metal-card-bg.png";
-import { FarmsState, useFarms } from "context/farms";
-import { Unarray } from "interface/utilities";
-import useFarmDataFormat from "hooks/useFarmDataFormat";
-import Image from "next/image";
-import { ASH_TOKEN } from "const/tokens";
-import { toEGLDD } from "helper/balance";
-import { fractionFormat } from "helper/number";
-import StakeLPModal from "components/StakeLPModal";
 import ICMinus from "assets/svg/minus.svg";
 import ICPlus from "assets/svg/plus.svg";
+import BaseModal from "components/BaseModal";
+import StakeLPModal from "components/StakeLPModal";
 import UnstakeLPModal from "components/UnstakeLPModal";
-import { ViewType } from "./FarmFilter";
-import { useScreenSize } from "hooks/useScreenSize";
-import HeadlessModal, {
-    HeadlessModalDefaultHeader,
-} from "components/HeadlessModal";
-import { Transition } from "@headlessui/react";
+import { ASH_TOKEN } from "const/tokens";
 import { TRANSITIONS } from "const/transitions";
+import { FarmsState, useFarms } from "context/farms";
+import { toEGLDD } from "helper/balance";
+import { fractionFormat } from "helper/number";
+import { useScreenSize } from "hooks/useScreenSize";
+import { Unarray } from "interface/utilities";
+import Image from "next/image";
+import React, { useEffect, useMemo, useState } from "react";
+import { ViewType } from "./FarmFilter";
 
 type props = {
     farmData: Unarray<FarmsState["farmRecords"]>;
@@ -323,24 +320,20 @@ function FarmCard({ farmData, viewType }: props) {
                     </Transition>
                 </div>
             )}
-            <HeadlessModal
-                open={mOpenFarm}
-                onClose={() => setMOpenFarm(false)}
-                transition="btt"
+            <BaseModal
+                isOpen={mOpenFarm}
+                onRequestClose={() => setMOpenFarm(false)}
+                type="drawer_btt"
             >
-                <div className="fixed bottom-0 left-0 right-0">
-                    <Card>
-                        <div>
-                            <div className="pt-4 px-4">
-                                <HeadlessModalDefaultHeader
-                                    onClose={() => setMOpenFarm(false)}
-                                />
-                            </div>
-                            <div className="pt-7">{cardElement}</div>
+                <Card>
+                    <div>
+                        <div className="pt-4 px-4 flex justify-end">
+                            <BaseModal.CloseBtn />
                         </div>
-                    </Card>
-                </div>
-            </HeadlessModal>
+                        <div className="pt-7">{cardElement}</div>
+                    </div>
+                </Card>
+            </BaseModal>
             <StakeLPModal
                 open={openStakeLP}
                 onClose={() => setOpenStakeLP(false)}

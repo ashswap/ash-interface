@@ -1,6 +1,7 @@
 import {
     getProxyProvider,
-    sendTransactions, useGetAccountInfo,
+    sendTransactions,
+    useGetAccountInfo,
     useGetLoginInfo
 } from "@elrondnetwork/dapp-core";
 import {
@@ -12,7 +13,8 @@ import {
     GasLimit,
     ProxyProvider,
     Query,
-    TokenIdentifierValue, TypeExpressionParser,
+    TokenIdentifierValue,
+    TypeExpressionParser,
     TypeMapper
 } from "@elrondnetwork/erdjs";
 import Fire from "assets/images/fire.png";
@@ -26,10 +28,8 @@ import SettingActiveIcon from "assets/svg/setting-active.svg";
 import SettingIcon from "assets/svg/setting.svg";
 import IconWallet from "assets/svg/wallet.svg";
 import BigNumber from "bignumber.js";
+import BaseModal from "components/BaseModal";
 import Button from "components/Button";
-import HeadlessModal, {
-    HeadlessModalDefaultHeader
-} from "components/HeadlessModal";
 import HistoryModal from "components/HistoryModal";
 import IconButton from "components/IconButton";
 import Setting from "components/Setting";
@@ -45,7 +45,6 @@ import { DappSendTransactionsPropsType } from "interface/dappCore";
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import styles from "./Swap.module.css";
-
 
 const Swap = () => {
     const screenSize = useScreenSize();
@@ -289,7 +288,7 @@ const Swap = () => {
         valueFrom,
         valueTo,
         setValueTo,
-        setValueFrom
+        setValueFrom,
     ]);
 
     const priceImpact = useMemo(() => {
@@ -608,24 +607,24 @@ const Swap = () => {
                 onClose={() => openHistoryModal(false)}
             />
             {screenSize.isMobile && (
-                <HeadlessModal
-                    open={showSetting}
-                    onClose={() => setShowSetting(false)}
-                    transition="btt"
+                <BaseModal
+                    isOpen={showSetting}
+                    onRequestClose={() => setShowSetting(false)}
+                    type="drawer_btt"
+                    className="clip-corner-4 clip-corner-tl bg-ash-dark-600 p-4 text-white flex flex-col max-h-full"
                 >
-                    <div className="clip-corner-4 clip-corner-tl bg-ash-dark-600 p-4 text-white flex flex-col fixed bottom-0 inset-x-0">
-                        <HeadlessModalDefaultHeader
-                            onClose={() => setShowSetting(false)}
-                        />
-                        <Setting />
-                        <Button
-                            className="uppercase text-xs mt-10"
-                            textClassName="h-10"
-                        >
-                            Confirm
-                        </Button>
+                    <div className="flex justify-end">
+                        <BaseModal.CloseBtn />
                     </div>
-                </HeadlessModal>
+                    <Setting />
+                    <Button
+                        className="uppercase text-xs mt-10"
+                        textClassName="h-10"
+                        onClick={() => setShowSetting(false)}
+                    >
+                        Confirm
+                    </Button>
+                </BaseModal>
             )}
         </div>
     );

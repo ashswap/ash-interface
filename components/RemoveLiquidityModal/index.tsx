@@ -10,17 +10,13 @@ import {
     Query,
     TokenIdentifierValue,
     TypeExpressionParser,
-    TypeMapper,
+    TypeMapper
 } from "@elrondnetwork/erdjs";
-import { notification, Slider } from "antd";
-import ICArrowBottomRight from "assets/svg/arrow-bottom-right.svg";
-import IconNewTab from "assets/svg/new-tab-green.svg";
+import { Slider } from "antd";
 import IconRight from "assets/svg/right-yellow.svg";
 import BigNumber from "bignumber.js";
+import BaseModal from "components/BaseModal";
 import Button from "components/Button";
-import HeadlessModal, {
-    HeadlessModalDefaultHeader,
-} from "components/HeadlessModal";
 import InputCurrency from "components/InputCurrency";
 import Token from "components/Token";
 import { gasLimit } from "const/dappConfig";
@@ -425,26 +421,25 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
 const RemoveLiquidityModal = ({ open, onClose, poolData }: Props) => {
     const screenSize = useScreenSize();
     return (
-        <HeadlessModal
-            open={!!open}
-            onClose={() => onClose && onClose()}
-            transition={screenSize.msm ? "btt" : "center"}
-        >
-            <div
-                className="clip-corner-4 clip-corner-tl bg-ash-dark-600 p-4
+        <BaseModal
+            isOpen={!!open}
+            onRequestClose={() => onClose && onClose()}
+            type={screenSize.msm ? "drawer_btt" : "modal"}
+            className="clip-corner-4 clip-corner-tl bg-ash-dark-600 p-4
                     sm:mt-28 max-w-4xl mx-auto
-                    fixed sm:relative inset-x-0 bottom-0 max-h-screen overflow-auto text-white"
-            >
-                <HeadlessModalDefaultHeader
-                    onClose={() => onClose && onClose()}
-                />
+                    fixed sm:relative inset-x-0 bottom-0 max-h-screen overflow-auto text-white flex flex-col"
+        >
+            <div className="flex justify-end">
+                <BaseModal.CloseBtn />
+            </div>
+            <div className="flex-grow overflow-auto">
                 <RemoveLPContent
                     open={open}
                     onClose={onClose}
                     poolData={poolData}
                 />
             </div>
-        </HeadlessModal>
+        </BaseModal>
     );
 };
 
