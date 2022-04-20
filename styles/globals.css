@@ -66,7 +66,7 @@ input[type="number"] {
 .ash-slider-green {
     --ash-slider-theme: theme("colors.stake-green.500");
 }
-.ash-slider-pink{
+.ash-slider-pink {
     --ash-slider-theme: theme("colors.pink.600");
 }
 .ash-slider .ant-slider-rail {
@@ -155,32 +155,22 @@ input[type="number"] {
         border-bottom: #88878d 0.8px solid;
         border-top: #88878d 0.8px solid;
         padding: 4px 4.5px;
-        background: linear-gradient(to right, #88878d 0.8px, transparent 0.8px) 0 100%,
-        linear-gradient(to right, #88878d 0.8px, transparent 0.8px) 100% 0,
-        linear-gradient(to left, #88878d 0.8px, transparent 0.8px) 0 100%,
-        linear-gradient(to left, #88878d 0.8px, transparent 0.8px) 100% 0;
+        background: linear-gradient(to right, #88878d 0.8px, transparent 0.8px)
+                0 100%,
+            linear-gradient(to right, #88878d 0.8px, transparent 0.8px) 100% 0,
+            linear-gradient(to left, #88878d 0.8px, transparent 0.8px) 0 100%,
+            linear-gradient(to left, #88878d 0.8px, transparent 0.8px) 100% 0;
 
         background-repeat: no-repeat;
         background-size: 100% calc(50% - 5px);
     }
 }
 
-/* remove scrolling on the body when the modal is open */
-.ReactModal__Body--open,
-.ReactModal__Html--open {
-    overflow: hidden;
-    
-}
-.ReactModal__Body--open{
-    padding-right: 0.375rem;
-}
-
-@media (pointer: fine) and (hover: hover){
-    ::-webkit-scrollbar{
+@media (pointer: fine) and (hover: hover) {
+    ::-webkit-scrollbar {
         @apply w-1.5 h-1.5 bg-transparent;
     }
-    ::-webkit-scrollbar-thumb{
+    ::-webkit-scrollbar-thumb {
         @apply bg-ash-gray-500/80 rounded-full hover:bg-ash-gray-500/50 border border-solid border-transparent bg-clip-padding;
-    
     }
 }

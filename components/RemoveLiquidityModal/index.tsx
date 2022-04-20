@@ -1,3 +1,4 @@
+import { getProxyProvider, sendTransactions } from "@elrondnetwork/dapp-core";
 import {
     Address,
     ArgSerializer,
@@ -5,30 +6,27 @@ import {
     ContractFunction,
     EndpointParameterDefinition,
     GasLimit,
+    ProxyProvider,
     Query,
     TokenIdentifierValue,
     TypeExpressionParser,
-    TypeMapper,
+    TypeMapper
 } from "@elrondnetwork/erdjs";
-import { notification, Slider } from "antd";
-import ICArrowBottomRight from "assets/svg/arrow-bottom-right.svg";
-import IconNewTab from "assets/svg/new-tab-green.svg";
+import { Slider } from "antd";
 import IconRight from "assets/svg/right-yellow.svg";
 import BigNumber from "bignumber.js";
+import BaseModal from "components/BaseModal";
 import Button from "components/Button";
-import HeadlessModal, {
-    HeadlessModalDefaultHeader,
-} from "components/HeadlessModal";
 import InputCurrency from "components/InputCurrency";
 import Token from "components/Token";
-import { gasLimit, network } from "const/network";
-import useContracts from "context/contracts";
-import { useDappContext } from "context/dapp";
+import { gasLimit } from "const/dappConfig";
 import { PoolsState } from "context/pools";
 import { useSwap } from "context/swap";
 import { useWallet } from "context/wallet";
 import { toEGLD, toEGLDD, toWei } from "helper/balance";
+import { useCreateTransaction } from "helper/transactionMethods";
 import { useScreenSize } from "hooks/useScreenSize";
+import { DappSendTransactionsPropsType } from "interface/dappCore";
 import { Unarray } from "interface/utilities";
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -52,13 +50,13 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
     const [value1, setValue1] = useState<string>("");
     const [liquidityDebounce] = useDebounce(liquidity, 500);
     const screenSize = useScreenSize();
-    const { fetchBalances, balances, lpTokens } = useWallet();
-    const { callContract } = useContracts();
-    const dapp = useDappContext();
+    const { fetchBalances, balances, lpTokens, insufficientEGLD } = useWallet();
+    const createTx = useCreateTransaction();
     const { slippage } = useSwap();
     const [displayInputLiquidity, setDisplayInputLiquidity] =
         useState<string>("");
     const [removing, setRemoving] = useState(false);
+    const proxy: ProxyProvider = getProxyProvider();
 
     const pricePerLP = useMemo(() => {
         // warning: mocking - change to 0 after pool analytic API success
@@ -133,11 +131,11 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
     );
 
     useEffect(() => {
-        if (!dapp.dapp.proxy || liquidityDebounce.eq(new BigNumber(0))) {
+        if (!proxy || liquidityDebounce.eq(new BigNumber(0))) {
             return;
         }
 
-        dapp.dapp.proxy
+        proxy
             .queryContract(
                 new Query({
                     address: new Address(pool.address),
@@ -183,13 +181,14 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
                     ).toString()
                 );
             });
-    }, [liquidityDebounce, pool, dapp.dapp.proxy]);
+    }, [liquidityDebounce, pool, proxy]);
 
     const removeLP = useCallback(async () => {
         if (removing || liquidity.eq(0)) return;
         setRemoving(true);
+        let sessionId = "";
         try {
-            let tx = await callContract(new Address(pool.address), {
+            let tx = await createTx(new Address(pool.address), {
                 func: new ContractFunction("ESDTTransfer"),
                 gasLimit: new GasLimit(gasLimit),
                 args: [
@@ -212,39 +211,26 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
                     ),
                 ],
             });
-
+            const payload: DappSendTransactionsPropsType = {
+                transactions: tx,
+                transactionsDisplayInfo: {
+                    successMessage: `Remove Liquidity Success ${value0} ${pool.tokens[0].name} and ${value1} ${pool.tokens[1].name}`,
+                },
+            };
+            sessionId = (await sendTransactions(payload)).sessionId || "";
             fetchBalances();
-
-            let key = `open${Date.now()}`;
-            notification.open({
-                key,
-                message: `Remove Liquidity Success ${value0} ${pool.tokens[0].name} and ${value1} ${pool.tokens[1].name}`,
-                icon: <IconNewTab />,
-                onClick: () =>
-                    window.open(
-                        network.explorerAddress +
-                            "/transactions/" +
-                            tx.toString(),
-                        "_blank"
-                    ),
-            });
-            setTimeout(() => {
-                notification.close(key);
-            }, 10000);
         } catch (error) {
             // TODO: extension close without response
         }
         setRemoving(false);
-        if (onClose) {
-            onClose();
-        }
+        if (sessionId) onClose?.();
     }, [
         value0,
         value1,
         slippage,
         pool,
         onClose,
-        callContract,
+        createTx,
         fetchBalances,
         liquidity,
         removing,
@@ -284,25 +270,25 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
                                 <span>TOTAL</span>
                             </div>
                             <div className="flex-1 flex items-center overflow-hidden bg-ash-dark-700 text-right text-lg h-[4.5rem] px-5 ">
-                            <InputCurrency
-                                className="bg-transparent text-right flex-grow outline-none"
-                                placeholder="0"
-                                value={displayInputLiquidity}
-                                onChange={(e) => {
-                                    const value = e.target.value || "";
-                                    setDisplayInputLiquidity(value);
-                                    setTotalUsd(
-                                        computeValidTotalUsd(
-                                            new BigNumber(
-                                                value.startsWith(".")
-                                                    ? "0" + value
-                                                    : value || "0"
+                                <InputCurrency
+                                    className="bg-transparent text-right flex-grow outline-none"
+                                    placeholder="0"
+                                    value={displayInputLiquidity}
+                                    onChange={(e) => {
+                                        const value = e.target.value || "";
+                                        setDisplayInputLiquidity(value);
+                                        setTotalUsd(
+                                            computeValidTotalUsd(
+                                                new BigNumber(
+                                                    value.startsWith(".")
+                                                        ? "0" + value
+                                                        : value || "0"
+                                                )
                                             )
-                                        )
-                                    );
-                                }}
-                            />
-                            <div className="text-ash-gray-500 ml-2">$</div>
+                                        );
+                                    }}
+                                />
+                                <div className="text-ash-gray-500 ml-2">$</div>
                             </div>
                         </div>
                         <div className="flex flex-row items-center">
@@ -423,7 +409,7 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
                         disable={removing || liquidity.eq(0)}
                         primaryColor="yellow-700"
                     >
-                        {dapp.account.balance === "0"
+                        {insufficientEGLD
                             ? "INSUFFICIENT EGLD BALANCE"
                             : "WITHDRAW"}
                     </Button>
@@ -435,26 +421,25 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
 const RemoveLiquidityModal = ({ open, onClose, poolData }: Props) => {
     const screenSize = useScreenSize();
     return (
-        <HeadlessModal
-            open={!!open}
-            onClose={() => onClose && onClose()}
-            transition={screenSize.msm ? "btt" : "center"}
-        >
-            <div
-                className="clip-corner-4 clip-corner-tl bg-ash-dark-600 p-4
+        <BaseModal
+            isOpen={!!open}
+            onRequestClose={() => onClose && onClose()}
+            type={screenSize.msm ? "drawer_btt" : "modal"}
+            className="clip-corner-4 clip-corner-tl bg-ash-dark-600 p-4
                     sm:mt-28 max-w-4xl mx-auto
-                    fixed sm:relative inset-x-0 bottom-0 max-h-screen overflow-auto text-white"
-            >
-                <HeadlessModalDefaultHeader
-                    onClose={() => onClose && onClose()}
-                />
+                    fixed sm:relative inset-x-0 bottom-0 max-h-screen overflow-auto text-white flex flex-col"
+        >
+            <div className="flex justify-end">
+                <BaseModal.CloseBtn />
+            </div>
+            <div className="flex-grow overflow-auto">
                 <RemoveLPContent
                     open={open}
                     onClose={onClose}
                     poolData={poolData}
                 />
             </div>
-        </HeadlessModal>
+        </BaseModal>
     );
 };
 

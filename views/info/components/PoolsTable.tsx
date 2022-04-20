@@ -2,7 +2,6 @@ import ICArrowLeft from "assets/svg/arrow-left.svg";
 import ICArrowRight from "assets/svg/arrow-right.svg";
 import ICStarOutline from "assets/svg/star-outline.svg";
 import ICStar from "assets/svg/star.svg";
-import { network } from "const/network";
 import pools from "const/pool";
 import { fetcher } from "helper/common";
 import { abbreviateCurrency } from "helper/number";

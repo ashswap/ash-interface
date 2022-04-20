@@ -1,4 +1,4 @@
-import { network } from "const/network";
+import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 import pools from "const/pool";
 import { randomHexColor } from "helper/color";
 import { fetcher } from "helper/common";
@@ -40,7 +40,7 @@ type RawChartRecord = {
 function AprByPoolsChart() {
     // default select the first pool
     const [selectedPools, setSelectedPools] = useState<Set<string>>(new Set([pools[0].address]));
-    const {data} = useSWR<RawChartRecord[]>(selectedPools.size > 0 ? `${network.ashApiBaseUrl}/pool/apr?pool=${Array.from(selectedPools).join(',')}` : null, fetcher);
+    const {data} = useSWR<RawChartRecord[]>(selectedPools.size > 0 ? `${ASHSWAP_CONFIG.ashApiBaseUrl}/pool/apr?pool=${Array.from(selectedPools).join(',')}` : null, fetcher);
     const [timeUnit, setTimeUnit] = useState<ValueOf<typeof TIME_UNIT>>("D");
     const themeColors = useMemo(() => {
         const nPool = pools.length;

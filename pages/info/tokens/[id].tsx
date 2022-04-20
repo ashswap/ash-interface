@@ -17,12 +17,13 @@ import TxsTable from "views/info/components/TxsTable";
 import { Tooltip } from "antd";
 import { useWallet } from "context/wallet";
 import useSWR from "swr";
-import { network } from "const/network";
 import { fetcher } from "helper/common";
 import { formatAmount, fractionFormat } from "helper/number";
 import PoolsTable from "views/info/components/PoolsTable";
 import { PoolStatsRecord } from "interface/poolStats";
 import { TxStatsRecord } from "interface/txStats";
+import { ASHSWAP_CONFIG } from "const/ashswapConfig";
+import { AccountInfoSliceNetworkType, useGetNetworkConfig } from "@elrondnetwork/dapp-core";
 
 type TokenStats = {
     change_percentage_day: number;
@@ -41,23 +42,24 @@ type props = { token: IToken };
 const TokenDetailPage: Page<props> = ({ token }: props) => {
     const { data: stats } = useSWR<TokenStats>(
         token.id
-            ? `${network.ashApiBaseUrl}/token/${token.id}/statistic`
+            ? `${ASHSWAP_CONFIG.ashApiBaseUrl}/token/${token.id}/statistic`
             : null,
         fetcher,
         { refreshInterval: 5 * 60 * 1000 }
     );
     const { data: pools } = useSWR<PoolStatsRecord[]>(
-        token.id ? `${network.ashApiBaseUrl}/token/${token.id}/pool` : null,
+        token.id ? `${ASHSWAP_CONFIG.ashApiBaseUrl}/token/${token.id}/pool` : null,
         fetcher,
         { refreshInterval: 5 * 60 * 1000 }
     );
     const { data: txs } = useSWR<TxStatsRecord[]>(
         token.id
-            ? `${network.ashApiBaseUrl}/token/${token.id}/transaction?offset=0&limit=50`
+            ? `${ASHSWAP_CONFIG.ashApiBaseUrl}/token/${token.id}/transaction?offset=0&limit=50`
             : null,
         fetcher,
         { refreshInterval: 5 * 60 * 1000 }
     );
+    const network: AccountInfoSliceNetworkType = useGetNetworkConfig().network;
     return (
         <div>
             <div className="text-white py-7 max-w-6xl mx-auto px-6 sm:px-0">

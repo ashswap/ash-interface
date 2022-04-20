@@ -1,8 +1,8 @@
-import { Transition } from "@headlessui/react";
+import { Transition, TransitionClasses } from "@headlessui/react";
 import IconClose from "assets/svg/close.svg";
 import { createContext, Fragment, useContext, useMemo, useState } from "react";
 import Modal, { Props } from "react-modal";
-const TRANSITIONS: Record<string, any> = {
+const TRANSITIONS: Record<string, TransitionClasses> = {
     center: {
         enter: "transition duration-200 ease-out",
         enterFrom: "transform scale-95 opacity-0",
@@ -22,20 +22,20 @@ const TRANSITIONS: Record<string, any> = {
     none: {},
 };
 const CONTAINER = {
-    drawer_btt: "fixed bottom-0 left-0 right-0",
-    drawer_ttb: "fixed top-0 left-0 right-0",
-    drawer_ltr: "fixed bottom-0 left-0 top-0",
-    drawer_rtl: "fixed bottom-0 top-0 right-0",
+    drawer_btt: "fixed max-h-full bottom-0 left-0 right-0",
+    drawer_ttb: "fixed max-h-full top-0 left-0 right-0",
+    drawer_ltr: "fixed max-w-full bottom-0 left-0 top-0",
+    drawer_rtl: "fixed max-w-full bottom-0 top-0 right-0",
     modal: "",
 };
 Modal.setAppElement("body");
-type ReactModalType = Props & {
+type BaseModalType = Props & {
     transition?: "btt" | "center" | "none";
     type?: "modal" | "drawer_btt" | "drawer_ttb" | "drawer_ltr" | "drawer_rtl";
 };
-const ModalContext = createContext<ReactModalType>({ isOpen: false });
+const ModalContext = createContext<BaseModalType>({ isOpen: false });
 
-const ReactModal = (props: ReactModalType) => {
+const BaseModal = (props: BaseModalType) => {
     const { transition, type = "modal", ...reactModalProps } = props;
     const [animating, setAnimating] = useState(false);
     const trans = useMemo(() => {
@@ -52,15 +52,19 @@ const ReactModal = (props: ReactModalType) => {
             <Transition show={props.isOpen} as={"div"}>
                 <Modal
                     shouldCloseOnEsc={true}
-                    shouldCloseOnOverlayClick={true} closeTimeoutMS={200}
+                    shouldCloseOnOverlayClick={true}
+                    closeTimeoutMS={200}
                     {...reactModalProps}
+                    bodyOpenClassName={`${reactModalProps.bodyOpenClassName} overflow-hidden sm:pr-1.5`}
                     overlayElement={(props, contentElement) => (
                         <div
                             {...props}
                             style={{}}
-                            className="overflow-auto fixed z-[999] inset-0 py-8 flex items-center justify-center"
+                            className="overflow-auto fixed z-[999] inset-0 py-8 "
                         >
-                            {contentElement}
+                            <div className="flex items-center justify-center min-h-full">
+                                {contentElement}
+                            </div>
                         </div>
                     )}
                     contentElement={(props, children) => (
@@ -78,7 +82,7 @@ const ReactModal = (props: ReactModalType) => {
                         leaveFrom="transform opacity-100"
                         leaveTo="transform opacity-0"
                     >
-                        <div className="bg-ash-purple-500/20 backdrop-blur-[30px] absolute z-[-1] inset-0 pointer-events-none"></div>
+                        <div className="bg-ash-purple-500/20 backdrop-blur-[30px] fixed z-[-1] inset-0 pointer-events-none"></div>
                     </Transition.Child>
                     <Transition.Child
                         as={Fragment}
@@ -88,7 +92,9 @@ const ReactModal = (props: ReactModalType) => {
                         beforeLeave={() => setAnimating(true)}
                         afterLeave={() => setAnimating(false)}
                     >
-                        <div className={`${CONTAINER[type]}`}>
+                        <div
+                            className={`${CONTAINER[type]} ${props.className}`}
+                        >
                             {props.children}
                         </div>
                     </Transition.Child>
@@ -108,5 +114,5 @@ const CloseBtn = () => {
         </button>
     );
 };
-ReactModal.CloseBtn = CloseBtn;
-export default ReactModal;
+BaseModal.CloseBtn = CloseBtn;
+export default BaseModal;

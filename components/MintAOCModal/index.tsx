@@ -1,19 +1,16 @@
-import HeadlessModal, {
-    HeadlessModalDefaultHeader,
-} from "components/HeadlessModal";
-import InputCurrency from "components/InputCurrency";
-import React, { useState } from "react";
-import Image from "next/image";
-import ImgUsdt from "assets/images/usdt-icon.png";
 import { Slider } from "antd";
-import { theme } from "tailwind.config";
-import Checkbox from "components/Checkbox";
-import Button from "components/Button";
-import { useDappContext } from "context/dapp";
-import ICChevronRight from "assets/svg/chevron-right.svg";
+import ImgUsdt from "assets/images/usdt-icon.png";
 import ICChevronDown from "assets/svg/chevron-down.svg";
+import ICChevronRight from "assets/svg/chevron-right.svg";
+import BaseModal from "components/BaseModal";
 import BasePopover from "components/BasePopover";
+import Checkbox from "components/Checkbox";
+import InputCurrency from "components/InputCurrency";
+import { useWallet } from "context/wallet";
 import { useScreenSize } from "hooks/useScreenSize";
+import Image from "next/image";
+import React, { useState } from "react";
+import { theme } from "tailwind.config";
 type props = {
     open: boolean;
     onClose: () => void;
@@ -21,15 +18,20 @@ type props = {
 function MintAOCModal({ open, onClose }: props) {
     const [feePct, setFeePct] = useState(0);
     const [isAgree, setIsAgree] = useState(false);
+    const { insufficientEGLD } = useWallet();
     const screenSize = useScreenSize();
-    const dapp = useDappContext();
     return (
-        <HeadlessModal open={open} onClose={onClose} transition={screenSize.msm ? "btt" : "center"}>
-            <div
-                className={`clip-corner-4 clip-corner-tl bg-ash-dark-400 ash-container p-4 text-white sm:mt-[7.5rem] fixed bottom-0 inset-x-0 sm:static max-h-full flex flex-col`}
-            >
-                <HeadlessModalDefaultHeader onClose={onClose} />
-                <div className="px-6 lg:px-20 pb-18 mt-3.5 flex-grow overflow-auto">
+        <BaseModal
+            isOpen={open}
+            onRequestClose={onClose}
+            type={screenSize.msm ? "drawer_btt" : "modal"}
+            className={`clip-corner-4 clip-corner-tl bg-ash-dark-400 ash-container p-4 text-white max-h-full flex flex-col`}
+        >
+            <div className="flex justify-end mb-3.5">
+                <BaseModal.CloseBtn />
+            </div>
+            <div className="flex-grow overflow-auto">
+                <div className="px-6 lg:px-20 pb-18">
                     <div className="text-2xl font-bold text-stake-green-500 mb-14">
                         Start stake & mint AOC
                     </div>
@@ -43,22 +45,36 @@ function MintAOCModal({ open, onClose }: props) {
                                     <div>
                                         <BasePopover
                                             className="w-full"
-                                            button={() =>
+                                            button={() => (
                                                 <button className="w-full h-18 flex items-center justify-between px-7 bg-ash-dark-600">
                                                     <div className="flex items-center">
                                                         <div>
-                                                        <Image src={ImgUsdt} alt="Token icon" width={16} height={16}/>
+                                                            <Image
+                                                                src={ImgUsdt}
+                                                                alt="Token icon"
+                                                                width={16}
+                                                                height={16}
+                                                            />
                                                         </div>
                                                         <div className="-ml-1">
-                                                        <Image src={ImgUsdt} alt="Token icon" width={16} height={16} />
+                                                            <Image
+                                                                src={ImgUsdt}
+                                                                alt="Token icon"
+                                                                width={16}
+                                                                height={16}
+                                                            />
                                                         </div>
-                                                        <div className="text-lg font-bold text-stake-gray-500 ml-2">Select</div>
+                                                        <div className="text-lg font-bold text-stake-gray-500 ml-2">
+                                                            Select
+                                                        </div>
                                                     </div>
-                                                    <ICChevronDown className="w-2 h-auto text-stake-gray-500"/>
+                                                    <ICChevronDown className="w-2 h-auto text-stake-gray-500" />
                                                 </button>
-                                            }
+                                            )}
                                         >
-                                            {() => <div className="">content</div>}
+                                            {() => (
+                                                <div className="">content</div>
+                                            )}
                                         </BasePopover>
                                     </div>
                                 </div>
@@ -225,13 +241,13 @@ function MintAOCModal({ open, onClose }: props) {
                             <div className="border-notch">
                                 <button
                                     className={`clip-corner-1 clip-corner-tl transition w-full h-12 flex items-center justify-center text-sm font-bold ${
-                                        dapp.account.balance === "0"
+                                        insufficientEGLD
                                             ? "bg-stake-green-500 text-ash-dark-600"
                                             : "bg-ash-dark-500 text-white"
                                     }`}
-                                    disabled={dapp.account.balance === "0"}
+                                    disabled={insufficientEGLD}
                                 >
-                                    {dapp.account.balance === "0" ? (
+                                    {insufficientEGLD ? (
                                         "INSUFFICIENT EGLD BALANCE"
                                     ) : (
                                         <div className="flex items-center">
@@ -245,7 +261,7 @@ function MintAOCModal({ open, onClose }: props) {
                     </div>
                 </div>
             </div>
-        </HeadlessModal>
+        </BaseModal>
     );
 }
 

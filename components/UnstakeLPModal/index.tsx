@@ -1,30 +1,35 @@
-import HeadlessModal, {
-    HeadlessModalDefaultHeader,
-} from "components/HeadlessModal";
+import { Slider } from "antd";
+import ICChevronRight from "assets/svg/chevron-right.svg";
+import BigNumber from "bignumber.js";
+import BaseModal from "components/BaseModal";
+import Checkbox from "components/Checkbox";
+import InputCurrency from "components/InputCurrency";
+import { blockTimeMs } from "const/dappConfig";
+import { ASH_TOKEN } from "const/tokens";
 import { FarmsState, useFarms } from "context/farms";
+import { useWallet } from "context/wallet";
+import { toEGLDD, toWei } from "helper/balance";
+import { fractionFormat } from "helper/number";
 import { useScreenSize } from "hooks/useScreenSize";
 import { Unarray } from "interface/utilities";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import { toEGLDD, toWei } from "helper/balance";
-import { useWallet } from "context/wallet";
-import BigNumber from "bignumber.js";
-import InputCurrency from "components/InputCurrency";
-import Checkbox from "components/Checkbox";
-import ICChevronRight from "assets/svg/chevron-right.svg";
-import { Slider } from "antd";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { theme } from "tailwind.config";
 import { useDebounce } from "use-debounce";
-import { fractionFormat } from "helper/number";
-import { ASH_TOKEN } from "const/tokens";
-import { blockTimeMs } from "const/network";
 type props = {
     open: boolean;
     onClose: () => void;
     farmData: Unarray<FarmsState["farmRecords"]>;
 };
 const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
-    const { pool, farm, stakedData, ashPerBlock, farmTokenSupply, emissionAPR } = farmData;
+    const {
+        pool,
+        farm,
+        stakedData,
+        ashPerBlock,
+        farmTokenSupply,
+        emissionAPR,
+    } = farmData;
     const [token0, token1] = pool.tokens;
     const [isAgree, setIsAgree] = useState(false);
     const [unStakeAmt, setUnStakeAmt] = useState<BigNumber>(new BigNumber(0));
@@ -81,8 +86,8 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
         );
     }, [isAgree, unStakeAmt, insufficientFarmToken, insufficientEGLD]);
     const unStake = useCallback(async () => {
-        const txsMap = await exitFarm(unStakeAmt, farm);
-        if (Object.keys(txsMap).length > 0 && onClose) {
+        const { sessionId } = await exitFarm(unStakeAmt, farm);
+        if (sessionId && onClose) {
             onClose();
         }
     }, [exitFarm, unStakeAmt, farm, onClose]);
@@ -118,7 +123,7 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
     }, [deboundedUnstakeAmt, farm, estimateRewardOnExit]);
 
     return (
-        <div className="mt-3.5 px-6 lg:px-20 pb-12 overflow-auto">
+        <div className="px-6 lg:px-20 pb-12 overflow-auto">
             <div className="text-2xl font-bold text-yellow-600 mb-9 lg:mb-14">
                 Unstake {lpName}
             </div>
@@ -283,8 +288,7 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
                                 Emission APR
                             </div>
                             <div className="text-white text-lg font-bold">
-                                {fractionFormat(emissionAPR.toNumber())}
-                                %
+                                {fractionFormat(emissionAPR.toNumber())}%
                             </div>
                         </div>
                     </div>
@@ -343,20 +347,21 @@ function UnstakeLPModal(props: props) {
     const { open, onClose, farmData } = props;
     const screenSize = useScreenSize();
     return (
-        <HeadlessModal
-            open={!!open}
-            onClose={() => onClose && onClose()}
-            transition={screenSize.isMobile ? "btt" : "center"}
+        <BaseModal
+            isOpen={!!open}
+            onRequestClose={() => onClose?.()}
+            type={screenSize.isMobile ? "drawer_btt" : "modal"}
+            className={`bg-stake-dark-400 text-white p-4 sm:ash-container flex flex-col max-h-full max-w-[51.75rem] mx-auto`}
         >
-            <div
-                className={`bg-stake-dark-400 text-white p-4 fixed bottom-0 inset-x-0 sm:static sm:mt-28 sm:ash-container flex flex-col max-h-full max-w-[51.75rem] mx-auto`}
-            >
-                <HeadlessModalDefaultHeader
-                    onClose={() => onClose && onClose()}
-                />
-                {open && <UnstakeLPContent {...props} />}
+            <div className="flex justify-end mb-3.5">
+                <BaseModal.CloseBtn />
             </div>
-        </HeadlessModal>
+            {open && (
+                <div className="flex-grow overflow-auto">
+                    <UnstakeLPContent {...props} />
+                </div>
+            )}
+        </BaseModal>
     );
 }
 

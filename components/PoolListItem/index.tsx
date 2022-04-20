@@ -1,15 +1,13 @@
+import IconDown from "assets/svg/down-white.svg";
+import AddLiquidityModal from "components/AddLiquidityModal";
+import BaseModal from "components/BaseModal";
+import Button from "components/Button";
 import { PoolsState } from "context/pools";
+import usePoolDataFormat from "hooks/usePoolDataFormat";
 import { useScreenSize } from "hooks/useScreenSize";
 import { Unarray } from "interface/utilities";
-import React, { useState } from "react";
 import Image from "next/image";
-import Button from "components/Button";
-import IconDown from "assets/svg/down-white.svg";
-import HeadlessModal, {
-    HeadlessModalDefaultHeader,
-} from "components/HeadlessModal";
-import AddLiquidityModal from "components/AddLiquidityModal";
-import usePoolDataFormat from "hooks/usePoolDataFormat";
+import React, { useState } from "react";
 
 function PoolListItem({
     poolData,
@@ -134,16 +132,17 @@ function PoolListItem({
                     </div>
                 )}
             </div>
-            <HeadlessModal
-                open={mIsExpand}
-                onClose={() => setMIsExpand(false)}
-                transition="btt"
+            <BaseModal
+                isOpen={mIsExpand}
+                onRequestClose={() => setMIsExpand(false)}
+                type="drawer_btt"
+                className="bg-ash-dark-600 clip-corner-4 clip-corner-tr p-4 text-white max-h-full flex flex-col"
             >
-                <div className="bg-ash-dark-600 clip-corner-4 clip-corner-tr p-4 fixed inset-x-0 bottom-0 text-white max-h-screen overflow-auto">
-                    <HeadlessModalDefaultHeader
-                        onClose={() => setMIsExpand(false)}
-                    />
-                    <div className="pt-16 px-6 pb-7">
+                <div className="flex justify-end mb-16">
+                    <BaseModal.CloseBtn />
+                </div>
+                <div className="flex-grow overflow-auto">
+                    <div className="px-6 pb-7">
                         <div className="flex justify-between mb-12">
                             <div>
                                 <div className="text-ash-gray-500 text-xs mb-[0.625rem]">
@@ -230,7 +229,7 @@ function PoolListItem({
                         </div>
                     </div>
                 </div>
-            </HeadlessModal>
+            </BaseModal>
             <AddLiquidityModal
                 open={openAddLiquidity}
                 onClose={() => setOpenAddLiquidity(false)}

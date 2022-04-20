@@ -1,44 +1,47 @@
 import {
+    getProxyProvider,
+    sendTransactions,
+    useGetAccountInfo,
+    useGetLoginInfo
+} from "@elrondnetwork/dapp-core";
+import {
     Address,
     ArgSerializer,
     BigUIntValue,
     ContractFunction,
     EndpointParameterDefinition,
     GasLimit,
+    ProxyProvider,
     Query,
     TokenIdentifierValue,
     TypeExpressionParser,
-    TypeMapper,
+    TypeMapper
 } from "@elrondnetwork/erdjs";
-import { notification } from "antd";
 import Fire from "assets/images/fire.png";
 import ICChevronDown from "assets/svg/chevron-down.svg";
 import ICChevronUp from "assets/svg/chevron-up.svg";
 import Clock from "assets/svg/clock.svg";
 import IconClose from "assets/svg/close.svg";
-import IconNewTab from "assets/svg/new-tab-green.svg";
 import Revert from "assets/svg/revert.svg";
 import IconRight from "assets/svg/right-white.svg";
 import SettingActiveIcon from "assets/svg/setting-active.svg";
 import SettingIcon from "assets/svg/setting.svg";
 import IconWallet from "assets/svg/wallet.svg";
 import BigNumber from "bignumber.js";
+import BaseModal from "components/BaseModal";
 import Button from "components/Button";
-import HeadlessModal, {
-    HeadlessModalDefaultHeader,
-} from "components/HeadlessModal";
 import HistoryModal from "components/HistoryModal";
 import IconButton from "components/IconButton";
 import Setting from "components/Setting";
 import SwapAmount from "components/SwapAmount";
-import { gasLimit, network } from "const/network";
-import useContracts from "context/contracts";
-import { useDappContext } from "context/dapp";
+import { gasLimit } from "const/dappConfig";
 import { useSwap } from "context/swap";
 import { useWallet } from "context/wallet";
 import { toEGLD, toWei } from "helper/balance";
+import { useCreateTransaction } from "helper/transactionMethods";
 import useMounted from "hooks/useMounted";
 import { useScreenSize } from "hooks/useScreenSize";
+import { DappSendTransactionsPropsType } from "interface/dappCore";
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import styles from "./Swap.module.css";
@@ -51,6 +54,7 @@ const Swap = () => {
         tokenTo,
         valueFrom,
         valueTo,
+        setValueFrom,
         setValueTo,
         setTokenFrom,
         setTokenTo,
@@ -67,10 +71,10 @@ const Swap = () => {
     const [swapping, setSwapping] = useState(false);
 
     const { connectWallet } = useWallet();
-    const { callContract } = useContracts();
-    const dapp = useDappContext();
-    const { proxy } = dapp.dapp;
-
+    const { isLoggedIn: loggedIn } = useGetLoginInfo();
+    const { account } = useGetAccountInfo();
+    const proxy: ProxyProvider = getProxyProvider();
+    const createTx = useCreateTransaction();
     useEffect(() => {
         setShowSetting(false);
         openHistoryModal(false);
@@ -193,7 +197,7 @@ const Swap = () => {
             proxy.queryContract(
                 new Query({
                     address: new Address(pool?.address),
-                    func: new ContractFunction("getTotalFeePercent"),
+                    func: new ContractFunction("getSwapFeePercent"),
                 })
             ),
         ]).then((results) => {
@@ -221,7 +225,6 @@ const Swap = () => {
             });
 
             setRates(rates);
-            console.log(results);
             let fee = new BigNumber(
                 "0x" +
                     Buffer.from(results[2].returnData[0], "base64").toString(
@@ -236,7 +239,7 @@ const Swap = () => {
     }, [pool, proxy, setRates]);
 
     const swap = useCallback(async () => {
-        if (!dapp.loggedIn || !tokenFrom || !tokenTo || swapping) {
+        if (!loggedIn || !tokenFrom || !tokenTo || swapping) {
             return;
         }
 
@@ -245,7 +248,7 @@ const Swap = () => {
         }
         setSwapping(true);
         try {
-            let tx = await callContract(new Address(pool?.address), {
+            const tx = await createTx(new Address(pool?.address), {
                 func: new ContractFunction("ESDTTransfer"),
                 gasLimit: new GasLimit(gasLimit),
                 args: [
@@ -256,24 +259,13 @@ const Swap = () => {
                     new BigUIntValue(new BigNumber(0)),
                 ],
             });
-
-            let key = `open${Date.now()}`;
-            notification.open({
-                key,
-                message: `Swap succeed ${valueFrom} ${tokenFrom.name} to ${valueTo} ${tokenTo.name}`,
-                icon: <IconNewTab />,
-
-                onClick: () =>
-                    window.open(
-                        network.explorerAddress +
-                            "/transactions/" +
-                            tx.toString(),
-                        "_blank"
-                    ),
-            });
-            setTimeout(() => {
-                notification.close(key);
-            }, 10000);
+            const payload: DappSendTransactionsPropsType = {
+                transactions: tx,
+                transactionsDisplayInfo: {
+                    successMessage: `Swap succeed ${valueFrom} ${tokenFrom.name} to ${valueTo} ${tokenTo.name}`,
+                },
+            };
+            const { error } = await sendTransactions(payload);
         } catch (error) {
             console.log(error);
             // TODO: extension close without response
@@ -282,17 +274,21 @@ const Swap = () => {
             //     duration: 10
             // });
         }
+        setValueTo("");
+        setValueFrom("");
         setSwapping(false);
     }, [
-        dapp.loggedIn,
+        loggedIn,
         pool,
         rawValueFrom,
-        callContract,
         tokenFrom,
         tokenTo,
+        swapping,
+        createTx,
         valueFrom,
         valueTo,
-        swapping,
+        setValueTo,
+        setValueFrom,
     ]);
 
     const priceImpact = useMemo(() => {
@@ -359,7 +355,7 @@ const Swap = () => {
                                     <IconButton
                                         icon={<Clock />}
                                         onClick={() =>
-                                            dapp.loggedIn &&
+                                            loggedIn &&
                                             openHistoryModal((state) => !state)
                                         }
                                     />
@@ -526,21 +522,13 @@ const Swap = () => {
 
                             {mounted &&
                                 (isInsufficentFund ||
-                                dapp.account.balance === "0" ? (
+                                account.balance === "0" ? (
                                     <Button
                                         leftIcon={
-                                            !dapp.loggedIn ? (
-                                                <IconWallet />
-                                            ) : (
-                                                <></>
-                                            )
+                                            !loggedIn ? <IconWallet /> : <></>
                                         }
                                         rightIcon={
-                                            dapp.loggedIn ? (
-                                                <IconRight />
-                                            ) : (
-                                                <></>
-                                            )
+                                            loggedIn ? <IconRight /> : <></>
                                         }
                                         topLeftCorner
                                         style={{ height: 48 }}
@@ -551,7 +539,7 @@ const Swap = () => {
                                         <span className="text-text-input-3">
                                             INSUFFICIENT{" "}
                                             <span className="text-insufficent-fund">
-                                                {dapp.account.balance === "0"
+                                                {account.balance === "0"
                                                     ? "EGLD"
                                                     : tokenFrom?.name}
                                             </span>{" "}
@@ -561,18 +549,10 @@ const Swap = () => {
                                 ) : (
                                     <Button
                                         leftIcon={
-                                            !dapp.loggedIn ? (
-                                                <IconWallet />
-                                            ) : (
-                                                <></>
-                                            )
+                                            !loggedIn ? <IconWallet /> : <></>
                                         }
                                         rightIcon={
-                                            dapp.loggedIn ? (
-                                                <IconRight />
-                                            ) : (
-                                                <></>
-                                            )
+                                            loggedIn ? <IconRight /> : <></>
                                         }
                                         topLeftCorner
                                         style={{ height: 48 }}
@@ -580,15 +560,13 @@ const Swap = () => {
                                         outline
                                         disable={swapping}
                                         onClick={
-                                            dapp.loggedIn
+                                            loggedIn
                                                 ? swap
                                                 : () => connectWallet()
                                         }
                                         glowOnHover
                                     >
-                                        {dapp.loggedIn
-                                            ? "SWAP"
-                                            : "CONNECT WALLET"}
+                                        {loggedIn ? "SWAP" : "CONNECT WALLET"}
                                     </Button>
                                 ))}
 
@@ -629,24 +607,24 @@ const Swap = () => {
                 onClose={() => openHistoryModal(false)}
             />
             {screenSize.isMobile && (
-                <HeadlessModal
-                    open={showSetting}
-                    onClose={() => setShowSetting(false)}
-                    transition="btt"
+                <BaseModal
+                    isOpen={showSetting}
+                    onRequestClose={() => setShowSetting(false)}
+                    type="drawer_btt"
+                    className="clip-corner-4 clip-corner-tl bg-ash-dark-600 p-4 text-white flex flex-col max-h-full"
                 >
-                    <div className="clip-corner-4 clip-corner-tl bg-ash-dark-600 p-4 text-white flex flex-col fixed bottom-0 inset-x-0">
-                        <HeadlessModalDefaultHeader
-                            onClose={() => setShowSetting(false)}
-                        />
-                        <Setting />
-                        <Button
-                            className="uppercase text-xs mt-10"
-                            textClassName="h-10"
-                        >
-                            Confirm
-                        </Button>
+                    <div className="flex justify-end">
+                        <BaseModal.CloseBtn />
                     </div>
-                </HeadlessModal>
+                    <Setting />
+                    <Button
+                        className="uppercase text-xs mt-10"
+                        textClassName="h-10"
+                        onClick={() => setShowSetting(false)}
+                    >
+                        Confirm
+                    </Button>
+                </BaseModal>
             )}
         </div>
     );

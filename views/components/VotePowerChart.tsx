@@ -1,4 +1,3 @@
-import { network } from "const/network";
 import { MONTH_SHORT } from "const/time";
 import { VE_ASH_DECIMALS } from "const/tokens";
 import { toEGLDD } from "helper/balance";
@@ -20,6 +19,7 @@ import ICArrowTopRight from "assets/svg/arrow-top-right.svg";
 import ICArrowBottomRight from "assets/svg/arrow-bottom-right.svg";
 import { ChartActiveDot } from "components/Chart/ChartActiveDot";
 import { ChartLineX } from "components/Chart/ChartLineX";
+import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 
 const CustomActiveDot = ({ dotColor, ...props }: any) => {
     const { cx, cy } = props;
@@ -45,7 +45,7 @@ const CustomTooltipCursor = ({ areaRef, ...props }: any) => {
 const interval = ["D", "W", "M"];
 function VotePowerChart() {
     const { data } = useSWR<[number, string][]>(
-        `${network.ashApiBaseUrl}/stake/governance/voting-power`,
+        `${ASHSWAP_CONFIG.ashApiBaseUrl}/stake/governance/voting-power`,
         fetcher,
         { refreshInterval: 10 * 60 * 1000 }
     );

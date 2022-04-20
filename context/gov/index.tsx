@@ -1,55 +1,43 @@
 import {
-    Address,
-    GasLimit,
-    ContractFunction,
-    TokenIdentifierValue,
-    BigUIntValue,
-    U64Value,
-    TransactionHash,
-    Query,
-    AddressValue,
-    TypeExpressionParser,
-    TypeMapper,
-    ArgSerializer,
-    EndpointParameterDefinition,
-    Transaction,
-    Nonce,
-} from "@elrondnetwork/erdjs";
-import { notification } from "antd";
-import BigNumber from "bignumber.js";
+    getApiProvider,
+    getProxyProvider,
+    sendTransactions,
+    useGetAccountInfo,
+    useGetLoginInfo,
+} from "@elrondnetwork/dapp-core";
+import { SendTransactionReturnType } from "@elrondnetwork/dapp-core/dist/services/transactions";
 import {
-    blockTimeMs,
-    dappContract,
-    gasLimit,
-    network,
-    shardId,
-} from "const/network";
+    Address,
+    AddressValue,
+    ApiProvider,
+    BigUIntValue,
+    ContractFunction,
+    GasLimit,
+    ProxyProvider,
+    Query,
+    TokenIdentifierValue,
+    Transaction,
+    U64Value,
+} from "@elrondnetwork/erdjs";
+import BigNumber from "bignumber.js";
+import { ASHSWAP_CONFIG } from "const/ashswapConfig";
+import { blockTimeMs, gasLimit } from "const/dappConfig";
+import pools from "const/pool";
 import { ASH_TOKEN } from "const/tokens";
-import { useWallet } from "context/wallet";
+import useContracts from "context/contracts";
+import { toEGLD, toEGLDD, toWei } from "helper/balance";
+import { queryContractParser } from "helper/serializer";
+import { useCreateTransaction } from "helper/transactionMethods";
+import { DappSendTransactionsPropsType } from "interface/dappCore";
+import IPool from "interface/pool";
+import moment from "moment";
 import {
     createContext,
     useCallback,
     useContext,
     useEffect,
-    useMemo,
     useState,
 } from "react";
-import IconNewTab from "assets/svg/new-tab-green.svg";
-import { toEGLD, toEGLDD, toWei } from "helper/balance";
-import { emptyFunc } from "helper/common";
-import { TokenBalance } from "interface/tokenBalance";
-import { useDappContext } from "context/dapp";
-import moment from "moment";
-import { queryContractParser } from "helper/serializer";
-import { IToken } from "interface/token";
-import IPool from "interface/pool";
-import pools from "const/pool";
-import useContracts from "context/contracts";
-import {
-    useCreateTransaction,
-    useSendMultipleTxs,
-    useSignTransactions,
-} from "helper/transactionMethods";
 const estimateVeASH = (weiAmt: BigNumber, lockDays: number) => {
     // ratio: lock 1 ASH in 1 year(365 days) -> 0.25 veASH
     const veASHPerDay = toEGLDD(ASH_TOKEN.decimals, weiAmt).multipliedBy(
@@ -57,20 +45,21 @@ const estimateVeASH = (weiAmt: BigNumber, lockDays: number) => {
     );
     return toWei(ASH_TOKEN, veASHPerDay.multipliedBy(lockDays).toString());
 };
+const emptySendTxsReturn: SendTransactionReturnType = { sessionId: "" };
 type GovStakeState = {
     lockASH: (
         weiAmt: BigNumber,
         unlockTimestamp: BigNumber
-    ) => Promise<TransactionHash | null>;
+    ) => Promise<SendTransactionReturnType>;
     lockMoreASH: ({
         weiAmt,
         unlockTimestamp,
     }: {
         weiAmt?: BigNumber;
         unlockTimestamp?: BigNumber;
-    }) => Promise<any>;
-    claimReward: () => Promise<Record<number, string> | null>;
-    unlockASH: () => Promise<TransactionHash | null>;
+    }) => Promise<SendTransactionReturnType>;
+    claimReward: () => Promise<SendTransactionReturnType>;
+    unlockASH: () => Promise<SendTransactionReturnType>;
     estimateVeASH: (weiAmt: BigNumber, lockDays: number) => BigNumber;
     lockedAmt: BigNumber;
     veASH: BigNumber;
@@ -83,10 +72,10 @@ type GovStakeState = {
     totalLockedPct: number;
 };
 const initState: GovStakeState = {
-    lockASH: (amt, unlock) => Promise.resolve(null),
-    lockMoreASH: () => Promise.resolve(null),
-    claimReward: () => Promise.resolve(null),
-    unlockASH: () => Promise.resolve(null),
+    lockASH: () => Promise.resolve(emptySendTxsReturn),
+    lockMoreASH: () => Promise.resolve(emptySendTxsReturn),
+    claimReward: () => Promise.resolve(emptySendTxsReturn),
+    unlockASH: () => Promise.resolve(emptySendTxsReturn),
     estimateVeASH,
     lockedAmt: new BigNumber(0),
     veASH: new BigNumber(0),
@@ -102,7 +91,6 @@ export const useStakeGov = () => {
     return useContext(StakeGovContext);
 };
 const StakeGovProvider = ({ children }: any) => {
-    const [currentBlock, setCurrentBlock] = useState<number>();
     const [lockedAmt, setLockedAmt] = useState<BigNumber>(new BigNumber(0));
     const [totalLockedAmt, setTotalLockedAmt] = useState<BigNumber>(
         new BigNumber(0)
@@ -116,83 +104,72 @@ const StakeGovProvider = ({ children }: any) => {
     const [rewardValue, setRewardValue] = useState<BigNumber>(new BigNumber(0));
     const [rewardLPToken, setRewardLPToken] = useState<IPool>();
     const [totalLockedPct, setTotalLockedPct] = useState(0);
-    const { callContract, getLPValue } = useContracts();
+    const { getLPValue } = useContracts();
     const createTransaction = useCreateTransaction();
-    const sendMultipleTxs = useSendMultipleTxs();
-    const signTxs = useSignTransactions();
-    const dapp = useDappContext();
+    const { isLoggedIn: loggedIn } = useGetLoginInfo();
+    const { address } = useGetAccountInfo();
+    const proxy: ProxyProvider = getProxyProvider();
+    const apiProvider: ApiProvider = getApiProvider();
 
     useEffect(() => {
-        if (!dapp.loggedIn) {
+        if (!loggedIn) {
             setLockedAmt(new BigNumber(0));
             setVEASH(new BigNumber(0));
             setUnlockTS(new BigNumber(0));
             setRewardLPAmt(new BigNumber(0));
             setRewardValue(new BigNumber(0));
         }
-    }, [dapp.loggedIn]);
+    }, [loggedIn]);
 
-    const lockASH = useCallback(
+    const lockASH: GovStakeState["lockASH"] = useCallback(
         async (weiAmt: BigNumber, unlockTimestamp: BigNumber) => {
             try {
-                const tx = await callContract(
-                    new Address(dappContract.voteEscrowedContract),
-                    {
-                        func: new ContractFunction("ESDTTransfer"),
-                        gasLimit: new GasLimit(gasLimit),
-                        args: [
-                            new TokenIdentifierValue(Buffer.from(ASH_TOKEN.id)),
-                            new BigUIntValue(weiAmt),
-                            new TokenIdentifierValue(
-                                Buffer.from("create_lock")
-                            ),
-                            new U64Value(unlockTimestamp),
-                        ],
-                    }
-                );
-                notification.open({
-                    message: `Lock succeed ${toEGLD(
-                        ASH_TOKEN,
-                        weiAmt?.toString() || "0"
-                    )} ${ASH_TOKEN.name}, unlock on ${moment
-                        .unix(unlockTimestamp.toNumber())
-                        .format("DD MMM, yyyy")}`,
-                    icon: <IconNewTab />,
-                    onClick: () =>
-                        window.open(
-                            network.explorerAddress +
-                                "/transactions/" +
-                                tx.toString(),
-                            "_blank"
-                        ),
-                });
-                return tx;
+                const payload: DappSendTransactionsPropsType = {
+                    transactions: await createTransaction(
+                        new Address(ASHSWAP_CONFIG.dappContract.voteEscrowedContract),
+                        {
+                            func: new ContractFunction("ESDTTransfer"),
+                            gasLimit: new GasLimit(gasLimit),
+                            args: [
+                                new TokenIdentifierValue(
+                                    Buffer.from(ASH_TOKEN.id)
+                                ),
+                                new BigUIntValue(weiAmt),
+                                new TokenIdentifierValue(
+                                    Buffer.from("create_lock")
+                                ),
+                                new U64Value(unlockTimestamp),
+                            ],
+                        }
+                    ),
+                    transactionsDisplayInfo: {
+                        successMessage: `Lock succeed ${toEGLD(
+                            ASH_TOKEN,
+                            weiAmt?.toString() || "0"
+                        )} ${ASH_TOKEN.name}, unlock on ${moment
+                            .unix(unlockTimestamp.toNumber())
+                            .format("DD MMM, yyyy")}`,
+                    },
+                };
+                return sendTransactions(payload);
             } catch (error) {
                 console.log(error);
-                return null;
+                return emptySendTxsReturn;
             }
         },
-        [callContract]
+        [createTransaction]
     );
 
-    const getNetworkStatus = useCallback(() => {
-        dapp.dapp.apiProvider
-            .doGetGeneric(`network/status/${shardId}`, (res) => res.data)
-            .then((val) => {
-                setCurrentBlock(val?.status?.erd_nonce);
-            });
-    }, [dapp.dapp.apiProvider]);
-
     const getVEASHAmt = useCallback(() => {
-        if (!dapp.loggedIn || !lockedAmt || lockedAmt.eq(0)) return;
+        if (!loggedIn || !lockedAmt || lockedAmt.eq(0)) return;
         const ts = moment().unix();
-        dapp.dapp.proxy
+        proxy
             .queryContract(
                 new Query({
-                    address: new Address(dappContract.voteEscrowedContract),
+                    address: new Address(ASHSWAP_CONFIG.dappContract.voteEscrowedContract),
                     func: new ContractFunction("balanceOfAtTs"),
                     args: [
-                        new AddressValue(new Address(dapp.address)),
+                        new AddressValue(new Address(address)),
                         new BigUIntValue(new BigNumber(ts)),
                     ],
                 })
@@ -201,16 +178,16 @@ const StakeGovProvider = ({ children }: any) => {
                 const values = queryContractParser(returnData[0], "BigUint");
                 setVEASH(values[0]?.valueOf() || new BigNumber(0));
             });
-    }, [dapp.loggedIn, dapp.dapp, dapp.address, lockedAmt]);
+    }, [loggedIn, address, lockedAmt, proxy]);
 
     const getLockedAmt = useCallback(() => {
-        if (!dapp.loggedIn) return;
-        dapp.dapp.proxy
+        if (!loggedIn) return;
+        proxy
             .queryContract(
                 new Query({
-                    address: new Address(dappContract.voteEscrowedContract),
+                    address: new Address(ASHSWAP_CONFIG.dappContract.voteEscrowedContract),
                     func: new ContractFunction("locked"),
-                    args: [new AddressValue(new Address(dapp.address))],
+                    args: [new AddressValue(new Address(address))],
                 })
             )
             .then(({ returnData }) => {
@@ -221,14 +198,14 @@ const StakeGovProvider = ({ children }: any) => {
                 setLockedAmt(values[0]?.valueOf().field0 || new BigNumber(0));
                 setUnlockTS(values[0]?.valueOf().field1 || new BigNumber(0));
             });
-    }, [dapp.loggedIn, dapp.dapp, dapp.address]);
+    }, [loggedIn, proxy, address]);
 
     const getTotalSupplyVeASH = useCallback(() => {
         const ts = moment().unix();
-        dapp.dapp.proxy
+        proxy
             .queryContract(
                 new Query({
-                    address: new Address(dappContract.voteEscrowedContract),
+                    address: new Address(ASHSWAP_CONFIG.dappContract.voteEscrowedContract),
                     func: new ContractFunction("totalSupplyAtTs"),
                     args: [new BigUIntValue(new BigNumber(ts))],
                 })
@@ -237,16 +214,16 @@ const StakeGovProvider = ({ children }: any) => {
                 const values = queryContractParser(returnData[0], "BigUint");
                 setTotalSupplyVeASH(values[0]?.valueOf() || new BigNumber(0));
             });
-    }, [dapp.dapp]);
+    }, [proxy]);
 
     const getRewardAmt = useCallback(() => {
-        if (!dapp.loggedIn) return;
-        dapp.dapp.proxy
+        if (!loggedIn) return;
+        proxy
             .queryContract(
                 new Query({
-                    address: new Address(dappContract.feeDistributor),
+                    address: new Address(ASHSWAP_CONFIG.dappContract.feeDistributor),
                     func: new ContractFunction("getClaimableAmount"),
-                    args: [new AddressValue(new Address(dapp.address))],
+                    args: [new AddressValue(new Address(address))],
                 })
             )
             .then(({ returnData }) => {
@@ -256,13 +233,13 @@ const StakeGovProvider = ({ children }: any) => {
                 );
                 setRewardLPAmt(values[0]?.valueOf() || new BigNumber(0));
             });
-    }, [dapp.loggedIn, dapp.dapp, dapp.address]);
+    }, [loggedIn, proxy, address]);
 
     const getTotalLockedAmt = useCallback(() => {
-        dapp.dapp.proxy
+        proxy
             .queryContract(
                 new Query({
-                    address: new Address(dappContract.voteEscrowedContract),
+                    address: new Address(ASHSWAP_CONFIG.dappContract.voteEscrowedContract),
                     func: new ContractFunction("totalLock"),
                 })
             )
@@ -270,18 +247,18 @@ const StakeGovProvider = ({ children }: any) => {
                 const values = queryContractParser(returnData[0], "BigUint");
                 setTotalLockedAmt(values[0]?.valueOf() || new BigNumber(0));
             });
-    }, [dapp.dapp]);
+    }, [proxy]);
 
-    const lockMoreASH = useCallback(
+    const lockMoreASH: GovStakeState["lockMoreASH"] = useCallback(
         async ({
             weiAmt,
             unlockTimestamp,
         }: { weiAmt?: BigNumber; unlockTimestamp?: BigNumber } = {}) => {
-            if (!dapp.loggedIn) return [];
+            if (!loggedIn) return emptySendTxsReturn;
             let txs: Transaction[] = [];
             if (weiAmt && weiAmt.gt(0)) {
                 const increaseAmtTx = await createTransaction(
-                    new Address(dappContract.voteEscrowedContract),
+                    new Address(ASHSWAP_CONFIG.dappContract.voteEscrowedContract),
                     {
                         func: new ContractFunction("ESDTTransfer"),
                         gasLimit: new GasLimit(gasLimit),
@@ -298,7 +275,7 @@ const StakeGovProvider = ({ children }: any) => {
             }
             if (unlockTimestamp && unlockTimestamp.gt(unlockTS)) {
                 const increaseLockTSTx = await createTransaction(
-                    new Address(dappContract.voteEscrowedContract),
+                    new Address(ASHSWAP_CONFIG.dappContract.voteEscrowedContract),
                     {
                         func: new ContractFunction("increase_unlock_time"),
                         gasLimit: new GasLimit(gasLimit),
@@ -307,42 +284,31 @@ const StakeGovProvider = ({ children }: any) => {
                 );
                 txs.push(increaseLockTSTx);
             }
-            if (!txs.length) return [];
-            const signedTxs = await signTxs(...txs);
-            const data = await sendMultipleTxs(signedTxs);
+            if (!txs.length) return emptySendTxsReturn;
 
-            let key = `open${Date.now()}`;
-            notification.open({
-                key,
-                message: `Lock succeed ${toEGLD(
-                    ASH_TOKEN,
-                    weiAmt?.toString() || "0"
-                )} ${ASH_TOKEN.name}, unlock on ${moment
-                    .unix(unlockTimestamp?.toNumber() || unlockTS?.toNumber())
-                    .format("DD MMM, yyyy")}`,
-                icon: <IconNewTab />,
-
-                onClick: () =>
-                    window.open(
-                        network.explorerAddress +
-                            "/transactions/" +
-                            data[0].toString(),
-                        "_blank"
-                    ),
-            });
-            setTimeout(() => {
-                notification.close(key);
-            }, 10000);
-            return data;
+            const payload: DappSendTransactionsPropsType = {
+                transactions: txs,
+                transactionsDisplayInfo: {
+                    successMessage: `Lock succeed ${toEGLD(
+                        ASH_TOKEN,
+                        weiAmt?.toString() || "0"
+                    )} ${ASH_TOKEN.name}, unlock on ${moment
+                        .unix(
+                            unlockTimestamp?.toNumber() || unlockTS?.toNumber()
+                        )
+                        .format("DD MMM, yyyy")}`,
+                },
+            };
+            return await sendTransactions(payload);
         },
-        [createTransaction, dapp.dapp, unlockTS, dapp.loggedIn, sendMultipleTxs]
+        [createTransaction, unlockTS, loggedIn]
     );
 
     const getRewardLPID = useCallback(() => {
-        dapp.dapp.proxy
+        proxy
             .queryContract(
                 new Query({
-                    address: new Address(dappContract.feeDistributor),
+                    address: new Address(ASHSWAP_CONFIG.dappContract.feeDistributor),
                     func: new ContractFunction("token"),
                 })
             )
@@ -352,106 +318,85 @@ const StakeGovProvider = ({ children }: any) => {
                 );
                 setRewardLPToken(pools.find((p) => p.lpToken.id === tokenID));
             });
-    }, [dapp.dapp]);
+    }, [proxy]);
 
-    const claimReward = useCallback(async () => {
-        if (!dapp.loggedIn) return null;
+    const claimReward: GovStakeState["claimReward"] = useCallback(async () => {
+        if (!loggedIn) return emptySendTxsReturn;
         try {
             const tx1 = await createTransaction(
-                new Address(dappContract.feeDistributor),
+                new Address(ASHSWAP_CONFIG.dappContract.feeDistributor),
                 {
                     func: new ContractFunction("checkpoint_total_supply_1"),
                     gasLimit: new GasLimit(gasLimit),
                 }
             );
             const tx2 = await createTransaction(
-                new Address(dappContract.feeDistributor),
+                new Address(ASHSWAP_CONFIG.dappContract.feeDistributor),
                 {
                     func: new ContractFunction("checkpoint_total_supply_2"),
                     gasLimit: new GasLimit(gasLimit),
                 }
             );
             const tx3 = await createTransaction(
-                new Address(dappContract.feeDistributor),
+                new Address(ASHSWAP_CONFIG.dappContract.feeDistributor),
                 {
                     func: new ContractFunction("checkpoint_total_supply_2"),
                     gasLimit: new GasLimit(gasLimit),
                 }
             );
             const tx4 = await createTransaction(
-                new Address(dappContract.feeDistributor),
+                new Address(ASHSWAP_CONFIG.dappContract.feeDistributor),
                 {
                     func: new ContractFunction("checkpoint_total_supply_2"),
                     gasLimit: new GasLimit(gasLimit),
                 }
             );
             const tx5 = await createTransaction(
-                new Address(dappContract.feeDistributor),
+                new Address(ASHSWAP_CONFIG.dappContract.feeDistributor),
                 {
                     func: new ContractFunction("claim"),
                     gasLimit: new GasLimit(gasLimit),
-                    args: [new AddressValue(new Address(dapp.address))],
+                    args: [new AddressValue(new Address(address))],
                 }
             );
-            const signedTxs = await signTxs(tx1, tx2, tx3, tx4, tx5);
-            const txs = await sendMultipleTxs(signedTxs);
-            let key = `open${Date.now()}`;
-            notification.open({
-                key,
-                message: `Reward was sent to your wallet`,
-                icon: <IconNewTab />,
-                onClick: () =>
-                    window.open(
-                        network.explorerAddress +
-                            "/transactions/" +
-                            txs[4].toString(),
-                        "_blank"
-                    ),
-            });
-            return txs;
+            const payload: DappSendTransactionsPropsType = {
+                transactions: [tx1, tx2, tx3, tx4, tx5],
+                transactionsDisplayInfo: {
+                    successMessage: `Reward was sent to your wallet`,
+                },
+            };
+            return await sendTransactions(payload);
         } catch (error) {
             console.log(error);
-            return null;
+            return emptySendTxsReturn;
         }
-    }, [
-        createTransaction,
-        dapp.address,
-        dapp.loggedIn,
-        sendMultipleTxs,
-        signTxs
-    ]);
+    }, [createTransaction, address, loggedIn]);
 
-    const unlockASH = useCallback(async () => {
-        if (!dapp.loggedIn || unlockTS.minus(moment().unix()).gt(0))
-            return null;
+    const unlockASH: GovStakeState["unlockASH"] = useCallback(async () => {
+        if (!loggedIn || unlockTS.minus(moment().unix()).gt(0))
+            return emptySendTxsReturn;
         try {
-            const tx = await callContract(
-                new Address(dappContract.voteEscrowedContract),
-                {
-                    func: new ContractFunction("withdraw"),
-                    gasLimit: new GasLimit(gasLimit),
-                }
-            );
-            notification.open({
-                message: `Unlock success ${toEGLDD(
-                    ASH_TOKEN.decimals,
-                    lockedAmt
-                )} ${ASH_TOKEN.name}`,
-                icon: <IconNewTab />,
-                onClick: () =>
-                    window.open(
-                        network.explorerAddress +
-                            "/transactions/" +
-                            tx.toString(),
-                        "_blank"
-                    ),
-            });
-            return tx;
+            const payload: DappSendTransactionsPropsType = {
+                transactions: await createTransaction(
+                    new Address(ASHSWAP_CONFIG.dappContract.voteEscrowedContract),
+                    {
+                        func: new ContractFunction("withdraw"),
+                        gasLimit: new GasLimit(gasLimit),
+                    }
+                ),
+                transactionsDisplayInfo: {
+                    successMessage: `Unlock success ${toEGLDD(
+                        ASH_TOKEN.decimals,
+                        lockedAmt
+                    )} ${ASH_TOKEN.name}`,
+                },
+            };
+            return await sendTransactions(payload);
         } catch (error) {
             console.log(error);
-            return null;
+            return emptySendTxsReturn;
         }
-    }, [unlockTS, lockedAmt, callContract, dapp.loggedIn]);
+    }, [unlockTS, lockedAmt, loggedIn, createTransaction]);
 
     const getRewardValue = useCallback(async () => {
         if (!rewardLPAmt || rewardLPAmt.eq(0) || !rewardLPToken) {
@@ -463,26 +408,10 @@ const StakeGovProvider = ({ children }: any) => {
     }, [rewardLPAmt, rewardLPToken, getLPValue]);
 
     const getASHTotalSupply = useCallback(() => {
-        return dapp.dapp.proxy
-            .queryContract(
-                new Query({
-                    address: new Address(
-                        "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u"
-                    ),
-                    func: new ContractFunction("getTokenProperties"),
-                    args: [new TokenIdentifierValue(Buffer.from(ASH_TOKEN.id))],
-                })
-            )
-            .then(({ returnData }) => {
-                const data = returnData[3];
-                if (data?.length > 0) {
-                    return new BigNumber(
-                        Buffer.from(data, "base64").toString("utf8")
-                    );
-                }
-                return new BigNumber(0);
-            });
-    }, [dapp.dapp]);
+        return apiProvider.getToken(ASH_TOKEN.id).then(({ supply }) => {
+            return toWei(ASH_TOKEN, supply || "0");
+        });
+    }, [apiProvider]);
 
     const getTotalLockedASHPct = useCallback(async () => {
         const totalSupply = await getASHTotalSupply();
@@ -495,15 +424,6 @@ const StakeGovProvider = ({ children }: any) => {
     useEffect(() => {
         getRewardValue();
     }, [getRewardValue]);
-
-    // update currentBlock every 6s
-    useEffect(() => {
-        getNetworkStatus();
-        const interval = setInterval(() => {
-            getNetworkStatus();
-        }, blockTimeMs);
-        return () => clearInterval(interval);
-    }, [getNetworkStatus]);
 
     useEffect(() => {
         getVEASHAmt();

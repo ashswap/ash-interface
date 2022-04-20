@@ -9,7 +9,10 @@ import ICMinus from "assets/svg/minus.svg";
 import ICChevronDown from "assets/svg/chevron-down.svg";
 import ICChevronUp from "assets/svg/chevron-up.svg";
 import usePoolDataFormat from "hooks/usePoolDataFormat";
-import { network } from "const/network";
+import {
+    AccountInfoSliceNetworkType,
+    useGetNetworkConfig,
+} from "@elrondnetwork/dapp-core";
 
 function StakedPoolCardItem({
     poolData,
@@ -21,6 +24,7 @@ function StakedPoolCardItem({
     const [openAddLiquidity, setOpenAddLiquidity] = useState<boolean>(false);
     const [openRemoveLiquidity, setOpenRemoveLiquidity] =
         useState<boolean>(false);
+    const network: AccountInfoSliceNetworkType = useGetNetworkConfig().network;
     const {
         formatedStats: { TVL, tradingAPR, volumn24h },
         formatedStakedData: {
@@ -140,7 +144,9 @@ function StakedPoolCardItem({
                     </div>
                     <div className="text-center mb-8">
                         <a
-                            href={`${network.explorerAddress}/tokens/${pool.lpToken.id}`} target="_blank" rel="noreferrer"
+                            href={`${network.explorerAddress}/tokens/${pool.lpToken.id}`}
+                            target="_blank"
+                            rel="noreferrer"
                             className="text-earn underline text-2xs font-bold hover:text-earn hover:underline"
                         >
                             View LP Distribution

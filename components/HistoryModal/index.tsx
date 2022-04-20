@@ -1,10 +1,13 @@
+import {
+    AccountInfoSliceNetworkType,
+    useGetAccountInfo,
+    useGetLoginInfo,
+    useGetNetworkConfig
+} from "@elrondnetwork/dapp-core";
 import IconNewTab from "assets/svg/new-tab.svg";
-import HeadlessModal, {
-    HeadlessModalDefaultHeader,
-} from "components/HeadlessModal";
-import { network } from "const/network";
+import BaseModal from "components/BaseModal";
+import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 import pools from "const/pool";
-import { useDappContext } from "context/dapp";
 import { toEGLD } from "helper/balance";
 import { fetcher } from "helper/common";
 import { useScreenSize } from "hooks/useScreenSize";
@@ -53,82 +56,90 @@ interface TXRecord {
 }
 
 const HistoryModal = ({ open, onClose }: Props) => {
-    const { address, loggedIn } = useDappContext();
+    const { isLoggedIn: loggedIn } = useGetLoginInfo();
+    const { address } = useGetAccountInfo();
     const { data: txHistory, mutate: refresh } = useSWR<TXRecord[]>(
         loggedIn
-            ? `${network.ashApiBaseUrl}/user/${address}/transaction`
+            ? `${ASHSWAP_CONFIG.ashApiBaseUrl}/user/${address}/transaction`
             : null,
         fetcher
     );
     const screenSize = useScreenSize();
+    const network: AccountInfoSliceNetworkType = useGetNetworkConfig().network;
 
     const displayTx = useMemo(() => {
-        return (txHistory || []).map((record) => {
-            const { name, transaction_hash } = record;
-            switch (name) {
-                case "swap":
-                    const {
-                        token_amount_in,
-                        token_amount_out,
-                        token_in,
-                        token_out,
-                    } = record;
-                    const tokenIn = TOKENS.find((t) => t.id === token_in);
-                    const tokenOut = TOKENS.find((t) => t.id === token_out);
+        return (txHistory || [])
+            .map((record) => {
+                const { name, transaction_hash } = record;
+                switch (name) {
+                    case "swap":
+                        const {
+                            token_amount_in,
+                            token_amount_out,
+                            token_in,
+                            token_out,
+                        } = record;
+                        const tokenIn = TOKENS.find((t) => t.id === token_in);
+                        const tokenOut = TOKENS.find((t) => t.id === token_out);
 
-                    if (
-                        !token_amount_in ||
-                        !token_amount_out ||
-                        !tokenIn ||
-                        !tokenOut
-                    ) {
+                        if (
+                            !token_amount_in ||
+                            !token_amount_out ||
+                            !tokenIn ||
+                            !tokenOut
+                        ) {
+                            return null;
+                        }
+                        return {
+                            msg: `Swap Success ${toEGLD(
+                                tokenIn,
+                                token_amount_in
+                            ).decimalPlaces(7)} ${tokenIn.name} to ${toEGLD(
+                                tokenOut,
+                                token_amount_out
+                            ).decimalPlaces(7)} ${tokenOut.name}`,
+                            txHash: transaction_hash,
+                            status: "success",
+                        };
+                    case "add_liquidity":
+                    case "remove_liquidity":
+                        const {
+                            first_token_amount,
+                            first_token_id,
+                            second_token_amount,
+                            second_token_id,
+                        } = record;
+                        const token1 = TOKENS.find(
+                            (t) => t.id === first_token_id
+                        );
+                        const token2 = TOKENS.find(
+                            (t) => t.id === second_token_id
+                        );
+                        if (
+                            !first_token_amount ||
+                            !second_token_amount ||
+                            !token1 ||
+                            !token2
+                        )
+                            return null;
+                        return {
+                            msg: `${
+                                name === "add_liquidity" ? "Add" : "Remove"
+                            } Success ${toEGLD(
+                                token1,
+                                first_token_amount
+                            ).decimalPlaces(7)} ${token1?.name} and ${toEGLD(
+                                token2,
+                                second_token_amount
+                            ).decimalPlaces(7)} ${token2.name}`,
+                            txHash: transaction_hash,
+                            status: "success",
+                        };
+                    default:
                         return null;
-                    }
-                    return {
-                        msg: `Swap Success ${toEGLD(
-                            tokenIn,
-                            token_amount_in
-                        ).decimalPlaces(7)} ${tokenIn.name} to ${toEGLD(
-                            tokenOut,
-                            token_amount_out
-                        ).decimalPlaces(7)} ${tokenOut.name}`,
-                        txHash: transaction_hash,
-                        status: "success",
-                    };
-                case "add_liquidity":
-                case "remove_liquidity":
-                    const {
-                        first_token_amount,
-                        first_token_id,
-                        second_token_amount,
-                        second_token_id,
-                    } = record;
-                    const token1 = TOKENS.find((t) => t.id === first_token_id);
-                    const token2 = TOKENS.find((t) => t.id === second_token_id);
-                    if (
-                        !first_token_amount ||
-                        !second_token_amount ||
-                        !token1 ||
-                        !token2
-                    )
-                        return null;
-                    return {
-                        msg: `${
-                            name === "add_liquidity" ? "Add" : "Remove"
-                        } Success ${toEGLD(
-                            token1,
-                            first_token_amount
-                        ).decimalPlaces(7)} ${token1?.name} and ${toEGLD(
-                            token2,
-                            second_token_amount
-                        ).decimalPlaces(7)} ${token2.name}`,
-                        txHash: transaction_hash,
-                        status: "success",
-                    };
-                default:
-                    return null;
-            }
-        }).filter(val => val !== null);
+                }
+            })
+            .filter((val) => val !== null);
     }, [txHistory]);
     useEffect(() => {
         if (open) {
@@ -145,16 +156,17 @@ const HistoryModal = ({ open, onClose }: Props) => {
     }, []);
 
     return (
-        <HeadlessModal
-            open={open}
-            onClose={() => onClose && onClose()}
-            transition={screenSize.msm ? "btt" : "center"}
+        <BaseModal
+            isOpen={open}
+            onRequestClose={() => onClose && onClose()}
+            type={screenSize.msm ? "drawer_btt" : "modal"}
+            className="clip-corner-4 clip-corner-tl bg-ash-dark-600 p-4 text-white w-full max-h-full mx-auto flex flex-col"
         >
-            <div className="clip-corner-4 clip-corner-tl bg-ash-dark-600 p-4 text-white max-h-[36rem] w-full sm:w-[21.875rem] sm:mt-28 mx-auto fixed bottom-0 sm:static">
-                <HeadlessModalDefaultHeader
-                    onClose={() => onClose && onClose()}
-                />
-                <div className="px-4 pt-3">
+            <div className="flex justify-end mb-3">
+                <BaseModal.CloseBtn />
+            </div>
+            <div className="flex-grow overflow-auto">
+                <div className="px-4">
                     <div className="font-bold text-2xl mb-5">History</div>
                     {displayTx.slice(0, 7).map((record) => {
                         if (!record) {
@@ -196,7 +208,7 @@ const HistoryModal = ({ open, onClose }: Props) => {
                     })}
                 </div>
             </div>
-        </HeadlessModal>
+        </BaseModal>
     );
 };
 

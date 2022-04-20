@@ -1,5 +1,5 @@
 import BigNumber from "bignumber.js";
-import { network } from "const/network";
+import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 import pools from "const/pool";
 import useContracts from "context/contracts";
 import { useWallet } from "context/wallet";
@@ -78,7 +78,7 @@ const PoolsProvider = ({ children }: any) => {
     const { lpTokens } = useWallet();
     // fetch pool stats
     const { data: poolStatsRecords } = useSWR<PoolStatsRecord[]>(
-        `${network.ashApiBaseUrl}/pool`,
+        `${ASHSWAP_CONFIG.ashApiBaseUrl}/pool`,
         fetcher
     );
 

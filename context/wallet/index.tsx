@@ -1,27 +1,25 @@
 import {
+    getApiProvider,
+    getProxyProvider,
+    useGetAccountInfo,
+    useGetLoginInfo,
+} from "@elrondnetwork/dapp-core";
+import {
     Address,
-    CallArguments,
-    ChainID,
-    ContractFunction,
-    GasLimit,
-    GasPrice,
+    ApiProvider,
     Nonce,
-    Query,
-    SmartContract,
-    TokenIdentifierValue,
+    ProxyProvider,
+    TokenOfAccountOnNetwork,
     Transaction,
     TransactionHash,
 } from "@elrondnetwork/erdjs";
 import BigNumber from "bignumber.js";
-import { blockTimeMs, gasLimit, gasPrice, network } from "const/network";
+import { blockTimeMs } from "const/dappConfig";
 import pools from "const/pool";
 import { ASH_TOKEN, TOKENS } from "const/tokens";
-import { useDappContext, useDappDispatch } from "context/dapp";
-import { arrayFetcher, emptyFunc, fetcher } from "helper/common";
-import useInitWalletConnect from "hooks/useInitWalletConnect";
-import { usePlatform } from "hooks/usePlatform";
+import { toWei } from "helper/balance";
+import { arrayFetcher, emptyFunc } from "helper/common";
 import { ITokenMap } from "interface/token";
-import { TokenBalancesMap } from "interface/tokenBalance";
 import {
     createContext,
     useCallback,
@@ -35,7 +33,7 @@ export interface State {
     isOpenConnectWalletModal: boolean;
     setIsOpenConnectWalletModal: (val: boolean) => void;
     fetchBalances: () => void;
-    balances: TokenBalancesMap;
+    balances: Record<string, TokenOfAccountOnNetwork>;
     tokens: ITokenMap;
     lpTokens: ITokenMap;
     tokenPrices: any;
@@ -72,21 +70,21 @@ interface Props {
 }
 export function WalletProvider({ children }: Props) {
     // start copy from dappContext
-    const dapp = useDappContext();
+    const { isLoggedIn: loggedIn } = useGetLoginInfo();
+    const { account, address } = useGetAccountInfo();
+    const proxy: ProxyProvider = getProxyProvider();
+    const apiProvider: ApiProvider = getApiProvider();
     // end
     const [lpTokens, setLpTokens] = useState<ITokenMap>({});
-    const [balances, setBalances] = useState<TokenBalancesMap>(
-        initState.balances
-    );
+    const [balances, setBalances] = useState<
+        Record<string, TokenOfAccountOnNetwork>
+    >(initState.balances);
     const [isOpenConnectWalletModal, setIsOpenConnectWalletModal] =
         useState(false);
-    const { isMobileOS } = usePlatform();
-    const dispatch = useDappDispatch();
-    const { walletConnect, walletConnectInit } = useInitWalletConnect();
 
     const insufficientEGLD = useMemo(
-        () => dapp.account.balance === "0",
-        [dapp.account.balance]
+        () => account.balance === "0",
+        [account.balance]
     );
 
     const tokens = useMemo(() => {
@@ -175,53 +173,43 @@ export function WalletProvider({ children }: Props) {
             }
         });
 
-        let promiseLpSupply: any[] = [];
+        let promiseLpSupply: Promise<string>[] = [];
         let tokenIds: any[] = [];
         for (const tokenId in tokens) {
             if (Object.prototype.hasOwnProperty.call(tokens, tokenId)) {
                 tokenIds.push(tokenId);
                 promiseLpSupply.push(
-                    dapp.dapp.proxy
-                        .doGetGeneric(
-                            `network/esdt/supply/${tokenId}`,
-                            (res) => res?.supply
-                        )
+                    apiProvider
+                        .getToken(tokenId)
+                        .then((val) => val.supply)
                         .catch(() => "0")
                 );
             }
         }
 
         Promise.all(promiseLpSupply).then((results) => {
-            results.map((supply: any, i: number) => {
-                tokens[tokenIds[i]].totalSupply = new BigNumber(supply);
+            results.map((supply, i) => {
+                tokens[tokenIds[i]].totalSupply = toWei(
+                    tokens[tokenIds[i]],
+                    supply || "0"
+                );
             });
             setLpTokens(tokens);
         });
-    }, [dapp.dapp.proxy]);
+    }, [apiProvider]);
 
     const fetchBalances = useCallback(() => {
-        if (!dapp.loggedIn) {
+        if (!loggedIn) {
+            setBalances({});
             return;
         }
-
-        dapp.dapp.proxy
-            .getAddressEsdtList(new Address(dapp.address))
-            .then((resp) => {
-                let tokenBalances: TokenBalancesMap = {};
-
-                for (const tokenId in resp) {
-                    tokenBalances[tokenId] = {
-                        balance: new BigNumber(resp[tokenId].balance),
-                        token:
-                            tokenId === ASH_TOKEN.id
-                                ? ASH_TOKEN
-                                : tokens[tokenId],
-                    };
-                }
-                setBalances(tokenBalances);
-            });
-    }, [tokens, dapp.loggedIn, dapp.dapp.proxy, dapp.address]);
-
+        proxy.getAddressEsdtList(new Address(address)).then((resp) => {
+            let tokenBalancesEntries: [string, TokenOfAccountOnNetwork][] = (
+                resp || []
+            ).map((val) => [val.tokenIdentifier, val]);
+            setBalances(Object.fromEntries(tokenBalancesEntries));
+        });
+    }, [loggedIn, proxy, address]);
     // fetch token balance
     useEffect(() => {
         fetchBalances();
@@ -232,12 +220,12 @@ export function WalletProvider({ children }: Props) {
     }, [fetchBalances]);
 
     const historyQuery = useMemo(() => {
-        if (!dapp.loggedIn) {
+        if (!loggedIn) {
             return "";
         }
 
         const parrams = new URLSearchParams();
-        parrams.append("sender", dapp.address);
+        parrams.append("sender", address);
         parrams.append("size", "12");
 
         const condition = {
@@ -255,55 +243,55 @@ export function WalletProvider({ children }: Props) {
         parrams.append("condition", JSON.stringify(condition));
 
         return parrams.toString();
-    }, [dapp.loggedIn, dapp.address]);
+    }, [loggedIn, address]);
 
     // useEffect(() => {
     //     !dapp.loggedIn && isMobileOS && walletConnectInit()
     // }, [isMobileOS, dapp.loggedIn]);
     const connectWallet = useCallback(
         (token?: string) => {
-            if (dapp.loggedIn) return;
+            if (loggedIn) return;
             // open connect wallet option modal
             setIsOpenConnectWalletModal(true);
         },
-        [dapp.loggedIn]
+        [loggedIn]
     );
 
     /**
      * Connect directly to maiar on mobile use URI - on android and IOS only
      */
-    const connectAppMaiarOnMobile = useCallback(
-        (token?: string) => {
-            if (isMobileOS) {
-                // try to generate uri and then open it up
-                if (walletConnect) {
-                    walletConnect.login().then((walletConectUri) => {
-                        let uri = "";
-                        if (token) {
-                            uri = `${walletConectUri}&token=${token}`;
-                            dispatch({
-                                type: "setTokenLogin",
-                                tokenLogin: {
-                                    loginToken: token,
-                                },
-                            });
-                        } else {
-                            uri = walletConectUri;
-                        }
-                        if (typeof window !== "undefined") {
-                            window.open(
-                                `${
-                                    dapp.walletConnectDeepLink
-                                }?wallet-connect=${encodeURIComponent(uri)}`,
-                                "_blank"
-                            );
-                        }
-                    });
-                }
-            }
-        },
-        [isMobileOS, walletConnect, dispatch, dapp.walletConnectDeepLink]
-    );
+    // const connectAppMaiarOnMobile = useCallback(
+    //     (token?: string) => {
+    //         if (isMobileOS) {
+    //             // try to generate uri and then open it up
+    //             if (walletConnect) {
+    //                 walletConnect.login().then((walletConectUri) => {
+    //                     let uri = "";
+    //                     if (token) {
+    //                         uri = `${walletConectUri}&token=${token}`;
+    //                         dispatch({
+    //                             type: "setTokenLogin",
+    //                             tokenLogin: {
+    //                                 loginToken: token,
+    //                             },
+    //                         });
+    //                     } else {
+    //                         uri = walletConectUri;
+    //                     }
+    //                     if (typeof window !== "undefined") {
+    //                         window.open(
+    //                             `${
+    //                                 dapp.walletConnectDeepLink
+    //                             }?wallet-connect=${encodeURIComponent(uri)}`,
+    //                             "_blank"
+    //                         );
+    //                     }
+    //                 });
+    //             }
+    //         }
+    //     },
+    //     [isMobileOS, walletConnect, dispatch, dapp.walletConnectDeepLink]
+    // );
 
     const value: State = {
         ...initState,

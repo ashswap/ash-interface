@@ -1,15 +1,12 @@
 import { Menu, Transition } from "@headlessui/react";
-import HeadlessModal, {
-    HeadlessModalDefaultHeader,
-} from "components/HeadlessModal";
+import ICChevronDown from "assets/svg/chevron-down.svg";
+import ICStake from "assets/svg/stake.svg";
+import BaseModal from "components/BaseModal";
 import { TAILWIND_BREAKPOINT } from "const/mediaQueries";
 import useMediaQuery from "hooks/useMediaQuery";
-import Image from "next/image";
 import Link from "next/link";
 import React, { Fragment, useState } from "react";
 import styles from "./Nav.module.css";
-import ICStake from "assets/svg/stake.svg";
-import ICChevronDown from "assets/svg/chevron-down.svg";
 const SOCIALS = [
     {
         name: "Liquidity Stake",
@@ -38,7 +35,7 @@ function StakeMenu() {
         `(max-width: ${TAILWIND_BREAKPOINT.SM}px)`
     );
     return (
-        <>
+        <div>
             <Menu
                 as="div"
                 className="hidden sm:flex relative text-left items-center"
@@ -108,23 +105,30 @@ function StakeMenu() {
                             <ICChevronDown className="inline w-2 ml-1 transition-none" />
                         </div>
                     </div>
-                    <HeadlessModal
-                        open={mIsOpen}
-                        onClose={() => setMIsOpen(false)}
-                        transition="btt"
+                    <BaseModal
+                        isOpen={mIsOpen}
+                        onRequestClose={() => setMIsOpen(false)}
+                        type="drawer_btt"
+                        className="clip-corner-4 clip-corner-tl bg-ash-dark-600 p-4 text-white max-h-screen flex flex-col"
                     >
-                        <div className="clip-corner-4 clip-corner-tl bg-ash-dark-600 p-4 fixed inset-x-0 bottom-0 text-white max-h-screen overflow-auto">
-                            <HeadlessModalDefaultHeader
-                                onClose={() => setMIsOpen(false)}
-                            />
-                            <div className="px-6 py-[3.75rem]">
+                        <div className="flex justify-end mb-3.5">
+                            <BaseModal.CloseBtn />
+                        </div>
+                        <div className="flex-grow overflow-auto">
+                            <div className="px-6 pb-[3.75rem]">
                                 <div className="mb-9 text-2xl font-bold">
                                     Stake
                                 </div>
                                 <div className="grid grid-cols-1 gap-4">
                                     {SOCIALS.map(({ name, url }) => {
                                         return (
-                                            <HeadlessLink key={name} href={url} onClick={() => setMIsOpen(false)}>
+                                            <HeadlessLink
+                                                key={name}
+                                                href={url}
+                                                onClick={() =>
+                                                    setMIsOpen(false)
+                                                }
+                                            >
                                                 <div className="bg-ash-dark-400 px-6 h-12 flex items-center text-xs font-bold text-white">
                                                     <span className="capitalize truncate">
                                                         {name}
@@ -136,10 +140,10 @@ function StakeMenu() {
                                 </div>
                             </div>
                         </div>
-                    </HeadlessModal>
+                    </BaseModal>
                 </>
             )}
-        </>
+        </div>
     );
 }
 
