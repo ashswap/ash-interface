@@ -1,10 +1,20 @@
-import { CustomNetworkType } from "@elrondnetwork/dapp-core";
+import {
+    CustomNetworkType,
+    fallbackNetworkConfigurations,
+} from "@elrondnetwork/dapp-core";
+import { ENVIRONMENT } from "./env";
 export const gasPrice = 1000000000;
 export const version = 1;
 export const gasLimit = 600000000;
 export const gasPerDataByte = 1500;
 export const shardId = 1;
 export const blockTimeMs = 6000;
-export const DAPP_CONFIG: CustomNetworkType = {
-}
 
+let defaultDevnet: CustomNetworkType = fallbackNetworkConfigurations.devnet;
+defaultDevnet.apiAddress = "https://api-elrond-devnet.ashswap.io";
+defaultDevnet.apiTimeout = "10000";
+
+export const DAPP_CONFIG: CustomNetworkType =
+    ENVIRONMENT.NETWORK === "testnet"
+        ? fallbackNetworkConfigurations.testnet
+        : defaultDevnet;
