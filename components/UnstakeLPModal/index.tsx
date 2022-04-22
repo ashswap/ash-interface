@@ -4,6 +4,7 @@ import BigNumber from "bignumber.js";
 import BaseModal from "components/BaseModal";
 import Checkbox from "components/Checkbox";
 import InputCurrency from "components/InputCurrency";
+import CardTooltip from "components/Tooltip/CardTooltip";
 import { blockTimeMs } from "const/dappConfig";
 import { ASH_TOKEN } from "const/tokens";
 import { FarmsState, useFarms } from "context/farms";
@@ -225,10 +226,19 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
                         </div>
                     </div>
                     <div>
-                        <div className="text-stake-gray-500 font-bold text-xs lg:text-sm mb-2 lg:mb-4">
-                            Harvest amount depends on the percentage of Unstake
-                            amount
-                        </div>
+                        <CardTooltip
+                            content={
+                                <div>
+                                    While unstaking your LP-Token, you also
+                                    harvest your ASH farmed by the percentage of
+                                    the LP-Token that would be unstaked.
+                                </div>
+                            }
+                        >
+                            <div className="inline-block text-stake-gray-500 font-bold text-xs lg:text-sm mb-2 lg:mb-4 underline">
+                                You also harvest your farm by Unstaking
+                            </div>
+                        </CardTooltip>
                         <div className="h-14 lg:h-18 pl-7 pr-4.5 flex items-center justify-between bg-ash-dark-400/30 text-ash-gray-600">
                             <div className="flex items-center">
                                 <div className="bg-pink-600 w-4 h-4 rounded-full mr-2"></div>

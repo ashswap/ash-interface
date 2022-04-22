@@ -73,7 +73,7 @@ function HeadlessModal({
                     initialFocus={initialFocus}
                     as={as || "div"}
                     static={rest.static || false}
-                    className={`fixed inset-0 z-[999] ${className}`}
+                    className={`fixed inset-0 z-modal ${className}`}
                 >
                     <div className="relative inset-0 w-full h-full overflow-hidden">
                         <Transition.Child

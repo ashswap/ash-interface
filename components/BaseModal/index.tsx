@@ -60,7 +60,7 @@ const BaseModal = (props: BaseModalType) => {
                         <div
                             {...props}
                             style={{}}
-                            className="overflow-auto fixed z-[999] inset-0 py-8 "
+                            className="overflow-auto fixed z-modal inset-0 py-8 "
                         >
                             <div className="flex items-center justify-center min-h-full">
                                 {contentElement}

@@ -82,7 +82,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
                         {/* <Component {...pageProps} /> */}
                         {getLayout(<Component {...pageProps} />)}
                         <ConnectWalletModal />
-                        <div className="fixed bottom-24 left-6 right-6 sm:bottom-12 sm:left-auto sm:right-12 z-[9999] flex flex-col items-end max-w-[480px] space-y-2 sm:space-y-4">
+                        <div className="fixed bottom-24 left-6 right-6 sm:bottom-12 sm:left-auto sm:right-12 z-toast flex flex-col items-end max-w-[480px] space-y-2 sm:space-y-4">
                             <TxsToastList />
                             <SignTxNotification />
                             <SignTxsModal />

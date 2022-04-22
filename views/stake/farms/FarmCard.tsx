@@ -4,6 +4,7 @@ import ICMinus from "assets/svg/minus.svg";
 import ICPlus from "assets/svg/plus.svg";
 import BaseModal from "components/BaseModal";
 import StakeLPModal from "components/StakeLPModal";
+import CardTooltip from "components/Tooltip/CardTooltip";
 import UnstakeLPModal from "components/UnstakeLPModal";
 import { ASH_TOKEN } from "const/tokens";
 import { TRANSITIONS } from "const/transitions";
@@ -113,18 +114,35 @@ function FarmCard({ farmData, viewType }: props) {
                         </div>
                     </div>
                     <div className="mb-12">
-                        <div className="text-ash-gray-500 text-xs font-bold underline mb-4">
-                            Emission APR
-                        </div>
+                        <CardTooltip
+                            strategy="fixed"
+                            content={
+                                <div>
+                                    Emission Annual Percentage Rate. This
+                                    summary is calculated by the ASH you have
+                                    farmed every day by staking LP.
+                                </div>
+                            }
+                        >
+                            <div className="inline-block text-ash-gray-500 text-xs font-bold underline mb-4">
+                                Emission APR
+                            </div>
+                        </CardTooltip>
                         <div className="text-lg font-bold text-ash-cyan-500">
                             {fractionFormat(emissionAPR.toNumber())}%
                         </div>
                     </div>
                     <div className="flex items-center justify-between mb-9">
                         <div>
-                            <div className="text-xs text-ash-gray-500 font-bold underline mb-2">
-                                {ASH_TOKEN.name} Earned
-                            </div>
+                            <CardTooltip
+                                content={
+                                    <div>Total ASH available to harvest.</div>
+                                }
+                            >
+                                <div className="inline-block text-xs text-ash-gray-500 font-bold underline mb-2">
+                                    {ASH_TOKEN.name} Farmed
+                                </div>
+                            </CardTooltip>
                             <div
                                 className={`text-lg font-bold ${
                                     stakedData?.totalRewardAmt.gt(0)
@@ -152,9 +170,17 @@ function FarmCard({ farmData, viewType }: props) {
                     </div>
                     <div className="flex items-center justify-between mb-11">
                         <div>
-                            <div className="text-xs text-ash-gray-500 font-bold underline mb-2">
-                                LP-Staked
-                            </div>
+                            <CardTooltip
+                                content={
+                                    <div>
+                                        Total amount of your staked LP-Token.
+                                    </div>
+                                }
+                            >
+                                <div className="inline-block text-xs text-ash-gray-500 font-bold underline mb-2">
+                                    LP-Staked
+                                </div>
+                            </CardTooltip>
                             <div
                                 className={`text-lg font-bold ${
                                     displayStakedLP === "0.00"
@@ -192,9 +218,18 @@ function FarmCard({ farmData, viewType }: props) {
                         </div>
                     </div>
                     <div className="bg-stake-dark-500 flex items-center justify-between h-12 px-4">
-                        <div className="text-ash-gray-500 text-2xs mr-2">
-                            Total Liquidity
-                        </div>
+                        <CardTooltip
+                            content={
+                                <div>
+                                    Total value of staked LP-Token on ASHSWAP
+                                    DEX
+                                </div>
+                            }
+                        >
+                            <div className="inline-block text-ash-gray-500 text-2xs mr-2 underline">
+                                Total Liquidity
+                            </div>
+                        </CardTooltip>
                         <div className="text-ash-gray-500 text-sm">
                             ${fractionFormat(totalLiquidityValue.toNumber())}
                         </div>

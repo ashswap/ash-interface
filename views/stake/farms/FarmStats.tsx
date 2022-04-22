@@ -1,4 +1,5 @@
 import BigNumber from "bignumber.js";
+import CardTooltip from "components/Tooltip/CardTooltip";
 import { ASH_TOKEN } from "const/tokens";
 import { useFarms } from "context/farms";
 import { toEGLDD } from "helper/balance";
@@ -60,9 +61,18 @@ function FarmStats({ onClickAll }: { onClickAll?: () => void }) {
                 </div>
                 <div className="bg-ash-dark-400/30 py-5 px-4.5">
                     <div className="px-5 py-2 mb-5">
-                        <div className="text-ash-gray-500 text-sm font-bold underline mb-6">
-                            TOTAL FARM REWARD
-                        </div>
+                        <CardTooltip
+                            content={
+                                <div>
+                                    Your rewards every by staking LP-Tokens, you
+                                    can claim them whenever you want.
+                                </div>
+                            }
+                        >
+                            <div className="text-ash-gray-500 text-sm font-bold underline mb-6">
+                                TOTAL FARM REWARD
+                            </div>
+                        </CardTooltip>
                         <div className="flex items-center">
                             <div className="w-4.5 h-4.5 rounded-full bg-pink-600 mr-2"></div>
                             <div className="text-white text-lg font-bold">
@@ -109,9 +119,30 @@ function FarmStats({ onClickAll }: { onClickAll?: () => void }) {
                         <div className="text-sm font-bold mb-4">TIPS</div>
                         <div className="text-sm">
                             Stake{" "}
-                            <span className="text-white font-bold">
-                                LP-Tokens
-                            </span>{" "}
+                            <CardTooltip
+                                content={
+                                    <>
+                                        <div className="mb-4">
+                                            Liquid Provider Tokens. This token
+                                            stand for your deposition in any
+                                            pools of ASHSWAP.
+                                        </div>
+                                        <a
+                                            href="https://docs.ashswap.io/testnet-guides/liquidity-staking"
+                                            target="_blank"
+                                            rel="noreferrer"
+                                        >
+                                            <span className="text-ash-cyan-500 underline">
+                                                View Pools Guide.
+                                            </span>
+                                        </a>
+                                    </>
+                                }
+                            >
+                                <span className="text-white font-bold underline">
+                                    LP-Tokens
+                                </span>
+                            </CardTooltip>{" "}
                             to earn ASH.
                         </div>
                         <div className="text-sm">
