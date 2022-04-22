@@ -50,7 +50,6 @@ function VotePowerChart() {
         { refreshInterval: 10 * 60 * 1000 }
     );
     const areaRef = useRef<any>(null);
-    const [activeIndex, setActiveIndex] = useState(-1);
 
     const { sm } = useScreenSize();
 
@@ -64,7 +63,12 @@ function VotePowerChart() {
     const displayChartData = useMemo(() => {
         return chartData;
     }, [chartData]);
-
+    const defaultIndex = useMemo(() => {
+        return displayChartData.findIndex((val) =>
+            moment.unix(val.timestamp).isSame(moment(), "years")
+        );
+    }, [displayChartData]);
+    const [activeIndex, setActiveIndex] = useState(defaultIndex);
     const ticks = useMemo(() => {
         return displayChartData.map(({ timestamp }) => timestamp);
     }, [displayChartData]);
@@ -74,13 +78,10 @@ function VotePowerChart() {
         return time.format("yyyy");
     }, []);
     const activePayload = useMemo(() => {
-        if (activeIndex === -1)
-            return displayChartData[displayChartData.length - 1];
         return displayChartData[activeIndex];
     }, [displayChartData, activeIndex]);
     const prevPayload = useMemo(() => {
         const index = activeIndex - 1;
-        if (index === -2) return displayChartData[displayChartData.length - 2];
         return displayChartData[index];
     }, [displayChartData, activeIndex]);
     const pct = useMemo(() => {
@@ -98,9 +99,11 @@ function VotePowerChart() {
                 <ResponsiveContainer>
                     <AreaChart
                         data={displayChartData}
-                        onMouseLeave={() => setActiveIndex(-1)}
+                        onMouseLeave={() => setActiveIndex(defaultIndex)}
                         onMouseMove={(e) => {
-                            setActiveIndex(e?.activeTooltipIndex || -1);
+                            setActiveIndex(
+                                e?.activeTooltipIndex ?? defaultIndex
+                            );
                         }}
                     >
                         <defs>
@@ -202,28 +205,25 @@ function VotePowerChart() {
                                     ?.value
                         )}
                     </span>
-                    {pct !== 0 &&
-                        moment
-                            .unix(activePayload.timestamp)
-                            .isSame(moment(), "year") && (
-                            <div
-                                className={`flex items-center ml-4 ${
-                                    pct > 0
-                                        ? "text-ash-green-500"
-                                        : "text-ash-purple-500"
-                                }`}
-                            >
-                                {pct > 0 ? (
-                                    <ICArrowTopRight className="w-1.5 h-1.5" />
-                                ) : (
-                                    <ICArrowBottomRight className="w-1.5 h-1.5" />
-                                )}
-                                <span className={`text-xs font-bold ml-1`}>
-                                    {pct > 0 && "+"}
-                                    {pct.toFixed(2)}%
-                                </span>
-                            </div>
-                        )}
+                    {pct !== 0 && (
+                        <div
+                            className={`flex items-center ml-4 ${
+                                pct > 0
+                                    ? "text-ash-green-500"
+                                    : "text-ash-purple-500"
+                            }`}
+                        >
+                            {pct > 0 ? (
+                                <ICArrowTopRight className="w-1.5 h-1.5" />
+                            ) : (
+                                <ICArrowBottomRight className="w-1.5 h-1.5" />
+                            )}
+                            <span className={`text-xs font-bold ml-1`}>
+                                {pct > 0 && "+"}
+                                {pct.toFixed(2)}%
+                            </span>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

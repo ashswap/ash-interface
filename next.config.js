@@ -12,11 +12,11 @@ module.exports = withReactSvg(withFonts({
     },
     async redirects() {
         return [
-            {
-                source: '/info',
-                destination: '/info/tokens',
-                permanent: true,
-            },
+            // {
+            //     source: '/info',
+            //     destination: '/info/tokens',
+            //     permanent: true,
+            // },
             // {
             //     source: '/stake/farms',
             //     destination: '/swap',
