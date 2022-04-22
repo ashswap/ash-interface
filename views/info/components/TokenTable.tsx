@@ -8,22 +8,11 @@ import { fetcher } from "helper/common";
 import { abbreviateCurrency, currencyFormater } from "helper/number";
 import { useScreenSize } from "hooks/useScreenSize";
 import { IToken } from "interface/token";
+import { TokenStatsRecord } from "interface/tokenStats";
 import Image from "next/image";
 import Link from "next/link";
 import React, { useCallback, useMemo, useState } from "react";
 import useSWR from "swr";
-type TokenRecord = {
-    change_percentage_day: number;
-    change_percentage_hour: number;
-    change_percentage_week: number;
-    liquidity: number;
-    price: number;
-    token_id: string;
-    transaction_count: number;
-    volume: number;
-    // added from client
-    token?: IToken;
-};
 
 const TokenRecord = ({
     active,
@@ -32,7 +21,7 @@ const TokenRecord = ({
 }: {
     active?: boolean;
     order: number;
-    tokenData: TokenRecord;
+    tokenData: TokenStatsRecord;
 }) => {
     const screenSize = useScreenSize();
     const format = useCallback(
@@ -123,25 +112,22 @@ const TokenRecord = ({
         </Link>
     );
 };
-function TokenTable() {
+function TokenTable({ data, hidePaging }: { data: TokenStatsRecord[], hidePaging?: boolean }) {
     const [pageIndex, setPageIndex] = useState(0);
     const [pageSize, setPageSize] = useState(10);
     const [sortBy, setSortBy] = useState<
-        keyof Omit<TokenRecord, "token" | "token_id"> | "name"
+        keyof Omit<TokenStatsRecord, "token" | "token_id"> | "name"
     >("volume");
-    const { data } = useSWR<TokenRecord[]>(
-        ENVIRONMENT.ASH_API + "/token",
-        fetcher
-    );
-    const tokenRecords: TokenRecord[] = useMemo(() => {
+
+    const tokenRecords: TokenStatsRecord[] = useMemo(() => {
         if (!data) return [];
         return data.map((val) => {
             const token = IN_POOL_TOKENS.find((t) => t.id === val.token_id);
-            const record: TokenRecord = { ...val, token };
+            const record: TokenStatsRecord = { ...val, token };
             return record;
         });
     }, [data]);
-    const sortedTokenRecords: TokenRecord[] = useMemo(() => {
+    const sortedTokenRecords: TokenStatsRecord[] = useMemo(() => {
         if (sortBy === "name") {
             return [...tokenRecords].sort((x, y) => {
                 const strX = x?.token?.name || "";
@@ -153,10 +139,10 @@ function TokenTable() {
             return y[sortBy] - x[sortBy];
         });
     }, [tokenRecords, sortBy]);
-    const displayTokens: TokenRecord[][] = useMemo(() => {
+    const displayTokens: TokenStatsRecord[][] = useMemo(() => {
         const length = sortedTokenRecords.length;
         const nPage = Math.ceil(length / pageSize);
-        const pagination: TokenRecord[][] = [];
+        const pagination: TokenStatsRecord[][] = [];
         for (let i = 0; i < nPage; i++) {
             pagination.push(
                 sortedTokenRecords.slice(i * pageSize, i * pageSize + pageSize)
@@ -238,37 +224,39 @@ function TokenTable() {
                         />
                     );
                 })}
-                <div className="bg-ash-dark-600 h-14 flex items-center justify-center text-xs">
-                    <button
-                        className={`p-1 ${
-                            pageIndex === 0
-                                ? "text-white/20 pointer-events-none"
-                                : "text-pink-600"
-                        }`}
-                        disabled={pageIndex === 0}
-                        onClick={() => setPageIndex((i) => i - 1)}
-                    >
-                        <ICArrowLeft className="w-4 h-4" />
-                    </button>
-                    <div className="px-6">
-                        <span className="text-white">{pageIndex + 1}</span>
-                        <span className="text-ash-gray-500">/</span>
-                        <span className="text-ash-gray-500">
-                            {displayTokens.length}
-                        </span>
+                {!hidePaging && (
+                    <div className="bg-ash-dark-600 h-14 flex items-center justify-center text-xs">
+                        <button
+                            className={`p-1 ${
+                                pageIndex === 0
+                                    ? "text-white/20 pointer-events-none"
+                                    : "text-pink-600"
+                            }`}
+                            disabled={pageIndex === 0}
+                            onClick={() => setPageIndex((i) => i - 1)}
+                        >
+                            <ICArrowLeft className="w-4 h-4" />
+                        </button>
+                        <div className="px-6">
+                            <span className="text-white">{pageIndex + 1}</span>
+                            <span className="text-ash-gray-500">/</span>
+                            <span className="text-ash-gray-500">
+                                {displayTokens.length}
+                            </span>
+                        </div>
+                        <button
+                            className={`p-1 ${
+                                pageIndex === displayTokens.length - 1
+                                    ? "text-white/20 pointer-events-none"
+                                    : "text-pink-600"
+                            }`}
+                            disabled={pageIndex === displayTokens.length - 1}
+                            onClick={() => setPageIndex((i) => i + 1)}
+                        >
+                            <ICArrowRight className="w-4 h-4" />
+                        </button>
                     </div>
-                    <button
-                        className={`p-1 ${
-                            pageIndex === displayTokens.length - 1
-                                ? "text-white/20 pointer-events-none"
-                                : "text-pink-600"
-                        }`}
-                        disabled={pageIndex === displayTokens.length - 1}
-                        onClick={() => setPageIndex((i) => i + 1)}
-                    >
-                        <ICArrowRight className="w-4 h-4" />
-                    </button>
-                </div>
+                )}
             </div>
         </div>
     );

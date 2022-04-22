@@ -8,6 +8,7 @@ import ICSearch from "assets/svg/search.svg";
 import ICSun from "assets/svg/sun.svg";
 import ICStake from "assets/svg/stake.svg";
 import ICToken from "assets/svg/token.svg";
+import ICHomeTrendUp from "assets/svg/home-trend-up.svg";
 import AddressMenu from "components/AddressMenu";
 import Input from "components/Input";
 import { useScreenSize } from "hooks/useScreenSize";
@@ -194,14 +195,15 @@ function InfoLayout({ children }: any) {
                         </div>
                         <div className="flex-grow overflow-auto">
                             <ul>
-                                {/* <li>
-                                <NavLink
-                                    href={{ pathname: "/info" }}
-                                    name="Overview"
-                                    Icon={ICHomeTrendUp}
-                                    active={isActive("/info", true)}
-                                />
-                            </li> */}
+                                <li>
+                                    <NavLink
+                                        href={{ pathname: "/info" }}
+                                        name="Overview"
+                                        Icon={ICHomeTrendUp}
+                                        collapsed={!openSidebar}
+                                        active={isActive("/info", true)}
+                                    />
+                                </li>
                                 <li>
                                     <NavLink
                                         href="/info/tokens"
@@ -410,12 +412,12 @@ function InfoLayout({ children }: any) {
             <div className="pb-[4.5rem]">{children}</div>
             <nav className="fixed bottom-0 left-0 right-0 w-full text-white bg-black/40 backdrop-filter backdrop-blur-xl">
                 <ul className="flex">
-                    {/* <MNavLink
+                    <MNavLink
                         href={{ pathname: "/info" }}
                         name="Overview"
                         Icon={ICHomeTrendUp}
                         active={isActive("/info", true)}
-                    /> */}
+                    />
                     <MNavLink
                         href="/info/tokens"
                         name="Tokens"

@@ -6,23 +6,22 @@ export const useValueChart = (
     chartData: ValueChartRecord[],
     timeUnit: ChartTimeUnitType
 ) => {
-    const displayChartData = useMemo(() => {
+    const displayChartData: ValueChartRecord[] = useMemo(() => {
         if (timeUnit === "D") return chartData;
-        const wMap: { [key: number]: number[] } = {};
+        const wMap: { [key: number]: ValueChartRecord[] } = {};
         chartData.map((val) => {
             // group by week or month to get the same key(timestamp)
+            const unix = moment.unix(val.timestamp);
             const w =
                 timeUnit === "W"
-                    ? moment
-                          .unix(val.timestamp)
+                    ? unix
                           .day(1)
                           .hour(0)
                           .minute(0)
                           .second(0)
                           .millisecond(0)
                           .unix()
-                    : moment
-                          .unix(val.timestamp)
+                    : unix
                           .date(1)
                           .hour(0)
                           .minute(0)
@@ -30,18 +29,23 @@ export const useValueChart = (
                           .millisecond(0)
                           .unix();
             if (wMap[w]) {
-                wMap[w].push(val.value);
+                wMap[w].push(val);
             } else {
-                wMap[w] = [val.value];
+                wMap[w] = [val];
             }
         });
-        const avg = Object.keys(wMap).map((k) => {
+        console.log(wMap);
+        const avg: ValueChartRecord[] = Object.keys(wMap).map((k) => {
             const sum = wMap[+k].reduce((total, value) => {
-                return total + value;
+                return total + value.value;
             }, 0);
             return {
                 timestamp: +k,
                 value: sum / wMap[+k].length,
+                range: [
+                    wMap[+k][0].timestamp,
+                    wMap[+k][wMap[+k].length - 1].timestamp,
+                ],
             };
         });
         return avg;

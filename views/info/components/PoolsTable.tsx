@@ -18,11 +18,9 @@ const currencyFormater = new Intl.NumberFormat("en-US", {
 
 type PoolWithStatsRecords = PoolStatsRecord & { pool?: IPool };
 const PoolRecord = ({
-    active,
     order,
     poolData,
 }: {
-    active: boolean;
     order: number;
     poolData: PoolWithStatsRecords;
 }) => {
@@ -100,7 +98,7 @@ const PoolRecord = ({
         </Link>
     );
 };
-function PoolsTable({ data }: { data: PoolStatsRecord[] }) {
+function PoolsTable({ data, hidePaging }: { data: PoolStatsRecord[], hidePaging?: boolean }) {
     const [pageIndex, setPageIndex] = useState(0);
     const [pageSize, setPageSize] = useState(10);
     const [sortBy, setSortBy] = useState<
@@ -168,43 +166,44 @@ function PoolsTable({ data }: { data: PoolStatsRecord[] }) {
                 return (
                     <PoolRecord
                         key={val.pool_address}
-                        active={false}
                         order={pageIndex * pageSize + index + 1}
                         poolData={val}
                     />
                 );
             })}
-            <div className="bg-ash-dark-600 h-14 flex items-center justify-center text-xs">
-                <button
-                    className={`p-1 ${
-                        pageIndex === 0
-                            ? "text-white/20 pointer-events-none"
-                            : "text-pink-600"
-                    }`}
-                    disabled={pageIndex === 0}
-                    onClick={() => setPageIndex((i) => i - 1)}
-                >
-                    <ICArrowLeft className="w-4 h-4" />
-                </button>
-                <div className="px-6">
-                    <span className="text-white">{pageIndex + 1}</span>
-                    <span className="text-ash-gray-500">/</span>
-                    <span className="text-ash-gray-500">
-                        {displayPoolRecords.length}
-                    </span>
+            {!hidePaging && (
+                <div className="bg-ash-dark-600 h-14 flex items-center justify-center text-xs">
+                    <button
+                        className={`p-1 ${
+                            pageIndex === 0
+                                ? "text-white/20 pointer-events-none"
+                                : "text-pink-600"
+                        }`}
+                        disabled={pageIndex === 0}
+                        onClick={() => setPageIndex((i) => i - 1)}
+                    >
+                        <ICArrowLeft className="w-4 h-4" />
+                    </button>
+                    <div className="px-6">
+                        <span className="text-white">{pageIndex + 1}</span>
+                        <span className="text-ash-gray-500">/</span>
+                        <span className="text-ash-gray-500">
+                            {displayPoolRecords.length}
+                        </span>
+                    </div>
+                    <button
+                        className={`p-1 ${
+                            pageIndex === displayPoolRecords.length - 1
+                                ? "text-white/20 pointer-events-none"
+                                : "text-pink-600"
+                        }`}
+                        disabled={pageIndex === displayPoolRecords.length - 1}
+                        onClick={() => setPageIndex((i) => i + 1)}
+                    >
+                        <ICArrowRight className="w-4 h-4" />
+                    </button>
                 </div>
-                <button
-                    className={`p-1 ${
-                        pageIndex === displayPoolRecords.length - 1
-                            ? "text-white/20 pointer-events-none"
-                            : "text-pink-600"
-                    }`}
-                    disabled={pageIndex === displayPoolRecords.length - 1}
-                    onClick={() => setPageIndex((i) => i + 1)}
-                >
-                    <ICArrowRight className="w-4 h-4" />
-                </button>
-            </div>
+            )}
         </div>
     );
 }
