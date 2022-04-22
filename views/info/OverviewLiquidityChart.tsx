@@ -177,7 +177,7 @@ function OverviewLiquidityChart() {
                 </ResponsiveContainer>
                 <div className="absolute top-0">
                     <div className="text-xs text-white mb-2">
-                        Volume{" "}
+                        Liquidity{" "}
                         <span className="text-stake-gray-500">
                             {rangeFormat}
                         </span>
