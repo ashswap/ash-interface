@@ -85,7 +85,6 @@ function VotePowerChart() {
         return displayChartData[index];
     }, [displayChartData, activeIndex]);
     const pct = useMemo(() => {
-        console.log(activePayload, prevPayload);
         const activeVal = activePayload?.value || 0;
         const prevVal = prevPayload?.value || 0;
         if (prevVal === 0) return 0;

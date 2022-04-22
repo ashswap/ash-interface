@@ -34,7 +34,6 @@ export const useValueChart = (
                 wMap[w] = [val];
             }
         });
-        console.log(wMap);
         const avg: ValueChartRecord[] = Object.keys(wMap).map((k) => {
             const sum = wMap[+k].reduce((total, value) => {
                 return total + value.value;
