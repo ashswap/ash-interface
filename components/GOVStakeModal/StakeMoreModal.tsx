@@ -5,7 +5,8 @@ import BaseModal from "components/BaseModal";
 import Checkbox from "components/Checkbox";
 import InputCurrency from "components/InputCurrency";
 import Switch from "components/Switch";
-import Tooltip from "components/Tooltip";
+import CardTooltip from "components/Tooltip/CardTooltip";
+import OnboardTooltip from "components/Tooltip/OnboardTooltip";
 import { ASH_TOKEN, VE_ASH_DECIMALS } from "const/tokens";
 import { useStakeGov } from "context/gov";
 import { useWallet } from "context/wallet";
@@ -275,9 +276,13 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                             </div>
                         </div>
                         <div className="mb-16 lg:mb-11">
-                            <div className="text-ash-gray-500 text-sm font-bold underline mb-2 lg:mb-4">
-                                Current lock period
-                            </div>
+                            <CardTooltip
+                                content={<div>Your lock remaining.</div>}
+                            >
+                                <div className="inline-block text-ash-gray-500 text-sm font-bold underline mb-2 lg:mb-4">
+                                    Current lock period
+                                </div>
+                            </CardTooltip>
                             <div className="bg-stake-dark-500 text-ash-gray-500 h-18 lg:h-20 pl-6 pr-4 flex items-center justify-between">
                                 <div className="text-lg lg:text-2xl font-bold">
                                     {moment
@@ -305,18 +310,38 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                                             }
                                         }}
                                     >
-                                        <span className="ml-3 text-ash-gray-500 text-sm font-bold underline">
-                                            I want to extend my lock period!
-                                        </span>
+                                        <CardTooltip
+                                            content={
+                                                <div>
+                                                    You can extend your locked
+                                                    period to recover your veASH
+                                                    to maximum of 4 years.
+                                                </div>
+                                            }
+                                        >
+                                            <span className="ml-3 text-ash-gray-500 text-sm font-bold underline">
+                                                I want to extend my lock period!
+                                            </span>
+                                        </CardTooltip>
                                     </Switch>
                                 </div>
                             ) : (
-                                <span className="text-ash-gray-500 text-sm font-bold underline">
-                                    Extend lock period
-                                </span>
+                                <CardTooltip
+                                    content={
+                                        <div>
+                                            You can extend your locked period to
+                                            recover your veASH to maximum of 4
+                                            years.
+                                        </div>
+                                    }
+                                >
+                                    <span className="text-ash-gray-500 text-sm font-bold underline">
+                                        Extend lock period
+                                    </span>
+                                </CardTooltip>
                             )}
                             {isExtend && (
-                                <Tooltip
+                                <OnboardTooltip
                                     open={
                                         onboardingExtendPeriod &&
                                         openOnboardingExtendTooltip
@@ -406,7 +431,7 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                                                 })}
                                             </div> */}
                                     </div>
-                                </Tooltip>
+                                </OnboardTooltip>
                             )}
                         </div>
                     </div>
@@ -416,9 +441,18 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                         </div>
                         <div className="flex flex-col space-y-11">
                             <div>
-                                <div className="text-ash-gray-500 text-xs underline mb-2">
-                                    Your total veASH
-                                </div>
+                                <CardTooltip
+                                    content={
+                                        <div>
+                                            Amount of veASH that you’ll receive
+                                            after stake
+                                        </div>
+                                    }
+                                >
+                                    <div className="inline-block text-ash-gray-500 text-xs underline mb-2">
+                                        Your total veASH
+                                    </div>
+                                </CardTooltip>
                                 <div
                                     className={`text-lg font-bold ${
                                         lockAmt.gt(0) || isExtend
@@ -449,9 +483,20 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                                 )}
                             </div>
                             <div>
-                                <div className="text-ash-gray-500 text-xs underline mb-2">
-                                    Your capacity
-                                </div>
+                                <CardTooltip
+                                    content={
+                                        <div>
+                                            Percentage of your veASH to the
+                                            total veASH in ASHSWAP Governance
+                                            Stake. It depends on the reward that
+                                            you’ll receive.
+                                        </div>
+                                    }
+                                >
+                                    <div className="text-ash-gray-500 text-xs underline mb-2">
+                                        Your capacity
+                                    </div>
+                                </CardTooltip>
                                 <div
                                     className={`text-lg font-bold ${
                                         lockAmt.gt(0) || isExtend
@@ -478,9 +523,18 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                                 )}
                             </div>
                             <div>
-                                <div className="text-ash-gray-500 text-xs underline mb-2">
-                                    Unlock Time
-                                </div>
+                                <CardTooltip
+                                    content={
+                                        <div>
+                                            The time that your veASH becomes 0.
+                                            You can claim back your staked ASH.
+                                        </div>
+                                    }
+                                >
+                                    <div className="text-ash-gray-500 text-xs underline mb-2">
+                                        Unlock Time
+                                    </div>
+                                </CardTooltip>
                                 <div
                                     className={`text-lg font-bold ${
                                         isExtend

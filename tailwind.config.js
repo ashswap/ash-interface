@@ -78,6 +78,11 @@ module.exports = {
                     500: "#B7B7D7"
                 }
 
+            },
+            zIndex: {
+                modal: 998,
+                toast: 999,
+                tooltip: 1000,
             }
         },
     },

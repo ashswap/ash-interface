@@ -7,6 +7,8 @@ import ICUnlock from "assets/svg/unlock.svg";
 import ICWallet from "assets/svg/wallet.svg";
 import BaseModal from "components/BaseModal";
 import GOVStakeModal from "components/GOVStakeModal";
+import CardTooltip from "components/Tooltip/CardTooltip";
+import TextTooltip from "components/Tooltip/TextTooltip";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 import { ASH_TOKEN, VE_ASH_DECIMALS } from "const/tokens";
 import { useStakeGov } from "context/gov";
@@ -121,9 +123,23 @@ function GovStats() {
                     <div className="flex flex-col space-y-6">
                         <div className="bg-ash-dark-400/30 px-[1.25rem] pt-7 pb-5">
                             <div className="px-5 mb-7">
-                                <div className="text-stake-gray-500 text-sm font-bold underline uppercase mb-7">
-                                    your reward
-                                </div>
+                                <CardTooltip
+                                    content={
+                                        <>
+                                            <div>
+                                                By staking ASH to holding veASH,
+                                                you’ll earn bounties from
+                                                trading fees in ASHSWAP DEX. The
+                                                reward will return to the user
+                                                as LP-Tokens.
+                                            </div>
+                                        </>
+                                    }
+                                >
+                                    <div className="inline-block text-stake-gray-500 text-sm font-bold underline uppercase mb-7">
+                                        your reward
+                                    </div>
+                                </CardTooltip>
                                 <div className="flex items-center">
                                     {rewardLPToken && (
                                         <div className="flex items-center">
@@ -176,9 +192,19 @@ function GovStats() {
                         </div>
                         <div className="bg-ash-dark-400/30 px-[1.25rem] pt-7 pb-5">
                             <div className="px-5 mb-7">
-                                <div className="text-stake-gray-500 text-sm font-bold underline uppercase mb-7">
-                                    your staked ash
-                                </div>
+                                <CardTooltip
+                                    content={
+                                        <div>
+                                            Total ASH that you’ve staked. You
+                                            cannot claim back until the lock
+                                            period ends.
+                                        </div>
+                                    }
+                                >
+                                    <div className="inline-block text-stake-gray-500 text-sm font-bold underline uppercase mb-7">
+                                        your staked ash
+                                    </div>
+                                </CardTooltip>
                                 <div className="flex items-center">
                                     {/* <div className="w-[1.125rem] h-[1.125rem] mr-2">
                                         <Image src={ImgUsdt} alt="token icon" />
@@ -215,9 +241,23 @@ function GovStats() {
                         </div>
                         <div className="bg-ash-dark-400/30 px-[1.25rem] pt-7 pb-5">
                             <div className="px-5 mb-7">
-                                <div className="text-stake-gray-500 text-sm font-bold underline mb-7">
-                                    YOUR veASH
-                                </div>
+                                <CardTooltip
+                                    content={
+                                        <div>
+                                            Voting-Escrow ASH. A type of token
+                                            that you’ll receive after staking
+                                            your ASH, veASH will reduce
+                                            day-by-day till the lock period
+                                            ends. You can extend your lock
+                                            period to recover your veASH.
+                                        </div>
+                                    }
+                                >
+                                    <div className="inline-block text-stake-gray-500 text-sm font-bold underline mb-7">
+                                        YOUR veASH
+                                    </div>
+                                </CardTooltip>
+
                                 <div className="flex items-center">
                                     {/* <div className="w-[1.125rem] h-[1.125rem] mr-2">
                                         <Image src={ImgUsdt} alt="token icon" />
@@ -232,9 +272,19 @@ function GovStats() {
                                 <div className="bg-ash-dark-400 text-stake-gray-500 px-3 py-2 w-7/12 h-[3.375rem] overflow-hidden">
                                     <div className="flex items-center mb-2">
                                         <ICLock className="w-3 h-3 mr-1" />
-                                        <span className="text-2xs font-bold underline">
-                                            Lock
-                                        </span>
+                                        <CardTooltip
+                                            content={
+                                                <div>
+                                                    Your lock period. When this
+                                                    period ends, you can claim
+                                                    back your staked ASH.
+                                                </div>
+                                            }
+                                        >
+                                            <span className="text-2xs font-bold underline">
+                                                Lock
+                                            </span>
+                                        </CardTooltip>
                                     </div>
                                     <div className="text-xs font-bold">
                                         {lockedAmt.gt(0)
@@ -247,9 +297,21 @@ function GovStats() {
                                 <div className="bg-ash-dark-400 text-stake-gray-500 px-3 py-2 w-5/12 h-[3.375rem] overflow-hidden">
                                     <div className="flex items-center mb-2">
                                         <ICCapacity className="w-3 h-3 mr-1" />
-                                        <span className="text-2xs font-bold underline">
-                                            Capacity
-                                        </span>
+                                        <CardTooltip
+                                            content={
+                                                <div>
+                                                    Percentage of your veASH to
+                                                    the total veASH in ASHSWAP
+                                                    Governance Stake. It depends
+                                                    on the reward that you’ll
+                                                    receive.
+                                                </div>
+                                            }
+                                        >
+                                            <span className="text-2xs font-bold underline">
+                                                Capacity
+                                            </span>
+                                        </CardTooltip>
                                     </div>
                                     <div className="text-xs font-bold">
                                         {capacityPct}%

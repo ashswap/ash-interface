@@ -4,7 +4,8 @@ import BigNumber from "bignumber.js";
 import BaseModal from "components/BaseModal";
 import Checkbox from "components/Checkbox";
 import InputCurrency from "components/InputCurrency";
-import Tooltip from "components/Tooltip";
+import CardTooltip from "components/Tooltip/CardTooltip";
+import OnboardTooltip from "components/Tooltip/OnboardTooltip";
 import { ASH_TOKEN, VE_ASH_DECIMALS } from "const/tokens";
 import { useStakeGov } from "context/gov";
 import { useWallet } from "context/wallet";
@@ -154,7 +155,7 @@ const FirstStakeContent = ({ open, onClose }: props) => {
                                 </div>
                             </div>
                         </div>
-                        <Tooltip
+                        <OnboardTooltip
                             open={onboardingStakeGov && openOnboardStakeTooltip}
                             onOpenChange={(val) =>
                                 val && setOpenOnboardTooltip(onboardingStakeGov)
@@ -177,7 +178,6 @@ const FirstStakeContent = ({ open, onClose }: props) => {
                                             ? ""
                                             : "drop-shadow(0px 4px 50px rgba(0, 0, 0, 0.5))",
                                     }}
-                                    className="sm:backdrop-blur-[30px]"
                                 >
                                     <div className="clip-corner-4 clip-corner-bl bg-ash-dark-600 p-[1px] max-w-full sm:max-w-[23rem] backdrop-blur-[30px] sm:mx-6">
                                         <div className="clip-corner-4 clip-corner-bl bg-ash-dark-400 px-12 pt-14 pb-11">
@@ -249,9 +249,20 @@ const FirstStakeContent = ({ open, onClose }: props) => {
                             }
                         >
                             <div>
-                                <div className="text-sm underline font-bold text-ash-gray-500 mb-4">
-                                    Lock period
-                                </div>
+                                <CardTooltip
+                                    content={
+                                        <div>
+                                            Your lock period. When this period
+                                            ends, you can claim back your staked
+                                            ASH.
+                                        </div>
+                                    }
+                                >
+                                    <div className="inline-block text-sm underline font-bold text-ash-gray-500 mb-4">
+                                        Lock period
+                                    </div>
+                                </CardTooltip>
+
                                 <LockPeriod
                                     lockDay={lockPeriod}
                                     min={minLock}
@@ -297,7 +308,7 @@ const FirstStakeContent = ({ open, onClose }: props) => {
                                     </div>
                                 </div>
                             </div>
-                        </Tooltip>
+                        </OnboardTooltip>
                     </div>
                     <div className="w-full sm:w-1/3 lg:w-[17.8125rem] flex-shrink-0 bg-stake-dark-500 py-[2.375rem] px-10">
                         <div className="text-white text-lg font-bold mb-16">
@@ -305,25 +316,57 @@ const FirstStakeContent = ({ open, onClose }: props) => {
                         </div>
                         <div className="flex flex-col space-y-11">
                             <div>
-                                <div className="text-stake-gray-500 text-xs underline mb-2">
-                                    VeASH Receive
-                                </div>
+                                <CardTooltip
+                                    content={
+                                        <div>
+                                            Amount of veASH that you’ll receive
+                                            after stake.
+                                        </div>
+                                    }
+                                >
+                                    <div className="inline-block text-stake-gray-500 text-xs underline mb-2">
+                                        VeASH Receive
+                                    </div>
+                                </CardTooltip>
+
                                 <div className="text-white text-lg font-bold">
                                     {fEstimatedVeASH}
                                 </div>
                             </div>
                             <div>
-                                <div className="text-stake-gray-500 text-xs underline mb-2">
-                                    Your capacity
-                                </div>
+                                <CardTooltip
+                                    content={
+                                        <div>
+                                            Percentage of your veASH to the
+                                            total veASH in ASHSWAP Governance
+                                            Stake. It depends on the reward that
+                                            you’ll receive.
+                                        </div>
+                                    }
+                                >
+                                    <div className="inline-block text-stake-gray-500 text-xs underline mb-2">
+                                        Your capacity
+                                    </div>
+                                </CardTooltip>
+
                                 <div className="text-white text-lg font-bold">
                                     {estimateCapacity}%
                                 </div>
                             </div>
                             <div>
-                                <div className="text-stake-gray-500 text-xs underline mb-2">
-                                    Unlock Time
-                                </div>
+                                <CardTooltip
+                                    content={
+                                        <div>
+                                            The time that your veASH becomes 0.
+                                            You can claim back your staked ASH.
+                                        </div>
+                                    }
+                                >
+                                    <div className="inline-block text-stake-gray-500 text-xs underline mb-2">
+                                        Unlock Time
+                                    </div>
+                                </CardTooltip>
+
                                 <div className="text-white text-lg font-bold min-h-[3rem]">
                                     {moment()
                                         .add(lockPeriod, "days")

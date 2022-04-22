@@ -1,5 +1,4 @@
-
-import Tooltip from "components/Tooltip";
+import BaseTooltip from "components/BaseTooltip";
 import React, { useCallback, useState } from "react";
 type Props = {
     text: string;
@@ -17,9 +16,16 @@ function CopyBtn({ text, copiedMsg = "Copied!", children }: Props) {
         }
     }, [text]);
     return (
-        <Tooltip open={visibleTooltip} content={<div className="px-3 py-2 text-white bg-stake-dark-400/80 text-xs">{copiedMsg}</div>} customArrow={<></>}>
+        <BaseTooltip
+            open={visibleTooltip}
+            content={
+                <div className="px-3 py-2 text-white bg-stake-dark-400/80 text-xs">
+                    {copiedMsg}
+                </div>
+            }
+        >
             <button onClick={() => copy()}>{children}</button>
-        </Tooltip>
+        </BaseTooltip>
     );
 }
 
