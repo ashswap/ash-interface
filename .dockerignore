@@ -38,3 +38,7 @@ yarn-error.log*
 
 # MacOS
 .DS_Store
+
+Jenkinsfile
+/scripts
+/.git
