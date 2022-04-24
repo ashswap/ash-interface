@@ -13,9 +13,7 @@ if [[ ! $(which git) ]]; then
     fi
 fi
 
-printenv
-TAG=$(git tag --points-at HEAD)
-DOCKER_IMAGE_TAG="${TAG:=latest}"
+DOCKER_IMAGE_TAG="${TAG_NAME:=latest}"
 
 NETWORK="devnet"
 if [[ "$DOCKER_IMAGE_TAG" == *"testnet"* ]]; then
