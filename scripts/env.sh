@@ -13,6 +13,7 @@ if [[ ! $(which git) ]]; then
     fi
 fi
 
+printenv
 TAG=$(git tag --points-at HEAD)
 DOCKER_IMAGE_TAG="${TAG:=latest}"
 
