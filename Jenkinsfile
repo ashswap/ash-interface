@@ -1,3 +1,8 @@
+def getCurrentTag() {
+  sh "git tag --points-at HEAD > .git/current-tag"
+  return readFile(".git/current-tag").trim()
+}
+
 pipeline {
     agent {
         label 'docker'
