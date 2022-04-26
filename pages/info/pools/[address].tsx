@@ -169,7 +169,7 @@ function PoolDetailPage({ pool }: Props) {
                 >
                     <div className="flex items-center justify-center bg-ash-gray-600/10 h-8 md:h-10 text-white px-2.5 md:px-4">
                         <ICNewTabRound className="w-4 h-4 md:w-5 md:h-5" />
-                        <span className="ml-2"><span className="hidden sm:inline">View on </span>Elrondscan</span>
+                        <span className="ml-2"><span className="hidden sm:inline">View on </span>Elrond Explorer</span>
                     </div>
                 </a>
             </div>

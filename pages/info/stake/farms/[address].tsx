@@ -174,7 +174,7 @@ function FarmDetailPage({ pool }: Props) {
                         <ICNewTabRound className="w-4 h-4 md:w-5 md:h-5" />
                         <span className="ml-2">
                             <span className="hidden sm:inline">View on </span>
-                            Elrondscan
+                            Elrond Explorer
                         </span>
                     </div>
                 </a>
