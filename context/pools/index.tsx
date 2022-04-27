@@ -97,6 +97,7 @@ const PoolsProvider = ({ children }: any) => {
         const records: PoolRecord[] = [];
         for (let i = 0; i < pools.length; i++) {
             const p = pools[i];
+            if(p.isMaiarPool) continue;
             let record: PoolRecord = {
                 pool: p,
                 poolStats: poolStatsRecords?.find(

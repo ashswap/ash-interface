@@ -5,6 +5,7 @@ import IconUSDC from "assets/images/usdc-icon.png";
 import IconWUSDC from "assets/images/wusdc-icon.png";
 import IconUSDT from "assets/images/usdt-icon.png";
 import { ENVIRONMENT } from "./env";
+import { MAIAR_POOLS } from "./maiarPools";
 
 const devnet: IPool[] = [
     {
@@ -168,6 +169,6 @@ const testnet: IPool[] = [
     },
 ];
 
-const pools = ENVIRONMENT.NETWORK == "devnet" ? devnet : testnet;
+const pools = ENVIRONMENT.NETWORK == "devnet" ? [...devnet, ...MAIAR_POOLS] : testnet;
 
 export default pools;

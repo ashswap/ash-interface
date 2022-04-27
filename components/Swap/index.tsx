@@ -2,7 +2,7 @@ import {
     getProxyProvider,
     sendTransactions,
     useGetAccountInfo,
-    useGetLoginInfo
+    useGetLoginInfo,
 } from "@elrondnetwork/dapp-core";
 import {
     Address,
@@ -13,9 +13,11 @@ import {
     GasLimit,
     ProxyProvider,
     Query,
+    QueryResponse,
     TokenIdentifierValue,
+    Transaction,
     TypeExpressionParser,
-    TypeMapper
+    TypeMapper,
 } from "@elrondnetwork/erdjs";
 import Fire from "assets/images/fire.png";
 import ICChevronDown from "assets/svg/chevron-down.svg";
@@ -37,11 +39,14 @@ import SwapAmount from "components/SwapAmount";
 import { gasLimit } from "const/dappConfig";
 import { useSwap } from "context/swap";
 import { useWallet } from "context/wallet";
-import { toEGLD, toWei } from "helper/balance";
+import { toEGLD, toEGLDD, toWei } from "helper/balance";
+import { formatAmount } from "helper/number";
+import { queryContractParser } from "helper/serializer";
 import { useCreateTransaction } from "helper/transactionMethods";
 import useMounted from "hooks/useMounted";
 import { useScreenSize } from "hooks/useScreenSize";
 import { DappSendTransactionsPropsType } from "interface/dappCore";
+import IPool from "interface/pool";
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import styles from "./Swap.module.css";
@@ -100,6 +105,151 @@ const Swap = () => {
         return toWei(tokenTo, valueTo);
     }, [valueTo, tokenTo]);
 
+    const getAmountOut = useCallback(
+        async (
+            poolAddress: string,
+            tokenFromId: string,
+            tokenToId: string,
+            amountIn: BigNumber
+        ) => {
+            try {
+                const { returnData } = await proxy.queryContract(
+                    new Query({
+                        address: new Address(poolAddress),
+                        func: new ContractFunction("getAmountOut"),
+                        args: [
+                            new TokenIdentifierValue(Buffer.from(tokenFromId)),
+                            new TokenIdentifierValue(Buffer.from(tokenToId)),
+                            new BigUIntValue(amountIn),
+                        ],
+                    })
+                );
+                const values = queryContractParser(
+                    returnData[0],
+                    "tuple3<BigUint, BigUint, bytes>"
+                );
+
+                return values[0].valueOf().field0 as BigNumber;
+            } catch (error) {
+                return new BigNumber(0);
+            }
+        },
+        [proxy]
+    );
+
+    const getAmountOutMaiarPool = useCallback(
+        async (
+            poolAddress: string,
+            tokenFromId: string,
+            amountIn: BigNumber
+        ) => {
+            try {
+                const { returnData } = await proxy.queryContract(
+                    new Query({
+                        address: new Address(poolAddress),
+                        func: new ContractFunction("getAmountOut"),
+                        args: [
+                            new TokenIdentifierValue(Buffer.from(tokenFromId)),
+                            new BigUIntValue(amountIn),
+                        ],
+                    })
+                );
+                return (
+                    queryContractParser(
+                        returnData[0],
+                        "BigUint"
+                    )?.[0]?.valueOf() || new BigNumber(0)
+                );
+            } catch (error) {}
+            return new BigNumber(0);
+        },
+        [proxy]
+    );
+
+    const calculateAmountOut = useCallback(
+        async (
+            pool: IPool,
+            tokenFromId: string,
+            tokenToId: string,
+            amountIn: BigNumber
+        ) => {
+            if (pool.isMaiarPool) {
+                return await getAmountOutMaiarPool(
+                    pool.address,
+                    tokenFromId,
+                    amountIn
+                );
+            }
+            return await getAmountOut(
+                pool.address,
+                tokenFromId,
+                tokenToId,
+                amountIn
+            );
+        },
+        [getAmountOutMaiarPool, getAmountOut]
+    );
+
+    const getFeePct = useCallback(
+        async (pool: IPool) => {
+            try {
+                let feeRes: QueryResponse;
+                if (pool.isMaiarPool) {
+                    feeRes = await proxy.queryContract(
+                        new Query({
+                            address: new Address(pool.address),
+                            func: new ContractFunction("getTotalFeePercent"),
+                        })
+                    );
+                } else {
+                    feeRes = await proxy.queryContract(
+                        new Query({
+                            address: new Address(pool.address),
+                            func: new ContractFunction("getSwapFeePercent"),
+                        })
+                    );
+                }
+                let fee = new BigNumber(
+                    "0x" +
+                        Buffer.from(feeRes.returnData[0], "base64").toString(
+                            "hex"
+                        )
+                );
+
+                fee = fee.div(new BigNumber(100000));
+                return fee;
+            } catch (error) {
+                console.error(error);
+            }
+            return new BigNumber(0);
+        },
+        [proxy]
+    );
+
+    const getReserveMaiarPool = useCallback(
+        async (pool: IPool) => {
+            const res = await proxy.queryContract(
+                new Query({
+                    address: new Address(pool.address),
+                    func: new ContractFunction("getReservesAndTotalSupply"),
+                })
+            );
+            const [token1, token2, supply] = res.returnData.map(
+                (data) =>
+                    queryContractParser(
+                        data,
+                        "BigUint"
+                    )[0].valueOf() as BigNumber
+            );
+            return {
+                token1,
+                token2,
+                supply,
+            };
+        },
+        [proxy]
+    );
+
     // calculate amount out
     useEffect(() => {
         if (!pool || !tokenFrom || !tokenTo || !valueFrom) {
@@ -107,139 +257,79 @@ const Swap = () => {
         }
 
         let amountIn = rawValueFrom;
-
-        proxy
-            .queryContract(
-                new Query({
-                    address: new Address(pool?.address),
-                    func: new ContractFunction("getAmountOut"),
-                    args: [
-                        new TokenIdentifierValue(Buffer.from(tokenFrom.id)),
-                        new TokenIdentifierValue(Buffer.from(tokenTo.id)),
-                        new BigUIntValue(amountIn),
-                    ],
-                })
-            )
-            .then(({ returnData }) => {
-                let resultHex = Buffer.from(returnData[0], "base64").toString(
-                    "hex"
+        calculateAmountOut(pool, tokenFrom.id, tokenTo.id, amountIn).then(
+            (amtOut) => {
+                setValueTo(
+                    amtOut
+                        .div(
+                            new BigNumber(10).exponentiatedBy(tokenTo.decimals)
+                        )
+                        .toString(10)
                 );
-                let parser = new TypeExpressionParser();
-                let mapper = new TypeMapper();
-                let serializer = new ArgSerializer();
-
-                let type = parser.parse("tuple3<BigUint, BigUint, bytes>");
-                let mappedType = mapper.mapType(type);
-
-                let endpointDefinitions = [
-                    new EndpointParameterDefinition("foo", "bar", mappedType),
-                ];
-                let values = serializer.stringToValues(
-                    resultHex,
-                    endpointDefinitions
-                );
-
-                let amountOut = values[0]
-                    .valueOf()
-                    .field0.div(
-                        new BigNumber(10).exponentiatedBy(tokenTo.decimals)
-                    );
-
-                setValueTo(amountOut.toString(10));
-            });
-    }, [valueFrom, tokenFrom, tokenTo, pool, proxy, rawValueFrom, setValueTo]);
+            }
+        );
+    }, [
+        valueFrom,
+        tokenFrom,
+        tokenTo,
+        pool,
+        rawValueFrom,
+        setValueTo,
+        calculateAmountOut,
+    ]);
 
     // find pools + fetch reserves
     useEffect(() => {
         if (!pool) {
             return;
         }
+        const [token1, token2] = pool.tokens;
+        if (pool.isMaiarPool) {
+            Promise.all([getReserveMaiarPool(pool), getFeePct(pool)]).then(
+                ([reserves, fee]) => {
+                    const rate1 = toEGLDD(token2.decimals, reserves.token2).div(
+                        toEGLDD(token1.decimals, reserves.token1)
+                    );
+                    const rate2 = new BigNumber(1).div(rate1);
+                    setRates([
+                        toWei(token2, rate1.toString()),
+                        toWei(token1, rate2.toString()),
+                    ]);
+                    setFee(fee.isNaN() ? 0 : fee.toNumber());
+                }
+            );
+            return;
+        }
 
         Promise.all([
-            proxy.queryContract(
-                new Query({
-                    address: new Address(pool?.address),
-                    func: new ContractFunction("getAmountOut"),
-                    args: [
-                        new TokenIdentifierValue(
-                            Buffer.from(pool!.tokens[0].id)
-                        ),
-                        new TokenIdentifierValue(
-                            Buffer.from(pool!.tokens[1].id)
-                        ),
-                        new BigUIntValue(
-                            new BigNumber(10).exponentiatedBy(
-                                pool!.tokens[0].decimals
-                            )
-                        ),
-                    ],
-                })
+            getAmountOut(
+                pool.address,
+                token1.id,
+                token2.id,
+                new BigNumber(10).exponentiatedBy(token1.decimals)
             ),
-            proxy.queryContract(
-                new Query({
-                    address: new Address(pool?.address),
-                    func: new ContractFunction("getAmountOut"),
-                    args: [
-                        new TokenIdentifierValue(
-                            Buffer.from(pool!.tokens[1].id)
-                        ),
-                        new TokenIdentifierValue(
-                            Buffer.from(pool!.tokens[0].id)
-                        ),
-                        new BigUIntValue(
-                            new BigNumber(10).exponentiatedBy(
-                                pool!.tokens[1].decimals
-                            )
-                        ),
-                    ],
-                })
+            getAmountOut(
+                pool.address,
+                token2.id,
+                token1.id,
+                new BigNumber(10).exponentiatedBy(token2.decimals)
             ),
-            proxy.queryContract(
-                new Query({
-                    address: new Address(pool?.address),
-                    func: new ContractFunction("getSwapFeePercent"),
-                })
-            ),
-        ]).then((results) => {
-            let rates = results.slice(0, 2).map((result) => {
-                let resultHex = Buffer.from(
-                    result.returnData[0],
-                    "base64"
-                ).toString("hex");
-                let parser = new TypeExpressionParser();
-                let mapper = new TypeMapper();
-                let serializer = new ArgSerializer();
-
-                let type = parser.parse("tuple3<BigUint, BigUint, bytes>");
-                let mappedType = mapper.mapType(type);
-
-                let endpointDefinitions = [
-                    new EndpointParameterDefinition("foo", "bar", mappedType),
-                ];
-                let values = serializer.stringToValues(
-                    resultHex,
-                    endpointDefinitions
-                );
-
-                return values[0].valueOf().field0;
-            });
-
-            setRates(rates);
-            let fee = new BigNumber(
-                "0x" +
-                    Buffer.from(results[2].returnData[0], "base64").toString(
-                        "hex"
-                    )
-            );
-
-            fee = fee.div(new BigNumber(100000));
-
+            getFeePct(pool),
+        ]).then(([rate1, rate2, fee]) => {
+            setRates([rate1, rate2]);
             setFee(fee.isNaN() ? 0 : fee.toNumber());
         });
-    }, [pool, proxy, setRates]);
+    }, [
+        pool,
+        setRates,
+        getAmountOut,
+        getAmountOutMaiarPool,
+        getFeePct,
+        getReserveMaiarPool,
+    ]);
 
     const swap = useCallback(async () => {
-        if (!loggedIn || !tokenFrom || !tokenTo || swapping) {
+        if (!loggedIn || !tokenFrom || !tokenTo || swapping || !pool) {
             return;
         }
 
@@ -248,17 +338,43 @@ const Swap = () => {
         }
         setSwapping(true);
         try {
-            const tx = await createTx(new Address(pool?.address), {
-                func: new ContractFunction("ESDTTransfer"),
-                gasLimit: new GasLimit(gasLimit),
-                args: [
-                    new TokenIdentifierValue(Buffer.from(tokenFrom.id)),
-                    new BigUIntValue(rawValueFrom),
-                    new TokenIdentifierValue(Buffer.from("exchange")),
-                    new TokenIdentifierValue(Buffer.from(tokenTo.id)),
-                    new BigUIntValue(new BigNumber(0)),
-                ],
-            });
+            let tx: Transaction;
+            if (pool.isMaiarPool) {
+                tx = await createTx(new Address(pool.address), {
+                    func: new ContractFunction("ESDTTransfer"),
+                    gasLimit: new GasLimit(gasLimit),
+                    args: [
+                        new TokenIdentifierValue(Buffer.from(tokenFrom.id)),
+                        new BigUIntValue(rawValueFrom),
+                        new TokenIdentifierValue(
+                            Buffer.from("swapTokensFixedInput")
+                        ),
+                        new TokenIdentifierValue(Buffer.from(tokenTo.id)),
+                        new BigUIntValue(
+                            new BigNumber(
+                                Math.floor(
+                                    rawValueTo
+                                        .multipliedBy(1 - slippage)
+                                        .toNumber()
+                                )
+                            )
+                        ),
+                    ],
+                });
+            } else {
+                tx = await createTx(new Address(pool?.address), {
+                    func: new ContractFunction("ESDTTransfer"),
+                    gasLimit: new GasLimit(gasLimit),
+                    args: [
+                        new TokenIdentifierValue(Buffer.from(tokenFrom.id)),
+                        new BigUIntValue(rawValueFrom),
+                        new TokenIdentifierValue(Buffer.from("exchange")),
+                        new TokenIdentifierValue(Buffer.from(tokenTo.id)),
+                        new BigUIntValue(new BigNumber(0)),
+                    ],
+                });
+            }
+
             const payload: DappSendTransactionsPropsType = {
                 transactions: tx,
                 transactionsDisplayInfo: {
@@ -289,6 +405,8 @@ const Swap = () => {
         valueTo,
         setValueTo,
         setValueFrom,
+        slippage,
+        rawValueTo,
     ]);
 
     const priceImpact = useMemo(() => {
@@ -324,10 +442,13 @@ const Swap = () => {
             return;
         }
 
-        return toEGLD(
-            tokenTo,
-            rawValueTo.multipliedBy(1 - slippage).toString()
-        ).toFixed(3);
+        return formatAmount(
+            toEGLD(
+                tokenTo,
+                rawValueTo.multipliedBy(1 - slippage).toString()
+            ).toNumber(),
+            {notation: "standard"}
+        );
     }, [tokenTo, rawValueTo, slippage]);
 
     return (
@@ -426,15 +547,19 @@ const Swap = () => {
                                         1 {tokenFrom?.name} ={" "}
                                         {pool &&
                                             rates &&
-                                            (pool?.tokens[0].id === tokenFrom.id
-                                                ? toEGLD(
-                                                      pool.tokens[1],
-                                                      rates[0].toString()
-                                                  ).toString()
-                                                : toEGLD(
-                                                      pool.tokens[0],
-                                                      rates[1].toString()
-                                                  ).toString())}{" "}
+                                            formatAmount(
+                                                pool?.tokens[0].id ===
+                                                    tokenFrom.id
+                                                    ? toEGLD(
+                                                          pool.tokens[1],
+                                                          rates[0].toString()
+                                                      ).toNumber()
+                                                    : toEGLD(
+                                                          pool.tokens[0],
+                                                          rates[1].toString()
+                                                      ).toNumber(),
+                                                { notation: "standard" }
+                                            )}{" "}
                                         {tokenTo?.name}
                                     </div>
                                 </div>
@@ -501,21 +626,47 @@ const Swap = () => {
                                             >
                                                 Swap fees
                                             </div>
-                                            <div
-                                                className={
-                                                    styles.swapResultValue
-                                                }
-                                            >
-                                                {tokenTo && rawValueTo
-                                                    ? toEGLD(
-                                                          tokenTo,
-                                                          rawValueTo
-                                                              .multipliedBy(fee)
-                                                              .toString()
-                                                      ).toFixed(3)
-                                                    : "0"}{" "}
-                                                {tokenTo?.name}
-                                            </div>
+                                            {pool.isMaiarPool ? (
+                                                <div
+                                                    className={
+                                                        styles.swapResultValue
+                                                    }
+                                                >
+                                                    {tokenFrom && rawValueFrom
+                                                        ? formatAmount(
+                                                              toEGLD(
+                                                                  tokenFrom,
+                                                                  rawValueFrom
+                                                                      .multipliedBy(
+                                                                          fee
+                                                                      )
+                                                                      .toString()
+                                                              ).toNumber()
+                                                          )
+                                                        : "0"}{" "}
+                                                    {tokenFrom?.name}
+                                                </div>
+                                            ) : (
+                                                <div
+                                                    className={
+                                                        styles.swapResultValue
+                                                    }
+                                                >
+                                                    {tokenTo && rawValueTo
+                                                        ? formatAmount(
+                                                              toEGLD(
+                                                                  tokenTo,
+                                                                  rawValueTo
+                                                                      .multipliedBy(
+                                                                          fee
+                                                                      )
+                                                                      .toString()
+                                                              ).toNumber()
+                                                          )
+                                                        : "0"}{" "}
+                                                    {tokenTo?.name}
+                                                </div>
+                                            )}
                                         </div>
                                     </>
                                 )}
