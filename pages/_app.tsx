@@ -1,5 +1,6 @@
 import { DappProvider } from "@elrondnetwork/dapp-core";
 import ConnectWalletModal from "components/ConnectWalletModal";
+import ErrorBoundary from "components/ErrorBoundary";
 import SignTxNotification from "components/SignTxNotification";
 import SignTxsModal from "components/SignTxsModal";
 import TxsToastList from "components/TxsToastList";
@@ -7,13 +8,14 @@ import { DAPP_CONFIG } from "const/dappConfig";
 import { ENVIRONMENT } from "const/env";
 import { ContractsProvider } from "context/contracts";
 import { WalletProvider } from "context/wallet";
+import useSentryUser from "hooks/useSentryUser";
 import { NextPage } from "next";
 import { NextSeo } from "next-seo";
 import { AppProps } from "next/app";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import Script from "next/script";
-import { ReactElement, ReactNode, useEffect } from "react";
+import { Fragment, ReactElement, ReactNode, useEffect } from "react";
 import * as gtag from "../helper/gtag";
 import "../styles/globals.css";
 
@@ -24,7 +26,13 @@ type NextPageWithLayout = NextPage & {
 type AppPropsWithLayout = AppProps & {
     Component: NextPageWithLayout;
 };
-
+const ProductionErrorBoundary =
+    process.env.NODE_ENV === "production" ? ErrorBoundary : Fragment;
+// const ProductionErrorBoundary = ErrorBoundary;
+const GlobalHooks = () => {
+    useSentryUser();
+    return null;
+};
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
     const router = useRouter();
     const getLayout = Component.getLayout ?? ((page) => page);
@@ -79,14 +87,17 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
             >
                 <WalletProvider>
                     <ContractsProvider>
-                        {/* <Component {...pageProps} /> */}
-                        {getLayout(<Component {...pageProps} />)}
-                        <ConnectWalletModal />
-                        <div className="fixed bottom-24 left-6 right-6 sm:bottom-12 sm:left-auto sm:right-12 z-toast flex flex-col items-end max-w-[480px] space-y-2 sm:space-y-4">
-                            <TxsToastList />
-                            <SignTxNotification />
-                            <SignTxsModal />
-                        </div>
+                        <GlobalHooks />
+                        <ProductionErrorBoundary>
+                            {/* <Component {...pageProps} /> */}
+                            {getLayout(<Component {...pageProps} />)}
+                            <ConnectWalletModal />
+                            <div className="fixed bottom-24 left-6 right-6 sm:bottom-12 sm:left-auto sm:right-12 z-toast flex flex-col items-end max-w-[480px] space-y-2 sm:space-y-4">
+                                <TxsToastList />
+                                <SignTxNotification />
+                                <SignTxsModal />
+                            </div>
+                        </ProductionErrorBoundary>
                     </ContractsProvider>
                 </WalletProvider>
             </DappProvider>
