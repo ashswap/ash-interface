@@ -1,5 +1,6 @@
 FROM node:14.18.0 AS builder
 ARG NETWORK=testnet
+ARG SENTRY_AUTH_TOKEN
 WORKDIR /app
 COPY package.json yarn.lock ./
 RUN yarn install --frozen-lockfile
