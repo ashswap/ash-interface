@@ -27,6 +27,7 @@ import { gasLimit } from "const/dappConfig";
 import { PoolsState } from "context/pools";
 import { useWallet } from "context/wallet";
 import { toEGLD, toWei } from "helper/balance";
+import { queryPoolContract } from "helper/contracts/pool";
 import { fractionFormat } from "helper/number";
 import { useCreateTransaction } from "helper/transactionMethods";
 import { useScreenSize } from "hooks/useScreenSize";
@@ -208,72 +209,14 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
         if (!pool || !proxy) {
             return;
         }
+        const [token1, token2] = pool.tokens;
 
         Promise.all([
-            proxy.queryContract(
-                new Query({
-                    address: new Address(pool?.address),
-                    func: new ContractFunction("getAmountOut"),
-                    args: [
-                        new TokenIdentifierValue(
-                            Buffer.from(pool!.tokens[0].id)
-                        ),
-                        new TokenIdentifierValue(
-                            Buffer.from(pool!.tokens[1].id)
-                        ),
-                        new BigUIntValue(
-                            new BigNumber(10).exponentiatedBy(
-                                pool!.tokens[0].decimals
-                            )
-                        ),
-                    ],
-                })
-            ),
-            proxy.queryContract(
-                new Query({
-                    address: new Address(pool?.address),
-                    func: new ContractFunction("getAmountOut"),
-                    args: [
-                        new TokenIdentifierValue(
-                            Buffer.from(pool!.tokens[1].id)
-                        ),
-                        new TokenIdentifierValue(
-                            Buffer.from(pool!.tokens[0].id)
-                        ),
-                        new BigUIntValue(
-                            new BigNumber(10).exponentiatedBy(
-                                pool!.tokens[1].decimals
-                            )
-                        ),
-                    ],
-                })
-            ),
+            queryPoolContract.getAmountOut(pool.address, token1.id, token2.id, new BigNumber(10).exponentiatedBy(token1.decimals)),
+            queryPoolContract.getAmountOut(pool.address, token2.id, token1.id, new BigNumber(10).exponentiatedBy(token2.decimals)),
         ]).then((results) => {
-            let rates = results.slice(0, 2).map((result) => {
-                let resultHex = Buffer.from(
-                    result.returnData[0],
-                    "base64"
-                ).toString("hex");
-                let parser = new TypeExpressionParser();
-                let mapper = new TypeMapper();
-                let serializer = new ArgSerializer();
-
-                let type = parser.parse("tuple3<BigUint, BigUint, bytes>");
-                let mappedType = mapper.mapType(type);
-
-                let endpointDefinitions = [
-                    new EndpointParameterDefinition("foo", "bar", mappedType),
-                ];
-                let values = serializer.stringToValues(
-                    resultHex,
-                    endpointDefinitions
-                );
-
-                return values[0].valueOf().field0;
-            });
-
             if (isMounted) {
-                setRates(rates);
+                setRates(results);
             }
         });
 

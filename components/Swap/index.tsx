@@ -6,18 +6,12 @@ import {
 } from "@elrondnetwork/dapp-core";
 import {
     Address,
-    ArgSerializer,
     BigUIntValue,
     ContractFunction,
-    EndpointParameterDefinition,
     GasLimit,
     ProxyProvider,
-    Query,
-    QueryResponse,
     TokenIdentifierValue,
     Transaction,
-    TypeExpressionParser,
-    TypeMapper,
 } from "@elrondnetwork/erdjs";
 import Fire from "assets/images/fire.png";
 import ICChevronDown from "assets/svg/chevron-down.svg";
@@ -36,12 +30,13 @@ import HistoryModal from "components/HistoryModal";
 import IconButton from "components/IconButton";
 import Setting from "components/Setting";
 import SwapAmount from "components/SwapAmount";
+import OnboardTooltip from "components/Tooltip/OnboardTooltip";
 import { gasLimit } from "const/dappConfig";
 import { useSwap } from "context/swap";
 import { useWallet } from "context/wallet";
 import { toEGLD, toEGLDD, toWei } from "helper/balance";
+import { queryPoolContract } from "helper/contracts/pool";
 import { formatAmount } from "helper/number";
-import { queryContractParser } from "helper/serializer";
 import { useCreateTransaction } from "helper/transactionMethods";
 import useMounted from "hooks/useMounted";
 import { useScreenSize } from "hooks/useScreenSize";
@@ -50,7 +45,77 @@ import IPool from "interface/pool";
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import styles from "./Swap.module.css";
-
+const MaiarPoolTooltip = ({
+    children,
+    pool,
+}: {
+    children: JSX.Element;
+    pool?: IPool;
+}) => {
+    const [openMaiarPoolTooltip, setOpenMaiarPoolTooltip] = useState(false);
+    const screenSize = useScreenSize();
+    useEffect(() => {
+        setOpenMaiarPoolTooltip(!!pool?.isMaiarPool && screenSize.md);
+    }, [pool, screenSize.md]);
+    if (!pool?.isMaiarPool) {
+        return <>{children}</>;
+    }
+    return (
+        <OnboardTooltip
+            open={openMaiarPoolTooltip}
+            onArrowClick={() => {
+                setOpenMaiarPoolTooltip(false);
+            }}
+            strategy={screenSize.isMobile ? "absolute" : "fixed"}
+            placement="left"
+            zIndex={10}
+            arrowStyle={() => ({})}
+            content={({ size }) => {
+                return (
+                    <>
+                        {pool && (
+                            <div
+                                style={{
+                                    filter: screenSize.isMobile
+                                        ? ""
+                                        : "drop-shadow(0px 4px 50px rgba(0, 0, 0, 0.5))",
+                                    maxWidth: size?.width,
+                                }}
+                            >
+                                <div className="clip-corner-4 clip-corner-bl bg-ash-dark-600 p-[1px] max-w-full sm:max-w-[23rem] backdrop-blur-[30px]">
+                                    <div className="clip-corner-4 clip-corner-bl bg-ash-dark-400 px-12 py-6">
+                                        <div className="font-bold text-lg leading-tight">
+                                            <Image
+                                                src={pool.tokens[0].icon}
+                                                alt={pool.tokens[0].name}
+                                                width={16}
+                                                height={16}
+                                            />
+                                            &nbsp;
+                                            {pool.tokens[0].name}
+                                            <span> - </span>
+                                            <Image
+                                                src={pool.tokens[1].icon}
+                                                alt={pool.tokens[1].name}
+                                                width={16}
+                                                height={16}
+                                            />
+                                            &nbsp;
+                                            {pool.tokens[1].name}
+                                            <span> only available in Battle of Yields</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </>
+                );
+            }}
+        >
+            {children}
+        </OnboardTooltip>
+    );
+};
 const Swap = () => {
     const screenSize = useScreenSize();
     const mounted = useMounted();
@@ -105,151 +170,6 @@ const Swap = () => {
         return toWei(tokenTo, valueTo);
     }, [valueTo, tokenTo]);
 
-    const getAmountOut = useCallback(
-        async (
-            poolAddress: string,
-            tokenFromId: string,
-            tokenToId: string,
-            amountIn: BigNumber
-        ) => {
-            try {
-                const { returnData } = await proxy.queryContract(
-                    new Query({
-                        address: new Address(poolAddress),
-                        func: new ContractFunction("getAmountOut"),
-                        args: [
-                            new TokenIdentifierValue(Buffer.from(tokenFromId)),
-                            new TokenIdentifierValue(Buffer.from(tokenToId)),
-                            new BigUIntValue(amountIn),
-                        ],
-                    })
-                );
-                const values = queryContractParser(
-                    returnData[0],
-                    "tuple3<BigUint, BigUint, bytes>"
-                );
-
-                return values[0].valueOf().field0 as BigNumber;
-            } catch (error) {
-                return new BigNumber(0);
-            }
-        },
-        [proxy]
-    );
-
-    const getAmountOutMaiarPool = useCallback(
-        async (
-            poolAddress: string,
-            tokenFromId: string,
-            amountIn: BigNumber
-        ) => {
-            try {
-                const { returnData } = await proxy.queryContract(
-                    new Query({
-                        address: new Address(poolAddress),
-                        func: new ContractFunction("getAmountOut"),
-                        args: [
-                            new TokenIdentifierValue(Buffer.from(tokenFromId)),
-                            new BigUIntValue(amountIn),
-                        ],
-                    })
-                );
-                return (
-                    queryContractParser(
-                        returnData[0],
-                        "BigUint"
-                    )?.[0]?.valueOf() || new BigNumber(0)
-                );
-            } catch (error) {}
-            return new BigNumber(0);
-        },
-        [proxy]
-    );
-
-    const calculateAmountOut = useCallback(
-        async (
-            pool: IPool,
-            tokenFromId: string,
-            tokenToId: string,
-            amountIn: BigNumber
-        ) => {
-            if (pool.isMaiarPool) {
-                return await getAmountOutMaiarPool(
-                    pool.address,
-                    tokenFromId,
-                    amountIn
-                );
-            }
-            return await getAmountOut(
-                pool.address,
-                tokenFromId,
-                tokenToId,
-                amountIn
-            );
-        },
-        [getAmountOutMaiarPool, getAmountOut]
-    );
-
-    const getFeePct = useCallback(
-        async (pool: IPool) => {
-            try {
-                let feeRes: QueryResponse;
-                if (pool.isMaiarPool) {
-                    feeRes = await proxy.queryContract(
-                        new Query({
-                            address: new Address(pool.address),
-                            func: new ContractFunction("getTotalFeePercent"),
-                        })
-                    );
-                } else {
-                    feeRes = await proxy.queryContract(
-                        new Query({
-                            address: new Address(pool.address),
-                            func: new ContractFunction("getSwapFeePercent"),
-                        })
-                    );
-                }
-                let fee = new BigNumber(
-                    "0x" +
-                        Buffer.from(feeRes.returnData[0], "base64").toString(
-                            "hex"
-                        )
-                );
-
-                fee = fee.div(new BigNumber(100000));
-                return fee;
-            } catch (error) {
-                console.error(error);
-            }
-            return new BigNumber(0);
-        },
-        [proxy]
-    );
-
-    const getReserveMaiarPool = useCallback(
-        async (pool: IPool) => {
-            const res = await proxy.queryContract(
-                new Query({
-                    address: new Address(pool.address),
-                    func: new ContractFunction("getReservesAndTotalSupply"),
-                })
-            );
-            const [token1, token2, supply] = res.returnData.map(
-                (data) =>
-                    queryContractParser(
-                        data,
-                        "BigUint"
-                    )[0].valueOf() as BigNumber
-            );
-            return {
-                token1,
-                token2,
-                supply,
-            };
-        },
-        [proxy]
-    );
-
     // calculate amount out
     useEffect(() => {
         if (!pool || !tokenFrom || !tokenTo || !valueFrom) {
@@ -257,8 +177,9 @@ const Swap = () => {
         }
 
         let amountIn = rawValueFrom;
-        calculateAmountOut(pool, tokenFrom.id, tokenTo.id, amountIn).then(
-            (amtOut) => {
+        queryPoolContract
+            .calculateAmountOut(pool, tokenFrom.id, tokenTo.id, amountIn)
+            .then((amtOut) => {
                 setValueTo(
                     amtOut
                         .div(
@@ -266,17 +187,8 @@ const Swap = () => {
                         )
                         .toString(10)
                 );
-            }
-        );
-    }, [
-        valueFrom,
-        tokenFrom,
-        tokenTo,
-        pool,
-        rawValueFrom,
-        setValueTo,
-        calculateAmountOut,
-    ]);
+            });
+    }, [valueFrom, tokenFrom, tokenTo, pool, rawValueFrom, setValueTo]);
 
     // find pools + fetch reserves
     useEffect(() => {
@@ -285,48 +197,42 @@ const Swap = () => {
         }
         const [token1, token2] = pool.tokens;
         if (pool.isMaiarPool) {
-            Promise.all([getReserveMaiarPool(pool), getFeePct(pool)]).then(
-                ([reserves, fee]) => {
-                    const rate1 = toEGLDD(token2.decimals, reserves.token2).div(
-                        toEGLDD(token1.decimals, reserves.token1)
-                    );
-                    const rate2 = new BigNumber(1).div(rate1);
-                    setRates([
-                        toWei(token2, rate1.toString()),
-                        toWei(token1, rate2.toString()),
-                    ]);
-                    setFee(fee.isNaN() ? 0 : fee.toNumber());
-                }
-            );
+            Promise.all([
+                queryPoolContract.getReserveMaiarPool(pool),
+                queryPoolContract.getFeePct(pool),
+            ]).then(([reserves, fee]) => {
+                const rate1 = toEGLDD(token2.decimals, reserves.token2).div(
+                    toEGLDD(token1.decimals, reserves.token1)
+                );
+                const rate2 = new BigNumber(1).div(rate1);
+                setRates([
+                    toWei(token2, rate1.toString()),
+                    toWei(token1, rate2.toString()),
+                ]);
+                setFee(fee.isNaN() ? 0 : fee.toNumber());
+            });
             return;
         }
 
         Promise.all([
-            getAmountOut(
+            queryPoolContract.getAmountOut(
                 pool.address,
                 token1.id,
                 token2.id,
                 new BigNumber(10).exponentiatedBy(token1.decimals)
             ),
-            getAmountOut(
+            queryPoolContract.getAmountOut(
                 pool.address,
                 token2.id,
                 token1.id,
                 new BigNumber(10).exponentiatedBy(token2.decimals)
             ),
-            getFeePct(pool),
+            queryPoolContract.getFeePct(pool),
         ]).then(([rate1, rate2, fee]) => {
             setRates([rate1, rate2]);
             setFee(fee.isNaN() ? 0 : fee.toNumber());
         });
-    }, [
-        pool,
-        setRates,
-        getAmountOut,
-        getAmountOutMaiarPool,
-        getFeePct,
-        getReserveMaiarPool,
-    ]);
+    }, [pool, setRates]);
 
     const swap = useCallback(async () => {
         if (!loggedIn || !tokenFrom || !tokenTo || swapping || !pool) {
@@ -447,9 +353,20 @@ const Swap = () => {
                 tokenTo,
                 rawValueTo.multipliedBy(1 - slippage).toString()
             ).toNumber(),
-            {notation: "standard"}
+            { notation: "standard" }
         );
     }, [tokenTo, rawValueTo, slippage]);
+
+    useEffect(() => {
+        if(!tokenFrom){
+            setValueFrom("");
+        }
+    }, [tokenFrom, setValueFrom]);
+    useEffect(() => {
+        if(!tokenTo){
+            setValueTo("");
+        }
+    }, [tokenTo, setValueTo]);
 
     return (
         <div className="flex flex-col items-center pt-3.5 pb-12 px-6">
@@ -470,7 +387,7 @@ const Swap = () => {
                                     alt="Ash"
                                 />
                             </div>
-                            <div className="flex flex-row justify-between pl-4">
+                            <div className="flex flex-row justify-between pl-4 mb-12">
                                 <div className="font-bold text-2xl">Swap</div>
                                 <div className="flex flex-row gap-2">
                                     <IconButton
@@ -490,36 +407,45 @@ const Swap = () => {
                                     />
                                 </div>
                             </div>
+                            <MaiarPoolTooltip pool={pool}>
+                                <div className="relative">
+                                    <SwapAmount
+                                        topLeftCorner
+                                        showQuickSelect={
+                                            !tokenFrom && !!tokenTo
+                                        }
+                                        type="from"
+                                        resetPivotToken={() =>
+                                            setTokenTo(undefined)
+                                        }
+                                    />
 
-                            <div className="relative pt-12">
-                                <SwapAmount
-                                    topLeftCorner
-                                    showQuickSelect={!tokenFrom && !!tokenTo}
-                                    type="from"
-                                    resetPivotToken={() =>
-                                        setTokenTo(undefined)
-                                    }
-                                />
-                                <div
-                                    style={{ height: 4, position: "relative" }}
-                                >
                                     <div
-                                        className={styles.revert}
-                                        onClick={revertToken}
+                                        style={{
+                                            height: 4,
+                                            position: "relative",
+                                        }}
                                     >
-                                        <Revert />
+                                        <div
+                                            className={styles.revert}
+                                            onClick={revertToken}
+                                        >
+                                            <Revert />
+                                        </div>
                                     </div>
+                                    <SwapAmount
+                                        bottomRightCorner
+                                        showQuickSelect={
+                                            !!tokenFrom && !tokenTo
+                                        }
+                                        type="to"
+                                        resetPivotToken={() =>
+                                            setTokenFrom(undefined)
+                                        }
+                                        disableInput
+                                    />
                                 </div>
-                                <SwapAmount
-                                    bottomRightCorner
-                                    showQuickSelect={!!tokenFrom && !tokenTo}
-                                    type="to"
-                                    resetPivotToken={() =>
-                                        setTokenFrom(undefined)
-                                    }
-                                    disableInput
-                                />
-                            </div>
+                            </MaiarPoolTooltip>
 
                             {tokenFrom && tokenTo && (
                                 <div
