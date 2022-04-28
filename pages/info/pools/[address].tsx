@@ -175,7 +175,7 @@ function PoolDetailPage({ pool }: Props) {
             </div>
 
             <div className="flex flex-wrap xl:flex-nowrap overflow-hidden mb-10 md:mb-18">
-                <div className="w-full xl:w-[16.625rem] flex flex-col space-y-2 mb-6 md:mb-18">
+                <div className="w-full xl:w-[16.625rem] flex flex-col space-y-2 mb-6 xl:mb-0">
                     <div className="px-4 md:px-[1.625rem] py-4 md:pt-5 md:pb-8 bg-ash-dark-600 flex flex-col justify-between">
                         <div className="mb-5 sm:mb-8 text-2xs sm:text-xs">Pooled Tokens</div>
                         <div className="flex items-center justify-between text-sm sm:text-lg mb-2.5 sm:mb-6">
@@ -248,7 +248,7 @@ function PoolDetailPage({ pool }: Props) {
                         </div>
                     </div>
                 </div>
-                <div className="flex-grow xl:ml-4 overflow-hidden min-h-[20rem]">
+                <div className="flex-grow xl:ml-4 overflow-hidden xl:h-[32.25rem] h-[20rem]">
                     <PoolChart pool={pool} />
                 </div>
             </div>
