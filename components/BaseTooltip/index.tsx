@@ -32,23 +32,33 @@ import {
     autoPlacement,
     safePolygon,
     Strategy,
+    size,
+    Dimensions,
+    ElementRects,
 } from "@floating-ui/react-dom-interactions";
 import { Transition } from "@headlessui/react";
 import { theme } from "tailwind.config";
 
 export type BaseTooltipProps = {
     open?: boolean;
-    content: JSX.Element;
+    content:
+        | JSX.Element
+        | ((args: { size?: Dimensions & ElementRects }) => void);
     children: JSX.Element;
     placement?: Placement;
     strategy?: Strategy;
+    autoPlacement?: boolean;
+    zIndex?: number;
     arrow?:
         | JSX.Element
-        | ((pos: {
-              x?: number;
-              y?: number;
-              centerOffset: number;
-          }, staticSide: "top" | "left" | "bottom" | "right") => JSX.Element);
+        | ((
+              pos: {
+                  x?: number;
+                  y?: number;
+                  centerOffset: number;
+              },
+              staticSide: "top" | "left" | "bottom" | "right"
+          ) => JSX.Element);
     arrowStyle?: (
         pos: {
             x?: number;
@@ -58,7 +68,7 @@ export type BaseTooltipProps = {
         staticSide: "top" | "left" | "bottom" | "right"
     ) => CSSProperties;
     onOpenChange?: (val: boolean) => void;
-}
+};
 
 const BaseTooltip = (props: BaseTooltipProps) => {
     const {
@@ -67,12 +77,15 @@ const BaseTooltip = (props: BaseTooltipProps) => {
         content,
         placement = "top",
         strategy: strategyProp = "absolute",
+        zIndex,
         arrowStyle,
         onOpenChange: onOpenChangeProp,
         arrow: customArrow,
+        autoPlacement: useAutoPlacement,
     } = props;
     const [_open, _setOpen] = useState(false);
     const arrowRef = useRef(null);
+    const [sizeState, setSizeState] = useState<Dimensions & ElementRects>();
     const open = useMemo(() => {
         return Object.prototype.hasOwnProperty.call(props, "open")
             ? openProp
@@ -108,7 +121,14 @@ const BaseTooltip = (props: BaseTooltipProps) => {
         middleware: [
             offset(20),
             arrow({ element: arrowRef }),
-            flip({ fallbackStrategy: "initialPlacement" }),
+            size({
+                apply(args) {
+                    setSizeState(args);
+                },
+            }),
+            useAutoPlacement
+                ? autoPlacement()
+                : flip({ fallbackStrategy: "initialPlacement" }),
             shift({ padding: 8 }),
         ],
         strategy: strategyProp,
@@ -158,7 +178,7 @@ const BaseTooltip = (props: BaseTooltipProps) => {
                             position: strategy,
                             top: y ?? "",
                             left: x ?? "",
-                            zIndex: theme.extend.zIndex.tooltip,
+                            zIndex: zIndex ?? theme.extend.zIndex.tooltip,
                         },
                     })}
                 >
@@ -171,7 +191,9 @@ const BaseTooltip = (props: BaseTooltipProps) => {
                         leaveFrom="transform opacity-100 scale-100"
                         leaveTo="transform opacity-0 scale-95"
                     >
-                        {content}
+                        {typeof content === "function"
+                            ? content({ size: sizeState })
+                            : content}
                         <div
                             ref={arrowRef}
                             className="absolute"
@@ -192,7 +214,10 @@ const BaseTooltip = (props: BaseTooltipProps) => {
                             {customArrow ? (
                                 typeof customArrow === "function" &&
                                 middlewareData?.arrow ? (
-                                    customArrow(middlewareData.arrow, staticSide as any)
+                                    customArrow(
+                                        middlewareData.arrow,
+                                        staticSide as any
+                                    )
                                 ) : (
                                     customArrow
                                 )

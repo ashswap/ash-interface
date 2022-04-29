@@ -5,9 +5,7 @@ import {
     sendTransactions,
     useGetAccountInfo,
     useGetLoginInfo,
-    useGetNetworkConfig,
-    useGetSignedTransactions,
-    useGetPendingTransactions,
+    useGetNetworkConfig, useGetPendingTransactions, useGetSignedTransactions
 } from "@elrondnetwork/dapp-core";
 import { SendTransactionReturnType } from "@elrondnetwork/dapp-core/dist/services/transactions";
 import {
@@ -22,7 +20,7 @@ import {
     Query,
     TokenIdentifierValue,
     Transaction,
-    TypedValue,
+    TypedValue
 } from "@elrondnetwork/erdjs/out";
 import BigNumber from "bignumber.js";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
@@ -47,7 +45,7 @@ import {
     useContext,
     useEffect,
     useMemo,
-    useState,
+    useState
 } from "react";
 import useSWR from "swr";
 import { useDebounce } from "use-debounce";
@@ -87,19 +85,6 @@ type FarmRecord = {
     farmTokenSupply: BigNumber;
     totalLiquidityValue: BigNumber;
     emissionAPR: BigNumber;
-    /** own LP tokens*/
-    liquidityData?: {
-        /** number of own LP token*/
-        ownLiquidity: BigNumber;
-        /** number of token 0 in own LP*/
-        value0: BigNumber;
-        /** number of token 1 in own LP*/
-        value1: BigNumber;
-        /** own LP over total LP*/
-        capacityPercent: BigNumber;
-        /** total liquidity in USD value*/
-        lpValueUsd: BigNumber;
-    };
 };
 export type FarmsState = {
     farmRecords: FarmRecord[];
@@ -210,6 +195,7 @@ const FarmsProvider = ({ children }: any) => {
 
     const getBlockReward = useCallback(
         async (farmAddress: string) => {
+            if (!proxy) return new BigNumber(0);
             return await proxy
                 .queryContract(
                     new Query({
@@ -329,22 +315,6 @@ const FarmsProvider = ({ children }: any) => {
                     totalLiquidityValue,
                     emissionAPR,
                 };
-                const ownLP = balances?.[p.lpToken.id]
-                    ? balances?.[p.lpToken.id].balance
-                    : new BigNumber(0);
-                if (ownLP.gt(0)) {
-                    const { value0, value1 } = await getTokenInLP(
-                        ownLP,
-                        p.address
-                    );
-                    record.liquidityData = {
-                        ownLiquidity: ownLP,
-                        capacityPercent: getPortion(p.lpToken.id, ownLP),
-                        value0,
-                        value1,
-                        lpValueUsd: await getLPValue(ownLP, p),
-                    };
-                }
                 const farmTokens = Object.keys(balances)
                     .filter((tokenId) => tokenId.startsWith(f.farm_token_id))
                     .map((id) => ({
@@ -383,8 +353,6 @@ const FarmsProvider = ({ children }: any) => {
     }, [
         balances,
         getLPValue,
-        getTokenInLP,
-        getPortion,
         poolStatsRecords,
         getReward,
         blockRewardMap,

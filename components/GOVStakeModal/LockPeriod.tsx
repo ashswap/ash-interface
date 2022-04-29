@@ -4,23 +4,45 @@ import React, { useCallback, useMemo, useRef, useState } from "react";
 import ICChevronDown from "assets/svg/chevron-down.svg";
 import { DatePicker } from "antd";
 import useClickOutside from "hooks/useClickOutside";
+import { ENVIRONMENT } from "const/env";
 
+export const lockPeriodFormater = (ms: number) => {
+    const yearDuration = 365 * 24 * 60 * 60 * 1000;
+    let years = Math.floor(ms / yearDuration);
+    let _days = (ms % yearDuration) / (24 * 60 * 60 * 1000);
+    let days = Math.floor(_days);
+    let _hours = (_days - days) * 24;
+    let hours = Math.floor(_hours);
+    let minutes = Math.floor((_hours - hours) * 60);
+    if(minutes === 59) {
+        hours++;
+        minutes = 0;
+    }
+    const y = years ? `${years} ${years > 1 ? "years" : "year"}` : "";
+    const d = days ? `${days} ${days > 1 ? "days" : "day"}` : "";
+    const h = hours ? `${hours} ${hours > 1 ? "hours" : "hour"}` : "";
+
+    const m = minutes
+        ? `${minutes} ${minutes > 1 ? "minutes" : "minute"}`
+        : "";
+    return [y, d, h, m].filter((s) => !!s).join(" ");
+}
 type props = {
-    lockDay: number;
+    lockSeconds: number;
     currentLock?: number;
     min?: number;
     max?: number;
     options: { value: number; label: string }[];
-    lockDayChange: (val: number) => void;
+    lockSecondsChange: (val: number) => void;
 };
 
 function LockPeriod({
-    lockDay,
+    lockSeconds: lockDay,
     min,
     max,
     currentLock = 0,
     options,
-    lockDayChange,
+    lockSecondsChange,
 }: props) {
     const datePickerRef = useRef<HTMLDivElement>(null);
     const [openDatePicker, setOpenDatePicker] = useState(false);
@@ -29,21 +51,13 @@ function LockPeriod({
     }, []);
     useClickOutside(datePickerRef, onClickOutside);
     const fUnlockDate = useMemo(() => {
-        return moment().add(lockDay, "days").format("DD MMM, yyyy");
+        return moment().add(lockDay, "seconds").format("DD MMM, yyyy");
     }, [lockDay]);
     const fSelectedDate = useMemo(() => {
-        let years = Math.floor(lockDay / 365);
-        let days = Math.floor(lockDay % 365);
-        let minutes = Math.ceil(((lockDay % 365) - days) * 24 * 60);
-        const y = years ? `${years} ${years > 1 ? "years" : "year"}` : "";
-        const d = days ? `${days} ${days > 1 ? "days" : "day"}` : "";
-        const m = minutes
-            ? `${minutes} ${minutes > 1 ? "minutes" : "minute"}`
-            : "";
-        return [y, d, m].filter((s) => !!s).join(" ");
+        return lockPeriodFormater(lockDay * 1000);
     }, [lockDay]);
     const dateValue = useMemo(() => {
-        return moment().endOf("days").add(lockDay, "days")
+        return moment().endOf("days").add(lockDay, "seconds")
     }, [lockDay]);
     return (
         <div className="bg-ash-dark-400 h-20 flex items-center justify-between pr-3">
@@ -51,7 +65,7 @@ function LockPeriod({
                 <DatePicker
                     className="invisible w-0 h-0 p-0 border-0 absolute left-0 bottom-0"
                     dropdownClassName="bg-pink-600 left-0 "
-                    open={openDatePicker}
+                    open={ENVIRONMENT.NETWORK !== "devnet" && openDatePicker}
                     popupStyle={{ left: "0px" }}
                     suffixIcon={undefined}
                     inputReadOnly={true}
@@ -78,7 +92,7 @@ function LockPeriod({
                     value={dateValue}
                     onChange={(val) =>
                         val &&
-                        lockDayChange(
+                        lockSecondsChange(
                             val
                                 .endOf("days")
                                 .diff(moment().endOf("days"), "days")
@@ -118,7 +132,7 @@ function LockPeriod({
                                         <button
                                             className="w-full py-3 text-left px-6"
                                             onClick={() => {
-                                                lockDayChange(lock.value);
+                                                lockSecondsChange(lock.value);
                                                 close();
                                             }}
                                         >
