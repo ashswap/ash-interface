@@ -14,6 +14,7 @@ import {
     TransactionHash,
 } from "@elrondnetwork/erdjs";
 import BigNumber from "bignumber.js";
+import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 import { blockTimeMs } from "const/dappConfig";
 import pools from "const/pool";
 import { ASH_TOKEN, TOKENS } from "const/tokens";
@@ -102,8 +103,8 @@ export function WalletProvider({ children }: Props) {
 
     const { data: priceEntries } = useSWR(
         TOKENS.map((token) =>
-            token.coingeckoId
-                ? `https://api.coingecko.com/api/v3/coins/${token.coingeckoId}`
+            token.id
+                ? `${ASHSWAP_CONFIG.ashApiBaseUrl}/token/${token.id}/price`
                 : null
         ),
         arrayFetcher,
@@ -114,11 +115,11 @@ export function WalletProvider({ children }: Props) {
         const map = Object.fromEntries(
             TOKENS.map((t, i) => [
                 t.id,
-                priceEntries?.[i]?.market_data.current_price.usd || 0,
+                priceEntries?.[i] || 0,
             ])
         );
         // dummy ash price = 1$ - TODO: get ash price from maiar after launching pool ash-usdt on maiar exchange
-        map[ASH_TOKEN.id] = 1;
+        // map[ASH_TOKEN.id] = 1;
         return map;
     }, [priceEntries]);
 
