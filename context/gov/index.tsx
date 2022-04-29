@@ -38,12 +38,12 @@ import {
     useEffect,
     useState,
 } from "react";
-const estimateVeASH = (weiAmt: BigNumber, lockDays: number) => {
+const estimateVeASH = (weiAmt: BigNumber, lockSeconds: number) => {
     // ratio: lock 1 ASH in 1 year(365 days) -> 0.25 veASH
-    const veASHPerDay = toEGLDD(ASH_TOKEN.decimals, weiAmt).multipliedBy(
-        new BigNumber(0.25).div(365)
+    const veASHPerSecond = toEGLDD(ASH_TOKEN.decimals, weiAmt).multipliedBy(
+        new BigNumber(0.25).div(365 * 24 * 60 * 60)
     );
-    return toWei(ASH_TOKEN, veASHPerDay.multipliedBy(lockDays).toString());
+    return toWei(ASH_TOKEN, veASHPerSecond.multipliedBy(lockSeconds).toString());
 };
 const emptySendTxsReturn: SendTransactionReturnType = { sessionId: "" };
 type GovStakeState = {
@@ -60,7 +60,7 @@ type GovStakeState = {
     }) => Promise<SendTransactionReturnType>;
     claimReward: () => Promise<SendTransactionReturnType>;
     unlockASH: () => Promise<SendTransactionReturnType>;
-    estimateVeASH: (weiAmt: BigNumber, lockDays: number) => BigNumber;
+    estimateVeASH: (weiAmt: BigNumber, lockSeconds: number) => BigNumber;
     lockedAmt: BigNumber;
     veASH: BigNumber;
     unlockTS: BigNumber;

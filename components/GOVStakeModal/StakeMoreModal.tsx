@@ -7,6 +7,7 @@ import InputCurrency from "components/InputCurrency";
 import Switch from "components/Switch";
 import CardTooltip from "components/Tooltip/CardTooltip";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
+import { ENVIRONMENT } from "const/env";
 import { ASH_TOKEN, VE_ASH_DECIMALS } from "const/tokens";
 import { useStakeGov } from "context/gov";
 import { useWallet } from "context/wallet";
@@ -17,22 +18,36 @@ import { useOnboarding } from "hooks/useOnboarding";
 import { useScreenSize } from "hooks/useScreenSize";
 import moment from "moment";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import LockPeriod from "./LockPeriod";
+import LockPeriod, { lockPeriodFormater } from "./LockPeriod";
 type props = {
     open: boolean;
     onClose: () => void;
 };
-const EXTEND_OPTS = [
-    // test purpose
-    { value: 1 / 48, label: "30 minutes" },
-    { value: 7, label: "+ 7 days" },
-    { value: 30, label: "+ 30 days" },
-    { value: 365, label: "+ 1 year" },
-];
-const MAX_LOCK = 4 * 365;
-const maxLock = 4 * 365;
-// test purpose - change back to 7
-const minLock = 1 / 48;
+const EXTEND_DEV = {
+    options: [
+        // test purpose
+        { value: 12 * 60 * 60, label: "+ 12 hours" },
+        { value: 24 * 60 * 60, label: "+ 1 day" },
+        { value: 3 * 24 * 60 * 60, label: "+ 3 days" },
+        { value: 1 * 7 * 24 * 60 * 60, label: "+ 1 week" },
+    ],
+    maxLock: 2 * 7 * 24 * 60 * 60,
+    minLock: 12 * 60 * 60,
+};
+const EXTEND_TEST = {
+    options: [
+        // test purpose
+        { value: 30 * 60, label: "+ minutes" },
+        { value: 24 * 60 * 60, label: "+ 1 day" },
+        { value: 1 * 365 * 24 * 60 * 60, label: "+ 1 year" },
+        { value: 2 * 365 * 24 * 60 * 60, label: "+ 2 years" },
+        { value: 3 * 365 * 24 * 60 * 60, label: "+ 3 years" },
+    ],
+    maxLock: 4 * 365 * 24 * 60 * 60,
+    minLock: 30 * 60,
+};
+const EXTEND_CONFIG =
+    ENVIRONMENT.NETWORK === "devnet" ? EXTEND_DEV : EXTEND_TEST;
 const StakeMoreContent = ({ open, onClose }: props) => {
     const {
         lockedAmt,
@@ -46,18 +61,10 @@ const StakeMoreContent = ({ open, onClose }: props) => {
     const ASHBalance = useMemo(() => balances[ASH_TOKEN.id], [balances]);
     const [lockAmt, setLockAmt] = useState<BigNumber>(new BigNumber(0));
     const [rawLockAmt, setRawLockAmt] = useState("");
-    const currentLockDays = useMemo(() => {
-        const current = moment
-            .unix(unlockTS.toNumber())
-            .endOf("days")
-            .diff(moment().endOf("days"), "days");
-        // test purpose
-        const currentM =
-            moment.unix(unlockTS.toNumber()).diff(moment(), "seconds") /
-            (24 * 60 * 60);
-        return currentM > 0 ? currentM : 0;
-    }, [unlockTS]);
-    const [extendLockPeriod, setExtendLockPeriod] = useState(minLock);
+    const [currentLockSeconds, setCurrentLockSeconds] = useState(0);
+    const [extendLockPeriod, setExtendLockPeriod] = useState(
+        EXTEND_CONFIG.minLock
+    ); // in seconds
     const [isAgree, setIsAgree] = useState(false);
     const [isExtend, setIsExtend] = useState(false);
     const { isMobile } = useScreenSize();
@@ -68,35 +75,28 @@ const StakeMoreContent = ({ open, onClose }: props) => {
     const [openOnboardingExtendTooltip, setOpenOnboardingExtendTooltip] =
         useState(false);
     const remaining = useMemo(() => {
-        let years = Math.floor(currentLockDays / 365);
-        let days = Math.floor(currentLockDays % 365);
-        // test purpose
-        let minutes = Math.ceil(((currentLockDays % 365) - days) * 24 * 60);
-        const y = years ? `${years} ${years > 1 ? "years" : "year"}` : "";
-        const d = days ? `${days} ${days > 1 ? "days" : "day"}` : "";
-        // test purpose
-        const m = minutes
-            ? `${minutes} ${minutes > 1 ? "minutes" : "minute"}`
-            : "";
-        return [y, d, m].filter((s) => !!s).join(" ");
-    }, [currentLockDays]);
+        return lockPeriodFormater(currentLockSeconds * 1000);
+    }, [currentLockSeconds]);
     const extendOpts = useMemo(() => {
-        const max = MAX_LOCK - currentLockDays;
+        const max = EXTEND_CONFIG.maxLock - currentLockSeconds;
         return [
-            ...EXTEND_OPTS.filter((opt) => opt.value < max),
-            { value: max, label: `max: ${max.toLocaleString("en-US")} days` },
+            ...EXTEND_CONFIG.options.filter((opt) => opt.value < max),
+            {
+                value: max,
+                label: `max: ${lockPeriodFormater(max * 1000)}`,
+            },
         ];
-    }, [currentLockDays]);
+    }, [currentLockSeconds]);
     const fLockedAmt = useMemo(() => {
         return fractionFormat(
             toEGLDD(ASH_TOKEN.decimals, lockedAmt).toNumber()
         );
     }, [lockedAmt]);
     useEffect(() => {
-        if (currentLockDays === 0) {
+        if (currentLockSeconds === 0) {
             setIsExtend(true);
         }
-    }, [currentLockDays]);
+    }, [currentLockSeconds]);
     const setMaxLockAmt = useCallback(() => {
         if (!ASHBalance) return;
         setLockAmt(ASHBalance.balance);
@@ -117,14 +117,15 @@ const StakeMoreContent = ({ open, onClose }: props) => {
             isAgree &&
             (lockAmt.gt(0) ||
                 (isExtend &&
-                    extendLockPeriod >= minLock &&
-                    extendLockPeriod + currentLockDays <= maxLock))
+                    extendLockPeriod >= EXTEND_CONFIG.minLock &&
+                    extendLockPeriod + currentLockSeconds <=
+                        EXTEND_CONFIG.maxLock))
         );
     }, [
         insufficientEGLD,
         extendLockPeriod,
         isAgree,
-        currentLockDays,
+        currentLockSeconds,
         lockAmt,
         isExtend,
         insufficientASH,
@@ -134,19 +135,12 @@ const StakeMoreContent = ({ open, onClose }: props) => {
         const { sessionId } = await lockMoreASH({
             weiAmt: lockAmt,
             unlockTimestamp: isExtend
-                ? extendLockPeriod === minLock
-                    ? new BigNumber(
-                          moment
-                              .unix(unlockTS.toNumber())
-                              .add(30, "minutes")
-                              .unix()
-                      )
-                    : new BigNumber(
-                          moment
-                              .unix(unlockTS.toNumber())
-                              .add(extendLockPeriod, "days")
-                              .unix()
-                      )
+                ? new BigNumber(
+                      moment
+                          .unix(unlockTS.toNumber())
+                          .add(extendLockPeriod, "seconds")
+                          .unix()
+                  )
                 : undefined,
         });
         if (sessionId) onClose?.();
@@ -156,19 +150,16 @@ const StakeMoreContent = ({ open, onClose }: props) => {
         if (isExtend) {
             return estimateVeASH(
                 lockedAmt.plus(lockAmt),
-                extendLockPeriod + currentLockDays
+                extendLockPeriod + currentLockSeconds
             );
         }
-        return estimateVeASH(
-            lockedAmt.plus(lockAmt),
-            currentLockDays + 7 / (24 * 60 * 60)
-        );
+        return estimateVeASH(lockedAmt.plus(lockAmt), currentLockSeconds);
     }, [
         estimateVeASH,
         extendLockPeriod,
         lockedAmt,
         lockAmt,
-        currentLockDays,
+        currentLockSeconds,
         isExtend,
     ]);
     const fEstimatedVeASH = useMemo(() => {
@@ -203,6 +194,17 @@ const StakeMoreContent = ({ open, onClose }: props) => {
             setOpenOnboardingExtendTooltip(true);
         }
     }, [isTouchScreen]);
+    useEffect(() => {
+        const func = () => {
+            const current = moment
+                .unix(unlockTS.toNumber())
+                .diff(moment(), "seconds");
+            setCurrentLockSeconds(current > 0 ? current : 0);
+        };
+        func();
+        const interval = setInterval(func, 60 * 1000);
+        return () => clearInterval(interval);
+    }, [unlockTS]);
     return (
         <>
             <div className="px-6 lg:px-20 pb-12 overflow-auto relative">
@@ -296,7 +298,7 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                         </div>
 
                         <div>
-                            {currentLockDays > 0 ? (
+                            {currentLockSeconds > 0 ? (
                                 <div className="flex items-center">
                                     <Switch
                                         className="flex items-center"
@@ -310,7 +312,7 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                                             }
                                         }}
                                     >
-                                        <CardTooltip
+                                        {/* <CardTooltip
                                             content={
                                                 <div>
                                                     You can extend your locked
@@ -322,7 +324,10 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                                             <span className="ml-3 text-ash-gray-500 text-sm font-bold underline">
                                                 I want to extend my lock period!
                                             </span>
-                                        </CardTooltip>
+                                        </CardTooltip> */}
+                                        <span className="ml-3 text-ash-gray-500 text-sm font-bold underline">
+                                            I want to extend my lock period!
+                                        </span>
                                     </Switch>
                                 </div>
                             ) : (
@@ -400,20 +405,24 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                                 >
                                     <div className="mt-8">
                                         <LockPeriod
-                                            lockDay={
+                                            lockSeconds={
                                                 extendLockPeriod +
-                                                currentLockDays
+                                                currentLockSeconds
                                             }
-                                            min={currentLockDays + minLock}
-                                            max={MAX_LOCK}
+                                            min={
+                                                currentLockSeconds +
+                                                EXTEND_CONFIG.minLock
+                                            }
+                                            max={EXTEND_CONFIG.maxLock}
                                             options={extendOpts.map((opt) => ({
                                                 ...opt,
                                                 value:
-                                                    opt.value + currentLockDays,
+                                                    opt.value +
+                                                    currentLockSeconds,
                                             }))}
-                                            lockDayChange={(val) =>
+                                            lockSecondsChange={(val) =>
                                                 setExtendLockPeriod(
-                                                    val - currentLockDays
+                                                    val - currentLockSeconds
                                                 )
                                             }
                                         />
@@ -550,7 +559,7 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                                     <div className="text-white text-lg font-bold">
                                         {moment
                                             .unix(unlockTS.toNumber())
-                                            .add(extendLockPeriod, "days")
+                                            .add(extendLockPeriod, "seconds")
                                             .format("DD MMM, yyyy")}
                                     </div>
                                 )}

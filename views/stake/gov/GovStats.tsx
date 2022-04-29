@@ -10,6 +10,7 @@ import GOVStakeModal from "components/GOVStakeModal";
 import CardTooltip from "components/Tooltip/CardTooltip";
 import TextTooltip from "components/Tooltip/TextTooltip";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
+import { ENVIRONMENT } from "const/env";
 import { ASH_TOKEN, VE_ASH_DECIMALS } from "const/tokens";
 import { useStakeGov } from "context/gov";
 import { useWallet } from "context/wallet";
@@ -399,54 +400,66 @@ function GovStats() {
                             Stake ASH to receive veASH. You can both earn from
                             transaction fee & have a power for voting!
                         </div>
-                        <ul>
-                            <li className="text-sm font-bold">
-                                <span className="text-stake-green-500">1</span>{" "}
-                                ASH locked for{" "}
-                                <span className="text-stake-green-500">
-                                    4 years
-                                </span>{" "}
-                                ={" "}
-                                <span className="text-stake-green-500">1</span>{" "}
-                                veASH
-                            </li>
-                            <li className="text-sm font-bold">
-                                <span className="text-stake-green-500">1</span>{" "}
-                                ASH locked for{" "}
-                                <span className="text-stake-green-500">
-                                    3 years
-                                </span>{" "}
-                                ={" "}
-                                <span className="text-stake-green-500">
-                                    0.75
-                                </span>{" "}
-                                veASH
-                            </li>
-                            <li className="text-sm font-bold">
-                                <span className="text-stake-green-500">1</span>{" "}
-                                ASH locked for{" "}
-                                <span className="text-stake-green-500">
-                                    2 years
-                                </span>{" "}
-                                ={" "}
-                                <span className="text-stake-green-500">
-                                    0.5
-                                </span>{" "}
-                                veASH
-                            </li>
-                            <li className="text-sm font-bold">
-                                <span className="text-stake-green-500">1</span>{" "}
-                                ASH locked for{" "}
-                                <span className="text-stake-green-500">
-                                    1 year
-                                </span>{" "}
-                                ={" "}
-                                <span className="text-stake-green-500">
-                                    0.25
-                                </span>{" "}
-                                veASH
-                            </li>
-                        </ul>
+                        {ENVIRONMENT.NETWORK !== "devnet" && (
+                            <ul>
+                                <li className="text-sm font-bold">
+                                    <span className="text-stake-green-500">
+                                        1
+                                    </span>{" "}
+                                    ASH locked for{" "}
+                                    <span className="text-stake-green-500">
+                                        4 years
+                                    </span>{" "}
+                                    ={" "}
+                                    <span className="text-stake-green-500">
+                                        1
+                                    </span>{" "}
+                                    veASH
+                                </li>
+                                <li className="text-sm font-bold">
+                                    <span className="text-stake-green-500">
+                                        1
+                                    </span>{" "}
+                                    ASH locked for{" "}
+                                    <span className="text-stake-green-500">
+                                        3 years
+                                    </span>{" "}
+                                    ={" "}
+                                    <span className="text-stake-green-500">
+                                        0.75
+                                    </span>{" "}
+                                    veASH
+                                </li>
+                                <li className="text-sm font-bold">
+                                    <span className="text-stake-green-500">
+                                        1
+                                    </span>{" "}
+                                    ASH locked for{" "}
+                                    <span className="text-stake-green-500">
+                                        2 years
+                                    </span>{" "}
+                                    ={" "}
+                                    <span className="text-stake-green-500">
+                                        0.5
+                                    </span>{" "}
+                                    veASH
+                                </li>
+                                <li className="text-sm font-bold">
+                                    <span className="text-stake-green-500">
+                                        1
+                                    </span>{" "}
+                                    ASH locked for{" "}
+                                    <span className="text-stake-green-500">
+                                        1 year
+                                    </span>{" "}
+                                    ={" "}
+                                    <span className="text-stake-green-500">
+                                        0.25
+                                    </span>{" "}
+                                    veASH
+                                </li>
+                            </ul>
+                        )}
                     </div>
                     <div>
                         <div className="text-whtie text-sm font-bold mb-5">
