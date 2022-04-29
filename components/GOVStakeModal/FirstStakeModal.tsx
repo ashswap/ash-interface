@@ -16,6 +16,7 @@ import useMediaQuery from "hooks/useMediaQuery";
 import { useOnboarding } from "hooks/useOnboarding";
 import { useScreenSize } from "hooks/useScreenSize";
 import moment from "moment";
+import Image from "next/image";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { theme } from "tailwind.config";
 import LockPeriod, { lockPeriodFormater } from "./LockPeriod";
@@ -129,7 +130,9 @@ const FirstStakeContent = ({ open, onClose }: props) => {
                                     Token
                                 </div>
                                 <div className="bg-ash-dark-400/30 h-14 lg:h-18 px-4 lg:px-7 flex items-center">
-                                    <div className="w-3.5 h-3.5 lg:w-7 lg:h-7 bg-pink-600 rounded-full mr-3"></div>
+                                    <div className="w-3.5 h-3.5 lg:w-7 lg:h-7 rounded-full relative mr-3">
+                                        <Image src={ASH_TOKEN.icon} alt={ASH_TOKEN.name} layout="fill" objectFit="contain"/>
+                                    </div>
                                     <div className="text-white text-sm lg:text-lg font-bold">
                                         {ASH_TOKEN.name}
                                     </div>

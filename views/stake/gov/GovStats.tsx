@@ -210,7 +210,14 @@ function GovStats() {
                                     {/* <div className="w-[1.125rem] h-[1.125rem] mr-2">
                                         <Image src={ImgUsdt} alt="token icon" />
                                     </div> */}
-                                    <div className="w-[1.125rem] h-[1.125rem] mr-2 rounded-full bg-pink-600"></div>
+                                    <div className="w-[1.125rem] h-[1.125rem] mr-2 rounded-full relative">
+                                        <Image
+                                            src={ASH_TOKEN.icon}
+                                            alt={ASH_TOKEN.name}
+                                            layout="fill"
+                                            objectFit="contain"
+                                        />
+                                    </div>
                                     <div className="text-lg text-white font-bold">
                                         {fLockedAmt}
                                     </div>
@@ -371,7 +378,14 @@ function GovStats() {
                                 {/* <div className="w-[1.125rem] h-[1.125rem] mr-2">
                                     <Image src={ImgUsdt} alt="token icon" />
                                 </div> */}
-                                <div className="w-[1.125rem] h-[1.125rem] mr-2 rounded-full bg-pink-600"></div>
+                                <div className="w-[1.125rem] h-[1.125rem] mr-2 rounded-full relative">
+                                    <Image
+                                        src={ASH_TOKEN.icon}
+                                        alt={ASH_TOKEN.name}
+                                        layout="fill"
+                                        objectFit="contain"
+                                    />
+                                </div>
                                 <div className="text-white text-lg font-bold">
                                     {fTotalLockedAmt}
                                 </div>

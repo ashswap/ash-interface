@@ -4,6 +4,7 @@ import { ASH_TOKEN } from "const/tokens";
 import { useFarms } from "context/farms";
 import { toEGLDD } from "helper/balance";
 import { fractionFormat } from "helper/number";
+import Image from "next/image";
 import React, {
     useCallback,
     useEffect,
@@ -74,7 +75,14 @@ function FarmStats({ onClickAll }: { onClickAll?: () => void }) {
                             </div>
                         </CardTooltip>
                         <div className="flex items-center">
-                            <div className="w-4.5 h-4.5 rounded-full bg-pink-600 mr-2"></div>
+                            <div className="w-4.5 h-4.5 rounded-full relative mr-2">
+                                <Image
+                                    src={ASH_TOKEN.icon}
+                                    alt={ASH_TOKEN.name}
+                                    layout="fill"
+                                    objectFit="contain"
+                                />
+                            </div>
                             <div className="text-white text-lg font-bold">
                                 {fractionFormat(
                                     toEGLDD(

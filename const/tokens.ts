@@ -2,12 +2,12 @@ import IPool from "interface/pool";
 import { IToken } from "interface/token";
 import { ENVIRONMENT } from "./env";
 import pools from "./pool";
-
+import ImgAshIcon from "assets/images/ash-icon.png";
 export const ASH_TOKEN: IToken = {
     id: ENVIRONMENT.NETWORK == "devnet" ? "ASH-f7c9ea" : "ASH-76f082",
     name: "ASH",
     decimals: 18,
-    icon: "",
+    icon: ImgAshIcon,
 };
 export const VE_ASH_DECIMALS = 18;
 const getTokenFromPools = (...pools: IPool[]) => {

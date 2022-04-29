@@ -17,6 +17,7 @@ import useMediaQuery from "hooks/useMediaQuery";
 import { useOnboarding } from "hooks/useOnboarding";
 import { useScreenSize } from "hooks/useScreenSize";
 import moment from "moment";
+import Image from "next/image";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import LockPeriod, { lockPeriodFormater } from "./LockPeriod";
 type props = {
@@ -256,7 +257,14 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                                 <div className="text-ash-gray-500 text-xs lg:text-sm font-bold mb-2 lg:mb-4 flex items-center">
                                     <div className="mr-1">Current</div>
                                     <div className="flex items-center">
-                                        <div className="w-3 h-3 bg-pink-600 rounded-full mr-1"></div>
+                                        <div className="w-3 h-3 rounded-full relative mr-1">
+                                            <Image
+                                                src={ASH_TOKEN.icon}
+                                                alt={ASH_TOKEN.name}
+                                                layout="fill"
+                                                objectFit="contain"
+                                            />
+                                        </div>
                                         <div>{ASH_TOKEN.name} Staked</div>
                                     </div>
                                 </div>
