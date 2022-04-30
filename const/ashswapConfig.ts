@@ -2,9 +2,9 @@ import { ENVIRONMENT } from "./env";
 
 const dappContractDevnet = {
     voteEscrowedContract:
-        "erd1qqqqqqqqqqqqqpgqtfc7rpl9dkfhkgt27ncw6p8tay8fpmffrmcqrmv22m",
+        "erd1qqqqqqqqqqqqqpgq2gu29l3m3g2pyg8g5y9ga5q0yxg366vxzh0qf3vars",
     feeDistributor:
-        "erd1qqqqqqqqqqqqqpgqfx4sx79slh2pr8vvszgs50l4vx9968uyrmcqaw6uf9",
+        "erd1qqqqqqqqqqqqqpgqhvsksal2fne9xadva8wdk23ty9juft40zh0qfhx6kg",
 };
 
 const dappContractTestnet = {

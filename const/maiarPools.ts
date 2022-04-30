@@ -1,16 +1,16 @@
 import IconAsh from "assets/images/ash-icon.png";
 import IconUSDC from "assets/images/usdc-icon.png";
-import IconBTC from "assets/images/btc-icon.png";
 import IconUSDT from "assets/images/usdt-icon.png";
+import IconBTC from "assets/images/btc-icon.png";
 import IPool from "interface/pool";
 export const MAIAR_POOLS: IPool[] = [
     {
         address:
-            "erd1qqqqqqqqqqqqqpgq5jctt8y23k8qznwmgxfjf6vj8dncvdfzzh0q225ddy",
+            "erd1qqqqqqqqqqqqqpgqp8mhm4dzt4vusdt2g36smup2f5vrtgrszh0qdpeqxx",
         lpToken: {
-            id: "LPT-cdd8b0",
+            id: "LPT-fd5668",
             icon: "#fff",
-            name: "LPT-cdd8b0",
+            name: "LPT-fd5668",
             decimals: 18,
         },
         tokens: [
@@ -21,9 +21,9 @@ export const MAIAR_POOLS: IPool[] = [
                 decimals: 18,
             },
             {
-                id: "USDC-d6c57a",
-                icon: IconUSDC,
-                name: "USDC",
+                id: "USDT-fedd98",
+                icon: IconUSDT,
+                name: "USDT",
                 decimals: 6,
             },
         ],
@@ -31,24 +31,24 @@ export const MAIAR_POOLS: IPool[] = [
     },
     {
         address:
-            "erd1qqqqqqqqqqqqqpgquz3kkwg6mnhsk6pvj99zttgyr4nakvrqzh0q5lv048",
+            "erd1qqqqqqqqqqqqqpgqe3wfkwqm49jmfeehc6apl59h6rv2h29lzh0qsg3ey5",
         lpToken: {
-            id: "LPT-0707f5",
+            id: "LPT-bfa0a3",
             icon: "#fff",
-            name: "LPT-0707f5",
+            name: "LPT-bfa0a3",
             decimals: 18,
         },
         tokens: [
             {
-                id: "BTC-573344",
+                id: "WBTC-027977",
                 icon: IconBTC,
-                name: "BTC",
-                decimals: 6,
+                name: "renBTC",
+                decimals: 8,
             },
             {
-                id: "USDT-2f78fb",
-                icon: IconUSDT,
-                name: "USDT",
+                id: "USDC-fecc49",
+                icon: IconUSDC,
+                name: "USDC",
                 decimals: 6,
             },
         ],
