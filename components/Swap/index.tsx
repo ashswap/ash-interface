@@ -29,6 +29,7 @@ import HistoryModal from "components/HistoryModal";
 import IconButton from "components/IconButton";
 import Setting from "components/Setting";
 import SwapAmount from "components/SwapAmount";
+import CardTooltip from "components/Tooltip/CardTooltip";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
 import { gasLimit } from "const/dappConfig";
 import { useSwap } from "context/swap";
@@ -564,13 +565,25 @@ const Swap = () => {
                                 rawValueFrom.gt(new BigNumber(0)) && (
                                     <>
                                         <div className="bg-black flex flex-row items-center justify-between h-10 pl-5 pr-6">
-                                            <div
-                                                className={
-                                                    styles.swapResultLabel
+                                            <CardTooltip
+                                                content={
+                                                    <div>
+                                                        Making a trade shifts
+                                                        the ratio of tokens in
+                                                        the pool, causing this
+                                                        change in price per
+                                                        token.
+                                                    </div>
                                                 }
                                             >
-                                                Price impact
-                                            </div>
+                                                <div
+                                                    className={
+                                                        styles.swapResultLabel
+                                                    }
+                                                >
+                                                    Price impact
+                                                </div>
+                                            </CardTooltip>
                                             <div
                                                 className={
                                                     styles.swapResultValue
@@ -581,13 +594,25 @@ const Swap = () => {
                                             </div>
                                         </div>
                                         <div className="bg-black flex flex-row items-center justify-between h-10 pl-5 pr-6">
-                                            <div
-                                                className={
-                                                    styles.swapResultLabel
+                                            <CardTooltip
+                                                content={
+                                                    <div>
+                                                        The minimum amount you
+                                                        would get after
+                                                        subtracting fees and
+                                                        maximum slippage being
+                                                        reached.
+                                                    </div>
                                                 }
                                             >
-                                                Minimum received
-                                            </div>
+                                                <div
+                                                    className={
+                                                        styles.swapResultLabel
+                                                    }
+                                                >
+                                                    Minimum received
+                                                </div>
+                                            </CardTooltip>
                                             <div
                                                 className={
                                                     styles.swapResultValue
@@ -597,13 +622,26 @@ const Swap = () => {
                                             </div>
                                         </div>
                                         <div className="bg-black flex flex-row items-center justify-between h-10 pl-5 pr-6">
-                                            <div
-                                                className={
-                                                    styles.swapResultLabel
+                                            <CardTooltip
+                                                content={
+                                                    <div>
+                                                        You can change this in
+                                                        settings to either make
+                                                        sure you get the amount
+                                                        you want or your
+                                                        transaction will not be
+                                                        reverted.
+                                                    </div>
                                                 }
                                             >
-                                                Slippage
-                                            </div>
+                                                <div
+                                                    className={
+                                                        styles.swapResultLabel
+                                                    }
+                                                >
+                                                    Slippage
+                                                </div>
+                                            </CardTooltip>
                                             <div
                                                 className={
                                                     styles.swapResultValue
@@ -613,13 +651,24 @@ const Swap = () => {
                                             </div>
                                         </div>
                                         <div className="bg-black flex flex-row items-center justify-between h-10 pl-5 pr-6">
-                                            <div
-                                                className={
-                                                    styles.swapResultLabel
+                                            <CardTooltip
+                                                content={
+                                                    <div>
+                                                        Which liquidity providers earn
+                                                        from successful
+                                                        transactions. Don&apos;t
+                                                        worry, It&apos;s small.
+                                                    </div>
                                                 }
                                             >
-                                                Swap fees
-                                            </div>
+                                                <div
+                                                    className={
+                                                        styles.swapResultLabel
+                                                    }
+                                                >
+                                                    Swap fees
+                                                </div>
+                                            </CardTooltip>
                                             {pool.isMaiarPool ? (
                                                 <div
                                                     className={
