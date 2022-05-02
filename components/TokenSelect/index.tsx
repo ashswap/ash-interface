@@ -7,7 +7,9 @@ import Input from "components/Input";
 import ListSwapPool from "components/ListSwapPool";
 import ListToken from "components/ListToken";
 import Token from "components/Token";
+import OnboardTooltip from "components/Tooltip/OnboardTooltip";
 import { useWallet } from "context/wallet";
+import { useOnboarding } from "hooks/useOnboarding";
 import { useScreenSize } from "hooks/useScreenSize";
 import IPool from "interface/pool";
 import { IToken } from "interface/token";
@@ -42,6 +44,18 @@ const TokenSelect = ({
     const [keyword, setKeyword] = useState<string>("");
     const { tokens, balances } = useWallet();
     const screenSize = useScreenSize();
+    // user onboarding
+    const [openOnboardSelectToken, setOnboardedSelectToken] =
+        useOnboarding("swap_select_token");
+    const [openOnboardSearchToken, setOnboardedSearchToken] =
+        useOnboarding("swap_search_token");
+    const [onboardingSelectTokenTo, setOnBoardedSelectTokenTo] = useOnboarding(
+        "swap_pop_select_token_to"
+    );
+    const [onboardingAvailablePair, setOnboardedAvailablePair] = useOnboarding(
+        "swap_view_available_pair"
+    );
+    // end user onboarding
 
     const tokenBalances = useMemo(() => {
         let tokenBalances: TokenBalance[] = [];
@@ -103,6 +117,10 @@ const TokenSelect = ({
         }
     }, [validPools]);
 
+    useEffect(() => {
+        if (value) setOnboardedSearchToken(true);
+    }, [value, setOnboardedSearchToken]);
+
     const renderPivotToken = () => {
         if (!pivotToken) {
             return null;
@@ -128,22 +146,45 @@ const TokenSelect = ({
 
     return (
         <>
-            <div
-                className={
-                    `flex flex-row items-center justify-between text-sm font-bold w-44 cursor-pointer select-none p-4 rounded-xl text-pink-600 ` +
-                    (value
-                        ? "bg-ash-dark-600"
-                        : `bg-bg-select hover:bg-bg-select-hover ${styles.containerHover}`)
+            <OnboardTooltip
+                open={
+                    type === "from" && screenSize.lg && openOnboardSelectToken
                 }
-                onClick={() => setOpen(true)}
+                onArrowClick={() => setOnboardedSelectToken(true)}
+                placement="left"
+                zIndex={10}
+                content={
+                    <OnboardTooltip.Panel>
+                        <div className="px-6 py-2.5 text-sm font-bold">
+                            <span className="text-stake-green-500">
+                                Select a token{" "}
+                            </span>
+                            <span>to swap</span>
+                        </div>
+                    </OnboardTooltip.Panel>
+                }
             >
-                {value ? (
-                    <Token token={value} />
-                ) : (
-                    <div className="text-xs sm:text-sm">Select a token</div>
-                )}
-                <Down />
-            </div>
+                <div
+                    className={
+                        `flex flex-row items-center justify-between text-sm font-bold w-44 cursor-pointer select-none p-4 rounded-xl text-pink-600 ` +
+                        (value
+                            ? "bg-ash-dark-600"
+                            : `bg-bg-select hover:bg-bg-select-hover ${styles.containerHover}`)
+                    }
+                    onClick={() => {
+                        setOpen(true);
+                        setOnboardedSelectToken(true);
+                    }}
+                >
+                    {value ? (
+                        <Token token={value} />
+                    ) : (
+                        <div className="text-xs sm:text-sm">Select a token</div>
+                    )}
+                    <Down />
+                </div>
+            </OnboardTooltip>
+
             <BaseModal
                 isOpen={open}
                 onRequestClose={() => setOpen(false)}
@@ -157,45 +198,141 @@ const TokenSelect = ({
                     <div className="font-bold text-lg text-white">
                         {modalTitle}
                     </div>
-                    <div className="flex flex-row items-center my-8 w-full">
-                        {pivotToken && type === "to" && renderPivotToken()}
-                        <Input
-                            placeholder="Search or try usdt-usdc"
-                            suffix={<Search />}
-                            outline
-                            autoFocus
-                            value={keyword}
-                            onChange={(e) => onChangeKeyword(e.target.value)}
-                            textClassName="text-sm"
-                            className="w-full caret-pink-500 overflow-hidden h-12 px-5"
-                        />
-                        {pivotToken && type === "from" && renderPivotToken()}
-                    </div>
-                    {validPools && filtedValidPools.length === 0 ? (
-                        <div className="text-insufficent-fund text-xs">
-                            That doesn&apos;t look like a supported swap!
+                    <OnboardTooltip
+                        open={
+                            type === "to" &&
+                            pivotToken &&
+                            screenSize.lg &&
+                            onboardingSelectTokenTo
+                        }
+                        placement="right"
+                        onArrowClick={() => setOnBoardedSelectTokenTo(true)}
+                        content={
+                            <OnboardTooltip.Panel>
+                                <div className="px-6 py-2.5 text-sm font-bold">
+                                    <span className="text-stake-green-500">
+                                        Select token{" "}
+                                    </span>
+                                    <span>that you want to swap to</span>
+                                </div>
+                            </OnboardTooltip.Panel>
+                        }
+                    >
+                        <div>
+                            <OnboardTooltip
+                                open={
+                                    type === "from" &&
+                                    screenSize.lg &&
+                                    openOnboardSearchToken
+                                }
+                                onArrowClick={() =>
+                                    setOnboardedSearchToken(true)
+                                }
+                                placement="left"
+                                content={
+                                    <OnboardTooltip.Panel>
+                                        <div className="px-6 py-2.5 text-sm font-bold">
+                                            <span>Try </span>
+                                            <span className="text-stake-green-500">
+                                                usdt-usdc
+                                            </span>
+                                        </div>
+                                    </OnboardTooltip.Panel>
+                                }
+                            >
+                                <div className="flex flex-row items-center py-8 w-full overflow-hidden">
+                                    {pivotToken &&
+                                        type === "to" &&
+                                        renderPivotToken()}
+
+                                    <Input
+                                        placeholder="Search or try usdt-usdc"
+                                        suffix={<Search />}
+                                        outline
+                                        autoFocus
+                                        value={keyword}
+                                        onChange={(e) => {
+                                            onChangeKeyword(e.target.value);
+                                            if (type === "from") {
+                                                setOnboardedSearchToken(true);
+                                            } else {
+                                                setOnBoardedSelectTokenTo(true);
+                                            }
+                                        }}
+                                        textClassName="text-sm"
+                                        className="w-full caret-pink-500 overflow-hidden h-12 px-5"
+                                    />
+                                    {pivotToken &&
+                                        type === "from" &&
+                                        renderPivotToken()}
+                                </div>
+                            </OnboardTooltip>
                         </div>
-                    ) : (
-                        <div className="font-normal text-xs text-white">
-                            {validPools ? "Supported pairs" : "Owned"}
-                        </div>
+                    </OnboardTooltip>
+
+                    {validPools && filtedValidPools.length === 0 && (
+                        <>
+                            <div className="text-insufficent-fund text-xs mb-14">
+                                That doesn&apos;t look like a supported swap!
+                            </div>
+                        </>
                     )}
+                    <div className="font-normal text-xs text-white">
+                        {validPools ? "Supported pairs" : "Owned"}
+                    </div>
                 </div>
 
                 <div className="flex-grow overflow-auto px-6 pb-7 min-h-[35vh] sm:min-h-[initial]">
                     {validPools ? (
-                        <ListSwapPool
-                            items={filtedValidPools}
-                            pivotToken={pivotToken!}
-                            isPivotFirst={type === "to"}
-                            onSelect={(p) =>
-                                onSelectToken(
-                                    p.tokens.filter(
-                                        (t) => t.id !== pivotToken?.id
-                                    )[0]
-                                )
+                        <OnboardTooltip
+                            open={
+                                type === "to" &&
+                                screenSize.lg &&
+                                validPools &&
+                                filtedValidPools.length === 0 &&
+                                onboardingAvailablePair
                             }
-                        />
+                            placement="right"
+                            onArrowClick={() => setOnboardedAvailablePair(true)}
+                            content={
+                                <OnboardTooltip.Panel>
+                                    <div className="px-6 py-2.5 text-sm font-bold text-white">
+                                        <div>
+                                            <span>View your </span>
+                                            <span className="text-stake-green-500">
+                                                available pairs
+                                            </span>
+                                        </div>
+                                        {/* <a href="">
+                                            <span className="text-xs underline">
+                                                Why your pair is not supported?
+                                            </span>
+                                            <span></span>
+                                        </a> */}
+                                    </div>
+                                </OnboardTooltip.Panel>
+                            }
+                        >
+                            <div>
+                                <ListSwapPool
+                                    items={
+                                        filtedValidPools.length === 0
+                                            ? validPools
+                                            : filtedValidPools
+                                    }
+                                    pivotToken={pivotToken!}
+                                    isPivotFirst={type === "to"}
+                                    onSelect={(p) => {
+                                        onSelectToken(
+                                            p.tokens.filter(
+                                                (t) => t.id !== pivotToken?.id
+                                            )[0]
+                                        );
+                                        setOnboardedAvailablePair(true);
+                                    }}
+                                />
+                            </div>
+                        </OnboardTooltip>
                     ) : (
                         <ListToken
                             className=""

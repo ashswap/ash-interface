@@ -1,6 +1,6 @@
 import {
-    getProxyProvider,
     sendTransactions,
+    transactionServices,
     useGetAccountInfo,
     useGetLoginInfo,
 } from "@elrondnetwork/dapp-core";
@@ -9,7 +9,6 @@ import {
     BigUIntValue,
     ContractFunction,
     GasLimit,
-    ProxyProvider,
     TokenIdentifierValue,
     Transaction,
 } from "@elrondnetwork/erdjs";
@@ -39,6 +38,7 @@ import { queryPoolContract } from "helper/contracts/pool";
 import { formatAmount } from "helper/number";
 import { useCreateTransaction } from "helper/transactionMethods";
 import useMounted from "hooks/useMounted";
+import { useOnboarding } from "hooks/useOnboarding";
 import { useScreenSize } from "hooks/useScreenSize";
 import { DappSendTransactionsPropsType } from "interface/dappCore";
 import IPool from "interface/pool";
@@ -84,7 +84,7 @@ const MaiarPoolTooltip = ({
                             >
                                 <div className="clip-corner-4 clip-corner-bl bg-ash-dark-600 p-[1px] max-w-full sm:max-w-[23rem] backdrop-blur-[30px]">
                                     <div className="clip-corner-4 clip-corner-bl bg-ash-dark-400 px-12 py-6">
-                                        <div className="font-bold text-lg leading-tight">
+                                        <div className="font-bold text-sm leading-tight">
                                             <Image
                                                 src={pool.tokens[0].icon}
                                                 alt={pool.tokens[0].name}
@@ -102,7 +102,11 @@ const MaiarPoolTooltip = ({
                                             />
                                             &nbsp;
                                             {pool.tokens[1].name}
-                                            <span> only available in Battle of Yields</span>
+                                            <span>
+                                                {" "}
+                                                only available in Battle of
+                                                Yields
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
@@ -139,12 +143,22 @@ const Swap = () => {
     const [fee, setFee] = useState<number>(0);
     const [isOpenFairPrice, setIsOpenFairPrice] = useState(false);
     const [swapping, setSwapping] = useState(false);
+    const [swapId, setSwapId] = useState("");
+    const [onboardingHistory, setOnboardedHistory] =
+        useOnboarding("swap_history");
+    const { isPending, isSuccessful } =
+        transactionServices.useTrackTransactionStatus({
+            transactionId: swapId,
+        });
 
     const { connectWallet } = useWallet();
     const { isLoggedIn: loggedIn } = useGetLoginInfo();
     const { account } = useGetAccountInfo();
-    const proxy: ProxyProvider = getProxyProvider();
     const createTx = useCreateTransaction();
+
+    const [onboardingFairPrice, setOnboaredFairPrice] =
+        useOnboarding("swap_fair_price");
+
     useEffect(() => {
         setShowSetting(false);
         openHistoryModal(false);
@@ -287,7 +301,10 @@ const Swap = () => {
                     successMessage: `Swap succeed ${valueFrom} ${tokenFrom.name} to ${valueTo} ${tokenTo.name}`,
                 },
             };
-            const { error } = await sendTransactions(payload);
+            const { error, sessionId } = await sendTransactions(payload);
+            if (onboardingHistory && sessionId) {
+                setSwapId(sessionId);
+            }
         } catch (error) {
             console.log(error);
             // TODO: extension close without response
@@ -313,6 +330,7 @@ const Swap = () => {
         setValueFrom,
         slippage,
         rawValueTo,
+        onboardingHistory,
     ]);
 
     const priceImpact = useMemo(() => {
@@ -358,12 +376,12 @@ const Swap = () => {
     }, [tokenTo, rawValueTo, slippage]);
 
     useEffect(() => {
-        if(!tokenFrom){
+        if (!tokenFrom) {
             setValueFrom("");
         }
     }, [tokenFrom, setValueFrom]);
     useEffect(() => {
-        if(!tokenTo){
+        if (!tokenTo) {
             setValueTo("");
         }
     }, [tokenTo, setValueTo]);
@@ -390,13 +408,44 @@ const Swap = () => {
                             <div className="flex flex-row justify-between pl-4 mb-12">
                                 <div className="font-bold text-2xl">Swap</div>
                                 <div className="flex flex-row gap-2">
-                                    <IconButton
-                                        icon={<Clock />}
-                                        onClick={() =>
-                                            loggedIn &&
-                                            openHistoryModal((state) => !state)
+                                    <OnboardTooltip
+                                        open={
+                                            screenSize.lg &&
+                                            onboardingHistory &&
+                                            !!swapId &&
+                                            !!isSuccessful
                                         }
-                                    />
+                                        zIndex={10}
+                                        placement="top"
+                                        onArrowClick={() =>
+                                            setOnboardedHistory(true)
+                                        }
+                                        content={
+                                            <OnboardTooltip.Panel>
+                                                <div className="px-6 py-2.5 text-sm font-bold text-white">
+                                                    <span>View your </span>
+                                                    <span className="text-stake-green-500">
+                                                        history{" "}
+                                                    </span>
+                                                    <span>of transactions</span>
+                                                </div>
+                                            </OnboardTooltip.Panel>
+                                        }
+                                    >
+                                        <div>
+                                            <IconButton
+                                                icon={<Clock />}
+                                                onClick={() => {
+                                                    if (loggedIn) {
+                                                        openHistoryModal(
+                                                            (state) => !state
+                                                        );
+                                                    }
+                                                    setOnboardedHistory(true);
+                                                }}
+                                            />
+                                        </div>
+                                    </OnboardTooltip>
                                     <IconButton
                                         icon={<SettingIcon />}
                                         activeIcon={<SettingActiveIcon />}
@@ -419,7 +468,6 @@ const Swap = () => {
                                             setTokenTo(undefined)
                                         }
                                     />
-
                                     <div
                                         style={{
                                             height: 4,
@@ -448,47 +496,67 @@ const Swap = () => {
                             </MaiarPoolTooltip>
 
                             {tokenFrom && tokenTo && (
-                                <div
-                                    className="flex flex-row justify-between text-xs text-white my-5"
-                                    style={{ color: "#00FF75" }}
+                                <OnboardTooltip
+                                    open={!!valueFrom && onboardingFairPrice}
+                                    placement="right"
+                                    zIndex={10}
+                                    onArrowClick={() =>
+                                        setOnboaredFairPrice(true)
+                                    }
+                                    content={
+                                        <OnboardTooltip.Panel>
+                                            <div className="px-6 py-2.5 text-sm font-bold text-white">
+                                                <span>More details for </span>
+                                                <span className="text-stake-green-500">
+                                                    Pro-Trader
+                                                </span>
+                                            </div>
+                                        </OnboardTooltip.Panel>
+                                    }
                                 >
                                     <div
-                                        className="opacity-50 font-bold flex flex-row items-center gap-2 select-none cursor-pointer"
-                                        onClick={() =>
-                                            setIsOpenFairPrice(
-                                                (state) => !state
-                                            )
-                                        }
+                                        className="flex flex-row justify-between text-xs text-white my-5"
+                                        style={{ color: "#00FF75" }}
                                     >
-                                        <div>Fair price</div>
+                                        <div
+                                            className="opacity-50 font-bold flex flex-row items-center gap-2 select-none cursor-pointer"
+                                            onClick={() => {
+                                                setIsOpenFairPrice(
+                                                    (state) => !state
+                                                );
+                                                setOnboaredFairPrice(true);
+                                            }}
+                                        >
+                                            <div>Fair price</div>
+                                            <div>
+                                                {isOpenFairPrice ? (
+                                                    <ICChevronUp />
+                                                ) : (
+                                                    <ICChevronDown />
+                                                )}
+                                            </div>
+                                        </div>
                                         <div>
-                                            {isOpenFairPrice ? (
-                                                <ICChevronUp />
-                                            ) : (
-                                                <ICChevronDown />
-                                            )}
+                                            1 {tokenFrom?.name} ={" "}
+                                            {pool &&
+                                                rates &&
+                                                formatAmount(
+                                                    pool?.tokens[0].id ===
+                                                        tokenFrom.id
+                                                        ? toEGLD(
+                                                              pool.tokens[1],
+                                                              rates[0].toString()
+                                                          ).toNumber()
+                                                        : toEGLD(
+                                                              pool.tokens[0],
+                                                              rates[1].toString()
+                                                          ).toNumber(),
+                                                    { notation: "standard" }
+                                                )}{" "}
+                                            {tokenTo?.name}
                                         </div>
                                     </div>
-                                    <div>
-                                        1 {tokenFrom?.name} ={" "}
-                                        {pool &&
-                                            rates &&
-                                            formatAmount(
-                                                pool?.tokens[0].id ===
-                                                    tokenFrom.id
-                                                    ? toEGLD(
-                                                          pool.tokens[1],
-                                                          rates[0].toString()
-                                                      ).toNumber()
-                                                    : toEGLD(
-                                                          pool.tokens[0],
-                                                          rates[1].toString()
-                                                      ).toNumber(),
-                                                { notation: "standard" }
-                                            )}{" "}
-                                        {tokenTo?.name}
-                                    </div>
-                                </div>
+                                </OnboardTooltip>
                             )}
 
                             {isOpenFairPrice &&
