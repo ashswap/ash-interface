@@ -129,7 +129,7 @@ const StakeGovProvider = ({ children }: any) => {
                         new Address(ASHSWAP_CONFIG.dappContract.voteEscrowedContract),
                         {
                             func: new ContractFunction("ESDTTransfer"),
-                            gasLimit: new GasLimit(gasLimit),
+                            gasLimit: new GasLimit(7_000_000),
                             args: [
                                 new TokenIdentifierValue(
                                     Buffer.from(ASH_TOKEN.id)
@@ -261,7 +261,7 @@ const StakeGovProvider = ({ children }: any) => {
                     new Address(ASHSWAP_CONFIG.dappContract.voteEscrowedContract),
                     {
                         func: new ContractFunction("ESDTTransfer"),
-                        gasLimit: new GasLimit(gasLimit),
+                        gasLimit: new GasLimit(7_000_000),
                         args: [
                             new TokenIdentifierValue(Buffer.from(ASH_TOKEN.id)),
                             new BigUIntValue(weiAmt),
@@ -278,7 +278,7 @@ const StakeGovProvider = ({ children }: any) => {
                     new Address(ASHSWAP_CONFIG.dappContract.voteEscrowedContract),
                     {
                         func: new ContractFunction("increase_unlock_time"),
-                        gasLimit: new GasLimit(gasLimit),
+                        gasLimit: new GasLimit(7_000_000),
                         args: [new U64Value(unlockTimestamp)],
                     }
                 );
@@ -326,41 +326,20 @@ const StakeGovProvider = ({ children }: any) => {
             const tx1 = await createTransaction(
                 new Address(ASHSWAP_CONFIG.dappContract.feeDistributor),
                 {
-                    func: new ContractFunction("checkpoint_total_supply_1"),
-                    gasLimit: new GasLimit(gasLimit),
+                    func: new ContractFunction("checkpoint_total_supply"),
+                    gasLimit: new GasLimit(7_000_000),
                 }
             );
             const tx2 = await createTransaction(
                 new Address(ASHSWAP_CONFIG.dappContract.feeDistributor),
                 {
-                    func: new ContractFunction("checkpoint_total_supply_2"),
-                    gasLimit: new GasLimit(gasLimit),
-                }
-            );
-            const tx3 = await createTransaction(
-                new Address(ASHSWAP_CONFIG.dappContract.feeDistributor),
-                {
-                    func: new ContractFunction("checkpoint_total_supply_2"),
-                    gasLimit: new GasLimit(gasLimit),
-                }
-            );
-            const tx4 = await createTransaction(
-                new Address(ASHSWAP_CONFIG.dappContract.feeDistributor),
-                {
-                    func: new ContractFunction("checkpoint_total_supply_2"),
-                    gasLimit: new GasLimit(gasLimit),
-                }
-            );
-            const tx5 = await createTransaction(
-                new Address(ASHSWAP_CONFIG.dappContract.feeDistributor),
-                {
                     func: new ContractFunction("claim"),
-                    gasLimit: new GasLimit(gasLimit),
+                    gasLimit: new GasLimit(14_000_000),
                     args: [new AddressValue(new Address(address))],
                 }
             );
             const payload: DappSendTransactionsPropsType = {
-                transactions: [tx1, tx2, tx3, tx4, tx5],
+                transactions: [tx1, tx2],
                 transactionsDisplayInfo: {
                     successMessage: `Reward was sent to your wallet`,
                 },
@@ -381,7 +360,7 @@ const StakeGovProvider = ({ children }: any) => {
                     new Address(ASHSWAP_CONFIG.dappContract.voteEscrowedContract),
                     {
                         func: new ContractFunction("withdraw"),
-                        gasLimit: new GasLimit(gasLimit),
+                        gasLimit: new GasLimit(7_000_000),
                     }
                 ),
                 transactionsDisplayInfo: {
