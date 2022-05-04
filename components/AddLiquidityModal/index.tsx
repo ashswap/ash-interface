@@ -6,16 +6,8 @@ import {
 } from "@elrondnetwork/dapp-core";
 import {
     Address,
-    AddressValue,
-    ArgSerializer,
-    BigUIntValue,
-    ContractFunction,
-    EndpointParameterDefinition,
-    GasLimit,
-    Query,
-    TokenIdentifierValue,
-    TypeExpressionParser,
-    TypeMapper
+    AddressValue, BigUIntValue,
+    ContractFunction, GasLimit, TokenIdentifierValue
 } from "@elrondnetwork/erdjs";
 import IconRight from "assets/svg/right-white.svg";
 import BigNumber from "bignumber.js";
@@ -23,7 +15,6 @@ import BaseModal from "components/BaseModal";
 import Button from "components/Button";
 import Checkbox from "components/Checkbox";
 import InputCurrency from "components/InputCurrency";
-import { gasLimit } from "const/dappConfig";
 import { PoolsState } from "context/pools";
 import { useWallet } from "context/wallet";
 import { toEGLD, toWei } from "helper/balance";
@@ -157,7 +148,7 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
         try {
             let tx = await createTx(new Address(address), {
                 func: new ContractFunction("MultiESDTNFTTransfer"),
-                gasLimit: new GasLimit(gasLimit),
+                gasLimit: new GasLimit(10_000_000),
                 args: [
                     new AddressValue(new Address(pool.address)),
                     new BigUIntValue(new BigNumber(2)),
@@ -176,6 +167,7 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
                     new AddressValue(Address.Zero()),
                 ],
             });
+
             const payload: DappSendTransactionsPropsType = {
                 transactions: tx,
                 transactionsDisplayInfo: {
@@ -212,8 +204,18 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
         const [token1, token2] = pool.tokens;
 
         Promise.all([
-            queryPoolContract.getAmountOut(pool.address, token1.id, token2.id, new BigNumber(10).exponentiatedBy(token1.decimals)),
-            queryPoolContract.getAmountOut(pool.address, token2.id, token1.id, new BigNumber(10).exponentiatedBy(token2.decimals)),
+            queryPoolContract.getAmountOut(
+                pool.address,
+                token1.id,
+                token2.id,
+                new BigNumber(10).exponentiatedBy(token1.decimals)
+            ),
+            queryPoolContract.getAmountOut(
+                pool.address,
+                token2.id,
+                token1.id,
+                new BigNumber(10).exponentiatedBy(token2.decimals)
+            ),
         ]).then((results) => {
             if (isMounted) {
                 setRates(results);

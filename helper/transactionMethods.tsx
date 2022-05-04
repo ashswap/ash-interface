@@ -3,7 +3,7 @@ import {
     getProxyProvider,
     useGetAccountInfo,
     useGetLoginInfo,
-    useGetNetworkConfig,
+    useGetNetworkConfig
 } from "@elrondnetwork/dapp-core";
 import {
     Address,
@@ -14,9 +14,13 @@ import {
     Nonce,
     ProxyProvider,
     SmartContract,
-    Transaction,
+    Transaction
 } from "@elrondnetwork/erdjs/out";
-import { gasLimit, gasPrice } from "const/dappConfig";
+import {
+    gasLimitBuffer,
+    gasPrice,
+    maxGasLimit
+} from "const/dappConfig";
 const emptyTx = new Transaction({
     nonce: new Nonce(0),
     receiver: new Address(),
@@ -43,7 +47,12 @@ export const useCreateTransaction = () => {
             data: tx.getData(),
             receiver: scAddress,
             gasPrice: new GasPrice(gasPrice),
-            gasLimit: new GasLimit(gasLimit),
+            gasLimit: new GasLimit(
+                Math.min(
+                    Math.floor(arg.gasLimit.valueOf() * gasLimitBuffer),
+                    maxGasLimit
+                )
+            ),
             version: tx.getVersion(),
         });
         return tx;

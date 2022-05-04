@@ -1,4 +1,4 @@
-import { useGetLoginInfo } from "@elrondnetwork/dapp-core";
+import { transactionServices, useGetLoginInfo } from "@elrondnetwork/dapp-core";
 import ICCapacity from "assets/svg/capacity.svg";
 import ICChevronDown from "assets/svg/chevron-down.svg";
 import ICChevronUp from "assets/svg/chevron-up.svg";
@@ -33,6 +33,8 @@ function GovStats() {
     const [isQAExpand, setIsQAExpand] = useState(false);
     const [openStakeGov, setOpenStakeGov] = useState(false);
     const [openHarvestResult, setOpenHarvestResult] = useState(false);
+    const [harvestId, setHarvestId] = useState("");
+    transactionServices.useTrackTransactionStatus({transactionId: harvestId, onSuccess: () => setOpenHarvestResult(true)});
     const {
         lockedAmt,
         veASH,
@@ -178,13 +180,13 @@ function GovStats() {
                                 className={`text-sm font-bold w-full h-[3.375rem] flex items-center justify-center ${
                                     canClaim
                                         ? "bg-ash-cyan-500 text-ash-dark-400"
-                                        : "bg-ash-dark-400 text-white"
+                                        : "bg-ash-dark-400 text-white cursor-not-allowed"
                                 }`}
                                 disabled={!canClaim}
                                 onClick={() =>
                                     canClaim &&
                                     claimReward().then(({ sessionId }) =>
-                                        setOpenHarvestResult(!!sessionId)
+                                        sessionId && setHarvestId(sessionId)
                                     )
                                 }
                             >

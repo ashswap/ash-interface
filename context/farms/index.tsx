@@ -386,7 +386,7 @@ const FarmsProvider = ({ children }: any) => {
                 );
                 const tx = await createTransaction(new Address(address), {
                     func: new ContractFunction("MultiESDTNFTTransfer"),
-                    gasLimit: new GasLimit(gasLimit),
+                    gasLimit: new GasLimit(9_000_000),
                     args: [
                         new AddressValue(new Address(farm.farm_address)),
                         new BigUIntValue(
@@ -441,7 +441,7 @@ const FarmsProvider = ({ children }: any) => {
             if (!loggedIn) throw new Error("Connect wallet to exit farm");
             return await createTransaction(new Address(address), {
                 func: new ContractFunction("ESDTNFTTransfer"),
-                gasLimit: new GasLimit(gasLimit),
+                gasLimit: new GasLimit(8_000_000),
                 args: [
                     new TokenIdentifierValue(Buffer.from(collection)),
                     new BigUIntValue(nonce),
@@ -532,7 +532,7 @@ const FarmsProvider = ({ children }: any) => {
             if (!loggedIn) throw new Error("Connect wallet to claim reward");
             return await createTransaction(new Address(address), {
                 func: new ContractFunction("ESDTNFTTransfer"),
-                gasLimit: new GasLimit(gasLimit),
+                gasLimit: new GasLimit(9_000_000),
                 args: [
                     new TokenIdentifierValue(Buffer.from(collection)),
                     new BigUIntValue(nonce),
