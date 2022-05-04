@@ -2,7 +2,7 @@ import {
     sendTransactions,
     transactionServices,
     useGetAccountInfo,
-    useGetLoginInfo
+    useGetLoginInfo,
 } from "@elrondnetwork/dapp-core";
 import {
     Address,
@@ -10,7 +10,7 @@ import {
     ContractFunction,
     GasLimit,
     TokenIdentifierValue,
-    Transaction
+    Transaction,
 } from "@elrondnetwork/erdjs";
 import Fire from "assets/images/fire.png";
 import ICChevronDown from "assets/svg/chevron-down.svg";
@@ -34,6 +34,7 @@ import OnboardTooltip from "components/Tooltip/OnboardTooltip";
 import { useSwap } from "context/swap";
 import { useWallet } from "context/wallet";
 import { toEGLD, toEGLDD, toWei } from "helper/balance";
+import { cancellablePromise } from "helper/cancellablePromise";
 import { queryPoolContract } from "helper/contracts/pool";
 import { formatAmount } from "helper/number";
 import { useCreateTransaction } from "helper/transactionMethods";
@@ -189,19 +190,24 @@ const Swap = () => {
         if (!pool || !tokenFrom || !tokenTo || !valueFrom) {
             return;
         }
-
+        console.log("query to get amt out", rawValueFrom.toString());
         let amountIn = rawValueFrom;
-        queryPoolContract
-            .calculateAmountOut(pool, tokenFrom.id, tokenTo.id, amountIn)
-            .then((amtOut) => {
-                setValueTo(
-                    amtOut
-                        .div(
-                            new BigNumber(10).exponentiatedBy(tokenTo.decimals)
-                        )
-                        .toString(10)
-                );
-            });
+
+        const calcPromise = queryPoolContract.calculateAmountOut(
+            pool,
+            tokenFrom.id,
+            tokenTo.id,
+            amountIn
+        );
+        const { promise, cancel } = cancellablePromise(calcPromise);
+        promise.then((amtOut) => {
+            setValueTo(
+                amtOut
+                    .div(new BigNumber(10).exponentiatedBy(tokenTo.decimals))
+                    .toString(10)
+            );
+        }).catch(() => {});
+        return () => cancel();
     }, [valueFrom, tokenFrom, tokenTo, pool, rawValueFrom, setValueTo]);
 
     // find pools + fetch reserves
@@ -653,10 +659,11 @@ const Swap = () => {
                                             <CardTooltip
                                                 content={
                                                     <div>
-                                                        Which liquidity providers earn
-                                                        from successful
-                                                        transactions. Don&apos;t
-                                                        worry, It&apos;s small.
+                                                        Which liquidity
+                                                        providers earn from
+                                                        successful transactions.
+                                                        Don&apos;t worry,
+                                                        It&apos;s small.
                                                     </div>
                                                 }
                                             >

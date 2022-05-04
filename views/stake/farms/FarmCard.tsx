@@ -159,7 +159,9 @@ function FarmCard({ farmData, viewType }: props) {
                                     ? "bg-ash-cyan-500 text-ash-dark-400"
                                     : "bg-ash-dark-400/30 cursor-not-allowed"
                             }`}
+                            disabled={!stakedData?.totalRewardAmt.gt(0)}
                             onClick={() =>
+                                stakedData?.totalRewardAmt.gt(0) &&
                                 claimReward(farm).then(() =>
                                     setMOpenFarm(false)
                                 )
@@ -315,7 +317,10 @@ function FarmCard({ farmData, viewType }: props) {
                                         : "text-ash-gray-600 bg-ash-dark-400/30 cursor-not-allowed"
                                 }`}
                                 disabled={!stakedData?.totalRewardAmt.gt(0)}
-                                onClick={() => claimReward(farm)}
+                                onClick={() =>
+                                    stakedData?.totalRewardAmt.gt(0) &&
+                                    claimReward(farm)
+                                }
                             >
                                 Harvest
                             </button>
