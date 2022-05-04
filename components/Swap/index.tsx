@@ -190,7 +190,6 @@ const Swap = () => {
         if (!pool || !tokenFrom || !tokenTo || !valueFrom) {
             return;
         }
-        console.log("query to get amt out", rawValueFrom.toString());
         let amountIn = rawValueFrom;
 
         const calcPromise = queryPoolContract.calculateAmountOut(
