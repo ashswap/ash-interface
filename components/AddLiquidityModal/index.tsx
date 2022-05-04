@@ -144,32 +144,68 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
         setAdding(true);
         let sessionId = "";
         try {
-            let tx = await createTx(new Address(address), {
-                func: new ContractFunction("MultiESDTNFTTransfer"),
-                gasLimit: new GasLimit(10_000_000),
-                args: [
-                    new AddressValue(new Address(pool.address)),
-                    new BigUIntValue(new BigNumber(2)),
+            const v0 = toWei(pool.tokens[0], value0 || "0");
+            const v1 = toWei(pool.tokens[1], value1 || "0");
+            let tx;
+            let msg = "";
+            if(v0.eq(0)){
+                tx = await createTx(new Address(pool.address), {
+                    func: new ContractFunction("ESDTTransfer"),
+                    gasLimit: new GasLimit(10_000_000),
+                    args: [
+                        new TokenIdentifierValue(Buffer.from(pool.tokens[1].id)),
+                        new BigUIntValue(v1),
+                        new TokenIdentifierValue(Buffer.from("addLiquidity")),
+                        new BigUIntValue(v0),
+                        new BigUIntValue(v1),
+                        new AddressValue(Address.Zero()),
+                    ]
+                });
+                msg = `Add liquidity success ${value1} ${pool.tokens[1].name}`;
+            }else if (v1.eq(0)){
+                tx = await createTx(new Address(pool.address), {
+                    func: new ContractFunction("ESDTTransfer"),
+                    gasLimit: new GasLimit(10_000_000),
+                    args: [
+                        new TokenIdentifierValue(Buffer.from(pool.tokens[0].id)),
+                        new BigUIntValue(v0),
+                        new TokenIdentifierValue(Buffer.from("addLiquidity")),
+                        new BigUIntValue(v0),
+                        new BigUIntValue(v1),
+                        new AddressValue(Address.Zero()),
+                    ]
+                });
+                msg = `Add liquidity success ${value0} ${pool.tokens[0].name}`;
+            }else{
+                tx = await createTx(new Address(address), {
+                    func: new ContractFunction("MultiESDTNFTTransfer"),
+                    gasLimit: new GasLimit(10_000_000),
+                    args: [
+                        new AddressValue(new Address(pool.address)),
+                        new BigUIntValue(new BigNumber(2)),
+    
+                        new TokenIdentifierValue(Buffer.from(pool.tokens[0].id)),
+                        new BigUIntValue(new BigNumber(0)),
+                        new BigUIntValue(toWei(pool.tokens[0], value0)),
+    
+                        new TokenIdentifierValue(Buffer.from(pool.tokens[1].id)),
+                        new BigUIntValue(new BigNumber(0)),
+                        new BigUIntValue(toWei(pool.tokens[1], value1)),
+    
+                        new TokenIdentifierValue(Buffer.from("addLiquidity")),
+                        new BigUIntValue(toWei(pool.tokens[0], value0)),
+                        new BigUIntValue(toWei(pool.tokens[1], value1)),
+                        new AddressValue(Address.Zero()),
+                    ],
+                });
+                msg = `Add liquidity Success ${value0} ${pool.tokens[0].name} and ${value1} ${pool.tokens[1].name}`;
+            }
 
-                    new TokenIdentifierValue(Buffer.from(pool.tokens[0].id)),
-                    new BigUIntValue(new BigNumber(0)),
-                    new BigUIntValue(toWei(pool.tokens[0], value0)),
-
-                    new TokenIdentifierValue(Buffer.from(pool.tokens[1].id)),
-                    new BigUIntValue(new BigNumber(0)),
-                    new BigUIntValue(toWei(pool.tokens[1], value1)),
-
-                    new TokenIdentifierValue(Buffer.from("addLiquidity")),
-                    new BigUIntValue(toWei(pool.tokens[0], value0)),
-                    new BigUIntValue(toWei(pool.tokens[1], value1)),
-                    new AddressValue(Address.Zero()),
-                ],
-            });
 
             const payload: DappSendTransactionsPropsType = {
                 transactions: tx,
                 transactionsDisplayInfo: {
-                    successMessage: `Add liquidity Success ${value0} ${pool.tokens[0].name} and ${value1} ${pool.tokens[1].name}`,
+                    successMessage: msg,
                 },
             };
             sessionId = (await sendTransactions(payload)).sessionId || "";
@@ -288,6 +324,16 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
             : formatAmount(num, {notation: "standard"});
     }, [pool, tokenPrices, value0Debounce, value1Debounce]);
 
+    const canAddLP = useMemo(() => {
+        const v0 = new BigNumber(value0 || "0");
+        const v1 = new BigNumber(value1 || "0");
+        return isAgree &&
+        account.balance !== "0" &&
+        !isInsufficentFund0 &&
+        !isInsufficentFund1 &&
+        !adding && !v0.plus(v1).eq(0)
+    }, [isAgree, account.balance, isInsufficentFund0, isInsufficentFund1, adding, value0, value1]);
+
     return (
         <div className="px-8 pb-16 sm:pb-7 flex-grow overflow-auto">
             <div className="inline-flex justify-between items-center">
@@ -394,13 +440,9 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
                         style={{ height: 48 }}
                         outline
                         disable={
-                            !isAgree ||
-                            account.balance === "0" ||
-                            isInsufficentFund0 ||
-                            isInsufficentFund1 ||
-                            adding
+                            !canAddLP
                         }
-                        onClick={isAgree ? addLP : () => {}}
+                        onClick={canAddLP ? addLP : () => {}}
                     >
                         {account.balance === "0"
                             ? "INSUFFICIENT EGLD BALANCE"
