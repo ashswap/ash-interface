@@ -47,7 +47,7 @@
 }
 
 .swapResultLabel {
-    @apply text-text-input-3;
+    @apply text-text-input-3 underline;
     font-size: 10px;
 }
 

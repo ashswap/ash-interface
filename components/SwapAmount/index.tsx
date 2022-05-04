@@ -2,9 +2,12 @@ import BigNumber from "bignumber.js";
 import InputCurrency from "components/InputCurrency";
 import QuickSelect from "components/QuickSelect";
 import TokenSelect from "components/TokenSelect";
+import OnboardTooltip from "components/Tooltip/OnboardTooltip";
 import pools from "const/pool";
 import { useSwap } from "context/swap";
 import { useWallet } from "context/wallet";
+import { useOnboarding } from "hooks/useOnboarding";
+import { useScreenSize } from "hooks/useScreenSize";
 import { IToken } from "interface/token";
 import { useEffect, useMemo, useRef } from "react";
 import { theme } from "tailwind.config";
@@ -35,6 +38,11 @@ const SwapAmount = (props: Props) => {
         setValueFrom,
         setValueTo,
     } = useSwap();
+    const screenSize = useScreenSize();
+    const [onboardingQuickSelectToken, setOnboardedQuickSelectToken] =
+        useOnboarding("swap_quick_select_token");
+    const [onboardingInputAmt, setOnboardedInputAmt] =
+        useOnboarding("swap_input_amt");
 
     const value = useMemo(() => {
         if (props.type === "from") {
@@ -141,39 +149,95 @@ const SwapAmount = (props: Props) => {
                     <div className={styles.insufficentFundBorderCorner2} />
                 </>
             )}
-            <div
-                className={`bg-bg flex flex-row px-2.5 pt-3.5 pb-5.5 ${styles.content}`}
+            <OnboardTooltip
+                open={
+                    props.type === "from" &&
+                    tokenFrom &&
+                    tokenTo &&
+                    screenSize.lg &&
+                    onboardingInputAmt
+                }
+                placement="right"
+                onArrowClick={() => setOnboardedInputAmt(true)}
+                zIndex={10}
+                content={
+                    <OnboardTooltip.Panel>
+                        <div className="px-6 py-2.5 text-sm font-bold">
+                            <span className="text-stake-green-500">
+                                Input amount{" "}
+                            </span>
+                            <span>of value</span>
+                        </div>
+                    </OnboardTooltip.Panel>
+                }
             >
-                <TokenSelect
-                    modalTitle={props.type === "from" ? "Swap from" : "Swap to"}
-                    value={token}
-                    onChange={onChangeToken}
-                    validPools={validPools}
-                    pivotToken={poolWithToken}
-                    type={props.type}
-                    resetPivotToken={props.resetPivotToken}
-                />
-                <InputCurrency
-                    ref={inputRef}
-                    className={`${styles.input} overflow-hidden`}
-                    disabled={props.disableInput}
-                    placeholder="0.00"
-                    value={value}
-                    style={{
-                        color:
-                            props.type === "from" && isInsufficentFund
-                                ? theme.extend.colors["insufficent-fund"]
-                                : undefined,
-                    }}
-                    onChange={(e) => onChangeValue(e.target.value)}
-                />
-            </div>
+                <div
+                    className={`bg-bg flex flex-row px-2.5 pt-3.5 pb-5.5 ${styles.content}`}
+                >
+                    <TokenSelect
+                        modalTitle={
+                            props.type === "from" ? "Swap from" : "Swap to"
+                        }
+                        value={token}
+                        onChange={onChangeToken}
+                        validPools={validPools}
+                        pivotToken={poolWithToken}
+                        type={props.type}
+                        resetPivotToken={props.resetPivotToken}
+                    />
+
+                    <InputCurrency
+                        ref={inputRef}
+                        className={`${styles.input} overflow-hidden`}
+                        disabled={props.disableInput}
+                        placeholder="0.00"
+                        value={value}
+                        style={{
+                            color:
+                                props.type === "from" && isInsufficentFund
+                                    ? theme.extend.colors["insufficent-fund"]
+                                    : undefined,
+                        }}
+                        onChange={(e) => {
+                            onChangeValue(e.target.value);
+                            setOnboardedInputAmt(true);
+                        }}
+                    />
+                </div>
+            </OnboardTooltip>
+
             {props.showQuickSelect && (
-                <QuickSelect
-                    className={styles.quickSelectContainer}
-                    tokens={suggestedTokens}
-                    onChange={onChangeToken}
-                />
+                <OnboardTooltip
+                    open={
+                        props.type === "to" &&
+                        screenSize.lg &&
+                        onboardingQuickSelectToken
+                    }
+                    placement="left"
+                    zIndex={10}
+                    onArrowClick={() => setOnboardedQuickSelectToken(true)}
+                    content={
+                        <OnboardTooltip.Panel>
+                            <div className="px-6 py-2.5 text-sm font-bold">
+                                <span className="text-stake-green-500">
+                                    Quick{" "}
+                                </span>
+                                <span>Selection</span>
+                            </div>
+                        </OnboardTooltip.Panel>
+                    }
+                >
+                    <div>
+                        <QuickSelect
+                            className={styles.quickSelectContainer}
+                            tokens={suggestedTokens}
+                            onChange={(val) => {
+                                onChangeToken(val);
+                                setOnboardedQuickSelectToken(true);
+                            }}
+                        />
+                    </div>
+                </OnboardTooltip>
             )}
             {token && (
                 <div

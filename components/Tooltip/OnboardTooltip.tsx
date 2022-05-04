@@ -1,10 +1,12 @@
-import React from "react";
+import React, { createContext, useContext } from "react";
 import ICCaretLeft from "assets/svg/caret-left.svg";
 import ICCaretRight from "assets/svg/caret-right.svg";
 import ICCaretUp from "assets/svg/caret-up.svg";
 import ICCaretDown from "assets/svg/caret-down.svg";
 import ICClose from "assets/svg/close.svg";
 import BaseTooltip, { BaseTooltipProps } from "components/BaseTooltip";
+import { useScreenSize } from "hooks/useScreenSize";
+import { Dimensions, ElementRects } from "@floating-ui/react-dom-interactions";
 const Arrow = ({
     direction,
     onClick,
@@ -73,5 +75,33 @@ const OnboardTooltip = ({ onArrowClick, arrowStyle, ...props }: Props) => {
         </BaseTooltip>
     );
 };
+
+const Panel = ({
+    children,
+    size,
+}: {
+    children: JSX.Element;
+    size?: Dimensions & ElementRects;
+}) => {
+    const screenSize = useScreenSize();
+    return (
+        <div
+            style={{
+                filter: screenSize.isMobile
+                    ? ""
+                    : "drop-shadow(0px 4px 50px rgba(0, 0, 0, 0.5))",
+                maxWidth: size?.width,
+            }}
+        >
+            <div className="clip-corner-4 clip-corner-bl bg-ash-dark-600 p-[1px] max-w-full sm:max-w-[23rem] backdrop-blur-[30px]">
+                <div className="clip-corner-4 clip-corner-bl bg-ash-dark-400 p-4">
+                    {children}
+                </div>
+            </div>
+        </div>
+    );
+};
+
+OnboardTooltip.Panel = Panel;
 
 export default OnboardTooltip;

@@ -6,25 +6,31 @@ type UserOnboardingStatus = {
     stake_gov_1st?: boolean;
     stake_gov_extend_lock_time?: boolean;
     stake_lp?: boolean;
+    swap_select_token?: boolean;
+    swap_search_token?: boolean;
+    swap_quick_select_token?: boolean;
+    swap_pop_select_token_to?: boolean;
+    swap_view_available_pair?: boolean;
+    swap_input_amt?: boolean;
+    swap_fair_price?: boolean;
+    swap_history?: boolean;
 };
 export const useOnboarding = (key: keyof UserOnboardingStatus) => {
     const [state, setState] = useState<boolean>(false);
-    const [localState, setLocalState] = useState<UserOnboardingStatus>({});
     useEffect(() => {
         const data: UserOnboardingStatus = storage.local.getItem("userOnboarding");
         setState(!data?.[key]);
     }, [key]);
     const _setState = useCallback(
         (val: boolean) => {
-            const newLocalState = { ...localState, [key]: val };
+            const newLocalState = { ...storage.local.getItem("userOnboarding"), [key]: val };
             storage.local.setItem({
                 key: "userOnboarding",
                 data: newLocalState,
             });
-            setLocalState(newLocalState);
             setState(!val);
         },
-        [key, localState]
+        [key]
     );
     return [state, _setState] as [typeof state, typeof _setState];
 };
