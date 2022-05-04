@@ -19,7 +19,6 @@ import BaseModal from "components/BaseModal";
 import Button from "components/Button";
 import InputCurrency from "components/InputCurrency";
 import Token from "components/Token";
-import { gasLimit } from "const/dappConfig";
 import { PoolsState } from "context/pools";
 import { useSwap } from "context/swap";
 import { useWallet } from "context/wallet";
@@ -190,7 +189,7 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
         try {
             let tx = await createTx(new Address(pool.address), {
                 func: new ContractFunction("ESDTTransfer"),
-                gasLimit: new GasLimit(gasLimit),
+                gasLimit: new GasLimit(9_000_000),
                 args: [
                     new TokenIdentifierValue(Buffer.from(pool.lpToken.id)),
                     new BigUIntValue(liquidity),

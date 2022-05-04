@@ -2,7 +2,7 @@ import {
     sendTransactions,
     transactionServices,
     useGetAccountInfo,
-    useGetLoginInfo,
+    useGetLoginInfo
 } from "@elrondnetwork/dapp-core";
 import {
     Address,
@@ -10,7 +10,7 @@ import {
     ContractFunction,
     GasLimit,
     TokenIdentifierValue,
-    Transaction,
+    Transaction
 } from "@elrondnetwork/erdjs";
 import Fire from "assets/images/fire.png";
 import ICChevronDown from "assets/svg/chevron-down.svg";
@@ -31,7 +31,6 @@ import Setting from "components/Setting";
 import SwapAmount from "components/SwapAmount";
 import CardTooltip from "components/Tooltip/CardTooltip";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
-import { gasLimit } from "const/dappConfig";
 import { useSwap } from "context/swap";
 import { useWallet } from "context/wallet";
 import { toEGLD, toEGLDD, toWei } from "helper/balance";
@@ -263,7 +262,7 @@ const Swap = () => {
             if (pool.isMaiarPool) {
                 tx = await createTx(new Address(pool.address), {
                     func: new ContractFunction("ESDTTransfer"),
-                    gasLimit: new GasLimit(gasLimit),
+                    gasLimit: new GasLimit(8_000_000),
                     args: [
                         new TokenIdentifierValue(Buffer.from(tokenFrom.id)),
                         new BigUIntValue(rawValueFrom),
@@ -285,7 +284,7 @@ const Swap = () => {
             } else {
                 tx = await createTx(new Address(pool?.address), {
                     func: new ContractFunction("ESDTTransfer"),
-                    gasLimit: new GasLimit(gasLimit),
+                    gasLimit: new GasLimit(8_000_000),
                     args: [
                         new TokenIdentifierValue(Buffer.from(tokenFrom.id)),
                         new BigUIntValue(rawValueFrom),
