@@ -5,6 +5,7 @@ import GovStats from "views/stake/gov/GovStats";
 import StakeGovProvider from "context/gov";
 import VotePowerChart from "views/components/VotePowerChart";
 import WeeklyFeeTable from "views/components/WeeklyFeeTable";
+import { ENVIRONMENT } from "const/env";
 
 function GovPage() {
     return (
@@ -25,7 +26,7 @@ function GovPage() {
                 </div>
                 <div>
                     <h2 className="text-lg font-bold text-white mb-5 lg:mb-7">
-                        Weekly Summary
+                        {ENVIRONMENT.NETWORK === "devnet" ? "Daily Summary" : "Weekly Summary"}
                     </h2>
                     <WeeklyFeeTable />
                 </div>

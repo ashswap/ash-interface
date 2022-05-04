@@ -101,11 +101,11 @@ const FirstStakeContent = ({ open, onClose }: props) => {
     const fEstimatedVeASH = useMemo(() => {
         const num = toEGLDD(VE_ASH_DECIMALS, estimatedVeASH).toNumber();
         return num === 0
-            ? "_"
+            ? "0"
             : fractionFormat(num, { maximumFractionDigits: num < 1 ? 8 : 2 });
     }, [estimatedVeASH]);
     const estimateCapacity = useMemo(() => {
-        if (estimatedVeASH.eq(0)) return "_";
+        if (estimatedVeASH.eq(0)) return "0";
         const pct = estimatedVeASH
             .multipliedBy(100)
             .div(totalSupplyVeASH.plus(estimatedVeASH));
@@ -169,7 +169,7 @@ const FirstStakeContent = ({ open, onClose }: props) => {
                                                   ASH_TOKEN,
                                                   ASHBalance.balance.toString()
                                               ).toFixed(2)
-                                            : "_"}{" "}
+                                            : "0"}{" "}
                                         {ASH_TOKEN.name}
                                     </span>
                                 </div>
