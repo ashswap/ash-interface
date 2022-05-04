@@ -68,9 +68,10 @@ const TokenLegend = ({
         </div>
     );
 };
+const ashPools = pools.filter(p => !p.isMaiarPool);
 function LiquidityByTokensChart() {
     const [selectedPools, setSelectedPools] = useState<Set<string>>(
-        new Set(pools.map((p) => p.address))
+        new Set(ashPools.map((p) => p.address))
     );
     const { data } = useSWR<RawChartRecord[]>(
         selectedPools.size > 0
@@ -177,7 +178,7 @@ function LiquidityByTokensChart() {
                             : "Select pools to view"
                     }
                 >
-                    {pools.map((p, i) => {
+                    {ashPools.map((p, i) => {
                         return (
                             <TokenOptionChart
                                 key={p.address}
