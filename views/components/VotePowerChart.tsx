@@ -20,6 +20,7 @@ import ICArrowBottomRight from "assets/svg/arrow-bottom-right.svg";
 import { ChartActiveDot } from "components/Chart/ChartActiveDot";
 import { ChartLineX } from "components/Chart/ChartLineX";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
+import { ENVIRONMENT } from "const/env";
 
 const CustomActiveDot = ({ dotColor, ...props }: any) => {
     const { cx, cy } = props;
@@ -64,6 +65,11 @@ function VotePowerChart() {
         return chartData;
     }, [chartData]);
     const defaultIndex = useMemo(() => {
+        if(ENVIRONMENT.NETWORK === "devnet"){
+            return displayChartData.findIndex((val) =>
+            moment.unix(val.timestamp).isSame(moment(), "days")
+        );
+        }
         return displayChartData.findIndex((val) =>
             moment.unix(val.timestamp).isSame(moment(), "years")
         );
@@ -75,6 +81,9 @@ function VotePowerChart() {
     // Xaxis formatter
     const tickFormatter = useCallback((val, index: number) => {
         const time = moment.unix(val);
+        if(ENVIRONMENT.NETWORK === "devnet"){
+            return time.format("DD/MM/yyyy");
+        }
         return time.format("yyyy");
     }, []);
     const activePayload = useMemo(() => {
