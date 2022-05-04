@@ -4,7 +4,7 @@ import { ENVIRONMENT } from "./env";
 import pools from "./pool";
 import ImgAshIcon from "assets/images/ash-icon.png";
 export const ASH_TOKEN: IToken = {
-    id: ENVIRONMENT.NETWORK == "devnet" ? "ASH-f7c9ea" : "ASH-76f082",
+    id: ENVIRONMENT.NETWORK == "devnet" ? "ASH-4ce444" : "ASH-76f082",
     name: "ASH",
     decimals: 18,
     icon: ImgAshIcon,

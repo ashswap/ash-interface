@@ -5,9 +5,9 @@ const devnet: IFarm[] = [
     {
         farm_address:
             "erd1qqqqqqqqqqqqqpgqm9h0q4zzr397u7duh78j6mwyu0fx2fcyzh0qnpdqwe",
-        reward_token_id: "ASH-f7c9ea",
+        reward_token_id: "ASH-4ce444",
         reward_token_decimal: 18,
-        farming_token_id: "LPT-d6d2a2",
+        farming_token_id: "LPT-999601",
         farming_token_decimal: 18,
         farm_token_id: "FUU-c50d65",
         farm_token_decimal: 18,
@@ -15,9 +15,9 @@ const devnet: IFarm[] = [
     {
         farm_address:
             "erd1qqqqqqqqqqqqqpgqgcq9jkdwyvjh9pnekr8xy6ytsvv2gpmkzh0q63t9dg",
-        reward_token_id: "ASH-f7c9ea",
+        reward_token_id: "ASH-4ce444",
         reward_token_decimal: 18,
-        farming_token_id: "LPT-5448e9",
+        farming_token_id: "LPT-ea941a",
         farming_token_decimal: 18,
         farm_token_id: "FUW-69b4e8",
         farm_token_decimal: 18,
@@ -25,9 +25,9 @@ const devnet: IFarm[] = [
     {
         farm_address:
             "erd1qqqqqqqqqqqqqpgqna7kmhzaeu704tpgwjec5sk9xt69fv0wzh0q3m2c4e",
-        reward_token_id: "ASH-f7c9ea",
+        reward_token_id: "ASH-4ce444",
         reward_token_decimal: 18,
-        farming_token_id: "LPT-58c291",
+        farming_token_id: "LPT-8860c3",
         farming_token_decimal: 18,
         farm_token_id: "FRW-f36b62",
         farm_token_decimal: 18,

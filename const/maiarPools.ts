@@ -6,22 +6,22 @@ import IPool from "interface/pool";
 export const MAIAR_POOLS: IPool[] = [
     {
         address:
-            "erd1qqqqqqqqqqqqqpgq3ygmhcsv3x945trks4mj5x6ap3rfsp3szh0qqq0q4q",
+            "erd1qqqqqqqqqqqqqpgq9efzwnujjm6f75pccujr2jp4j5csym0vrmcqg9r3ff",
         lpToken: {
-            id: "LPT-27a9ec",
+            id: "LPT-8d3117",
             icon: "#fff",
-            name: "LPT-27a9ec",
+            name: "LPT-8d3117",
             decimals: 18,
         },
         tokens: [
             {
-                id: "ASH-f7c9ea",
+                id: "ASH-4ce444",
                 icon: IconAsh,
                 name: "ASH",
                 decimals: 18,
             },
             {
-                id: "USDT-b070dd",
+                id: "USDT-a55fa7",
                 icon: IconUSDT,
                 name: "USDT",
                 decimals: 6,
@@ -31,22 +31,22 @@ export const MAIAR_POOLS: IPool[] = [
     },
     {
         address:
-            "erd1qqqqqqqqqqqqqpgq2l6flczxhql5dxh3jxtk5mut8nfv0kmyzh0qqk7an6",
+            "erd1qqqqqqqqqqqqqpgqkec4u8tkq4tztu30vvk889dnnddex5k8rmcqqnw6a4",
         lpToken: {
-            id: "LPT-93d436",
+            id: "LPT-a31851",
             icon: "#fff",
-            name: "LPT-93d436",
+            name: "LPT-a31851",
             decimals: 18,
         },
         tokens: [
             {
-                id: "WBTC-2d09a6",
+                id: "WBTC-9bdb9b",
                 icon: IconWBTC,
                 name: "wBTC",
                 decimals: 8,
             },
             {
-                id: "USDC-ae1f6d",
+                id: "USDC-d5181d",
                 icon: IconUSDC,
                 name: "USDC",
                 decimals: 6,
