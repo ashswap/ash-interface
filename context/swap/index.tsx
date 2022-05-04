@@ -24,7 +24,7 @@ export interface State {
 }
 
 export const initState: State = {
-    slippage: 0.01,
+    slippage: 0.001,
     isInsufficentFund: false,
     setSlippage: emptyFunc,
     setInsufficentFund: emptyFunc,

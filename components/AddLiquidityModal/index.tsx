@@ -19,7 +19,7 @@ import { PoolsState } from "context/pools";
 import { useWallet } from "context/wallet";
 import { toEGLD, toWei } from "helper/balance";
 import { queryPoolContract } from "helper/contracts/pool";
-import { fractionFormat } from "helper/number";
+import { formatAmount, fractionFormat } from "helper/number";
 import { useCreateTransaction } from "helper/transactionMethods";
 import { useScreenSize } from "hooks/useScreenSize";
 import { DappSendTransactionsPropsType } from "interface/dappCore";
@@ -128,8 +128,6 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
     const { isLoggedIn: loggedIn } = useGetLoginInfo();
     const { address, account } = useGetAccountInfo();
     const proxy = getProxyProvider();
-    // const provider = dapp.dapp.provider;
-    const [rates, setRates] = useState<BigNumber[] | undefined>(undefined);
     const { pool, poolStats, liquidityData } = poolData;
 
     // reset when open modal
@@ -146,32 +144,68 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
         setAdding(true);
         let sessionId = "";
         try {
-            let tx = await createTx(new Address(address), {
-                func: new ContractFunction("MultiESDTNFTTransfer"),
-                gasLimit: new GasLimit(10_000_000),
-                args: [
-                    new AddressValue(new Address(pool.address)),
-                    new BigUIntValue(new BigNumber(2)),
+            const v0 = toWei(pool.tokens[0], value0 || "0");
+            const v1 = toWei(pool.tokens[1], value1 || "0");
+            let tx;
+            let msg = "";
+            if(v0.eq(0)){
+                tx = await createTx(new Address(pool.address), {
+                    func: new ContractFunction("ESDTTransfer"),
+                    gasLimit: new GasLimit(10_000_000),
+                    args: [
+                        new TokenIdentifierValue(Buffer.from(pool.tokens[1].id)),
+                        new BigUIntValue(v1),
+                        new TokenIdentifierValue(Buffer.from("addLiquidity")),
+                        new BigUIntValue(v0),
+                        new BigUIntValue(v1),
+                        new AddressValue(Address.Zero()),
+                    ]
+                });
+                msg = `Add liquidity success ${value1} ${pool.tokens[1].name}`;
+            }else if (v1.eq(0)){
+                tx = await createTx(new Address(pool.address), {
+                    func: new ContractFunction("ESDTTransfer"),
+                    gasLimit: new GasLimit(10_000_000),
+                    args: [
+                        new TokenIdentifierValue(Buffer.from(pool.tokens[0].id)),
+                        new BigUIntValue(v0),
+                        new TokenIdentifierValue(Buffer.from("addLiquidity")),
+                        new BigUIntValue(v0),
+                        new BigUIntValue(v1),
+                        new AddressValue(Address.Zero()),
+                    ]
+                });
+                msg = `Add liquidity success ${value0} ${pool.tokens[0].name}`;
+            }else{
+                tx = await createTx(new Address(address), {
+                    func: new ContractFunction("MultiESDTNFTTransfer"),
+                    gasLimit: new GasLimit(10_000_000),
+                    args: [
+                        new AddressValue(new Address(pool.address)),
+                        new BigUIntValue(new BigNumber(2)),
+    
+                        new TokenIdentifierValue(Buffer.from(pool.tokens[0].id)),
+                        new BigUIntValue(new BigNumber(0)),
+                        new BigUIntValue(toWei(pool.tokens[0], value0)),
+    
+                        new TokenIdentifierValue(Buffer.from(pool.tokens[1].id)),
+                        new BigUIntValue(new BigNumber(0)),
+                        new BigUIntValue(toWei(pool.tokens[1], value1)),
+    
+                        new TokenIdentifierValue(Buffer.from("addLiquidity")),
+                        new BigUIntValue(toWei(pool.tokens[0], value0)),
+                        new BigUIntValue(toWei(pool.tokens[1], value1)),
+                        new AddressValue(Address.Zero()),
+                    ],
+                });
+                msg = `Add liquidity Success ${value0} ${pool.tokens[0].name} and ${value1} ${pool.tokens[1].name}`;
+            }
 
-                    new TokenIdentifierValue(Buffer.from(pool.tokens[0].id)),
-                    new BigUIntValue(new BigNumber(0)),
-                    new BigUIntValue(toWei(pool.tokens[0], value0)),
-
-                    new TokenIdentifierValue(Buffer.from(pool.tokens[1].id)),
-                    new BigUIntValue(new BigNumber(0)),
-                    new BigUIntValue(toWei(pool.tokens[1], value1)),
-
-                    new TokenIdentifierValue(Buffer.from("addLiquidity")),
-                    new BigUIntValue(toWei(pool.tokens[0], value0)),
-                    new BigUIntValue(toWei(pool.tokens[1], value1)),
-                    new AddressValue(Address.Zero()),
-                ],
-            });
 
             const payload: DappSendTransactionsPropsType = {
                 transactions: tx,
                 transactionsDisplayInfo: {
-                    successMessage: `Add liquidity Success ${value0} ${pool.tokens[0].name} and ${value1} ${pool.tokens[1].name}`,
+                    successMessage: msg,
                 },
             };
             sessionId = (await sendTransactions(payload)).sessionId || "";
@@ -193,77 +227,6 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
         loggedIn,
         createTx,
     ]);
-
-    // find pools + fetch reserves
-    useEffect(() => {
-        let isMounted = true;
-
-        if (!pool || !proxy) {
-            return;
-        }
-        const [token1, token2] = pool.tokens;
-
-        Promise.all([
-            queryPoolContract.getAmountOut(
-                pool.address,
-                token1.id,
-                token2.id,
-                new BigNumber(10).exponentiatedBy(token1.decimals)
-            ),
-            queryPoolContract.getAmountOut(
-                pool.address,
-                token2.id,
-                token1.id,
-                new BigNumber(10).exponentiatedBy(token2.decimals)
-            ),
-        ]).then((results) => {
-            if (isMounted) {
-                setRates(results);
-            }
-        });
-
-        return () => {
-            isMounted = false;
-        };
-    }, [pool, proxy, setRates]);
-
-    const onChangeValue0 = useCallback(
-        (value: string) => {
-            if (!rates) {
-                return;
-            }
-
-            setValue0(value);
-            setValue1(
-                value
-                    ? toEGLD(
-                          pool.tokens[1],
-                          rates[0].multipliedBy(new BigNumber(value)).toString()
-                      ).toString(10)
-                    : ""
-            );
-        },
-        [rates, pool]
-    );
-
-    const onChangeValue1 = useCallback(
-        (value: string) => {
-            if (!rates) {
-                return;
-            }
-
-            setValue1(value);
-            setValue0(
-                value
-                    ? toEGLD(
-                          pool.tokens[0],
-                          rates[1].multipliedBy(new BigNumber(value)).toString()
-                      ).toString(10)
-                    : ""
-            );
-        },
-        [rates, pool]
-    );
 
     const balance0 = useMemo(() => {
         return balances[pool.tokens[0].id]
@@ -342,15 +305,15 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
     // }, [value0Debounce, value1Debounce, pool, proxy]);
 
     const liquidityValue = useMemo(() => {
-        if (!value0Debounce || !value1Debounce) {
+        if (!value0Debounce && !value1Debounce) {
             return "0.000";
         }
 
         let token0 = pool.tokens[0];
         let token1 = pool.tokens[1];
 
-        let balance0 = new BigNumber(value0Debounce);
-        let balance1 = new BigNumber(value1Debounce);
+        let balance0 = new BigNumber(value0Debounce || "0");
+        let balance1 = new BigNumber(value1Debounce || "0");
 
         const valueUsd0 = balance0.multipliedBy(tokenPrices[token0.id]);
         const valueUsd1 = balance1.multipliedBy(tokenPrices[token1.id]);
@@ -358,8 +321,18 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
         const num = valueUsd0.plus(valueUsd1).toNumber() || 0;
         return num === 0
             ? "0.000"
-            : fractionFormat(num, { maximumFractionDigits: 3 });
+            : formatAmount(num, {notation: "standard"});
     }, [pool, tokenPrices, value0Debounce, value1Debounce]);
+
+    const canAddLP = useMemo(() => {
+        const v0 = new BigNumber(value0 || "0");
+        const v1 = new BigNumber(value1 || "0");
+        return isAgree &&
+        account.balance !== "0" &&
+        !isInsufficentFund0 &&
+        !isInsufficentFund1 &&
+        !adding && !v0.plus(v1).eq(0)
+    }, [isAgree, account.balance, isInsufficentFund0, isInsufficentFund1, adding, value0, value1]);
 
     return (
         <div className="px-8 pb-16 sm:pb-7 flex-grow overflow-auto">
@@ -401,7 +374,7 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
                                 liquidityData?.value0?.toString() || "0"
                             ).toFixed(2)}
                             value={value0}
-                            onChangeValue={(val) => onChangeValue0(val)}
+                            onChangeValue={(val) => setValue0(val)}
                             isInsufficentFund={isInsufficentFund0}
                             balance={balance0}
                         />
@@ -414,7 +387,7 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
                                 liquidityData?.value1?.toString() || "0"
                             ).toFixed(2)}
                             value={value1}
-                            onChangeValue={(val) => onChangeValue1(val)}
+                            onChangeValue={(val) => setValue1(val)}
                             isInsufficentFund={isInsufficentFund1}
                             balance={balance1}
                         />
@@ -467,13 +440,9 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
                         style={{ height: 48 }}
                         outline
                         disable={
-                            !isAgree ||
-                            account.balance === "0" ||
-                            isInsufficentFund0 ||
-                            isInsufficentFund1 ||
-                            adding
+                            !canAddLP
                         }
-                        onClick={isAgree ? addLP : () => {}}
+                        onClick={canAddLP ? addLP : () => {}}
                     >
                         {account.balance === "0"
                             ? "INSUFFICIENT EGLD BALANCE"

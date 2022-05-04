@@ -73,7 +73,7 @@ const Setting = (props: Props) => {
                 />
                 <div>%</div>
             </div>
-            {slippage < 0.005 && (
+            {slippage < 0.001 && (
                 <div className="text-insufficent-fund text-xs mt-12">
                     Your transactions may fail.
                 </div>
