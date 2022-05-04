@@ -1,7 +1,7 @@
 import IconAsh from "assets/images/ash-icon.png";
 import IconUSDC from "assets/images/usdc-icon.png";
 import IconUSDT from "assets/images/usdt-icon.png";
-import IconBTC from "assets/images/btc-icon.png";
+import IconWBTC from "assets/images/wbtc-icon.png";
 import IPool from "interface/pool";
 export const MAIAR_POOLS: IPool[] = [
     {
@@ -41,8 +41,8 @@ export const MAIAR_POOLS: IPool[] = [
         tokens: [
             {
                 id: "WBTC-027977",
-                icon: IconBTC,
-                name: "renBTC",
+                icon: IconWBTC,
+                name: "wBTC",
                 decimals: 8,
             },
             {
