@@ -9,7 +9,7 @@
         "lint": "next lint"
     },
     "dependencies": {
-        "@elrondnetwork/dapp-core": "^1.1.6",
+        "@elrondnetwork/dapp-core": "https://github.com/ashswap/dapp-core#c162190d15a49b7f5614eadc8abc41c1c8a072cb",
         "@elrondnetwork/erdjs": "9.1.0",
         "@floating-ui/react-dom-interactions": "^0.0.15",
         "@headlessui/react": "^1.4.3",

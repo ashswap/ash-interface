@@ -220,7 +220,6 @@ export const TxToast = ({
             sent: processingMessage,
             pending: processingMessage,
             success: successMessage,
-            completed: successMessage,
             cancelled: errorMessage,
             fail: errorMessage,
             timedOut: timedOutMessage,
