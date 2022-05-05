@@ -22,7 +22,7 @@ const usePoolDataFormat = (data: Unarray<PoolsState["poolToDisplay"]>) => {
         () => (total_value_locked ? fractionFormat(total_value_locked) : "_"),
         [total_value_locked]
     );
-    const volumn24h = useMemo(
+    const volume24h = useMemo(
         () => (usd_volume ? fractionFormat(usd_volume) : "_"),
         [usd_volume]
     );
@@ -71,7 +71,7 @@ const usePoolDataFormat = (data: Unarray<PoolsState["poolToDisplay"]>) => {
             tradingAPR,
             emissionAPR,
             TVL,
-            volumn24h,
+            volume24h,
         },
         formatedStakedData: {
             fValue0,

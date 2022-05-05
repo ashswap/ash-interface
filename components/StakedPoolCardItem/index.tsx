@@ -26,7 +26,7 @@ function StakedPoolCardItem({
         useState<boolean>(false);
     const network: AccountInfoSliceNetworkType = useGetNetworkConfig().network;
     const {
-        formatedStats: { TVL, tradingAPR, volumn24h },
+        formatedStats: { TVL, tradingAPR, volume24h },
         formatedStakedData: {
             fCapacityPercent,
             fLpValueUsd,
@@ -126,7 +126,7 @@ function StakedPoolCardItem({
                         </div>
                         <div className="flex flex-row justify-between items-center h-12 px-4">
                             <div className="underline text-2xs">24H Volume</div>
-                            <div className="text-sm">${volumn24h}</div>
+                            <div className="text-sm">${volume24h}</div>
                         </div>
                         <div className="flex flex-row justify-between items-center h-12 px-4">
                             <div className="underline text-2xs">LP Token</div>
