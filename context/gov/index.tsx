@@ -341,7 +341,7 @@ const StakeGovProvider = ({ children }: any) => {
                 new Address(ASHSWAP_CONFIG.dappContract.feeDistributor),
                 {
                     func: new ContractFunction("claim"),
-                    gasLimit: new GasLimit(14_000_000),
+                    gasLimit: new GasLimit(500_000_000),
                     args: [new AddressValue(new Address(address))],
                 }
             );
