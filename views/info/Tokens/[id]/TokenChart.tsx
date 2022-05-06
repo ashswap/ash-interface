@@ -11,7 +11,7 @@ import TokenVolumeChart from "./TokenVolumeChart";
 
 const CHART_TYPES = {
     LIQUIDITY: "Liquidity",
-    VOLUMN: "Volumn",
+    VOLUME: "Volume",
     PRICE: "Price",
 } as const;
 const ChartTypeArr = ENVIRONMENT.NETWORK === "devnet" ? Object.values(CHART_TYPES).filter(val => val !== "Price") : Object.values(CHART_TYPES);
@@ -38,7 +38,7 @@ function TokenChart({token}: {token: IToken}) {
             </div>
             <div className="flex-grow mb-5 overflow-hidden">
                 {chartType === "Liquidity" && <TokenLiquidityChart token={token} timeUnit={timeUnit} />}
-                {chartType === "Volumn" && <TokenVolumeChart token={token} timeUnit={timeUnit}/>}
+                {chartType === "Volume" && <TokenVolumeChart token={token} timeUnit={timeUnit}/>}
                 {/* {chartType === "Price" && <TokenPriceChart token={token} timeUnit={timeUnit} />} */}
                 {chartType === "Price" && <TokenPriceAreaChart token={token} timeUnit={timeUnit} />}
             </div>

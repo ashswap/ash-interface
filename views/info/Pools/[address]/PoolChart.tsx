@@ -8,7 +8,7 @@ import PoolPriceRatioAreaChart from "./PoolPriceRatioAreaChart";
 import PoolVolumeChart from "./PoolVolumeChart";
 const CHART_TYPES = {
     LIQUIDITY: "Liquidity",
-    VOLUMN: "Volumn",
+    VOLUME: "Volume",
     RATIO12: "ratio12",
     RATIO21: "ratio21",
 } as const;
@@ -44,7 +44,7 @@ function PoolChart({ pool }: Props) {
                 {chartType === "Liquidity" && (
                     <PoolLiquidityChart pool={pool} timeUnit={timeUnit} />
                 )}
-                {chartType === "Volumn" && (
+                {chartType === "Volume" && (
                     <PoolVolumeChart pool={pool} timeUnit={timeUnit} />
                 )}
                 {(chartType === "ratio12" || chartType === "ratio21") && (
