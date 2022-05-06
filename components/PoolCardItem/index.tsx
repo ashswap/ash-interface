@@ -17,7 +17,7 @@ function PoolCardItem({
     const [openAddLiquidity, setOpenAddLiquidity] = useState<boolean>(false);
     const network: AccountInfoSliceNetworkType = useGetNetworkConfig().network;
     const {
-        formatedStats: { TVL, tradingAPR, volumn24h },
+        formatedStats: { TVL, tradingAPR, volume24h },
     } = usePoolDataFormat(poolData);
     return (
         <div
@@ -67,7 +67,7 @@ function PoolCardItem({
                 </div>
                 <div className="flex flex-row justify-between items-center h-12 px-4">
                     <div className="underline text-2xs">24H Volume</div>
-                    <div className="text-sm">${volumn24h}</div>
+                    <div className="text-sm">${volume24h}</div>
                 </div>
                 {isExpand && (
                     <>

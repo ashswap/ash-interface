@@ -1,29 +1,29 @@
 import IconAsh from "assets/images/ash-icon.png";
 import IconUSDC from "assets/images/usdc-icon.png";
-import IconBTC from "assets/images/btc-icon.png";
 import IconUSDT from "assets/images/usdt-icon.png";
+import IconWBTC from "assets/images/wbtc-icon.png";
 import IPool from "interface/pool";
 export const MAIAR_POOLS: IPool[] = [
     {
         address:
-            "erd1qqqqqqqqqqqqqpgq5jctt8y23k8qznwmgxfjf6vj8dncvdfzzh0q225ddy",
+            "erd1qqqqqqqqqqqqqpgq9efzwnujjm6f75pccujr2jp4j5csym0vrmcqg9r3ff",
         lpToken: {
-            id: "LPT-cdd8b0",
+            id: "LPT-8d3117",
             icon: "#fff",
-            name: "LPT-cdd8b0",
+            name: "LPT-8d3117",
             decimals: 18,
         },
         tokens: [
             {
-                id: "ASH-f7c9ea",
+                id: "ASH-4ce444",
                 icon: IconAsh,
                 name: "ASH",
                 decimals: 18,
             },
             {
-                id: "USDC-d6c57a",
-                icon: IconUSDC,
-                name: "USDC",
+                id: "USDT-a55fa7",
+                icon: IconUSDT,
+                name: "USDT",
                 decimals: 6,
             },
         ],
@@ -31,24 +31,24 @@ export const MAIAR_POOLS: IPool[] = [
     },
     {
         address:
-            "erd1qqqqqqqqqqqqqpgquz3kkwg6mnhsk6pvj99zttgyr4nakvrqzh0q5lv048",
+            "erd1qqqqqqqqqqqqqpgqkec4u8tkq4tztu30vvk889dnnddex5k8rmcqqnw6a4",
         lpToken: {
-            id: "LPT-0707f5",
+            id: "LPT-a31851",
             icon: "#fff",
-            name: "LPT-0707f5",
+            name: "LPT-a31851",
             decimals: 18,
         },
         tokens: [
             {
-                id: "BTC-573344",
-                icon: IconBTC,
-                name: "BTC",
-                decimals: 6,
+                id: "WBTC-9bdb9b",
+                icon: IconWBTC,
+                name: "wBTC",
+                decimals: 8,
             },
             {
-                id: "USDT-2f78fb",
-                icon: IconUSDT,
-                name: "USDT",
+                id: "USDC-d5181d",
+                icon: IconUSDC,
+                name: "USDC",
                 decimals: 6,
             },
         ],

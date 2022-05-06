@@ -12,7 +12,7 @@ import { ASH_TOKEN, VE_ASH_DECIMALS } from "const/tokens";
 import { useStakeGov } from "context/gov";
 import { useWallet } from "context/wallet";
 import { toEGLDD, toWei } from "helper/balance";
-import { fractionFormat } from "helper/number";
+import { formatAmount, fractionFormat } from "helper/number";
 import useMediaQuery from "hooks/useMediaQuery";
 import { useOnboarding } from "hooks/useOnboarding";
 import { useScreenSize } from "hooks/useScreenSize";
@@ -166,7 +166,7 @@ const StakeMoreContent = ({ open, onClose }: props) => {
     const fEstimatedVeASH = useMemo(() => {
         const num = toEGLDD(VE_ASH_DECIMALS, estimatedVeASH).toNumber();
         return num === 0
-            ? "_"
+            ? "0"
             : fractionFormat(num, { maximumFractionDigits: num < 1 ? 8 : 2 });
     }, [estimatedVeASH]);
     const estimatedCapacity = useMemo(() => {
@@ -244,11 +244,11 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                                         onClick={() => setMaxLockAmt()}
                                     >
                                         {ASHBalance
-                                            ? toEGLDD(
-                                                  ASH_TOKEN.decimals,
-                                                  ASHBalance.balance
-                                              ).toFixed(2)
-                                            : "_"}{" "}
+                                            ? formatAmount(toEGLDD(
+                                                ASH_TOKEN.decimals,
+                                                ASHBalance.balance
+                                            ).toNumber(), {notation: "standard"})
+                                            : "0"}{" "}
                                         {ASH_TOKEN.name}
                                     </span>
                                 </div>
@@ -276,10 +276,10 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                                 <div className="text-right text-2xs lg:text-xs mt-2 text-ash-gray-500">
                                     <span>Total stake: </span>
                                     <span>
-                                        {toEGLDD(
+                                        {formatAmount(toEGLDD(
                                             ASH_TOKEN.decimals,
                                             lockedAmt.plus(lockAmt)
-                                        ).toString(10)}{" "}
+                                        ).toNumber(), {notation: "standard"})}{" "}
                                         ASH
                                     </span>
                                 </div>

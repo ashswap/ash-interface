@@ -10,23 +10,23 @@ import { MAIAR_POOLS } from "./maiarPools";
 const devnet: IPool[] = [
     {
         address:
-            "erd1qqqqqqqqqqqqqpgqycvysm6mdrdls3nqvpgademdc7kvapvmzh0qv78flx",
+            "erd1qqqqqqqqqqqqqpgqzxcjxnxsw99lzdjqtcak5x8x39pkxkz0rmcqyl76wx",
         lpToken: {
-            id: "LPT-2897ed",
+            id: "LPT-999601",
             icon: "#fff",
-            name: "LPT-2897ed",
+            name: "LPT-999601",
             decimals: 18,
         },
         tokens: [
             {
-                id: "USDC-d6c57a",
+                id: "USDC-d5181d",
                 icon: IconUSDC,
                 name: "USDC",
                 decimals: 6,
                 coingeckoId: "usd-coin",
             },
             {
-                id: "USDT-2f78fb",
+                id: "USDT-a55fa7",
                 icon: IconUSDT,
                 name: "USDT",
                 decimals: 6,
@@ -36,23 +36,23 @@ const devnet: IPool[] = [
     },
     {
         address:
-            "erd1qqqqqqqqqqqqqpgqwf5e9c8r9rvspdwmnd3egkh82rs68rd9zh0qc5m7gw",
+            "erd1qqqqqqqqqqqqqpgq9wj92y9sfw0dua57664hdc5gd656h95yrmcqtnqv5l",
         lpToken: {
-            id: "LPT-4c3309",
+            id: "LPT-ea941a",
             icon: "#fff",
-            name: "LPT-4c3309",
+            name: "LPT-ea941a",
             decimals: 18,
         },
         tokens: [
             {
-                id: "USDC-d6c57a",
+                id: "USDC-d5181d",
                 icon: IconUSDC,
                 name: "USDC",
                 decimals: 6,
                 coingeckoId: "usd-coin",
             },
             {
-                id: "WUSDC-c01108",
+                id: "WUSDC-3124eb",
                 icon: IconWUSDC,
                 name: "wUSDC",
                 decimals: 6,
@@ -62,26 +62,26 @@ const devnet: IPool[] = [
     },
     {
         address:
-            "erd1qqqqqqqqqqqqqpgqdauw2t0tjs5tgqef2cec5gdglpantctazh0qnr48zk",
+            "erd1qqqqqqqqqqqqqpgqla72lhk8szfdh2l2nt9vflt803uz3prsrmcq2w885d",
         lpToken: {
-            id: "LPT-4236a8",
+            id: "LPT-8860c3",
             icon: "#fff",
-            name: "LPT-4236a8",
+            name: "LPT-8860c3",
             decimals: 18,
         },
         tokens: [
             {
-                id: "BTC-573344",
+                id: "RENBTC-0b6973",
                 icon: IconBTC,
-                name: "BTC",
-                decimals: 6,
+                name: "renBTC",
+                decimals: 8,
                 coingeckoId: "bitcoin",
             },
             {
-                id: "WBTC-3a02ea",
+                id: "WBTC-9bdb9b",
                 icon: IconWBTC,
                 name: "wBTC",
-                decimals: 6,
+                decimals: 8,
                 coingeckoId: "wrapped-bitcoin",
             },
         ],

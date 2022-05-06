@@ -35,7 +35,7 @@ function FarmFilter({ viewType, onChangeViewType }: props) {
             className="w-full md:max-w-80 h-12 px-5"
             backgroundClassName="bg-ash-dark-700"
             textColorClassName="text-input-3"
-            placeholder="Search pool"
+            placeholder="Search farms"
             type="text"
             textAlign="left"
             textClassName="font-normal text-xs md:text-sm"

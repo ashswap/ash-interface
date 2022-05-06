@@ -160,7 +160,7 @@ const HistoryModal = ({ open, onClose }: Props) => {
             isOpen={open}
             onRequestClose={() => onClose && onClose()}
             type={screenSize.msm ? "drawer_btt" : "modal"}
-            className="clip-corner-4 clip-corner-tl bg-ash-dark-600 p-4 text-white w-full max-h-full mx-auto flex flex-col"
+            className="clip-corner-4 clip-corner-tl bg-ash-dark-600 p-4 text-white sm:w-[32rem] w-full max-h-full mx-auto flex flex-col"
         >
             <div className="flex justify-end mb-3">
                 <BaseModal.CloseBtn />

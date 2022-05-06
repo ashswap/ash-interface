@@ -4,7 +4,7 @@ import { ENVIRONMENT } from "./env";
 import pools from "./pool";
 import ImgAshIcon from "assets/images/ash-icon.png";
 export const ASH_TOKEN: IToken = {
-    id: ENVIRONMENT.NETWORK == "devnet" ? "ASH-f7c9ea" : "ASH-76f082",
+    id: ENVIRONMENT.NETWORK == "devnet" ? "ASH-4ce444" : "ASH-76f082",
     name: "ASH",
     decimals: 18,
     icon: ImgAshIcon,
@@ -20,5 +20,7 @@ const getTokenFromPools = (...pools: IPool[]) => {
     return Array.from(map.values());
 };
 export const IN_POOL_TOKENS = getTokenFromPools(...pools);
-export const TOKENS = [...IN_POOL_TOKENS, ASH_TOKEN];
+export const TOKENS = !!IN_POOL_TOKENS.find((val) => val.id === ASH_TOKEN.id)
+    ? [...IN_POOL_TOKENS]
+    : [...IN_POOL_TOKENS, ASH_TOKEN];
 export const TOKENS_MAP = Object.fromEntries(TOKENS.map((t) => [t.id, t]));
