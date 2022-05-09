@@ -83,7 +83,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
             <DappProvider
                 environment={ENVIRONMENT.NETWORK}
                 customNetworkConfig={DAPP_CONFIG}
-                completedTransactionsDelay={500}
+                // completedTransactionsDelay={500}
             >
                 <WalletProvider>
                     <ContractsProvider>
