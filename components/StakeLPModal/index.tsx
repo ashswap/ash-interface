@@ -130,7 +130,7 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
                                         ? toEGLDD(
                                               pool.lpToken.decimals,
                                               LPBalance.balance.toString()
-                                          ).toFixed(2)
+                                          ).toFixed(8)
                                         : "0.00"}{" "}
                                     {lpName}
                                 </span>
