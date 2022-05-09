@@ -13,6 +13,7 @@ import {
     AccountInfoSliceNetworkType,
     useGetNetworkConfig,
 } from "@elrondnetwork/dapp-core";
+import CardTooltip from "components/Tooltip/CardTooltip";
 
 function StakedPoolCardItem({
     poolData,
@@ -84,9 +85,14 @@ function StakedPoolCardItem({
                         </div>
                     </div>
                     <div className="mb-8">
-                        <div className="text-stake-gray-500 text-xs underline mb-4">
-                            Estimate in USD
+                        <div className="text-stake-gray-500 text-xs underline mb-4 inline-block">
+                            <CardTooltip
+                                content={<>Your deposit value in USD</>}
+                            >
+                                <span>Estimate in USD</span>
+                            </CardTooltip>
                         </div>
+
                         <div className="text-lg leading-tight">
                             <span className="text-stake-gray-500">$</span>
                             <span className="text-white font-bold">
@@ -95,9 +101,20 @@ function StakedPoolCardItem({
                         </div>
                     </div>
                     <div>
-                        <div className="text-stake-gray-500 text-xs underline mb-4">
-                            Your capacity
+                        <div className="text-stake-gray-500 text-xs underline mb-4 block">
+                            <CardTooltip
+                                content={
+                                    <>
+                                        Percentage of your deposit to the total
+                                        liquidity in this pool. It depends on
+                                        the reward that you&apos;ll receive.
+                                    </>
+                                }
+                            >
+                                <span>Your capacity</span>
+                            </CardTooltip>
                         </div>
+
                         <div className="text-lg text-white font-bold leading-snug">
                             {fCapacityPercent}%
                         </div>

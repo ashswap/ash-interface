@@ -5,7 +5,11 @@ import Image from "next/image";
 import AddLiquidityModal from "components/AddLiquidityModal";
 import Down from "assets/svg/down-white.svg";
 import usePoolDataFormat from "hooks/usePoolDataFormat";
-import { AccountInfoSliceNetworkType, useGetNetworkConfig } from "@elrondnetwork/dapp-core";
+import {
+    AccountInfoSliceNetworkType,
+    useGetNetworkConfig,
+} from "@elrondnetwork/dapp-core";
+import CardTooltip from "components/Tooltip/CardTooltip";
 
 function PoolCardItem({
     poolData,
@@ -45,9 +49,20 @@ function PoolCardItem({
             </div>
             <div className="flex flex-row my-12 justify-between items-center">
                 <div>
-                    <div className="text-text-input-3 text-xs mb-4 underline">
-                        Trading APR
-                    </div>
+                    <CardTooltip
+                        content={
+                            <>
+                                Estimation for growth of your deposit over a
+                                year, based on trading activity in the past 24
+                                hours.
+                            </>
+                        }
+                    >
+                        <div className="text-text-input-3 text-xs mb-4 underline">
+                            Trading APR
+                        </div>
+                    </CardTooltip>
+
                     <div className="text-yellow-600 font-bold text-lg leading-tight">
                         {tradingAPR}%
                     </div>
@@ -62,19 +77,49 @@ function PoolCardItem({
 
             <div className="bg-bg my-4 text-text-input-3">
                 <div className="flex flex-row justify-between items-center h-12 px-4">
-                    <div className="underline text-2xs">Total Liquidity</div>
+                    <CardTooltip
+                        content={
+                            <>
+                                Total value of overall deposited tokens in this
+                                pool.
+                            </>
+                        }
+                    >
+                        <div className="underline text-2xs">
+                            Total Liquidity
+                        </div>
+                    </CardTooltip>
                     <div className="text-sm">${TVL}</div>
                 </div>
                 <div className="flex flex-row justify-between items-center h-12 px-4">
-                    <div className="underline text-2xs">24H Volume</div>
+                    <CardTooltip
+                        content={
+                            <>
+                                Total value of token traded in the past 24
+                                hours.
+                            </>
+                        }
+                    >
+                        <div className="underline text-2xs">24H Volume</div>
+                    </CardTooltip>
                     <div className="text-sm">${volume24h}</div>
                 </div>
                 {isExpand && (
                     <>
                         <div className="flex flex-row justify-between items-center h-12 px-4">
-                            <div className="underline text-2xs">
-                                Trading APR
-                            </div>
+                            <CardTooltip
+                                content={
+                                    <>
+                                        Estimation for growth of your deposit
+                                        over a year, based on trading activity
+                                        in the past 24 hours.
+                                    </>
+                                }
+                            >
+                                <div className="underline text-2xs">
+                                    Trading APR
+                                </div>
+                            </CardTooltip>
                             <div className="text-sm">{tradingAPR}%</div>
                         </div>
                     </>
