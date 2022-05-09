@@ -234,7 +234,7 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
                   .div(
                       new BigNumber(10).exponentiatedBy(pool.tokens[0].decimals)
                   )
-                  .toFixed(3)
+                  .toFixed(8)
                   .toString()
             : "0";
     }, [balances, pool]);
@@ -245,7 +245,7 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
                   .div(
                       new BigNumber(10).exponentiatedBy(pool.tokens[1].decimals)
                   )
-                  .toFixed(3)
+                  .toFixed(8)
                   .toString()
             : "0";
     }, [balances, pool]);
@@ -299,7 +299,7 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
     //             );
 
     //             setLiquidity(
-    //                 toEGLD(pool.lpToken, liquidity.toString()).toFixed(3)
+    //                 toEGLD(pool.lpToken, liquidity.toString()).toFixed(8)
     //             );
     //         });
     // }, [value0Debounce, value1Debounce, pool, proxy]);
