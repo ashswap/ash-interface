@@ -13,7 +13,7 @@ const devnet: IPool[] = [
             "erd1qqqqqqqqqqqqqpgqzxcjxnxsw99lzdjqtcak5x8x39pkxkz0rmcqyl76wx",
         lpToken: {
             id: "LPT-999601",
-            icon: "#fff",
+            icon: "",
             name: "LPT-999601",
             decimals: 18,
         },
@@ -39,7 +39,7 @@ const devnet: IPool[] = [
             "erd1qqqqqqqqqqqqqpgq9wj92y9sfw0dua57664hdc5gd656h95yrmcqtnqv5l",
         lpToken: {
             id: "LPT-ea941a",
-            icon: "#fff",
+            icon: "",
             name: "LPT-ea941a",
             decimals: 18,
         },
@@ -65,7 +65,7 @@ const devnet: IPool[] = [
             "erd1qqqqqqqqqqqqqpgqla72lhk8szfdh2l2nt9vflt803uz3prsrmcq2w885d",
         lpToken: {
             id: "LPT-8860c3",
-            icon: "#fff",
+            icon: "",
             name: "LPT-8860c3",
             decimals: 18,
         },
@@ -94,7 +94,7 @@ const testnet: IPool[] = [
             "erd1qqqqqqqqqqqqqpgqaphkarlvclh2c3v0hq2em73gcuxkh5yxj9ts6s5dt2",
         lpToken: {
             id: "LPT-89ce1b",
-            icon: "#fff",
+            icon: "",
             name: "LPT-89ce1b",
             decimals: 18,
         },
@@ -120,7 +120,7 @@ const testnet: IPool[] = [
             "erd1qqqqqqqqqqqqqpgq4nkwakpzh60akfjld0990v93s803eam7j9ts76jvn0",
         lpToken: {
             id: "LPT-a56ef1",
-            icon: "#fff",
+            icon: "",
             name: "LPT-a56ef1",
             decimals: 18,
         },
@@ -146,7 +146,7 @@ const testnet: IPool[] = [
             "erd1qqqqqqqqqqqqqpgqu8cqv3ajn52pnkfz3ftuk49r0y4kxcezj9tse6q77g",
         lpToken: {
             id: "LPT-907366",
-            icon: "#fff",
+            icon: "",
             name: "LPT-907366",
             decimals: 18,
         },
