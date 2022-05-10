@@ -30,6 +30,7 @@ import { notification } from "antd";
 import { Transition } from "@headlessui/react";
 import ICHourGlass from "assets/svg/hourglass.svg";
 import ICChevronRight from "assets/svg/chevron-right.svg";
+import ICChevronLeft from "assets/svg/chevron-left.svg";
 import ICCopy from "assets/svg/copy.svg";
 import ICNewTabRound from "assets/svg/new-tab-round.svg";
 import ICCheck from "assets/svg/check.svg";
@@ -51,7 +52,9 @@ interface TransactionToastPropsType {
     transactions: SignedTransactionType[];
     status: TransactionBatchStatusesEnum;
     lifetimeAfterSuccess?: number;
+    collapsed?: boolean;
     onClose?: (toastId: string) => void;
+    onCollapsedChange?: (val: boolean) => void;
 }
 
 const StatusIconMap: Record<
@@ -119,13 +122,15 @@ export const TxToast = ({
     startTimeProgress,
     endTimeProgress,
     lifetimeAfterSuccess,
+    collapsed,
+    onCollapsedChange
 }: TransactionToastPropsType) => {
     const ref = useRef(null);
     const [shouldRender, setShouldRender] = useState(true);
     const transactionDisplayInfo = useGetTransactionDisplayInfo(toastId);
     const network: AccountInfoSliceNetworkType = useGetNetworkConfig().network;
     const { signedTransactions } = useGetSignedTransactions();
-    const [collapse, setCollapse] = useState(false);
+
     // const accountShard = useGetAccountShard();
 
     const {
@@ -266,12 +271,12 @@ export const TxToast = ({
         >
             <div
                 className={`clip-corner-4 clip-corner-br bg-clip-border p-[1px] backdrop-blur-[30px] transition-all overflow-hidden ${
-                    collapse ? "w-auto" : "w-[calc(100vw-3rem)] sm:w-[480px]"
+                    collapsed ? "w-auto" : "w-[calc(100vw-3rem)] sm:w-[480px]"
                 }`}
             >
                 <div className="clip-corner-4 clip-corner-br p-4 bg-ash-dark-600/80 backdrop-blur-[30px]">
                     <div className="flex justify-between">
-                        {!collapse && (
+                        {!collapsed && (
                             <div className="flex items-center space-x-4 sm:space-x-10 sm:mr-5 sm:py-4 overflow-hidden">
                                 <div className="px-4 sm:px-5">
                                     <ICHourGlass className="w-8 sm:w-16 h-auto text-stake-gray-500" />
@@ -297,21 +302,25 @@ export const TxToast = ({
                             </div>
                         )}
                         <div>
-                            {/* <button
+                            <button
                                 className="w-10 h-10 bg-ash-dark-600 hover:bg-ash-dark-400 flex items-center justify-center text-white mb-5"
-                                onClick={() => setCollapse((val) => !val)}
+                                onClick={() => onCollapsedChange?.(!collapsed)}
                             >
-                                <ICChevronRight className="w-2.5 h-2.5" />
-                            </button> */}
-                            {done && (
+                                {collapsed ? (
+                                    <ICChevronLeft className="w-2.5 h-2.5" />
+                                ) : (
+                                    <ICChevronRight className="w-2.5 h-2.5" />
+                                )}
+                            </button>
+                            {/* {done && (
                                 <button
                                     className="w-10 h-10 bg-ash-dark-600 hover:bg-ash-dark-400 flex items-center justify-center text-white mb-5"
                                     onClick={() => setShouldRender(false)}
                                 >
                                     <IClose className="w-2.5 h-2.5" />
                                 </button>
-                            )}
-                            {collapse && (
+                            )} */}
+                            {collapsed && (
                                 <>
                                     <div className="text-sm font-bold text-stake-gray-500 mb-4">
                                         {processed}

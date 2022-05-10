@@ -1,10 +1,5 @@
 import {
-    LoginMethodsEnum,
-    transactionServices,
-    useGetLoginInfo,
-    useGetNotification,
-    useGetSignTransactionsError,
-    useSignTransactions,
+    LoginMethodsEnum, useGetLoginInfo, useSignTransactions
 } from "@elrondnetwork/dapp-core";
 import { Transition } from "@headlessui/react";
 import React, { Fragment, useMemo } from "react";
