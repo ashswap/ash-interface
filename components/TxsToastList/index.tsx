@@ -31,6 +31,7 @@ function TxsToastList({
     successfulToastLifetime = 30,
 }: Props) {
     const [toastsIds, setToastsIds] = useState<string[]>([]);
+    const [collapsed, setCollapsed] = useState(false);
 
     const pendingTransactionsFromStore =
         useGetPendingTransactions().pendingTransactions;
@@ -67,6 +68,8 @@ function TxsToastList({
                 onClose={(id) =>
                     setToastsIds((val) => val.filter((x) => x !== id))
                 }
+                collapsed={collapsed}
+                onCollapsedChange={(val) => setCollapsed(val)}
             />
         );
     });
