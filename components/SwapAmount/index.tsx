@@ -6,6 +6,8 @@ import OnboardTooltip from "components/Tooltip/OnboardTooltip";
 import pools from "const/pool";
 import { useSwap } from "context/swap";
 import { useWallet } from "context/wallet";
+import { toEGLDD } from "helper/balance";
+import { formatAmount } from "helper/number";
 import { useOnboarding } from "hooks/useOnboarding";
 import { useScreenSize } from "hooks/useScreenSize";
 import { IToken } from "interface/token";
@@ -109,16 +111,8 @@ const SwapAmount = (props: Props) => {
     }, [validPools, poolWithToken]);
 
     const balance = useMemo(() => {
-        if (!token) {
-            return "0";
-        }
-
-        return balances[token.id]
-            ? balances[token.id].balance
-                  .div(new BigNumber(10).exponentiatedBy(token.decimals))
-                  .toFixed(3)
-                  .toString()
-            : "0";
+        if(!token) return new BigNumber(0);
+        return toEGLDD(token.decimals, balances[token.id].balance);
     }, [token, balances]);
 
     useEffect(() => {
@@ -251,10 +245,10 @@ const SwapAmount = (props: Props) => {
                                 : ""
                         }`}
                         onClick={() => {
-                            props.type === "from" && onChangeValue(balance);
+                            props.type === "from" && onChangeValue(balance.toString());
                         }}
                     >
-                        {balance} {token.name}
+                        {formatAmount(balance.toNumber(), {notation: "standard"})} {token.name}
                     </span>
                 </div>
             )}
