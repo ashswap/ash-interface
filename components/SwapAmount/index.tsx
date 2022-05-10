@@ -112,7 +112,7 @@ const SwapAmount = (props: Props) => {
 
     const balance = useMemo(() => {
         if(!token) return new BigNumber(0);
-        return toEGLDD(token.decimals, balances[token.id].balance);
+        return toEGLDD(token.decimals, balances[token.id] ? balances[token.id].balance : new BigNumber(0));
     }, [token, balances]);
 
     useEffect(() => {
