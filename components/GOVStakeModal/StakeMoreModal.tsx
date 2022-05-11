@@ -5,6 +5,7 @@ import BaseModal from "components/BaseModal";
 import Checkbox from "components/Checkbox";
 import InputCurrency from "components/InputCurrency";
 import Switch from "components/Switch";
+import TextAmt from "components/TextAmt";
 import CardTooltip from "components/Tooltip/CardTooltip";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
 import { ENVIRONMENT } from "const/env";
@@ -12,7 +13,6 @@ import { ASH_TOKEN, VE_ASH_DECIMALS } from "const/tokens";
 import { useStakeGov } from "context/gov";
 import { useWallet } from "context/wallet";
 import { toEGLDD, toWei } from "helper/balance";
-import { formatAmount, fractionFormat } from "helper/number";
 import useMediaQuery from "hooks/useMediaQuery";
 import { useOnboarding } from "hooks/useOnboarding";
 import { useScreenSize } from "hooks/useScreenSize";
@@ -88,11 +88,6 @@ const StakeMoreContent = ({ open, onClose }: props) => {
             },
         ];
     }, [currentLockSeconds]);
-    const fLockedAmt = useMemo(() => {
-        return fractionFormat(
-            toEGLDD(ASH_TOKEN.decimals, lockedAmt).toNumber()
-        );
-    }, [lockedAmt]);
     useEffect(() => {
         if (currentLockSeconds === 0) {
             setIsExtend(true);
@@ -163,12 +158,6 @@ const StakeMoreContent = ({ open, onClose }: props) => {
         currentLockSeconds,
         isExtend,
     ]);
-    const fEstimatedVeASH = useMemo(() => {
-        const num = toEGLDD(VE_ASH_DECIMALS, estimatedVeASH).toNumber();
-        return num === 0
-            ? "0"
-            : fractionFormat(num, { maximumFractionDigits: num < 1 ? 8 : 2 });
-    }, [estimatedVeASH]);
     const estimatedCapacity = useMemo(() => {
         const pct = estimatedVeASH
             .multipliedBy(100)
@@ -184,12 +173,7 @@ const StakeMoreContent = ({ open, onClose }: props) => {
         const e = estimatedCapacity.startsWith("<") ? 0 : +estimatedCapacity;
         return new BigNumber(e).minus(c).toNumber();
     }, [currentCapacity, estimatedCapacity]);
-    const fVeASH = useMemo(() => {
-        const num = toEGLDD(VE_ASH_DECIMALS, veASH).toNumber();
-        return num === 0
-            ? "0"
-            : fractionFormat(num, { maximumFractionDigits: num < 1 ? 8 : 2 });
-    }, [veASH]);
+
     useEffect(() => {
         if (isTouchScreen) {
             setOpenOnboardingExtendTooltip(true);
@@ -206,6 +190,7 @@ const StakeMoreContent = ({ open, onClose }: props) => {
         const interval = setInterval(func, 60 * 1000);
         return () => clearInterval(interval);
     }, [unlockTS]);
+    const aClass = "";
     return (
         <>
             <div className="px-6 lg:px-20 pb-12 overflow-auto relative">
@@ -239,16 +224,19 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                                     <span className="text-ash-gray-500">
                                         Balance:{" "}
                                     </span>
+
                                     <span
                                         className="text-earn cursor-pointer"
                                         onClick={() => setMaxLockAmt()}
                                     >
-                                        {ASHBalance
-                                            ? formatAmount(toEGLDD(
+                                        <TextAmt
+                                            number={toEGLDD(
                                                 ASH_TOKEN.decimals,
                                                 ASHBalance.balance
-                                            ).toNumber(), {notation: "standard"})
-                                            : "0"}{" "}
+                                            )}
+                                            options={{ notation: "standard" }}
+                                        />
+                                        &nbsp;
                                         {ASH_TOKEN.name}
                                     </span>
                                 </div>
@@ -270,16 +258,25 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                                 </div>
                                 <div className="bg-stake-dark-500 h-14 lg:h-18 px-6 flex items-center justify-end text-ash-gray-500">
                                     <div className="text-right text-sm lg:text-lg">
-                                        {fLockedAmt}
+                                        <TextAmt
+                                            number={toEGLDD(
+                                                ASH_TOKEN.decimals,
+                                                lockedAmt
+                                            )}
+                                            options={{ notation: "standard" }}
+                                        />
                                     </div>
                                 </div>
                                 <div className="text-right text-2xs lg:text-xs mt-2 text-ash-gray-500">
                                     <span>Total stake: </span>
                                     <span>
-                                        {formatAmount(toEGLDD(
-                                            ASH_TOKEN.decimals,
-                                            lockedAmt.plus(lockAmt)
-                                        ).toNumber(), {notation: "standard"})}{" "}
+                                        <TextAmt
+                                            number={toEGLDD(
+                                                ASH_TOKEN.decimals,
+                                                lockedAmt.plus(lockAmt)
+                                            )}
+                                            options={{ notation: "standard" }}
+                                        />{" "}
                                         ASH
                                     </span>
                                 </div>
@@ -477,12 +474,25 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                                             : "text-white"
                                     }`}
                                 >
-                                    {fVeASH}
+                                    <TextAmt
+                                        number={toEGLDD(VE_ASH_DECIMALS, veASH)}
+                                        decimalClassName={`${
+                                            lockAmt.gt(0) || isExtend
+                                                ? ""
+                                                : "text-stake-gray-500"
+                                        }`}
+                                    />
                                 </div>
                                 {(lockAmt.gt(0) || isExtend) && (
                                     <div className="flex items-start">
                                         <div className="text-white text-lg font-bold mr-6">
-                                            {fEstimatedVeASH}
+                                            <TextAmt
+                                                number={toEGLDD(
+                                                    VE_ASH_DECIMALS,
+                                                    estimatedVeASH
+                                                )}
+                                                decimalClassName="text-stake-gray-500"
+                                            />
                                         </div>
                                         <div className="text-ash-green-500 flex items-center text-2xs font-bold">
                                             <ICArrowTopRight className="mr-1.5" />

@@ -2,12 +2,15 @@ import {
     getProxyProvider,
     sendTransactions,
     useGetAccountInfo,
-    useGetLoginInfo
+    useGetLoginInfo,
 } from "@elrondnetwork/dapp-core";
 import {
     Address,
-    AddressValue, BigUIntValue,
-    ContractFunction, GasLimit, TokenIdentifierValue
+    AddressValue,
+    BigUIntValue,
+    ContractFunction,
+    GasLimit,
+    TokenIdentifierValue,
 } from "@elrondnetwork/erdjs";
 import IconRight from "assets/svg/right-white.svg";
 import BigNumber from "bignumber.js";
@@ -15,11 +18,11 @@ import BaseModal from "components/BaseModal";
 import Button from "components/Button";
 import Checkbox from "components/Checkbox";
 import InputCurrency from "components/InputCurrency";
+import TextAmt from "components/TextAmt";
 import { PoolsState } from "context/pools";
 import { useWallet } from "context/wallet";
-import { toEGLD, toWei } from "helper/balance";
+import { toEGLD, toEGLDD, toWei } from "helper/balance";
 import { queryPoolContract } from "helper/contracts/pool";
-import { formatAmount, fractionFormat } from "helper/number";
 import { useCreateTransaction } from "helper/transactionMethods";
 import { useScreenSize } from "hooks/useScreenSize";
 import { DappSendTransactionsPropsType } from "interface/dappCore";
@@ -42,7 +45,7 @@ interface TokenInputProps {
     isInsufficentFund: boolean;
     onChangeValue: (val: string) => void;
     balance: string;
-    tokenInPool: string;
+    tokenInPool: BigNumber;
 }
 const TokenInput = ({
     token,
@@ -66,7 +69,7 @@ const TokenInput = ({
                             {token.name}
                         </div>
                         <div className="text-text-input-3 text-xs truncate leading-tight">
-                            {tokenInPool}&nbsp; in pool
+                            <TextAmt number={tokenInPool}/>&nbsp; in pool
                         </div>
                     </div>
                     <div className="block sm:hidden text-xs font-bold text-white">
@@ -108,7 +111,8 @@ const TokenInput = ({
                         className="text-earn select-none cursor-pointer"
                         onClick={() => onChangeValue(balance)}
                     >
-                        {balance} {token.name}
+                        <TextAmt number={balance} options={{notation: "standard"}} />&nbsp;
+                        {token.name}
                     </span>
                 </div>
             </div>
@@ -148,50 +152,58 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
             const v1 = toWei(pool.tokens[1], value1 || "0");
             let tx;
             let msg = "";
-            if(v0.eq(0)){
+            if (v0.eq(0)) {
                 tx = await createTx(new Address(pool.address), {
                     func: new ContractFunction("ESDTTransfer"),
                     gasLimit: new GasLimit(10_000_000),
                     args: [
-                        new TokenIdentifierValue(Buffer.from(pool.tokens[1].id)),
+                        new TokenIdentifierValue(
+                            Buffer.from(pool.tokens[1].id)
+                        ),
                         new BigUIntValue(v1),
                         new TokenIdentifierValue(Buffer.from("addLiquidity")),
                         new BigUIntValue(v0),
                         new BigUIntValue(v1),
                         new AddressValue(Address.Zero()),
-                    ]
+                    ],
                 });
                 msg = `Add liquidity success ${value1} ${pool.tokens[1].name}`;
-            }else if (v1.eq(0)){
+            } else if (v1.eq(0)) {
                 tx = await createTx(new Address(pool.address), {
                     func: new ContractFunction("ESDTTransfer"),
                     gasLimit: new GasLimit(10_000_000),
                     args: [
-                        new TokenIdentifierValue(Buffer.from(pool.tokens[0].id)),
+                        new TokenIdentifierValue(
+                            Buffer.from(pool.tokens[0].id)
+                        ),
                         new BigUIntValue(v0),
                         new TokenIdentifierValue(Buffer.from("addLiquidity")),
                         new BigUIntValue(v0),
                         new BigUIntValue(v1),
                         new AddressValue(Address.Zero()),
-                    ]
+                    ],
                 });
                 msg = `Add liquidity success ${value0} ${pool.tokens[0].name}`;
-            }else{
+            } else {
                 tx = await createTx(new Address(address), {
                     func: new ContractFunction("MultiESDTNFTTransfer"),
                     gasLimit: new GasLimit(10_000_000),
                     args: [
                         new AddressValue(new Address(pool.address)),
                         new BigUIntValue(new BigNumber(2)),
-    
-                        new TokenIdentifierValue(Buffer.from(pool.tokens[0].id)),
+
+                        new TokenIdentifierValue(
+                            Buffer.from(pool.tokens[0].id)
+                        ),
                         new BigUIntValue(new BigNumber(0)),
                         new BigUIntValue(toWei(pool.tokens[0], value0)),
-    
-                        new TokenIdentifierValue(Buffer.from(pool.tokens[1].id)),
+
+                        new TokenIdentifierValue(
+                            Buffer.from(pool.tokens[1].id)
+                        ),
                         new BigUIntValue(new BigNumber(0)),
                         new BigUIntValue(toWei(pool.tokens[1], value1)),
-    
+
                         new TokenIdentifierValue(Buffer.from("addLiquidity")),
                         new BigUIntValue(toWei(pool.tokens[0], value0)),
                         new BigUIntValue(toWei(pool.tokens[1], value1)),
@@ -200,7 +212,6 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
                 });
                 msg = `Add liquidity Success ${value0} ${pool.tokens[0].name} and ${value1} ${pool.tokens[1].name}`;
             }
-
 
             const payload: DappSendTransactionsPropsType = {
                 transactions: tx,
@@ -306,7 +317,7 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
 
     const liquidityValue = useMemo(() => {
         if (!value0Debounce && !value1Debounce) {
-            return "0.000";
+            return new BigNumber(0);
         }
 
         let token0 = pool.tokens[0];
@@ -318,21 +329,29 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
         const valueUsd0 = balance0.multipliedBy(tokenPrices[token0.id]);
         const valueUsd1 = balance1.multipliedBy(tokenPrices[token1.id]);
 
-        const num = valueUsd0.plus(valueUsd1).toNumber() || 0;
-        return num === 0
-            ? "0.000"
-            : formatAmount(num, {notation: "standard"});
+        return valueUsd0.plus(valueUsd1) || new BigNumber(0);
     }, [pool, tokenPrices, value0Debounce, value1Debounce]);
 
     const canAddLP = useMemo(() => {
         const v0 = new BigNumber(value0 || "0");
         const v1 = new BigNumber(value1 || "0");
-        return isAgree &&
-        account.balance !== "0" &&
-        !isInsufficentFund0 &&
-        !isInsufficentFund1 &&
-        !adding && !v0.plus(v1).eq(0)
-    }, [isAgree, account.balance, isInsufficentFund0, isInsufficentFund1, adding, value0, value1]);
+        return (
+            isAgree &&
+            account.balance !== "0" &&
+            !isInsufficentFund0 &&
+            !isInsufficentFund1 &&
+            !adding &&
+            !v0.plus(v1).eq(0)
+        );
+    }, [
+        isAgree,
+        account.balance,
+        isInsufficentFund0,
+        isInsufficentFund1,
+        adding,
+        value0,
+        value1,
+    ]);
 
     return (
         <div className="px-8 pb-16 sm:pb-7 flex-grow overflow-auto">
@@ -369,10 +388,10 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
                     <div className="py-1.5">
                         <TokenInput
                             token={pool.tokens[0]}
-                            tokenInPool={toEGLD(
-                                pool.tokens[0],
-                                liquidityData?.value0?.toString() || "0"
-                            ).toFixed(2)}
+                            tokenInPool={toEGLDD(
+                                pool.tokens[0].decimals,
+                                liquidityData?.value0 || 0
+                            )}
                             value={value0}
                             onChangeValue={(val) => setValue0(val)}
                             isInsufficentFund={isInsufficentFund0}
@@ -382,10 +401,10 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
                     <div className="py-1.5">
                         <TokenInput
                             token={pool.tokens[1]}
-                            tokenInPool={toEGLD(
-                                pool.tokens[1],
-                                liquidityData?.value1?.toString() || "0"
-                            ).toFixed(2)}
+                            tokenInPool={toEGLDD(
+                                pool.tokens[1].decimals,
+                                liquidityData?.value1 || 0
+                            )}
                             value={value1}
                             onChangeValue={(val) => setValue1(val)}
                             isInsufficentFund={isInsufficentFund1}
@@ -401,7 +420,11 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
                         <div className="flex-1 overflow-hidden bg-ash-dark-700 text-right text-lg h-[4.5rem] px-5 outline-none flex items-center justify-end">
                             <span>
                                 <span className="text-ash-gray-500">$ </span>
-                                {liquidityValue}
+                                <TextAmt
+                                    number={liquidityValue}
+                                    options={{ notation: "standard" }}
+                                    decimalClassName="text-stake-gray-500"
+                                />
                             </span>
                         </div>
                     </div>
@@ -439,9 +462,7 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
                         topLeftCorner
                         style={{ height: 48 }}
                         outline
-                        disable={
-                            !canAddLP
-                        }
+                        disable={!canAddLP}
                         onClick={canAddLP ? addLP : () => {}}
                     >
                         {account.balance === "0"

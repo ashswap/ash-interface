@@ -4,7 +4,7 @@ import ICStarOutline from "assets/svg/star-outline.svg";
 import ICStar from "assets/svg/star.svg";
 import pools from "const/pool";
 import { fetcher } from "helper/common";
-import { abbreviateCurrency } from "helper/number";
+import { formatAmount } from "helper/number";
 import { useScreenSize } from "hooks/useScreenSize";
 import IPool from "interface/pool";
 import { PoolStatsRecord } from "interface/poolStats";
@@ -32,7 +32,7 @@ const PoolRecord = ({
             if (screenSize.xl) {
                 return currencyFormater.format(val);
             }
-            return abbreviateCurrency(val).toString().toUpperCase();
+            return formatAmount(val);
         },
         [screenSize.xl]
     );

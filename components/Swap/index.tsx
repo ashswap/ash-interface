@@ -29,6 +29,7 @@ import HistoryModal from "components/HistoryModal";
 import IconButton from "components/IconButton";
 import Setting from "components/Setting";
 import SwapAmount from "components/SwapAmount";
+import TextAmt from "components/TextAmt";
 import CardTooltip from "components/Tooltip/CardTooltip";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
 import { useSwap } from "context/swap";
@@ -36,7 +37,6 @@ import { useWallet } from "context/wallet";
 import { toEGLD, toEGLDD, toWei } from "helper/balance";
 import { cancellablePromise } from "helper/cancellablePromise";
 import { queryPoolContract } from "helper/contracts/pool";
-import { formatAmount } from "helper/number";
 import { useCreateTransaction } from "helper/transactionMethods";
 import useMounted from "hooks/useMounted";
 import { useOnboarding } from "hooks/useOnboarding";
@@ -199,13 +199,17 @@ const Swap = () => {
             amountIn
         );
         const { promise, cancel } = cancellablePromise(calcPromise);
-        promise.then((amtOut) => {
-            setValueTo(
-                amtOut
-                    .div(new BigNumber(10).exponentiatedBy(tokenTo.decimals))
-                    .toString(10)
-            );
-        }).catch(() => {});
+        promise
+            .then((amtOut) => {
+                setValueTo(
+                    amtOut
+                        .div(
+                            new BigNumber(10).exponentiatedBy(tokenTo.decimals)
+                        )
+                        .toString(10)
+                );
+            })
+            .catch(() => {});
         return () => cancel();
     }, [valueFrom, tokenFrom, tokenTo, pool, rawValueFrom, setValueTo]);
 
@@ -340,11 +344,11 @@ const Swap = () => {
 
     const priceImpact = useMemo(() => {
         if (!pool || !rates || !tokenFrom || !rawValueFrom || !rawValueTo) {
-            return "0%";
+            return 0;
         }
 
         if (rawValueFrom.isZero()) {
-            return "0%";
+            return 0;
         }
 
         const rate =
@@ -356,27 +360,21 @@ const Swap = () => {
             .div(new BigNumber(10).exponentiatedBy(tokenFrom.decimals))
             .multipliedBy(rate);
 
-        return (
-            realOut
-                .minus(rawValueTo)
-                .abs()
-                .multipliedBy(100)
-                .div(realOut)
-                .toFixed(3) + "%"
-        );
+        return realOut
+            .minus(rawValueTo)
+            .abs()
+            .multipliedBy(100)
+            .div(realOut)
+            .toNumber();
     }, [pool, rates, tokenFrom, rawValueFrom, rawValueTo]);
 
     const minimumReceive = useMemo(() => {
         if (!tokenTo || !rawValueTo) {
-            return;
+            return new BigNumber(0);
         }
-
-        return formatAmount(
-            toEGLD(
-                tokenTo,
-                rawValueTo.multipliedBy(1 - slippage).toString()
-            ).toNumber(),
-            { notation: "standard" }
+        return toEGLD(
+            tokenTo,
+            rawValueTo.multipliedBy(1 - slippage).toString()
         );
     }, [tokenTo, rawValueTo, slippage]);
 
@@ -543,21 +541,27 @@ const Swap = () => {
                                         </div>
                                         <div>
                                             1 {tokenFrom?.name} ={" "}
-                                            {pool &&
-                                                rates &&
-                                                formatAmount(
-                                                    pool?.tokens[0].id ===
+                                            {pool && rates && (
+                                                <TextAmt
+                                                    number={
+                                                        pool?.tokens[0].id ===
                                                         tokenFrom.id
-                                                        ? toEGLD(
-                                                              pool.tokens[1],
-                                                              rates[0].toString()
-                                                          ).toNumber()
-                                                        : toEGLD(
-                                                              pool.tokens[0],
-                                                              rates[1].toString()
-                                                          ).toNumber(),
-                                                    { notation: "standard" }
-                                                )}{" "}
+                                                            ? toEGLD(
+                                                                  pool
+                                                                      .tokens[1],
+                                                                  rates[0].toString()
+                                                              )
+                                                            : toEGLD(
+                                                                  pool
+                                                                      .tokens[0],
+                                                                  rates[1].toString()
+                                                              )
+                                                    }
+                                                    options={{
+                                                        notation: "standard",
+                                                    }}
+                                                />
+                                            )}{" "}
                                             {tokenTo?.name}
                                         </div>
                                     </div>
@@ -594,7 +598,8 @@ const Swap = () => {
                                                 }
                                                 style={{ color: "#00FF75" }}
                                             >
-                                                {priceImpact}
+                                                <TextAmt number={priceImpact} />
+                                                %
                                             </div>
                                         </div>
                                         <div className="bg-black flex flex-row items-center justify-between h-10 pl-5 pr-6">
@@ -622,7 +627,14 @@ const Swap = () => {
                                                     styles.swapResultValue
                                                 }
                                             >
-                                                {minimumReceive} {tokenTo?.name}
+                                                <TextAmt
+                                                    number={minimumReceive}
+                                                    options={{
+                                                        notation: "standard",
+                                                    }}
+                                                    decimalClassName="text-stake-gray-500"
+                                                />
+                                                &nbsp;{tokenTo?.name}
                                             </div>
                                         </div>
                                         <div className="bg-black flex flex-row items-center justify-between h-10 pl-5 pr-6">
@@ -651,7 +663,11 @@ const Swap = () => {
                                                     styles.swapResultValue
                                                 }
                                             >
-                                                {slippage * 100}%
+                                                <TextAmt
+                                                    number={slippage * 100}
+                                                    decimalClassName="text-stake-gray-500"
+                                                />
+                                                %
                                             </div>
                                         </div>
                                         <div className="bg-black flex flex-row items-center justify-between h-10 pl-5 pr-6">
@@ -680,18 +696,24 @@ const Swap = () => {
                                                         styles.swapResultValue
                                                     }
                                                 >
-                                                    {tokenFrom && rawValueFrom
-                                                        ? formatAmount(
-                                                              toEGLD(
-                                                                  tokenFrom,
-                                                                  rawValueFrom
-                                                                      .multipliedBy(
-                                                                          fee
-                                                                      )
-                                                                      .toString()
-                                                              ).toNumber()
-                                                          )
-                                                        : "0"}{" "}
+                                                    {tokenFrom &&
+                                                    rawValueFrom ? (
+                                                        <TextAmt
+                                                            number={toEGLDD(
+                                                                tokenFrom.decimals,
+                                                                rawValueFrom.multipliedBy(
+                                                                    fee
+                                                                )
+                                                            )}
+                                                            options={{
+                                                                notation:
+                                                                    "standard",
+                                                            }}
+                                                            decimalClassName="text-stake-gray-500"
+                                                        />
+                                                    ) : (
+                                                        "0.00"
+                                                    )}{" "}
                                                     {tokenFrom?.name}
                                                 </div>
                                             ) : (
@@ -700,18 +722,23 @@ const Swap = () => {
                                                         styles.swapResultValue
                                                     }
                                                 >
-                                                    {tokenTo && rawValueTo
-                                                        ? formatAmount(
-                                                              toEGLD(
-                                                                  tokenTo,
-                                                                  rawValueTo
-                                                                      .multipliedBy(
-                                                                          fee
-                                                                      )
-                                                                      .toString()
-                                                              ).toNumber()
-                                                          )
-                                                        : "0"}{" "}
+                                                    {tokenTo && rawValueTo ? (
+                                                        <TextAmt
+                                                            number={toEGLDD(
+                                                                tokenTo.decimals,
+                                                                rawValueTo.multipliedBy(
+                                                                    fee
+                                                                )
+                                                            )}
+                                                            options={{
+                                                                notation:
+                                                                    "standard",
+                                                            }}
+                                                            decimalClassName="text-stake-gray-500"
+                                                        />
+                                                    ) : (
+                                                        "0.00"
+                                                    )}{" "}
                                                     {tokenTo?.name}
                                                 </div>
                                             )}
