@@ -1,51 +1,4 @@
 import numeral from "numeral";
-const ABBR_SYMBOL = ["", "k", "M", "B", "T"] as const;
-const defaultFractionOpt: Intl.NumberFormatOptions = {
-    maximumFractionDigits: 2,
-};
-export const currencyFormater = new Intl.NumberFormat("en-US", {
-    maximumFractionDigits: 2,
-});
-export const fractionFormat = (
-    val: number,
-    options: Intl.NumberFormatOptions = defaultFractionOpt
-) => {
-    if (typeof val !== "number") return "";
-    const opt = { ...defaultFractionOpt, ...options };
-    return val.toLocaleString("en-US", {
-        ...opt,
-        minimumFractionDigits:
-            val < 1
-                ? opt.minimumFractionDigits || opt.maximumFractionDigits
-                : opt.minimumFractionDigits,
-    });
-};
-export function abbreviateCurrency(
-    n: number,
-    minPlus?: number
-): number | string {
-    if (n === 0) return n;
-    if (Math.abs(n) < 1) return currencyFormater.format(n);
-    if (minPlus !== undefined) {
-        return n > minPlus ? `${minPlus}+` : n;
-    }
-    // what tier? (determines SI symbol)
-    const tier = Math.floor(Math.floor(Math.log10(Math.abs(n))) / 3);
-
-    // get suffix and determine scale
-    const suffix =
-        ABBR_SYMBOL[tier >= ABBR_SYMBOL.length ? ABBR_SYMBOL.length - 1 : tier];
-    const scale = Math.pow(10, Math.min(tier, ABBR_SYMBOL.length - 1) * 3);
-
-    // scale the number
-    const scaled = n / scale;
-
-    // format number and add suffix
-    // const fixed = scaled.toFixed(1);
-
-    // return (fixed.endsWith('.0') ? fixed.substring(0, fixed.length - 2) : fixed) + suffix;
-    return currencyFormater.format(scaled) + suffix;
-}
 
 // Returns first 2 digits after first non-zero decimal
 // i.e. 0.001286 -> 0.0012, 0.9845 -> 0.98, 0.0102 -> 0.010, etc
@@ -87,12 +40,12 @@ export const formatAmount = (
         }
         return "0.00";
     }
-    if (!amount) return "-";
+    if (!amount) return "0.00";
     if (displayThreshold && amount < displayThreshold) {
         return `<${displayThreshold}`;
     }
     if (amount < 1 && !tokenPrecision) {
-        return getFirstThreeNonZeroDecimals(amount);
+        return getFirstThreeNonZeroDecimals(amount) || "0.00";
     }
 
     let precision = 2;

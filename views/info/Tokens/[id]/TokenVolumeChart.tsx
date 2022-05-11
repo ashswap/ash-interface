@@ -3,7 +3,7 @@ import { ChartLineX } from "components/Chart/ChartLineX";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 import { MONTH_SHORT } from "const/time";
 import { fetcher } from "helper/common";
-import { abbreviateCurrency, formatAmount } from "helper/number";
+import { formatAmount } from "helper/number";
 import { useScreenSize } from "hooks/useScreenSize";
 import { useValueChart } from "hooks/useValueChart";
 import { ChartTimeUnitType } from "interface/chart";
@@ -142,7 +142,7 @@ function TokenVolumeChart({
                     padding={{ top: 20, bottom: 20 }}
                     domain={[0, (max: number) => max * 1.2]}
                     tickFormatter={(val: number) =>
-                        abbreviateCurrency(val).toString()
+                        formatAmount(val)
                     }
                     width={50}
                     tick={{ fill: "#B7B7D7", fontSize: sm ? 12 : 10 }}

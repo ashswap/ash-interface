@@ -10,7 +10,7 @@ import {
     Query,
     TokenIdentifierValue,
     TypeExpressionParser,
-    TypeMapper
+    TypeMapper,
 } from "@elrondnetwork/erdjs";
 import { Slider } from "antd";
 import IconRight from "assets/svg/right-yellow.svg";
@@ -18,6 +18,7 @@ import BigNumber from "bignumber.js";
 import BaseModal from "components/BaseModal";
 import Button from "components/Button";
 import InputCurrency from "components/InputCurrency";
+import TextAmt from "components/TextAmt";
 import Token from "components/Token";
 import { PoolsState } from "context/pools";
 import { useSwap } from "context/swap";
@@ -340,18 +341,14 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
                             <div className="py-2 text-2xs sm:text-sm text-text-input-3 text-right">
                                 <span>Available: </span>
                                 <span className="text-earn">
-                                    {balances[pool.tokens[0].id]
-                                        ? balances[pool.tokens[0].id].balance
-                                              .div(
-                                                  new BigNumber(
-                                                      10
-                                                  ).exponentiatedBy(
-                                                      pool.tokens[0].decimals
-                                                  )
-                                              )
-                                              .toFixed(3)
-                                              .toString()
-                                        : "0"}{" "}
+                                    <TextAmt
+                                        number={toEGLDD(
+                                            pool.tokens[0].decimals,
+                                            balances[pool.tokens[0].id]
+                                                .balance || 0
+                                        )}
+                                        options={{ notation: "standard" }}
+                                    />{" "}
                                     {pool.tokens[0].name}
                                 </span>
                             </div>
@@ -373,18 +370,14 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
                             <div className="py-2 text-2xs sm:text-sm text-text-input-3 text-right">
                                 <span>Available: </span>
                                 <span className="text-earn">
-                                    {balances[pool.tokens[1].id]
-                                        ? balances[pool.tokens[1].id].balance
-                                              .div(
-                                                  new BigNumber(
-                                                      10
-                                                  ).exponentiatedBy(
-                                                      pool.tokens[1].decimals
-                                                  )
-                                              )
-                                              .toFixed(3)
-                                              .toString()
-                                        : "0"}{" "}
+                                    <TextAmt
+                                        number={toEGLDD(
+                                            pool.tokens[1].decimals,
+                                            balances[pool.tokens[1].id]
+                                                .balance || 0
+                                        )}
+                                        options={{ notation: "standard" }}
+                                    />{" "}
                                     {pool.tokens[1].name}
                                 </span>
                             </div>

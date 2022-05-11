@@ -1,9 +1,9 @@
 import BigNumber from "bignumber.js";
+import TextAmt from "components/TextAmt";
 import CardTooltip from "components/Tooltip/CardTooltip";
 import { ASH_TOKEN } from "const/tokens";
 import { useFarms } from "context/farms";
 import { toEGLDD } from "helper/balance";
-import { fractionFormat } from "helper/number";
 import Image from "next/image";
 import React, {
     useCallback,
@@ -84,12 +84,13 @@ function FarmStats({ onClickAll }: { onClickAll?: () => void }) {
                                 />
                             </div>
                             <div className="text-white text-lg font-bold">
-                                {fractionFormat(
-                                    toEGLDD(
+                                <TextAmt
+                                    number={toEGLDD(
                                         ASH_TOKEN.decimals,
                                         totalReward
-                                    ).toNumber()
-                                )}{" "}
+                                    )}
+                                    decimalClassName="text-stake-gray-500"
+                                />{" "}
                                 ASH
                             </div>
                         </div>
@@ -119,7 +120,11 @@ function FarmStats({ onClickAll }: { onClickAll?: () => void }) {
                         <div className="text-lg">
                             <span className="text-ash-gray-500">$ </span>
                             <span className="text-white font-bold">
-                                {fractionFormat(TVL.toNumber())}
+                                <TextAmt
+                                    number={TVL}
+                                    decimalClassName="text-stake-gray-500"
+                                    options={{notation: "standard"}}
+                                />
                             </span>
                         </div>
                     </div>

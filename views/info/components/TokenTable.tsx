@@ -5,7 +5,9 @@ import ICStar from "assets/svg/star.svg";
 import { ENVIRONMENT } from "const/env";
 import { IN_POOL_TOKENS } from "const/tokens";
 import { fetcher } from "helper/common";
-import { abbreviateCurrency, currencyFormater } from "helper/number";
+import {
+    formatAmount,
+} from "helper/number";
 import { useScreenSize } from "hooks/useScreenSize";
 import { IToken } from "interface/token";
 import { TokenStatsRecord } from "interface/tokenStats";
@@ -27,10 +29,9 @@ const TokenRecord = ({
     const format = useCallback(
         (val: number) => {
             if (typeof val !== "number") return "";
-            if (screenSize.xl) {
-                return currencyFormater.format(val);
-            }
-            return abbreviateCurrency(val).toString().toUpperCase();
+            return formatAmount(val, {
+                notation: screenSize.xl ? "standard" : "compact",
+            });
         },
         [screenSize]
     );
@@ -112,7 +113,13 @@ const TokenRecord = ({
         </Link>
     );
 };
-function TokenTable({ data, hidePaging }: { data: TokenStatsRecord[], hidePaging?: boolean }) {
+function TokenTable({
+    data,
+    hidePaging,
+}: {
+    data: TokenStatsRecord[];
+    hidePaging?: boolean;
+}) {
     const [pageIndex, setPageIndex] = useState(0);
     const [pageSize, setPageSize] = useState(10);
     const [sortBy, setSortBy] = useState<

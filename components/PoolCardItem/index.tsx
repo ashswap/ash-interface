@@ -4,12 +4,12 @@ import React, { useState } from "react";
 import Image from "next/image";
 import AddLiquidityModal from "components/AddLiquidityModal";
 import Down from "assets/svg/down-white.svg";
-import usePoolDataFormat from "hooks/usePoolDataFormat";
 import {
     AccountInfoSliceNetworkType,
     useGetNetworkConfig,
 } from "@elrondnetwork/dapp-core";
 import CardTooltip from "components/Tooltip/CardTooltip";
+import TextAmt from "components/TextAmt";
 
 function PoolCardItem({
     poolData,
@@ -20,9 +20,7 @@ function PoolCardItem({
     const [isExpand, setIsExpand] = useState<boolean>(false);
     const [openAddLiquidity, setOpenAddLiquidity] = useState<boolean>(false);
     const network: AccountInfoSliceNetworkType = useGetNetworkConfig().network;
-    const {
-        formatedStats: { TVL, tradingAPR, volume24h },
-    } = usePoolDataFormat(poolData);
+    const {total_value_locked, apr_day: tradingAPR, usd_volume: volume24h} = poolData.poolStats || {};
     return (
         <div
             className={`bg-ash-dark-700 clip-corner-4 clip-corner-tr pt-8 pb-5 px-6 sm:px-11 text-white`}
@@ -64,7 +62,7 @@ function PoolCardItem({
                     </CardTooltip>
 
                     <div className="text-yellow-600 font-bold text-lg leading-tight">
-                        {tradingAPR}%
+                        <TextAmt number={tradingAPR || 0}/>%
                     </div>
                 </div>
             </div>
@@ -89,7 +87,7 @@ function PoolCardItem({
                             Total Liquidity
                         </div>
                     </CardTooltip>
-                    <div className="text-sm">${TVL}</div>
+                    <div className="text-sm">$<TextAmt number={total_value_locked || 0} options={{notation: "standard"}}/></div>
                 </div>
                 <div className="flex flex-row justify-between items-center h-12 px-4">
                     <CardTooltip
@@ -102,7 +100,7 @@ function PoolCardItem({
                     >
                         <div className="underline text-2xs">24H Volume</div>
                     </CardTooltip>
-                    <div className="text-sm">${volume24h}</div>
+                    <div className="text-sm">$<TextAmt number={volume24h || 0} options={{notation: "standard"}}/></div>
                 </div>
                 {isExpand && (
                     <>
@@ -120,7 +118,7 @@ function PoolCardItem({
                                     Trading APR
                                 </div>
                             </CardTooltip>
-                            <div className="text-sm">{tradingAPR}%</div>
+                            <div className="text-sm"><TextAmt number={tradingAPR || 0}/>%</div>
                         </div>
                     </>
                 )}
