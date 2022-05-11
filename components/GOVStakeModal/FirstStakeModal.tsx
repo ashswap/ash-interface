@@ -163,12 +163,13 @@ const FirstStakeContent = ({ open, onClose }: props) => {
                                         className="text-earn cursor-pointer"
                                         onClick={() => setMaxLockAmt()}
                                     >
-                                        {ASHBalance
-                                            ? toEGLD(
-                                                  ASH_TOKEN,
-                                                  ASHBalance.balance.toString()
-                                              ).toFixed(2)
-                                            : "0"}{" "}
+                                        <TextAmt
+                                            number={toEGLDD(
+                                                ASH_TOKEN.decimals,
+                                                ASHBalance?.balance || 0
+                                            )}
+                                            options={{notation: "standard"}}
+                                        />{" "}
                                         {ASH_TOKEN.name}
                                     </span>
                                 </div>

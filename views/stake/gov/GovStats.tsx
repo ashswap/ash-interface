@@ -25,7 +25,27 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { useMemo, useState } from "react";
 import useSWR from "swr";
-
+const ExpiredLockTooltip = ({
+    children,
+    disabled,
+}: {
+    children: JSX.Element;
+    disabled?: boolean;
+}) => {
+    if (disabled) return <>{children}</>;
+    return (
+        <CardTooltip
+            content={
+                <>
+                    The lock period has expired, please withdraw your fund
+                    first.
+                </>
+            }
+        >
+            {children}
+        </CardTooltip>
+    );
+};
 function GovStats() {
     const { data: adminFee24h } = useSWR<number>(
         `${ASHSWAP_CONFIG.ashApiBaseUrl}/stake/governance/admin-fee`,
@@ -90,12 +110,19 @@ function GovStats() {
                             Weekly Summary
                         </button> */}
                     {loggedIn && (
-                        <button
-                            className="bg-pink-600 text-white h-12 px-6 flex items-center justify-center"
-                            onClick={() => setOpenStakeGov(true)}
-                        >
-                            Add/Manage Stake
-                        </button>
+                        <ExpiredLockTooltip disabled={!canUnlockASH}>
+                            <button
+                                className={`h-12 px-6 flex items-center justify-center ${
+                                    canUnlockASH
+                                        ? "bg-ash-dark-400 text-stake-gray-500 cursor-not-allowed"
+                                        : "bg-pink-600 text-white"
+                                }`}
+                                
+                                onClick={() => !canUnlockASH && setOpenStakeGov(true)}
+                            >
+                                Add / Manage Stake
+                            </button>
+                        </ExpiredLockTooltip>
                     )}
                 </div>
             </div>
@@ -329,12 +356,19 @@ function GovStats() {
                     </div>
                     {mounted &&
                         (loggedIn ? (
-                            <button
-                                className="bg-pink-600 text-white text-sm md:text-lg font-bold w-full h-14 md:h-[4.5rem] flex items-center justify-center mt-3"
-                                onClick={() => setOpenStakeGov(true)}
-                            >
-                                Add / Manage Stake
-                            </button>
+                            <ExpiredLockTooltip disabled={!canUnlockASH}>
+                                <button
+                                    className={`text-sm md:text-lg font-bold w-full h-14 md:h-[4.5rem] flex items-center justify-center mt-3 ${
+                                        canUnlockASH
+                                            ? "bg-ash-dark-400 text-stake-gray-500 cursor-not-allowed"
+                                            : "bg-pink-600 text-white"
+                                    }`}
+                                    
+                                    onClick={() => !canUnlockASH && setOpenStakeGov(true)}
+                                >
+                                    Add / Manage Stake
+                                </button>
+                            </ExpiredLockTooltip>
                         ) : (
                             <button
                                 className="bg-pink-600 text-white text-sm md:text-lg font-bold w-full h-14 md:h-[4.5rem] flex items-center justify-center mt-3"
@@ -349,7 +383,7 @@ function GovStats() {
                     <h2 className="text-lg md:text-2xl mb-10 md:mb-11 font-bold text-white">
                         Overall stats
                     </h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 lg:gap-x-7.5 gap-y-1 sm:gap-y-4 lg:gap-y-6 mb-16">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 lg:gap-x-7.5 gap-y-1 sm:gap-y-4 lg:gap-y-6 mb-16">
                         <div className="bg-ash-dark-400/30 px-[2.375rem] py-7 flex flex-col justify-between">
                             <div className="text-stake-gray-500 text-sm font-bold mb-6 sm:mb-2 leading-tight">
                                 APR
@@ -578,7 +612,7 @@ function GovStats() {
                                     <TextAmt number={rewardValue} />
                                     &nbsp; LP-
                                     {rewardLPToken.tokens[0].name}
-                                    {rewardLPToken.tokens[0].name} has been sent
+                                    {rewardLPToken.tokens[1].name} has been sent
                                     to your wallet
                                 </div>
                             </>
