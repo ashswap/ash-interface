@@ -344,8 +344,7 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
                                     <TextAmt
                                         number={toEGLDD(
                                             pool.tokens[0].decimals,
-                                            balances[pool.tokens[0].id]
-                                                ?.balance || 0
+                                            balances[pool.tokens[0].id]?.balance || 0
                                         )}
                                         options={{ notation: "standard" }}
                                     />{" "}
@@ -373,8 +372,7 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
                                     <TextAmt
                                         number={toEGLDD(
                                             pool.tokens[1].decimals,
-                                            balances[pool.tokens[1].id]
-                                                ?.balance || 0
+                                            balances[pool.tokens[1].id]?.balance || 0
                                         )}
                                         options={{ notation: "standard" }}
                                     />{" "}
