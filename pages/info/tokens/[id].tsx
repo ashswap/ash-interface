@@ -18,7 +18,7 @@ import { Tooltip } from "antd";
 import { useWallet } from "context/wallet";
 import useSWR from "swr";
 import { fetcher } from "helper/common";
-import { formatAmount, fractionFormat } from "helper/number";
+import { formatAmount } from "helper/number";
 import PoolsTable from "views/info/components/PoolsTable";
 import { PoolStatsRecord } from "interface/poolStats";
 import { TxStatsRecord } from "interface/txStats";

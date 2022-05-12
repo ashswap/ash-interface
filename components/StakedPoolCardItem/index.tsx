@@ -8,12 +8,13 @@ import ICPlus from "assets/svg/plus.svg";
 import ICMinus from "assets/svg/minus.svg";
 import ICChevronDown from "assets/svg/chevron-down.svg";
 import ICChevronUp from "assets/svg/chevron-up.svg";
-import usePoolDataFormat from "hooks/usePoolDataFormat";
 import {
     AccountInfoSliceNetworkType,
     useGetNetworkConfig,
 } from "@elrondnetwork/dapp-core";
 import CardTooltip from "components/Tooltip/CardTooltip";
+import TextAmt from "components/TextAmt";
+import { toEGLDD } from "helper/balance";
 
 function StakedPoolCardItem({
     poolData,
@@ -26,18 +27,15 @@ function StakedPoolCardItem({
     const [openRemoveLiquidity, setOpenRemoveLiquidity] =
         useState<boolean>(false);
     const network: AccountInfoSliceNetworkType = useGetNetworkConfig().network;
-    const {
-        formatedStats: { TVL, tradingAPR, volume24h },
-        formatedStakedData: {
-            fCapacityPercent,
-            fLpValueUsd,
-            fOwnLiquidity,
-            fValue0,
-            fValue1,
-        },
-    } = usePoolDataFormat(poolData);
-    if (!liquidityData) return null;
 
+    if (!liquidityData) return null;
+    const {
+        total_value_locked,
+        apr_day: tradingAPR,
+        usd_volume: volume24h,
+    } = poolStats || {};
+    const { capacityPercent, lpValueUsd, ownLiquidity, value0, value1 } =
+        liquidityData;
     return (
         <div
             className={`bg-ash-dark-700 clip-corner-4 clip-corner-tr pt-8 pb-5 px-6 sm:px-11 text-white`}
@@ -49,7 +47,12 @@ function StakedPoolCardItem({
                             {pool.tokens[0].name}
                         </div>
                         <div className="text-earn font-bold text-lg leading-tight">
-                            {fValue0}
+                            <TextAmt
+                                number={toEGLDD(
+                                    pool.tokens[0].decimals,
+                                    value0 || 0
+                                )}
+                            />
                         </div>
                     </div>
                     <div className="mb-8">
@@ -57,7 +60,12 @@ function StakedPoolCardItem({
                             {pool.tokens[1].name}
                         </div>
                         <div className="text-earn font-bold text-lg leading-tight">
-                            {fValue1}
+                            <TextAmt
+                                number={toEGLDD(
+                                    pool.tokens[1].decimals,
+                                    value1 || 0
+                                )}
+                            />
                         </div>
                     </div>
                     <div className="flex">
@@ -96,7 +104,10 @@ function StakedPoolCardItem({
                         <div className="text-lg leading-tight">
                             <span className="text-stake-gray-500">$</span>
                             <span className="text-white font-bold">
-                                {fLpValueUsd}
+                                <TextAmt
+                                    number={lpValueUsd || 0}
+                                    decimalClassName="text-stake-gray-500"
+                                />
                             </span>
                         </div>
                     </div>
@@ -116,7 +127,11 @@ function StakedPoolCardItem({
                         </div>
 
                         <div className="text-lg text-white font-bold leading-snug">
-                            {fCapacityPercent}%
+                            <TextAmt
+                                number={capacityPercent || 0}
+                                decimalClassName="text-stake-gray-500"
+                            />
+                            %
                         </div>
                     </div>
                 </div>
@@ -127,7 +142,7 @@ function StakedPoolCardItem({
                         Trading APR
                     </div>
                     <div className="text-yellow-600 font-bold text-lg">
-                        {tradingAPR}%
+                        <TextAmt number={tradingAPR || 0} />%
                     </div>
                 </div>
             </div>
@@ -139,24 +154,43 @@ function StakedPoolCardItem({
                             <div className="underline text-2xs">
                                 Total Liquidity
                             </div>
-                            <div className="text-sm">${TVL}</div>
+                            <div className="text-sm">
+                                $
+                                <TextAmt
+                                    number={total_value_locked || 0}
+                                    options={{ notation: "standard" }}
+                                />
+                            </div>
                         </div>
                         <div className="flex flex-row justify-between items-center h-12 px-4">
                             <div className="underline text-2xs">24H Volume</div>
-                            <div className="text-sm">${volume24h}</div>
+                            <div className="text-sm">
+                                $
+                                <TextAmt
+                                    number={volume24h || 0}
+                                    options={{ notation: "standard" }}
+                                />
+                            </div>
                         </div>
                         <div className="flex flex-row justify-between items-center h-12 px-4">
                             <div className="underline text-2xs">LP Token</div>
                             <div className="text-sm">
-                                {fOwnLiquidity} {pool.tokens[0].name}-
-                                {pool.tokens[1].name}
+                                <TextAmt
+                                    number={toEGLDD(
+                                        pool.lpToken.decimals,
+                                        ownLiquidity || 0
+                                    )}
+                                />{" "}
+                                {pool.tokens[0].name}-{pool.tokens[1].name}
                             </div>
                         </div>
                         <div className="flex flex-row justify-between items-center h-12 px-4">
                             <div className="underline text-2xs">
                                 Trading APR
                             </div>
-                            <div className="text-sm">{tradingAPR}%</div>
+                            <div className="text-sm">
+                                <TextAmt number={tradingAPR || 0} />%
+                            </div>
                         </div>
                     </div>
                     <div className="text-center mb-8">

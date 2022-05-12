@@ -3,12 +3,12 @@ import BigNumber from "bignumber.js";
 import BaseModal from "components/BaseModal";
 import Checkbox from "components/Checkbox";
 import InputCurrency from "components/InputCurrency";
+import TextAmt from "components/TextAmt";
 import { blockTimeMs } from "const/dappConfig";
 import { ASH_TOKEN } from "const/tokens";
 import { FarmsState, useFarms } from "context/farms";
 import { useWallet } from "context/wallet";
 import { toEGLDD, toWei } from "helper/balance";
-import { fractionFormat } from "helper/number";
 import { useScreenSize } from "hooks/useScreenSize";
 import { Unarray } from "interface/utilities";
 import Image from "next/image";
@@ -126,12 +126,11 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
                                     className="text-earn cursor-pointer"
                                     onClick={() => setMaxStakeAmt()}
                                 >
-                                    {LPBalance
-                                        ? toEGLDD(
+                                    <TextAmt number={LPBalance ? toEGLDD(
                                               pool.lpToken.decimals,
-                                              LPBalance.balance.toString()
-                                          ).toFixed(8)
-                                        : "0.00"}{" "}
+                                              LPBalance.balance
+                                          ) : 0}/>
+                                    {" "}
                                     {lpName}
                                 </span>
                             </div>
@@ -148,12 +147,13 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
                                 ASH earn per day
                             </div>
                             <div className="text-white text-lg font-bold">
-                                {fractionFormat(
-                                    toEGLDD(
+                                <TextAmt
+                                    number={toEGLDD(
                                         ASH_TOKEN.decimals,
                                         ashPerDay
-                                    ).toNumber()
-                                )}
+                                    )}
+                                    decimalClassName="text-stake-gray-500"
+                                />
                             </div>
                         </div>
                         <div>
@@ -161,7 +161,7 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
                                 Emission APR
                             </div>
                             <div className="text-white text-lg font-bold">
-                                {fractionFormat(emissionAPR.toNumber())}%
+                                <TextAmt number={emissionAPR} decimalClassName="text-stake-gray-500" />%
                             </div>
                         </div>
                     </div>

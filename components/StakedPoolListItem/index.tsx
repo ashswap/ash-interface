@@ -5,8 +5,8 @@ import ICPlus from "assets/svg/plus.svg";
 import AddLiquidityModal from "components/AddLiquidityModal";
 import BaseModal from "components/BaseModal";
 import RemoveLiquidityModal from "components/RemoveLiquidityModal";
+import TextAmt from "components/TextAmt";
 import { PoolsState } from "context/pools";
-import { abbreviateCurrency } from "helper/number";
 import usePoolDataFormat from "hooks/usePoolDataFormat";
 import { useScreenSize } from "hooks/useScreenSize";
 import { Unarray } from "interface/utilities";
@@ -107,9 +107,9 @@ const StakedPoolListItem = ({
                                 <span className="inline-block mr-1">
                                     <span className="text-ash-gray-500">$</span>
                                     <span>
-                                        {abbreviateCurrency(
-                                            liquidityData.lpValueUsd.toNumber()
-                                        )}
+                                        <TextAmt
+                                            number={liquidityData.lpValueUsd}
+                                        />
                                     </span>
                                 </span>
                                 {/* {isExpand && (

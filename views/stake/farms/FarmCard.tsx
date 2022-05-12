@@ -2,15 +2,16 @@ import { Transition } from "@headlessui/react";
 import ImgMetalCardBg from "assets/images/metal-card-bg.png";
 import ICMinus from "assets/svg/minus.svg";
 import ICPlus from "assets/svg/plus.svg";
+import BigNumber from "bignumber.js";
 import BaseModal from "components/BaseModal";
 import StakeLPModal from "components/StakeLPModal";
+import TextAmt from "components/TextAmt";
 import CardTooltip from "components/Tooltip/CardTooltip";
 import UnstakeLPModal from "components/UnstakeLPModal";
 import { ASH_TOKEN } from "const/tokens";
 import { TRANSITIONS } from "const/transitions";
 import { FarmsState, useFarms } from "context/farms";
 import { toEGLDD } from "helper/balance";
-import { fractionFormat } from "helper/number";
 import { useScreenSize } from "hooks/useScreenSize";
 import { Unarray } from "interface/utilities";
 import Image from "next/image";
@@ -50,19 +51,14 @@ function FarmCard({ farmData, viewType }: props) {
     const screenSize = useScreenSize();
     const { claimReward, loadingMap } = useFarms();
     const [token0, token1] = farmData.pool.tokens;
-    const displayStakedLP = useMemo(() => {
+    const stakedLPAmt = useMemo(() => {
         if (!stakedData?.totalStakedLP || stakedData?.totalStakedLP.eq(0))
-            return "0.00";
+            return new BigNumber(0);
         const bal = toEGLDD(farm.farm_token_decimal, stakedData.totalStakedLP);
-        if (bal.lt(0.01)) return "< 0.01";
-        return fractionFormat(bal.toNumber());
+        return bal;
     }, [farm, stakedData]);
-    const fTotalRewardAmt = useMemo(() => {
-        if (!stakedData || !stakedData?.totalRewardAmt) return "0.00";
-        const num = toEGLDD(ASH_TOKEN.decimals, stakedData.totalRewardAmt);
-        return fractionFormat(num.toNumber(), {
-            maximumFractionDigits: num.lt(0.01) ? 6 : 2,
-        });
+    const totalRewardAmt = useMemo(() => {
+        return stakedData?.totalRewardAmt || new BigNumber(0);
     }, [stakedData]);
 
     useEffect(() => {
@@ -129,7 +125,11 @@ function FarmCard({ farmData, viewType }: props) {
                             </div>
                         </CardTooltip>
                         <div className="text-lg font-bold text-ash-cyan-500">
-                            {fractionFormat(emissionAPR.toNumber())}%
+                            <TextAmt
+                                number={emissionAPR}
+                                options={{ notation: "standard" }}
+                            />
+                            %
                         </div>
                     </div>
                     <div className="flex items-center justify-between mb-9">
@@ -150,7 +150,17 @@ function FarmCard({ farmData, viewType }: props) {
                                         : "text-ash-gray-500"
                                 }`}
                             >
-                                {fTotalRewardAmt}
+                                <TextAmt
+                                    number={toEGLDD(
+                                        ASH_TOKEN.decimals,
+                                        totalRewardAmt
+                                    )}
+                                    decimalClassName={`${
+                                        totalRewardAmt.gt(0)
+                                            ? "text-stake-gray-500"
+                                            : ""
+                                    }`}
+                                />
                             </div>
                         </div>
                         <button
@@ -185,12 +195,19 @@ function FarmCard({ farmData, viewType }: props) {
                             </CardTooltip>
                             <div
                                 className={`text-lg font-bold ${
-                                    displayStakedLP === "0.00"
+                                    stakedLPAmt.eq(0)
                                         ? "text-ash-gray-500"
                                         : "text-white"
                                 }`}
                             >
-                                {displayStakedLP}
+                                <TextAmt
+                                    number={stakedLPAmt}
+                                    decimalClassName={`${
+                                        stakedLPAmt.eq(0)
+                                            ? ""
+                                            : "text-stake-gray-500"
+                                    }`}
+                                />
                             </div>
                         </div>
                         <div>
@@ -233,7 +250,11 @@ function FarmCard({ farmData, viewType }: props) {
                             </div>
                         </CardTooltip>
                         <div className="text-ash-gray-500 text-sm">
-                            ${fractionFormat(totalLiquidityValue.toNumber())}
+                            $
+                            <TextAmt
+                                number={totalLiquidityValue}
+                                options={{ notation: "standard" }}
+                            />
                         </div>
                     </div>
                 </div>
@@ -293,20 +314,37 @@ function FarmCard({ farmData, viewType }: props) {
                             </div>
                             {/* emission APR */}
                             <div className="flex-shrink-0 w-[18%] text-ash-cyan-500 text-xs lg:text-lg font-bold">
-                                {fractionFormat(emissionAPR.toNumber())}%
+                                <TextAmt
+                                    number={emissionAPR}
+                                    options={{ notation: "standard" }}
+                                />
+                                %
                             </div>
                             {/* ash Earned */}
                             <div className="flex-shrink-0 w-1/5 lg:w-[18%] bg-stake-dark-500 h-8 sm:h-10 lg:h-12 px-3.5 hidden md:flex items-center justify-end text-right text-white text-xs lg:text-lg font-bold">
-                                {fTotalRewardAmt}
+                                <TextAmt
+                                    number={toEGLDD(
+                                        ASH_TOKEN.decimals,
+                                        totalRewardAmt
+                                    )}
+                                    decimalClassName="text-stake-gray-500"
+                                />
                             </div>
                             {/* LP staked */}
                             <div className="flex-shrink-0 w-1/5 lg:w-[18%] bg-stake-dark-500 h-8 sm:h-10 lg:h-12 px-3.5 hidden md:flex items-center justify-end text-right text-white text-xs lg:text-lg font-bold">
-                                {displayStakedLP}
+                                <TextAmt
+                                    number={stakedLPAmt}
+                                    decimalClassName="text-stake-gray-500"
+                                />
                             </div>
                             {/* Total liquidity */}
                             <div className="flex-shrink-0 w-1/3 md:w-1/5 lg:w-[18%] bg-stake-dark-500 h-8 sm:h-10 lg:h-12 px-3.5 flex items-center justify-end text-right text-white text-xs font-bold">
                                 $
-                                {fractionFormat(totalLiquidityValue.toNumber())}
+                                <TextAmt
+                                    number={totalLiquidityValue}
+                                    options={{ notation: "standard" }}
+                                    decimalClassName="text-stake-gray-500"
+                                />
                             </div>
                         </div>
                         <div className="hidden sm:flex items-center space-x-2">

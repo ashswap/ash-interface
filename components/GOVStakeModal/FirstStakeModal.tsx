@@ -4,6 +4,7 @@ import BigNumber from "bignumber.js";
 import BaseModal from "components/BaseModal";
 import Checkbox from "components/Checkbox";
 import InputCurrency from "components/InputCurrency";
+import TextAmt from "components/TextAmt";
 import CardTooltip from "components/Tooltip/CardTooltip";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
 import { ENVIRONMENT } from "const/env";
@@ -11,7 +12,6 @@ import { ASH_TOKEN, VE_ASH_DECIMALS } from "const/tokens";
 import { useStakeGov } from "context/gov";
 import { useWallet } from "context/wallet";
 import { toEGLD, toEGLDD, toWei } from "helper/balance";
-import { fractionFormat } from "helper/number";
 import useMediaQuery from "hooks/useMediaQuery";
 import { useOnboarding } from "hooks/useOnboarding";
 import { useScreenSize } from "hooks/useScreenSize";
@@ -55,7 +55,7 @@ const LOCK_CONFIG_TEST = {
 const LOCK_CONFIG =
     ENVIRONMENT.NETWORK === "devnet" ? LOCK_CONFIG_DEV : LOCK_CONFIG_TEST;
 const FirstStakeContent = ({ open, onClose }: props) => {
-    const [lockPeriod, setLockPeriod] = useState(LOCK_CONFIG.minLock);// in seconds
+    const [lockPeriod, setLockPeriod] = useState(LOCK_CONFIG.minLock); // in seconds
     const [isAgree, setIsAgree] = useState(false);
     const { balances, insufficientEGLD } = useWallet();
     const { lockASH, estimateVeASH, totalSupplyVeASH } = useStakeGov();
@@ -98,12 +98,6 @@ const FirstStakeContent = ({ open, onClose }: props) => {
     const estimatedVeASH = useMemo(() => {
         return estimateVeASH(lockAmt, lockPeriod);
     }, [estimateVeASH, lockPeriod, lockAmt]);
-    const fEstimatedVeASH = useMemo(() => {
-        const num = toEGLDD(VE_ASH_DECIMALS, estimatedVeASH).toNumber();
-        return num === 0
-            ? "0"
-            : fractionFormat(num, { maximumFractionDigits: num < 1 ? 8 : 2 });
-    }, [estimatedVeASH]);
     const estimateCapacity = useMemo(() => {
         if (estimatedVeASH.eq(0)) return "0";
         const pct = estimatedVeASH
@@ -131,7 +125,12 @@ const FirstStakeContent = ({ open, onClose }: props) => {
                                 </div>
                                 <div className="bg-ash-dark-400/30 h-14 lg:h-18 px-4 lg:px-7 flex items-center">
                                     <div className="w-3.5 h-3.5 lg:w-7 lg:h-7 rounded-full relative mr-3">
-                                        <Image src={ASH_TOKEN.icon} alt={ASH_TOKEN.name} layout="fill" objectFit="contain"/>
+                                        <Image
+                                            src={ASH_TOKEN.icon}
+                                            alt={ASH_TOKEN.name}
+                                            layout="fill"
+                                            objectFit="contain"
+                                        />
                                     </div>
                                     <div className="text-white text-sm lg:text-lg font-bold">
                                         {ASH_TOKEN.name}
@@ -164,12 +163,13 @@ const FirstStakeContent = ({ open, onClose }: props) => {
                                         className="text-earn cursor-pointer"
                                         onClick={() => setMaxLockAmt()}
                                     >
-                                        {ASHBalance
-                                            ? toEGLD(
-                                                  ASH_TOKEN,
-                                                  ASHBalance.balance.toString()
-                                              ).toFixed(2)
-                                            : "0"}{" "}
+                                        <TextAmt
+                                            number={toEGLDD(
+                                                ASH_TOKEN.decimals,
+                                                ASHBalance?.balance || 0
+                                            )}
+                                            options={{notation: "standard"}}
+                                        />{" "}
                                         {ASH_TOKEN.name}
                                     </span>
                                 </div>
@@ -292,7 +292,9 @@ const FirstStakeContent = ({ open, onClose }: props) => {
                                     max={LOCK_CONFIG.maxLock}
                                     options={LOCK_CONFIG.predefinedLockPeriod}
                                     lockSecondsChange={(val) =>
-                                        setLockPeriod(val > 0 ? val : LOCK_CONFIG.minLock)
+                                        setLockPeriod(
+                                            val > 0 ? val : LOCK_CONFIG.minLock
+                                        )
                                     }
                                 />
                                 <div className="overflow-hidden mt-8">
@@ -301,9 +303,19 @@ const FirstStakeContent = ({ open, onClose }: props) => {
                                         step={LOCK_CONFIG.sliderStep}
                                         marks={{
                                             [LOCK_CONFIG.minLock]: "",
-                                            [(LOCK_CONFIG.maxLock - LOCK_CONFIG.minLock) / 4 + LOCK_CONFIG.minLock]: "",
-                                            [(LOCK_CONFIG.maxLock - LOCK_CONFIG.minLock) / 2 + LOCK_CONFIG.minLock]: "",
-                                            [((LOCK_CONFIG.maxLock - LOCK_CONFIG.minLock)* 3) / 4 + LOCK_CONFIG.minLock]: "",
+                                            [(LOCK_CONFIG.maxLock -
+                                                LOCK_CONFIG.minLock) /
+                                                4 +
+                                            LOCK_CONFIG.minLock]: "",
+                                            [(LOCK_CONFIG.maxLock -
+                                                LOCK_CONFIG.minLock) /
+                                                2 +
+                                            LOCK_CONFIG.minLock]: "",
+                                            [((LOCK_CONFIG.maxLock -
+                                                LOCK_CONFIG.minLock) *
+                                                3) /
+                                                4 +
+                                            LOCK_CONFIG.minLock]: "",
                                             [LOCK_CONFIG.maxLock]: "",
                                         }}
                                         handleStyle={{
@@ -320,16 +332,21 @@ const FirstStakeContent = ({ open, onClose }: props) => {
                                         max={LOCK_CONFIG.maxLock}
                                         value={lockPeriod}
                                         tipFormatter={(val) =>
-                                            val && lockPeriodFormater(val * 1000)
+                                            val &&
+                                            lockPeriodFormater(val * 1000)
                                         }
                                         onChange={(e) => setLockPeriod(e)}
                                     />
                                     <div className="flex justify-between mt-1">
                                         <div className="text-xs lg:text-sm font-bold text-white">
-                                            {lockPeriodFormater(LOCK_CONFIG.minLock * 1000)}
+                                            {lockPeriodFormater(
+                                                LOCK_CONFIG.minLock * 1000
+                                            )}
                                         </div>
                                         <div className="text-xs lg:text-sm font-bold text-pink-600">
-                                        {lockPeriodFormater(LOCK_CONFIG.maxLock * 1000)}
+                                            {lockPeriodFormater(
+                                                LOCK_CONFIG.maxLock * 1000
+                                            )}
                                         </div>
                                     </div>
                                 </div>
@@ -356,7 +373,13 @@ const FirstStakeContent = ({ open, onClose }: props) => {
                                 </CardTooltip>
 
                                 <div className="text-white text-lg font-bold">
-                                    {fEstimatedVeASH}
+                                    <TextAmt
+                                        number={toEGLDD(
+                                            VE_ASH_DECIMALS,
+                                            estimatedVeASH
+                                        )}
+                                        decimalClassName="text-stake-gray-500"
+                                    />
                                 </div>
                             </div>
                             <div>

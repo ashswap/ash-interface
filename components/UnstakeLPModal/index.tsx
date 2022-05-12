@@ -4,13 +4,13 @@ import BigNumber from "bignumber.js";
 import BaseModal from "components/BaseModal";
 import Checkbox from "components/Checkbox";
 import InputCurrency from "components/InputCurrency";
+import TextAmt from "components/TextAmt";
 import CardTooltip from "components/Tooltip/CardTooltip";
 import { blockTimeMs } from "const/dappConfig";
 import { ASH_TOKEN } from "const/tokens";
 import { FarmsState, useFarms } from "context/farms";
 import { useWallet } from "context/wallet";
 import { toEGLDD, toWei } from "helper/balance";
-import { fractionFormat } from "helper/number";
 import { useScreenSize } from "hooks/useScreenSize";
 import { Unarray } from "interface/utilities";
 import Image from "next/image";
@@ -183,12 +183,13 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
                                     className="text-earn cursor-pointer"
                                     onClick={() => setMaxStakeAmt()}
                                 >
-                                    {stakedData?.totalStakedLP.gt(0)
-                                        ? toEGLDD(
-                                              farm.farming_token_decimal,
-                                              stakedData.totalStakedLP
-                                          ).toFixed(2)
-                                        : "0.00"}{" "}
+                                    <TextAmt
+                                        number={toEGLDD(
+                                            farm.farming_token_decimal,
+                                            stakedData?.totalStakedLP || 0
+                                        )}
+                                        options={{notation: "standard"}}
+                                    />{" "}
                                     {lpName}
                                 </span>
                             </div>
@@ -247,14 +248,13 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
                                 </div>
                             </div>
                             <div className="text-sm lg:text-lg font-bold">
-                                {rewardOnExit.eq(0)
-                                    ? "0.00"
-                                    : fractionFormat(
-                                          toEGLDD(
-                                              ASH_TOKEN.decimals,
-                                              rewardOnExit
-                                          ).toNumber()
-                                      )}
+                                <TextAmt
+                                    number={toEGLDD(
+                                        ASH_TOKEN.decimals,
+                                        rewardOnExit
+                                    )}
+                                    options={{ notation: "standard" }}
+                                />
                             </div>
                         </div>
                     </div>
@@ -275,21 +275,28 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
                                         : "text-white"
                                 }`}
                             >
-                                {fractionFormat(
-                                    toEGLDD(
+                                <TextAmt
+                                    number={toEGLDD(
                                         ASH_TOKEN.decimals,
                                         ashPerDay
-                                    ).toNumber()
-                                )}
+                                    )}
+                                    options={{ notation: "standard" }}
+                                    decimalClassName={`${
+                                        unStakeAmt.gt(0)
+                                            ? ""
+                                            : "text-stake-gray-500"
+                                    }`}
+                                />
                             </div>
                             {unStakeAmt.gt(0) && (
                                 <div className="text-white text-lg font-bold">
-                                    {fractionFormat(
-                                        toEGLDD(
+                                    <TextAmt
+                                        number={toEGLDD(
                                             ASH_TOKEN.decimals,
                                             afterUnstakeAshPerDay
-                                        ).toNumber()
-                                    )}
+                                        )}
+                                        options={{ notation: "standard" }}
+                                    />
                                 </div>
                             )}
                         </div>
@@ -298,7 +305,12 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
                                 Emission APR
                             </div>
                             <div className="text-white text-lg font-bold">
-                                {fractionFormat(emissionAPR.toNumber())}%
+                                <TextAmt
+                                    number={emissionAPR}
+                                    options={{ notation: "standard" }}
+                                    decimalClassName="text-stake-gray-500"
+                                />
+                                %
                             </div>
                         </div>
                     </div>
