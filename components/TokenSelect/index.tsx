@@ -64,9 +64,7 @@ const TokenSelect = ({
             if (Object.prototype.hasOwnProperty.call(tokens, tokenId)) {
                 const tokenBalance: TokenBalance = {
                     token: tokens[tokenId],
-                    balance: balances[tokenId]
-                        ? balances[tokenId].balance
-                        : new BigNumber(0),
+                    balance: balances[tokenId]?.balance || new BigNumber(0),
                 };
 
                 tokenBalances.push(tokenBalance);

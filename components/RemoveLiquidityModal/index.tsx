@@ -131,7 +131,7 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
     );
 
     useEffect(() => {
-        if (!proxy || liquidityDebounce.eq(new BigNumber(0))) {
+        if (!proxy || liquidityDebounce.eq(0) || liquidityDebounce.isNaN()) {
             return;
         }
 
@@ -142,7 +142,7 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
                     func: new ContractFunction("getRemoveLiquidityTokens"),
                     args: [
                         new BigUIntValue(
-                            new BigNumber(liquidityDebounce.toString())
+                            liquidityDebounce
                         ),
                         new BigUIntValue(new BigNumber(0)),
                         new BigUIntValue(new BigNumber(0)),
@@ -180,7 +180,7 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
                         values[0].valueOf().field1.toString()
                     ).toString()
                 );
-            });
+            }).catch(error => console.log(error));
     }, [liquidityDebounce, pool, proxy]);
 
     const removeLP = useCallback(async () => {
@@ -345,7 +345,7 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
                                         number={toEGLDD(
                                             pool.tokens[0].decimals,
                                             balances[pool.tokens[0].id]
-                                                .balance || 0
+                                                ?.balance || 0
                                         )}
                                         options={{ notation: "standard" }}
                                     />{" "}
@@ -374,7 +374,7 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
                                         number={toEGLDD(
                                             pool.tokens[1].decimals,
                                             balances[pool.tokens[1].id]
-                                                .balance || 0
+                                                ?.balance || 0
                                         )}
                                         options={{ notation: "standard" }}
                                     />{" "}
