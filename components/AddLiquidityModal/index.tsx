@@ -69,7 +69,8 @@ const TokenInput = ({
                             {token.name}
                         </div>
                         <div className="text-text-input-3 text-xs truncate leading-tight">
-                            <TextAmt number={tokenInPool}/>&nbsp; in pool
+                            <TextAmt number={tokenInPool} />
+                            &nbsp; in pool
                         </div>
                     </div>
                     <div className="block sm:hidden text-xs font-bold text-white">
@@ -111,7 +112,11 @@ const TokenInput = ({
                         className="text-earn select-none cursor-pointer"
                         onClick={() => onChangeValue(balance)}
                     >
-                        <TextAmt number={balance} options={{notation: "standard"}} />&nbsp;
+                        <TextAmt
+                            number={balance}
+                            options={{ notation: "standard" }}
+                        />
+                        &nbsp;
                         {token.name}
                     </span>
                 </div>
@@ -240,29 +245,25 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
     ]);
 
     const balance0 = useMemo(() => {
-        return balances[pool.tokens[0].id]
-            ? balances[pool.tokens[0].id].balance
-                  .div(
-                      new BigNumber(10).exponentiatedBy(pool.tokens[0].decimals)
-                  )
-                  .toFixed(8)
-                  .toString()
-            : "0";
+        return (
+            balances[pool.tokens[0].id]?.balance
+                .div(new BigNumber(10).exponentiatedBy(pool.tokens[0].decimals))
+                .toFixed(8)
+                .toString() || "0"
+        );
     }, [balances, pool]);
 
     const balance1 = useMemo(() => {
-        return balances[pool.tokens[1].id]
-            ? balances[pool.tokens[1].id].balance
-                  .div(
-                      new BigNumber(10).exponentiatedBy(pool.tokens[1].decimals)
-                  )
-                  .toFixed(8)
-                  .toString()
-            : "0";
+        return (
+            balances[pool.tokens[1].id]?.balance
+                .div(new BigNumber(10).exponentiatedBy(pool.tokens[1].decimals))
+                .toFixed(8)
+                .toString() || "0"
+        );
     }, [balances, pool]);
 
     const isInsufficentFund0 = useMemo(() => {
-        if (value0 === "" || balance0 === "") {
+        if (value0 === "" || balance0 === "0") {
             return false;
         }
 
@@ -273,7 +274,7 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
     }, [value0, balance0]);
 
     const isInsufficentFund1 = useMemo(() => {
-        if (value1 === "" || balance1 === "") {
+        if (value1 === "" || balance1 === "0") {
             return false;
         }
 

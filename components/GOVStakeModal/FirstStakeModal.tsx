@@ -59,7 +59,7 @@ const FirstStakeContent = ({ open, onClose }: props) => {
     const [isAgree, setIsAgree] = useState(false);
     const { balances, insufficientEGLD } = useWallet();
     const { lockASH, estimateVeASH, totalSupplyVeASH } = useStakeGov();
-    const ASHBalance = useMemo(() => balances[ASH_TOKEN.id], [balances]);
+    const ASHBalance = useMemo(() => balances[ASH_TOKEN.id]?.balance || new BigNumber(0), [balances]);
     const [lockAmt, setLockAmt] = useState<BigNumber>(new BigNumber(0));
     const [rawLockAmt, setRawLockAmt] = useState("");
     const [onboardingStakeGov, setOnboardedStakeGov] =
@@ -69,14 +69,14 @@ const FirstStakeContent = ({ open, onClose }: props) => {
     const screenSize = useScreenSize();
 
     const setMaxLockAmt = useCallback(() => {
-        setLockAmt(ASHBalance.balance);
+        setLockAmt(ASHBalance);
         setRawLockAmt(
-            toEGLD(ASH_TOKEN, ASHBalance.balance.toString()).toString(10)
+            toEGLD(ASH_TOKEN, ASHBalance.toString()).toString(10)
         );
     }, [ASHBalance]);
     const insufficientASH = useMemo(() => {
         if (!ASHBalance) return true;
-        return lockAmt.gt(ASHBalance.balance);
+        return lockAmt.gt(ASHBalance);
     }, [ASHBalance, lockAmt]);
     const canStake = useMemo(() => {
         return (
@@ -166,7 +166,7 @@ const FirstStakeContent = ({ open, onClose }: props) => {
                                         <TextAmt
                                             number={toEGLDD(
                                                 ASH_TOKEN.decimals,
-                                                ASHBalance?.balance || 0
+                                                ASHBalance
                                             )}
                                             options={{notation: "standard"}}
                                         />{" "}
