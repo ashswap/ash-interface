@@ -10,6 +10,7 @@ import {
 } from "@elrondnetwork/dapp-core";
 import CardTooltip from "components/Tooltip/CardTooltip";
 import TextAmt from "components/TextAmt";
+import { formatAmount } from "helper/number";
 
 function PoolCardItem({
     poolData,
@@ -20,7 +21,11 @@ function PoolCardItem({
     const [isExpand, setIsExpand] = useState<boolean>(false);
     const [openAddLiquidity, setOpenAddLiquidity] = useState<boolean>(false);
     const network: AccountInfoSliceNetworkType = useGetNetworkConfig().network;
-    const {total_value_locked, apr_day: tradingAPR, usd_volume: volume24h} = poolData.poolStats || {};
+    const {
+        total_value_locked,
+        apr_day: tradingAPR,
+        usd_volume: volume24h,
+    } = poolData.poolStats || {};
     return (
         <div
             className={`bg-ash-dark-700 clip-corner-4 clip-corner-tr pt-8 pb-5 px-6 sm:px-11 text-white`}
@@ -62,7 +67,7 @@ function PoolCardItem({
                     </CardTooltip>
 
                     <div className="text-yellow-600 font-bold text-lg leading-tight">
-                        <TextAmt number={tradingAPR || 0}/>%
+                        {formatAmount(tradingAPR || 0, {notation: "standard"})}%
                     </div>
                 </div>
             </div>
@@ -87,7 +92,13 @@ function PoolCardItem({
                             Total Liquidity
                         </div>
                     </CardTooltip>
-                    <div className="text-sm">$<TextAmt number={total_value_locked || 0} options={{notation: "standard"}}/></div>
+                    <div className="text-sm">
+                        $
+                        <TextAmt
+                            number={total_value_locked || 0}
+                            options={{ notation: "standard" }}
+                        />
+                    </div>
                 </div>
                 <div className="flex flex-row justify-between items-center h-12 px-4">
                     <CardTooltip
@@ -100,7 +111,13 @@ function PoolCardItem({
                     >
                         <div className="underline text-2xs">24H Volume</div>
                     </CardTooltip>
-                    <div className="text-sm">$<TextAmt number={volume24h || 0} options={{notation: "standard"}}/></div>
+                    <div className="text-sm">
+                        $
+                        <TextAmt
+                            number={volume24h || 0}
+                            options={{ notation: "standard" }}
+                        />
+                    </div>
                 </div>
                 {isExpand && (
                     <>
@@ -118,7 +135,9 @@ function PoolCardItem({
                                     Trading APR
                                 </div>
                             </CardTooltip>
-                            <div className="text-sm"><TextAmt number={tradingAPR || 0}/>%</div>
+                            <div className="text-sm">
+                                {formatAmount(tradingAPR || 0, {notation: "standard"})}%
+                            </div>
                         </div>
                     </>
                 )}

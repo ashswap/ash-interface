@@ -9,6 +9,7 @@ import { ASH_TOKEN } from "const/tokens";
 import { FarmsState, useFarms } from "context/farms";
 import { useWallet } from "context/wallet";
 import { toEGLDD, toWei } from "helper/balance";
+import { formatAmount } from "helper/number";
 import { useScreenSize } from "hooks/useScreenSize";
 import { Unarray } from "interface/utilities";
 import Image from "next/image";
@@ -126,11 +127,16 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
                                     className="text-earn cursor-pointer"
                                     onClick={() => setMaxStakeAmt()}
                                 >
-                                    <TextAmt number={LPBalance ? toEGLDD(
-                                              pool.lpToken.decimals,
-                                              LPBalance.balance
-                                          ) : 0}/>
-                                    {" "}
+                                    <TextAmt
+                                        number={
+                                            LPBalance
+                                                ? toEGLDD(
+                                                      pool.lpToken.decimals,
+                                                      LPBalance.balance
+                                                  )
+                                                : 0
+                                        }
+                                    />{" "}
                                     {lpName}
                                 </span>
                             </div>
@@ -161,7 +167,10 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
                                 Emission APR
                             </div>
                             <div className="text-white text-lg font-bold">
-                                <TextAmt number={emissionAPR} decimalClassName="text-stake-gray-500" />%
+                                {formatAmount(emissionAPR?.toNumber() || 0, {
+                                    notation: "standard",
+                                })}
+                                %
                             </div>
                         </div>
                     </div>

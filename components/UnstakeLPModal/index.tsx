@@ -11,6 +11,7 @@ import { ASH_TOKEN } from "const/tokens";
 import { FarmsState, useFarms } from "context/farms";
 import { useWallet } from "context/wallet";
 import { toEGLDD, toWei } from "helper/balance";
+import { formatAmount } from "helper/number";
 import { useScreenSize } from "hooks/useScreenSize";
 import { Unarray } from "interface/utilities";
 import Image from "next/image";
@@ -188,7 +189,7 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
                                             farm.farming_token_decimal,
                                             stakedData?.totalStakedLP || 0
                                         )}
-                                        options={{notation: "standard"}}
+                                        options={{ notation: "standard" }}
                                     />{" "}
                                     {lpName}
                                 </span>
@@ -305,11 +306,9 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
                                 Emission APR
                             </div>
                             <div className="text-white text-lg font-bold">
-                                <TextAmt
-                                    number={emissionAPR}
-                                    options={{ notation: "standard" }}
-                                    decimalClassName="text-stake-gray-500"
-                                />
+                                {formatAmount(emissionAPR?.toNumber() || 0, {
+                                    notation: "standard",
+                                })}
                                 %
                             </div>
                         </div>

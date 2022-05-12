@@ -15,6 +15,7 @@ import {
 import CardTooltip from "components/Tooltip/CardTooltip";
 import TextAmt from "components/TextAmt";
 import { toEGLDD } from "helper/balance";
+import { formatAmount } from "helper/number";
 
 function StakedPoolCardItem({
     poolData,
@@ -48,10 +49,13 @@ function StakedPoolCardItem({
                         </div>
                         <div className="text-earn font-bold text-lg leading-tight">
                             <TextAmt
-                                number={toEGLDD(
-                                    pool.tokens[0].decimals,
-                                    value0 || 0
-                                )}
+                                number={
+                                    12345678 ||
+                                    toEGLDD(
+                                        pool.tokens[0].decimals,
+                                        value0 || 0
+                                    )
+                                }
                             />
                         </div>
                     </div>
@@ -127,10 +131,9 @@ function StakedPoolCardItem({
                         </div>
 
                         <div className="text-lg text-white font-bold leading-snug">
-                            <TextAmt
-                                number={capacityPercent || 0}
-                                decimalClassName="text-stake-gray-500"
-                            />
+                            {formatAmount(capacityPercent?.toNumber() || 0, {
+                                notation: "standard",
+                            })}
                             %
                         </div>
                     </div>
@@ -142,7 +145,10 @@ function StakedPoolCardItem({
                         Trading APR
                     </div>
                     <div className="text-yellow-600 font-bold text-lg">
-                        <TextAmt number={tradingAPR || 0} />%
+                        {formatAmount(tradingAPR || 0, {
+                            notation: "standard",
+                        })}
+                        %
                     </div>
                 </div>
             </div>
@@ -189,7 +195,10 @@ function StakedPoolCardItem({
                                 Trading APR
                             </div>
                             <div className="text-sm">
-                                <TextAmt number={tradingAPR || 0} />%
+                                {formatAmount(tradingAPR || 0, {
+                                    notation: "standard",
+                                })}
+                                %
                             </div>
                         </div>
                     </div>

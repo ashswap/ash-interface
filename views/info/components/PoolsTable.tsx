@@ -88,9 +88,9 @@ const PoolRecord = ({
                         <span className="text-white">{liquidity}</span>
                     </div>
                     <div className="hidden md:block w-16 lg:w-24 xl:w-32 text-xs text-right text-white">
-                        {poolData.apr_day
-                            ? poolData.apr_day?.toLocaleString("en-US")
-                            : "_"}
+                        {formatAmount(poolData.apr_day || 0, {
+                            notation: "standard",
+                        })}
                         %
                     </div>
                 </div>
@@ -98,7 +98,13 @@ const PoolRecord = ({
         </Link>
     );
 };
-function PoolsTable({ data, hidePaging }: { data: PoolStatsRecord[], hidePaging?: boolean }) {
+function PoolsTable({
+    data,
+    hidePaging,
+}: {
+    data: PoolStatsRecord[];
+    hidePaging?: boolean;
+}) {
     const [pageIndex, setPageIndex] = useState(0);
     const [pageSize, setPageSize] = useState(10);
     const [sortBy, setSortBy] = useState<
