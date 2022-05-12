@@ -253,8 +253,8 @@ const FarmsProvider = ({ children }: any) => {
     const getReward = useCallback(
         async (farm: IFarm, amt: BigNumber, sftId: string) => {
             if (!loggedIn) return new BigNumber(0);
-            const data = await getSNFTAttrs(sftId);
-            if (!data?.attributes) return new BigNumber(0);
+            const attributes = balances[sftId]?.attributes;
+            if (!attributes) return new BigNumber(0);
             const res = await proxy.queryContract(
                 new Query({
                     address: new Address(farm.farm_address),
@@ -263,7 +263,7 @@ const FarmsProvider = ({ children }: any) => {
                     ),
                     args: [
                         new BigUIntValue(amt),
-                        new BytesValue(Buffer.from(data.attributes, "base64")),
+                        new BytesValue(attributes),
                     ],
                 })
             );
@@ -274,7 +274,7 @@ const FarmsProvider = ({ children }: any) => {
                 16
             );
         },
-        [loggedIn, getSNFTAttrs, proxy]
+        [loggedIn, proxy, balances]
     );
 
     const getFarmRecords = useCallback(async () => {
@@ -324,7 +324,7 @@ const FarmsProvider = ({ children }: any) => {
                             id.replace(f.farm_token_id + "-", ""),
                             16
                         ),
-                        balance: balances[id].balance,
+                        balance: balances[id]?.balance || new BigNumber(0),
                     }));
                 const isFarmed = farmTokens.some(({ balance }) =>
                     balance.gt(0)

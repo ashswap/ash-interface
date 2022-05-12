@@ -34,7 +34,7 @@ export interface State {
     isOpenConnectWalletModal: boolean;
     setIsOpenConnectWalletModal: (val: boolean) => void;
     fetchBalances: () => void;
-    balances: Record<string, TokenOfAccountOnNetwork>;
+    balances: Record<string, TokenOfAccountOnNetwork | null>;
     tokens: ITokenMap;
     lpTokens: ITokenMap;
     tokenPrices: any;
@@ -77,9 +77,7 @@ export function WalletProvider({ children }: Props) {
     const apiProvider: ApiProvider = getApiProvider();
     // end
     const [lpTokens, setLpTokens] = useState<ITokenMap>({});
-    const [balances, setBalances] = useState<
-        Record<string, TokenOfAccountOnNetwork>
-    >(initState.balances);
+    const [balances, setBalances] = useState<State["balances"]>(initState.balances);
     const [isOpenConnectWalletModal, setIsOpenConnectWalletModal] =
         useState(false);
 
