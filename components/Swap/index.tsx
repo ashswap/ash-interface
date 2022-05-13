@@ -37,6 +37,7 @@ import { useWallet } from "context/wallet";
 import { toEGLD, toEGLDD, toWei } from "helper/balance";
 import { cancellablePromise } from "helper/cancellablePromise";
 import { queryPoolContract } from "helper/contracts/pool";
+import { formatAmount } from "helper/number";
 import { useCreateTransaction } from "helper/transactionMethods";
 import useMounted from "hooks/useMounted";
 import { useOnboarding } from "hooks/useOnboarding";
@@ -598,7 +599,9 @@ const Swap = () => {
                                                 }
                                                 style={{ color: "#00FF75" }}
                                             >
-                                                <TextAmt number={priceImpact} />
+                                                {formatAmount(priceImpact, {
+                                                    notation: "standard",
+                                                })}
                                                 %
                                             </div>
                                         </div>
@@ -663,10 +666,9 @@ const Swap = () => {
                                                     styles.swapResultValue
                                                 }
                                             >
-                                                <TextAmt
-                                                    number={slippage * 100}
-                                                    decimalClassName="text-stake-gray-500"
-                                                />
+                                                {formatAmount(slippage * 100, {
+                                                    notation: "standard",
+                                                })}
                                                 %
                                             </div>
                                         </div>
