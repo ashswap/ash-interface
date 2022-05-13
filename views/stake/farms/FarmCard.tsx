@@ -12,6 +12,7 @@ import { ASH_TOKEN } from "const/tokens";
 import { TRANSITIONS } from "const/transitions";
 import { FarmsState, useFarms } from "context/farms";
 import { toEGLDD } from "helper/balance";
+import { formatAmount } from "helper/number";
 import { useScreenSize } from "hooks/useScreenSize";
 import { Unarray } from "interface/utilities";
 import Image from "next/image";
@@ -125,10 +126,9 @@ function FarmCard({ farmData, viewType }: props) {
                             </div>
                         </CardTooltip>
                         <div className="text-lg font-bold text-ash-cyan-500">
-                            <TextAmt
-                                number={emissionAPR}
-                                options={{ notation: "standard" }}
-                            />
+                            {formatAmount(emissionAPR?.toNumber() || 0, {
+                                notation: "standard",
+                            })}
                             %
                         </div>
                     </div>
@@ -314,10 +314,9 @@ function FarmCard({ farmData, viewType }: props) {
                             </div>
                             {/* emission APR */}
                             <div className="flex-shrink-0 w-[18%] text-ash-cyan-500 text-xs lg:text-lg font-bold">
-                                <TextAmt
-                                    number={emissionAPR}
-                                    options={{ notation: "standard" }}
-                                />
+                                {formatAmount(emissionAPR?.toNumber() || 0, {
+                                    notation: "standard",
+                                })}
                                 %
                             </div>
                             {/* ash Earned */}

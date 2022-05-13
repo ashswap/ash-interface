@@ -14,13 +14,21 @@ function TextAmt({
     decimalClassName,
 }: TextAmtProps) {
     const [intPart, decimalPart] = useMemo(() => {
-        return formatAmount(new BigNumber(number).toNumber(), options)?.split(".") || [];
+        return (
+            formatAmount(new BigNumber(number).toNumber(), options)?.split(
+                "."
+            ) || []
+        );
     }, [number, options]);
 
+    const applyDecimalStyle = useMemo(() => {
+        return decimalPart && /[0-9]+$/.test(decimalPart);
+    }, [decimalPart]);
+
     return (
-        <span className={className}>
+        <span translate="no" className={className}>
             <span>{intPart}</span>
-            <span className={`${decimalClassName ?? "opacity-50"}`}>
+            <span className={`${applyDecimalStyle ? decimalClassName ?? "opacity-50" : ""}`}>
                 {decimalPart ? "." + decimalPart : ""}
             </span>
         </span>

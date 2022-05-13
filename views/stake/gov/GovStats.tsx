@@ -117,8 +117,9 @@ function GovStats() {
                                         ? "bg-ash-dark-400 text-stake-gray-500 cursor-not-allowed"
                                         : "bg-pink-600 text-white"
                                 }`}
-                                
-                                onClick={() => !canUnlockASH && setOpenStakeGov(true)}
+                                onClick={() =>
+                                    !canUnlockASH && setOpenStakeGov(true)
+                                }
                             >
                                 Add / Manage Stake
                             </button>
@@ -363,8 +364,9 @@ function GovStats() {
                                             ? "bg-ash-dark-400 text-stake-gray-500 cursor-not-allowed"
                                             : "bg-pink-600 text-white"
                                     }`}
-                                    
-                                    onClick={() => !canUnlockASH && setOpenStakeGov(true)}
+                                    onClick={() =>
+                                        !canUnlockASH && setOpenStakeGov(true)
+                                    }
                                 >
                                     Add / Manage Stake
                                 </button>
@@ -389,11 +391,7 @@ function GovStats() {
                                 APR
                             </div>
                             <div className="text-pink-600 text-lg font-bold leading-tight">
-                                <TextAmt
-                                    number={apr}
-                                    options={{ notation: "standard" }}
-                                />
-                                %
+                                {formatAmount(apr, { notation: "standard" })}%
                             </div>
                         </div>
                         <div className="bg-ash-dark-400/30 px-[2.375rem] py-7 flex flex-col justify-between">
@@ -401,10 +399,9 @@ function GovStats() {
                                 PERCENTAGE of total ASH Locked
                             </div>
                             <div className="text-white text-lg font-bold leading-tight">
-                                <TextAmt
-                                    number={totalLockedPct}
-                                    decimalClassName="text-stake-gray-500"
-                                />
+                                {formatAmount(totalLockedPct, {
+                                    notation: "standard",
+                                })}
                                 %
                             </div>
                         </div>
