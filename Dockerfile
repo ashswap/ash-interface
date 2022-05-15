@@ -1,4 +1,4 @@
-FROM node:14.18.0 AS builder
+FROM node:16.15.0 AS builder
 ARG NETWORK=testnet
 ARG SENTRY_AUTH_TOKEN
 WORKDIR /app
@@ -8,7 +8,7 @@ COPY . .
 COPY .env.${NETWORK} .env
 RUN yarn build && yarn install --production --ignore-scripts --prefer-offline
 
-FROM node:14.18.0 AS runner
+FROM node:16.15.0 AS runner
 WORKDIR /app
 
 ENV NODE_ENV production
