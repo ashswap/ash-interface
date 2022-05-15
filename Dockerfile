@@ -1,14 +1,14 @@
-FROM node:16.15.0 AS builder
+FROM node:16.14.0 AS builder
 ARG NETWORK=testnet
 ARG SENTRY_AUTH_TOKEN
 WORKDIR /app
 COPY package.json yarn.lock ./
-RUN yarn install --frozen-lockfile --network-concurrency 1 --ignore-scripts
+RUN NODE_TLS_REJECT_UNAUTHORIZED=0 yarn install --frozen-lockfile --network-concurrency 1 --ignore-scripts
 COPY . .
 COPY .env.${NETWORK} .env
 RUN yarn build && yarn install --production --ignore-scripts --prefer-offline
 
-FROM node:16.15.0 AS runner
+FROM node:16.14.0 AS runner
 WORKDIR /app
 
 ENV NODE_ENV production
