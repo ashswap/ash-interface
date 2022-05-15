@@ -3,7 +3,7 @@ ARG NETWORK=testnet
 ARG SENTRY_AUTH_TOKEN
 WORKDIR /app
 COPY package.json yarn.lock ./
-RUN NODE_TLS_REJECT_UNAUTHORIZED=0 yarn install --frozen-lockfile --network-concurrency 1 --ignore-scripts
+RUN yarn install --network-concurrency 1
 COPY . .
 COPY .env.${NETWORK} .env
 RUN yarn build && yarn install --production --ignore-scripts --prefer-offline
