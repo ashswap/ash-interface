@@ -19,11 +19,13 @@ import Button from "components/Button";
 import Checkbox from "components/Checkbox";
 import InputCurrency from "components/InputCurrency";
 import TextAmt from "components/TextAmt";
+import OnboardTooltip from "components/Tooltip/OnboardTooltip";
 import { PoolsState } from "context/pools";
 import { useWallet } from "context/wallet";
 import { toEGLD, toEGLDD, toWei } from "helper/balance";
 import { queryPoolContract } from "helper/contracts/pool";
 import { useCreateTransaction } from "helper/transactionMethods";
+import { useOnboarding } from "hooks/useOnboarding";
 import { useScreenSize } from "hooks/useScreenSize";
 import { DappSendTransactionsPropsType } from "interface/dappCore";
 import { IToken } from "interface/token";
@@ -138,7 +140,12 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
     const { address, account } = useGetAccountInfo();
     const proxy = getProxyProvider();
     const { pool, poolStats, liquidityData } = poolData;
-
+    const [onboardingDepositInput, setOnboardedDepositInput] =
+        useOnboarding("pool_deposit_input");
+    const [onboardingPoolCheck, setOnboardedPoolCheck] = useOnboarding(
+        "pool_deposit_checkbox"
+    );
+    const screenSize = useScreenSize();
     // reset when open modal
     useEffect(() => {
         if (open) {
@@ -147,6 +154,12 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
             setValue1("");
         }
     }, [open]);
+
+    useEffect(() => {
+        if (new BigNumber(value0 || 0).plus(new BigNumber(value1 || 0)).gt(0)) {
+            setOnboardedDepositInput(true);
+        }
+    }, [value0, value1, setOnboardedDepositInput]);
 
     const addLP = useCallback(async () => {
         if (!loggedIn || adding) return;
@@ -386,32 +399,50 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
             </div>
             <div className="my-10">
                 <div className="relative">
-                    <div className="py-1.5">
-                        <TokenInput
-                            token={pool.tokens[0]}
-                            tokenInPool={toEGLDD(
-                                pool.tokens[0].decimals,
-                                liquidityData?.value0 || 0
-                            )}
-                            value={value0}
-                            onChangeValue={(val) => setValue0(val)}
-                            isInsufficentFund={isInsufficentFund0}
-                            balance={balance0}
-                        />
-                    </div>
-                    <div className="py-1.5">
-                        <TokenInput
-                            token={pool.tokens[1]}
-                            tokenInPool={toEGLDD(
-                                pool.tokens[1].decimals,
-                                liquidityData?.value1 || 0
-                            )}
-                            value={value1}
-                            onChangeValue={(val) => setValue1(val)}
-                            isInsufficentFund={isInsufficentFund1}
-                            balance={balance1}
-                        />
-                    </div>
+                    <OnboardTooltip
+                        open={onboardingDepositInput && screenSize.md}
+                        placement="left"
+                        onArrowClick={() => setOnboardedDepositInput(true)}
+                        content={({ size }) => (
+                            <OnboardTooltip.Panel size={size} className="w-36">
+                                <div className="p-3 text-xs font-bold">
+                                    <span className="text-stake-green-500">
+                                        Input value{" "}
+                                    </span>
+                                    <span>that you want to deposit</span>
+                                </div>
+                            </OnboardTooltip.Panel>
+                        )}
+                    >
+                        <div>
+                            <div className="py-1.5">
+                                <TokenInput
+                                    token={pool.tokens[0]}
+                                    tokenInPool={toEGLDD(
+                                        pool.tokens[0].decimals,
+                                        liquidityData?.value0 || 0
+                                    )}
+                                    value={value0}
+                                    onChangeValue={(val) => setValue0(val)}
+                                    isInsufficentFund={isInsufficentFund0}
+                                    balance={balance0}
+                                />
+                            </div>
+                            <div className="py-1.5">
+                                <TokenInput
+                                    token={pool.tokens[1]}
+                                    tokenInPool={toEGLDD(
+                                        pool.tokens[1].decimals,
+                                        liquidityData?.value1 || 0
+                                    )}
+                                    value={value1}
+                                    onChangeValue={(val) => setValue1(val)}
+                                    isInsufficentFund={isInsufficentFund1}
+                                    balance={balance1}
+                                />
+                            </div>
+                        </div>
+                    </OnboardTooltip>
 
                     <div className="flex items-center space-x-1 bg-ash-dark-700 sm:bg-transparent mb-11 sm:mb-0">
                         <div className="flex items-center font-bold w-24 sm:w-1/3 px-4 sm:px-0 border-r border-r-ash-gray-500 sm:border-r-0">
@@ -437,27 +468,49 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
             </div>
 
             <div className="sm:flex gap-8">
-                <Checkbox
-                    className="w-full mb-12 sm:mb-0 sm:w-2/3"
-                    checked={isAgree}
-                    onChange={setAgree}
-                    text={
-                        <span>
-                            I verify that I have read the{" "}
-                            <a
-                                href="https://docs.ashswap.io/guides/add-remove-liquidity"
-                                target="_blank"
-                                rel="noreferrer"
-                            >
-                                <b className="text-white">
-                                    <u>AshSwap Pools Guide</u>
-                                </b>
-                            </a>{" "}
-                            and understand the risks of providing liquidity,
-                            including impermanent loss.
-                        </span>
-                    }
-                />
+                <OnboardTooltip
+                    open={onboardingPoolCheck && !onboardingDepositInput && screenSize.md}
+                    placement="bottom-start"
+                    onArrowClick={() => setOnboardedPoolCheck(true)}arrowStyle={() => ({left: 0})}
+                    content={({ size }) => (
+                        <OnboardTooltip.Panel size={size} className="w-36">
+                            <div className="p-3 text-xs font-bold">
+                                <span className="text-stake-green-500">
+                                    Click check box{" "}
+                                </span>
+                                <span>to verify your actions</span>
+                            </div>
+                        </OnboardTooltip.Panel>
+                    )}
+                >
+                    <div>
+                        <Checkbox
+                            className="w-full mb-12 sm:mb-0 sm:w-2/3"
+                            checked={isAgree}
+                            onChange={(val) => {
+                                setAgree(val);
+                                setOnboardedPoolCheck(true);
+                            }}
+                            text={
+                                <span>
+                                    I verify that I have read the{" "}
+                                    <a
+                                        href="https://docs.ashswap.io/guides/add-remove-liquidity"
+                                        target="_blank"
+                                        rel="noreferrer"
+                                    >
+                                        <b className="text-white">
+                                            <u>AshSwap Pools Guide</u>
+                                        </b>
+                                    </a>{" "}
+                                    and understand the risks of providing
+                                    liquidity, including impermanent loss.
+                                </span>
+                            }
+                        />
+                    </div>
+                </OnboardTooltip>
+
                 <div className="w-full sm:w-1/3">
                     <Button
                         topLeftCorner
