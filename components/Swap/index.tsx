@@ -267,6 +267,9 @@ const Swap = () => {
             return;
         }
         setSwapping(true);
+        const minAmtOut = new BigNumber(
+            Math.floor(rawValueTo.multipliedBy(1 - slippage).toNumber())
+        );
         try {
             let tx: Transaction;
             if (pool.isMaiarPool) {
@@ -280,15 +283,7 @@ const Swap = () => {
                             Buffer.from("swapTokensFixedInput")
                         ),
                         new TokenIdentifierValue(Buffer.from(tokenTo.id)),
-                        new BigUIntValue(
-                            new BigNumber(
-                                Math.floor(
-                                    rawValueTo
-                                        .multipliedBy(1 - slippage)
-                                        .toNumber()
-                                )
-                            )
-                        ),
+                        new BigUIntValue(minAmtOut),
                     ],
                 });
             } else {
@@ -300,7 +295,7 @@ const Swap = () => {
                         new BigUIntValue(rawValueFrom),
                         new TokenIdentifierValue(Buffer.from("exchange")),
                         new TokenIdentifierValue(Buffer.from(tokenTo.id)),
-                        new BigUIntValue(new BigNumber(0)),
+                        new BigUIntValue(minAmtOut),
                     ],
                 });
             }

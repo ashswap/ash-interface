@@ -28,7 +28,7 @@ function TextAmt({
     return (
         <span translate="no" className={className}>
             <span>{intPart}</span>
-            <span className={`${applyDecimalStyle ? decimalClassName ?? "opacity-50" : ""}`}>
+            <span className={`${applyDecimalStyle ? decimalClassName ?? "opacity-70" : ""}`}>
                 {decimalPart ? "." + decimalPart : ""}
             </span>
         </span>

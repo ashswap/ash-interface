@@ -35,6 +35,8 @@ import {
     size,
     Dimensions,
     ElementRects,
+    detectOverflow,
+    hide,
 } from "@floating-ui/react-dom-interactions";
 import { Transition } from "@headlessui/react";
 import { theme } from "tailwind.config";
@@ -43,7 +45,7 @@ export type BaseTooltipProps = {
     open?: boolean;
     content:
         | JSX.Element
-        | ((args: { size?: Dimensions & ElementRects }) => void);
+        | ((args: { size?: Dimensions & ElementRects }) => JSX.Element);
     children: JSX.Element;
     placement?: Placement;
     strategy?: Strategy;
@@ -86,11 +88,13 @@ const BaseTooltip = (props: BaseTooltipProps) => {
     const [_open, _setOpen] = useState(false);
     const arrowRef = useRef(null);
     const [sizeState, setSizeState] = useState<Dimensions & ElementRects>();
+    const [isOverflow, setIsOverflow] = useState(false);
     const open = useMemo(() => {
+        if(isOverflow) return false;
         return Object.prototype.hasOwnProperty.call(props, "open")
             ? openProp
             : _open;
-    }, [openProp, _open, props]);
+    }, [openProp, _open, props, isOverflow]);
     const onOpenChange = useCallback(
         (val: boolean) => {
             _setOpen(val);
@@ -130,6 +134,7 @@ const BaseTooltip = (props: BaseTooltipProps) => {
                 ? autoPlacement()
                 : flip({ fallbackStrategy: "initialPlacement" }),
             shift({ padding: 8 }),
+            hide()
         ],
         strategy: strategyProp,
     });
@@ -148,11 +153,7 @@ const BaseTooltip = (props: BaseTooltipProps) => {
 
     useEffect(() => {
         if (refs.reference.current && refs.floating.current && open) {
-            return autoUpdate(
-                refs.reference.current,
-                refs.floating.current,
-                update
-            );
+            autoUpdate(refs.reference.current, refs.floating.current, update);
         }
     }, [refs.reference, refs.floating, update, open]);
     const { x: arrowX, y: arrowY, centerOffset } = middlewareData.arrow || {};
@@ -179,6 +180,7 @@ const BaseTooltip = (props: BaseTooltipProps) => {
                             top: y ?? "",
                             left: x ?? "",
                             zIndex: zIndex ?? theme.extend.zIndex.tooltip,
+                            visibility: middlewareData.hide?.referenceHidden ? "hidden" : "visible"
                         },
                     })}
                 >
@@ -212,11 +214,14 @@ const BaseTooltip = (props: BaseTooltipProps) => {
                             }}
                         >
                             {customArrow ? (
-                                typeof customArrow === "function" &&
-                                middlewareData?.arrow ? (
-                                    customArrow(
-                                        middlewareData.arrow,
-                                        staticSide as any
+                                typeof customArrow === "function" ? (
+                                    middlewareData?.arrow ? (
+                                        customArrow(
+                                            middlewareData.arrow,
+                                            staticSide as any
+                                        )
+                                    ) : (
+                                        <></>
                                     )
                                 ) : (
                                     customArrow

@@ -24,18 +24,22 @@ const ListPool = (props: Props) => {
         return poolToDisplay.filter((p) => !p.liquidityData);
     }, [poolToDisplay]);
 
+    const firstUnstakePoolIndex = useMemo(() => {
+        return poolToDisplay.findIndex(p => !p.liquidityData);
+    }, [poolToDisplay]);
+
     return (
         <div className={props.className}>
             {props.view === ViewType.Card ? (
                 <>
                     <div className={`${styles.containerCard}`}>
-                        {!stakedOnly && poolToDisplay.map((p) => {
+                        {!stakedOnly && poolToDisplay.map((p, i) => {
                             return (
                                 <div key={p.pool.address}>
                                     {!!p.liquidityData ? (
                                         <StakedPoolCardItem poolData={p} />
                                     ) : (
-                                        <PoolCardItem poolData={p} />
+                                        <PoolCardItem poolData={p} withTooltip={firstUnstakePoolIndex === i} />
                                     )}
                                 </div>
                             );

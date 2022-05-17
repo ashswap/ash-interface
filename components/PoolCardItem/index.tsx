@@ -11,11 +11,16 @@ import {
 import CardTooltip from "components/Tooltip/CardTooltip";
 import TextAmt from "components/TextAmt";
 import { formatAmount } from "helper/number";
+import OnboardTooltip from "components/Tooltip/OnboardTooltip";
+import { useOnboarding } from "hooks/useOnboarding";
+import { useScreenSize } from "hooks/useScreenSize";
 
 function PoolCardItem({
     poolData,
+    withTooltip,
 }: {
     poolData: Unarray<PoolsState["poolToDisplay"]>;
+    withTooltip?: boolean;
 }) {
     const { pool } = poolData;
     const [isExpand, setIsExpand] = useState<boolean>(false);
@@ -26,6 +31,9 @@ function PoolCardItem({
         apr_day: tradingAPR,
         usd_volume: volume24h,
     } = poolData.poolStats || {};
+    const screenSize = useScreenSize();
+    const [onboardingPoolDeposit, setOnboardedPoolDeposit] =
+        useOnboarding("pool_deposit");
     return (
         <div
             className={`bg-ash-dark-700 clip-corner-4 clip-corner-tr pt-8 pb-5 px-6 sm:px-11 text-white`}
@@ -67,16 +75,40 @@ function PoolCardItem({
                     </CardTooltip>
 
                     <div className="text-yellow-600 font-bold text-lg leading-tight">
-                        {formatAmount(tradingAPR || 0, {notation: "standard"})}%
+                        {formatAmount(tradingAPR || 0, {
+                            notation: "standard",
+                        })}
+                        %
                     </div>
                 </div>
             </div>
-            <button
-                className="w-full clip-corner-1 clip-corner-br bg-pink-600 h-14 text-sm font-bold text-white underline"
-                onClick={() => setOpenAddLiquidity(true)}
+            <OnboardTooltip
+                open={onboardingPoolDeposit && screenSize.md}
+                zIndex={10}
+                placement="left"
+                disabled={!withTooltip}
+                onArrowClick={() => setOnboardedPoolDeposit(true)}
+                content={
+                    <OnboardTooltip.Panel>
+                        <div className="p-3 max-w-[8rem] text-xs font-bold">
+                            <span className="text-stake-green-500">
+                                Deposit{" "}
+                            </span>
+                            <span>a pool to start your Farm & Earn</span>
+                        </div>
+                    </OnboardTooltip.Panel>
+                }
             >
-                Deposit
-            </button>
+                <button
+                    className="w-full clip-corner-1 clip-corner-br bg-pink-600 h-14 text-sm font-bold text-white underline"
+                    onClick={() => {
+                        setOpenAddLiquidity(true);
+                        setOnboardedPoolDeposit(true);
+                    }}
+                >
+                    Deposit
+                </button>
+            </OnboardTooltip>
 
             <div className="bg-bg my-4 text-text-input-3">
                 <div className="flex flex-row justify-between items-center h-12 px-4">
@@ -136,7 +168,10 @@ function PoolCardItem({
                                 </div>
                             </CardTooltip>
                             <div className="text-sm">
-                                {formatAmount(tradingAPR || 0, {notation: "standard"})}%
+                                {formatAmount(tradingAPR || 0, {
+                                    notation: "standard",
+                                })}
+                                %
                             </div>
                         </div>
                     </>
