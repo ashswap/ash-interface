@@ -49,13 +49,10 @@ function StakedPoolCardItem({
                         </div>
                         <div className="text-earn font-bold text-lg leading-tight">
                             <TextAmt
-                                number={
-                                    12345678 ||
-                                    toEGLDD(
-                                        pool.tokens[0].decimals,
-                                        value0 || 0
-                                    )
-                                }
+                                number={toEGLDD(
+                                    pool.tokens[0].decimals,
+                                    value0 || 0
+                                )}
                             />
                         </div>
                     </div>

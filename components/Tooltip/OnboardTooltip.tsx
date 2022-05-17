@@ -53,8 +53,17 @@ const Arrow = ({
 };
 type Props = Omit<BaseTooltipProps, "arrow"> & {
     onArrowClick?: () => void;
+    disabled?: boolean;
 };
-const OnboardTooltip = ({ onArrowClick, arrowStyle, ...props }: Props) => {
+const OnboardTooltip = ({
+    onArrowClick,
+    arrowStyle,
+    disabled,
+    ...props
+}: Props) => {
+    if (disabled) {
+        return <>{props.children}</>;
+    }
     return (
         <BaseTooltip
             {...props}
@@ -79,9 +88,11 @@ const OnboardTooltip = ({ onArrowClick, arrowStyle, ...props }: Props) => {
 const Panel = ({
     children,
     size,
+    className,
 }: {
     children: JSX.Element;
     size?: Dimensions & ElementRects;
+    className?: string;
 }) => {
     const screenSize = useScreenSize();
     return (
@@ -92,6 +103,7 @@ const Panel = ({
                     : "drop-shadow(0px 4px 50px rgba(0, 0, 0, 0.5))",
                 maxWidth: size?.width,
             }}
+            className={className}
         >
             <div className="clip-corner-4 clip-corner-bl bg-ash-dark-600 p-[1px] max-w-full sm:max-w-[23rem] backdrop-blur-[30px]">
                 <div className="clip-corner-4 clip-corner-bl bg-ash-dark-400 p-4">
