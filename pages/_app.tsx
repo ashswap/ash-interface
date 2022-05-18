@@ -30,14 +30,18 @@ const ProductionErrorBoundary =
     process.env.NODE_ENV === "production" ? ErrorBoundary : Fragment;
 // const ProductionErrorBoundary = ErrorBoundary;
 const GlobalHooks = () => {
-    const {failedTransactionsArray} = transactionServices.useGetFailedTransactions();
-    const {successfulTransactionsArray} = transactionServices.useGetSuccessfulTransactions();
-    const {fetchBalances} = useWallet();
+    const { failedTransactionsArray } =
+        transactionServices.useGetFailedTransactions();
+    const { successfulTransactionsArray } =
+        transactionServices.useGetSuccessfulTransactions();
+    const { fetchBalances } = useWallet();
     const txsCount = useMemo(() => {
-        return failedTransactionsArray.length + successfulTransactionsArray.length;
+        return (
+            failedTransactionsArray.length + successfulTransactionsArray.length
+        );
     }, [failedTransactionsArray.length, successfulTransactionsArray.length]);
     useEffect(() => {
-        if(txsCount > 0){
+        if (txsCount > 0) {
             fetchBalances();
         }
     }, [txsCount, fetchBalances]);
@@ -96,23 +100,25 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
                 customNetworkConfig={DAPP_CONFIG}
                 // completedTransactionsDelay={500}
             >
-                <WalletProvider>
-                    <ContractsProvider>
-                        <GlobalHooks />
-                        <ProductionErrorBoundary>
-                            {/* <Component {...pageProps} /> */}
-                            {getLayout(<Component {...pageProps} />)}
-                            <ConnectWalletModal />
-                            <div className="fixed bottom-24 left-6 right-6 sm:bottom-12 sm:left-auto sm:right-12 z-toast flex flex-col items-end sm:max-w-[480px] space-y-2 sm:space-y-4">
-                                <SignTxNotification />
-                                <SignTxsModal />
-                                <div className="absolute top-0 right-0 -translate-y-full pb-4 sm:pb-8">
-                                    <TxsToastList />
-                                </div>
-                            </div>
-                        </ProductionErrorBoundary>
-                    </ContractsProvider>
-                </WalletProvider>
+                <>
+                    <WalletProvider>
+                        <ContractsProvider>
+                            <GlobalHooks />
+                            <ProductionErrorBoundary>
+                                {/* <Component {...pageProps} /> */}
+                                {getLayout(<Component {...pageProps} />)}
+                                <ConnectWalletModal />
+                            </ProductionErrorBoundary>
+                        </ContractsProvider>
+                    </WalletProvider>
+                    <div className="fixed bottom-24 left-6 right-6 sm:bottom-12 sm:left-auto sm:right-12 z-toast flex flex-col items-end sm:max-w-[480px] space-y-2 sm:space-y-4">
+                        <SignTxNotification />
+                        <SignTxsModal />
+                        <div className="absolute top-0 right-0 -translate-y-full pb-4 sm:pb-8">
+                            <TxsToastList />
+                        </div>
+                    </div>
+                </>
             </DappProvider>
         </>
     );
