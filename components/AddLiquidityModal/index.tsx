@@ -1,6 +1,5 @@
 import {
     getProxyProvider,
-    sendTransactions,
     useGetAccountInfo,
     useGetLoginInfo,
 } from "@elrondnetwork/dapp-core";
@@ -24,7 +23,10 @@ import { PoolsState } from "context/pools";
 import { useWallet } from "context/wallet";
 import { toEGLD, toEGLDD, toWei } from "helper/balance";
 import { queryPoolContract } from "helper/contracts/pool";
-import { useCreateTransaction } from "helper/transactionMethods";
+import {
+    sendTransactions,
+    useCreateTransaction,
+} from "helper/transactionMethods";
 import { useOnboarding } from "hooks/useOnboarding";
 import { useScreenSize } from "hooks/useScreenSize";
 import { DappSendTransactionsPropsType } from "interface/dappCore";
@@ -469,9 +471,14 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
 
             <div className="sm:flex gap-8">
                 <OnboardTooltip
-                    open={onboardingPoolCheck && !onboardingDepositInput && screenSize.md}
+                    open={
+                        onboardingPoolCheck &&
+                        !onboardingDepositInput &&
+                        screenSize.md
+                    }
                     placement="bottom-start"
-                    onArrowClick={() => setOnboardedPoolCheck(true)}arrowStyle={() => ({left: 0})}
+                    onArrowClick={() => setOnboardedPoolCheck(true)}
+                    arrowStyle={() => ({ left: 0 })}
                     content={({ size }) => (
                         <OnboardTooltip.Panel size={size} className="w-36">
                             <div className="p-3 text-xs font-bold">

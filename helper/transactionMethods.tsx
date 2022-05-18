@@ -1,6 +1,8 @@
 import {
     AccountInfoSliceNetworkType,
+    getAccountProvider,
     getProxyProvider,
+    transactionServices,
     useGetAccountInfo,
     useGetLoginInfo,
     useGetNetworkConfig
@@ -9,8 +11,9 @@ import {
     Address,
     CallArguments,
     ChainID,
+    ExtensionProvider,
     GasLimit,
-    GasPrice,
+    GasPrice, IDappProvider,
     Nonce,
     ProxyProvider,
     SmartContract,
@@ -21,6 +24,7 @@ import {
     gasPrice,
     maxGasLimit
 } from "const/dappConfig";
+import { DappSendTransactionsPropsType } from "interface/dappCore";
 const emptyTx = new Transaction({
     nonce: new Nonce(0),
     receiver: new Address(),
@@ -58,3 +62,10 @@ export const useCreateTransaction = () => {
         return tx;
     };
 };
+export const sendTransactions = async (payload: DappSendTransactionsPropsType) => {
+    const accProvider: IDappProvider = getAccountProvider();
+    if(accProvider instanceof ExtensionProvider){
+        await ExtensionProvider.getInstance()?.cancelAction?.();
+    }
+    return await transactionServices.sendTransactions(payload);
+}
