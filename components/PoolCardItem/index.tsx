@@ -99,15 +99,17 @@ function PoolCardItem({
                     </OnboardTooltip.Panel>
                 }
             >
-                <button
-                    className="w-full clip-corner-1 clip-corner-br bg-pink-600 h-14 text-sm font-bold text-white underline"
-                    onClick={() => {
-                        setOpenAddLiquidity(true);
-                        setOnboardedPoolDeposit(true);
-                    }}
-                >
-                    Deposit
-                </button>
+                <div>
+                    <button
+                        className="w-full clip-corner-1 clip-corner-br bg-pink-600 h-14 text-sm font-bold text-white underline"
+                        onClick={() => {
+                            setOpenAddLiquidity(true);
+                            setOnboardedPoolDeposit(true);
+                        }}
+                    >
+                        Deposit
+                    </button>
+                </div>
             </OnboardTooltip>
 
             <div className="bg-bg my-4 text-text-input-3">

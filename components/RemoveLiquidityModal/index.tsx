@@ -1,4 +1,4 @@
-import { getProxyProvider, sendTransactions } from "@elrondnetwork/dapp-core";
+import { getProxyProvider } from "@elrondnetwork/dapp-core";
 import {
     Address,
     ArgSerializer,
@@ -25,7 +25,7 @@ import { PoolsState } from "context/pools";
 import { useSwap } from "context/swap";
 import { useWallet } from "context/wallet";
 import { toEGLD, toEGLDD, toWei } from "helper/balance";
-import { useCreateTransaction } from "helper/transactionMethods";
+import { sendTransactions, useCreateTransaction } from "helper/transactionMethods";
 import { useOnboarding } from "hooks/useOnboarding";
 import { useScreenSize } from "hooks/useScreenSize";
 import { DappSendTransactionsPropsType } from "interface/dappCore";
@@ -375,8 +375,7 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
                                     <TextAmt
                                         number={toEGLDD(
                                             pool.tokens[0].decimals,
-                                            balances[pool.tokens[0].id]
-                                                ?.balance || 0
+                                            liquidityData?.value0 || 0
                                         )}
                                         options={{ notation: "standard" }}
                                     />{" "}
@@ -404,8 +403,7 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
                                     <TextAmt
                                         number={toEGLDD(
                                             pool.tokens[1].decimals,
-                                            balances[pool.tokens[1].id]
-                                                ?.balance || 0
+                                            liquidityData?.value1 || 0
                                         )}
                                         options={{ notation: "standard" }}
                                     />{" "}

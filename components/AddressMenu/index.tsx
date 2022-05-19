@@ -5,7 +5,7 @@ import {
 } from "@elrondnetwork/dapp-core";
 import ImgAvatar from "assets/images/avatar.png";
 import IconChange from "assets/svg/change.svg";
-import ICChevronDown from "assets/svg/chevron-down.svg";
+import ICChevronUp from "assets/svg/chevron-up.svg";
 import IconCopy from "assets/svg/copy.svg";
 import IconDisconnect from "assets/svg/disconnect.svg";
 import BaseModal from "components/BaseModal";
@@ -118,7 +118,7 @@ function AddressMenu({ infoLayout, dropdownBtn, connectBtn }: AddressMenuProp) {
                                                     address.slice(-8)}
                                             </span>
                                         </div>
-                                        <ICChevronDown />
+                                        <ICChevronUp />
                                     </button>
                                     <WalletBalance />
                                     <div className="mt-5">
@@ -176,7 +176,7 @@ function AddressMenu({ infoLayout, dropdownBtn, connectBtn }: AddressMenuProp) {
                         <div className="text-lg font-bold mb-7">
                             Wallet actions
                         </div>
-                        <WalletBalance/>
+                        <WalletBalance />
                         <div className="text-sm">
                             <button
                                 className="bg-bg rounded-lg px-6 h-12 flex items-center w-full mt-4 text-xs"

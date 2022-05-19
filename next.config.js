@@ -14,7 +14,10 @@ const moduleExports = withReactSvg(
             defaultLocale: "en",
         },
         async redirects() {
-            return [];
+            return [
+                { source: "/stake", destination: "/", permanent: false },
+                { source: "/stake/mint", destination: "/", permanent: false },
+            ];
         },
     })
 );

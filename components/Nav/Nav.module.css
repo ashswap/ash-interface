@@ -22,3 +22,7 @@
     @apply bg-ash-dark-600 text-white;
     cursor: default;
 }
+
+.stakeMenuItem:hover {
+    box-shadow: 0px 4px 50px rgba(69, 71, 101, 0.5);
+}

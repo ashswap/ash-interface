@@ -1181,9 +1181,9 @@
     assert "^2.0.0"
     perf_hooks "0.0.1"
 
-"@elrondnetwork/dapp-core@https://github.com/ashswap/dapp-core#c162190d15a49b7f5614eadc8abc41c1c8a072cb":
+"@elrondnetwork/dapp-core@https://github.com/ashswap/dapp-core#20d83034dae3c8a3a37e40904547356fd05a97f8":
   version "1.1.17"
-  resolved "https://github.com/ashswap/dapp-core#c162190d15a49b7f5614eadc8abc41c1c8a072cb"
+  resolved "https://github.com/ashswap/dapp-core#20d83034dae3c8a3a37e40904547356fd05a97f8"
   dependencies:
     "@elrondnetwork/erdjs" "9.1.0"
     "@reduxjs/toolkit" "1.6.2"

@@ -1,5 +1,5 @@
 import {
-    sendTransactions,
+    
     transactionServices,
     useGetAccountInfo,
     useGetLoginInfo,
@@ -38,7 +38,7 @@ import { toEGLD, toEGLDD, toWei } from "helper/balance";
 import { cancellablePromise } from "helper/cancellablePromise";
 import { queryPoolContract } from "helper/contracts/pool";
 import { formatAmount } from "helper/number";
-import { useCreateTransaction } from "helper/transactionMethods";
+import { sendTransactions, useCreateTransaction } from "helper/transactionMethods";
 import useMounted from "hooks/useMounted";
 import { useOnboarding } from "hooks/useOnboarding";
 import { useScreenSize } from "hooks/useScreenSize";
