@@ -1,5 +1,7 @@
 import {
-    LoginMethodsEnum, useGetLoginInfo, useSignTransactions
+    LoginMethodsEnum,
+    useGetLoginInfo,
+    useSignTransactions,
 } from "@elrondnetwork/dapp-core";
 import { Transition } from "@headlessui/react";
 import React, { Fragment, useMemo } from "react";
@@ -46,7 +48,6 @@ function SignTxsModal() {
                     </div>
                 </div>
             </Transition>
-
         </>
     );
 }

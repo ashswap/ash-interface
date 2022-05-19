@@ -1,4 +1,4 @@
-import { getProxyProvider, sendTransactions } from "@elrondnetwork/dapp-core";
+import { getProxyProvider } from "@elrondnetwork/dapp-core";
 import {
     Address,
     ArgSerializer,
@@ -25,7 +25,7 @@ import { PoolsState } from "context/pools";
 import { useSwap } from "context/swap";
 import { useWallet } from "context/wallet";
 import { toEGLD, toEGLDD, toWei } from "helper/balance";
-import { useCreateTransaction } from "helper/transactionMethods";
+import { sendTransactions, useCreateTransaction } from "helper/transactionMethods";
 import { useOnboarding } from "hooks/useOnboarding";
 import { useScreenSize } from "hooks/useScreenSize";
 import { DappSendTransactionsPropsType } from "interface/dappCore";

@@ -2,10 +2,11 @@ import {
     AccountInfoSliceNetworkType,
     getApiProvider,
     getProxyProvider,
-    sendTransactions,
     useGetAccountInfo,
     useGetLoginInfo,
-    useGetNetworkConfig, useGetPendingTransactions, useGetSignedTransactions
+    useGetNetworkConfig,
+    useGetPendingTransactions,
+    useGetSignedTransactions,
 } from "@elrondnetwork/dapp-core";
 import { SendTransactionReturnType } from "@elrondnetwork/dapp-core/dist/services/transactions";
 import {
@@ -15,12 +16,13 @@ import {
     BigUIntValue,
     BytesValue,
     ContractFunction,
+    ExtensionProvider,
     GasLimit,
     ProxyProvider,
     Query,
     TokenIdentifierValue,
     Transaction,
-    TypedValue
+    TypedValue,
 } from "@elrondnetwork/erdjs/out";
 import BigNumber from "bignumber.js";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
@@ -32,7 +34,10 @@ import useContracts from "context/contracts";
 import { useWallet } from "context/wallet";
 import { toEGLD, toEGLDD } from "helper/balance";
 import { fetcher } from "helper/common";
-import { useCreateTransaction } from "helper/transactionMethods";
+import {
+    sendTransactions,
+    useCreateTransaction,
+} from "helper/transactionMethods";
 import { DappSendTransactionsPropsType } from "interface/dappCore";
 import { IFarm } from "interface/farm";
 import IPool from "interface/pool";
@@ -45,7 +50,7 @@ import {
     useContext,
     useEffect,
     useMemo,
-    useState
+    useState,
 } from "react";
 import useSWR from "swr";
 import { useDebounce } from "use-debounce";
@@ -261,10 +266,7 @@ const FarmsProvider = ({ children }: any) => {
                     func: new ContractFunction(
                         "calculateRewardsForGivenPosition"
                     ),
-                    args: [
-                        new BigUIntValue(amt),
-                        new BytesValue(attributes),
-                    ],
+                    args: [new BigUIntValue(amt), new BytesValue(attributes)],
                 })
             );
             return new BigNumber(
