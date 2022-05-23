@@ -1,3 +1,4 @@
+import { transactionServices } from "@elrondnetwork/dapp-core";
 import ImgLPGem from "assets/images/lp-gem.png";
 import ImgMintGem from "assets/images/mint-gem.png";
 import ImgVoteGem from "assets/images/vote-gem.png";
@@ -6,13 +7,17 @@ import ICStakeGov from "assets/svg/stake-gov.svg";
 import ICStakeLP from "assets/svg/stake-lp.svg";
 import ICStakeMintAoc from "assets/svg/stake-mint-aoc.svg";
 import ICStake from "assets/svg/stake.svg";
+import { addLPSessionIdAtom } from "atoms/addLiquidity";
 import BaseModal from "components/BaseModal";
 import BaseTooltip from "components/BaseTooltip";
+import OnboardTooltip from "components/Tooltip/OnboardTooltip";
+import { useOnboarding } from "hooks/useOnboarding";
 import { useScreenSize } from "hooks/useScreenSize";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
+import { useRecoilValue } from "recoil";
 import styles from "./Nav.module.css";
 const SOCIALS = [
     {
@@ -41,6 +46,14 @@ function StakeMenu() {
     const { isMobile } = useScreenSize();
     const [openTooltip, setOpenTooltip] = useState(false);
     const router = useRouter();
+    const addLPSessionId = useRecoilValue(addLPSessionIdAtom);
+    const { isSuccessful } =
+        transactionServices.useTrackTransactionStatus({
+            transactionId: addLPSessionId,
+        });
+    const [onboaringFarmFromAddedLp, setOnboardedFarmFromAddedLp] =
+        useOnboarding("pool_farm_from_added_lp");
+
     useEffect(() => {
         setOpenTooltip(false);
     }, [router.route]);
@@ -49,7 +62,10 @@ function StakeMenu() {
             <div>
                 <BaseTooltip
                     placement="bottom"
-                    open={openTooltip}
+                    open={
+                        openTooltip &&
+                        (!isSuccessful || !onboaringFarmFromAddedLp)
+                    }
                     onOpenChange={(val) => setOpenTooltip(val)}
                     content={
                         <div className="grid grid-cols-3 w-screen max-w-5xl gap-1">
@@ -248,13 +264,45 @@ function StakeMenu() {
                         </div>
                     }
                 >
-                    <button className={`${styles.btn} outline-none`}>
-                        <ICStake className="inline-block w-4 h-4 md:mr-2 transition-none" />
-                        <div className="flex items-center">
-                            <span className="truncate">Stake</span>
-                            <ICChevronDown className="inline w-2 ml-1 transition-none" />
-                        </div>
-                    </button>
+                    <div>
+                        <OnboardTooltip
+                            open={onboaringFarmFromAddedLp && isSuccessful}
+                            placement="bottom-start"
+                            zIndex={10}
+                            onArrowClick={() =>
+                                setOnboardedFarmFromAddedLp(true)
+                            }
+                            content={
+                                <OnboardTooltip.Panel>
+                                    <div className="text-white text-xs font-bold p-3 max-w-[16rem]">
+                                        <span>
+                                            After you add liquidity you can{" "}
+                                        </span>
+                                        <span className="text-stake-green-500">
+                                            stake{" "}
+                                        </span>
+                                        <span>your LP tokens in a </span>
+                                        <span className="text-ash-cyan-500">
+                                            [LP-Stake farm]{" "}
+                                        </span>
+                                        <span>to earn more rewards!</span>
+                                    </div>
+                                </OnboardTooltip.Panel>
+                            }
+                        >
+                            <div>
+                                <button
+                                    className={`${styles.btn} outline-none`}
+                                >
+                                    <ICStake className="inline-block w-4 h-4 md:mr-2 transition-none" />
+                                    <div className="flex items-center">
+                                        <span className="truncate">Stake</span>
+                                        <ICChevronDown className="inline w-2 ml-1 transition-none" />
+                                    </div>
+                                </button>
+                            </div>
+                        </OnboardTooltip>
+                    </div>
                 </BaseTooltip>
             </div>
         );
