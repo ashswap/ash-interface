@@ -19,6 +19,7 @@ type UserOnboardingStatus = {
     pool_deposit_checkbox?: boolean;
     pool_withdraw_input?: boolean;
     pool_withdraw_estimate?: boolean;
+    pool_farm_from_added_lp?: boolean;
 };
 export const useOnboarding = (key: keyof UserOnboardingStatus) => {
     const [state, setState] = useState<boolean>(false);

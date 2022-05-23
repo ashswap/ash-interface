@@ -1,5 +1,6 @@
 import {
     getProxyProvider,
+    transactionServices,
     useGetAccountInfo,
     useGetLoginInfo,
 } from "@elrondnetwork/dapp-core";
@@ -12,6 +13,7 @@ import {
     TokenIdentifierValue,
 } from "@elrondnetwork/erdjs";
 import IconRight from "assets/svg/right-white.svg";
+import { addLPSessionIdAtom } from "atoms/addLiquidity";
 import BigNumber from "bignumber.js";
 import BaseModal from "components/BaseModal";
 import Button from "components/Button";
@@ -35,6 +37,7 @@ import { Unarray } from "interface/utilities";
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useSetRecoilState } from "recoil";
 import { theme } from "tailwind.config";
 import { useDebounce } from "use-debounce";
 
@@ -147,6 +150,8 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
     const [onboardingPoolCheck, setOnboardedPoolCheck] = useOnboarding(
         "pool_deposit_checkbox"
     );
+
+    const setAddLPSessionId = useSetRecoilState(addLPSessionIdAtom);
     const screenSize = useScreenSize();
     // reset when open modal
     useEffect(() => {
@@ -240,24 +245,14 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
                 },
             };
             sessionId = (await sendTransactions(payload)).sessionId || "";
-            fetchBalances();
+            setAddLPSessionId(sessionId);
         } catch (error) {
             // TODO: extension close without response
             console.log(error);
         }
         setAdding(false);
         if (sessionId) onClose?.();
-    }, [
-        value0,
-        value1,
-        pool,
-        onClose,
-        fetchBalances,
-        adding,
-        address,
-        loggedIn,
-        createTx,
-    ]);
+    }, [value0, value1, pool, onClose, adding, address, loggedIn, createTx, setAddLPSessionId]);
 
     const balance0 = useMemo(() => {
         return (
