@@ -1,8 +1,8 @@
 import IconDown from "assets/svg/down-white.svg";
+import { PoolsState } from "atoms/poolsState";
 import AddLiquidityModal from "components/AddLiquidityModal";
 import BaseModal from "components/BaseModal";
 import Button from "components/Button";
-import { PoolsState } from "context/pools";
 import usePoolDataFormat from "hooks/usePoolDataFormat";
 import { useScreenSize } from "hooks/useScreenSize";
 import { Unarray } from "interface/utilities";

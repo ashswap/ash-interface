@@ -1,4 +1,6 @@
 import ICChevronRight from "assets/svg/chevron-right.svg";
+import { accIsInsufficientEGLDState } from "atoms/dappState";
+import { walletBalanceState } from "atoms/walletState";
 import BigNumber from "bignumber.js";
 import BaseModal from "components/BaseModal";
 import Checkbox from "components/Checkbox";
@@ -7,13 +9,13 @@ import TextAmt from "components/TextAmt";
 import { blockTimeMs } from "const/dappConfig";
 import { ASH_TOKEN } from "const/tokens";
 import { FarmsState, useFarms } from "context/farms";
-import { useWallet } from "context/wallet";
 import { toEGLDD, toWei } from "helper/balance";
 import { formatAmount } from "helper/number";
 import { useScreenSize } from "hooks/useScreenSize";
 import { Unarray } from "interface/utilities";
 import Image from "next/image";
 import React, { useCallback, useMemo, useState } from "react";
+import { useRecoilValue } from "recoil";
 type props = {
     open: boolean;
     onClose: () => void;
@@ -24,7 +26,8 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
         farmData;
     const [token0, token1] = pool.tokens;
     const [isAgree, setIsAgree] = useState(false);
-    const { balances, insufficientEGLD } = useWallet();
+    const balances = useRecoilValue(walletBalanceState);
+    const insufficientEGLD = useRecoilValue(accIsInsufficientEGLDState);
     const [stakeAmt, setStakeAmt] = useState<BigNumber>(new BigNumber(0));
     const [rawStakeAmt, setRawStakeAmt] = useState("");
     const { enterFarm } = useFarms();

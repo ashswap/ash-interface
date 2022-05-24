@@ -1,4 +1,4 @@
-import { DappProvider, transactionServices } from "@elrondnetwork/dapp-core";
+import { DappProvider } from "@elrondnetwork/dapp-core";
 import ConnectWalletModal from "components/ConnectWalletModal";
 import ErrorBoundary from "components/ErrorBoundary";
 import SignTxNotification from "components/SignTxNotification";
@@ -7,7 +7,8 @@ import TxsToastList from "components/TxsToastList";
 import { DAPP_CONFIG } from "const/dappConfig";
 import { ENVIRONMENT } from "const/env";
 import { ContractsProvider } from "context/contracts";
-import { useWallet, WalletProvider } from "context/wallet";
+import { useRecoilAdapter } from "hooks/useRecoilAdapter";
+import { useRefreshAfterTxCompleted } from "hooks/useRefreshAfterTxCompleted";
 import useSentryUser from "hooks/useSentryUser";
 import { NextPage } from "next";
 import { NextSeo } from "next-seo";
@@ -15,7 +16,7 @@ import { AppProps } from "next/app";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import Script from "next/script";
-import { Fragment, ReactElement, ReactNode, useEffect, useMemo } from "react";
+import { Fragment, ReactElement, ReactNode, useEffect } from "react";
 import { RecoilRoot } from "recoil";
 import * as gtag from "../helper/gtag";
 import "../styles/globals.css";
@@ -31,22 +32,10 @@ const ProductionErrorBoundary =
     process.env.NODE_ENV === "production" ? ErrorBoundary : Fragment;
 // const ProductionErrorBoundary = ErrorBoundary;
 const GlobalHooks = () => {
-    const { failedTransactionsArray } =
-        transactionServices.useGetFailedTransactions();
-    const { successfulTransactionsArray } =
-        transactionServices.useGetSuccessfulTransactions();
-    const { fetchBalances } = useWallet();
-    const txsCount = useMemo(() => {
-        return (
-            failedTransactionsArray.length + successfulTransactionsArray.length
-        );
-    }, [failedTransactionsArray.length, successfulTransactionsArray.length]);
-    useEffect(() => {
-        if (txsCount > 0) {
-            fetchBalances();
-        }
-    }, [txsCount, fetchBalances]);
+    // setup recoil
+    useRecoilAdapter();
     useSentryUser();
+    useRefreshAfterTxCompleted();
     return null;
 };
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
@@ -103,16 +92,14 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
                     // completedTransactionsDelay={500}
                 >
                     <>
-                        <WalletProvider>
-                            <ContractsProvider>
-                                <GlobalHooks />
-                                <ProductionErrorBoundary>
-                                    {/* <Component {...pageProps} /> */}
-                                    {getLayout(<Component {...pageProps} />)}
-                                    <ConnectWalletModal />
-                                </ProductionErrorBoundary>
-                            </ContractsProvider>
-                        </WalletProvider>
+                        <ContractsProvider>
+                            <GlobalHooks />
+                            <ProductionErrorBoundary>
+                                {/* <Component {...pageProps} /> */}
+                                {getLayout(<Component {...pageProps} />)}
+                                <ConnectWalletModal />
+                            </ProductionErrorBoundary>
+                        </ContractsProvider>
                         <div className="fixed bottom-24 left-6 right-6 sm:bottom-12 sm:left-auto sm:right-12 z-toast flex flex-col items-end sm:max-w-[480px] space-y-2 sm:space-y-4">
                             <SignTxNotification />
                             <SignTxsModal />

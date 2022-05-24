@@ -2,14 +2,15 @@ import { Slider } from "antd";
 import ImgUsdt from "assets/images/usdt-icon.png";
 import ICChevronDown from "assets/svg/chevron-down.svg";
 import ICChevronRight from "assets/svg/chevron-right.svg";
+import { accIsInsufficientEGLDState } from "atoms/dappState";
 import BaseModal from "components/BaseModal";
 import BasePopover from "components/BasePopover";
 import Checkbox from "components/Checkbox";
 import InputCurrency from "components/InputCurrency";
-import { useWallet } from "context/wallet";
 import { useScreenSize } from "hooks/useScreenSize";
 import Image from "next/image";
 import React, { useState } from "react";
+import { useRecoilValue } from "recoil";
 import { theme } from "tailwind.config";
 type props = {
     open: boolean;
@@ -18,7 +19,7 @@ type props = {
 function MintAOCModal({ open, onClose }: props) {
     const [feePct, setFeePct] = useState(0);
     const [isAgree, setIsAgree] = useState(false);
-    const { insufficientEGLD } = useWallet();
+    const insufficientEGLD = useRecoilValue(accIsInsufficientEGLDState);
     const screenSize = useScreenSize();
     return (
         <BaseModal

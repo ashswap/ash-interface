@@ -10,10 +10,13 @@ import {
     Query,
     TokenIdentifierValue,
     TypeExpressionParser,
-    TypeMapper,
+    TypeMapper
 } from "@elrondnetwork/erdjs";
 import { Slider } from "antd";
 import IconRight from "assets/svg/right-yellow.svg";
+import { accIsInsufficientEGLDState } from "atoms/dappState";
+import { PoolsState } from "atoms/poolsState";
+import { walletLPMapState } from "atoms/walletState";
 import BigNumber from "bignumber.js";
 import BaseModal from "components/BaseModal";
 import Button from "components/Button";
@@ -21,17 +24,17 @@ import InputCurrency from "components/InputCurrency";
 import TextAmt from "components/TextAmt";
 import Token from "components/Token";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
-import { PoolsState } from "context/pools";
 import { useSwap } from "context/swap";
-import { useWallet } from "context/wallet";
 import { toEGLD, toEGLDD, toWei } from "helper/balance";
 import { sendTransactions, useCreateTransaction } from "helper/transactionMethods";
+import { useFetchBalances } from "hooks/useFetchBalances";
 import { useOnboarding } from "hooks/useOnboarding";
 import { useScreenSize } from "hooks/useScreenSize";
 import { DappSendTransactionsPropsType } from "interface/dappCore";
 import { Unarray } from "interface/utilities";
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useRecoilValue } from "recoil";
 import { theme } from "tailwind.config";
 import { useDebounce } from "use-debounce";
 import styles from "./RemoveLiquidityModal.module.css";
@@ -52,7 +55,9 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
     const [value1, setValue1] = useState<string>("");
     const [liquidityDebounce] = useDebounce(liquidity, 500);
     const screenSize = useScreenSize();
-    const { fetchBalances, balances, lpTokens, insufficientEGLD } = useWallet();
+    const fetchBalances = useFetchBalances();
+    const lpTokens = useRecoilValue(walletLPMapState);
+    const insufficientEGLD = useRecoilValue(accIsInsufficientEGLDState);
     const createTx = useCreateTransaction();
     const { slippage } = useSwap();
     const [displayInputLiquidity, setDisplayInputLiquidity] =

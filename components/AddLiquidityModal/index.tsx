@@ -1,8 +1,6 @@
 import {
-    getProxyProvider,
-    transactionServices,
-    useGetAccountInfo,
-    useGetLoginInfo,
+    getProxyProvider, useGetAccountInfo,
+    useGetLoginInfo
 } from "@elrondnetwork/dapp-core";
 import {
     Address,
@@ -10,10 +8,12 @@ import {
     BigUIntValue,
     ContractFunction,
     GasLimit,
-    TokenIdentifierValue,
+    TokenIdentifierValue
 } from "@elrondnetwork/erdjs";
 import IconRight from "assets/svg/right-white.svg";
 import { addLPSessionIdAtom } from "atoms/addLiquidity";
+import { PoolsState } from "atoms/poolsState";
+import { walletBalanceState, walletTokenPriceState } from "atoms/walletState";
 import BigNumber from "bignumber.js";
 import BaseModal from "components/BaseModal";
 import Button from "components/Button";
@@ -21,13 +21,10 @@ import Checkbox from "components/Checkbox";
 import InputCurrency from "components/InputCurrency";
 import TextAmt from "components/TextAmt";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
-import { PoolsState } from "context/pools";
-import { useWallet } from "context/wallet";
-import { toEGLD, toEGLDD, toWei } from "helper/balance";
-import { queryPoolContract } from "helper/contracts/pool";
+import { toEGLDD, toWei } from "helper/balance";
 import {
     sendTransactions,
-    useCreateTransaction,
+    useCreateTransaction
 } from "helper/transactionMethods";
 import { useOnboarding } from "hooks/useOnboarding";
 import { useScreenSize } from "hooks/useScreenSize";
@@ -37,7 +34,7 @@ import { Unarray } from "interface/utilities";
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useSetRecoilState } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import { theme } from "tailwind.config";
 import { useDebounce } from "use-debounce";
 
@@ -140,7 +137,10 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
     const [isProMode, setIsProMode] = useState(false);
     const [adding, setAdding] = useState(false);
     const createTx = useCreateTransaction();
-    const { fetchBalances, balances, tokenPrices } = useWallet();
+    // recoil
+    const balances = useRecoilValue(walletBalanceState);
+    const tokenPrices = useRecoilValue(walletTokenPriceState);
+    // end recoil
     const { isLoggedIn: loggedIn } = useGetLoginInfo();
     const { address, account } = useGetAccountInfo();
     const proxy = getProxyProvider();

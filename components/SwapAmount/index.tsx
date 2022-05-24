@@ -1,3 +1,4 @@
+import { walletBalanceState } from "atoms/walletState";
 import BigNumber from "bignumber.js";
 import InputCurrency from "components/InputCurrency";
 import QuickSelect from "components/QuickSelect";
@@ -5,13 +6,13 @@ import TokenSelect from "components/TokenSelect";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
 import pools from "const/pool";
 import { useSwap } from "context/swap";
-import { useWallet } from "context/wallet";
 import { toEGLDD } from "helper/balance";
 import { formatAmount } from "helper/number";
 import { useOnboarding } from "hooks/useOnboarding";
 import { useScreenSize } from "hooks/useScreenSize";
 import { IToken } from "interface/token";
 import { useEffect, useMemo, useRef } from "react";
+import { useRecoilValue } from "recoil";
 import { theme } from "tailwind.config";
 import styles from "./SwapAmount.module.css";
 
@@ -27,7 +28,7 @@ interface Props {
 
 const SwapAmount = (props: Props) => {
     const inputRef = useRef<HTMLInputElement>(null);
-    const { balances } = useWallet();
+    const balances = useRecoilValue(walletBalanceState);
     const {
         isInsufficentFund,
         setInsufficentFund,

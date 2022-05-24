@@ -1,23 +1,14 @@
-import { getProxyProvider, useGetAccountInfo, useSignTransactions } from "@elrondnetwork/dapp-core";
+import { getProxyProvider } from "@elrondnetwork/dapp-core";
 import {
-    Address,
-    ContractFunction,
-    Query,
-    BigUIntValue,
-    CallArguments,
-    TransactionHash,
-    ProxyProvider,
-    IProvider,
+    Address, BigUIntValue, ContractFunction, ProxyProvider, Query, TransactionHash
 } from "@elrondnetwork/erdjs";
+import { walletTokenPriceState } from "atoms/walletState";
 import BigNumber from "bignumber.js";
-import { useWallet } from "context/wallet";
 import { toEGLDD } from "helper/balance";
 import { queryContractParser } from "helper/serializer";
-import {
-    useCreateTransaction,
-} from "helper/transactionMethods";
 import IPool from "interface/pool";
 import { createContext, useCallback, useContext } from "react";
+import { useRecoilValue } from "recoil";
 import { ContractsState, initContractsState } from "./state";
 
 const emptyTxHash = new TransactionHash("");
@@ -32,7 +23,7 @@ const useContracts = () => {
 
 export const ContractsProvider = ({ children }: any) => {
     const proxy: ProxyProvider = getProxyProvider();
-    const { tokenPrices } = useWallet();
+    const tokenPrices = useRecoilValue(walletTokenPriceState);
     const getTokenInLP = useCallback(
         (ownLiquidity: BigNumber, poolAddress: string) => {
             return proxy

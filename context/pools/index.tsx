@@ -1,8 +1,8 @@
+import { walletBalanceState, walletLPMapState } from "atoms/walletState";
 import BigNumber from "bignumber.js";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 import pools from "const/pool";
 import useContracts from "context/contracts";
-import { useWallet } from "context/wallet";
 import { toEGLD } from "helper/balance";
 import { fetcher } from "helper/common";
 import IPool from "interface/pool";
@@ -15,8 +15,9 @@ import {
     useContext,
     useEffect,
     useMemo,
-    useState,
+    useState
 } from "react";
+import { useRecoilValue } from "recoil";
 import useSWR from "swr";
 import { useDebounce } from "use-debounce";
 const emptyFunc = () => {};
@@ -73,9 +74,9 @@ const PoolsProvider = ({ children }: any) => {
     const [deboundKeyword] = useDebounce(keyword, 500);
     const [stakedOnly, setStakedOnly] = useState(false);
     const [inactive, setInactive] = useState(false);
-    const { balances } = useWallet();
     const { getTokenInLP, getLPValue } = useContracts();
-    const { lpTokens } = useWallet();
+    const balances = useRecoilValue(walletBalanceState);
+    const lpTokens = useRecoilValue(walletLPMapState);
     // fetch pool stats
     const { data: poolStatsRecords } = useSWR<PoolStatsRecord[]>(
         `${ASHSWAP_CONFIG.ashApiBaseUrl}/pool`,

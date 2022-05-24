@@ -1,5 +1,7 @@
 import ICArrowTopRight from "assets/svg/arrow-top-right.svg";
 import ICChevronRight from "assets/svg/chevron-right.svg";
+import { accIsInsufficientEGLDState } from "atoms/dappState";
+import { walletBalanceState } from "atoms/walletState";
 import BigNumber from "bignumber.js";
 import BaseModal from "components/BaseModal";
 import Checkbox from "components/Checkbox";
@@ -11,7 +13,6 @@ import OnboardTooltip from "components/Tooltip/OnboardTooltip";
 import { ENVIRONMENT } from "const/env";
 import { ASH_TOKEN, VE_ASH_DECIMALS } from "const/tokens";
 import { useStakeGov } from "context/gov";
-import { useWallet } from "context/wallet";
 import { toEGLDD, toWei } from "helper/balance";
 import useMediaQuery from "hooks/useMediaQuery";
 import { useOnboarding } from "hooks/useOnboarding";
@@ -19,6 +20,7 @@ import { useScreenSize } from "hooks/useScreenSize";
 import moment from "moment";
 import Image from "next/image";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useRecoilValue } from "recoil";
 import LockPeriod, { lockPeriodFormater } from "./LockPeriod";
 type props = {
     open: boolean;
@@ -58,7 +60,8 @@ const StakeMoreContent = ({ open, onClose }: props) => {
         totalSupplyVeASH,
         veASH,
     } = useStakeGov();
-    const { balances, insufficientEGLD } = useWallet();
+    const balances = useRecoilValue(walletBalanceState);
+    const insufficientEGLD = useRecoilValue(accIsInsufficientEGLDState);
     const ASHBalance = useMemo(() => balances[ASH_TOKEN.id]?.balance || new BigNumber(0), [balances]);
     const [lockAmt, setLockAmt] = useState<BigNumber>(new BigNumber(0));
     const [rawLockAmt, setRawLockAmt] = useState("");

@@ -5,25 +5,26 @@ import ICChevronUp from "assets/svg/chevron-up.svg";
 import ICLock from "assets/svg/lock.svg";
 import ICUnlock from "assets/svg/unlock.svg";
 import ICWallet from "assets/svg/wallet.svg";
+import { walletTokenPriceState } from "atoms/walletState";
 import BaseModal from "components/BaseModal";
 import GOVStakeModal from "components/GOVStakeModal";
 import TextAmt from "components/TextAmt";
 import CardTooltip from "components/Tooltip/CardTooltip";
-import TextTooltip from "components/Tooltip/TextTooltip";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 import { ENVIRONMENT } from "const/env";
 import { ASH_TOKEN, VE_ASH_DECIMALS } from "const/tokens";
 import { useStakeGov } from "context/gov";
-import { useWallet } from "context/wallet";
 import { toEGLDD } from "helper/balance";
 import { fetcher } from "helper/common";
 import { formatAmount } from "helper/number";
+import { useConnectWallet } from "hooks/useConnectWallet";
 import useMounted from "hooks/useMounted";
 import { useScreenSize } from "hooks/useScreenSize";
 import moment from "moment";
 import Image from "next/image";
 import Link from "next/link";
 import React, { useMemo, useState } from "react";
+import { useRecoilValue } from "recoil";
 import useSWR from "swr";
 const ExpiredLockTooltip = ({
     children,
@@ -74,7 +75,8 @@ function GovStats() {
     } = useStakeGov();
     const { isLoggedIn: loggedIn } = useGetLoginInfo();
     const mounted = useMounted();
-    const { connectWallet, tokenPrices } = useWallet();
+    const connectWallet = useConnectWallet();
+    const tokenPrices = useRecoilValue(walletTokenPriceState);
     const screenSize = useScreenSize();
     const capacityPct = useMemo(() => {
         if (totalSupplyVeASH.eq(0)) return "_";
