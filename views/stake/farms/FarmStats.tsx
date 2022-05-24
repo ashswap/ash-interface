@@ -1,22 +1,25 @@
+import { farmRecordsState, farmStakedOnlyState } from "atoms/farmsState";
 import BigNumber from "bignumber.js";
 import TextAmt from "components/TextAmt";
 import CardTooltip from "components/Tooltip/CardTooltip";
 import { ASH_TOKEN } from "const/tokens";
-import { useFarms } from "context/farms";
 import { toEGLDD } from "helper/balance";
+import useFarmClaimReward from "hooks/useFarmClaimReward";
 import Image from "next/image";
 import React, {
     useCallback,
     useEffect,
     useMemo,
     useRef,
-    useState,
+    useState
 } from "react";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 
 function FarmStats({ onClickAll }: { onClickAll?: () => void }) {
     const [harvesting, setHarvesting] = useState(false);
-    const { farmRecords, claimReward, setStakedOnly, claimAllReward } =
-        useFarms();
+    const farmRecords = useRecoilValue(farmRecordsState);
+    const { claimReward, claimAllFarmsReward: claimAllReward } = useFarmClaimReward();
+    const setStakedOnly = useSetRecoilState(farmStakedOnlyState);
     const TVL = useMemo(() => {
         return farmRecords.reduce(
             (total, val) => total.plus(val.totalLiquidityValue),
@@ -123,7 +126,7 @@ function FarmStats({ onClickAll }: { onClickAll?: () => void }) {
                                 <TextAmt
                                     number={TVL}
                                     decimalClassName="text-stake-gray-500"
-                                    options={{notation: "standard"}}
+                                    options={{ notation: "standard" }}
                                 />
                             </span>
                         </div>

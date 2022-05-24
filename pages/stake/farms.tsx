@@ -1,15 +1,15 @@
+import ICArrowRight from "assets/svg/arrow-right.svg";
 import StakeLayout from "components/Layout/stake";
 import React, { ReactElement, useRef } from "react";
-import ICArrowRight from "assets/svg/arrow-right.svg";
-import GovStats from "views/stake/gov/GovStats";
-import FarmsProvider from "context/farms";
-import FarmStats from "views/stake/farms/FarmStats";
 import FarmLayout from "views/stake/farms/FarmLayout";
+import FarmsState from "views/stake/farms/FarmsState";
+import FarmStats from "views/stake/farms/FarmStats";
 
 function FarmsPage() {
     const farmLayoutContainerRef = useRef<HTMLDivElement>(null);
     return (
-        <FarmsProvider>
+        <>
+            <FarmsState />
             <div className="ash-container text-white pt-[1.875rem]">
                 <ul className="flex space-x-1 mb-4 md:mb-[3.25rem] text-sm md:text-lg font-bold">
                     <li>Stake</li>
@@ -24,13 +24,19 @@ function FarmsPage() {
                     </h1>
                 </div>
                 <div className="mb-24">
-                    <FarmStats onClickAll={() => farmLayoutContainerRef.current?.scrollIntoView({behavior: "smooth"})}/>
+                    <FarmStats
+                        onClickAll={() =>
+                            farmLayoutContainerRef.current?.scrollIntoView({
+                                behavior: "smooth",
+                            })
+                        }
+                    />
                 </div>
                 <div ref={farmLayoutContainerRef}>
-                <FarmLayout />
+                    <FarmLayout />
                 </div>
             </div>
-        </FarmsProvider>
+        </>
     );
 }
 FarmsPage.getLayout = function getLayout(page: ReactElement) {

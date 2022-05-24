@@ -2,6 +2,7 @@ import { Transition } from "@headlessui/react";
 import ImgMetalCardBg from "assets/images/metal-card-bg.png";
 import ICMinus from "assets/svg/minus.svg";
 import ICPlus from "assets/svg/plus.svg";
+import { farmLoadingMapState, FarmsState } from "atoms/farmsState";
 import BigNumber from "bignumber.js";
 import BaseModal from "components/BaseModal";
 import StakeLPModal from "components/StakeLPModal";
@@ -10,13 +11,14 @@ import CardTooltip from "components/Tooltip/CardTooltip";
 import UnstakeLPModal from "components/UnstakeLPModal";
 import { ASH_TOKEN } from "const/tokens";
 import { TRANSITIONS } from "const/transitions";
-import { FarmsState, useFarms } from "context/farms";
 import { toEGLDD } from "helper/balance";
 import { formatAmount } from "helper/number";
+import useFarmClaimReward from "hooks/useFarmClaimReward";
 import { useScreenSize } from "hooks/useScreenSize";
 import { Unarray } from "interface/utilities";
 import Image from "next/image";
 import React, { useEffect, useMemo, useState } from "react";
+import { useRecoilValue } from "recoil";
 import { ViewType } from "./FarmFilter";
 
 type props = {
@@ -50,7 +52,8 @@ function FarmCard({ farmData, viewType }: props) {
     const [openUnstakeLP, setOpenUnstakeLP] = useState<boolean>(false);
     const [mOpenFarm, setMOpenFarm] = useState(false);
     const screenSize = useScreenSize();
-    const { claimReward, loadingMap } = useFarms();
+    const loadingMap = useRecoilValue(farmLoadingMapState);
+    const { claimReward } = useFarmClaimReward();
     const [token0, token1] = farmData.pool.tokens;
     const stakedLPAmt = useMemo(() => {
         if (!stakedData?.totalStakedLP || stakedData?.totalStakedLP.eq(0))

@@ -10,11 +10,11 @@ const useMediaQuery = (query: string) => {
         if (unsuport) {
             setMatches(false);
         } else {
-            const media = window.matchMedia(query);
-            if (media.matches !== matches) {
+            listener = () => {
+                const media = window.matchMedia(query);
                 setMatches(media.matches);
-            }
-            listener = () => setMatches(media.matches);
+            };
+            listener();
             window.addEventListener("resize", listener);
         }
 
@@ -23,7 +23,7 @@ const useMediaQuery = (query: string) => {
                 !!listener &&
                 window.removeEventListener("resize", listener);
         };
-    }, [matches, query]);
+    }, [query]);
 
     return matches;
 };

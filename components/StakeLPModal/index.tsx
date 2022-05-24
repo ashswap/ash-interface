@@ -1,5 +1,6 @@
 import ICChevronRight from "assets/svg/chevron-right.svg";
 import { accIsInsufficientEGLDState } from "atoms/dappState";
+import { FarmsState } from "atoms/farmsState";
 import { walletBalanceState } from "atoms/walletState";
 import BigNumber from "bignumber.js";
 import BaseModal from "components/BaseModal";
@@ -8,9 +9,9 @@ import InputCurrency from "components/InputCurrency";
 import TextAmt from "components/TextAmt";
 import { blockTimeMs } from "const/dappConfig";
 import { ASH_TOKEN } from "const/tokens";
-import { FarmsState, useFarms } from "context/farms";
 import { toEGLDD, toWei } from "helper/balance";
 import { formatAmount } from "helper/number";
+import useEnterFarm from "hooks/useEnterFarm";
 import { useScreenSize } from "hooks/useScreenSize";
 import { Unarray } from "interface/utilities";
 import Image from "next/image";
@@ -30,7 +31,7 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
     const insufficientEGLD = useRecoilValue(accIsInsufficientEGLDState);
     const [stakeAmt, setStakeAmt] = useState<BigNumber>(new BigNumber(0));
     const [rawStakeAmt, setRawStakeAmt] = useState("");
-    const { enterFarm } = useFarms();
+    const enterFarm = useEnterFarm();
     const LPBalance = useMemo(
         () => balances[pool.lpToken.id],
         [balances, pool.lpToken]

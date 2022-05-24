@@ -1,6 +1,7 @@
 import { Slider } from "antd";
 import ICChevronRight from "assets/svg/chevron-right.svg";
 import { accIsInsufficientEGLDState } from "atoms/dappState";
+import { FarmsState } from "atoms/farmsState";
 import BigNumber from "bignumber.js";
 import BaseModal from "components/BaseModal";
 import Checkbox from "components/Checkbox";
@@ -9,9 +10,9 @@ import TextAmt from "components/TextAmt";
 import CardTooltip from "components/Tooltip/CardTooltip";
 import { blockTimeMs } from "const/dappConfig";
 import { ASH_TOKEN } from "const/tokens";
-import { FarmsState, useFarms } from "context/farms";
 import { toEGLDD, toWei } from "helper/balance";
 import { formatAmount } from "helper/number";
+import useExitFarm from "hooks/useExitFarm";
 import { useScreenSize } from "hooks/useScreenSize";
 import { Unarray } from "interface/utilities";
 import Image from "next/image";
@@ -41,7 +42,7 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
     const [unstakePct, setUnstakePct] = useState(0);
     const [rewardOnExit, setRewardOnExit] = useState(new BigNumber(0));
     const insufficientEGLD = useRecoilValue(accIsInsufficientEGLDState);
-    const { exitFarm, estimateRewardOnExit } = useFarms();
+    const { exitFarm, estimateRewardOnExit } = useExitFarm();
 
     const setMaxStakeAmt = useCallback(() => {
         if (!stakedData?.totalStakedLP) return;
