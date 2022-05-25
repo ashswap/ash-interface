@@ -1,15 +1,16 @@
-import StakeLayout from "components/Layout/stake";
-import React, { ReactElement } from "react";
 import ICArrowRight from "assets/svg/arrow-right.svg";
-import GovStats from "views/stake/gov/GovStats";
-import StakeGovProvider from "context/gov";
+import StakeLayout from "components/Layout/stake";
+import { ENVIRONMENT } from "const/env";
+import React, { ReactElement } from "react";
 import VotePowerChart from "views/components/VotePowerChart";
 import WeeklyFeeTable from "views/components/WeeklyFeeTable";
-import { ENVIRONMENT } from "const/env";
+import GovState from "views/stake/gov/GovRecoilState";
+import GovStats from "views/stake/gov/GovStats";
 
 function GovPage() {
     return (
-        <StakeGovProvider>
+        <>
+            <GovState />
             <div className="ash-container text-white pt-[1.875rem]">
                 <ul className="flex space-x-1 mb-4 md:mb-[3.25rem] text-sm md:text-lg font-bold">
                     <li>Stake</li>
@@ -19,19 +20,21 @@ function GovPage() {
                     </li>
                 </ul>
                 <div className="mb-9">
-                <GovStats />
+                    <GovStats />
                 </div>
                 <div className="mb-14">
                     <VotePowerChart />
                 </div>
                 <div>
                     <h2 className="text-lg font-bold text-white mb-5 lg:mb-7">
-                        {ENVIRONMENT.NETWORK === "devnet" ? "Daily Summary" : "Weekly Summary"}
+                        {ENVIRONMENT.NETWORK === "devnet"
+                            ? "Daily Summary"
+                            : "Weekly Summary"}
                     </h2>
                     <WeeklyFeeTable />
                 </div>
             </div>
-        </StakeGovProvider>
+        </>
     );
 }
 GovPage.getLayout = function getLayout(page: ReactElement) {

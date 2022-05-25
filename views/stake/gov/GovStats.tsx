@@ -5,6 +5,7 @@ import ICChevronUp from "assets/svg/chevron-up.svg";
 import ICLock from "assets/svg/lock.svg";
 import ICUnlock from "assets/svg/unlock.svg";
 import ICWallet from "assets/svg/wallet.svg";
+import { govLockedAmtState, govRewardLPAmtState, govRewardLPTokenState, govRewardLPValueState, govTotalLockedAmtState, govTotalLockedPctState, govTotalSupplyVeASH, govUnlockTSState, govVeASHAmtState } from "atoms/govState";
 import { walletTokenPriceState } from "atoms/walletState";
 import BaseModal from "components/BaseModal";
 import GOVStakeModal from "components/GOVStakeModal";
@@ -13,11 +14,12 @@ import CardTooltip from "components/Tooltip/CardTooltip";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 import { ENVIRONMENT } from "const/env";
 import { ASH_TOKEN, VE_ASH_DECIMALS } from "const/tokens";
-import { useStakeGov } from "context/gov";
 import { toEGLDD } from "helper/balance";
 import { fetcher } from "helper/common";
 import { formatAmount } from "helper/number";
 import { useConnectWallet } from "hooks/useConnectWallet";
+import useGovClaimReward from "hooks/useGovContract/useGovClaimReward";
+import useGovUnlockASH from "hooks/useGovContract/useGovUnlockASH";
 import useMounted from "hooks/useMounted";
 import { useScreenSize } from "hooks/useScreenSize";
 import moment from "moment";
@@ -48,6 +50,16 @@ const ExpiredLockTooltip = ({
     );
 };
 function GovStats() {
+    const lockedAmt = useRecoilValue(govLockedAmtState);
+    const veASH = useRecoilValue(govVeASHAmtState);
+    const unlockTS = useRecoilValue(govUnlockTSState);
+    const totalSupplyVeASH = useRecoilValue(govTotalSupplyVeASH);
+    const totalLockedAmt = useRecoilValue(govTotalLockedAmtState);
+    const rewardLPAmt = useRecoilValue(govRewardLPAmtState);
+    const rewardLPToken = useRecoilValue(govRewardLPTokenState);
+    const rewardValue = useRecoilValue(govRewardLPValueState);
+    const totalLockedPct = useRecoilValue(govTotalLockedPctState);
+
     const { data: adminFee24h } = useSWR<number>(
         `${ASHSWAP_CONFIG.ashApiBaseUrl}/stake/governance/admin-fee`,
         fetcher
@@ -60,19 +72,9 @@ function GovStats() {
         transactionId: harvestId,
         onSuccess: () => setOpenHarvestResult(true),
     });
-    const {
-        lockedAmt,
-        veASH,
-        unlockTS,
-        totalSupplyVeASH,
-        totalLockedAmt,
-        rewardLPAmt,
-        rewardLPToken,
-        rewardValue,
-        totalLockedPct,
-        claimReward,
-        unlockASH,
-    } = useStakeGov();
+
+    const claimReward = useGovClaimReward();
+    const unlockASH = useGovUnlockASH();
     const { isLoggedIn: loggedIn } = useGetLoginInfo();
     const mounted = useMounted();
     const connectWallet = useConnectWallet();
