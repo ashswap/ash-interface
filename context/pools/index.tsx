@@ -2,9 +2,10 @@ import { walletBalanceState, walletLPMapState } from "atoms/walletState";
 import BigNumber from "bignumber.js";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 import pools from "const/pool";
-import useContracts from "context/contracts";
 import { toEGLD } from "helper/balance";
 import { fetcher } from "helper/common";
+import { queryPoolContract } from "helper/contracts/pool";
+import useLPValue from "hooks/useLPValue";
 import IPool from "interface/pool";
 import { PoolStatsRecord } from "interface/poolStats";
 import {
@@ -74,7 +75,7 @@ const PoolsProvider = ({ children }: any) => {
     const [deboundKeyword] = useDebounce(keyword, 500);
     const [stakedOnly, setStakedOnly] = useState(false);
     const [inactive, setInactive] = useState(false);
-    const { getTokenInLP, getLPValue } = useContracts();
+    const getLPValue = useLPValue();
     const balances = useRecoilValue(walletBalanceState);
     const lpTokens = useRecoilValue(walletLPMapState);
     // fetch pool stats
@@ -107,7 +108,7 @@ const PoolsProvider = ({ children }: any) => {
             };
             const ownLP = balances[p.lpToken.id]?.balance || new BigNumber(0);
             if (ownLP.gt(0)) {
-                const { value0, value1 } = await getTokenInLP(ownLP, p.address);
+                const { value0, value1 } = await queryPoolContract.getTokenInLP(ownLP, p.address);
                 record.liquidityData = {
                     ownLiquidity: ownLP,
                     capacityPercent: getPortion(p.lpToken.id, ownLP),
@@ -119,7 +120,7 @@ const PoolsProvider = ({ children }: any) => {
             records.push(record);
         }
         setPoolRecords(records);
-    }, [balances, getTokenInLP, getPortion, getLPValue, poolStatsRecords]);
+    }, [balances, getPortion, getLPValue, poolStatsRecords]);
 
     useEffect(() => {
         getPoolRecords();

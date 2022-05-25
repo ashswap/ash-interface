@@ -8,9 +8,10 @@ import PoolFilter, { ViewType } from "components/PoolFilter";
 import PoolMenu from "components/PoolMenu";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 import pools from "const/pool";
-import useContracts from "context/contracts";
 import { toEGLD } from "helper/balance";
 import { fetcher } from "helper/common";
+import { queryPoolContract } from "helper/contracts/pool";
+import useLPValue from "hooks/useLPValue";
 import { useScreenSize } from "hooks/useScreenSize";
 import IPool from "interface/pool";
 import { PoolStatsRecord } from "interface/poolStats";
@@ -45,8 +46,7 @@ const PoolStateHook = () => {
     const lpTokens = useRecoilValue(walletLPMapState);
     const setPoolRecords = useSetRecoilState(poolRecordsState);
     const setDeboundKeyword = useSetRecoilState(poolDeboundKeywordState);
-    const { getTokenInLP, getLPValue } = useContracts();
-
+    const getLPValue = useLPValue();
     const [deboundKeyword] = useDebounce(keyword, 500);
 
     useEffect(() => {
@@ -83,7 +83,7 @@ const PoolStateHook = () => {
             };
             const ownLP = balances[p.lpToken.id]?.balance || new BigNumber(0);
             if (ownLP.gt(0)) {
-                const { value0, value1 } = await getTokenInLP(ownLP, p.address);
+                const { value0, value1 } = await queryPoolContract.getTokenInLP(ownLP, p.address);
                 record.liquidityData = {
                     ownLiquidity: ownLP,
                     capacityPercent: getPortion(p.lpToken.id, ownLP),
@@ -95,7 +95,7 @@ const PoolStateHook = () => {
             records.push(record);
         }
         setPoolRecords(records);
-    }, [balances, getTokenInLP, getPortion, getLPValue, poolStatsRecords, setPoolRecords]);
+    }, [balances, getPortion, getLPValue, poolStatsRecords, setPoolRecords]);
 
     useEffect(() => {
         getPoolRecords();

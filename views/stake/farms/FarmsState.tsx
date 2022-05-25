@@ -16,10 +16,10 @@ import { blockTimeMs } from "const/dappConfig";
 import { FARMS } from "const/farms";
 import pools from "const/pool";
 import { ASH_TOKEN } from "const/tokens";
-import useContracts from "context/contracts";
 import { toEGLDD } from "helper/balance";
 import { fetcher } from "helper/common";
 import useFarmReward from "hooks/useFarmReward";
+import useLPValue from "hooks/useLPValue";
 import { IFarm } from "interface/farm";
 import IPool from "interface/pool";
 import { PoolStatsRecord } from "interface/poolStats";
@@ -91,7 +91,7 @@ const FarmsState = () => {
 
     const pendingTransactionsFromStore =
         useGetPendingTransactions().pendingTransactions;
-    const { getLPValue } = useContracts();
+    const getLPValue = useLPValue();
 
     const proxy: ProxyProvider = getProxyProvider();
 

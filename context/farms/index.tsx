@@ -29,13 +29,13 @@ import { blockTimeMs } from "const/dappConfig";
 import { FARMS } from "const/farms";
 import pools from "const/pool";
 import { ASH_TOKEN } from "const/tokens";
-import useContracts from "context/contracts";
 import { toEGLD, toEGLDD } from "helper/balance";
 import { fetcher } from "helper/common";
 import {
     sendTransactions,
     useCreateTransaction
 } from "helper/transactionMethods";
+import useLPValue from "hooks/useLPValue";
 import { DappSendTransactionsPropsType } from "interface/dappCore";
 import { IFarm } from "interface/farm";
 import IPool from "interface/pool";
@@ -159,7 +159,7 @@ const FarmsProvider = ({ children }: any) => {
         useGetSignedTransactions().signedTransactions;
     const pendingTransactionsFromStore =
         useGetPendingTransactions().pendingTransactions;
-    const { getTokenInLP, getLPValue } = useContracts();
+    const getLPValue = useLPValue();
     const createTransaction = useCreateTransaction();
     const { isLoggedIn: loggedIn } = useGetLoginInfo();
     const proxy: ProxyProvider = getProxyProvider();

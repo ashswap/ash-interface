@@ -27,9 +27,9 @@ import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 import { blockTimeMs } from "const/dappConfig";
 import pools from "const/pool";
 import { ASH_TOKEN } from "const/tokens";
-import useContracts from "context/contracts";
 import { toWei } from "helper/balance";
 import { queryContractParser } from "helper/serializer";
+import useLPValue from "hooks/useLPValue";
 import moment from "moment";
 import {
     useCallback, useEffect
@@ -53,7 +53,7 @@ const GovState = () => {
         govRewardLPTokenState
     );
 
-    const { getLPValue } = useContracts();
+    const getLPValue = useLPValue();
 
     const proxy: ProxyProvider = getProxyProvider();
     const apiProvider: ApiProvider = getApiProvider();
