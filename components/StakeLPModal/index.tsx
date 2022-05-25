@@ -11,7 +11,7 @@ import { blockTimeMs } from "const/dappConfig";
 import { ASH_TOKEN } from "const/tokens";
 import { toEGLDD, toWei } from "helper/balance";
 import { formatAmount } from "helper/number";
-import useEnterFarm from "hooks/useEnterFarm";
+import useEnterFarm from "hooks/useFarmContract/useEnterFarm";
 import { useScreenSize } from "hooks/useScreenSize";
 import { Unarray } from "interface/utilities";
 import Image from "next/image";

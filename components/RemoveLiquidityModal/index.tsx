@@ -10,7 +10,7 @@ import {
     Query,
     TokenIdentifierValue,
     TypeExpressionParser,
-    TypeMapper
+    TypeMapper,
 } from "@elrondnetwork/erdjs";
 import { Slider } from "antd";
 import IconRight from "assets/svg/right-yellow.svg";
@@ -26,9 +26,13 @@ import Token from "components/Token";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
 import { useSwap } from "context/swap";
 import { toEGLD, toEGLDD, toWei } from "helper/balance";
-import { sendTransactions, useCreateTransaction } from "helper/transactionMethods";
+import {
+    sendTransactions,
+    useCreateTransaction,
+} from "helper/transactionMethods";
 import { useFetchBalances } from "hooks/useFetchBalances";
 import { useOnboarding } from "hooks/useOnboarding";
+import usePoolRemoveLP from "hooks/usePoolContract/usePoolRemoveLP";
 import { useScreenSize } from "hooks/useScreenSize";
 import { DappSendTransactionsPropsType } from "interface/dappCore";
 import { Unarray } from "interface/utilities";
@@ -67,6 +71,7 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
     const [onboardingWithdrawInput, setOnboardedWithdrawInput] = useOnboarding(
         "pool_withdraw_input"
     );
+    const removePoolLP = usePoolRemoveLP();
 
     const pricePerLP = useMemo(() => {
         // warning: mocking - change to 0 after pool analytic API success
@@ -195,54 +200,31 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
     const removeLP = useCallback(async () => {
         if (removing || liquidity.eq(0)) return;
         setRemoving(true);
-        let sessionId = "";
         try {
-            let tx = await createTx(new Address(pool.address), {
-                func: new ContractFunction("ESDTTransfer"),
-                gasLimit: new GasLimit(9_000_000),
-                args: [
-                    new TokenIdentifierValue(Buffer.from(pool.lpToken.id)),
-                    new BigUIntValue(liquidity),
-                    new TokenIdentifierValue(Buffer.from("removeLiquidity")),
-                    new BigUIntValue(
-                        new BigNumber(
-                            toWei(pool.tokens[0], value0)
-                                .multipliedBy(1 - slippage)
-                                .toFixed(0)
-                        )
-                    ),
-                    new BigUIntValue(
-                        new BigNumber(
-                            toWei(pool.tokens[1], value1)
-                                .multipliedBy(1 - slippage)
-                                .toFixed(0)
-                        )
-                    ),
-                ],
-            });
-            const payload: DappSendTransactionsPropsType = {
-                transactions: tx,
-                transactionsDisplayInfo: {
-                    successMessage: `Remove Liquidity Success ${value0} ${pool.tokens[0].name} and ${value1} ${pool.tokens[1].name}`,
-                },
-            };
-            sessionId = (await sendTransactions(payload)).sessionId || "";
-            fetchBalances();
+            const [token0, token1] = pool.tokens;
+            const { sessionId } = await removePoolLP(
+                pool,
+                liquidity,
+                toWei(token0, value0),
+                toWei(token1, value1),
+                slippage
+            );
+            if (sessionId) onClose?.();
         } catch (error) {
             // TODO: extension close without response
+            console.error(error);
+        } finally {
+            setRemoving(false);
         }
-        setRemoving(false);
-        if (sessionId) onClose?.();
     }, [
         value0,
         value1,
         slippage,
         pool,
         onClose,
-        createTx,
-        fetchBalances,
         liquidity,
         removing,
+        removePoolLP,
     ]);
 
     return (

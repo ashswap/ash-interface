@@ -12,7 +12,7 @@ import { blockTimeMs } from "const/dappConfig";
 import { ASH_TOKEN } from "const/tokens";
 import { toEGLDD, toWei } from "helper/balance";
 import { formatAmount } from "helper/number";
-import useExitFarm from "hooks/useExitFarm";
+import useExitFarm from "hooks/useFarmContract/useExitFarm";
 import { useScreenSize } from "hooks/useScreenSize";
 import { Unarray } from "interface/utilities";
 import Image from "next/image";

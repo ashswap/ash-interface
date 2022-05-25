@@ -11,7 +11,7 @@ import pools from "const/pool";
 import { toEGLD } from "helper/balance";
 import { fetcher } from "helper/common";
 import { queryPoolContract } from "helper/contracts/pool";
-import useLPValue from "hooks/useLPValue";
+import useLPValue from "hooks/usePoolContract/useLPValue";
 import { useScreenSize } from "hooks/useScreenSize";
 import IPool from "interface/pool";
 import { PoolStatsRecord } from "interface/poolStats";

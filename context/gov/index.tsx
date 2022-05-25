@@ -30,7 +30,7 @@ import {
     sendTransactions,
     useCreateTransaction
 } from "helper/transactionMethods";
-import useLPValue from "hooks/useLPValue";
+import useLPValue from "hooks/usePoolContract/useLPValue";
 import { DappSendTransactionsPropsType } from "interface/dappCore";
 import IPool from "interface/pool";
 import moment from "moment";

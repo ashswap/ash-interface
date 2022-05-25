@@ -29,7 +29,7 @@ import pools from "const/pool";
 import { ASH_TOKEN } from "const/tokens";
 import { toWei } from "helper/balance";
 import { queryContractParser } from "helper/serializer";
-import useLPValue from "hooks/useLPValue";
+import useLPValue from "hooks/usePoolContract/useLPValue";
 import moment from "moment";
 import {
     useCallback, useEffect

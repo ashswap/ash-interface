@@ -13,7 +13,7 @@ import { ASH_TOKEN } from "const/tokens";
 import { TRANSITIONS } from "const/transitions";
 import { toEGLDD } from "helper/balance";
 import { formatAmount } from "helper/number";
-import useFarmClaimReward from "hooks/useFarmClaimReward";
+import useFarmClaimReward from "hooks/useFarmContract/useFarmClaimReward";
 import { useScreenSize } from "hooks/useScreenSize";
 import { Unarray } from "interface/utilities";
 import Image from "next/image";

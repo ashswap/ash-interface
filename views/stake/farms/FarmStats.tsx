@@ -4,7 +4,7 @@ import TextAmt from "components/TextAmt";
 import CardTooltip from "components/Tooltip/CardTooltip";
 import { ASH_TOKEN } from "const/tokens";
 import { toEGLDD } from "helper/balance";
-import useFarmClaimReward from "hooks/useFarmClaimReward";
+import useFarmClaimReward from "hooks/useFarmContract/useFarmClaimReward";
 import Image from "next/image";
 import React, {
     useCallback,
