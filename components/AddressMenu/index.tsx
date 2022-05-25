@@ -8,9 +8,10 @@ import IconChange from "assets/svg/change.svg";
 import ICChevronUp from "assets/svg/chevron-up.svg";
 import IconCopy from "assets/svg/copy.svg";
 import IconDisconnect from "assets/svg/disconnect.svg";
+import { walletIsOpenConnectModalState } from "atoms/walletState";
 import BaseModal from "components/BaseModal";
 import BasePopover from "components/BasePopover";
-import { useWallet } from "context/wallet";
+import { useConnectWallet } from "hooks/useConnectWallet";
 import useMounted from "hooks/useMounted";
 import { useScreenSize } from "hooks/useScreenSize";
 import Image from "next/image";
@@ -22,6 +23,7 @@ import {
     useState
 } from "react";
 import { Modifier } from "react-popper";
+import { useSetRecoilState } from "recoil";
 import WalletBalance from "./WalletBalance";
 const overlayModifier: Partial<Modifier<unknown, object>> = {
     name: "overlay",
@@ -60,7 +62,8 @@ function AddressMenu({ infoLayout, dropdownBtn, connectBtn }: AddressMenuProp) {
     const [showMenu, setShowMenu] = useState(false);
     const mounted = useMounted();
     const { isMobile } = useScreenSize();
-    const { connectWallet, setIsOpenConnectWalletModal } = useWallet();
+    const connectWallet = useConnectWallet();
+    const setIsOpenConnectWalletModal = useSetRecoilState(walletIsOpenConnectModalState);
     useEffect(() => {
         setMShowMenu(false);
         setShowMenu(false);

@@ -2,7 +2,7 @@ import {
     getApiProvider,
     getProxyProvider,
     useGetAccountInfo,
-    useGetLoginInfo,
+    useGetLoginInfo
 } from "@elrondnetwork/dapp-core";
 import { SendTransactionReturnType } from "@elrondnetwork/dapp-core/dist/services/transactions";
 import {
@@ -16,21 +16,21 @@ import {
     Query,
     TokenIdentifierValue,
     Transaction,
-    U64Value,
+    U64Value
 } from "@elrondnetwork/erdjs";
 import BigNumber from "bignumber.js";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
-import { blockTimeMs, gasLimit } from "const/dappConfig";
+import { blockTimeMs } from "const/dappConfig";
 import { ENVIRONMENT } from "const/env";
 import pools from "const/pool";
 import { ASH_TOKEN } from "const/tokens";
-import useContracts from "context/contracts";
 import { toEGLD, toEGLDD, toWei } from "helper/balance";
 import { queryContractParser } from "helper/serializer";
 import {
     sendTransactions,
-    useCreateTransaction,
+    useCreateTransaction
 } from "helper/transactionMethods";
+import useLPValue from "hooks/usePoolContract/useLPValue";
 import { DappSendTransactionsPropsType } from "interface/dappCore";
 import IPool from "interface/pool";
 import moment from "moment";
@@ -39,7 +39,7 @@ import {
     useCallback,
     useContext,
     useEffect,
-    useState,
+    useState
 } from "react";
 const estimateVeASH = (weiAmt: BigNumber, lockSeconds: number) => {
     if (ENVIRONMENT.NETWORK === "devnet") {
@@ -117,7 +117,7 @@ const StakeGovProvider = ({ children }: any) => {
     const [rewardValue, setRewardValue] = useState<BigNumber>(new BigNumber(0));
     const [rewardLPToken, setRewardLPToken] = useState<IPool>();
     const [totalLockedPct, setTotalLockedPct] = useState(0);
-    const { getLPValue } = useContracts();
+    const getLPValue = useLPValue();
     const createTransaction = useCreateTransaction();
     const { isLoggedIn: loggedIn } = useGetLoginInfo();
     const { address } = useGetAccountInfo();

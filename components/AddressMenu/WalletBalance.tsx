@@ -1,15 +1,16 @@
 import { useGetAccountInfo } from "@elrondnetwork/dapp-core";
+import ImgEgldIcon from "assets/images/egld-icon.png";
+import { walletBalanceState } from "atoms/walletState";
 import BigNumber from "bignumber.js";
+import TextAmt from "components/TextAmt";
 import { ENVIRONMENT } from "const/env";
 import pools from "const/pool";
 import { TOKENS } from "const/tokens";
-import { useWallet } from "context/wallet";
 import { toEGLDD } from "helper/balance";
 import { IToken } from "interface/token";
 import Image from "next/image";
 import React, { useMemo } from "react";
-import ImgEgldIcon from "assets/images/egld-icon.png";
-import TextAmt from "components/TextAmt";
+import { useRecoilValue } from "recoil";
 type TokenWithBalance = IToken & {
     balance: BigNumber;
 }
@@ -25,7 +26,7 @@ const TokenBalance = ({data}: {data: Omit<TokenWithBalance, "id">}) => {
     </div>
 }
 function WalletBalance() {
-    const {balances} = useWallet();
+    const balances = useRecoilValue(walletBalanceState);
     const {account} = useGetAccountInfo();
     const ashSupportedBalances = useMemo(() => {
         const supportedTokens: TokenWithBalance[] = TOKENS.map(t => {

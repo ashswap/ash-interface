@@ -6,7 +6,7 @@ import {
     useGetLoginInfo,
     useGetNetworkConfig,
     useGetPendingTransactions,
-    useGetSignedTransactions,
+    useGetSignedTransactions
 } from "@elrondnetwork/dapp-core";
 import { SendTransactionReturnType } from "@elrondnetwork/dapp-core/dist/services/transactions";
 import {
@@ -15,29 +15,27 @@ import {
     ApiProvider,
     BigUIntValue,
     BytesValue,
-    ContractFunction,
-    ExtensionProvider,
-    GasLimit,
+    ContractFunction, GasLimit,
     ProxyProvider,
     Query,
     TokenIdentifierValue,
     Transaction,
-    TypedValue,
+    TypedValue
 } from "@elrondnetwork/erdjs/out";
+import { walletBalanceState, walletLPMapState, walletTokenPriceState } from "atoms/walletState";
 import BigNumber from "bignumber.js";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
-import { blockTimeMs, gasLimit } from "const/dappConfig";
+import { blockTimeMs } from "const/dappConfig";
 import { FARMS } from "const/farms";
 import pools from "const/pool";
 import { ASH_TOKEN } from "const/tokens";
-import useContracts from "context/contracts";
-import { useWallet } from "context/wallet";
 import { toEGLD, toEGLDD } from "helper/balance";
 import { fetcher } from "helper/common";
 import {
     sendTransactions,
-    useCreateTransaction,
+    useCreateTransaction
 } from "helper/transactionMethods";
+import useLPValue from "hooks/usePoolContract/useLPValue";
 import { DappSendTransactionsPropsType } from "interface/dappCore";
 import { IFarm } from "interface/farm";
 import IPool from "interface/pool";
@@ -50,8 +48,9 @@ import {
     useContext,
     useEffect,
     useMemo,
-    useState,
+    useState
 } from "react";
+import { useRecoilValue } from "recoil";
 import useSWR from "swr";
 import { useDebounce } from "use-debounce";
 const calcUnstakeEntries = (
@@ -160,13 +159,15 @@ const FarmsProvider = ({ children }: any) => {
         useGetSignedTransactions().signedTransactions;
     const pendingTransactionsFromStore =
         useGetPendingTransactions().pendingTransactions;
-    const { getTokenInLP, getLPValue } = useContracts();
+    const getLPValue = useLPValue();
     const createTransaction = useCreateTransaction();
     const { isLoggedIn: loggedIn } = useGetLoginInfo();
     const proxy: ProxyProvider = getProxyProvider();
     const apiProvider: ApiProvider = getApiProvider();
     const { address } = useGetAccountInfo();
-    const { lpTokens, tokenPrices, balances } = useWallet();
+    const lpTokens = useRecoilValue(walletLPMapState);
+    const tokenPrices = useRecoilValue(walletTokenPriceState);
+    const balances = useRecoilValue(walletBalanceState);
     const network: AccountInfoSliceNetworkType = useGetNetworkConfig().network;
     // fetch pool stats
     const { data: poolStatsRecords } = useSWR<PoolStatsRecord[]>(

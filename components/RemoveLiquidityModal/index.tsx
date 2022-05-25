@@ -14,6 +14,9 @@ import {
 } from "@elrondnetwork/erdjs";
 import { Slider } from "antd";
 import IconRight from "assets/svg/right-yellow.svg";
+import { accIsInsufficientEGLDState } from "atoms/dappState";
+import { PoolsState } from "atoms/poolsState";
+import { walletLPMapState } from "atoms/walletState";
 import BigNumber from "bignumber.js";
 import BaseModal from "components/BaseModal";
 import Button from "components/Button";
@@ -21,17 +24,21 @@ import InputCurrency from "components/InputCurrency";
 import TextAmt from "components/TextAmt";
 import Token from "components/Token";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
-import { PoolsState } from "context/pools";
 import { useSwap } from "context/swap";
-import { useWallet } from "context/wallet";
 import { toEGLD, toEGLDD, toWei } from "helper/balance";
-import { sendTransactions, useCreateTransaction } from "helper/transactionMethods";
+import {
+    sendTransactions,
+    useCreateTransaction,
+} from "helper/transactionMethods";
+import { useFetchBalances } from "hooks/useFetchBalances";
 import { useOnboarding } from "hooks/useOnboarding";
+import usePoolRemoveLP from "hooks/usePoolContract/usePoolRemoveLP";
 import { useScreenSize } from "hooks/useScreenSize";
 import { DappSendTransactionsPropsType } from "interface/dappCore";
 import { Unarray } from "interface/utilities";
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useRecoilValue } from "recoil";
 import { theme } from "tailwind.config";
 import { useDebounce } from "use-debounce";
 import styles from "./RemoveLiquidityModal.module.css";
@@ -52,7 +59,9 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
     const [value1, setValue1] = useState<string>("");
     const [liquidityDebounce] = useDebounce(liquidity, 500);
     const screenSize = useScreenSize();
-    const { fetchBalances, balances, lpTokens, insufficientEGLD } = useWallet();
+    const fetchBalances = useFetchBalances();
+    const lpTokens = useRecoilValue(walletLPMapState);
+    const insufficientEGLD = useRecoilValue(accIsInsufficientEGLDState);
     const createTx = useCreateTransaction();
     const { slippage } = useSwap();
     const [displayInputLiquidity, setDisplayInputLiquidity] =
@@ -62,6 +71,7 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
     const [onboardingWithdrawInput, setOnboardedWithdrawInput] = useOnboarding(
         "pool_withdraw_input"
     );
+    const removePoolLP = usePoolRemoveLP();
 
     const pricePerLP = useMemo(() => {
         // warning: mocking - change to 0 after pool analytic API success
@@ -190,54 +200,31 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
     const removeLP = useCallback(async () => {
         if (removing || liquidity.eq(0)) return;
         setRemoving(true);
-        let sessionId = "";
         try {
-            let tx = await createTx(new Address(pool.address), {
-                func: new ContractFunction("ESDTTransfer"),
-                gasLimit: new GasLimit(9_000_000),
-                args: [
-                    new TokenIdentifierValue(Buffer.from(pool.lpToken.id)),
-                    new BigUIntValue(liquidity),
-                    new TokenIdentifierValue(Buffer.from("removeLiquidity")),
-                    new BigUIntValue(
-                        new BigNumber(
-                            toWei(pool.tokens[0], value0)
-                                .multipliedBy(1 - slippage)
-                                .toFixed(0)
-                        )
-                    ),
-                    new BigUIntValue(
-                        new BigNumber(
-                            toWei(pool.tokens[1], value1)
-                                .multipliedBy(1 - slippage)
-                                .toFixed(0)
-                        )
-                    ),
-                ],
-            });
-            const payload: DappSendTransactionsPropsType = {
-                transactions: tx,
-                transactionsDisplayInfo: {
-                    successMessage: `Remove Liquidity Success ${value0} ${pool.tokens[0].name} and ${value1} ${pool.tokens[1].name}`,
-                },
-            };
-            sessionId = (await sendTransactions(payload)).sessionId || "";
-            fetchBalances();
+            const [token0, token1] = pool.tokens;
+            const { sessionId } = await removePoolLP(
+                pool,
+                liquidity,
+                toWei(token0, value0),
+                toWei(token1, value1),
+                slippage
+            );
+            if (sessionId) onClose?.();
         } catch (error) {
             // TODO: extension close without response
+            console.error(error);
+        } finally {
+            setRemoving(false);
         }
-        setRemoving(false);
-        if (sessionId) onClose?.();
     }, [
         value0,
         value1,
         slippage,
         pool,
         onClose,
-        createTx,
-        fetchBalances,
         liquidity,
         removing,
+        removePoolLP,
     ]);
 
     return (

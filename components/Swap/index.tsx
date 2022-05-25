@@ -1,8 +1,8 @@
 import {
-    
+
     transactionServices,
     useGetAccountInfo,
-    useGetLoginInfo,
+    useGetLoginInfo
 } from "@elrondnetwork/dapp-core";
 import {
     Address,
@@ -10,7 +10,7 @@ import {
     ContractFunction,
     GasLimit,
     TokenIdentifierValue,
-    Transaction,
+    Transaction
 } from "@elrondnetwork/erdjs";
 import Fire from "assets/images/fire.png";
 import ICChevronDown from "assets/svg/chevron-down.svg";
@@ -33,12 +33,12 @@ import TextAmt from "components/TextAmt";
 import CardTooltip from "components/Tooltip/CardTooltip";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
 import { useSwap } from "context/swap";
-import { useWallet } from "context/wallet";
 import { toEGLD, toEGLDD, toWei } from "helper/balance";
 import { cancellablePromise } from "helper/cancellablePromise";
 import { queryPoolContract } from "helper/contracts/pool";
 import { formatAmount } from "helper/number";
 import { sendTransactions, useCreateTransaction } from "helper/transactionMethods";
+import { useConnectWallet } from "hooks/useConnectWallet";
 import useMounted from "hooks/useMounted";
 import { useOnboarding } from "hooks/useOnboarding";
 import { useScreenSize } from "hooks/useScreenSize";
@@ -153,7 +153,7 @@ const Swap = () => {
             transactionId: swapId,
         });
 
-    const { connectWallet } = useWallet();
+    const connectWallet = useConnectWallet();
     const { isLoggedIn: loggedIn } = useGetLoginInfo();
     const { account } = useGetAccountInfo();
     const createTx = useCreateTransaction();
