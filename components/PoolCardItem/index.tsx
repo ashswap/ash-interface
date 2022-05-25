@@ -1,19 +1,20 @@
-import { PoolsState } from "context/pools";
-import { Unarray } from "interface/utilities";
-import React, { useState } from "react";
-import Image from "next/image";
-import AddLiquidityModal from "components/AddLiquidityModal";
-import Down from "assets/svg/down-white.svg";
+
 import {
     AccountInfoSliceNetworkType,
-    useGetNetworkConfig,
+    useGetNetworkConfig
 } from "@elrondnetwork/dapp-core";
-import CardTooltip from "components/Tooltip/CardTooltip";
+import Down from "assets/svg/down-white.svg";
+import { PoolsState } from "atoms/poolsState";
+import AddLiquidityModal from "components/AddLiquidityModal";
 import TextAmt from "components/TextAmt";
-import { formatAmount } from "helper/number";
+import CardTooltip from "components/Tooltip/CardTooltip";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
+import { formatAmount } from "helper/number";
 import { useOnboarding } from "hooks/useOnboarding";
 import { useScreenSize } from "hooks/useScreenSize";
+import { Unarray } from "interface/utilities";
+import Image from "next/image";
+import React, { useState } from "react";
 
 function PoolCardItem({
     poolData,

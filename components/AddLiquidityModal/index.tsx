@@ -1,17 +1,12 @@
 import {
     getProxyProvider,
     useGetAccountInfo,
-    useGetLoginInfo,
+    useGetLoginInfo
 } from "@elrondnetwork/dapp-core";
-import {
-    Address,
-    AddressValue,
-    BigUIntValue,
-    ContractFunction,
-    GasLimit,
-    TokenIdentifierValue,
-} from "@elrondnetwork/erdjs";
 import IconRight from "assets/svg/right-white.svg";
+import { addLPSessionIdAtom } from "atoms/addLiquidity";
+import { PoolsState } from "atoms/poolsState";
+import { walletBalanceState, walletTokenPriceState } from "atoms/walletState";
 import BigNumber from "bignumber.js";
 import BaseModal from "components/BaseModal";
 import Button from "components/Button";
@@ -19,22 +14,19 @@ import Checkbox from "components/Checkbox";
 import InputCurrency from "components/InputCurrency";
 import TextAmt from "components/TextAmt";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
-import { PoolsState } from "context/pools";
-import { useWallet } from "context/wallet";
-import { toEGLD, toEGLDD, toWei } from "helper/balance";
-import { queryPoolContract } from "helper/contracts/pool";
+import { toEGLDD, toWei } from "helper/balance";
 import {
-    sendTransactions,
-    useCreateTransaction,
+    useCreateTransaction
 } from "helper/transactionMethods";
 import { useOnboarding } from "hooks/useOnboarding";
+import usePoolAddLP from "hooks/usePoolContract/usePoolAddLP";
 import { useScreenSize } from "hooks/useScreenSize";
-import { DappSendTransactionsPropsType } from "interface/dappCore";
 import { IToken } from "interface/token";
 import { Unarray } from "interface/utilities";
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import { theme } from "tailwind.config";
 import { useDebounce } from "use-debounce";
 
@@ -137,7 +129,11 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
     const [isProMode, setIsProMode] = useState(false);
     const [adding, setAdding] = useState(false);
     const createTx = useCreateTransaction();
-    const { fetchBalances, balances, tokenPrices } = useWallet();
+    const addPoolLP = usePoolAddLP();
+    // recoil
+    const balances = useRecoilValue(walletBalanceState);
+    const tokenPrices = useRecoilValue(walletTokenPriceState);
+    // end recoil
     const { isLoggedIn: loggedIn } = useGetLoginInfo();
     const { address, account } = useGetAccountInfo();
     const proxy = getProxyProvider();
@@ -147,6 +143,8 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
     const [onboardingPoolCheck, setOnboardedPoolCheck] = useOnboarding(
         "pool_deposit_checkbox"
     );
+
+    const setAddLPSessionId = useSetRecoilState(addLPSessionIdAtom);
     const screenSize = useScreenSize();
     // reset when open modal
     useEffect(() => {
@@ -166,97 +164,26 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
     const addLP = useCallback(async () => {
         if (!loggedIn || adding) return;
         setAdding(true);
-        let sessionId = "";
+        const v0 = toWei(pool.tokens[0], value0 || "0");
+        const v1 = toWei(pool.tokens[1], value1 || "0");
         try {
-            const v0 = toWei(pool.tokens[0], value0 || "0");
-            const v1 = toWei(pool.tokens[1], value1 || "0");
-            let tx;
-            let msg = "";
-            if (v0.eq(0)) {
-                tx = await createTx(new Address(pool.address), {
-                    func: new ContractFunction("ESDTTransfer"),
-                    gasLimit: new GasLimit(10_000_000),
-                    args: [
-                        new TokenIdentifierValue(
-                            Buffer.from(pool.tokens[1].id)
-                        ),
-                        new BigUIntValue(v1),
-                        new TokenIdentifierValue(Buffer.from("addLiquidity")),
-                        new BigUIntValue(v0),
-                        new BigUIntValue(v1),
-                        new AddressValue(Address.Zero()),
-                    ],
-                });
-                msg = `Add liquidity success ${value1} ${pool.tokens[1].name}`;
-            } else if (v1.eq(0)) {
-                tx = await createTx(new Address(pool.address), {
-                    func: new ContractFunction("ESDTTransfer"),
-                    gasLimit: new GasLimit(10_000_000),
-                    args: [
-                        new TokenIdentifierValue(
-                            Buffer.from(pool.tokens[0].id)
-                        ),
-                        new BigUIntValue(v0),
-                        new TokenIdentifierValue(Buffer.from("addLiquidity")),
-                        new BigUIntValue(v0),
-                        new BigUIntValue(v1),
-                        new AddressValue(Address.Zero()),
-                    ],
-                });
-                msg = `Add liquidity success ${value0} ${pool.tokens[0].name}`;
-            } else {
-                tx = await createTx(new Address(address), {
-                    func: new ContractFunction("MultiESDTNFTTransfer"),
-                    gasLimit: new GasLimit(10_000_000),
-                    args: [
-                        new AddressValue(new Address(pool.address)),
-                        new BigUIntValue(new BigNumber(2)),
-
-                        new TokenIdentifierValue(
-                            Buffer.from(pool.tokens[0].id)
-                        ),
-                        new BigUIntValue(new BigNumber(0)),
-                        new BigUIntValue(toWei(pool.tokens[0], value0)),
-
-                        new TokenIdentifierValue(
-                            Buffer.from(pool.tokens[1].id)
-                        ),
-                        new BigUIntValue(new BigNumber(0)),
-                        new BigUIntValue(toWei(pool.tokens[1], value1)),
-
-                        new TokenIdentifierValue(Buffer.from("addLiquidity")),
-                        new BigUIntValue(toWei(pool.tokens[0], value0)),
-                        new BigUIntValue(toWei(pool.tokens[1], value1)),
-                        new AddressValue(Address.Zero()),
-                    ],
-                });
-                msg = `Add liquidity Success ${value0} ${pool.tokens[0].name} and ${value1} ${pool.tokens[1].name}`;
-            }
-
-            const payload: DappSendTransactionsPropsType = {
-                transactions: tx,
-                transactionsDisplayInfo: {
-                    successMessage: msg,
-                },
-            };
-            sessionId = (await sendTransactions(payload)).sessionId || "";
-            fetchBalances();
+            const { sessionId } = await addPoolLP(pool, v0, v1);
+            setAddLPSessionId(sessionId || "");
+            if (sessionId) onClose?.();
         } catch (error) {
-            // TODO: extension close without response
-            console.log(error);
+            console.error(error);
+        } finally {
+            setAdding(false);
         }
-        setAdding(false);
-        if (sessionId) onClose?.();
     }, [
         value0,
         value1,
         pool,
         onClose,
-        fetchBalances,
         adding,
-        address,
         loggedIn,
-        createTx,
+        addPoolLP,
+        setAddLPSessionId,
     ]);
 
     const balance0 = useMemo(() => {

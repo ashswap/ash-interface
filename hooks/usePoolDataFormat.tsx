@@ -1,4 +1,4 @@
-import { PoolsState } from "context/pools";
+import { PoolsState } from "atoms/poolsState";
 import { toEGLD } from "helper/balance";
 import { formatAmount } from "helper/number";
 import { Unarray } from "interface/utilities";
@@ -10,34 +10,36 @@ const usePoolDataFormat = (data: Unarray<PoolsState["poolToDisplay"]>) => {
         poolStats || {};
     const { capacityPercent, lpValueUsd, ownLiquidity, value0, value1 } =
         liquidityData || {};
-    const tradingAPR = useMemo(
-        () => (formatAmount(apr_day || 0)),
-        [apr_day]
-    );
+    const tradingAPR = useMemo(() => formatAmount(apr_day || 0), [apr_day]);
     const emissionAPR = useMemo(
-        () => emission_apr === -1 ? "Infinity" : formatAmount(emission_apr || 0),
+        () =>
+            emission_apr === -1 ? "Infinity" : formatAmount(emission_apr || 0),
         [emission_apr]
     );
     const TVL = useMemo(
-        () => (formatAmount(total_value_locked || 0)),
+        () => formatAmount(total_value_locked || 0),
         [total_value_locked]
     );
     const volume24h = useMemo(
-        () => (formatAmount(usd_volume || 0)),
+        () => formatAmount(usd_volume || 0),
         [usd_volume]
     );
     const fValue0 = useMemo(
         () =>
-        formatAmount(
-            value0 ? toEGLD(pool.tokens[0], value0.toString()).toNumber() : 0
-        ),
+            formatAmount(
+                value0
+                    ? toEGLD(pool.tokens[0], value0.toString()).toNumber()
+                    : 0
+            ),
         [value0, pool]
     );
     const fValue1 = useMemo(
         () =>
-        formatAmount(
-            value1 ? toEGLD(pool.tokens[1], value1.toString()).toNumber() : 0
-        ),
+            formatAmount(
+                value1
+                    ? toEGLD(pool.tokens[1], value1.toString()).toNumber()
+                    : 0
+            ),
         [value1, pool]
     );
     const fCapacityPercent = useMemo(
@@ -50,14 +52,16 @@ const usePoolDataFormat = (data: Unarray<PoolsState["poolToDisplay"]>) => {
         [capacityPercent]
     );
     const fLpValueUsd = useMemo(
-        () => (formatAmount(lpValueUsd ? lpValueUsd.toNumber() : 0)),
+        () => formatAmount(lpValueUsd ? lpValueUsd.toNumber() : 0),
         [lpValueUsd]
     );
     const fOwnLiquidity = useMemo(
         () =>
-        formatAmount(
-            ownLiquidity ? toEGLD(pool.lpToken, ownLiquidity.toString()).toNumber() : 0
-        ),
+            formatAmount(
+                ownLiquidity
+                    ? toEGLD(pool.lpToken, ownLiquidity.toString()).toNumber()
+                    : 0
+            ),
         [ownLiquidity, pool.lpToken]
     );
     return {

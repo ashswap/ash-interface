@@ -25,3 +25,4 @@ export const TOKENS = !!IN_POOL_TOKENS.find((val) => val.id === ASH_TOKEN.id)
     ? [...IN_POOL_TOKENS]
     : [...IN_POOL_TOKENS, ASH_TOKEN];
 export const TOKENS_MAP = Object.fromEntries(TOKENS.map((t) => [t.id, t]));
+export const IN_POOL_TOKENS_MAP = Object.fromEntries(IN_POOL_TOKENS.map((t) => [t.id, t]));

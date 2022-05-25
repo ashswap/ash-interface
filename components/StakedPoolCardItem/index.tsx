@@ -1,21 +1,22 @@
-import { PoolsState } from "context/pools";
-import { Unarray } from "interface/utilities";
-import React, { useState } from "react";
-import Image from "next/image";
-import AddLiquidityModal from "components/AddLiquidityModal";
-import RemoveLiquidityModal from "components/RemoveLiquidityModal";
-import ICPlus from "assets/svg/plus.svg";
-import ICMinus from "assets/svg/minus.svg";
-import ICChevronDown from "assets/svg/chevron-down.svg";
-import ICChevronUp from "assets/svg/chevron-up.svg";
+
 import {
     AccountInfoSliceNetworkType,
-    useGetNetworkConfig,
+    useGetNetworkConfig
 } from "@elrondnetwork/dapp-core";
-import CardTooltip from "components/Tooltip/CardTooltip";
+import ICChevronDown from "assets/svg/chevron-down.svg";
+import ICChevronUp from "assets/svg/chevron-up.svg";
+import ICMinus from "assets/svg/minus.svg";
+import ICPlus from "assets/svg/plus.svg";
+import { PoolsState } from "atoms/poolsState";
+import AddLiquidityModal from "components/AddLiquidityModal";
+import RemoveLiquidityModal from "components/RemoveLiquidityModal";
 import TextAmt from "components/TextAmt";
+import CardTooltip from "components/Tooltip/CardTooltip";
 import { toEGLDD } from "helper/balance";
 import { formatAmount } from "helper/number";
+import { Unarray } from "interface/utilities";
+import Image from "next/image";
+import React, { useState } from "react";
 
 function StakedPoolCardItem({
     poolData,

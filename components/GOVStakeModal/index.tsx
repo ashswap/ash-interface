@@ -1,5 +1,5 @@
-import { useStakeGov } from "context/gov";
-import { useState } from "react";
+import { govLockedAmtState } from "atoms/govState";
+import { useRecoilValue } from "recoil";
 import FirstStakeModal from "./FirstStakeModal";
 import StakeMoreModal from "./StakeMoreModal";
 
@@ -8,7 +8,7 @@ type props = {
     onClose: () => void;
 };
 function GOVStakeModal({ open, onClose }: props) {
-    const {lockedAmt} = useStakeGov();
+    const lockedAmt = useRecoilValue(govLockedAmtState);
 
     return (
         <>

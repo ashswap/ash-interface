@@ -19,6 +19,9 @@ const moduleExports = withReactSvg(
                 { source: "/stake/mint", destination: "/", permanent: false },
             ];
         },
+        sentry: {
+            hideSourceMaps: true,
+        }
     })
 );
 
@@ -37,3 +40,16 @@ const sentryWebpackPluginOptions = {
 // Make sure adding Sentry options is the last code to run before exporting, to
 // ensure that your source maps include changes from all other Webpack plugins
 module.exports = withSentryConfig(moduleExports, sentryWebpackPluginOptions);
+
+// https://github.com/facebookexperimental/Recoil/issues/733
+// safely ignore recoil warning messages in dev (triggered by HMR)
+function interceptStdout(text) {
+  if (text.includes("Duplicate atom key")) {
+    return ""
+  }
+  return text
+}
+
+if (process.env.NODE_ENV === "development") {
+    require("intercept-stdout")(interceptStdout)
+}

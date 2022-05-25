@@ -11,13 +11,14 @@ import {
 import BigNumber from "bignumber.js";
 import { queryContractParser } from "helper/serializer";
 import IPool from "interface/pool";
-const proxy: ProxyProvider = getProxyProvider();
+
 const getAmountOut = async (
     poolAddress: string,
     tokenFromId: string,
     tokenToId: string,
     amountIn: BigNumber
 ) => {
+    const proxy: ProxyProvider = getProxyProvider();
     try {
         const { returnData } = await proxy.queryContract(
             new Query({
@@ -46,6 +47,7 @@ const getAmountOutMaiarPool = async (
     tokenFromId: string,
     amountIn: BigNumber
 ) => {
+    const proxy: ProxyProvider = getProxyProvider();
     try {
         const { returnData } = await proxy.queryContract(
             new Query({
@@ -78,6 +80,7 @@ const calculateAmountOut = async (
 };
 
 const getReserveMaiarPool = async (pool: IPool) => {
+    const proxy: ProxyProvider = getProxyProvider();
     const res = await proxy.queryContract(
         new Query({
             address: new Address(pool.address),
@@ -95,6 +98,7 @@ const getReserveMaiarPool = async (pool: IPool) => {
 };
 
 const getFeePct = async (pool: IPool) => {
+    const proxy: ProxyProvider = getProxyProvider();
     try {
         let feeRes: QueryResponse;
         if (pool.isMaiarPool) {
@@ -124,10 +128,37 @@ const getFeePct = async (pool: IPool) => {
     return new BigNumber(0);
 };
 
+const getTokenInLP = async (ownLiquidity: BigNumber, poolAddress: string) => {
+    const proxy: ProxyProvider = getProxyProvider();
+    return proxy
+        .queryContract(
+            new Query({
+                address: new Address(poolAddress),
+                func: new ContractFunction("getRemoveLiquidityTokens"),
+                args: [
+                    new BigUIntValue(ownLiquidity),
+                    new BigUIntValue(new BigNumber(0)),
+                    new BigUIntValue(new BigNumber(0)),
+                ],
+            })
+        )
+        .then(({ returnData }) => {
+            const values = queryContractParser(
+                returnData[0],
+                "tuple2<BigUint,BigUint>"
+            );
+            return {
+                value0: new BigNumber(values[0].valueOf().field0.toString()),
+                value1: new BigNumber(values[0].valueOf().field1.toString()),
+            };
+        });
+};
+
 export const queryPoolContract = {
     getAmountOut,
     getAmountOutMaiarPool,
     calculateAmountOut,
     getFeePct,
     getReserveMaiarPool,
+    getTokenInLP
 };
