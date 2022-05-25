@@ -19,6 +19,9 @@ const moduleExports = withReactSvg(
                 { source: "/stake/mint", destination: "/", permanent: false },
             ];
         },
+        sentry: {
+            hideSourceMaps: true,
+        }
     })
 );
 
