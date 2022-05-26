@@ -1,4 +1,8 @@
-import { poolDeboundKeywordState, poolKeywordState, poolRecordsState } from "atoms/poolsState";
+import {
+    poolDeboundKeywordState,
+    poolKeywordState,
+    poolRecordsState,
+} from "atoms/poolsState";
 import { walletBalanceState, walletLPMapState } from "atoms/walletState";
 import BigNumber from "bignumber.js";
 import BasicLayout from "components/Layout/Basic";
@@ -7,6 +11,7 @@ import PoolBanner from "components/PoolBanner";
 import PoolFilter, { ViewType } from "components/PoolFilter";
 import PoolMenu from "components/PoolMenu";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
+import { blockTimeMs } from "const/dappConfig";
 import pools from "const/pool";
 import { toEGLD } from "helper/balance";
 import { fetcher } from "helper/common";
@@ -17,11 +22,9 @@ import IPool from "interface/pool";
 import { PoolStatsRecord } from "interface/poolStats";
 import type { NextPage } from "next";
 import { useCallback, useEffect, useState } from "react";
-import { useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilCallback, useRecoilValue, useSetRecoilState } from "recoil";
 import useSWR from "swr";
 import { useDebounce } from "use-debounce";
-
-
 
 type PoolRecord = {
     pool: IPool;
@@ -42,9 +45,9 @@ type PoolRecord = {
 };
 const PoolStateHook = () => {
     const keyword = useRecoilValue(poolKeywordState);
-    const balances = useRecoilValue(walletBalanceState);
+    // const balances = useRecoilValue(walletBalanceState);
     const lpTokens = useRecoilValue(walletLPMapState);
-    const setPoolRecords = useSetRecoilState(poolRecordsState);
+    // const setPoolRecords = useSetRecoilState(poolRecordsState);
     const setDeboundKeyword = useSetRecoilState(poolDeboundKeywordState);
     const getLPValue = useLPValue();
     const [deboundKeyword] = useDebounce(keyword, 500);
@@ -59,46 +62,67 @@ const PoolStateHook = () => {
         fetcher
     );
 
-    const getPortion = useCallback(
-        (lpTokenId, ownLiquidity: BigNumber) => {
-            const lpToken = lpTokens[lpTokenId];
-            if (!lpToken) return new BigNumber(0);
-            return toEGLD(lpToken, ownLiquidity.toString())
-                .multipliedBy(100)
-                .div(lpToken.totalSupply!);
-        },
-        [lpTokens]
+    const getPortion = useRecoilCallback(
+        ({ snapshot, set }) =>
+            async (lpTokenId: string, ownLiquidity: BigNumber) => {
+                const lpTokens = await snapshot.getPromise(walletLPMapState);
+                const lpToken = lpTokens[lpTokenId];
+                if (!lpToken) return new BigNumber(0);
+                return toEGLD(lpToken, ownLiquidity.toString())
+                    .multipliedBy(100)
+                    .div(lpToken.totalSupply!);
+            },
+        []
     );
 
-    const getPoolRecords = useCallback(async () => {
-        const records: PoolRecord[] = [];
-        for (let i = 0; i < pools.length; i++) {
-            const p = pools[i];
-            if (p.isMaiarPool) continue;
-            let record: PoolRecord = {
-                pool: p,
-                poolStats: poolStatsRecords?.find(
-                    (stats) => stats.pool_address === p.address
-                ),
-            };
-            const ownLP = balances[p.lpToken.id]?.balance || new BigNumber(0);
-            if (ownLP.gt(0)) {
-                const { value0, value1 } = await queryPoolContract.getTokenInLP(ownLP, p.address);
-                record.liquidityData = {
-                    ownLiquidity: ownLP,
-                    capacityPercent: getPortion(p.lpToken.id, ownLP),
-                    value0,
-                    value1,
-                    lpValueUsd: await getLPValue(ownLP, p),
-                };
-            }
-            records.push(record);
-        }
-        setPoolRecords(records);
-    }, [balances, getPortion, getLPValue, poolStatsRecords, setPoolRecords]);
+    const getPoolRecords = useRecoilCallback(
+        ({ snapshot, set }) =>
+            async () => {
+                const balances = await snapshot.getPromise(walletBalanceState);
+
+                const recordPromises: Promise<PoolRecord>[] = [];
+                for (let i = 0; i < pools.length; i++) {
+                    const p = pools[i];
+                    if (p.isMaiarPool) continue;
+                    const promiseFn = (async () => {
+                        let record: PoolRecord = {
+                            pool: p,
+                            poolStats: poolStatsRecords?.find(
+                                (stats) => stats.pool_address === p.address
+                            ),
+                        };
+                        const ownLP =
+                            balances[p.lpToken.id]?.balance || new BigNumber(0);
+                        if (ownLP.gt(0)) {
+                            const { amt0, amt1, lpValueUsd } = await getLPValue(
+                                ownLP,
+                                p
+                            );
+                            record.liquidityData = {
+                                ownLiquidity: ownLP,
+                                capacityPercent: await getPortion(
+                                    p.lpToken.id,
+                                    ownLP
+                                ),
+                                value0: amt0,
+                                value1: amt1,
+                                lpValueUsd,
+                            };
+                        }
+                        return record;
+                    })();
+                    recordPromises.push(promiseFn);
+                }
+                const records = await Promise.all(recordPromises);
+                set(poolRecordsState, records);
+            },
+        [getPortion, getLPValue, poolStatsRecords]
+    );
 
     useEffect(() => {
         getPoolRecords();
+        const interval = setInterval(getPoolRecords, blockTimeMs);
+        return () => clearInterval(interval);
     }, [getPoolRecords]);
     return null;
 };
