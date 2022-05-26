@@ -1,8 +1,7 @@
 import {
-
     transactionServices,
     useGetAccountInfo,
-    useGetLoginInfo
+    useGetLoginInfo,
 } from "@elrondnetwork/dapp-core";
 import {
     Address,
@@ -10,7 +9,7 @@ import {
     ContractFunction,
     GasLimit,
     TokenIdentifierValue,
-    Transaction
+    Transaction,
 } from "@elrondnetwork/erdjs";
 import Fire from "assets/images/fire.png";
 import ICChevronDown from "assets/svg/chevron-down.svg";
@@ -37,7 +36,10 @@ import { toEGLD, toEGLDD, toWei } from "helper/balance";
 import { cancellablePromise } from "helper/cancellablePromise";
 import { queryPoolContract } from "helper/contracts/pool";
 import { formatAmount } from "helper/number";
-import { sendTransactions, useCreateTransaction } from "helper/transactionMethods";
+import {
+    sendTransactions,
+    useCreateTransaction,
+} from "helper/transactionMethods";
 import { useConnectWallet } from "hooks/useConnectWallet";
 import useMounted from "hooks/useMounted";
 import { useOnboarding } from "hooks/useOnboarding";
@@ -46,6 +48,7 @@ import { DappSendTransactionsPropsType } from "interface/dappCore";
 import IPool from "interface/pool";
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useDebounce } from "use-debounce";
 import styles from "./Swap.module.css";
 const MaiarPoolTooltip = ({
     children,
@@ -140,6 +143,7 @@ const Swap = () => {
         isInsufficentFund,
         slippage,
     } = useSwap();
+    const [valueFromDebound] = useDebounce(valueFrom, 500);
     const [showSetting, setShowSetting] = useState<boolean>(false);
     const [isOpenHistoryModal, openHistoryModal] = useState<boolean>(false);
     const [fee, setFee] = useState<number>(0);
@@ -152,6 +156,7 @@ const Swap = () => {
         transactionServices.useTrackTransactionStatus({
             transactionId: swapId,
         });
+    const [fetchingAmtOut, setFetchingAmtOut] = useState(false);
 
     const connectWallet = useConnectWallet();
     const { isLoggedIn: loggedIn } = useGetLoginInfo();
@@ -171,12 +176,12 @@ const Swap = () => {
     };
 
     const rawValueFrom = useMemo(() => {
-        if (!valueFrom || !tokenFrom) {
+        if (!valueFromDebound || !tokenFrom) {
             return new BigNumber(0);
         }
 
-        return toWei(tokenFrom, valueFrom);
-    }, [valueFrom, tokenFrom]);
+        return toWei(tokenFrom, valueFromDebound);
+    }, [valueFromDebound, tokenFrom]);
 
     const rawValueTo = useMemo(() => {
         if (!valueTo || !tokenTo) {
@@ -188,18 +193,18 @@ const Swap = () => {
 
     // calculate amount out
     useEffect(() => {
-        if (!pool || !tokenFrom || !tokenTo || !valueFrom) {
+        if (!pool || !tokenFrom || !tokenTo || rawValueFrom.eq(0)) {
             return;
         }
-        let amountIn = rawValueFrom;
 
         const calcPromise = queryPoolContract.calculateAmountOut(
             pool,
             tokenFrom.id,
             tokenTo.id,
-            amountIn
+            rawValueFrom
         );
         const { promise, cancel } = cancellablePromise(calcPromise);
+        setFetchingAmtOut(true);
         promise
             .then((amtOut) => {
                 setValueTo(
@@ -210,9 +215,10 @@ const Swap = () => {
                         .toString(10)
                 );
             })
-            .catch(() => {});
+            .catch(() => {})
+            .finally(() => setFetchingAmtOut(false));
         return () => cancel();
-    }, [valueFrom, tokenFrom, tokenTo, pool, rawValueFrom, setValueTo]);
+    }, [tokenFrom, tokenTo, pool, rawValueFrom, setValueTo]);
 
     // find pools + fetch reserves
     useEffect(() => {
@@ -259,17 +265,24 @@ const Swap = () => {
     }, [pool, setRates]);
 
     const swap = useCallback(async () => {
-        if (!loggedIn || !tokenFrom || !tokenTo || swapping || !pool) {
+        if (
+            !loggedIn ||
+            !tokenFrom ||
+            !tokenTo ||
+            swapping ||
+            !pool ||
+            fetchingAmtOut
+        ) {
             return;
         }
 
-        if (rawValueFrom.lte(0)) {
-            return;
-        }
-        setSwapping(true);
+        if (rawValueFrom.eq(0) || rawValueFrom.isNaN()) return;
         const minAmtOut = new BigNumber(
             Math.floor(rawValueTo.multipliedBy(1 - slippage).toNumber())
         );
+        if (minAmtOut.eq(0) || minAmtOut.isNaN()) return;
+        setSwapping(true);
+
         try {
             let tx: Transaction;
             if (pool.isMaiarPool) {
@@ -303,7 +316,13 @@ const Swap = () => {
             const payload: DappSendTransactionsPropsType = {
                 transactions: tx,
                 transactionsDisplayInfo: {
-                    successMessage: `Swap succeed ${valueFrom} ${tokenFrom.name} to ${valueTo} ${tokenTo.name}`,
+                    successMessage: `Swap succeed ${formatAmount(
+                        toEGLDD(tokenFrom.decimals, rawValueFrom).toNumber(),
+                        { notation: "standard" }
+                    )} ${tokenFrom.name} to ${formatAmount(
+                        toEGLDD(tokenTo.decimals, rawValueTo).toNumber(),
+                        { notation: "standard" }
+                    )} ${tokenTo.name}`,
                 },
             };
             const { error, sessionId } = await sendTransactions(payload);
@@ -329,13 +348,12 @@ const Swap = () => {
         tokenTo,
         swapping,
         createTx,
-        valueFrom,
-        valueTo,
         setValueTo,
         setValueFrom,
         slippage,
         rawValueTo,
         onboardingHistory,
+        fetchingAmtOut,
     ]);
 
     const priceImpact = useMemo(() => {
@@ -781,7 +799,7 @@ const Swap = () => {
                                         style={{ height: 48 }}
                                         className="mt-12 text-xs sm:text-sm"
                                         outline
-                                        disable={swapping}
+                                        disable={swapping || fetchingAmtOut}
                                         onClick={
                                             loggedIn
                                                 ? swap
