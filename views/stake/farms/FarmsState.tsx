@@ -174,7 +174,7 @@ const FarmsState = () => {
                 const farmTokenSupply = await getFarmTokenSupply(
                     f.farm_address
                 );
-                const totalLiquidityValue = await getLPValue(
+                const {lpValueUsd: totalLiquidityValue} = await getLPValue(
                     farmTokenSupply,
                     p
                 );
