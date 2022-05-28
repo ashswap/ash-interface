@@ -91,23 +91,23 @@ const devnet: IPool[] = [
 const testnet: IPool[] = [
     {
         address:
-            "erd1qqqqqqqqqqqqqpgqaphkarlvclh2c3v0hq2em73gcuxkh5yxj9ts6s5dt2",
+            "erd1qqqqqqqqqqqqqpgqup9ww85el3d609x96nuvev7axv3y7kcyj9ts6ny2us",
         lpToken: {
-            id: "LPT-89ce1b",
+            id: "LPT-f0204d",
             icon: "",
-            name: "LPT-89ce1b",
+            name: "LPT-f0204d",
             decimals: 18,
         },
         tokens: [
             {
-                id: "USDC-780dd8",
+                id: "USDC-cbf0b9",
                 icon: IconUSDC,
                 name: "USDC",
                 decimals: 6,
                 coingeckoId: "usd-coin",
             },
             {
-                id: "USDT-7d8186",
+                id: "USDT-8d1668",
                 icon: IconUSDT,
                 name: "USDT",
                 decimals: 6,
@@ -117,23 +117,23 @@ const testnet: IPool[] = [
     },
     {
         address:
-            "erd1qqqqqqqqqqqqqpgq4nkwakpzh60akfjld0990v93s803eam7j9ts76jvn0",
+            "erd1qqqqqqqqqqqqqpgqsteq4s8cspwhy3tfd2kn6sed87ktql3xj9tspx4qgs",
         lpToken: {
-            id: "LPT-a56ef1",
+            id: "LPT-75f818",
             icon: "",
-            name: "LPT-a56ef1",
+            name: "LPT-75f818",
             decimals: 18,
         },
         tokens: [
             {
-                id: "USDC-780dd8",
+                id: "USDC-cbf0b9",
                 icon: IconUSDC,
                 name: "USDC",
                 decimals: 6,
                 coingeckoId: "usd-coin",
             },
             {
-                id: "WUSDC-553207",
+                id: "WUSDC-365a33",
                 icon: IconWUSDC,
                 name: "wUSDC",
                 decimals: 6,
@@ -143,23 +143,23 @@ const testnet: IPool[] = [
     },
     {
         address:
-            "erd1qqqqqqqqqqqqqpgqu8cqv3ajn52pnkfz3ftuk49r0y4kxcezj9tse6q77g",
+            "erd1qqqqqqqqqqqqqpgqythjwuvwqw4qxl73fd8zzk2kh4wqfqgxj9tscants9",
         lpToken: {
-            id: "LPT-907366",
+            id: "LPT-2acb85",
             icon: "",
-            name: "LPT-907366",
+            name: "LPT-2acb85",
             decimals: 18,
         },
         tokens: [
             {
-                id: "BTC-38b805",
+                id: "RENBTC-36935a",
                 icon: IconBTC,
                 name: "BTC",
                 decimals: 6,
                 coingeckoId: "bitcoin",
             },
             {
-                id: "WBTC-aefe2f",
+                id: "WBTC-ebec12",
                 icon: IconWBTC,
                 name: "wBTC",
                 decimals: 6,
@@ -169,6 +169,6 @@ const testnet: IPool[] = [
     },
 ];
 
-const pools = ENVIRONMENT.NETWORK == "devnet" ? [...devnet, ...MAIAR_POOLS] : testnet;
+const pools = ENVIRONMENT.NETWORK == "devnet" ? [...devnet, ...MAIAR_POOLS] : [...testnet, ...MAIAR_POOLS];
 
 export default pools;
