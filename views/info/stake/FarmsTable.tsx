@@ -5,7 +5,7 @@ import ICStar from "assets/svg/star.svg";
 import { FARMS } from "const/farms";
 import pools from "const/pool";
 import { fetcher } from "helper/common";
-import { abbreviateCurrency, formatAmount } from "helper/number";
+import { formatAmount } from "helper/number";
 import { useScreenSize } from "hooks/useScreenSize";
 import { IFarm } from "interface/farm";
 import { FarmStatsRecord } from "interface/farmStats";

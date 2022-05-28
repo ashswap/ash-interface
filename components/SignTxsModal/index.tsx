@@ -1,9 +1,6 @@
 import {
     LoginMethodsEnum,
-    transactionServices,
     useGetLoginInfo,
-    useGetNotification,
-    useGetSignTransactionsError,
     useSignTransactions,
 } from "@elrondnetwork/dapp-core";
 import { Transition } from "@headlessui/react";
@@ -51,7 +48,6 @@ function SignTxsModal() {
                     </div>
                 </div>
             </Transition>
-
         </>
     );
 }

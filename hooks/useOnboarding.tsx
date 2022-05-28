@@ -14,12 +14,21 @@ type UserOnboardingStatus = {
     swap_input_amt?: boolean;
     swap_fair_price?: boolean;
     swap_history?: boolean;
+    pool_deposit?: boolean;
+    pool_deposit_input?: boolean;
+    pool_deposit_checkbox?: boolean;
+    pool_withdraw_input?: boolean;
+    pool_withdraw_estimate?: boolean;
+    pool_farm_from_added_lp?: boolean;
 };
 export const useOnboarding = (key: keyof UserOnboardingStatus) => {
     const [state, setState] = useState<boolean>(false);
     useEffect(() => {
         const data: UserOnboardingStatus = storage.local.getItem("userOnboarding");
-        setState(!data?.[key]);
+        setTimeout(() => {
+            setState(!data?.[key]);
+        }, 1000);
+        
     }, [key]);
     const _setState = useCallback(
         (val: boolean) => {

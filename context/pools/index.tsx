@@ -1,10 +1,11 @@
+import { walletBalanceState, walletLPMapState } from "atoms/walletState";
 import BigNumber from "bignumber.js";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 import pools from "const/pool";
-import useContracts from "context/contracts";
-import { useWallet } from "context/wallet";
 import { toEGLD } from "helper/balance";
 import { fetcher } from "helper/common";
+import { queryPoolContract } from "helper/contracts/pool";
+import useLPValue from "hooks/usePoolContract/useLPValue";
 import IPool from "interface/pool";
 import { PoolStatsRecord } from "interface/poolStats";
 import {
@@ -15,8 +16,9 @@ import {
     useContext,
     useEffect,
     useMemo,
-    useState,
+    useState
 } from "react";
+import { useRecoilValue } from "recoil";
 import useSWR from "swr";
 import { useDebounce } from "use-debounce";
 const emptyFunc = () => {};
@@ -73,9 +75,9 @@ const PoolsProvider = ({ children }: any) => {
     const [deboundKeyword] = useDebounce(keyword, 500);
     const [stakedOnly, setStakedOnly] = useState(false);
     const [inactive, setInactive] = useState(false);
-    const { balances } = useWallet();
-    const { getTokenInLP, getLPValue } = useContracts();
-    const { lpTokens } = useWallet();
+    const getLPValue = useLPValue();
+    const balances = useRecoilValue(walletBalanceState);
+    const lpTokens = useRecoilValue(walletLPMapState);
     // fetch pool stats
     const { data: poolStatsRecords } = useSWR<PoolStatsRecord[]>(
         `${ASHSWAP_CONFIG.ashApiBaseUrl}/pool`,
@@ -97,30 +99,28 @@ const PoolsProvider = ({ children }: any) => {
         const records: PoolRecord[] = [];
         for (let i = 0; i < pools.length; i++) {
             const p = pools[i];
-            if(p.isMaiarPool) continue;
+            if (p.isMaiarPool) continue;
             let record: PoolRecord = {
                 pool: p,
                 poolStats: poolStatsRecords?.find(
                     (stats) => stats.pool_address === p.address
                 ),
             };
-            const ownLP = balances?.[p.lpToken.id]
-                ? balances?.[p.lpToken.id].balance
-                : new BigNumber(0);
+            const ownLP = balances[p.lpToken.id]?.balance || new BigNumber(0);
             if (ownLP.gt(0)) {
-                const { value0, value1 } = await getTokenInLP(ownLP, p.address);
+                const {amt0, amt1, lpValueUsd} = await getLPValue(ownLP, p);
                 record.liquidityData = {
                     ownLiquidity: ownLP,
                     capacityPercent: getPortion(p.lpToken.id, ownLP),
-                    value0,
-                    value1,
-                    lpValueUsd: await getLPValue(ownLP, p),
+                    value0: amt0,
+                    value1: amt1,
+                    lpValueUsd,
                 };
             }
             records.push(record);
         }
         setPoolRecords(records);
-    }, [balances, getTokenInLP, getPortion, getLPValue, poolStatsRecords]);
+    }, [balances, getPortion, getLPValue, poolStatsRecords]);
 
     useEffect(() => {
         getPoolRecords();

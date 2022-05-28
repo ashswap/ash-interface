@@ -2,19 +2,20 @@ import {
     loginServices,
     useGetLoginInfo
 } from "@elrondnetwork/dapp-core";
+import { walletIsOpenConnectModalState } from "atoms/walletState";
 import BaseModal from "components/BaseModal";
-import { useWallet } from "context/wallet";
 import Image from "next/image";
 import platform from "platform";
 import QRCode from "qrcode";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import connectWalletBg from "../../assets/images/connect-wallet-bg.png";
-import downloadAppGallery from "../../assets/images/download-app-gallery.png";
-import downloadAppStore from "../../assets/images/download-app-store.png";
-import downloadPlayStore from "../../assets/images/download-play-store.png";
-import maiarLogo from "../../assets/images/maiar-logo.png";
-import ICConnectApp from "../../assets/svg/connect-app.svg";
-import ICConnectExtension from "../../assets/svg/connect-extension.svg";
+import { useRecoilState } from "recoil";
+import connectWalletBg from "assets/images/connect-wallet-bg.png";
+import downloadAppGallery from "assets/images/download-app-gallery.png";
+import downloadAppStore from "assets/images/download-app-store.png";
+import downloadPlayStore from "assets/images/download-play-store.png";
+import maiarLogo from "assets/images/maiar-logo.png";
+import ICConnectApp from "assets/svg/connect-app.svg";
+import ICConnectExtension from "assets/svg/connect-extension.svg";
 import styles from "./ConnectWalletModal.module.css";
 
 const MAIAR_WALLET_LINK = {
@@ -27,8 +28,9 @@ const MAIAR_WALLET_LINK = {
 
 function ConnectWalletModal() {
     const { isLoggedIn: loggedIn } = useGetLoginInfo();
-    const { isOpenConnectWalletModal, setIsOpenConnectWalletModal } =
-        useWallet();
+    const [ isOpenConnectWalletModal, setIsOpenConnectWalletModal ] =
+        useRecoilState(walletIsOpenConnectModalState);
+    
     const [isOpenQR, setIsOpenQR] = useState(false);
     const [isOpenDownloadExtension, setIsOpenDownloadExtension] =
         useState(false);

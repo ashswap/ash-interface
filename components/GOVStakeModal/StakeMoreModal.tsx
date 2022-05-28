@@ -1,24 +1,28 @@
 import ICArrowTopRight from "assets/svg/arrow-top-right.svg";
 import ICChevronRight from "assets/svg/chevron-right.svg";
+import { accIsInsufficientEGLDState } from "atoms/dappState";
+import { govLockedAmtState, govTotalSupplyVeASH, govUnlockTSState, govVeASHAmtState } from "atoms/govState";
+import { walletBalanceState } from "atoms/walletState";
 import BigNumber from "bignumber.js";
 import BaseModal from "components/BaseModal";
 import Checkbox from "components/Checkbox";
 import InputCurrency from "components/InputCurrency";
 import Switch from "components/Switch";
+import TextAmt from "components/TextAmt";
 import CardTooltip from "components/Tooltip/CardTooltip";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
 import { ENVIRONMENT } from "const/env";
 import { ASH_TOKEN, VE_ASH_DECIMALS } from "const/tokens";
-import { useStakeGov } from "context/gov";
-import { useWallet } from "context/wallet";
 import { toEGLDD, toWei } from "helper/balance";
-import { fractionFormat } from "helper/number";
+import { estimateVeASH } from "helper/voteEscrow";
+import useGovLockMore from "hooks/useGovContract/useGovLockMore";
 import useMediaQuery from "hooks/useMediaQuery";
 import { useOnboarding } from "hooks/useOnboarding";
 import { useScreenSize } from "hooks/useScreenSize";
 import moment from "moment";
 import Image from "next/image";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useRecoilValue } from "recoil";
 import LockPeriod, { lockPeriodFormater } from "./LockPeriod";
 type props = {
     open: boolean;
@@ -50,16 +54,15 @@ const EXTEND_TEST = {
 const EXTEND_CONFIG =
     ENVIRONMENT.NETWORK === "devnet" ? EXTEND_DEV : EXTEND_TEST;
 const StakeMoreContent = ({ open, onClose }: props) => {
-    const {
-        lockedAmt,
-        unlockTS,
-        lockMoreASH,
-        estimateVeASH,
-        totalSupplyVeASH,
-        veASH,
-    } = useStakeGov();
-    const { balances, insufficientEGLD } = useWallet();
-    const ASHBalance = useMemo(() => balances[ASH_TOKEN.id], [balances]);
+    const lockedAmt = useRecoilValue(govLockedAmtState);
+    const unlockTS = useRecoilValue(govUnlockTSState);
+    const totalSupplyVeASH = useRecoilValue(govTotalSupplyVeASH);
+    const veASH = useRecoilValue(govVeASHAmtState);
+    const lockMoreASH = useGovLockMore();
+
+    const balances = useRecoilValue(walletBalanceState);
+    const insufficientEGLD = useRecoilValue(accIsInsufficientEGLDState);
+    const ASHBalance = useMemo(() => balances[ASH_TOKEN.id]?.balance || new BigNumber(0), [balances]);
     const [lockAmt, setLockAmt] = useState<BigNumber>(new BigNumber(0));
     const [rawLockAmt, setRawLockAmt] = useState("");
     const [currentLockSeconds, setCurrentLockSeconds] = useState(0);
@@ -88,11 +91,6 @@ const StakeMoreContent = ({ open, onClose }: props) => {
             },
         ];
     }, [currentLockSeconds]);
-    const fLockedAmt = useMemo(() => {
-        return fractionFormat(
-            toEGLDD(ASH_TOKEN.decimals, lockedAmt).toNumber()
-        );
-    }, [lockedAmt]);
     useEffect(() => {
         if (currentLockSeconds === 0) {
             setIsExtend(true);
@@ -100,15 +98,15 @@ const StakeMoreContent = ({ open, onClose }: props) => {
     }, [currentLockSeconds]);
     const setMaxLockAmt = useCallback(() => {
         if (!ASHBalance) return;
-        setLockAmt(ASHBalance.balance);
+        setLockAmt(ASHBalance);
         setRawLockAmt(
-            toEGLDD(ASH_TOKEN.decimals, ASHBalance.balance).toString(10)
+            toEGLDD(ASH_TOKEN.decimals, ASHBalance).toString(10)
         );
     }, [ASHBalance]);
 
     const insufficientASH = useMemo(() => {
         if (!ASHBalance) return true;
-        return lockAmt.gt(ASHBalance.balance);
+        return lockAmt.gt(ASHBalance);
     }, [ASHBalance, lockAmt]);
 
     const canStake = useMemo(() => {
@@ -156,19 +154,12 @@ const StakeMoreContent = ({ open, onClose }: props) => {
         }
         return estimateVeASH(lockedAmt.plus(lockAmt), currentLockSeconds);
     }, [
-        estimateVeASH,
         extendLockPeriod,
         lockedAmt,
         lockAmt,
         currentLockSeconds,
         isExtend,
     ]);
-    const fEstimatedVeASH = useMemo(() => {
-        const num = toEGLDD(VE_ASH_DECIMALS, estimatedVeASH).toNumber();
-        return num === 0
-            ? "_"
-            : fractionFormat(num, { maximumFractionDigits: num < 1 ? 8 : 2 });
-    }, [estimatedVeASH]);
     const estimatedCapacity = useMemo(() => {
         const pct = estimatedVeASH
             .multipliedBy(100)
@@ -184,12 +175,7 @@ const StakeMoreContent = ({ open, onClose }: props) => {
         const e = estimatedCapacity.startsWith("<") ? 0 : +estimatedCapacity;
         return new BigNumber(e).minus(c).toNumber();
     }, [currentCapacity, estimatedCapacity]);
-    const fVeASH = useMemo(() => {
-        const num = toEGLDD(VE_ASH_DECIMALS, veASH).toNumber();
-        return num === 0
-            ? "0"
-            : fractionFormat(num, { maximumFractionDigits: num < 1 ? 8 : 2 });
-    }, [veASH]);
+
     useEffect(() => {
         if (isTouchScreen) {
             setOpenOnboardingExtendTooltip(true);
@@ -206,6 +192,7 @@ const StakeMoreContent = ({ open, onClose }: props) => {
         const interval = setInterval(func, 60 * 1000);
         return () => clearInterval(interval);
     }, [unlockTS]);
+    const aClass = "";
     return (
         <>
             <div className="px-6 lg:px-20 pb-12 overflow-auto relative">
@@ -239,16 +226,19 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                                     <span className="text-ash-gray-500">
                                         Balance:{" "}
                                     </span>
+
                                     <span
                                         className="text-earn cursor-pointer"
                                         onClick={() => setMaxLockAmt()}
                                     >
-                                        {ASHBalance
-                                            ? toEGLDD(
-                                                  ASH_TOKEN.decimals,
-                                                  ASHBalance.balance
-                                              ).toFixed(2)
-                                            : "_"}{" "}
+                                        <TextAmt
+                                            number={toEGLDD(
+                                                ASH_TOKEN.decimals,
+                                                ASHBalance
+                                            )}
+                                            options={{ notation: "standard" }}
+                                        />
+                                        &nbsp;
                                         {ASH_TOKEN.name}
                                     </span>
                                 </div>
@@ -270,16 +260,25 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                                 </div>
                                 <div className="bg-stake-dark-500 h-14 lg:h-18 px-6 flex items-center justify-end text-ash-gray-500">
                                     <div className="text-right text-sm lg:text-lg">
-                                        {fLockedAmt}
+                                        <TextAmt
+                                            number={toEGLDD(
+                                                ASH_TOKEN.decimals,
+                                                lockedAmt
+                                            )}
+                                            options={{ notation: "standard" }}
+                                        />
                                     </div>
                                 </div>
                                 <div className="text-right text-2xs lg:text-xs mt-2 text-ash-gray-500">
                                     <span>Total stake: </span>
                                     <span>
-                                        {toEGLDD(
-                                            ASH_TOKEN.decimals,
-                                            lockedAmt.plus(lockAmt)
-                                        ).toString(10)}{" "}
+                                        <TextAmt
+                                            number={toEGLDD(
+                                                ASH_TOKEN.decimals,
+                                                lockedAmt.plus(lockAmt)
+                                            )}
+                                            options={{ notation: "standard" }}
+                                        />{" "}
                                         ASH
                                     </span>
                                 </div>
@@ -477,12 +476,25 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                                             : "text-white"
                                     }`}
                                 >
-                                    {fVeASH}
+                                    <TextAmt
+                                        number={toEGLDD(VE_ASH_DECIMALS, veASH)}
+                                        decimalClassName={`${
+                                            lockAmt.gt(0) || isExtend
+                                                ? ""
+                                                : "text-stake-gray-500"
+                                        }`}
+                                    />
                                 </div>
                                 {(lockAmt.gt(0) || isExtend) && (
                                     <div className="flex items-start">
                                         <div className="text-white text-lg font-bold mr-6">
-                                            {fEstimatedVeASH}
+                                            <TextAmt
+                                                number={toEGLDD(
+                                                    VE_ASH_DECIMALS,
+                                                    estimatedVeASH
+                                                )}
+                                                decimalClassName="text-stake-gray-500"
+                                            />
                                         </div>
                                         <div className="text-ash-green-500 flex items-center text-2xs font-bold">
                                             <ICArrowTopRight className="mr-1.5" />

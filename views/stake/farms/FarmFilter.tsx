@@ -1,41 +1,40 @@
-import { FarmsState, useFarms } from "context/farms";
-import React from "react";
+import ICChevronDown from "assets/svg/chevron-down.svg";
 import ICGrid from "assets/svg/grid.svg";
 import ICList from "assets/svg/list.svg";
 import ICSearch from "assets/svg/search.svg";
-import ICChevronDown from "assets/svg/chevron-down.svg";
-import { useScreenSize } from "hooks/useScreenSize";
-import Input from "components/Input";
+import {
+    farmKeywordState,
+    farmSortOptionState,
+    FarmsState,
+    farmStakedOnlyState,
+    farmViewTypeState,
+} from "atoms/farmsState";
 import BasePopover from "components/BasePopover";
+import Input from "components/Input";
+import { useScreenSize } from "hooks/useScreenSize";
+import React from "react";
+import { useRecoilState } from "recoil";
 export enum ViewType {
     Card,
     List,
 }
-type props = {
-    viewType: ViewType;
-    onChangeViewType: (val: ViewType) => void;
-};
 const options: { value: FarmsState["sortOption"]; label: any }[] = [
     { value: "apr", label: "APR" },
     { value: "liquidity", label: "Liquidity" },
     { value: "volume", label: "24h Volume" },
 ];
-function FarmFilter({ viewType, onChangeViewType }: props) {
-    const {
-        stakedOnly,
-        setStakedOnly,
-        keyword,
-        setKeyword,
-        sortOption,
-        setSortOption,
-    } = useFarms();
+function FarmFilter() {
+    const [stakedOnly, setStakedOnly] = useRecoilState(farmStakedOnlyState);
+    const [keyword, setKeyword] = useRecoilState(farmKeywordState);
+    const [sortOption, setSortOption] = useRecoilState(farmSortOptionState);
+    const [viewType, onChangeViewType] = useRecoilState(farmViewTypeState);
     const screenSize = useScreenSize();
     const SearchBox = (
         <Input
             className="w-full md:max-w-80 h-12 px-5"
             backgroundClassName="bg-ash-dark-700"
             textColorClassName="text-input-3"
-            placeholder="Search pool"
+            placeholder="Search farms"
             type="text"
             textAlign="left"
             textClassName="font-normal text-xs md:text-sm"
@@ -46,6 +45,7 @@ function FarmFilter({ viewType, onChangeViewType }: props) {
             }}
         />
     );
+
     return (
         <div>
             <div className="flex space-x-4 mb-8">

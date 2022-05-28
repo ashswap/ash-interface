@@ -1,9 +1,8 @@
 import {
     getApiProvider,
     getProxyProvider,
-    sendTransactions,
     useGetAccountInfo,
-    useGetLoginInfo,
+    useGetLoginInfo
 } from "@elrondnetwork/dapp-core";
 import { SendTransactionReturnType } from "@elrondnetwork/dapp-core/dist/services/transactions";
 import {
@@ -17,17 +16,21 @@ import {
     Query,
     TokenIdentifierValue,
     Transaction,
-    U64Value,
+    U64Value
 } from "@elrondnetwork/erdjs";
 import BigNumber from "bignumber.js";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
-import { blockTimeMs, gasLimit } from "const/dappConfig";
+import { blockTimeMs } from "const/dappConfig";
+import { ENVIRONMENT } from "const/env";
 import pools from "const/pool";
 import { ASH_TOKEN } from "const/tokens";
-import useContracts from "context/contracts";
 import { toEGLD, toEGLDD, toWei } from "helper/balance";
 import { queryContractParser } from "helper/serializer";
-import { useCreateTransaction } from "helper/transactionMethods";
+import {
+    sendTransactions,
+    useCreateTransaction
+} from "helper/transactionMethods";
+import useLPValue from "hooks/usePoolContract/useLPValue";
 import { DappSendTransactionsPropsType } from "interface/dappCore";
 import IPool from "interface/pool";
 import moment from "moment";
@@ -36,14 +39,24 @@ import {
     useCallback,
     useContext,
     useEffect,
-    useState,
+    useState
 } from "react";
 const estimateVeASH = (weiAmt: BigNumber, lockSeconds: number) => {
+    if (ENVIRONMENT.NETWORK === "devnet") {
+        // ratio: lock 1 ASH in 2 weeks(14 days) -> 1 veASH
+        const veASHPerS = toEGLDD(ASH_TOKEN.decimals, weiAmt).multipliedBy(
+            new BigNumber(1).div(2 * 7 * 24 * 60 * 60)
+        );
+        return toWei(ASH_TOKEN, veASHPerS.multipliedBy(lockSeconds).toString());
+    }
     // ratio: lock 1 ASH in 1 year(365 days) -> 0.25 veASH
     const veASHPerSecond = toEGLDD(ASH_TOKEN.decimals, weiAmt).multipliedBy(
         new BigNumber(0.25).div(365 * 24 * 60 * 60)
     );
-    return toWei(ASH_TOKEN, veASHPerSecond.multipliedBy(lockSeconds).toString());
+    return toWei(
+        ASH_TOKEN,
+        veASHPerSecond.multipliedBy(lockSeconds).toString()
+    );
 };
 const emptySendTxsReturn: SendTransactionReturnType = { sessionId: "" };
 type GovStakeState = {
@@ -104,7 +117,7 @@ const StakeGovProvider = ({ children }: any) => {
     const [rewardValue, setRewardValue] = useState<BigNumber>(new BigNumber(0));
     const [rewardLPToken, setRewardLPToken] = useState<IPool>();
     const [totalLockedPct, setTotalLockedPct] = useState(0);
-    const { getLPValue } = useContracts();
+    const getLPValue = useLPValue();
     const createTransaction = useCreateTransaction();
     const { isLoggedIn: loggedIn } = useGetLoginInfo();
     const { address } = useGetAccountInfo();
@@ -126,10 +139,12 @@ const StakeGovProvider = ({ children }: any) => {
             try {
                 const payload: DappSendTransactionsPropsType = {
                     transactions: await createTransaction(
-                        new Address(ASHSWAP_CONFIG.dappContract.voteEscrowedContract),
+                        new Address(
+                            ASHSWAP_CONFIG.dappContract.voteEscrowedContract
+                        ),
                         {
                             func: new ContractFunction("ESDTTransfer"),
-                            gasLimit: new GasLimit(gasLimit),
+                            gasLimit: new GasLimit(7_000_000),
                             args: [
                                 new TokenIdentifierValue(
                                     Buffer.from(ASH_TOKEN.id)
@@ -166,7 +181,9 @@ const StakeGovProvider = ({ children }: any) => {
         proxy
             .queryContract(
                 new Query({
-                    address: new Address(ASHSWAP_CONFIG.dappContract.voteEscrowedContract),
+                    address: new Address(
+                        ASHSWAP_CONFIG.dappContract.voteEscrowedContract
+                    ),
                     func: new ContractFunction("balanceOfAtTs"),
                     args: [
                         new AddressValue(new Address(address)),
@@ -185,7 +202,9 @@ const StakeGovProvider = ({ children }: any) => {
         proxy
             .queryContract(
                 new Query({
-                    address: new Address(ASHSWAP_CONFIG.dappContract.voteEscrowedContract),
+                    address: new Address(
+                        ASHSWAP_CONFIG.dappContract.voteEscrowedContract
+                    ),
                     func: new ContractFunction("locked"),
                     args: [new AddressValue(new Address(address))],
                 })
@@ -205,7 +224,9 @@ const StakeGovProvider = ({ children }: any) => {
         proxy
             .queryContract(
                 new Query({
-                    address: new Address(ASHSWAP_CONFIG.dappContract.voteEscrowedContract),
+                    address: new Address(
+                        ASHSWAP_CONFIG.dappContract.voteEscrowedContract
+                    ),
                     func: new ContractFunction("totalSupplyAtTs"),
                     args: [new BigUIntValue(new BigNumber(ts))],
                 })
@@ -221,7 +242,9 @@ const StakeGovProvider = ({ children }: any) => {
         proxy
             .queryContract(
                 new Query({
-                    address: new Address(ASHSWAP_CONFIG.dappContract.feeDistributor),
+                    address: new Address(
+                        ASHSWAP_CONFIG.dappContract.feeDistributor
+                    ),
                     func: new ContractFunction("getClaimableAmount"),
                     args: [new AddressValue(new Address(address))],
                 })
@@ -239,7 +262,9 @@ const StakeGovProvider = ({ children }: any) => {
         proxy
             .queryContract(
                 new Query({
-                    address: new Address(ASHSWAP_CONFIG.dappContract.voteEscrowedContract),
+                    address: new Address(
+                        ASHSWAP_CONFIG.dappContract.voteEscrowedContract
+                    ),
                     func: new ContractFunction("totalLock"),
                 })
             )
@@ -258,10 +283,12 @@ const StakeGovProvider = ({ children }: any) => {
             let txs: Transaction[] = [];
             if (weiAmt && weiAmt.gt(0)) {
                 const increaseAmtTx = await createTransaction(
-                    new Address(ASHSWAP_CONFIG.dappContract.voteEscrowedContract),
+                    new Address(
+                        ASHSWAP_CONFIG.dappContract.voteEscrowedContract
+                    ),
                     {
                         func: new ContractFunction("ESDTTransfer"),
-                        gasLimit: new GasLimit(gasLimit),
+                        gasLimit: new GasLimit(7_000_000),
                         args: [
                             new TokenIdentifierValue(Buffer.from(ASH_TOKEN.id)),
                             new BigUIntValue(weiAmt),
@@ -275,10 +302,12 @@ const StakeGovProvider = ({ children }: any) => {
             }
             if (unlockTimestamp && unlockTimestamp.gt(unlockTS)) {
                 const increaseLockTSTx = await createTransaction(
-                    new Address(ASHSWAP_CONFIG.dappContract.voteEscrowedContract),
+                    new Address(
+                        ASHSWAP_CONFIG.dappContract.voteEscrowedContract
+                    ),
                     {
                         func: new ContractFunction("increase_unlock_time"),
-                        gasLimit: new GasLimit(gasLimit),
+                        gasLimit: new GasLimit(7_000_000),
                         args: [new U64Value(unlockTimestamp)],
                     }
                 );
@@ -308,7 +337,9 @@ const StakeGovProvider = ({ children }: any) => {
         proxy
             .queryContract(
                 new Query({
-                    address: new Address(ASHSWAP_CONFIG.dappContract.feeDistributor),
+                    address: new Address(
+                        ASHSWAP_CONFIG.dappContract.feeDistributor
+                    ),
                     func: new ContractFunction("token"),
                 })
             )
@@ -326,41 +357,20 @@ const StakeGovProvider = ({ children }: any) => {
             const tx1 = await createTransaction(
                 new Address(ASHSWAP_CONFIG.dappContract.feeDistributor),
                 {
-                    func: new ContractFunction("checkpoint_total_supply_1"),
-                    gasLimit: new GasLimit(gasLimit),
+                    func: new ContractFunction("checkpoint_total_supply"),
+                    gasLimit: new GasLimit(7_000_000),
                 }
             );
             const tx2 = await createTransaction(
                 new Address(ASHSWAP_CONFIG.dappContract.feeDistributor),
                 {
-                    func: new ContractFunction("checkpoint_total_supply_2"),
-                    gasLimit: new GasLimit(gasLimit),
-                }
-            );
-            const tx3 = await createTransaction(
-                new Address(ASHSWAP_CONFIG.dappContract.feeDistributor),
-                {
-                    func: new ContractFunction("checkpoint_total_supply_2"),
-                    gasLimit: new GasLimit(gasLimit),
-                }
-            );
-            const tx4 = await createTransaction(
-                new Address(ASHSWAP_CONFIG.dappContract.feeDistributor),
-                {
-                    func: new ContractFunction("checkpoint_total_supply_2"),
-                    gasLimit: new GasLimit(gasLimit),
-                }
-            );
-            const tx5 = await createTransaction(
-                new Address(ASHSWAP_CONFIG.dappContract.feeDistributor),
-                {
                     func: new ContractFunction("claim"),
-                    gasLimit: new GasLimit(gasLimit),
+                    gasLimit: new GasLimit(500_000_000),
                     args: [new AddressValue(new Address(address))],
                 }
             );
             const payload: DappSendTransactionsPropsType = {
-                transactions: [tx1, tx2, tx3, tx4, tx5],
+                transactions: [tx1, tx2],
                 transactionsDisplayInfo: {
                     successMessage: `Reward was sent to your wallet`,
                 },
@@ -378,10 +388,12 @@ const StakeGovProvider = ({ children }: any) => {
         try {
             const payload: DappSendTransactionsPropsType = {
                 transactions: await createTransaction(
-                    new Address(ASHSWAP_CONFIG.dappContract.voteEscrowedContract),
+                    new Address(
+                        ASHSWAP_CONFIG.dappContract.voteEscrowedContract
+                    ),
                     {
                         func: new ContractFunction("withdraw"),
-                        gasLimit: new GasLimit(gasLimit),
+                        gasLimit: new GasLimit(7_000_000),
                     }
                 ),
                 transactionsDisplayInfo: {
@@ -403,7 +415,7 @@ const StakeGovProvider = ({ children }: any) => {
             setRewardValue(new BigNumber(0));
             return;
         }
-        const value = await getLPValue(rewardLPAmt, rewardLPToken);
+        const {lpValueUsd: value} = await getLPValue(rewardLPAmt, rewardLPToken);
         setRewardValue(value || new BigNumber(0));
     }, [rewardLPAmt, rewardLPToken, getLPValue]);
 

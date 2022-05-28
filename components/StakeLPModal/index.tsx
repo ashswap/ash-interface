@@ -1,18 +1,22 @@
 import ICChevronRight from "assets/svg/chevron-right.svg";
+import { accIsInsufficientEGLDState } from "atoms/dappState";
+import { FarmsState } from "atoms/farmsState";
+import { walletBalanceState } from "atoms/walletState";
 import BigNumber from "bignumber.js";
 import BaseModal from "components/BaseModal";
 import Checkbox from "components/Checkbox";
 import InputCurrency from "components/InputCurrency";
+import TextAmt from "components/TextAmt";
 import { blockTimeMs } from "const/dappConfig";
 import { ASH_TOKEN } from "const/tokens";
-import { FarmsState, useFarms } from "context/farms";
-import { useWallet } from "context/wallet";
 import { toEGLDD, toWei } from "helper/balance";
-import { fractionFormat } from "helper/number";
+import { formatAmount } from "helper/number";
+import useEnterFarm from "hooks/useFarmContract/useEnterFarm";
 import { useScreenSize } from "hooks/useScreenSize";
 import { Unarray } from "interface/utilities";
 import Image from "next/image";
 import React, { useCallback, useMemo, useState } from "react";
+import { useRecoilValue } from "recoil";
 type props = {
     open: boolean;
     onClose: () => void;
@@ -23,10 +27,11 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
         farmData;
     const [token0, token1] = pool.tokens;
     const [isAgree, setIsAgree] = useState(false);
-    const { balances, insufficientEGLD } = useWallet();
+    const balances = useRecoilValue(walletBalanceState);
+    const insufficientEGLD = useRecoilValue(accIsInsufficientEGLDState);
     const [stakeAmt, setStakeAmt] = useState<BigNumber>(new BigNumber(0));
     const [rawStakeAmt, setRawStakeAmt] = useState("");
-    const { enterFarm } = useFarms();
+    const enterFarm = useEnterFarm();
     const LPBalance = useMemo(
         () => balances[pool.lpToken.id],
         [balances, pool.lpToken]
@@ -126,12 +131,16 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
                                     className="text-earn cursor-pointer"
                                     onClick={() => setMaxStakeAmt()}
                                 >
-                                    {LPBalance
-                                        ? toEGLDD(
-                                              pool.lpToken.decimals,
-                                              LPBalance.balance.toString()
-                                          ).toFixed(2)
-                                        : "0.00"}{" "}
+                                    <TextAmt
+                                        number={
+                                            LPBalance
+                                                ? toEGLDD(
+                                                      pool.lpToken.decimals,
+                                                      LPBalance.balance
+                                                  )
+                                                : 0
+                                        }
+                                    />{" "}
                                     {lpName}
                                 </span>
                             </div>
@@ -148,12 +157,13 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
                                 ASH earn per day
                             </div>
                             <div className="text-white text-lg font-bold">
-                                {fractionFormat(
-                                    toEGLDD(
+                                <TextAmt
+                                    number={toEGLDD(
                                         ASH_TOKEN.decimals,
                                         ashPerDay
-                                    ).toNumber()
-                                )}
+                                    )}
+                                    decimalClassName="text-stake-gray-500"
+                                />
                             </div>
                         </div>
                         <div>
@@ -161,7 +171,10 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
                                 Emission APR
                             </div>
                             <div className="text-white text-lg font-bold">
-                                {fractionFormat(emissionAPR.toNumber())}%
+                                {formatAmount(emissionAPR?.toNumber() || 0, {
+                                    notation: "standard",
+                                })}
+                                %
                             </div>
                         </div>
                     </div>

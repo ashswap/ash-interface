@@ -1,42 +1,32 @@
 import {
     getProxyProvider,
-    sendTransactions,
     useGetAccountInfo,
     useGetLoginInfo
 } from "@elrondnetwork/dapp-core";
-import {
-    Address,
-    AddressValue,
-    ArgSerializer,
-    BigUIntValue,
-    ContractFunction,
-    EndpointParameterDefinition,
-    GasLimit,
-    Query,
-    TokenIdentifierValue,
-    TypeExpressionParser,
-    TypeMapper
-} from "@elrondnetwork/erdjs";
 import IconRight from "assets/svg/right-white.svg";
+import { addLPSessionIdAtom } from "atoms/addLiquidity";
+import { PoolsState } from "atoms/poolsState";
+import { walletBalanceState, walletTokenPriceState } from "atoms/walletState";
 import BigNumber from "bignumber.js";
 import BaseModal from "components/BaseModal";
 import Button from "components/Button";
 import Checkbox from "components/Checkbox";
 import InputCurrency from "components/InputCurrency";
-import { gasLimit } from "const/dappConfig";
-import { PoolsState } from "context/pools";
-import { useWallet } from "context/wallet";
-import { toEGLD, toWei } from "helper/balance";
-import { queryPoolContract } from "helper/contracts/pool";
-import { fractionFormat } from "helper/number";
-import { useCreateTransaction } from "helper/transactionMethods";
+import TextAmt from "components/TextAmt";
+import OnboardTooltip from "components/Tooltip/OnboardTooltip";
+import { toEGLDD, toWei } from "helper/balance";
+import {
+    useCreateTransaction
+} from "helper/transactionMethods";
+import { useOnboarding } from "hooks/useOnboarding";
+import usePoolAddLP from "hooks/usePoolContract/usePoolAddLP";
 import { useScreenSize } from "hooks/useScreenSize";
-import { DappSendTransactionsPropsType } from "interface/dappCore";
 import { IToken } from "interface/token";
 import { Unarray } from "interface/utilities";
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import { theme } from "tailwind.config";
 import { useDebounce } from "use-debounce";
 
@@ -51,7 +41,7 @@ interface TokenInputProps {
     isInsufficentFund: boolean;
     onChangeValue: (val: string) => void;
     balance: string;
-    tokenInPool: string;
+    tokenInPool: BigNumber;
 }
 const TokenInput = ({
     token,
@@ -75,7 +65,8 @@ const TokenInput = ({
                             {token.name}
                         </div>
                         <div className="text-text-input-3 text-xs truncate leading-tight">
-                            {tokenInPool}&nbsp; in pool
+                            <TextAmt number={tokenInPool} />
+                            &nbsp; in pool
                         </div>
                     </div>
                     <div className="block sm:hidden text-xs font-bold text-white">
@@ -117,7 +108,12 @@ const TokenInput = ({
                         className="text-earn select-none cursor-pointer"
                         onClick={() => onChangeValue(balance)}
                     >
-                        {balance} {token.name}
+                        <TextAmt
+                            number={balance}
+                            options={{ notation: "standard" }}
+                        />
+                        &nbsp;
+                        {token.name}
                     </span>
                 </div>
             </div>
@@ -133,14 +129,23 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
     const [isProMode, setIsProMode] = useState(false);
     const [adding, setAdding] = useState(false);
     const createTx = useCreateTransaction();
-    const { fetchBalances, balances, tokenPrices } = useWallet();
+    const addPoolLP = usePoolAddLP();
+    // recoil
+    const balances = useRecoilValue(walletBalanceState);
+    const tokenPrices = useRecoilValue(walletTokenPriceState);
+    // end recoil
     const { isLoggedIn: loggedIn } = useGetLoginInfo();
     const { address, account } = useGetAccountInfo();
     const proxy = getProxyProvider();
-    // const provider = dapp.dapp.provider;
-    const [rates, setRates] = useState<BigNumber[] | undefined>(undefined);
     const { pool, poolStats, liquidityData } = poolData;
+    const [onboardingDepositInput, setOnboardedDepositInput] =
+        useOnboarding("pool_deposit_input");
+    const [onboardingPoolCheck, setOnboardedPoolCheck] = useOnboarding(
+        "pool_deposit_checkbox"
+    );
 
+    const setAddLPSessionId = useSetRecoilState(addLPSessionIdAtom);
+    const screenSize = useScreenSize();
     // reset when open modal
     useEffect(() => {
         if (open) {
@@ -150,143 +155,57 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
         }
     }, [open]);
 
+    useEffect(() => {
+        if (new BigNumber(value0 || 0).plus(new BigNumber(value1 || 0)).gt(0)) {
+            setOnboardedDepositInput(true);
+        }
+    }, [value0, value1, setOnboardedDepositInput]);
+
     const addLP = useCallback(async () => {
         if (!loggedIn || adding) return;
         setAdding(true);
-        let sessionId = "";
+        const v0 = toWei(pool.tokens[0], value0 || "0");
+        const v1 = toWei(pool.tokens[1], value1 || "0");
         try {
-            let tx = await createTx(new Address(address), {
-                func: new ContractFunction("MultiESDTNFTTransfer"),
-                gasLimit: new GasLimit(gasLimit),
-                args: [
-                    new AddressValue(new Address(pool.address)),
-                    new BigUIntValue(new BigNumber(2)),
-
-                    new TokenIdentifierValue(Buffer.from(pool.tokens[0].id)),
-                    new BigUIntValue(new BigNumber(0)),
-                    new BigUIntValue(toWei(pool.tokens[0], value0)),
-
-                    new TokenIdentifierValue(Buffer.from(pool.tokens[1].id)),
-                    new BigUIntValue(new BigNumber(0)),
-                    new BigUIntValue(toWei(pool.tokens[1], value1)),
-
-                    new TokenIdentifierValue(Buffer.from("addLiquidity")),
-                    new BigUIntValue(toWei(pool.tokens[0], value0)),
-                    new BigUIntValue(toWei(pool.tokens[1], value1)),
-                    new AddressValue(Address.Zero()),
-                ],
-            });
-            const payload: DappSendTransactionsPropsType = {
-                transactions: tx,
-                transactionsDisplayInfo: {
-                    successMessage: `Add liquidity Success ${value0} ${pool.tokens[0].name} and ${value1} ${pool.tokens[1].name}`,
-                },
-            };
-            sessionId = (await sendTransactions(payload)).sessionId || "";
-            fetchBalances();
+            const { sessionId } = await addPoolLP(pool, v0, v1);
+            setAddLPSessionId(sessionId || "");
+            if (sessionId) onClose?.();
         } catch (error) {
-            // TODO: extension close without response
-            console.log(error);
+            console.error(error);
+        } finally {
+            setAdding(false);
         }
-        setAdding(false);
-        if (sessionId) onClose?.();
     }, [
         value0,
         value1,
         pool,
         onClose,
-        fetchBalances,
         adding,
-        address,
         loggedIn,
-        createTx,
+        addPoolLP,
+        setAddLPSessionId,
     ]);
 
-    // find pools + fetch reserves
-    useEffect(() => {
-        let isMounted = true;
-
-        if (!pool || !proxy) {
-            return;
-        }
-        const [token1, token2] = pool.tokens;
-
-        Promise.all([
-            queryPoolContract.getAmountOut(pool.address, token1.id, token2.id, new BigNumber(10).exponentiatedBy(token1.decimals)),
-            queryPoolContract.getAmountOut(pool.address, token2.id, token1.id, new BigNumber(10).exponentiatedBy(token2.decimals)),
-        ]).then((results) => {
-            if (isMounted) {
-                setRates(results);
-            }
-        });
-
-        return () => {
-            isMounted = false;
-        };
-    }, [pool, proxy, setRates]);
-
-    const onChangeValue0 = useCallback(
-        (value: string) => {
-            if (!rates) {
-                return;
-            }
-
-            setValue0(value);
-            setValue1(
-                value
-                    ? toEGLD(
-                          pool.tokens[1],
-                          rates[0].multipliedBy(new BigNumber(value)).toString()
-                      ).toString(10)
-                    : ""
-            );
-        },
-        [rates, pool]
-    );
-
-    const onChangeValue1 = useCallback(
-        (value: string) => {
-            if (!rates) {
-                return;
-            }
-
-            setValue1(value);
-            setValue0(
-                value
-                    ? toEGLD(
-                          pool.tokens[0],
-                          rates[1].multipliedBy(new BigNumber(value)).toString()
-                      ).toString(10)
-                    : ""
-            );
-        },
-        [rates, pool]
-    );
-
     const balance0 = useMemo(() => {
-        return balances[pool.tokens[0].id]
-            ? balances[pool.tokens[0].id].balance
-                  .div(
-                      new BigNumber(10).exponentiatedBy(pool.tokens[0].decimals)
-                  )
-                  .toFixed(3)
-                  .toString()
-            : "0";
+        return (
+            balances[pool.tokens[0].id]?.balance
+                .div(new BigNumber(10).exponentiatedBy(pool.tokens[0].decimals))
+                .toFixed(8)
+                .toString() || "0"
+        );
     }, [balances, pool]);
 
     const balance1 = useMemo(() => {
-        return balances[pool.tokens[1].id]
-            ? balances[pool.tokens[1].id].balance
-                  .div(
-                      new BigNumber(10).exponentiatedBy(pool.tokens[1].decimals)
-                  )
-                  .toFixed(3)
-                  .toString()
-            : "0";
+        return (
+            balances[pool.tokens[1].id]?.balance
+                .div(new BigNumber(10).exponentiatedBy(pool.tokens[1].decimals))
+                .toFixed(8)
+                .toString() || "0"
+        );
     }, [balances, pool]);
 
     const isInsufficentFund0 = useMemo(() => {
-        if (value0 === "" || balance0 === "") {
+        if (value0 === "" || balance0 === "0") {
             return false;
         }
 
@@ -297,7 +216,7 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
     }, [value0, balance0]);
 
     const isInsufficentFund1 = useMemo(() => {
-        if (value1 === "" || balance1 === "") {
+        if (value1 === "" || balance1 === "0") {
             return false;
         }
 
@@ -334,30 +253,48 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
     //             );
 
     //             setLiquidity(
-    //                 toEGLD(pool.lpToken, liquidity.toString()).toFixed(3)
+    //                 toEGLD(pool.lpToken, liquidity.toString()).toFixed(8)
     //             );
     //         });
     // }, [value0Debounce, value1Debounce, pool, proxy]);
 
     const liquidityValue = useMemo(() => {
-        if (!value0Debounce || !value1Debounce) {
-            return "0.000";
+        if (!value0Debounce && !value1Debounce) {
+            return new BigNumber(0);
         }
 
         let token0 = pool.tokens[0];
         let token1 = pool.tokens[1];
 
-        let balance0 = new BigNumber(value0Debounce);
-        let balance1 = new BigNumber(value1Debounce);
+        let balance0 = new BigNumber(value0Debounce || "0");
+        let balance1 = new BigNumber(value1Debounce || "0");
 
         const valueUsd0 = balance0.multipliedBy(tokenPrices[token0.id]);
         const valueUsd1 = balance1.multipliedBy(tokenPrices[token1.id]);
 
-        const num = valueUsd0.plus(valueUsd1).toNumber() || 0;
-        return num === 0
-            ? "0.000"
-            : fractionFormat(num, { maximumFractionDigits: 3 });
+        return valueUsd0.plus(valueUsd1) || new BigNumber(0);
     }, [pool, tokenPrices, value0Debounce, value1Debounce]);
+
+    const canAddLP = useMemo(() => {
+        const v0 = new BigNumber(value0 || "0");
+        const v1 = new BigNumber(value1 || "0");
+        return (
+            isAgree &&
+            account.balance !== "0" &&
+            !isInsufficentFund0 &&
+            !isInsufficentFund1 &&
+            !adding &&
+            !v0.plus(v1).eq(0)
+        );
+    }, [
+        isAgree,
+        account.balance,
+        isInsufficentFund0,
+        isInsufficentFund1,
+        adding,
+        value0,
+        value1,
+    ]);
 
     return (
         <div className="px-8 pb-16 sm:pb-7 flex-grow overflow-auto">
@@ -391,32 +328,50 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
             </div>
             <div className="my-10">
                 <div className="relative">
-                    <div className="py-1.5">
-                        <TokenInput
-                            token={pool.tokens[0]}
-                            tokenInPool={toEGLD(
-                                pool.tokens[0],
-                                liquidityData?.value0?.toString() || "0"
-                            ).toFixed(2)}
-                            value={value0}
-                            onChangeValue={(val) => onChangeValue0(val)}
-                            isInsufficentFund={isInsufficentFund0}
-                            balance={balance0}
-                        />
-                    </div>
-                    <div className="py-1.5">
-                        <TokenInput
-                            token={pool.tokens[1]}
-                            tokenInPool={toEGLD(
-                                pool.tokens[1],
-                                liquidityData?.value1?.toString() || "0"
-                            ).toFixed(2)}
-                            value={value1}
-                            onChangeValue={(val) => onChangeValue1(val)}
-                            isInsufficentFund={isInsufficentFund1}
-                            balance={balance1}
-                        />
-                    </div>
+                    <OnboardTooltip
+                        open={onboardingDepositInput && screenSize.md}
+                        placement="left"
+                        onArrowClick={() => setOnboardedDepositInput(true)}
+                        content={({ size }) => (
+                            <OnboardTooltip.Panel size={size} className="w-36">
+                                <div className="p-3 text-xs font-bold">
+                                    <span className="text-stake-green-500">
+                                        Input value{" "}
+                                    </span>
+                                    <span>that you want to deposit</span>
+                                </div>
+                            </OnboardTooltip.Panel>
+                        )}
+                    >
+                        <div>
+                            <div className="py-1.5">
+                                <TokenInput
+                                    token={pool.tokens[0]}
+                                    tokenInPool={toEGLDD(
+                                        pool.tokens[0].decimals,
+                                        liquidityData?.value0 || 0
+                                    )}
+                                    value={value0}
+                                    onChangeValue={(val) => setValue0(val)}
+                                    isInsufficentFund={isInsufficentFund0}
+                                    balance={balance0}
+                                />
+                            </div>
+                            <div className="py-1.5">
+                                <TokenInput
+                                    token={pool.tokens[1]}
+                                    tokenInPool={toEGLDD(
+                                        pool.tokens[1].decimals,
+                                        liquidityData?.value1 || 0
+                                    )}
+                                    value={value1}
+                                    onChangeValue={(val) => setValue1(val)}
+                                    isInsufficentFund={isInsufficentFund1}
+                                    balance={balance1}
+                                />
+                            </div>
+                        </div>
+                    </OnboardTooltip>
 
                     <div className="flex items-center space-x-1 bg-ash-dark-700 sm:bg-transparent mb-11 sm:mb-0">
                         <div className="flex items-center font-bold w-24 sm:w-1/3 px-4 sm:px-0 border-r border-r-ash-gray-500 sm:border-r-0">
@@ -426,7 +381,11 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
                         <div className="flex-1 overflow-hidden bg-ash-dark-700 text-right text-lg h-[4.5rem] px-5 outline-none flex items-center justify-end">
                             <span>
                                 <span className="text-ash-gray-500">$ </span>
-                                {liquidityValue}
+                                <TextAmt
+                                    number={liquidityValue}
+                                    options={{ notation: "standard" }}
+                                    decimalClassName="text-stake-gray-500"
+                                />
                             </span>
                         </div>
                     </div>
@@ -438,40 +397,61 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
             </div>
 
             <div className="sm:flex gap-8">
-                <Checkbox
-                    className="w-full mb-12 sm:mb-0 sm:w-2/3"
-                    checked={isAgree}
-                    onChange={setAgree}
-                    text={
-                        <span>
-                            I verify that I have read the{" "}
-                            <a
-                                href="https://docs.ashswap.io/guides/add-remove-liquidity"
-                                target="_blank"
-                                rel="noreferrer"
-                            >
-                                <b className="text-white">
-                                    <u>AshSwap Pools Guide</u>
-                                </b>
-                            </a>{" "}
-                            and understand the risks of providing liquidity,
-                            including impermanent loss.
-                        </span>
+                <OnboardTooltip
+                    open={
+                        onboardingPoolCheck &&
+                        !onboardingDepositInput &&
+                        screenSize.md
                     }
-                />
+                    placement="bottom-start"
+                    onArrowClick={() => setOnboardedPoolCheck(true)}
+                    arrowStyle={() => ({ left: 0 })}
+                    content={({ size }) => (
+                        <OnboardTooltip.Panel size={size} className="w-36">
+                            <div className="p-3 text-xs font-bold">
+                                <span className="text-stake-green-500">
+                                    Click check box{" "}
+                                </span>
+                                <span>to verify your actions</span>
+                            </div>
+                        </OnboardTooltip.Panel>
+                    )}
+                >
+                    <div>
+                        <Checkbox
+                            className="w-full mb-12 sm:mb-0 sm:w-2/3"
+                            checked={isAgree}
+                            onChange={(val) => {
+                                setAgree(val);
+                                setOnboardedPoolCheck(true);
+                            }}
+                            text={
+                                <span>
+                                    I verify that I have read the{" "}
+                                    <a
+                                        href="https://docs.ashswap.io/guides/add-remove-liquidity"
+                                        target="_blank"
+                                        rel="noreferrer"
+                                    >
+                                        <b className="text-white">
+                                            <u>AshSwap Pools Guide</u>
+                                        </b>
+                                    </a>{" "}
+                                    and understand the risks of providing
+                                    liquidity, including impermanent loss.
+                                </span>
+                            }
+                        />
+                    </div>
+                </OnboardTooltip>
+
                 <div className="w-full sm:w-1/3">
                     <Button
                         topLeftCorner
                         style={{ height: 48 }}
                         outline
-                        disable={
-                            !isAgree ||
-                            account.balance === "0" ||
-                            isInsufficentFund0 ||
-                            isInsufficentFund1 ||
-                            adding
-                        }
-                        onClick={isAgree ? addLP : () => {}}
+                        disable={!canAddLP}
+                        onClick={canAddLP ? addLP : () => {}}
                     >
                         {account.balance === "0"
                             ? "INSUFFICIENT EGLD BALANCE"

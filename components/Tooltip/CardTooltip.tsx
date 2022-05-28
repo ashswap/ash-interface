@@ -1,8 +1,11 @@
 import BaseTooltip, { BaseTooltipProps } from "components/BaseTooltip";
 import React from "react";
 
-type Props = BaseTooltipProps;
-function CardTooltip({ content, ...props }: Props) {
+type Props = BaseTooltipProps & {disabled?: boolean};
+function CardTooltip({ content, disabled, ...props }: Props) {
+    if(disabled){
+        return <>{props.children}</>
+    }
     return (
         <BaseTooltip
             {...props}

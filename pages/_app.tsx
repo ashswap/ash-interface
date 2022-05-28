@@ -6,8 +6,8 @@ import SignTxsModal from "components/SignTxsModal";
 import TxsToastList from "components/TxsToastList";
 import { DAPP_CONFIG } from "const/dappConfig";
 import { ENVIRONMENT } from "const/env";
-import { ContractsProvider } from "context/contracts";
-import { WalletProvider } from "context/wallet";
+import { useRecoilAdapter } from "hooks/useRecoilAdapter";
+import { useRefreshAfterTxCompleted } from "hooks/useRefreshAfterTxCompleted";
 import useSentryUser from "hooks/useSentryUser";
 import { NextPage } from "next";
 import { NextSeo } from "next-seo";
@@ -16,6 +16,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import Script from "next/script";
 import { Fragment, ReactElement, ReactNode, useEffect } from "react";
+import { RecoilRoot } from "recoil";
 import * as gtag from "../helper/gtag";
 import "../styles/globals.css";
 
@@ -30,7 +31,10 @@ const ProductionErrorBoundary =
     process.env.NODE_ENV === "production" ? ErrorBoundary : Fragment;
 // const ProductionErrorBoundary = ErrorBoundary;
 const GlobalHooks = () => {
+    // setup recoil
+    useRecoilAdapter();
     useSentryUser();
+    useRefreshAfterTxCompleted();
     return null;
 };
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
@@ -80,27 +84,29 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
                 description="Swap or provide liquidity on the AshSwap Protocol."
             />
 
-            <DappProvider
-                environment={ENVIRONMENT.NETWORK}
-                customNetworkConfig={DAPP_CONFIG}
-                completedTransactionsDelay={500}
-            >
-                <WalletProvider>
-                    <ContractsProvider>
+            <RecoilRoot>
+                <DappProvider
+                    environment={ENVIRONMENT.NETWORK}
+                    customNetworkConfig={DAPP_CONFIG}
+                    // completedTransactionsDelay={500}
+                >
+                    <>
                         <GlobalHooks />
                         <ProductionErrorBoundary>
                             {/* <Component {...pageProps} /> */}
                             {getLayout(<Component {...pageProps} />)}
                             <ConnectWalletModal />
-                            <div className="fixed bottom-24 left-6 right-6 sm:bottom-12 sm:left-auto sm:right-12 z-toast flex flex-col items-end max-w-[480px] space-y-2 sm:space-y-4">
-                                <TxsToastList />
-                                <SignTxNotification />
-                                <SignTxsModal />
-                            </div>
                         </ProductionErrorBoundary>
-                    </ContractsProvider>
-                </WalletProvider>
-            </DappProvider>
+                        <div className="fixed bottom-24 left-6 right-6 sm:bottom-12 sm:left-auto sm:right-12 z-toast flex flex-col items-end sm:max-w-[480px] space-y-2 sm:space-y-4">
+                            <SignTxNotification />
+                            <SignTxsModal />
+                            <div className="absolute top-0 right-0 -translate-y-full pb-4 sm:pb-8">
+                                <TxsToastList />
+                            </div>
+                        </div>
+                    </>
+                </DappProvider>
+            </RecoilRoot>
         </>
     );
 }

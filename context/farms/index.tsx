@@ -2,10 +2,11 @@ import {
     AccountInfoSliceNetworkType,
     getApiProvider,
     getProxyProvider,
-    sendTransactions,
     useGetAccountInfo,
     useGetLoginInfo,
-    useGetNetworkConfig, useGetPendingTransactions, useGetSignedTransactions
+    useGetNetworkConfig,
+    useGetPendingTransactions,
+    useGetSignedTransactions
 } from "@elrondnetwork/dapp-core";
 import { SendTransactionReturnType } from "@elrondnetwork/dapp-core/dist/services/transactions";
 import {
@@ -14,25 +15,27 @@ import {
     ApiProvider,
     BigUIntValue,
     BytesValue,
-    ContractFunction,
-    GasLimit,
+    ContractFunction, GasLimit,
     ProxyProvider,
     Query,
     TokenIdentifierValue,
     Transaction,
     TypedValue
 } from "@elrondnetwork/erdjs/out";
+import { walletBalanceState, walletLPMapState, walletTokenPriceState } from "atoms/walletState";
 import BigNumber from "bignumber.js";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
-import { blockTimeMs, gasLimit } from "const/dappConfig";
+import { blockTimeMs } from "const/dappConfig";
 import { FARMS } from "const/farms";
 import pools from "const/pool";
 import { ASH_TOKEN } from "const/tokens";
-import useContracts from "context/contracts";
-import { useWallet } from "context/wallet";
 import { toEGLD, toEGLDD } from "helper/balance";
 import { fetcher } from "helper/common";
-import { useCreateTransaction } from "helper/transactionMethods";
+import {
+    sendTransactions,
+    useCreateTransaction
+} from "helper/transactionMethods";
+import useLPValue from "hooks/usePoolContract/useLPValue";
 import { DappSendTransactionsPropsType } from "interface/dappCore";
 import { IFarm } from "interface/farm";
 import IPool from "interface/pool";
@@ -47,6 +50,7 @@ import {
     useMemo,
     useState
 } from "react";
+import { useRecoilValue } from "recoil";
 import useSWR from "swr";
 import { useDebounce } from "use-debounce";
 const calcUnstakeEntries = (
@@ -155,13 +159,15 @@ const FarmsProvider = ({ children }: any) => {
         useGetSignedTransactions().signedTransactions;
     const pendingTransactionsFromStore =
         useGetPendingTransactions().pendingTransactions;
-    const { getTokenInLP, getLPValue } = useContracts();
+    const getLPValue = useLPValue();
     const createTransaction = useCreateTransaction();
     const { isLoggedIn: loggedIn } = useGetLoginInfo();
     const proxy: ProxyProvider = getProxyProvider();
     const apiProvider: ApiProvider = getApiProvider();
     const { address } = useGetAccountInfo();
-    const { lpTokens, tokenPrices, balances } = useWallet();
+    const lpTokens = useRecoilValue(walletLPMapState);
+    const tokenPrices = useRecoilValue(walletTokenPriceState);
+    const balances = useRecoilValue(walletBalanceState);
     const network: AccountInfoSliceNetworkType = useGetNetworkConfig().network;
     // fetch pool stats
     const { data: poolStatsRecords } = useSWR<PoolStatsRecord[]>(
@@ -253,18 +259,15 @@ const FarmsProvider = ({ children }: any) => {
     const getReward = useCallback(
         async (farm: IFarm, amt: BigNumber, sftId: string) => {
             if (!loggedIn) return new BigNumber(0);
-            const data = await getSNFTAttrs(sftId);
-            if (!data?.attributes) return new BigNumber(0);
+            const attributes = balances[sftId]?.attributes;
+            if (!attributes) return new BigNumber(0);
             const res = await proxy.queryContract(
                 new Query({
                     address: new Address(farm.farm_address),
                     func: new ContractFunction(
                         "calculateRewardsForGivenPosition"
                     ),
-                    args: [
-                        new BigUIntValue(amt),
-                        new BytesValue(Buffer.from(data.attributes, "base64")),
-                    ],
+                    args: [new BigUIntValue(amt), new BytesValue(attributes)],
                 })
             );
             return new BigNumber(
@@ -274,7 +277,7 @@ const FarmsProvider = ({ children }: any) => {
                 16
             );
         },
-        [loggedIn, getSNFTAttrs, proxy]
+        [loggedIn, proxy, balances]
     );
 
     const getFarmRecords = useCallback(async () => {
@@ -288,7 +291,7 @@ const FarmsProvider = ({ children }: any) => {
                 const farmTokenSupply = await getFarmTokenSupply(
                     f.farm_address
                 );
-                const totalLiquidityValue = await getLPValue(
+                const {lpValueUsd: totalLiquidityValue} = await getLPValue(
                     farmTokenSupply,
                     p
                 );
@@ -324,7 +327,7 @@ const FarmsProvider = ({ children }: any) => {
                             id.replace(f.farm_token_id + "-", ""),
                             16
                         ),
-                        balance: balances[id].balance,
+                        balance: balances[id]?.balance || new BigNumber(0),
                     }));
                 const isFarmed = farmTokens.some(({ balance }) =>
                     balance.gt(0)
@@ -386,7 +389,7 @@ const FarmsProvider = ({ children }: any) => {
                 );
                 const tx = await createTransaction(new Address(address), {
                     func: new ContractFunction("MultiESDTNFTTransfer"),
-                    gasLimit: new GasLimit(gasLimit),
+                    gasLimit: new GasLimit(9_000_000),
                     args: [
                         new AddressValue(new Address(farm.farm_address)),
                         new BigUIntValue(
@@ -441,7 +444,7 @@ const FarmsProvider = ({ children }: any) => {
             if (!loggedIn) throw new Error("Connect wallet to exit farm");
             return await createTransaction(new Address(address), {
                 func: new ContractFunction("ESDTNFTTransfer"),
-                gasLimit: new GasLimit(gasLimit),
+                gasLimit: new GasLimit(8_000_000),
                 args: [
                     new TokenIdentifierValue(Buffer.from(collection)),
                     new BigUIntValue(nonce),
@@ -532,7 +535,7 @@ const FarmsProvider = ({ children }: any) => {
             if (!loggedIn) throw new Error("Connect wallet to claim reward");
             return await createTransaction(new Address(address), {
                 func: new ContractFunction("ESDTNFTTransfer"),
-                gasLimit: new GasLimit(gasLimit),
+                gasLimit: new GasLimit(9_000_000),
                 args: [
                     new TokenIdentifierValue(Buffer.from(collection)),
                     new BigUIntValue(nonce),

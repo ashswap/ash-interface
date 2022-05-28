@@ -1,5 +1,5 @@
 import ICArrowBottomRight from "assets/svg/arrow-bottom-right.svg";
-import { abbreviateCurrency } from "helper/number";
+import { formatAmount } from "helper/number";
 import { useScreenSize } from "hooks/useScreenSize";
 import { ValueOf } from "interface/utilities";
 import moment from "moment";
@@ -89,7 +89,7 @@ function FeeByTokensChart() {
                             axisLine={false}
                             domain={["minData", (max: number) => max * 1.5]}
                             tickFormatter={(val) =>
-                                "$ " + abbreviateCurrency(val).toString()
+                                "$ " + formatAmount(val)
                             }
                             width={50}
                             tick={{ fontSize: "12px" }}

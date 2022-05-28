@@ -1,8 +1,8 @@
 import IconDown from "assets/svg/down-white.svg";
+import { PoolsState } from "atoms/poolsState";
 import AddLiquidityModal from "components/AddLiquidityModal";
 import BaseModal from "components/BaseModal";
 import Button from "components/Button";
-import { PoolsState } from "context/pools";
 import usePoolDataFormat from "hooks/usePoolDataFormat";
 import { useScreenSize } from "hooks/useScreenSize";
 import { Unarray } from "interface/utilities";
@@ -24,7 +24,7 @@ function PoolListItem({
         setMIsExpand(true);
     };
     const {
-        formatedStats: { TVL, emissionAPR, tradingAPR, volumn24h },
+        formatedStats: { TVL, emissionAPR, tradingAPR, volume24h },
     } = usePoolDataFormat(poolData);
     return (
         <>
@@ -72,7 +72,7 @@ function PoolListItem({
                         </div>
                         <div className="w-[37%] sm:w-2/12 flex items-center justify-end bg-bg h-8 sm:h-12 text-xs text-right px-3">
                             <span className="text-text-input-3">$</span>
-                            <span>{volumn24h}</span>
+                            <span>{volume24h}</span>
                         </div>
                     </div>
                     <div className="hidden sm:flex items-center w-[20%] pl-4">
@@ -211,7 +211,7 @@ function PoolListItem({
                             </div>
                             <div className="flex justify-between items-center h-9 px-4">
                                 <div className="text-2xs mr-4">24H Volume</div>
-                                <div className="text-sm">${volumn24h}</div>
+                                <div className="text-sm">${volume24h}</div>
                             </div>
                             <div className="flex justify-between items-center h-9 px-4">
                                 <div className="text-2xs mr-4">Trading APR</div>

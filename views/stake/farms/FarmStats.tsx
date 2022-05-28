@@ -1,22 +1,25 @@
+import { farmRecordsState, farmStakedOnlyState } from "atoms/farmsState";
 import BigNumber from "bignumber.js";
+import TextAmt from "components/TextAmt";
 import CardTooltip from "components/Tooltip/CardTooltip";
 import { ASH_TOKEN } from "const/tokens";
-import { useFarms } from "context/farms";
 import { toEGLDD } from "helper/balance";
-import { fractionFormat } from "helper/number";
+import useFarmClaimReward from "hooks/useFarmContract/useFarmClaimReward";
 import Image from "next/image";
 import React, {
     useCallback,
     useEffect,
     useMemo,
     useRef,
-    useState,
+    useState
 } from "react";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 
 function FarmStats({ onClickAll }: { onClickAll?: () => void }) {
     const [harvesting, setHarvesting] = useState(false);
-    const { farmRecords, claimReward, setStakedOnly, claimAllReward } =
-        useFarms();
+    const farmRecords = useRecoilValue(farmRecordsState);
+    const { claimReward, claimAllFarmsReward: claimAllReward } = useFarmClaimReward();
+    const setStakedOnly = useSetRecoilState(farmStakedOnlyState);
     const TVL = useMemo(() => {
         return farmRecords.reduce(
             (total, val) => total.plus(val.totalLiquidityValue),
@@ -84,12 +87,13 @@ function FarmStats({ onClickAll }: { onClickAll?: () => void }) {
                                 />
                             </div>
                             <div className="text-white text-lg font-bold">
-                                {fractionFormat(
-                                    toEGLDD(
+                                <TextAmt
+                                    number={toEGLDD(
                                         ASH_TOKEN.decimals,
                                         totalReward
-                                    ).toNumber()
-                                )}{" "}
+                                    )}
+                                    decimalClassName="text-stake-gray-500"
+                                />{" "}
                                 ASH
                             </div>
                         </div>
@@ -119,7 +123,11 @@ function FarmStats({ onClickAll }: { onClickAll?: () => void }) {
                         <div className="text-lg">
                             <span className="text-ash-gray-500">$ </span>
                             <span className="text-white font-bold">
-                                {fractionFormat(TVL.toNumber())}
+                                <TextAmt
+                                    number={TVL}
+                                    decimalClassName="text-stake-gray-500"
+                                    options={{ notation: "standard" }}
+                                />
                             </span>
                         </div>
                     </div>

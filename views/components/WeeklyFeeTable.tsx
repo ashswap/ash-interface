@@ -6,6 +6,7 @@ import ICArrowRight from "assets/svg/arrow-right.svg";
 import moment from "moment";
 import { formatAmount } from "helper/number";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
+import { ENVIRONMENT } from "const/env";
 type FeeRecord = {
     from_timestamp: number;
     to_timestamp: number;
@@ -22,11 +23,25 @@ const Row = ({ order, feeData }: { order: number; feeData: FeeRecord }) => {
         <div className="grid grid-cols-[2rem,1fr,1fr] gap-x-4 sm:gap-x-8 lg:gap-x-28 items-center h-12 bg-ash-dark-600 px-4.5 lg:px-6 text-stake-gray-500 text-xs">
             <div className="text-right">{order}</div>
             <div className="">
-                <span className="text-white">{from.format("DD MMM, ")}</span>
-                <span>{from.format("yyyy")}</span>
-                <span> - </span>
-                <span className="text-white">{to.format("DD MMM, ")}</span>
-                <span>{to.format("yyyy")}</span>
+                {ENVIRONMENT.NETWORK === "devnet" ? (
+                    <>
+                        <span className="text-white">
+                            {from.format("DD MMM, yyyy")}
+                        </span>
+                    </>
+                ) : (
+                    <>
+                        <span className="text-white">
+                            {from.format("DD MMM, ")}
+                        </span>
+                        <span>{from.format("yyyy")}</span>
+                        <span> - </span>
+                        <span className="text-white">
+                            {to.format("DD MMM, ")}
+                        </span>
+                        <span>{to.format("yyyy")}</span>
+                    </>
+                )}
             </div>
             <div className="text-right">
                 $
@@ -40,7 +55,9 @@ const Row = ({ order, feeData }: { order: number; feeData: FeeRecord }) => {
 function WeeklyFeeTable() {
     // testing/BoY purpose: currently calculate fee every 10 minutes -> should get x*7*24*60/10 records from server
     const { data } = useSWR<FeeRecord[]>(
-        `${ASHSWAP_CONFIG.ashApiBaseUrl}/stake/governance/summary?offset=0&limit=${10*7*24*60/10}`,
+        `${
+            ASHSWAP_CONFIG.ashApiBaseUrl
+        }/stake/governance/summary?offset=0&limit=${(10 * 7 * 24 * 60) / 10}`,
         fetcher
     );
     const [pageIndex, setPageIndex] = useState(0);
@@ -48,21 +65,36 @@ function WeeklyFeeTable() {
     const records = useMemo(() => {
         const map: Record<number, FeeRecord[]> = {};
         (data || []).map((val) => {
-            const key = moment.unix(val.from_timestamp).weekday(0).endOf("days").unix();
-            map[key] = [...(map[key] || []), val];
-        });
-        return Object.entries(map).map(([k, val]) => {
-            const sum = val.reduce(
-                (total, feeRecord) => total + feeRecord.total_admin_fee_in_usd,
-                0
-            );
-            const record: FeeRecord = {
-                from_timestamp: val[val.length - 1].from_timestamp,
-                to_timestamp: val[0].to_timestamp,
-                total_admin_fee_in_usd: sum
+            if (ENVIRONMENT.NETWORK === "devnet") {
+                const key = moment
+                    .unix(val.from_timestamp)
+                    .endOf("days")
+                    .unix();
+                map[key] = [...(map[key] || []), val];
+            } else {
+                const key = moment
+                    .unix(val.from_timestamp)
+                    .weekday(0)
+                    .endOf("days")
+                    .unix();
+                map[key] = [...(map[key] || []), val];
             }
-            return record;
-        }).sort((x, y) => y.from_timestamp - x.from_timestamp);
+        });
+        return Object.entries(map)
+            .map(([k, val]) => {
+                const sum = val.reduce(
+                    (total, feeRecord) =>
+                        total + feeRecord.total_admin_fee_in_usd,
+                    0
+                );
+                const record: FeeRecord = {
+                    from_timestamp: val[val.length - 1].from_timestamp,
+                    to_timestamp: val[0].to_timestamp,
+                    total_admin_fee_in_usd: sum,
+                };
+                return record;
+            })
+            .sort((x, y) => y.from_timestamp - x.from_timestamp);
     }, [data]);
     const displayRecords: FeeRecord[][] = useMemo(() => {
         const length = records.length;
@@ -80,7 +112,7 @@ function WeeklyFeeTable() {
         <div>
             <div className="grid grid-cols-[2rem,1fr,1fr] gap-x-4 sm:gap-x-8 lg:gap-x-28 items-center h-12 bg-ash-dark-600 px-4.5 lg:px-6 text-stake-gray-500 text-xs">
                 <div className="text-right">#</div>
-                <div className="">Week time</div>
+                <div className="">Time</div>
                 <div className="text-right">Fees</div>
             </div>
             {displayRecords[pageIndex]?.map((val, index) => {

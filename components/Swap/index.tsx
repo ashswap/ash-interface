@@ -1,5 +1,4 @@
 import {
-    sendTransactions,
     transactionServices,
     useGetAccountInfo,
     useGetLoginInfo,
@@ -29,15 +28,19 @@ import HistoryModal from "components/HistoryModal";
 import IconButton from "components/IconButton";
 import Setting from "components/Setting";
 import SwapAmount from "components/SwapAmount";
+import TextAmt from "components/TextAmt";
 import CardTooltip from "components/Tooltip/CardTooltip";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
-import { gasLimit } from "const/dappConfig";
 import { useSwap } from "context/swap";
-import { useWallet } from "context/wallet";
 import { toEGLD, toEGLDD, toWei } from "helper/balance";
+import { cancellablePromise } from "helper/cancellablePromise";
 import { queryPoolContract } from "helper/contracts/pool";
 import { formatAmount } from "helper/number";
-import { useCreateTransaction } from "helper/transactionMethods";
+import {
+    sendTransactions,
+    useCreateTransaction,
+} from "helper/transactionMethods";
+import { useConnectWallet } from "hooks/useConnectWallet";
 import useMounted from "hooks/useMounted";
 import { useOnboarding } from "hooks/useOnboarding";
 import { useScreenSize } from "hooks/useScreenSize";
@@ -45,6 +48,7 @@ import { DappSendTransactionsPropsType } from "interface/dappCore";
 import IPool from "interface/pool";
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useDebounce } from "use-debounce";
 import styles from "./Swap.module.css";
 const MaiarPoolTooltip = ({
     children,
@@ -139,6 +143,7 @@ const Swap = () => {
         isInsufficentFund,
         slippage,
     } = useSwap();
+    const [valueFromDebound] = useDebounce(valueFrom, 500);
     const [showSetting, setShowSetting] = useState<boolean>(false);
     const [isOpenHistoryModal, openHistoryModal] = useState<boolean>(false);
     const [fee, setFee] = useState<number>(0);
@@ -151,8 +156,9 @@ const Swap = () => {
         transactionServices.useTrackTransactionStatus({
             transactionId: swapId,
         });
+    const [fetchingAmtOut, setFetchingAmtOut] = useState(false);
 
-    const { connectWallet } = useWallet();
+    const connectWallet = useConnectWallet();
     const { isLoggedIn: loggedIn } = useGetLoginInfo();
     const { account } = useGetAccountInfo();
     const createTx = useCreateTransaction();
@@ -170,12 +176,12 @@ const Swap = () => {
     };
 
     const rawValueFrom = useMemo(() => {
-        if (!valueFrom || !tokenFrom) {
+        if (!valueFromDebound || !tokenFrom) {
             return new BigNumber(0);
         }
 
-        return toWei(tokenFrom, valueFrom);
-    }, [valueFrom, tokenFrom]);
+        return toWei(tokenFrom, valueFromDebound);
+    }, [valueFromDebound, tokenFrom]);
 
     const rawValueTo = useMemo(() => {
         if (!valueTo || !tokenTo) {
@@ -187,13 +193,19 @@ const Swap = () => {
 
     // calculate amount out
     useEffect(() => {
-        if (!pool || !tokenFrom || !tokenTo || !valueFrom) {
+        if (!pool || !tokenFrom || !tokenTo || rawValueFrom.eq(0)) {
             return;
         }
 
-        let amountIn = rawValueFrom;
-        queryPoolContract
-            .calculateAmountOut(pool, tokenFrom.id, tokenTo.id, amountIn)
+        const calcPromise = queryPoolContract.calculateAmountOut(
+            pool,
+            tokenFrom.id,
+            tokenTo.id,
+            rawValueFrom
+        );
+        const { promise, cancel } = cancellablePromise(calcPromise);
+        setFetchingAmtOut(true);
+        promise
             .then((amtOut) => {
                 setValueTo(
                     amtOut
@@ -202,8 +214,11 @@ const Swap = () => {
                         )
                         .toString(10)
                 );
-            });
-    }, [valueFrom, tokenFrom, tokenTo, pool, rawValueFrom, setValueTo]);
+            })
+            .catch(() => {})
+            .finally(() => setFetchingAmtOut(false));
+        return () => cancel();
+    }, [tokenFrom, tokenTo, pool, rawValueFrom, setValueTo]);
 
     // find pools + fetch reserves
     useEffect(() => {
@@ -250,20 +265,30 @@ const Swap = () => {
     }, [pool, setRates]);
 
     const swap = useCallback(async () => {
-        if (!loggedIn || !tokenFrom || !tokenTo || swapping || !pool) {
+        if (
+            !loggedIn ||
+            !tokenFrom ||
+            !tokenTo ||
+            swapping ||
+            !pool ||
+            fetchingAmtOut
+        ) {
             return;
         }
 
-        if (rawValueFrom.lte(0)) {
-            return;
-        }
+        if (rawValueFrom.eq(0) || rawValueFrom.isNaN()) return;
+        const minAmtOut = new BigNumber(
+            Math.floor(rawValueTo.multipliedBy(1 - slippage).toNumber())
+        );
+        if (minAmtOut.eq(0) || minAmtOut.isNaN()) return;
         setSwapping(true);
+
         try {
             let tx: Transaction;
             if (pool.isMaiarPool) {
                 tx = await createTx(new Address(pool.address), {
                     func: new ContractFunction("ESDTTransfer"),
-                    gasLimit: new GasLimit(gasLimit),
+                    gasLimit: new GasLimit(8_000_000),
                     args: [
                         new TokenIdentifierValue(Buffer.from(tokenFrom.id)),
                         new BigUIntValue(rawValueFrom),
@@ -271,27 +296,19 @@ const Swap = () => {
                             Buffer.from("swapTokensFixedInput")
                         ),
                         new TokenIdentifierValue(Buffer.from(tokenTo.id)),
-                        new BigUIntValue(
-                            new BigNumber(
-                                Math.floor(
-                                    rawValueTo
-                                        .multipliedBy(1 - slippage)
-                                        .toNumber()
-                                )
-                            )
-                        ),
+                        new BigUIntValue(minAmtOut),
                     ],
                 });
             } else {
                 tx = await createTx(new Address(pool?.address), {
                     func: new ContractFunction("ESDTTransfer"),
-                    gasLimit: new GasLimit(gasLimit),
+                    gasLimit: new GasLimit(8_000_000),
                     args: [
                         new TokenIdentifierValue(Buffer.from(tokenFrom.id)),
                         new BigUIntValue(rawValueFrom),
                         new TokenIdentifierValue(Buffer.from("exchange")),
                         new TokenIdentifierValue(Buffer.from(tokenTo.id)),
-                        new BigUIntValue(new BigNumber(0)),
+                        new BigUIntValue(minAmtOut),
                     ],
                 });
             }
@@ -299,7 +316,13 @@ const Swap = () => {
             const payload: DappSendTransactionsPropsType = {
                 transactions: tx,
                 transactionsDisplayInfo: {
-                    successMessage: `Swap succeed ${valueFrom} ${tokenFrom.name} to ${valueTo} ${tokenTo.name}`,
+                    successMessage: `Swap succeed ${formatAmount(
+                        toEGLDD(tokenFrom.decimals, rawValueFrom).toNumber(),
+                        { notation: "standard" }
+                    )} ${tokenFrom.name} to ${formatAmount(
+                        toEGLDD(tokenTo.decimals, rawValueTo).toNumber(),
+                        { notation: "standard" }
+                    )} ${tokenTo.name}`,
                 },
             };
             const { error, sessionId } = await sendTransactions(payload);
@@ -325,22 +348,21 @@ const Swap = () => {
         tokenTo,
         swapping,
         createTx,
-        valueFrom,
-        valueTo,
         setValueTo,
         setValueFrom,
         slippage,
         rawValueTo,
         onboardingHistory,
+        fetchingAmtOut,
     ]);
 
     const priceImpact = useMemo(() => {
         if (!pool || !rates || !tokenFrom || !rawValueFrom || !rawValueTo) {
-            return "0%";
+            return 0;
         }
 
         if (rawValueFrom.isZero()) {
-            return "0%";
+            return 0;
         }
 
         const rate =
@@ -352,27 +374,21 @@ const Swap = () => {
             .div(new BigNumber(10).exponentiatedBy(tokenFrom.decimals))
             .multipliedBy(rate);
 
-        return (
-            realOut
-                .minus(rawValueTo)
-                .abs()
-                .multipliedBy(100)
-                .div(realOut)
-                .toFixed(3) + "%"
-        );
+        return realOut
+            .minus(rawValueTo)
+            .abs()
+            .multipliedBy(100)
+            .div(realOut)
+            .toNumber();
     }, [pool, rates, tokenFrom, rawValueFrom, rawValueTo]);
 
     const minimumReceive = useMemo(() => {
         if (!tokenTo || !rawValueTo) {
-            return;
+            return new BigNumber(0);
         }
-
-        return formatAmount(
-            toEGLD(
-                tokenTo,
-                rawValueTo.multipliedBy(1 - slippage).toString()
-            ).toNumber(),
-            { notation: "standard" }
+        return toEGLD(
+            tokenTo,
+            rawValueTo.multipliedBy(1 - slippage).toString()
         );
     }, [tokenTo, rawValueTo, slippage]);
 
@@ -539,21 +555,27 @@ const Swap = () => {
                                         </div>
                                         <div>
                                             1 {tokenFrom?.name} ={" "}
-                                            {pool &&
-                                                rates &&
-                                                formatAmount(
-                                                    pool?.tokens[0].id ===
+                                            {pool && rates && (
+                                                <TextAmt
+                                                    number={
+                                                        pool?.tokens[0].id ===
                                                         tokenFrom.id
-                                                        ? toEGLD(
-                                                              pool.tokens[1],
-                                                              rates[0].toString()
-                                                          ).toNumber()
-                                                        : toEGLD(
-                                                              pool.tokens[0],
-                                                              rates[1].toString()
-                                                          ).toNumber(),
-                                                    { notation: "standard" }
-                                                )}{" "}
+                                                            ? toEGLD(
+                                                                  pool
+                                                                      .tokens[1],
+                                                                  rates[0].toString()
+                                                              )
+                                                            : toEGLD(
+                                                                  pool
+                                                                      .tokens[0],
+                                                                  rates[1].toString()
+                                                              )
+                                                    }
+                                                    options={{
+                                                        notation: "standard",
+                                                    }}
+                                                />
+                                            )}{" "}
                                             {tokenTo?.name}
                                         </div>
                                     </div>
@@ -590,7 +612,10 @@ const Swap = () => {
                                                 }
                                                 style={{ color: "#00FF75" }}
                                             >
-                                                {priceImpact}
+                                                {formatAmount(priceImpact, {
+                                                    notation: "standard",
+                                                })}
+                                                %
                                             </div>
                                         </div>
                                         <div className="bg-black flex flex-row items-center justify-between h-10 pl-5 pr-6">
@@ -618,7 +643,14 @@ const Swap = () => {
                                                     styles.swapResultValue
                                                 }
                                             >
-                                                {minimumReceive} {tokenTo?.name}
+                                                <TextAmt
+                                                    number={minimumReceive}
+                                                    options={{
+                                                        notation: "standard",
+                                                    }}
+                                                    decimalClassName="text-stake-gray-500"
+                                                />
+                                                &nbsp;{tokenTo?.name}
                                             </div>
                                         </div>
                                         <div className="bg-black flex flex-row items-center justify-between h-10 pl-5 pr-6">
@@ -647,17 +679,21 @@ const Swap = () => {
                                                     styles.swapResultValue
                                                 }
                                             >
-                                                {slippage * 100}%
+                                                {formatAmount(slippage * 100, {
+                                                    notation: "standard",
+                                                })}
+                                                %
                                             </div>
                                         </div>
                                         <div className="bg-black flex flex-row items-center justify-between h-10 pl-5 pr-6">
                                             <CardTooltip
                                                 content={
                                                     <div>
-                                                        Which liquidity providers earn
-                                                        from successful
-                                                        transactions. Don&apos;t
-                                                        worry, It&apos;s small.
+                                                        Which liquidity
+                                                        providers earn from
+                                                        successful transactions.
+                                                        Don&apos;t worry,
+                                                        It&apos;s small.
                                                     </div>
                                                 }
                                             >
@@ -675,18 +711,24 @@ const Swap = () => {
                                                         styles.swapResultValue
                                                     }
                                                 >
-                                                    {tokenFrom && rawValueFrom
-                                                        ? formatAmount(
-                                                              toEGLD(
-                                                                  tokenFrom,
-                                                                  rawValueFrom
-                                                                      .multipliedBy(
-                                                                          fee
-                                                                      )
-                                                                      .toString()
-                                                              ).toNumber()
-                                                          )
-                                                        : "0"}{" "}
+                                                    {tokenFrom &&
+                                                    rawValueFrom ? (
+                                                        <TextAmt
+                                                            number={toEGLDD(
+                                                                tokenFrom.decimals,
+                                                                rawValueFrom.multipliedBy(
+                                                                    fee
+                                                                )
+                                                            )}
+                                                            options={{
+                                                                notation:
+                                                                    "standard",
+                                                            }}
+                                                            decimalClassName="text-stake-gray-500"
+                                                        />
+                                                    ) : (
+                                                        "0.00"
+                                                    )}{" "}
                                                     {tokenFrom?.name}
                                                 </div>
                                             ) : (
@@ -695,18 +737,23 @@ const Swap = () => {
                                                         styles.swapResultValue
                                                     }
                                                 >
-                                                    {tokenTo && rawValueTo
-                                                        ? formatAmount(
-                                                              toEGLD(
-                                                                  tokenTo,
-                                                                  rawValueTo
-                                                                      .multipliedBy(
-                                                                          fee
-                                                                      )
-                                                                      .toString()
-                                                              ).toNumber()
-                                                          )
-                                                        : "0"}{" "}
+                                                    {tokenTo && rawValueTo ? (
+                                                        <TextAmt
+                                                            number={toEGLDD(
+                                                                tokenTo.decimals,
+                                                                rawValueTo.multipliedBy(
+                                                                    fee
+                                                                )
+                                                            )}
+                                                            options={{
+                                                                notation:
+                                                                    "standard",
+                                                            }}
+                                                            decimalClassName="text-stake-gray-500"
+                                                        />
+                                                    ) : (
+                                                        "0.00"
+                                                    )}{" "}
                                                     {tokenTo?.name}
                                                 </div>
                                             )}
@@ -752,7 +799,7 @@ const Swap = () => {
                                         style={{ height: 48 }}
                                         className="mt-12 text-xs sm:text-sm"
                                         outline
-                                        disable={swapping}
+                                        disable={swapping || fetchingAmtOut}
                                         onClick={
                                             loggedIn
                                                 ? swap

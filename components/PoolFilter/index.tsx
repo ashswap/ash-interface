@@ -1,18 +1,9 @@
-import CardGrey from "assets/svg/card-grey.svg";
-import Card from "assets/svg/card.svg";
-import ListGrey from "assets/svg/list-grey.svg";
-import ICList from "assets/svg/list.svg";
 import ICChevronDown from "assets/svg/chevron-down.svg";
 import Search from "assets/svg/search.svg";
+import { poolKeywordState, poolSortOptionState, PoolsState } from "atoms/poolsState";
 import BasePopover from "components/BasePopover";
-import IconButton from "components/IconButton";
 import Input from "components/Input";
-import Select from "components/Select";
-import { TAILWIND_BREAKPOINT } from "const/mediaQueries";
-import { PoolsState, usePools } from "context/pools";
-import useMediaQuery from "hooks/useMediaQuery";
-import { useScreenSize } from "hooks/useScreenSize";
-import { useMemo, useState } from "react";
+import { useRecoilState } from "recoil";
 
 export enum ViewType {
     Card,
@@ -29,13 +20,9 @@ const options: { value: PoolsState["sortOption"]; label: any }[] = [
     { value: "volume", label: "24h Volume" },
 ];
 const PoolFilter = (props: Props) => {
-    const [isLivedPool, setIsLivedPool] = useState(true);
-    const screenSize = useScreenSize();
 
-    const { keyword, setKeyword, sortOption, setSortOption } = usePools();
-    const selectOpt = useMemo(() => {
-        return options.find((o) => o.value === sortOption);
-    }, [sortOption]);
+    const [keyword, setKeyword] = useRecoilState(poolKeywordState);
+    const [sortOption, setSortOption] = useRecoilState(poolSortOptionState);
 
     const SearchBox = (
         <Input

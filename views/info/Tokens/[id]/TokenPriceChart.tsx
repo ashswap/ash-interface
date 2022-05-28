@@ -1,7 +1,7 @@
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 import { MONTH_SHORT } from "const/time";
 import { fetcher } from "helper/common";
-import { abbreviateCurrency } from "helper/number";
+import { formatAmount } from "helper/number";
 import { ChartTimeUnitType } from "interface/chart";
 import { IToken } from "interface/token";
 import moment from "moment";
@@ -203,7 +203,7 @@ const TokenPriceChart = ({
                     padding={{ top: 20 }}
                     domain={[minValue, maxValue + (maxValue - minValue) * 0.2]}
                     tickFormatter={(val: number) =>
-                        abbreviateCurrency(val).toString()
+                        formatAmount(val)
                     }
                     width={50}
                     tick={{ fill: "#B7B7D7", fontSize: 12 }}

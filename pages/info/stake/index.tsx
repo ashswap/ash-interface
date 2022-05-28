@@ -9,6 +9,7 @@ import useSWR from "swr";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 import { FarmStatsRecord } from "interface/farmStats";
 import { fetcher } from "helper/common";
+import { ENVIRONMENT } from "const/env";
 
 function StakePage() {
     const { data: farmRecords } = useSWR<FarmStatsRecord[]>(
@@ -42,7 +43,9 @@ function StakePage() {
                 </div>
                 <div className="mb-16 lg:mb-28">
                     <h2 className="text-lg font-bold text-white mb-5 lg:mb-7">
-                        Weekly Summary
+                        {ENVIRONMENT.NETWORK === "devnet"
+                            ? "Daily Summary"
+                            : "Weekly Summary"}
                     </h2>
                     <WeeklyFeeTable />
                 </div>

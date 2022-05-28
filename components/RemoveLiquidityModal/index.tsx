@@ -1,4 +1,4 @@
-import { getProxyProvider, sendTransactions } from "@elrondnetwork/dapp-core";
+import { getProxyProvider } from "@elrondnetwork/dapp-core";
 import {
     Address,
     ArgSerializer,
@@ -10,26 +10,35 @@ import {
     Query,
     TokenIdentifierValue,
     TypeExpressionParser,
-    TypeMapper
+    TypeMapper,
 } from "@elrondnetwork/erdjs";
 import { Slider } from "antd";
 import IconRight from "assets/svg/right-yellow.svg";
+import { accIsInsufficientEGLDState } from "atoms/dappState";
+import { PoolsState } from "atoms/poolsState";
+import { walletLPMapState } from "atoms/walletState";
 import BigNumber from "bignumber.js";
 import BaseModal from "components/BaseModal";
 import Button from "components/Button";
 import InputCurrency from "components/InputCurrency";
+import TextAmt from "components/TextAmt";
 import Token from "components/Token";
-import { gasLimit } from "const/dappConfig";
-import { PoolsState } from "context/pools";
+import OnboardTooltip from "components/Tooltip/OnboardTooltip";
 import { useSwap } from "context/swap";
-import { useWallet } from "context/wallet";
 import { toEGLD, toEGLDD, toWei } from "helper/balance";
-import { useCreateTransaction } from "helper/transactionMethods";
+import {
+    sendTransactions,
+    useCreateTransaction,
+} from "helper/transactionMethods";
+import { useFetchBalances } from "hooks/useFetchBalances";
+import { useOnboarding } from "hooks/useOnboarding";
+import usePoolRemoveLP from "hooks/usePoolContract/usePoolRemoveLP";
 import { useScreenSize } from "hooks/useScreenSize";
 import { DappSendTransactionsPropsType } from "interface/dappCore";
 import { Unarray } from "interface/utilities";
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useRecoilValue } from "recoil";
 import { theme } from "tailwind.config";
 import { useDebounce } from "use-debounce";
 import styles from "./RemoveLiquidityModal.module.css";
@@ -50,13 +59,19 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
     const [value1, setValue1] = useState<string>("");
     const [liquidityDebounce] = useDebounce(liquidity, 500);
     const screenSize = useScreenSize();
-    const { fetchBalances, balances, lpTokens, insufficientEGLD } = useWallet();
+    const fetchBalances = useFetchBalances();
+    const lpTokens = useRecoilValue(walletLPMapState);
+    const insufficientEGLD = useRecoilValue(accIsInsufficientEGLDState);
     const createTx = useCreateTransaction();
     const { slippage } = useSwap();
     const [displayInputLiquidity, setDisplayInputLiquidity] =
         useState<string>("");
     const [removing, setRemoving] = useState(false);
     const proxy: ProxyProvider = getProxyProvider();
+    const [onboardingWithdrawInput, setOnboardedWithdrawInput] = useOnboarding(
+        "pool_withdraw_input"
+    );
+    const removePoolLP = usePoolRemoveLP();
 
     const pricePerLP = useMemo(() => {
         // warning: mocking - change to 0 after pool analytic API success
@@ -131,7 +146,7 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
     );
 
     useEffect(() => {
-        if (!proxy || liquidityDebounce.eq(new BigNumber(0))) {
+        if (!proxy || liquidityDebounce.eq(0) || liquidityDebounce.isNaN()) {
             return;
         }
 
@@ -141,9 +156,7 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
                     address: new Address(pool.address),
                     func: new ContractFunction("getRemoveLiquidityTokens"),
                     args: [
-                        new BigUIntValue(
-                            new BigNumber(liquidityDebounce.toString())
-                        ),
+                        new BigUIntValue(liquidityDebounce),
                         new BigUIntValue(new BigNumber(0)),
                         new BigUIntValue(new BigNumber(0)),
                     ],
@@ -180,60 +193,38 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
                         values[0].valueOf().field1.toString()
                     ).toString()
                 );
-            });
+            })
+            .catch((error) => console.log(error));
     }, [liquidityDebounce, pool, proxy]);
 
     const removeLP = useCallback(async () => {
         if (removing || liquidity.eq(0)) return;
         setRemoving(true);
-        let sessionId = "";
         try {
-            let tx = await createTx(new Address(pool.address), {
-                func: new ContractFunction("ESDTTransfer"),
-                gasLimit: new GasLimit(gasLimit),
-                args: [
-                    new TokenIdentifierValue(Buffer.from(pool.lpToken.id)),
-                    new BigUIntValue(liquidity),
-                    new TokenIdentifierValue(Buffer.from("removeLiquidity")),
-                    new BigUIntValue(
-                        new BigNumber(
-                            toWei(pool.tokens[0], value0)
-                                .multipliedBy(1 - slippage)
-                                .toFixed(0)
-                        )
-                    ),
-                    new BigUIntValue(
-                        new BigNumber(
-                            toWei(pool.tokens[1], value1)
-                                .multipliedBy(1 - slippage)
-                                .toFixed(0)
-                        )
-                    ),
-                ],
-            });
-            const payload: DappSendTransactionsPropsType = {
-                transactions: tx,
-                transactionsDisplayInfo: {
-                    successMessage: `Remove Liquidity Success ${value0} ${pool.tokens[0].name} and ${value1} ${pool.tokens[1].name}`,
-                },
-            };
-            sessionId = (await sendTransactions(payload)).sessionId || "";
-            fetchBalances();
+            const [token0, token1] = pool.tokens;
+            const { sessionId } = await removePoolLP(
+                pool,
+                liquidity,
+                toWei(token0, value0),
+                toWei(token1, value1),
+                slippage
+            );
+            if (sessionId) onClose?.();
         } catch (error) {
             // TODO: extension close without response
+            console.error(error);
+        } finally {
+            setRemoving(false);
         }
-        setRemoving(false);
-        if (sessionId) onClose?.();
     }, [
         value0,
         value1,
         slippage,
         pool,
         onClose,
-        createTx,
-        fetchBalances,
         liquidity,
         removing,
+        removePoolLP,
     ]);
 
     return (
@@ -264,33 +255,59 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
             <div className="mt-8 mb-12 sm:my-10">
                 <div className="relative mb-11 sm:mb-0">
                     <div>
-                        <div className="flex items-center space-x-1 bg-ash-dark-700 sm:bg-transparent pl-4 sm:pl-0">
-                            <div className="flex items-center font-bold w-24 flex-shrink-0 border-r border-r-ash-gray-500 sm:border-r-0">
-                                <IconRight className="mr-4" />
-                                <span>TOTAL</span>
-                            </div>
-                            <div className="flex-1 flex items-center overflow-hidden bg-ash-dark-700 text-right text-lg h-[4.5rem] px-5 ">
-                                <InputCurrency
-                                    className="bg-transparent text-right flex-grow outline-none"
-                                    placeholder="0"
-                                    value={displayInputLiquidity}
-                                    onChange={(e) => {
-                                        const value = e.target.value || "";
-                                        setDisplayInputLiquidity(value);
-                                        setTotalUsd(
-                                            computeValidTotalUsd(
-                                                new BigNumber(
-                                                    value.startsWith(".")
-                                                        ? "0" + value
-                                                        : value || "0"
+                        <OnboardTooltip
+                            open={onboardingWithdrawInput && screenSize.md}
+                            placement="left"
+                            onArrowClick={() => setOnboardedWithdrawInput(true)}
+                            content={({ size }) => (
+                                <OnboardTooltip.Panel
+                                    size={size}
+                                    className="w-36"
+                                >
+                                    <div className="p-3 text-xs font-bold">
+                                        <span className="text-stake-green-500">
+                                            Input{" "}
+                                        </span>
+                                        <span>value or </span>
+                                        <span className="text-stake-green-500">
+                                            touch the slider
+                                        </span>
+                                    </div>
+                                </OnboardTooltip.Panel>
+                            )}
+                        >
+                            <div className="flex items-center space-x-1 bg-ash-dark-700 sm:bg-transparent pl-4 sm:pl-0">
+                                <div className="flex items-center font-bold w-24 flex-shrink-0 border-r border-r-ash-gray-500 sm:border-r-0">
+                                    <IconRight className="mr-4" />
+                                    <span>TOTAL</span>
+                                </div>
+                                <div className="flex-1 flex items-center overflow-hidden bg-ash-dark-700 text-right text-lg h-[4.5rem] px-5 ">
+                                    <InputCurrency
+                                        className="bg-transparent text-right flex-grow outline-none"
+                                        placeholder="0"
+                                        value={displayInputLiquidity}
+                                        onChange={(e) => {
+                                            const value = e.target.value || "";
+                                            setDisplayInputLiquidity(value);
+                                            setTotalUsd(
+                                                computeValidTotalUsd(
+                                                    new BigNumber(
+                                                        value.startsWith(".")
+                                                            ? "0" + value
+                                                            : value || "0"
+                                                    )
                                                 )
-                                            )
-                                        );
-                                    }}
-                                />
-                                <div className="text-ash-gray-500 ml-2">$</div>
+                                            );
+                                            setOnboardedWithdrawInput(true);
+                                        }}
+                                    />
+                                    <div className="text-ash-gray-500 ml-2">
+                                        $
+                                    </div>
+                                </div>
                             </div>
-                        </div>
+                        </OnboardTooltip>
+
                         <div className="flex flex-row items-center">
                             <div className="sm:w-24"></div>
                             <div className="flex flex-row items-center flex-1 gap-4">
@@ -317,9 +334,10 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
                                     min={0}
                                     max={100}
                                     value={liquidityPercent}
-                                    onChange={(e) =>
-                                        onChangeLiquidityPercent(e)
-                                    }
+                                    onChange={(e) => {
+                                        onChangeLiquidityPercent(e);
+                                        setOnboardedWithdrawInput(true);
+                                    }}
                                 />
                             </div>
                         </div>
@@ -341,18 +359,13 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
                             <div className="py-2 text-2xs sm:text-sm text-text-input-3 text-right">
                                 <span>Available: </span>
                                 <span className="text-earn">
-                                    {balances[pool.tokens[0].id]
-                                        ? balances[pool.tokens[0].id].balance
-                                              .div(
-                                                  new BigNumber(
-                                                      10
-                                                  ).exponentiatedBy(
-                                                      pool.tokens[0].decimals
-                                                  )
-                                              )
-                                              .toFixed(3)
-                                              .toString()
-                                        : "0"}{" "}
+                                    <TextAmt
+                                        number={toEGLDD(
+                                            pool.tokens[0].decimals,
+                                            liquidityData?.value0 || 0
+                                        )}
+                                        options={{ notation: "standard" }}
+                                    />{" "}
                                     {pool.tokens[0].name}
                                 </span>
                             </div>
@@ -374,18 +387,13 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
                             <div className="py-2 text-2xs sm:text-sm text-text-input-3 text-right">
                                 <span>Available: </span>
                                 <span className="text-earn">
-                                    {balances[pool.tokens[1].id]
-                                        ? balances[pool.tokens[1].id].balance
-                                              .div(
-                                                  new BigNumber(
-                                                      10
-                                                  ).exponentiatedBy(
-                                                      pool.tokens[1].decimals
-                                                  )
-                                              )
-                                              .toFixed(3)
-                                              .toString()
-                                        : "0"}{" "}
+                                    <TextAmt
+                                        number={toEGLDD(
+                                            pool.tokens[1].decimals,
+                                            liquidityData?.value1 || 0
+                                        )}
+                                        options={{ notation: "standard" }}
+                                    />{" "}
                                     {pool.tokens[1].name}
                                 </span>
                             </div>

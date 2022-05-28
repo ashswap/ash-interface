@@ -1,22 +1,30 @@
 import {
     AccountInfoSliceNetworkType,
+    getAccountProvider,
     getProxyProvider,
+    transactionServices,
     useGetAccountInfo,
     useGetLoginInfo,
-    useGetNetworkConfig,
+    useGetNetworkConfig
 } from "@elrondnetwork/dapp-core";
 import {
     Address,
     CallArguments,
     ChainID,
+    ExtensionProvider,
     GasLimit,
-    GasPrice,
+    GasPrice, IDappProvider,
     Nonce,
     ProxyProvider,
     SmartContract,
-    Transaction,
+    Transaction
 } from "@elrondnetwork/erdjs/out";
-import { gasLimit, gasPrice } from "const/dappConfig";
+import {
+    gasLimitBuffer,
+    gasPrice,
+    maxGasLimit
+} from "const/dappConfig";
+import { DappSendTransactionsPropsType } from "interface/dappCore";
 const emptyTx = new Transaction({
     nonce: new Nonce(0),
     receiver: new Address(),
@@ -43,9 +51,21 @@ export const useCreateTransaction = () => {
             data: tx.getData(),
             receiver: scAddress,
             gasPrice: new GasPrice(gasPrice),
-            gasLimit: new GasLimit(gasLimit),
+            gasLimit: new GasLimit(
+                Math.min(
+                    Math.floor(arg.gasLimit.valueOf() * gasLimitBuffer),
+                    maxGasLimit
+                )
+            ),
             version: tx.getVersion(),
         });
         return tx;
     };
 };
+export const sendTransactions = async (payload: DappSendTransactionsPropsType) => {
+    const accProvider: IDappProvider = getAccountProvider();
+    if(accProvider instanceof ExtensionProvider){
+        await ExtensionProvider.getInstance()?.cancelAction?.();
+    }
+    return await transactionServices.sendTransactions(payload);
+}

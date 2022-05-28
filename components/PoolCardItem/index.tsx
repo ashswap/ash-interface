@@ -1,24 +1,40 @@
-import { PoolsState } from "context/pools";
-import { Unarray } from "interface/utilities";
-import React, { useState } from "react";
-import Image from "next/image";
-import AddLiquidityModal from "components/AddLiquidityModal";
+
+import {
+    AccountInfoSliceNetworkType,
+    useGetNetworkConfig
+} from "@elrondnetwork/dapp-core";
 import Down from "assets/svg/down-white.svg";
-import usePoolDataFormat from "hooks/usePoolDataFormat";
-import { AccountInfoSliceNetworkType, useGetNetworkConfig } from "@elrondnetwork/dapp-core";
+import { PoolsState } from "atoms/poolsState";
+import AddLiquidityModal from "components/AddLiquidityModal";
+import TextAmt from "components/TextAmt";
+import CardTooltip from "components/Tooltip/CardTooltip";
+import OnboardTooltip from "components/Tooltip/OnboardTooltip";
+import { formatAmount } from "helper/number";
+import { useOnboarding } from "hooks/useOnboarding";
+import { useScreenSize } from "hooks/useScreenSize";
+import { Unarray } from "interface/utilities";
+import Image from "next/image";
+import React, { useState } from "react";
 
 function PoolCardItem({
     poolData,
+    withTooltip,
 }: {
     poolData: Unarray<PoolsState["poolToDisplay"]>;
+    withTooltip?: boolean;
 }) {
     const { pool } = poolData;
     const [isExpand, setIsExpand] = useState<boolean>(false);
     const [openAddLiquidity, setOpenAddLiquidity] = useState<boolean>(false);
     const network: AccountInfoSliceNetworkType = useGetNetworkConfig().network;
     const {
-        formatedStats: { TVL, tradingAPR, volumn24h },
-    } = usePoolDataFormat(poolData);
+        total_value_locked,
+        apr_day: tradingAPR,
+        usd_volume: volume24h,
+    } = poolData.poolStats || {};
+    const screenSize = useScreenSize();
+    const [onboardingPoolDeposit, setOnboardedPoolDeposit] =
+        useOnboarding("pool_deposit");
     return (
         <div
             className={`bg-ash-dark-700 clip-corner-4 clip-corner-tr pt-8 pb-5 px-6 sm:px-11 text-white`}
@@ -45,37 +61,121 @@ function PoolCardItem({
             </div>
             <div className="flex flex-row my-12 justify-between items-center">
                 <div>
-                    <div className="text-text-input-3 text-xs mb-4 underline">
-                        Trading APR
-                    </div>
+                    <CardTooltip
+                        content={
+                            <>
+                                Estimation for growth of your deposit over a
+                                year, based on trading activity in the past 24
+                                hours.
+                            </>
+                        }
+                    >
+                        <div className="text-text-input-3 text-xs mb-4 underline">
+                            Trading APR
+                        </div>
+                    </CardTooltip>
+
                     <div className="text-yellow-600 font-bold text-lg leading-tight">
-                        {tradingAPR}%
+                        {formatAmount(tradingAPR || 0, {
+                            notation: "standard",
+                        })}
+                        %
                     </div>
                 </div>
             </div>
-            <button
-                className="w-full clip-corner-1 clip-corner-br bg-pink-600 h-14 text-sm font-bold text-white underline"
-                onClick={() => setOpenAddLiquidity(true)}
+            <OnboardTooltip
+                open={onboardingPoolDeposit && screenSize.md}
+                zIndex={10}
+                placement="left"
+                disabled={!withTooltip}
+                onArrowClick={() => setOnboardedPoolDeposit(true)}
+                content={
+                    <OnboardTooltip.Panel>
+                        <div className="p-3 max-w-[8rem] text-xs font-bold">
+                            <span className="text-stake-green-500">
+                                Deposit{" "}
+                            </span>
+                            <span>a pool to start your Farm & Earn</span>
+                        </div>
+                    </OnboardTooltip.Panel>
+                }
             >
-                Deposit
-            </button>
+                <div>
+                    <button
+                        className="w-full clip-corner-1 clip-corner-br bg-pink-600 h-14 text-sm font-bold text-white underline"
+                        onClick={() => {
+                            setOpenAddLiquidity(true);
+                            setOnboardedPoolDeposit(true);
+                        }}
+                    >
+                        Deposit
+                    </button>
+                </div>
+            </OnboardTooltip>
 
             <div className="bg-bg my-4 text-text-input-3">
                 <div className="flex flex-row justify-between items-center h-12 px-4">
-                    <div className="underline text-2xs">Total Liquidity</div>
-                    <div className="text-sm">${TVL}</div>
+                    <CardTooltip
+                        content={
+                            <>
+                                Total value of overall deposited tokens in this
+                                pool.
+                            </>
+                        }
+                    >
+                        <div className="underline text-2xs">
+                            Total Liquidity
+                        </div>
+                    </CardTooltip>
+                    <div className="text-sm">
+                        $
+                        <TextAmt
+                            number={total_value_locked || 0}
+                            options={{ notation: "standard" }}
+                        />
+                    </div>
                 </div>
                 <div className="flex flex-row justify-between items-center h-12 px-4">
-                    <div className="underline text-2xs">24H Volume</div>
-                    <div className="text-sm">${volumn24h}</div>
+                    <CardTooltip
+                        content={
+                            <>
+                                Total value of token traded in the past 24
+                                hours.
+                            </>
+                        }
+                    >
+                        <div className="underline text-2xs">24H Volume</div>
+                    </CardTooltip>
+                    <div className="text-sm">
+                        $
+                        <TextAmt
+                            number={volume24h || 0}
+                            options={{ notation: "standard" }}
+                        />
+                    </div>
                 </div>
                 {isExpand && (
                     <>
                         <div className="flex flex-row justify-between items-center h-12 px-4">
-                            <div className="underline text-2xs">
-                                Trading APR
+                            <CardTooltip
+                                content={
+                                    <>
+                                        Estimation for growth of your deposit
+                                        over a year, based on trading activity
+                                        in the past 24 hours.
+                                    </>
+                                }
+                            >
+                                <div className="underline text-2xs">
+                                    Trading APR
+                                </div>
+                            </CardTooltip>
+                            <div className="text-sm">
+                                {formatAmount(tradingAPR || 0, {
+                                    notation: "standard",
+                                })}
+                                %
                             </div>
-                            <div className="text-sm">{tradingAPR}%</div>
                         </div>
                     </>
                 )}

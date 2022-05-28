@@ -2,11 +2,11 @@ import ICChevronDown from "assets/svg/chevron-down.svg";
 import ICChevronUp from "assets/svg/chevron-up.svg";
 import ICMinus from "assets/svg/minus.svg";
 import ICPlus from "assets/svg/plus.svg";
+import { PoolsState } from "atoms/poolsState";
 import AddLiquidityModal from "components/AddLiquidityModal";
 import BaseModal from "components/BaseModal";
 import RemoveLiquidityModal from "components/RemoveLiquidityModal";
-import { PoolsState } from "context/pools";
-import { abbreviateCurrency } from "helper/number";
+import TextAmt from "components/TextAmt";
 import usePoolDataFormat from "hooks/usePoolDataFormat";
 import { useScreenSize } from "hooks/useScreenSize";
 import { Unarray } from "interface/utilities";
@@ -25,7 +25,7 @@ const StakedPoolListItem = ({
     const { isMobile } = useScreenSize();
     const { pool, poolStats, liquidityData } = poolData;
     const {
-        formatedStats: { TVL, emissionAPR, tradingAPR, volumn24h },
+        formatedStats: { TVL, emissionAPR, tradingAPR, volume24h },
         formatedStakedData: {
             fCapacityPercent,
             fLpValueUsd,
@@ -107,9 +107,9 @@ const StakedPoolListItem = ({
                                 <span className="inline-block mr-1">
                                     <span className="text-ash-gray-500">$</span>
                                     <span>
-                                        {abbreviateCurrency(
-                                            liquidityData.lpValueUsd.toNumber()
-                                        )}
+                                        <TextAmt
+                                            number={liquidityData.lpValueUsd}
+                                        />
                                     </span>
                                 </span>
                                 {/* {isExpand && (
@@ -195,7 +195,7 @@ const StakedPoolListItem = ({
                                 </div>
                                 <div className="bg-ash-dark-400 h-12 px-4 flex justify-between items-center">
                                     <div className="text-2xs">24H Volume</div>
-                                    <div className="text-sm">${volumn24h}</div>
+                                    <div className="text-sm">${volume24h}</div>
                                 </div>
                                 <div className="bg-ash-dark-400 h-12 px-4 flex justify-between items-center">
                                     <div className="text-2xs">LP Tokens</div>
@@ -399,7 +399,7 @@ const StakedPoolListItem = ({
                             </div>
                             <div className="flex justify-between items-center h-9 space-x-4 px-4">
                                 <div className="text-2xs">24H Volume</div>
-                                <div className="text-sm">${volumn24h}</div>
+                                <div className="text-sm">${volume24h}</div>
                             </div>
                             <div className="flex justify-between items-center h-9 space-x-4 px-4">
                                 <div className="text-2xs">LP Token</div>

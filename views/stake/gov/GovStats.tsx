@@ -1,31 +1,65 @@
-import { useGetLoginInfo } from "@elrondnetwork/dapp-core";
+import { transactionServices, useGetLoginInfo } from "@elrondnetwork/dapp-core";
 import ICCapacity from "assets/svg/capacity.svg";
 import ICChevronDown from "assets/svg/chevron-down.svg";
 import ICChevronUp from "assets/svg/chevron-up.svg";
 import ICLock from "assets/svg/lock.svg";
 import ICUnlock from "assets/svg/unlock.svg";
 import ICWallet from "assets/svg/wallet.svg";
+import { govLockedAmtState, govRewardLPAmtState, govRewardLPTokenState, govRewardLPValueState, govTotalLockedAmtState, govTotalLockedPctState, govTotalSupplyVeASH, govUnlockTSState, govVeASHAmtState } from "atoms/govState";
+import { walletTokenPriceState } from "atoms/walletState";
 import BaseModal from "components/BaseModal";
 import GOVStakeModal from "components/GOVStakeModal";
+import TextAmt from "components/TextAmt";
 import CardTooltip from "components/Tooltip/CardTooltip";
-import TextTooltip from "components/Tooltip/TextTooltip";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 import { ENVIRONMENT } from "const/env";
 import { ASH_TOKEN, VE_ASH_DECIMALS } from "const/tokens";
-import { useStakeGov } from "context/gov";
-import { useWallet } from "context/wallet";
 import { toEGLDD } from "helper/balance";
 import { fetcher } from "helper/common";
-import { formatAmount, fractionFormat } from "helper/number";
+import { formatAmount } from "helper/number";
+import { useConnectWallet } from "hooks/useConnectWallet";
+import useGovClaimReward from "hooks/useGovContract/useGovClaimReward";
+import useGovUnlockASH from "hooks/useGovContract/useGovUnlockASH";
 import useMounted from "hooks/useMounted";
 import { useScreenSize } from "hooks/useScreenSize";
 import moment from "moment";
 import Image from "next/image";
 import Link from "next/link";
 import React, { useMemo, useState } from "react";
+import { useRecoilValue } from "recoil";
 import useSWR from "swr";
-
+const ExpiredLockTooltip = ({
+    children,
+    disabled,
+}: {
+    children: JSX.Element;
+    disabled?: boolean;
+}) => {
+    if (disabled) return <>{children}</>;
+    return (
+        <CardTooltip
+            content={
+                <>
+                    The lock period has expired, please withdraw your fund
+                    first.
+                </>
+            }
+        >
+            {children}
+        </CardTooltip>
+    );
+};
 function GovStats() {
+    const lockedAmt = useRecoilValue(govLockedAmtState);
+    const veASH = useRecoilValue(govVeASHAmtState);
+    const unlockTS = useRecoilValue(govUnlockTSState);
+    const totalSupplyVeASH = useRecoilValue(govTotalSupplyVeASH);
+    const totalLockedAmt = useRecoilValue(govTotalLockedAmtState);
+    const rewardLPAmt = useRecoilValue(govRewardLPAmtState);
+    const rewardLPToken = useRecoilValue(govRewardLPTokenState);
+    const rewardValue = useRecoilValue(govRewardLPValueState);
+    const totalLockedPct = useRecoilValue(govTotalLockedPctState);
+
     const { data: adminFee24h } = useSWR<number>(
         `${ASHSWAP_CONFIG.ashApiBaseUrl}/stake/governance/admin-fee`,
         fetcher
@@ -33,50 +67,23 @@ function GovStats() {
     const [isQAExpand, setIsQAExpand] = useState(false);
     const [openStakeGov, setOpenStakeGov] = useState(false);
     const [openHarvestResult, setOpenHarvestResult] = useState(false);
-    const {
-        lockedAmt,
-        veASH,
-        unlockTS,
-        totalSupplyVeASH,
-        totalLockedAmt,
-        rewardLPAmt,
-        rewardLPToken,
-        rewardValue,
-        totalLockedPct,
-        claimReward,
-        unlockASH,
-    } = useStakeGov();
+    const [harvestId, setHarvestId] = useState("");
+    transactionServices.useTrackTransactionStatus({
+        transactionId: harvestId,
+        onSuccess: () => setOpenHarvestResult(true),
+    });
+
+    const claimReward = useGovClaimReward();
+    const unlockASH = useGovUnlockASH();
     const { isLoggedIn: loggedIn } = useGetLoginInfo();
     const mounted = useMounted();
-    const { connectWallet, tokenPrices } = useWallet();
+    const connectWallet = useConnectWallet();
+    const tokenPrices = useRecoilValue(walletTokenPriceState);
     const screenSize = useScreenSize();
-    const fLockedAmt = useMemo(() => {
-        return fractionFormat(
-            toEGLDD(ASH_TOKEN.decimals, lockedAmt).toNumber()
-        );
-    }, [lockedAmt]);
-    const fVEASHAmt = useMemo(() => {
-        return fractionFormat(toEGLDD(VE_ASH_DECIMALS, veASH).toNumber());
-    }, [veASH]);
-    const fTotalVeASH = useMemo(() => {
-        return fractionFormat(
-            toEGLDD(VE_ASH_DECIMALS, totalSupplyVeASH).toNumber()
-        );
-    }, [totalSupplyVeASH]);
     const capacityPct = useMemo(() => {
         if (totalSupplyVeASH.eq(0)) return "_";
         return veASH.multipliedBy(100).div(totalSupplyVeASH).toFixed(2);
     }, [veASH, totalSupplyVeASH]);
-    const fTotalLockedAmt = useMemo(() => {
-        return fractionFormat(
-            toEGLDD(ASH_TOKEN.decimals, totalLockedAmt).toNumber()
-        );
-    }, [totalLockedAmt]);
-    const fRewardValue = useMemo(() => {
-        if (!rewardValue || rewardValue.eq(0)) return "0";
-        const num = rewardValue.toNumber();
-        return fractionFormat(num, { maximumFractionDigits: num < 1 ? 6 : 2 });
-    }, [rewardValue]);
     const apr = useMemo(() => {
         if (!adminFee24h) return 0;
         return (
@@ -107,12 +114,20 @@ function GovStats() {
                             Weekly Summary
                         </button> */}
                     {loggedIn && (
-                        <button
-                            className="bg-pink-600 text-white h-12 px-6 flex items-center justify-center"
-                            onClick={() => setOpenStakeGov(true)}
-                        >
-                            Add/Manage Stake
-                        </button>
+                        <ExpiredLockTooltip disabled={!canUnlockASH}>
+                            <button
+                                className={`h-12 px-6 flex items-center justify-center ${
+                                    canUnlockASH
+                                        ? "bg-ash-dark-400 text-stake-gray-500 cursor-not-allowed"
+                                        : "bg-pink-600 text-white"
+                                }`}
+                                onClick={() =>
+                                    !canUnlockASH && setOpenStakeGov(true)
+                                }
+                            >
+                                Add / Manage Stake
+                            </button>
+                        </ExpiredLockTooltip>
                     )}
                 </div>
             </div>
@@ -169,7 +184,10 @@ function GovStats() {
                                             $
                                         </span>
                                         <span className="text-white font-bold">
-                                            {fRewardValue}
+                                            <TextAmt
+                                                number={rewardValue}
+                                                decimalClassName="text-stake-gray-500"
+                                            />
                                         </span>
                                     </div>
                                 </div>
@@ -178,13 +196,14 @@ function GovStats() {
                                 className={`text-sm font-bold w-full h-[3.375rem] flex items-center justify-center ${
                                     canClaim
                                         ? "bg-ash-cyan-500 text-ash-dark-400"
-                                        : "bg-ash-dark-400 text-white"
+                                        : "bg-ash-dark-400 text-white cursor-not-allowed"
                                 }`}
                                 disabled={!canClaim}
                                 onClick={() =>
                                     canClaim &&
-                                    claimReward().then(({ sessionId }) =>
-                                        setOpenHarvestResult(!!sessionId)
+                                    claimReward().then(
+                                        ({ sessionId }) =>
+                                            sessionId && setHarvestId(sessionId)
                                     )
                                 }
                             >
@@ -219,7 +238,13 @@ function GovStats() {
                                         />
                                     </div>
                                     <div className="text-lg text-white font-bold">
-                                        {fLockedAmt}
+                                        <TextAmt
+                                            number={toEGLDD(
+                                                ASH_TOKEN.decimals,
+                                                lockedAmt
+                                            )}
+                                            decimalClassName="text-stake-gray-500"
+                                        />
                                     </div>
                                 </div>
                             </div>
@@ -272,7 +297,13 @@ function GovStats() {
                                     </div> */}
                                     <div className="w-[1.125rem] h-[1.125rem] mr-2 rounded-full bg-ash-purple-500"></div>
                                     <div className="text-lg text-white font-bold">
-                                        {fVEASHAmt}
+                                        <TextAmt
+                                            number={toEGLDD(
+                                                VE_ASH_DECIMALS,
+                                                veASH
+                                            )}
+                                            decimalClassName="text-stake-gray-500"
+                                        />
                                     </div>
                                 </div>
                             </div>
@@ -330,12 +361,20 @@ function GovStats() {
                     </div>
                     {mounted &&
                         (loggedIn ? (
-                            <button
-                                className="bg-pink-600 text-white text-sm md:text-lg font-bold w-full h-14 md:h-[4.5rem] flex items-center justify-center mt-3"
-                                onClick={() => setOpenStakeGov(true)}
-                            >
-                                Add / Manage Stake
-                            </button>
+                            <ExpiredLockTooltip disabled={!canUnlockASH}>
+                                <button
+                                    className={`text-sm md:text-lg font-bold w-full h-14 md:h-[4.5rem] flex items-center justify-center mt-3 ${
+                                        canUnlockASH
+                                            ? "bg-ash-dark-400 text-stake-gray-500 cursor-not-allowed"
+                                            : "bg-pink-600 text-white"
+                                    }`}
+                                    onClick={() =>
+                                        !canUnlockASH && setOpenStakeGov(true)
+                                    }
+                                >
+                                    Add / Manage Stake
+                                </button>
+                            </ExpiredLockTooltip>
                         ) : (
                             <button
                                 className="bg-pink-600 text-white text-sm md:text-lg font-bold w-full h-14 md:h-[4.5rem] flex items-center justify-center mt-3"
@@ -350,13 +389,13 @@ function GovStats() {
                     <h2 className="text-lg md:text-2xl mb-10 md:mb-11 font-bold text-white">
                         Overall stats
                     </h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 lg:gap-x-7.5 gap-y-1 sm:gap-y-4 lg:gap-y-6 mb-16">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 lg:gap-x-7.5 gap-y-1 sm:gap-y-4 lg:gap-y-6 mb-16">
                         <div className="bg-ash-dark-400/30 px-[2.375rem] py-7 flex flex-col justify-between">
                             <div className="text-stake-gray-500 text-sm font-bold mb-6 sm:mb-2 leading-tight">
                                 APR
                             </div>
                             <div className="text-pink-600 text-lg font-bold leading-tight">
-                                {formatAmount(apr)}%
+                                {formatAmount(apr, { notation: "standard" })}%
                             </div>
                         </div>
                         <div className="bg-ash-dark-400/30 px-[2.375rem] py-7 flex flex-col justify-between">
@@ -364,9 +403,9 @@ function GovStats() {
                                 PERCENTAGE of total ASH Locked
                             </div>
                             <div className="text-white text-lg font-bold leading-tight">
-                                {totalLockedPct < 0.01
-                                    ? "< 0.01"
-                                    : totalLockedPct.toFixed(2)}
+                                {formatAmount(totalLockedPct, {
+                                    notation: "standard",
+                                })}
                                 %
                             </div>
                         </div>
@@ -387,7 +426,14 @@ function GovStats() {
                                     />
                                 </div>
                                 <div className="text-white text-lg font-bold">
-                                    {fTotalLockedAmt}
+                                    <TextAmt
+                                        number={toEGLDD(
+                                            ASH_TOKEN.decimals,
+                                            totalLockedAmt
+                                        )}
+                                        options={{ notation: "standard" }}
+                                        decimalClassName="text-stake-gray-500"
+                                    />
                                 </div>
                             </div>
                         </div>
@@ -401,7 +447,14 @@ function GovStats() {
                                 </div> */}
                                 <div className="w-[1.125rem] h-[1.125rem] mr-2 rounded-full bg-ash-purple-500"></div>
                                 <div className="text-white text-lg font-bold">
-                                    {fTotalVeASH}
+                                    <TextAmt
+                                        number={toEGLDD(
+                                            VE_ASH_DECIMALS,
+                                            totalSupplyVeASH
+                                        )}
+                                        options={{ notation: "standard" }}
+                                        decimalClassName="text-stake-gray-500"
+                                    />
                                 </div>
                             </div>
                         </div>
@@ -557,9 +610,10 @@ function GovStats() {
                                     </div>
                                 </div>
                                 <div className="text-center text-ash-gray-500 text-lg font-bold">
-                                    ${fRewardValue} LP-
+                                    <TextAmt number={rewardValue} />
+                                    &nbsp; LP-
                                     {rewardLPToken.tokens[0].name}
-                                    {rewardLPToken.tokens[0].name} has been sent
+                                    {rewardLPToken.tokens[1].name} has been sent
                                     to your wallet
                                 </div>
                             </>

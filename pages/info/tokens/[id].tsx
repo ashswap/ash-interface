@@ -1,29 +1,25 @@
+import { AccountInfoSliceNetworkType, useGetNetworkConfig } from "@elrondnetwork/dapp-core";
+import { Tooltip } from "antd";
 import ICArrowRight from "assets/svg/arrow-right.svg";
 import ICCopy from "assets/svg/copy.svg";
 import ICNewTabRound from "assets/svg/new-tab-round.svg";
-import ICStarOutline from "assets/svg/star-outline.svg";
 import ICSwap from "assets/svg/swap.svg";
-import ICArrowBottomRight from "assets/svg/arrow-bottom-right.svg";
-import ICArrowTopRight from "assets/svg/arrow-top-right.svg";
 import InfoLayout from "components/Layout/Info";
+import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 import { IN_POOL_TOKENS } from "const/tokens";
+import { fetcher } from "helper/common";
+import { formatAmount } from "helper/number";
+import { PoolStatsRecord } from "interface/poolStats";
 import { IToken } from "interface/token";
+import { TxStatsRecord } from "interface/txStats";
 import { GetServerSideProps, NextPage } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import React, { ReactElement } from "react";
-import TokenChart from "views/info/Tokens/[id]/TokenChart";
-import TxsTable from "views/info/components/TxsTable";
-import { Tooltip } from "antd";
-import { useWallet } from "context/wallet";
 import useSWR from "swr";
-import { fetcher } from "helper/common";
-import { formatAmount, fractionFormat } from "helper/number";
 import PoolsTable from "views/info/components/PoolsTable";
-import { PoolStatsRecord } from "interface/poolStats";
-import { TxStatsRecord } from "interface/txStats";
-import { ASHSWAP_CONFIG } from "const/ashswapConfig";
-import { AccountInfoSliceNetworkType, useGetNetworkConfig } from "@elrondnetwork/dapp-core";
+import TxsTable from "views/info/components/TxsTable";
+import TokenChart from "views/info/Tokens/[id]/TokenChart";
 
 type TokenStats = {
     change_percentage_day: number;

@@ -1,6 +1,7 @@
 import IconClose from "assets/svg/close-1.svg";
 import Down from "assets/svg/down.svg";
 import Search from "assets/svg/search.svg";
+import { walletBalanceState } from "atoms/walletState";
 import BigNumber from "bignumber.js";
 import BaseModal from "components/BaseModal";
 import Input from "components/Input";
@@ -8,13 +9,14 @@ import ListSwapPool from "components/ListSwapPool";
 import ListToken from "components/ListToken";
 import Token from "components/Token";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
-import { useWallet } from "context/wallet";
+import { IN_POOL_TOKENS_MAP } from "const/tokens";
 import { useOnboarding } from "hooks/useOnboarding";
 import { useScreenSize } from "hooks/useScreenSize";
 import IPool from "interface/pool";
 import { IToken } from "interface/token";
 import { TokenBalance } from "interface/tokenBalance";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useRecoilValue } from "recoil";
 import styles from "./TokenSelect.module.css";
 
 interface Props {
@@ -42,7 +44,8 @@ const TokenSelect = ({
     >([]);
     const [filtedValidPools, setFiltedValidPools] = useState<IPool[]>([]);
     const [keyword, setKeyword] = useState<string>("");
-    const { tokens, balances } = useWallet();
+    const tokens = IN_POOL_TOKENS_MAP;
+    const balances = useRecoilValue(walletBalanceState);
     const screenSize = useScreenSize();
     // user onboarding
     const [openOnboardSelectToken, setOnboardedSelectToken] =
@@ -64,15 +67,11 @@ const TokenSelect = ({
             if (Object.prototype.hasOwnProperty.call(tokens, tokenId)) {
                 const tokenBalance: TokenBalance = {
                     token: tokens[tokenId],
-                    balance: balances[tokenId]
-                        ? balances[tokenId].balance
-                        : new BigNumber(0),
+                    balance: balances[tokenId]?.balance || new BigNumber(0),
                 };
-
                 tokenBalances.push(tokenBalance);
             }
         }
-
         return tokenBalances;
     }, [tokens, balances]);
 

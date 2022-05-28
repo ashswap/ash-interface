@@ -3,15 +3,18 @@ import {
     useGetAccountInfo,
     useGetLoginInfo
 } from "@elrondnetwork/dapp-core";
+import ImgAvatar from "assets/images/avatar.png";
 import IconChange from "assets/svg/change.svg";
+import ICChevronUp from "assets/svg/chevron-up.svg";
 import IconCopy from "assets/svg/copy.svg";
 import IconDisconnect from "assets/svg/disconnect.svg";
+import { walletIsOpenConnectModalState } from "atoms/walletState";
 import BaseModal from "components/BaseModal";
 import BasePopover from "components/BasePopover";
-import { TAILWIND_BREAKPOINT } from "const/mediaQueries";
-import { useWallet } from "context/wallet";
-import useMediaQuery from "hooks/useMediaQuery";
+import { useConnectWallet } from "hooks/useConnectWallet";
 import useMounted from "hooks/useMounted";
+import { useScreenSize } from "hooks/useScreenSize";
+import Image from "next/image";
 import {
     Dispatch,
     SetStateAction,
@@ -19,6 +22,27 @@ import {
     useEffect,
     useState
 } from "react";
+import { Modifier } from "react-popper";
+import { useSetRecoilState } from "recoil";
+import WalletBalance from "./WalletBalance";
+const overlayModifier: Partial<Modifier<unknown, object>> = {
+    name: "overlay",
+    enabled: true,
+    options: {},
+    phase: "beforeRead",
+    fn: ({ state }) => {
+        return {
+            ...state,
+            rects: {
+                ...state.rects,
+                reference: {
+                    ...state.rects.reference,
+                    height: 0,
+                },
+            },
+        };
+    },
+};
 type AddressMenuProp = {
     infoLayout?: boolean;
     dropdownBtn: (
@@ -29,6 +53,7 @@ type AddressMenuProp = {
         connectWallet: (token?: string | undefined) => void
     ) => JSX.Element;
 };
+
 function AddressMenu({ infoLayout, dropdownBtn, connectBtn }: AddressMenuProp) {
     const { isLoggedIn: loggedIn } = useGetLoginInfo();
     const { address } = useGetAccountInfo();
@@ -36,14 +61,13 @@ function AddressMenu({ infoLayout, dropdownBtn, connectBtn }: AddressMenuProp) {
     const [mShowMenu, setMShowMenu] = useState(false);
     const [showMenu, setShowMenu] = useState(false);
     const mounted = useMounted();
-    const isSMScreen = useMediaQuery(
-        `(max-width: ${TAILWIND_BREAKPOINT.SM}px)`
-    );
-    const { connectWallet, setIsOpenConnectWalletModal } = useWallet();
+    const { isMobile } = useScreenSize();
+    const connectWallet = useConnectWallet();
+    const setIsOpenConnectWalletModal = useSetRecoilState(walletIsOpenConnectModalState);
     useEffect(() => {
         setMShowMenu(false);
         setShowMenu(false);
-    }, [isSMScreen]);
+    }, [isMobile]);
     const copyAddress = useCallback(() => {
         if (!loggedIn) {
             return;
@@ -65,43 +89,75 @@ function AddressMenu({ infoLayout, dropdownBtn, connectBtn }: AddressMenuProp) {
                 {mounted &&
                     (loggedIn ? (
                         <BasePopover
-                            options={{ strategy: "fixed" }}
-                            button={() => (
+                            options={{
+                                strategy: "fixed",
+                                placement: "bottom-end",
+                                modifiers: [overlayModifier],
+                            }}
+                            button={({ open }) => (
                                 <div>{dropdownBtn(address, setMShowMenu)}</div>
                             )}
                         >
                             {({ close }) => (
-                                <div className="bg-ash-dark-700">
+                                <div className="bg-stake-dark-400 min-w-[17.5rem] max-w-full px-4 py-6">
                                     <button
-                                        className={`w-full py-2 px-3 flex items-center overflow-hidden text-white hover:text-white transition-all font-bold text-xs hover:bg-ash-dark-500`}
-                                        onClick={() => {
-                                            copyAddress();
-                                            close();
-                                        }}
+                                        className="px-4 w-full h-10 hover:bg-ash-dark-500 flex items-center justify-between text-white font-bold text-xs mb-5"
+                                        onClick={() =>
+                                            isMobile
+                                                ? setMShowMenu(true)
+                                                : close()
+                                        }
                                     >
-                                        <IconCopy className="w-5 h-5 text-ash-gray-600 mr-3.5" />
-                                        <span>Copy address</span>
+                                        <div className="flex items-center mr-2.5">
+                                            <Image
+                                                src={ImgAvatar}
+                                                alt="avatar"
+                                                width={24}
+                                                height={24}
+                                            />
+                                            <span className="ml-2.5">
+                                                {address.slice(0, 8) +
+                                                    "..." +
+                                                    address.slice(-8)}
+                                            </span>
+                                        </div>
+                                        <ICChevronUp />
                                     </button>
-                                    <button
-                                        className={`w-full py-2 px-3 flex items-center overflow-hidden text-white hover:text-white transition-all font-bold text-xs hover:bg-ash-dark-500`}
-                                        onClick={() => {
-                                            setIsOpenConnectWalletModal(true);
-                                            close();
-                                        }}
-                                    >
-                                        <IconChange className="w-5 h-5 text-ash-gray-600 mr-3.5" />
-                                        <span>Change wallet</span>
-                                    </button>
-                                    <button
-                                        className={`w-full py-2 px-3 flex items-center overflow-hidden text-white hover:text-white transition-all font-bold text-xs hover:bg-ash-dark-500`}
-                                        onClick={() => {
-                                            logoutDapp();
-                                            close();
-                                        }}
-                                    >
-                                        <IconDisconnect className="w-5 h-5 text-ash-gray-600 mr-3.5" />
-                                        <span>Disconnect wallet</span>
-                                    </button>
+                                    <WalletBalance />
+                                    <div className="mt-5">
+                                        <button
+                                            className={`w-full py-2 px-4 flex items-center overflow-hidden text-white hover:text-white transition-all font-bold text-xs hover:bg-ash-dark-500`}
+                                            onClick={() => {
+                                                copyAddress();
+                                                close();
+                                            }}
+                                        >
+                                            <IconCopy className="w-5 h-5 text-ash-gray-600 mr-3.5" />
+                                            <span>Copy address</span>
+                                        </button>
+                                        <button
+                                            className={`w-full py-2 px-4 flex items-center overflow-hidden text-white hover:text-white transition-all font-bold text-xs hover:bg-ash-dark-500`}
+                                            onClick={() => {
+                                                setIsOpenConnectWalletModal(
+                                                    true
+                                                );
+                                                close();
+                                            }}
+                                        >
+                                            <IconChange className="w-5 h-5 text-ash-gray-600 mr-3.5" />
+                                            <span>Change wallet</span>
+                                        </button>
+                                        <button
+                                            className={`w-full py-2 px-4 flex items-center overflow-hidden text-white hover:text-white transition-all font-bold text-xs hover:bg-ash-dark-500`}
+                                            onClick={() => {
+                                                logoutDapp();
+                                                close();
+                                            }}
+                                        >
+                                            <IconDisconnect className="w-5 h-5 text-ash-gray-600 mr-3.5" />
+                                            <span>Disconnect wallet</span>
+                                        </button>
+                                    </div>
                                 </div>
                             )}
                         </BasePopover>
@@ -109,7 +165,7 @@ function AddressMenu({ infoLayout, dropdownBtn, connectBtn }: AddressMenuProp) {
                         <>{connectBtn(connectWallet)}</>
                     ))}
             </div>
-            {isSMScreen && (
+            {isMobile && (
                 <BaseModal
                     isOpen={mShowMenu}
                     onRequestClose={() => setMShowMenu(false)}
@@ -123,31 +179,32 @@ function AddressMenu({ infoLayout, dropdownBtn, connectBtn }: AddressMenuProp) {
                         <div className="text-lg font-bold mb-7">
                             Wallet actions
                         </div>
+                        <WalletBalance />
                         <div className="text-sm">
                             <button
-                                className="bg-bg rounded-lg px-11 h-14 flex items-center w-full mt-4"
+                                className="bg-bg rounded-lg px-6 h-12 flex items-center w-full mt-4 text-xs"
                                 onClick={copyAddress}
                             >
                                 <i className="mr-4">
-                                    <IconCopy className="h-7 w-7 text-ash-gray-500" />
+                                    <IconCopy className="h-5 w-5 text-ash-gray-500" />
                                 </i>
                                 <span>Copy address</span>
                             </button>
-                            <button className="bg-bg rounded-lg px-11 h-14 flex items-center w-full mt-4">
+                            <button className="bg-bg rounded-lg px-6 h-12 flex items-center w-full mt-4 text-xs">
                                 <i className="mr-4">
-                                    <IconChange className="h-7 w-7" />
+                                    <IconChange className="h-5 w-5 text-ash-gray-500" />
                                 </i>
                                 <span>Change wallet</span>
                             </button>
                             <button
-                                className="bg-bg rounded-lg px-11 h-14 flex items-center w-full mt-4"
+                                className="bg-bg rounded-lg px-6 h-12 flex items-center w-full mt-4 text-xs"
                                 onClick={() => {
                                     setMShowMenu(false);
                                     logoutDapp();
                                 }}
                             >
                                 <i className="mr-4">
-                                    <IconDisconnect className="h-7 w-7" />
+                                    <IconDisconnect className="h-5 w-5 text-ash-gray-500" />
                                 </i>
                                 <span>Disconnect wallet</span>
                             </button>
