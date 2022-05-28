@@ -415,7 +415,7 @@ const StakeGovProvider = ({ children }: any) => {
             setRewardValue(new BigNumber(0));
             return;
         }
-        const value = await getLPValue(rewardLPAmt, rewardLPToken);
+        const {lpValueUsd: value} = await getLPValue(rewardLPAmt, rewardLPToken);
         setRewardValue(value || new BigNumber(0));
     }, [rewardLPAmt, rewardLPToken, getLPValue]);
 
