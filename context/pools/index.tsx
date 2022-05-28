@@ -108,13 +108,13 @@ const PoolsProvider = ({ children }: any) => {
             };
             const ownLP = balances[p.lpToken.id]?.balance || new BigNumber(0);
             if (ownLP.gt(0)) {
-                const { value0, value1 } = await queryPoolContract.getTokenInLP(ownLP, p.address);
+                const {amt0, amt1, lpValueUsd} = await getLPValue(ownLP, p);
                 record.liquidityData = {
                     ownLiquidity: ownLP,
                     capacityPercent: getPortion(p.lpToken.id, ownLP),
-                    value0,
-                    value1,
-                    lpValueUsd: await getLPValue(ownLP, p),
+                    value0: amt0,
+                    value1: amt1,
+                    lpValueUsd,
                 };
             }
             records.push(record);
