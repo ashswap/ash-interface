@@ -23,6 +23,7 @@ import {
 } from "react";
 import { useSetRecoilState } from "recoil";
 import useSWR from "swr";
+import useInterval from "./useInterval";
 
 export function useRecoilAdapter() {
     // start copy from dappContext
@@ -103,11 +104,5 @@ export function useRecoilAdapter() {
     }, [apiProvider, setLpTokens]);
 
     // fetch token balance every block
-    useEffect(() => {
-        fetchBalances();
-        let interval = setInterval(fetchBalances, blockTimeMs);
-        return () => {
-            clearInterval(interval);
-        };
-    }, [fetchBalances]);
+    useInterval(fetchBalances, blockTimeMs);
 }

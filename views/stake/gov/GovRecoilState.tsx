@@ -29,6 +29,7 @@ import pools from "const/pool";
 import { ASH_TOKEN } from "const/tokens";
 import { toWei } from "helper/balance";
 import { queryContractParser } from "helper/serializer";
+import useInterval from "hooks/useInterval";
 import useLPValue from "hooks/usePoolContract/useLPValue";
 import moment from "moment";
 import {
@@ -222,53 +223,12 @@ const GovState = () => {
         getRewardValue();
     }, [getRewardValue]);
 
-    useEffect(() => {
-        getVEASHAmt();
-        const interval = setInterval(() => {
-            getVEASHAmt();
-        }, blockTimeMs);
-        return () => clearInterval(interval);
-    }, [getVEASHAmt]);
-
-    useEffect(() => {
-        getLockedAmt();
-        const interval = setInterval(() => {
-            getLockedAmt();
-        }, blockTimeMs);
-        return () => clearInterval(interval);
-    }, [getLockedAmt]);
-
-    useEffect(() => {
-        getTotalSupplyVeASH();
-        const interval = setInterval(() => {
-            getTotalSupplyVeASH();
-        }, blockTimeMs);
-        return () => clearInterval(interval);
-    }, [getTotalSupplyVeASH]);
-
-    useEffect(() => {
-        getRewardAmt();
-        const interval = setInterval(() => {
-            getRewardAmt();
-        }, blockTimeMs);
-        return () => clearInterval(interval);
-    }, [getRewardAmt]);
-
-    useEffect(() => {
-        getTotalLockedAmt();
-        const interval = setInterval(() => {
-            getTotalLockedAmt();
-        }, blockTimeMs);
-        return () => clearInterval(interval);
-    }, [getTotalLockedAmt]);
-
-    useEffect(() => {
-        getTotalLockedASHPct();
-        const interval = setInterval(() => {
-            getTotalLockedASHPct();
-        }, blockTimeMs);
-        return () => clearInterval(interval);
-    }, [getTotalLockedASHPct]);
+    useInterval(getVEASHAmt, blockTimeMs);
+    useInterval(getLockedAmt, blockTimeMs);
+    useInterval(getTotalSupplyVeASH, blockTimeMs);
+    useInterval(getRewardAmt, blockTimeMs);
+    useInterval(getTotalLockedAmt, blockTimeMs);
+    useInterval(getTotalLockedASHPct, blockTimeMs);
 
     useEffect(() => {
         getRewardLPID();
