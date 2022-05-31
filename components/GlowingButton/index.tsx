@@ -3,11 +3,11 @@ import React, { useMemo } from "react";
 import { twMerge } from "tailwind-merge";
 
 const pinkWrapperClassName =
-    "hover:colored-drop-shadow-sm hover:colored-drop-shadow-pink-600/75";
+    "hover:colored-drop-shadow-xs md:hover:colored-drop-shadow-sm hover:colored-drop-shadow-pink-600/75";
 const cyanWrapperClassName =
-    "hover:colored-drop-shadow-sm hover:colored-drop-shadow-ash-light-blue-500/75";
+    "hover:colored-drop-shadow-xs md:hover:colored-drop-shadow-sm hover:colored-drop-shadow-ash-light-blue-500/75";
 const yellowWrapperClassName =
-    "hover:colored-drop-shadow-sm hover:colored-drop-shadow-yellow-700/75";
+    "hover:colored-drop-shadow-xs md:hover:colored-drop-shadow-sm hover:colored-drop-shadow-yellow-700/75";
 const THEME = {
     pink: pinkWrapperClassName,
     cyan: cyanWrapperClassName,

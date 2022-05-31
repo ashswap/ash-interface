@@ -36,7 +36,7 @@ const CONTAINER = {
     modal: "",
 };
 Modal.setAppElement("body");
-type BaseModalType = Props & {
+export type BaseModalType = Props & {
     transition?: "btt" | "center" | "none";
     type?: "modal" | "drawer_btt" | "drawer_ttb" | "drawer_ltr" | "drawer_rtl";
 };

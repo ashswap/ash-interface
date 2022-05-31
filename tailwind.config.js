@@ -76,6 +76,7 @@ module.exports = {
                 },
                 "stake-dark": {
                     400: "#2B2C44",
+                    450: "#28273f",
                     500: "#26253C"
                 },
                 "stake-green": {
