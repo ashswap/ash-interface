@@ -53,10 +53,11 @@ const TestnetGuard = ({ children }: any) => {
         return (
             <div className="w-screen h-screen bg-ash-dark-600 flex flex-col items-center justify-center px-6 text-center">
                 <div className="text-3xl text-white font-bold mb-20">
-                    Official testing version in{" "}
+                    Official testing version of AshSwap is in{" "}
                     <a href="https://devnet.ashswap.io">
-                        <span className="text-pink-600">Devnet</span>
+                        <span className="text-pink-600 underline">Devnet</span>
                     </a>
+                    {" "}now
                 </div>
                 <input
                     type="password"
