@@ -5,17 +5,17 @@ import Modal, { Props } from "react-modal";
 const TRANSITIONS: Record<string, TransitionClasses> = {
     center: {
         enter: "transition duration-200 ease-out",
-        enterFrom: "transform scale-95 opacity-0",
-        enterTo: "transform scale-100 opacity-100",
+        enterFrom: "scale-95 opacity-0",
+        enterTo: "scale-100 opacity-100",
         leave: "transition duration-75 ease-out",
-        leaveFrom: "transform scale-100 opacity-100",
-        leaveTo: "transform scale-95 opacity-0",
+        leaveFrom: "scale-100 opacity-100",
+        leaveTo: "scale-95 opacity-0",
     },
     btt: {
-        enter: "transition duration-300 ease-in-out transform",
+        enter: "transition duration-300 ease-in-out",
         enterFrom: "translate-y-full opacity-0",
         enterTo: "translate-y-0 opacity-100",
-        leave: "transition duration-300 ease-out transform",
+        leave: "transition duration-300 ease-out",
         leaveFrom: "translate-y-0 opacity-100",
         leaveTo: "translate-y-full opacity-0",
     },
@@ -76,11 +76,11 @@ const BaseModal = (props: BaseModalType) => {
                     <Transition.Child
                         as={Fragment}
                         enter="transition duration-300 ease-out"
-                        enterFrom="transform opacity-0"
-                        enterTo="transform opacity-100"
+                        enterFrom="opacity-0"
+                        enterTo="opacity-100"
                         leave="transition duration-100 ease-out"
-                        leaveFrom="transform opacity-100"
-                        leaveTo="transform opacity-0"
+                        leaveFrom="opacity-100"
+                        leaveTo="opacity-0"
                     >
                         <div className="bg-ash-purple-500/20 backdrop-blur-[30px] fixed z-[-1] inset-0 pointer-events-none"></div>
                     </Transition.Child>

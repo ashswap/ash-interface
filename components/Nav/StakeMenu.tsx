@@ -47,10 +47,9 @@ function StakeMenu() {
     const [openTooltip, setOpenTooltip] = useState(false);
     const router = useRouter();
     const addLPSessionId = useRecoilValue(addLPSessionIdAtom);
-    const { isSuccessful } =
-        transactionServices.useTrackTransactionStatus({
-            transactionId: addLPSessionId,
-        });
+    const { isSuccessful } = transactionServices.useTrackTransactionStatus({
+        transactionId: addLPSessionId,
+    });
     const [onboaringFarmFromAddedLp, setOnboardedFarmFromAddedLp] =
         useOnboarding("pool_farm_from_added_lp");
 
@@ -330,7 +329,7 @@ function StakeMenu() {
                 <div className="flex justify-end mb-3.5">
                     <BaseModal.CloseBtn />
                 </div>
-                <div className="flex-grow overflow-auto">
+                <div className="grow overflow-auto">
                     <div className="px-6 pb-[3.75rem]">
                         <div className="mb-9 text-2xl font-bold">Stake</div>
                         <div className="grid grid-cols-1 gap-4">

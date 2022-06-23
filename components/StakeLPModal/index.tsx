@@ -77,7 +77,7 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
                 Stake {lpName}
             </div>
             <div className="sm:flex sm:space-x-8 lg:space-x-24 mb-18">
-                <div className="flex flex-col flex-grow mb-16 lg:mb-0">
+                <div className="flex flex-col grow mb-16 lg:mb-0">
                     <div className="w-full grid md:grid-cols-2 gap-y-6 gap-x-4 lg:gap-x-7.5">
                         <div>
                             <div className="text-ash-gray-500 text-xs lg:text-sm font-bold mb-2 lg:mb-4">
@@ -147,7 +147,7 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
                         </div>
                     </div>
                 </div>
-                <div className="w-full sm:w-1/3 lg:w-[17.8125rem] flex-shrink-0 bg-stake-dark-500 py-[2.375rem] px-10">
+                <div className="w-full sm:w-1/3 lg:w-[17.8125rem] shrink-0 bg-stake-dark-500 py-[2.375rem] px-10">
                     <div className="text-white text-lg font-bold mb-16">
                         Estimate Farming
                     </div>
@@ -181,7 +181,7 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
                 </div>
             </div>
             <div className="sm:flex sm:space-x-8 lg:space-x-24">
-                <div className="w-full mb-12 sm:mb-0 sm:flex-grow">
+                <div className="w-full mb-12 sm:mb-0 sm:grow">
                     <Checkbox
                         checked={isAgree}
                         onChange={setIsAgree}
@@ -203,7 +203,7 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
                         }
                     />
                 </div>
-                <div className="w-full sm:w-1/3 lg:w-[17.8125rem] flex-shrink-0">
+                <div className="w-full sm:w-1/3 lg:w-[17.8125rem] shrink-0">
                     <div className="border-notch">
                         <button
                             className={`clip-corner-1 clip-corner-tl transition w-full h-12 flex items-center justify-center text-sm font-bold ${
@@ -243,7 +243,7 @@ function StakeLPModal(props: props) {
                 <div className="flex justify-end mb-3.5">
                     <BaseModal.CloseBtn />
                 </div>
-                <div className="flex-grow overflow-auto">
+                <div className="grow overflow-auto">
                     <StakeLPContent {...props} />
                 </div>
             </BaseModal>

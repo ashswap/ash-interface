@@ -262,7 +262,7 @@ function FarmDetailPage({ pool }: Props) {
                         </div>
                     </div>
                 </div>
-                <div className="flex-grow xl:ml-4 overflow-hidden xl:h-[32.25rem]">
+                <div className="grow xl:ml-4 overflow-hidden xl:h-[32.25rem]">
                     <PoolChart pool={pool} />
                 </div>
             </div>

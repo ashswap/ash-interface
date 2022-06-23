@@ -1,7 +1,6 @@
-
 import {
     AccountInfoSliceNetworkType,
-    useGetNetworkConfig
+    useGetNetworkConfig,
 } from "@elrondnetwork/dapp-core";
 import ICChevronDown from "assets/svg/chevron-down.svg";
 import ICChevronUp from "assets/svg/chevron-up.svg";
@@ -85,7 +84,7 @@ function StakedPoolCardItem({
                         </button>
                     </div>
                 </div>
-                <div className="flex-grow flex flex-col justify-end relative">
+                <div className="grow flex flex-col justify-end relative">
                     <div className="absolute top-0 right-0 flex flex-row justify-between items-center">
                         <div className="w-[3.25rem]">
                             <Image src={pool.tokens[0].icon} alt="token icon" />

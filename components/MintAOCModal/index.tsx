@@ -31,13 +31,13 @@ function MintAOCModal({ open, onClose }: props) {
             <div className="flex justify-end mb-3.5">
                 <BaseModal.CloseBtn />
             </div>
-            <div className="flex-grow overflow-auto">
+            <div className="grow overflow-auto">
                 <div className="px-6 lg:px-20 pb-18">
                     <div className="text-2xl font-bold text-stake-green-500 mb-14">
                         Start stake & mint AOC
                     </div>
                     <div className="sm:flex sm:gap-8 lg:gap-24 mb-16">
-                        <div className="flex-grow">
+                        <div className="grow">
                             <div className="sm:flex sm:space-x-4 lg:space-x-7.5 mb-12">
                                 <div className="sm:w-1/2">
                                     <div className="text-stake-gray-500 text-xs md:text-sm font-bold mb-4">
@@ -117,7 +117,7 @@ function MintAOCModal({ open, onClose }: props) {
                                     <div className="w-40 h-20 flex items-center px-7 text-[2rem] font-bold text-white bg-ash-dark-600 mr-7.5">
                                         {feePct}%
                                     </div>
-                                    <div className="flex-grow flex flex-col justify-between">
+                                    <div className="grow flex flex-col justify-between">
                                         <div>
                                             <Slider
                                                 className="ash-slider ash-slider-green my-0"
@@ -185,7 +185,7 @@ function MintAOCModal({ open, onClose }: props) {
                                 </div>
                             </div>
                         </div>
-                        <div className="w-1/3 flex-shrink-0 bg-stake-dark-400 p-10">
+                        <div className="w-1/3 shrink-0 bg-stake-dark-400 p-10">
                             <div className="text-lg text-white font-bold mb-16">
                                 Estimate Minting
                             </div>
@@ -216,7 +216,7 @@ function MintAOCModal({ open, onClose }: props) {
                         </div>
                     </div>
                     <div className="sm:flex sm:gap-8 lg:gap-24">
-                        <div className="w-full mb-12 sm:mb-0 sm:flex-grow">
+                        <div className="w-full mb-12 sm:mb-0 sm:grow">
                             <Checkbox
                                 checked={isAgree}
                                 onChange={setIsAgree}
@@ -238,7 +238,7 @@ function MintAOCModal({ open, onClose }: props) {
                                 }
                             />
                         </div>
-                        <div className="w-full sm:w-1/3 flex-shrink-0">
+                        <div className="w-full sm:w-1/3 shrink-0">
                             <div className="border-notch">
                                 <button
                                     className={`clip-corner-1 clip-corner-tl transition w-full h-12 flex items-center justify-center text-sm font-bold ${

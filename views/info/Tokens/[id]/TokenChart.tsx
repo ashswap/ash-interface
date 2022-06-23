@@ -14,14 +14,17 @@ const CHART_TYPES = {
     VOLUME: "Volume",
     PRICE: "Price",
 } as const;
-const ChartTypeArr = ENVIRONMENT.NETWORK === "devnet" ? Object.values(CHART_TYPES).filter(val => val !== "Price") : Object.values(CHART_TYPES);
+const ChartTypeArr =
+    ENVIRONMENT.NETWORK === "devnet"
+        ? Object.values(CHART_TYPES).filter((val) => val !== "Price")
+        : Object.values(CHART_TYPES);
 type ChartType = ValueOf<typeof CHART_TYPES>;
-function TokenChart({token}: {token: IToken}) {
+function TokenChart({ token }: { token: IToken }) {
     const [chartType, setChartType] = useState<ChartType>("Liquidity");
     const [timeUnit, setTimeUnit] = useState<ChartTimeUnitType>("D");
     return (
         <div className="flex flex-col px-4 md:px-8 py-4 md:pb-8 md:pt-7 bg-ash-dark-600 h-full overflow-hidden">
-            <div className="text-ash-gray-500 flex space-x-2 flex-shrink-0">
+            <div className="text-ash-gray-500 flex space-x-2 shrink-0">
                 {ChartTypeArr.map((type) => {
                     return (
                         <button
@@ -36,13 +39,19 @@ function TokenChart({token}: {token: IToken}) {
                     );
                 })}
             </div>
-            <div className="flex-grow mb-5 overflow-hidden">
-                {chartType === "Liquidity" && <TokenLiquidityChart token={token} timeUnit={timeUnit} />}
-                {chartType === "Volume" && <TokenVolumeChart token={token} timeUnit={timeUnit}/>}
+            <div className="grow mb-5 overflow-hidden">
+                {chartType === "Liquidity" && (
+                    <TokenLiquidityChart token={token} timeUnit={timeUnit} />
+                )}
+                {chartType === "Volume" && (
+                    <TokenVolumeChart token={token} timeUnit={timeUnit} />
+                )}
                 {/* {chartType === "Price" && <TokenPriceChart token={token} timeUnit={timeUnit} />} */}
-                {chartType === "Price" && <TokenPriceAreaChart token={token} timeUnit={timeUnit} />}
+                {chartType === "Price" && (
+                    <TokenPriceAreaChart token={token} timeUnit={timeUnit} />
+                )}
             </div>
-            <div className="text-ash-gray-500 flex space-x-2 flex-shrink-0">
+            <div className="text-ash-gray-500 flex space-x-2 shrink-0">
                 {CHART_INTERVAL.map((unit) => {
                     return (
                         <button

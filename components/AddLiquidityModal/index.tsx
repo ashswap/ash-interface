@@ -1,7 +1,7 @@
 import {
     getProxyProvider,
     useGetAccountInfo,
-    useGetLoginInfo
+    useGetLoginInfo,
 } from "@elrondnetwork/dapp-core";
 import IconRight from "assets/svg/right-white.svg";
 import { addLPSessionIdAtom } from "atoms/addLiquidity";
@@ -15,9 +15,7 @@ import InputCurrency from "components/InputCurrency";
 import TextAmt from "components/TextAmt";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
 import { toEGLDD, toWei } from "helper/balance";
-import {
-    useCreateTransaction
-} from "helper/transactionMethods";
+import { useCreateTransaction } from "helper/transactionMethods";
 import { useOnboarding } from "hooks/useOnboarding";
 import usePoolAddLP from "hooks/usePoolContract/usePoolAddLP";
 import { useScreenSize } from "hooks/useScreenSize";
@@ -57,7 +55,7 @@ const TokenInput = ({
                 <div
                     className={`flex items-center w-24 sm:w-1/3 px-4 sm:px-0 border-r border-r-ash-gray-500 sm:border-r-0`}
                 >
-                    <div className="w-5 h-5 rounded-full mr-2 flex-shrink-0">
+                    <div className="w-5 h-5 rounded-full mr-2 shrink-0">
                         <Image src={token.icon} alt="token icon" />
                     </div>
                     <div className="hidden sm:block overflow-hidden">
@@ -297,7 +295,7 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
     ]);
 
     return (
-        <div className="px-8 pb-16 sm:pb-7 flex-grow overflow-auto">
+        <div className="px-8 pb-16 sm:pb-7 grow overflow-auto">
             <div className="inline-flex justify-between items-center">
                 <div className="mr-2">
                     {/* <div className="text-text-input-3 text-xs">Deposit</div> */}
@@ -476,7 +474,7 @@ const AddLiquidityModal = (props: Props) => {
                 <BaseModal.CloseBtn />
             </div>
             {open && (
-                <div className="flex-grow overflow-auto">
+                <div className="grow overflow-auto">
                     <AddLiquidityContent {...props} />
                 </div>
             )}

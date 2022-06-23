@@ -11,14 +11,15 @@ import React, {
     useEffect,
     useMemo,
     useRef,
-    useState
+    useState,
 } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 
 function FarmStats({ onClickAll }: { onClickAll?: () => void }) {
     const [harvesting, setHarvesting] = useState(false);
     const farmRecords = useRecoilValue(farmRecordsState);
-    const { claimReward, claimAllFarmsReward: claimAllReward } = useFarmClaimReward();
+    const { claimReward, claimAllFarmsReward: claimAllReward } =
+        useFarmClaimReward();
     const setStakedOnly = useSetRecoilState(farmStakedOnlyState);
     const TVL = useMemo(() => {
         return farmRecords.reduce(
@@ -48,7 +49,7 @@ function FarmStats({ onClickAll }: { onClickAll?: () => void }) {
     }, [harvesting, totalReward, claimAllReward]);
     return (
         <div className="flex flex-col md:flex-row">
-            <div className="md:w-[21.875rem] flex-shrink-0 flex flex-col px-7 lg:px-9 pb-9 pt-7 lg:pt-14 bg-stake-dark-400 mb-4 md:mb-0 md:mr-[1.875rem]">
+            <div className="md:w-[21.875rem] shrink-0 flex flex-col px-7 lg:px-9 pb-9 pt-7 lg:pt-14 bg-stake-dark-400 mb-4 md:mb-0 md:mr-[1.875rem]">
                 <div className="flex justify-between items-center mb-9">
                     <h2 className="text-2xl font-bold text-white">
                         Your Summary
@@ -111,7 +112,7 @@ function FarmStats({ onClickAll }: { onClickAll?: () => void }) {
                     </button>
                 </div>
             </div>
-            <div className="flex-grow px-7 lg:px-16 pt-7 lg:pt-14 pb-9 bg-stake-dark-400">
+            <div className="grow px-7 lg:px-16 pt-7 lg:pt-14 pb-9 bg-stake-dark-400">
                 <h2 className="text-2xl font-bold text-white mb-9">
                     Overall stats
                 </h2>

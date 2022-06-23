@@ -113,7 +113,7 @@ const SwapAmount = (props: Props) => {
     }, [validPools, poolWithToken]);
 
     const balance = useMemo(() => {
-        if(!token) return new BigNumber(0);
+        if (!token) return new BigNumber(0);
         return toEGLDD(token.decimals, balances[token.id]?.balance || 0);
     }, [token, balances]);
 
@@ -184,7 +184,7 @@ const SwapAmount = (props: Props) => {
 
                     <InputCurrency
                         ref={inputRef}
-                        className={`${styles.input} overflow-hidden flex-grow font-medium`}
+                        className={`${styles.input} overflow-hidden grow font-medium`}
                         disabled={props.disableInput}
                         placeholder="0.00"
                         value={value}
@@ -240,24 +240,38 @@ const SwapAmount = (props: Props) => {
                     className={`${styles.balanceContainer} bg-bg px-2.5 pb-3.5 text-xs sm:text-sm text-text-input-3 flex justify-between`}
                 >
                     <div>
-                    <span>Balance: </span>
-                    <span
-                        className={`text-earn ${
-                            balances[token.id] && props.type === "from"
-                                ? "select-none cursor-pointer"
-                                : ""
-                        }`}
-                        onClick={() => {
-                            props.type === "from" && onChangeValue(balance.toString());
-                        }}
-                    >
-                        {formatAmount(balance.toNumber(), {notation: "standard"})} {token.name}
-                    </span>
+                        <span>Balance: </span>
+                        <span
+                            className={`text-earn ${
+                                balances[token.id] && props.type === "from"
+                                    ? "select-none cursor-pointer"
+                                    : ""
+                            }`}
+                            onClick={() => {
+                                props.type === "from" &&
+                                    onChangeValue(balance.toString());
+                            }}
+                        >
+                            {formatAmount(balance.toNumber(), {
+                                notation: "standard",
+                            })}{" "}
+                            {token.name}
+                        </span>
                     </div>
                     <div className="font-medium text-white">
-                        {value ? <>
-                            <span className="text-ash-gray-600">$ </span><span>{formatAmount(+(value || 0) * priceMap[token.id], {notation: "standard"})}</span>
-                        </> : <span className="text-ash-gray-600">-/-</span>}
+                        {value ? (
+                            <>
+                                <span className="text-ash-gray-600">$ </span>
+                                <span>
+                                    {formatAmount(
+                                        +(value || 0) * priceMap[token.id],
+                                        { notation: "standard" }
+                                    )}
+                                </span>
+                            </>
+                        ) : (
+                            <span className="text-ash-gray-600">-/-</span>
+                        )}
                     </div>
                 </div>
             )}

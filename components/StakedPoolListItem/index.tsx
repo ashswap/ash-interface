@@ -49,7 +49,7 @@ const StakedPoolListItem = ({
             >
                 <div className="flex flex-row text-white w-full">
                     <div className="w-8/12 px-4 sm:px-11 flex items-center">
-                        <div className="flex-grow flex items-center space-x-4">
+                        <div className="grow flex items-center space-x-4">
                             <div className="w-7/12 sm:w-1/2 overflow-hidden">
                                 <div className="flex items-center">
                                     <div className="flex items-center mr-2 sm:mr-0">
@@ -155,7 +155,7 @@ const StakedPoolListItem = ({
                         </div>
                     </div>
                     <div className="hidden w-4/12 pl-11 pr-1 border-l border-l-ash-gray-500 sm:flex items-center space-x-4">
-                        <div className="text-earn flex-grow flex items-center">
+                        <div className="text-earn grow flex items-center">
                             {/* <span>ELDG&nbsp;</span>
                             <span className="text-lg font-bold">0.52</span> */}
                             Comming soon
@@ -182,11 +182,11 @@ const StakedPoolListItem = ({
                 </div>
                 {isExpand && (
                     <div className="mt-10 pl-4 pr-1 sm:pl-11 flex items-end space-x-4">
-                        <div className="flex-grow flex space-x-4">
+                        <div className="grow flex space-x-4">
                             <div className="text-earn underline w-32 text-2xs">
                                 View LP Distribution
                             </div>
-                            <div className="flex-grow grid grid-cols-3 text-ash-gray-500 gap-1">
+                            <div className="grow grid grid-cols-3 text-ash-gray-500 gap-1">
                                 <div className="bg-ash-dark-400 h-12 px-4 flex justify-between items-center">
                                     <div className="text-2xs">
                                         Total Liquidity
@@ -248,7 +248,7 @@ const StakedPoolListItem = ({
                 <div className="flex justify-end mb-16">
                     <BaseModal.CloseBtn />
                 </div>
-                <div className="flex-grow overflow-auto">
+                <div className="grow overflow-auto">
                     <div className="px-6 pb-7">
                         <div className="grid grid-cols-2 gap-1 items-end mb-8">
                             <div>

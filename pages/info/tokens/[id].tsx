@@ -1,4 +1,7 @@
-import { AccountInfoSliceNetworkType, useGetNetworkConfig } from "@elrondnetwork/dapp-core";
+import {
+    AccountInfoSliceNetworkType,
+    useGetNetworkConfig,
+} from "@elrondnetwork/dapp-core";
 import { Tooltip } from "antd";
 import ICArrowRight from "assets/svg/arrow-right.svg";
 import ICCopy from "assets/svg/copy.svg";
@@ -44,7 +47,9 @@ const TokenDetailPage: Page<props> = ({ token }: props) => {
         { refreshInterval: 5 * 60 * 1000 }
     );
     const { data: pools } = useSWR<PoolStatsRecord[]>(
-        token.id ? `${ASHSWAP_CONFIG.ashApiBaseUrl}/token/${token.id}/pool` : null,
+        token.id
+            ? `${ASHSWAP_CONFIG.ashApiBaseUrl}/token/${token.id}/pool`
+            : null,
         fetcher,
         { refreshInterval: 5 * 60 * 1000 }
     );
@@ -219,7 +224,7 @@ const TokenDetailPage: Page<props> = ({ token }: props) => {
                             </div>
                         </div>
                     </div>
-                    <div className="flex-grow h-[23.5rem] xl:ml-4 overflow-hidden mb-12 md:mb-18">
+                    <div className="grow h-[23.5rem] xl:ml-4 overflow-hidden mb-12 md:mb-18">
                         <TokenChart token={token} />
                     </div>
                 </div>
@@ -250,6 +255,9 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
             props: { token },
         };
     }
-    return { props: {}, redirect: {permanent: true, destination: "/info/tokens"} };
+    return {
+        props: {},
+        redirect: { permanent: true, destination: "/info/tokens" },
+    };
 };
 export default TokenDetailPage;

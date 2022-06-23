@@ -1,7 +1,12 @@
 import ICArrowTopRight from "assets/svg/arrow-top-right.svg";
 import ICChevronRight from "assets/svg/chevron-right.svg";
 import { accIsInsufficientEGLDState } from "atoms/dappState";
-import { govLockedAmtState, govTotalSupplyVeASH, govUnlockTSState, govVeASHAmtState } from "atoms/govState";
+import {
+    govLockedAmtState,
+    govTotalSupplyVeASH,
+    govUnlockTSState,
+    govVeASHAmtState,
+} from "atoms/govState";
 import { walletBalanceState } from "atoms/walletState";
 import BigNumber from "bignumber.js";
 import BaseModal from "components/BaseModal";
@@ -62,7 +67,10 @@ const StakeMoreContent = ({ open, onClose }: props) => {
 
     const balances = useRecoilValue(walletBalanceState);
     const insufficientEGLD = useRecoilValue(accIsInsufficientEGLDState);
-    const ASHBalance = useMemo(() => balances[ASH_TOKEN.id]?.balance || new BigNumber(0), [balances]);
+    const ASHBalance = useMemo(
+        () => balances[ASH_TOKEN.id]?.balance || new BigNumber(0),
+        [balances]
+    );
     const [lockAmt, setLockAmt] = useState<BigNumber>(new BigNumber(0));
     const [rawLockAmt, setRawLockAmt] = useState("");
     const [currentLockSeconds, setCurrentLockSeconds] = useState(0);
@@ -99,9 +107,7 @@ const StakeMoreContent = ({ open, onClose }: props) => {
     const setMaxLockAmt = useCallback(() => {
         if (!ASHBalance) return;
         setLockAmt(ASHBalance);
-        setRawLockAmt(
-            toEGLDD(ASH_TOKEN.decimals, ASHBalance).toString(10)
-        );
+        setRawLockAmt(toEGLDD(ASH_TOKEN.decimals, ASHBalance).toString(10));
     }, [ASHBalance]);
 
     const insufficientASH = useMemo(() => {
@@ -153,13 +159,7 @@ const StakeMoreContent = ({ open, onClose }: props) => {
             );
         }
         return estimateVeASH(lockedAmt.plus(lockAmt), currentLockSeconds);
-    }, [
-        extendLockPeriod,
-        lockedAmt,
-        lockAmt,
-        currentLockSeconds,
-        isExtend,
-    ]);
+    }, [extendLockPeriod, lockedAmt, lockAmt, currentLockSeconds, isExtend]);
     const estimatedCapacity = useMemo(() => {
         const pct = estimatedVeASH
             .multipliedBy(100)
@@ -200,7 +200,7 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                     Manage Your Governance Stake
                 </div>
                 <div className="sm:flex sm:space-x-8 lg:space-x-24 mb-24">
-                    <div className="flex flex-col flex-grow mb-16 lg:mb-0">
+                    <div className="flex flex-col grow mb-16 lg:mb-0">
                         <div className="w-full grid grid-cols-2 gap-x-4 lg:gap-x-7.5 mb-16 lg:mb-12">
                             <div>
                                 <div className="text-ash-gray-500 text-xs lg:text-sm font-bold mb-2 lg:mb-4">
@@ -438,7 +438,7 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                                                     return (
                                                         <button
                                                             key={opt.value}
-                                                            className={`border border-ash-gray-500 bg-ash-gray-500/10 h-11 lg:h-12 flex items-center justify-center px-1 text-ash-gray-500 text-xs lg:text-sm ${i === extendOpts.length - 1 ? "flex-grow" : "w-24"}`}
+                                                            className={`border border-ash-gray-500 bg-ash-gray-500/10 h-11 lg:h-12 flex items-center justify-center px-1 text-ash-gray-500 text-xs lg:text-sm ${i === extendOpts.length - 1 ? "grow" : "w-24"}`}
                                                             onClick={() => setExtendLockPeriod(opt.value)}
                                                         >
                                                             {opt.label}
@@ -451,7 +451,7 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                             )}
                         </div>
                     </div>
-                    <div className="w-full sm:w-1/3 lg:w-[17.8125rem] flex-shrink-0 bg-stake-dark-500 py-[2.375rem] px-10 sm:px-4 lg:px-10">
+                    <div className="w-full sm:w-1/3 lg:w-[17.8125rem] shrink-0 bg-stake-dark-500 py-[2.375rem] px-10 sm:px-4 lg:px-10">
                         <div className="text-white text-lg font-bold mb-16">
                             Estimate Staking
                         </div>
@@ -588,7 +588,7 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                     </div>
                 </div>
                 <div className="sm:flex sm:space-x-8 lg:space-x-24">
-                    <div className="w-full mb-12 sm:mb-0 sm:flex-grow">
+                    <div className="w-full mb-12 sm:mb-0 sm:grow">
                         <Checkbox
                             checked={isAgree}
                             onChange={setIsAgree}
@@ -610,7 +610,7 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                             }
                         />
                     </div>
-                    <div className="w-full sm:w-1/3 lg:w-[17.8125rem] flex-shrink-0">
+                    <div className="w-full sm:w-1/3 lg:w-[17.8125rem] shrink-0">
                         <div className="border-notch">
                             <button
                                 className={`clip-corner-1 clip-corner-tl transition w-full h-12 flex items-center justify-center text-sm font-bold text-white ${
@@ -652,7 +652,7 @@ function StakeMoreModal({ open, onClose }: props) {
                     <BaseModal.CloseBtn />
                 </div>
                 {open && (
-                    <div className="flex-grow overflow-auto">
+                    <div className="grow overflow-auto">
                         <StakeMoreContent open={open} onClose={onClose} />
                     </div>
                 )}

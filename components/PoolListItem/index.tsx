@@ -76,7 +76,7 @@ function PoolListItem({
                         </div>
                     </div>
                     <div className="hidden sm:flex items-center w-[20%] pl-4">
-                        <div className="flex-grow">
+                        <div className="grow">
                             <Button
                                 bottomRightCorner
                                 style={{ height: 48 }}
@@ -141,7 +141,7 @@ function PoolListItem({
                 <div className="flex justify-end mb-16">
                     <BaseModal.CloseBtn />
                 </div>
-                <div className="flex-grow overflow-auto">
+                <div className="grow overflow-auto">
                     <div className="px-6 pb-7">
                         <div className="flex justify-between mb-12">
                             <div>

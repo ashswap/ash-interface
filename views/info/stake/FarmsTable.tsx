@@ -49,7 +49,7 @@ const FarmRecord = ({
                     <div className="w-5">{order}</div>
                     <div className="flex-1 overflow-hidden">
                         <div className="flex items-center mr-2 overflow-hidden">
-                            <div className="flex-shrink-0 flex">
+                            <div className="shrink-0 flex">
                                 <div className="w-4 h-4 lg:w-6 lg:h-6">
                                     <Image
                                         src={token1?.icon || ""}

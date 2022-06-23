@@ -2,7 +2,7 @@ import {
     AccountInfoSliceNetworkType,
     useGetAccountInfo,
     useGetLoginInfo,
-    useGetNetworkConfig
+    useGetNetworkConfig,
 } from "@elrondnetwork/dapp-core";
 import IconNewTab from "assets/svg/new-tab.svg";
 import BaseModal from "components/BaseModal";
@@ -165,7 +165,7 @@ const HistoryModal = ({ open, onClose }: Props) => {
             <div className="flex justify-end mb-3">
                 <BaseModal.CloseBtn />
             </div>
-            <div className="flex-grow overflow-auto">
+            <div className="grow overflow-auto">
                 <div className="px-4">
                     <div className="font-bold text-2xl mb-5">History</div>
                     {displayTx.slice(0, 7).map((record) => {
@@ -187,7 +187,7 @@ const HistoryModal = ({ open, onClose }: Props) => {
                                     onClick={() => openTransaction(txHash)}
                                 >
                                     <div
-                                        className={`flex-shrink-0 mt-1.5 h-[5px] w-[5px] ${
+                                        className={`shrink-0 mt-1.5 h-[5px] w-[5px] ${
                                             status === "success"
                                                 ? "bg-ash-green-500"
                                                 : "bg-ash-purple-500"

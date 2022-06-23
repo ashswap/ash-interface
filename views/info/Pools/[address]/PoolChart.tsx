@@ -21,7 +21,7 @@ function PoolChart({ pool }: Props) {
     const [token1, token2] = useMemo(() => pool.tokens, [pool]);
     return (
         <div className="flex flex-col px-4 md:px-8 py-4 md:pb-8 md:pt-7 bg-ash-dark-600 h-full overflow-hidden">
-            <div className="text-ash-gray-500 flex space-x-2 flex-shrink-0">
+            <div className="text-ash-gray-500 flex space-x-2 shrink-0">
                 {ChartTypeArr.map((type) => {
                     return (
                         <button
@@ -40,7 +40,7 @@ function PoolChart({ pool }: Props) {
                     );
                 })}
             </div>
-            <div className="flex-grow mb-5 overflow-hidden">
+            <div className="grow mb-5 overflow-hidden">
                 {chartType === "Liquidity" && (
                     <PoolLiquidityChart pool={pool} timeUnit={timeUnit} />
                 )}
@@ -56,7 +56,7 @@ function PoolChart({ pool }: Props) {
                 )}
                 {/* {chartType === "Price" && <TokenPriceAreaChart token={token} timeUnit={timeUnit} />} */}
             </div>
-            <div className="text-ash-gray-500 flex space-x-2 flex-shrink-0">
+            <div className="text-ash-gray-500 flex space-x-2 shrink-0">
                 {CHART_INTERVAL.map((unit) => {
                     return (
                         <button
