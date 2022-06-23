@@ -27,7 +27,6 @@ import Button from "components/Button";
 import HistoryModal from "components/HistoryModal";
 import IconButton from "components/IconButton";
 import Setting from "components/Setting";
-import SwapAmount from "components/SwapAmount";
 import TextAmt from "components/TextAmt";
 import CardTooltip from "components/Tooltip/CardTooltip";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
@@ -49,6 +48,7 @@ import IPool from "interface/pool";
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDebounce } from "use-debounce";
+import SwapAmount from "./components/SwapAmount";
 import styles from "./Swap.module.css";
 const MaiarPoolTooltip = ({
     children,
@@ -407,7 +407,7 @@ const Swap = () => {
         <div className="flex flex-col items-center pt-3.5 pb-12 px-6">
             <div className="flex max-w-full">
                 <div
-                    className={`w-full max-w-[28.75rem] transition-none relative ${
+                    className={`w-full max-w-[30.75rem] transition-none relative ${
                         showSetting && !screenSize.isMobile && "sm:w-7/12"
                     }`}
                 >
@@ -831,7 +831,7 @@ const Swap = () => {
                     </div>
                 </div>
                 {showSetting && !screenSize.isMobile && (
-                    <div className="relative px-12 py-14 bg-ash-dark-600 sm:w-5/12 max-w-[23rem] text-white border-l border-l-[#757391]">
+                    <div className="relative px-12 py-14 bg-ash-dark-600 sm:w-5/12 max-w-[23rem] text-white border-l border-l-ash-gray-600/50">
                         <div className="absolute top-4 right-4">
                             <IconButton
                                 icon={<IconClose className="text-white" />}

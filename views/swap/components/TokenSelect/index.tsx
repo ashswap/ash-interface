@@ -1,12 +1,12 @@
-import IconClose from "assets/svg/close-1.svg";
-import Down from "assets/svg/down.svg";
+import ICClose from "assets/svg/close.svg";
+import ICChevronDown from "assets/svg/chevron-down.svg";
 import Search from "assets/svg/search.svg";
 import { walletBalanceState } from "atoms/walletState";
 import BigNumber from "bignumber.js";
 import BaseModal from "components/BaseModal";
 import Input from "components/Input";
-import ListSwapPool from "components/ListSwapPool";
-import ListToken from "components/ListToken";
+import ListSwapPool from "views/swap/components/ListSwapPool";
+import ListToken from "views/swap/components/ListToken";
 import Token from "components/Token";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
 import { IN_POOL_TOKENS_MAP } from "const/tokens";
@@ -18,6 +18,8 @@ import { TokenBalance } from "interface/tokenBalance";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
 import styles from "./TokenSelect.module.css";
+import Image from "next/image";
+import Avatar from "components/Avatar";
 
 interface Props {
     onChange?: (t: IToken) => void;
@@ -132,9 +134,14 @@ const TokenSelect = ({
                     className="flex flex-row items-center justify-center gap-3.5 bg-bg h-12 rounded-lg"
                     style={{ padding: "18px 12px 18px 18px" }}
                 >
-                    <Token token={pivotToken} />
-                    <IconClose
-                        className="cursor-pointer"
+                    <div className="flex items-center">
+                        <div className="w-3.5 h-3.5 relative overflow-hidden rounded-full">
+                            <Image src={pivotToken.icon} alt={pivotToken.name} layout="fill" objectFit="contain" />
+                        </div>
+                        <div className="text-sm text-white ml-1 mt-0.5">{pivotToken.name}</div>
+                    </div>
+                    <ICClose
+                        className="cursor-pointer w-2 h-auto text-ash-gray-600"
                         onClick={resetPivotToken}
                     />
                 </div>
@@ -165,10 +172,10 @@ const TokenSelect = ({
             >
                 <div
                     className={
-                        `flex flex-row items-center justify-between text-sm font-bold w-44 cursor-pointer select-none p-4 rounded-xl text-pink-600 ` +
+                        `flex flex-row items-center justify-between text-sm font-bold cursor-pointer select-none px-4 h-12 rounded-xl space-x-6 transition-all ` +
                         (value
-                            ? "bg-ash-dark-600"
-                            : `bg-bg-select hover:bg-bg-select-hover ${styles.containerHover}`)
+                            ? `bg-ash-dark-600 text-white ${styles.selectedHover}`
+                            : `bg-bg-select hover:bg-bg-select-hover text-pink-600 ${styles.containerHover}`)
                     }
                     onClick={() => {
                         setOpen(true);
@@ -176,11 +183,14 @@ const TokenSelect = ({
                     }}
                 >
                     {value ? (
-                        <Token token={value} />
+                        <div className="flex items-center">
+                            <Avatar src={value.icon} alt={value.name} className="w-4 h-4"/>
+                            <div className="mt-0.5 ml-2 text-xs sm:text-sm font-bold">{value.name}</div>
+                        </div>
                     ) : (
                         <div className="text-xs sm:text-sm">Select a token</div>
                     )}
-                    <Down />
+                    <ICChevronDown />
                 </div>
             </OnboardTooltip>
 
@@ -239,13 +249,13 @@ const TokenSelect = ({
                                     </OnboardTooltip.Panel>
                                 }
                             >
-                                <div className="flex flex-row items-center py-8 w-full overflow-hidden">
+                                <div className="flex flex-row items-center pt-8 w-full overflow-hidden">
                                     {pivotToken &&
                                         type === "to" &&
                                         renderPivotToken()}
 
                                     <Input
-                                        placeholder="Search or try usdt-usdc"
+                                        placeholder={pivotToken ? type === "to" ? "swap to" : "swap from" : "Search or try usdt-usdc"}
                                         suffix={<Search />}
                                         outline
                                         autoFocus
@@ -259,7 +269,7 @@ const TokenSelect = ({
                                             }
                                         }}
                                         textClassName="text-sm"
-                                        className="w-full caret-pink-500 overflow-hidden h-12 px-5"
+                                        className="w-full caret-pink-500 placeholder-ash-gray-600 overflow-hidden h-12 px-5"
                                     />
                                     {pivotToken &&
                                         type === "from" &&
@@ -271,12 +281,12 @@ const TokenSelect = ({
 
                     {validPools && filtedValidPools.length === 0 && (
                         <>
-                            <div className="text-insufficent-fund text-xs mb-14">
+                            <div className="text-insufficent-fund text-base mb-14 mt-4">
                                 That doesn&apos;t look like a supported swap!
                             </div>
                         </>
                     )}
-                    <div className="font-normal text-xs text-white">
+                    <div className="font-normal text-xs text-white mt-10">
                         {validPools ? "Supported pairs" : "Owned"}
                     </div>
                 </div>

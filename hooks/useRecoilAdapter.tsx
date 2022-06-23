@@ -50,7 +50,7 @@ export function useRecoilAdapter() {
         setLoginInfo(loginInfo);
     }, [loginInfo, setLoginInfo]);
 
-    const { data: priceEntries } = useSWR(
+    const { data: priceEntries } = useSWR<number[]>(
         TOKENS.map((token) =>
             token.id
                 ? `${ASHSWAP_CONFIG.ashApiBaseUrl}/token/${token.id}/price`

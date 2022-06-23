@@ -1,8 +1,7 @@
-import { walletBalanceState } from "atoms/walletState";
+import { walletBalanceState, walletTokenPriceState } from "atoms/walletState";
 import BigNumber from "bignumber.js";
 import InputCurrency from "components/InputCurrency";
-import QuickSelect from "components/QuickSelect";
-import TokenSelect from "components/TokenSelect";
+import TokenSelect from "views/swap/components/TokenSelect";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
 import pools from "const/pool";
 import { useSwap } from "context/swap";
@@ -15,6 +14,7 @@ import { useEffect, useMemo, useRef } from "react";
 import { useRecoilValue } from "recoil";
 import { theme } from "tailwind.config";
 import styles from "./SwapAmount.module.css";
+import QuickSelect from "../QuickSelect";
 
 interface Props {
     topLeftCorner?: boolean;
@@ -41,6 +41,7 @@ const SwapAmount = (props: Props) => {
         setValueFrom,
         setValueTo,
     } = useSwap();
+    const priceMap = useRecoilValue(walletTokenPriceState);
     const screenSize = useScreenSize();
     const [onboardingQuickSelectToken, setOnboardedQuickSelectToken] =
         useOnboarding("swap_quick_select_token");
@@ -167,7 +168,7 @@ const SwapAmount = (props: Props) => {
                 }
             >
                 <div
-                    className={`bg-bg flex flex-row px-2.5 pt-3.5 pb-5.5 ${styles.content}`}
+                    className={`bg-bg flex px-2.5 pt-3.5 pb-4 sm:pb-5.5 ${styles.content}`}
                 >
                     <TokenSelect
                         modalTitle={
@@ -183,7 +184,7 @@ const SwapAmount = (props: Props) => {
 
                     <InputCurrency
                         ref={inputRef}
-                        className={`${styles.input} overflow-hidden`}
+                        className={`${styles.input} overflow-hidden flex-grow font-medium`}
                         disabled={props.disableInput}
                         placeholder="0.00"
                         value={value}
@@ -236,8 +237,9 @@ const SwapAmount = (props: Props) => {
             )}
             {token && (
                 <div
-                    className={`${styles.balanceContainer} bg-bg px-2.5 pb-3.5 text-sm text-text-input-3`}
+                    className={`${styles.balanceContainer} bg-bg px-2.5 pb-3.5 text-xs sm:text-sm text-text-input-3 flex justify-between`}
                 >
+                    <div>
                     <span>Balance: </span>
                     <span
                         className={`text-earn ${
@@ -251,6 +253,12 @@ const SwapAmount = (props: Props) => {
                     >
                         {formatAmount(balance.toNumber(), {notation: "standard"})} {token.name}
                     </span>
+                    </div>
+                    <div className="font-medium text-white">
+                        {value ? <>
+                            <span className="text-ash-gray-600">$ </span><span>{formatAmount(+(value || 0) * priceMap[token.id], {notation: "standard"})}</span>
+                        </> : <span className="text-ash-gray-600">-/-</span>}
+                    </div>
                 </div>
             )}
             {props.children}
