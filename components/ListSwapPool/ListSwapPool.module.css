@@ -1,6 +1,0 @@
-.pool {
-    @apply flex flex-row items-center cursor-pointer select-none bg-ash-dark-700;
-    width: 230px;
-    padding: 5px 0;
-    margin: 8px 0;
-}

@@ -1,0 +1,6 @@
+.containerHover:hover {
+    box-shadow: 0px 4px 30px rgba(255, 0, 92, 0.4);
+}
+.selectedHover{
+    filter: drop-shadow(0px 8px 20px rgba(117, 115, 145, 0.1));
+}

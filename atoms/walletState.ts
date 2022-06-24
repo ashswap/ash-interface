@@ -14,8 +14,8 @@ export const walletBalanceState = atom<
     default: {},
 });
 
-export const walletTokenPriceState = atom<any>({
-    key: "wallet_token_ptices",
+export const walletTokenPriceState = atom<Record<string, number>>({
+    key: "wallet_token_prices",
     default: {},
 });
 

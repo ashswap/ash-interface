@@ -49,7 +49,7 @@ const TestnetGuard = ({ children }: any) => {
     useEffect(() => {
         localStorage.setItem("testnet_pass", pass);
     }, [pass]);
-    if (ENVIRONMENT.NETWORK === "testnet" && !authorized)
+    if (ENVIRONMENT.NETWORK === "testnet" && process.env.NODE_ENV === "production" && !authorized)
         return (
             <div className="w-screen h-screen bg-ash-dark-600 flex flex-col items-center justify-center px-6 text-center">
                 <div className="text-3xl text-white font-bold mb-20">
