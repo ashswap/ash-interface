@@ -71,13 +71,13 @@ function StakedPoolCardItem({
                     </div>
                     <div className="flex">
                         <button
-                            className="clip-corner-1 clip-corner-bl bg-ash-dark-400 w-14 h-14 flex items-center justify-center text-pink-600 mr-0.5"
+                            className="clip-corner-1 clip-corner-bl bg-ash-dark-400 hover:bg-ash-dark-300 active:bg-ash-dark-600 transition-all w-14 h-14 flex items-center justify-center text-pink-600 mr-0.5"
                             onClick={() => setOpenAddLiquidity(true)}
                         >
                             <ICPlus />
                         </button>
                         <button
-                            className="clip-corner-1 clip-corner-br bg-ash-dark-400 w-14 h-14 flex items-center justify-center text-yellow-600"
+                            className="clip-corner-1 clip-corner-br bg-ash-dark-400 hover:bg-ash-dark-300 active:bg-ash-dark-600 transition-all w-14 h-14 flex items-center justify-center text-yellow-600"
                             onClick={() => setOpenRemoveLiquidity(true)}
                         >
                             <ICMinus />
@@ -138,9 +138,20 @@ function StakedPoolCardItem({
             </div>
             <div className="flex flex-row mt-6 mb-5.5 justify-between items-center">
                 <div className="mr-1">
-                    <div className="text-stake-gray-500 text-xs mb-4 underline">
-                        Trading APR
-                    </div>
+                    <CardTooltip
+                        content={
+                            <>
+                                Estimation for growth of your deposit over a
+                                year, based on trading activity in the past 24
+                                hours.
+                            </>
+                        }
+                    >
+                        <div className="text-stake-gray-500 text-xs mb-4 underline">
+                            Trading APR
+                        </div>
+                    </CardTooltip>
+
                     <div className="text-yellow-600 font-bold text-lg">
                         {formatAmount(tradingAPR || 0, {
                             notation: "standard",
@@ -188,9 +199,20 @@ function StakedPoolCardItem({
                             </div>
                         </div>
                         <div className="flex flex-row justify-between items-center h-12 px-4">
-                            <div className="underline text-2xs">
-                                Trading APR
-                            </div>
+                            <CardTooltip
+                                content={
+                                    <>
+                                        Estimation for growth of your deposit
+                                        over a year, based on trading activity
+                                        in the past 24 hours.
+                                    </>
+                                }
+                            >
+                                <div className="underline text-2xs">
+                                    Trading APR
+                                </div>
+                            </CardTooltip>
+
                             <div className="text-sm">
                                 {formatAmount(tradingAPR || 0, {
                                     notation: "standard",

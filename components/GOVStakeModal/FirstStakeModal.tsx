@@ -6,6 +6,7 @@ import { walletBalanceState } from "atoms/walletState";
 import BigNumber from "bignumber.js";
 import BaseModal from "components/BaseModal";
 import Checkbox from "components/Checkbox";
+import GlowingButton from "components/GlowingButton";
 import InputCurrency from "components/InputCurrency";
 import TextAmt from "components/TextAmt";
 import CardTooltip from "components/Tooltip/CardTooltip";
@@ -456,11 +457,10 @@ const FirstStakeContent = ({ open, onClose }: props) => {
                         />
                     </div>
                     <div className="w-full sm:w-[17.8125rem] shrink-0">
-                        <div className="border-notch">
-                            <button
-                                className={`clip-corner-1 clip-corner-tl transition w-full h-12 flex items-center justify-center text-sm font-bold text-white ${
-                                    canStake ? "bg-pink-600" : "bg-ash-dark-500"
-                                }`}
+                        <div className="border-notch-x border-notch-white/50">
+                            <GlowingButton
+                                theme="pink"
+                                className={`clip-corner-1 clip-corner-tl transition w-full h-12 flex items-center justify-center text-sm font-bold text-white`}
                                 disabled={!canStake}
                                 onClick={() => canStake && lock()}
                             >
@@ -474,7 +474,7 @@ const FirstStakeContent = ({ open, onClose }: props) => {
                                         <ICChevronRight className="w-2 h-auto" />
                                     </div>
                                 )}
-                            </button>
+                            </GlowingButton>
                         </div>
                     </div>
                 </div>

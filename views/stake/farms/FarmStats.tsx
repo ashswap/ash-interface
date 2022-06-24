@@ -1,5 +1,6 @@
 import { farmRecordsState, farmStakedOnlyState } from "atoms/farmsState";
 import BigNumber from "bignumber.js";
+import GlowingButton from "components/GlowingButton";
 import TextAmt from "components/TextAmt";
 import CardTooltip from "components/Tooltip/CardTooltip";
 import { ASH_TOKEN } from "const/tokens";
@@ -99,17 +100,14 @@ function FarmStats({ onClickAll }: { onClickAll?: () => void }) {
                             </div>
                         </div>
                     </div>
-                    <button
-                        className={`w-full h-[3.375rem] text-sm font-bold flex items-center justify-center ${
-                            harvesting || totalReward.eq(0)
-                                ? "bg-ash-dark-400 opacity-30 cursor-not-allowed"
-                                : "bg-ash-cyan-500 text-ash-dark-400"
-                        }`}
+                    <GlowingButton
+                        theme="cyan"
+                        className={`w-full h-[3.375rem] text-sm font-bold`}
                         disabled={harvesting || totalReward.eq(0)}
                         onClick={() => harvestAll()}
                     >
                         Harvest
-                    </button>
+                    </GlowingButton>
                 </div>
             </div>
             <div className="grow px-7 lg:px-16 pt-7 lg:pt-14 pb-9 bg-stake-dark-400">

@@ -4,13 +4,9 @@ import {
     ArgSerializer,
     BigUIntValue,
     ContractFunction,
-    EndpointParameterDefinition,
-    GasLimit,
-    ProxyProvider,
-    Query,
-    TokenIdentifierValue,
-    TypeExpressionParser,
-    TypeMapper,
+    EndpointParameterDefinition, ProxyProvider,
+    Query, TypeExpressionParser,
+    TypeMapper
 } from "@elrondnetwork/erdjs";
 import { Slider } from "antd";
 import IconRight from "assets/svg/right-yellow.svg";
@@ -19,7 +15,7 @@ import { PoolsState } from "atoms/poolsState";
 import { walletLPMapState } from "atoms/walletState";
 import BigNumber from "bignumber.js";
 import BaseModal from "components/BaseModal";
-import Button from "components/Button";
+import GlowingButton from "components/GlowingButton";
 import InputCurrency from "components/InputCurrency";
 import TextAmt from "components/TextAmt";
 import Token from "components/Token";
@@ -27,14 +23,12 @@ import OnboardTooltip from "components/Tooltip/OnboardTooltip";
 import { useSwap } from "context/swap";
 import { toEGLD, toEGLDD, toWei } from "helper/balance";
 import {
-    sendTransactions,
-    useCreateTransaction,
+    useCreateTransaction
 } from "helper/transactionMethods";
 import { useFetchBalances } from "hooks/useFetchBalances";
 import { useOnboarding } from "hooks/useOnboarding";
 import usePoolRemoveLP from "hooks/usePoolContract/usePoolRemoveLP";
 import { useScreenSize } from "hooks/useScreenSize";
-import { DappSendTransactionsPropsType } from "interface/dappCore";
 import { Unarray } from "interface/utilities";
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -408,19 +402,18 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
 
             <div className="sm:flex justify-end md:gap-8">
                 <div className="sm:w-1/2 md:w-1/3">
-                    <Button
-                        topLeftCorner
-                        style={{ height: 48 }}
-                        className="mt-1.5"
-                        outline
-                        onClick={removeLP}
-                        disable={removing || liquidity.eq(0)}
-                        primaryColor="yellow-700"
-                    >
-                        {insufficientEGLD
-                            ? "INSUFFICIENT EGLD BALANCE"
-                            : "WITHDRAW"}
-                    </Button>
+                    <div className="border-notch-x border-notch-white/50 mt-1.5">
+                        <GlowingButton
+                            theme="yellow"
+                            className="w-full h-12 font-bold clip-corner-1 clip-corner-tl"
+                            onClick={removeLP}
+                            disabled={removing || liquidity.eq(0)}
+                        >
+                            {insufficientEGLD
+                                ? "INSUFFICIENT EGLD BALANCE"
+                                : "WITHDRAW"}
+                        </GlowingButton>
+                    </div>
                 </div>
             </div>
         </div>

@@ -11,6 +11,7 @@ import { walletBalanceState } from "atoms/walletState";
 import BigNumber from "bignumber.js";
 import BaseModal from "components/BaseModal";
 import Checkbox from "components/Checkbox";
+import GlowingButton from "components/GlowingButton";
 import InputCurrency from "components/InputCurrency";
 import Switch from "components/Switch";
 import TextAmt from "components/TextAmt";
@@ -26,7 +27,7 @@ import { useOnboarding } from "hooks/useOnboarding";
 import { useScreenSize } from "hooks/useScreenSize";
 import moment from "moment";
 import Image from "next/image";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
 import LockPeriod, { lockPeriodFormater } from "./LockPeriod";
 type props = {
@@ -611,11 +612,10 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                         />
                     </div>
                     <div className="w-full sm:w-1/3 lg:w-[17.8125rem] shrink-0">
-                        <div className="border-notch">
-                            <button
-                                className={`clip-corner-1 clip-corner-tl transition w-full h-12 flex items-center justify-center text-sm font-bold text-white ${
-                                    canStake ? "bg-pink-600" : "bg-ash-dark-500"
-                                }`}
+                        <div className="border-notch-x border-notch-white/50">
+                            <GlowingButton
+                                theme="pink"
+                                className={`clip-corner-1 clip-corner-tl w-full h-12 text-sm font-bold`}
                                 disabled={!canStake}
                                 onClick={() => canStake && lockMore()}
                             >
@@ -629,7 +629,7 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                                         <ICChevronRight className="w-2 h-auto" />
                                     </div>
                                 )}
-                            </button>
+                            </GlowingButton>
                         </div>
                     </div>
                 </div>

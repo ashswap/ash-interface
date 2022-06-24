@@ -1,7 +1,7 @@
 import {
     transactionServices,
     useGetAccountInfo,
-    useGetLoginInfo,
+    useGetLoginInfo
 } from "@elrondnetwork/dapp-core";
 import {
     Address,
@@ -9,7 +9,7 @@ import {
     ContractFunction,
     GasLimit,
     TokenIdentifierValue,
-    Transaction,
+    Transaction
 } from "@elrondnetwork/erdjs";
 import Fire from "assets/images/fire.png";
 import ICChevronDown from "assets/svg/chevron-down.svg";
@@ -22,8 +22,9 @@ import SettingActiveIcon from "assets/svg/setting-active.svg";
 import SettingIcon from "assets/svg/setting.svg";
 import IconWallet from "assets/svg/wallet.svg";
 import BigNumber from "bignumber.js";
+import BaseButton from "components/BaseButton";
 import BaseModal from "components/BaseModal";
-import Button from "components/Button";
+import GlowingButton from "components/GlowingButton";
 import HistoryModal from "components/HistoryModal";
 import IconButton from "components/IconButton";
 import Setting from "components/Setting";
@@ -37,7 +38,7 @@ import { queryPoolContract } from "helper/contracts/pool";
 import { formatAmount } from "helper/number";
 import {
     sendTransactions,
-    useCreateTransaction,
+    useCreateTransaction
 } from "helper/transactionMethods";
 import { useConnectWallet } from "hooks/useConnectWallet";
 import useMounted from "hooks/useMounted";
@@ -761,55 +762,49 @@ const Swap = () => {
                                     </>
                                 )}
 
-                            {mounted &&
-                                (isInsufficentFund ||
-                                account.balance === "0" ? (
-                                    <Button
-                                        leftIcon={
-                                            !loggedIn ? <IconWallet /> : <></>
+                            {mounted && (
+                                <div className="border-notch-x border-notch-white/50 mt-12">
+                                    <GlowingButton
+                                        theme="pink"
+                                        className="w-full clip-corner-1 clip-corner-tl uppercase h-12 text-xs sm:text-sm font-bold"
+                                        disabled={
+                                            swapping ||
+                                            fetchingAmtOut ||
+                                            isInsufficentFund ||
+                                            account.balance === "0"
                                         }
-                                        rightIcon={
-                                            loggedIn ? <IconRight /> : <></>
-                                        }
-                                        topLeftCorner
-                                        style={{ height: 48 }}
-                                        className="mt-12"
-                                        disable
-                                        outline
-                                    >
-                                        <span className="text-text-input-3">
-                                            INSUFFICIENT{" "}
-                                            <span className="text-insufficent-fund">
-                                                {account.balance === "0"
-                                                    ? "EGLD"
-                                                    : tokenFrom?.name}
-                                            </span>{" "}
-                                            BALANCE
-                                        </span>
-                                    </Button>
-                                ) : (
-                                    <Button
-                                        leftIcon={
-                                            !loggedIn ? <IconWallet /> : <></>
-                                        }
-                                        rightIcon={
-                                            loggedIn ? <IconRight /> : <></>
-                                        }
-                                        topLeftCorner
-                                        style={{ height: 48 }}
-                                        className="mt-12 text-xs sm:text-sm"
-                                        outline
-                                        disable={swapping || fetchingAmtOut}
                                         onClick={
                                             loggedIn
                                                 ? swap
                                                 : () => connectWallet()
                                         }
-                                        glowOnHover
                                     >
-                                        {loggedIn ? "SWAP" : "CONNECT WALLET"}
-                                    </Button>
-                                ))}
+                                        <div className="flex items-center space-x-2.5">
+                                            {!loggedIn && <IconWallet />}
+                                            {isInsufficentFund ||
+                                            account.balance === "0" ? (
+                                                <span className="text-text-input-3">
+                                                    INSUFFICIENT{" "}
+                                                    <span className="text-insufficent-fund">
+                                                        {account.balance === "0"
+                                                            ? "EGLD"
+                                                            : tokenFrom?.name}
+                                                    </span>{" "}
+                                                    BALANCE
+                                                </span>
+                                            ) : (
+                                                <span className="mt-0.5">
+                                                    {loggedIn
+                                                        ? "SWAP"
+                                                        : "CONNECT WALLET"}
+                                                </span>
+                                            )}
+
+                                            {loggedIn && <IconRight />}
+                                        </div>
+                                    </GlowingButton>
+                                </div>
+                            )}
 
                             <div
                                 className="text-xs font-bold text-center"
@@ -858,13 +853,13 @@ const Swap = () => {
                         <BaseModal.CloseBtn />
                     </div>
                     <Setting />
-                    <Button
-                        className="uppercase text-xs mt-10"
-                        textClassName="h-10"
+                    <BaseButton
+                        theme="pink"
+                        className="uppercase text-xs font-bold mt-10 h-12 w-full"
                         onClick={() => setShowSetting(false)}
                     >
                         Confirm
-                    </Button>
+                    </BaseButton>
                 </BaseModal>
             )}
         </div>

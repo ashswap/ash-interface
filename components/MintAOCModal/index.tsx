@@ -239,7 +239,7 @@ function MintAOCModal({ open, onClose }: props) {
                             />
                         </div>
                         <div className="w-full sm:w-1/3 shrink-0">
-                            <div className="border-notch">
+                            <div className="border-notch-x border-notch-white/50">
                                 <button
                                     className={`clip-corner-1 clip-corner-tl transition w-full h-12 flex items-center justify-center text-sm font-bold ${
                                         insufficientEGLD
