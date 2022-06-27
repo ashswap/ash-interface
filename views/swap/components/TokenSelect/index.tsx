@@ -131,7 +131,7 @@ const TokenSelect = ({
             <>
                 {type === "from" && <div className="mx-2">-</div>}
                 <div
-                    className="flex flex-row items-center justify-center gap-3.5 bg-bg h-12 rounded-lg"
+                    className="flex flex-row items-center justify-center gap-3.5 bg-ash-dark-400 hover:bg-ash-dark-350 transition-all h-12 rounded-lg"
                     style={{ padding: "18px 12px 18px 18px" }}
                 >
                     <div className="flex items-center">
@@ -181,7 +181,7 @@ const TokenSelect = ({
                     className={
                         `flex flex-row items-center justify-between text-sm font-bold cursor-pointer select-none px-4 h-12 rounded-xl space-x-6 transition-all ` +
                         (value
-                            ? `bg-ash-dark-600 text-white ${styles.selectedHover}`
+                            ? `bg-ash-dark-600 hover:bg-ash-dark-700 colored-drop-shadow-xs colored-drop-shadow-ash-gray-600/10 text-white ${styles.selectedHover}`
                             : `bg-bg-select hover:bg-bg-select-hover text-pink-600 ${styles.containerHover}`)
                     }
                     onClick={() => {

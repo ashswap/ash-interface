@@ -13,7 +13,6 @@ import downloadPlayStore from "assets/images/download-play-store.png";
 import maiarLogo from "assets/images/maiar-logo.png";
 import ICConnectApp from "assets/svg/connect-app.svg";
 import ICConnectExtension from "assets/svg/connect-extension.svg";
-import styles from "./ConnectWalletModal.module.css";
 
 const MAIAR_WALLET_LINK = {
     PLAY_STORE: "https://maiar.onelink.me/HLcx/52dcde54",
@@ -93,7 +92,7 @@ function ConnectWalletModal() {
                                 >
                                     <div className="mr-[1.625rem]">
                                         <ICConnectExtension
-                                            className={`${styles.connectIcon} w-16 inline text-ash-blue-500`}
+                                            className={`colored-drop-shadow-xs colored-drop-shadow-ash-blue-500 w-16 inline text-ash-blue-500`}
                                         />
                                     </div>
                                     <div className="text-sm font-bold uppercase">
@@ -109,7 +108,7 @@ function ConnectWalletModal() {
                                 >
                                     <div className="mr-[1.625rem] w-16 text-center">
                                         <ICConnectApp
-                                            className={`${styles.connectIcon} h-16 inline text-ash-blue-500`}
+                                            className={`colored-drop-shadow-xs colored-drop-shadow-ash-blue-500 h-16 inline text-ash-blue-500`}
                                         />
                                     </div>
                                     <div className="text-sm font-bold uppercase">
@@ -140,7 +139,7 @@ function ConnectWalletModal() {
                     </div>
                     <div className="flex items-center space-x-8 mb-[5.5rem]">
                         <ICConnectApp
-                            className={`${styles.dropShadowPink} text-pink-600 h-14 sm:h-[6.75rem] w-auto`}
+                            className={`colored-drop-shadow-xs colored-drop-shadow-pink-600 text-pink-600 h-14 sm:h-[6.75rem] w-auto`}
                         />
                         <div className="flex items-center space-x-1">
                             <div className="w-1.5 h-1.5 bg-pink-600"></div>
@@ -235,7 +234,7 @@ function ConnectWalletModal() {
                     </div>
                     <div className="flex items-center space-x-8 mb-[5.5rem]">
                         <ICConnectExtension
-                            className={`${styles.dropShadowPink} text-pink-600 w-14 sm:w-[6.75rem] h-auto`}
+                            className={`colored-drop-shadow-xs colored-drop-shadow-pink-600 text-pink-600 w-14 sm:w-[6.75rem] h-auto`}
                         />
                         <div className="flex items-center space-x-1">
                             <div className="w-1.5 h-1.5 bg-pink-600"></div>

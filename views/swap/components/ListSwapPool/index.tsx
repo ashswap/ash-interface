@@ -42,7 +42,7 @@ const ListSwapPool = (props: Props) => {
             {props.items.map((pool) => (
                 <div
                     key={pool.address}
-                    className={`bg-ash-dark-400 rounded-lg h-14 px-5 flex items-center cursor-pointer ${
+                    className={`bg-ash-dark-400 hover:bg-ash-dark-350 hover:colored-drop-shadow-sm hover:colored-drop-shadow-ash-dark-350/75 transition-all rounded-lg h-14 px-5 flex items-center cursor-pointer ${
                         props.isPivotFirst ? "" : "flex-row-reverse"
                     }`}
                     onClick={() => props.onSelect && props.onSelect(pool)}
