@@ -1,7 +1,6 @@
 module.exports = {
-    purge: ["./pages/**/*.{js,ts,jsx,tsx}", "./components/**/*.{js,ts,jsx,tsx}", "./views/**/*.{js,ts,jsx,tsx}"],
+    content: ["./pages/**/*.{js,ts,jsx,tsx}", "./components/**/*.{js,ts,jsx,tsx}", "./views/**/*.{js,ts,jsx,tsx}"],
     darkMode: "class", // or "media" or "class"
-    mode: "jit",
     theme: {
         extend: {
             container: {
@@ -85,9 +84,6 @@ module.exports = {
                 tooltip: 1000,
             }
         },
-    },
-    variants: {
-        extend: {},
     },
     plugins: [
         require('@tailwindcss/line-clamp'),

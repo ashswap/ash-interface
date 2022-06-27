@@ -1,6 +1,10 @@
 import ICChevronDown from "assets/svg/chevron-down.svg";
 import Search from "assets/svg/search.svg";
-import { poolKeywordState, poolSortOptionState, PoolsState } from "atoms/poolsState";
+import {
+    poolKeywordState,
+    poolSortOptionState,
+    PoolsState,
+} from "atoms/poolsState";
 import BasePopover from "components/BasePopover";
 import Input from "components/Input";
 import { useRecoilState } from "recoil";
@@ -20,7 +24,6 @@ const options: { value: PoolsState["sortOption"]; label: any }[] = [
     { value: "volume", label: "24h Volume" },
 ];
 const PoolFilter = (props: Props) => {
-
     const [keyword, setKeyword] = useRecoilState(poolKeywordState);
     const [sortOption, setSortOption] = useRecoilState(poolSortOptionState);
 
@@ -45,7 +48,7 @@ const PoolFilter = (props: Props) => {
             <div
                 className={`flex mt-3.5 mb-4 md:mb-0 space-x-2 lg:space-x-7.5`}
             >
-                <div className="flex-grow overflow-hidden max-w-[21.875rem]">
+                <div className="grow overflow-hidden max-w-[21.875rem]">
                     {SearchBox}
                 </div>
                 <BasePopover

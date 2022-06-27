@@ -47,16 +47,16 @@ const TokenLegend = ({
     return (
         <div className="flex items-center py-1.5">
             <div
-                className="w-4 h-4 rounded-full mr-2.5 flex-shrink-0"
+                className="w-4 h-4 rounded-full mr-2.5 shrink-0"
                 style={{ backgroundColor: color }}
             ></div>
             <div
-                className="font-bold text-sm w-9 text-right mr-9 flex-shrink-0"
+                className="font-bold text-sm w-9 text-right mr-9 shrink-0"
                 style={{ color }}
             >
                 {percent}%
             </div>
-            <div className="mr-1 flex-shrink-0">
+            <div className="mr-1 shrink-0">
                 <Image
                     src={token.icon}
                     alt={token.name}
@@ -68,7 +68,7 @@ const TokenLegend = ({
         </div>
     );
 };
-const ashPools = pools.filter(p => !p.isMaiarPool);
+const ashPools = pools.filter((p) => !p.isMaiarPool);
 function LiquidityByTokensChart() {
     const [selectedPools, setSelectedPools] = useState<Set<string>>(
         new Set(ashPools.map((p) => p.address))
@@ -92,7 +92,9 @@ function LiquidityByTokensChart() {
                 const pct = +((liquidity * 100) / total).toFixed(2);
                 const record: ChartRecord = {
                     value: liquidity,
-                    token: IN_POOL_TOKENS.find((t) => t.id === tokenId) as IToken,
+                    token: IN_POOL_TOKENS.find(
+                        (t) => t.id === tokenId
+                    ) as IToken,
                     percent:
                         index === data.length - 1
                             ? new BigNumber(100).minus(spct).toNumber()

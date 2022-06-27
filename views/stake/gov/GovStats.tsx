@@ -5,7 +5,17 @@ import ICChevronUp from "assets/svg/chevron-up.svg";
 import ICLock from "assets/svg/lock.svg";
 import ICUnlock from "assets/svg/unlock.svg";
 import ICWallet from "assets/svg/wallet.svg";
-import { govLockedAmtState, govRewardLPAmtState, govRewardLPTokenState, govRewardLPValueState, govTotalLockedAmtState, govTotalLockedPctState, govTotalSupplyVeASH, govUnlockTSState, govVeASHAmtState } from "atoms/govState";
+import {
+    govLockedAmtState,
+    govRewardLPAmtState,
+    govRewardLPTokenState,
+    govRewardLPValueState,
+    govTotalLockedAmtState,
+    govTotalLockedPctState,
+    govTotalSupplyVeASH,
+    govUnlockTSState,
+    govVeASHAmtState,
+} from "atoms/govState";
 import { walletTokenPriceState } from "atoms/walletState";
 import BaseModal from "components/BaseModal";
 import GOVStakeModal from "components/GOVStakeModal";
@@ -132,7 +142,7 @@ function GovStats() {
                 </div>
             </div>
             <div className="flex flex-col md:flex-row">
-                <div className="md:w-[21.875rem] flex-shrink-0 flex flex-col px-7 lg:px-9 pb-9 pt-7 lg:pt-14 bg-stake-dark-400 mb-4 md:mb-0 md:mr-4 lg:mr-[1.875rem]">
+                <div className="md:w-[21.875rem] shrink-0 flex flex-col px-7 lg:px-9 pb-9 pt-7 lg:pt-14 bg-stake-dark-400 mb-4 md:mb-0 md:mr-4 lg:mr-[1.875rem]">
                     <h2 className="text-lg md:text-2xl mb-11 md:mb-11 font-bold text-white">
                         Your staked
                     </h2>
@@ -385,7 +395,7 @@ function GovStats() {
                             </button>
                         ))}
                 </div>
-                <div className="flex-grow px-7 lg:px-16 pt-7 lg:pt-14 pb-9 bg-stake-dark-400">
+                <div className="grow px-7 lg:px-16 pt-7 lg:pt-14 pb-9 bg-stake-dark-400">
                     <h2 className="text-lg md:text-2xl mb-10 md:mb-11 font-bold text-white">
                         Overall stats
                     </h2>
@@ -541,7 +551,7 @@ function GovStats() {
                                 className="w-full h-14 lg:h-[4.25rem] px-4 lg:px-[2.375rem] flex items-center justify-between text-pink-600"
                                 onClick={() => setIsQAExpand((val) => !val)}
                             >
-                                <div className="line-clamp-2 text-xs lg:text-sm font-bold flex-grow text-left mr-4">
+                                <div className="line-clamp-2 text-xs lg:text-sm font-bold grow text-left mr-4">
                                     OMG? Does it mean user will lose money
                                     everyday?
                                 </div>
@@ -586,7 +596,7 @@ function GovStats() {
                 <div className="px-4 pt-4 flex justify-end mb-4">
                     <BaseModal.CloseBtn />
                 </div>
-                <div className="flex-grow overflow-auto pt-10">
+                <div className="grow overflow-auto pt-10">
                     <div className="px-[3.375rem] flex flex-col items-center pb-28 border-b border-dashed border-b-ash-gray-500">
                         <div className="text-2xl font-bold text-stake-green-500 mb-12">
                             Harvest successfully

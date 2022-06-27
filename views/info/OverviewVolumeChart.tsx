@@ -78,7 +78,8 @@ function OverviewVolumeChart() {
         [timeUnit]
     );
     const rangeFormat = useMemo(() => {
-        const payload = activePayload || displayChartData[displayChartData.length - 1];
+        const payload =
+            activePayload || displayChartData[displayChartData.length - 1];
         if (!payload) return "";
         if (timeUnit === "D")
             return moment.unix(payload.timestamp).format("DD MMM, yyyy");
@@ -93,7 +94,7 @@ function OverviewVolumeChart() {
     }, [activePayload, timeUnit, displayChartData]);
     return (
         <div className="flex flex-col h-full overflow-hidden">
-            <div className="flex-grow relative">
+            <div className="grow relative">
                 <ResponsiveContainer width="100%" height="100%">
                     <BarChart
                         data={displayChartData}
@@ -157,9 +158,7 @@ function OverviewVolumeChart() {
                             tickLine={false}
                             padding={{ top: 20, bottom: 20 }}
                             domain={[0, (max: number) => max * 1.5]}
-                            tickFormatter={(val: number) =>
-                                formatAmount(val)
-                            }
+                            tickFormatter={(val: number) => formatAmount(val)}
                             width={50}
                             tick={{ fill: "#B7B7D7", fontSize: sm ? 12 : 10 }}
                         />
@@ -180,7 +179,10 @@ function OverviewVolumeChart() {
                 </ResponsiveContainer>
                 <div className="absolute top-0">
                     <div className="text-xs text-white mb-2">
-                        Volume <span className="text-stake-gray-500">{rangeFormat}</span>
+                        Volume{" "}
+                        <span className="text-stake-gray-500">
+                            {rangeFormat}
+                        </span>
                     </div>
                     <div className="text-lg leading-tight">
                         <span className="text-ash-gray-500">$ </span>
@@ -195,7 +197,7 @@ function OverviewVolumeChart() {
                     </div>
                 </div>
             </div>
-            <div className="text-ash-gray-500 flex space-x-2 flex-shrink-0">
+            <div className="text-ash-gray-500 flex space-x-2 shrink-0">
                 {CHART_INTERVAL.map((unit) => {
                     return (
                         <button

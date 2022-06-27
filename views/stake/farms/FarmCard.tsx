@@ -291,8 +291,8 @@ function FarmCard({ farmData, viewType }: props) {
                             screenSize.isMobile && setMOpenFarm(true)
                         }
                     >
-                        <div className="flex-grow flex items-center space-x-2">
-                            <div className="flex space-x-2 md:space-x-6 flex-grow overflow-hidden">
+                        <div className="grow flex items-center space-x-2">
+                            <div className="flex space-x-2 md:space-x-6 grow overflow-hidden">
                                 <div className="flex">
                                     <div className="w-4 h-4 md:w-6 md:h-6 lg:w-9 lg:h-9">
                                         <Image
@@ -316,14 +316,14 @@ function FarmCard({ farmData, viewType }: props) {
                                 </div>
                             </div>
                             {/* emission APR */}
-                            <div className="flex-shrink-0 w-[18%] text-ash-cyan-500 text-xs lg:text-lg font-bold">
+                            <div className="shrink-0 w-[18%] text-ash-cyan-500 text-xs lg:text-lg font-bold">
                                 {formatAmount(emissionAPR?.toNumber() || 0, {
                                     notation: "standard",
                                 })}
                                 %
                             </div>
                             {/* ash Earned */}
-                            <div className="flex-shrink-0 w-1/5 lg:w-[18%] bg-stake-dark-500 h-8 sm:h-10 lg:h-12 px-3.5 hidden md:flex items-center justify-end text-right text-white text-xs lg:text-lg font-bold">
+                            <div className="shrink-0 w-1/5 lg:w-[18%] bg-stake-dark-500 h-8 sm:h-10 lg:h-12 px-3.5 hidden md:flex items-center justify-end text-right text-white text-xs lg:text-lg font-bold">
                                 <TextAmt
                                     number={toEGLDD(
                                         ASH_TOKEN.decimals,
@@ -333,14 +333,14 @@ function FarmCard({ farmData, viewType }: props) {
                                 />
                             </div>
                             {/* LP staked */}
-                            <div className="flex-shrink-0 w-1/5 lg:w-[18%] bg-stake-dark-500 h-8 sm:h-10 lg:h-12 px-3.5 hidden md:flex items-center justify-end text-right text-white text-xs lg:text-lg font-bold">
+                            <div className="shrink-0 w-1/5 lg:w-[18%] bg-stake-dark-500 h-8 sm:h-10 lg:h-12 px-3.5 hidden md:flex items-center justify-end text-right text-white text-xs lg:text-lg font-bold">
                                 <TextAmt
                                     number={stakedLPAmt}
                                     decimalClassName="text-stake-gray-500"
                                 />
                             </div>
                             {/* Total liquidity */}
-                            <div className="flex-shrink-0 w-1/3 md:w-1/5 lg:w-[18%] bg-stake-dark-500 h-8 sm:h-10 lg:h-12 px-3.5 flex items-center justify-end text-right text-white text-xs font-bold">
+                            <div className="shrink-0 w-1/3 md:w-1/5 lg:w-[18%] bg-stake-dark-500 h-8 sm:h-10 lg:h-12 px-3.5 flex items-center justify-end text-right text-white text-xs font-bold">
                                 $
                                 <TextAmt
                                     number={totalLiquidityValue}

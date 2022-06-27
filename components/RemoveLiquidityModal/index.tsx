@@ -277,13 +277,13 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
                             )}
                         >
                             <div className="flex items-center space-x-1 bg-ash-dark-700 sm:bg-transparent pl-4 sm:pl-0">
-                                <div className="flex items-center font-bold w-24 flex-shrink-0 border-r border-r-ash-gray-500 sm:border-r-0">
+                                <div className="flex items-center font-bold w-24 shrink-0 border-r border-r-ash-gray-500 sm:border-r-0">
                                     <IconRight className="mr-4" />
                                     <span>TOTAL</span>
                                 </div>
                                 <div className="flex-1 flex items-center overflow-hidden bg-ash-dark-700 text-right text-lg h-[4.5rem] px-5 ">
                                     <InputCurrency
-                                        className="bg-transparent text-right flex-grow outline-none"
+                                        className="bg-transparent text-right grow outline-none"
                                         placeholder="0"
                                         value={displayInputLiquidity}
                                         onChange={(e) => {
@@ -440,7 +440,7 @@ const RemoveLiquidityModal = ({ open, onClose, poolData }: Props) => {
             <div className="flex justify-end">
                 <BaseModal.CloseBtn />
             </div>
-            <div className="flex-grow overflow-auto">
+            <div className="grow overflow-auto">
                 <RemoveLPContent
                     open={open}
                     onClose={onClose}

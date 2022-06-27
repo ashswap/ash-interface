@@ -1,7 +1,4 @@
-import {
-    loginServices,
-    useGetLoginInfo
-} from "@elrondnetwork/dapp-core";
+import { loginServices, useGetLoginInfo } from "@elrondnetwork/dapp-core";
 import { walletIsOpenConnectModalState } from "atoms/walletState";
 import BaseModal from "components/BaseModal";
 import Image from "next/image";
@@ -28,9 +25,9 @@ const MAIAR_WALLET_LINK = {
 
 function ConnectWalletModal() {
     const { isLoggedIn: loggedIn } = useGetLoginInfo();
-    const [ isOpenConnectWalletModal, setIsOpenConnectWalletModal ] =
+    const [isOpenConnectWalletModal, setIsOpenConnectWalletModal] =
         useRecoilState(walletIsOpenConnectModalState);
-    
+
     const [isOpenQR, setIsOpenQR] = useState(false);
     const [isOpenDownloadExtension, setIsOpenDownloadExtension] =
         useState(false);
@@ -65,7 +62,7 @@ function ConnectWalletModal() {
                 <div className="flex justify-end">
                     <BaseModal.CloseBtn />
                 </div>
-                <div className="flex-grow px-3 py-8 overflow-auto">
+                <div className="grow px-3 py-8 overflow-auto">
                     <div
                         className="flex justify-center bg-no-repeat bg-left bg-contain py-8 overflow-hidden"
                         style={{
@@ -135,7 +132,7 @@ function ConnectWalletModal() {
                 <div className="flex justify-end">
                     <BaseModal.CloseBtn />
                 </div>
-                <div className="flex-grow flex flex-col items-center text-center py-10 px-6">
+                <div className="grow flex flex-col items-center text-center py-10 px-6">
                     <div className="text-lg sm:text-2xl font-bold mb-9">
                         Install{" "}
                         <span className="text-ash-blue-500">Maiar Wallet</span>{" "}
@@ -230,7 +227,7 @@ function ConnectWalletModal() {
                 <div className="flex justify-end">
                     <BaseModal.CloseBtn />
                 </div>
-                <div className="flex-grow flex flex-col items-center text-center pt-6 pb-10 px-2 sm:px-6">
+                <div className="grow flex flex-col items-center text-center pt-6 pb-10 px-2 sm:px-6">
                     <div className="text-lg sm:text-2xl font-bold mb-9">
                         Install{" "}
                         <span className="text-ash-blue-500">Maiar Wallet</span>{" "}

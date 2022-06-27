@@ -124,7 +124,7 @@ const FirstStakeContent = ({ open, onClose }: props) => {
                     Governance Stake
                 </div>
                 <div className="sm:flex sm:space-x-8 lg:space-x-24 mb-24">
-                    <div className="flex flex-col flex-grow mb-16 lg:mb-0">
+                    <div className="flex flex-col grow mb-16 lg:mb-0">
                         <div className="w-full flex sm:grid sm:grid-cols-2 sm:gap-x-4 lg:gap-x-7.5 mb-12">
                             <div className="w-1/3 sm:w-auto mr-5 sm:mr-0">
                                 <div className="text-ash-gray-500 text-xs lg:text-sm font-bold mb-2 lg:mb-4">
@@ -360,7 +360,7 @@ const FirstStakeContent = ({ open, onClose }: props) => {
                             </div>
                         </OnboardTooltip>
                     </div>
-                    <div className="w-full sm:w-1/3 lg:w-[17.8125rem] flex-shrink-0 bg-stake-dark-500 py-[2.375rem] px-10">
+                    <div className="w-full sm:w-1/3 lg:w-[17.8125rem] shrink-0 bg-stake-dark-500 py-[2.375rem] px-10">
                         <div className="text-white text-lg font-bold mb-16">
                             Estimate Staking
                         </div>
@@ -433,7 +433,7 @@ const FirstStakeContent = ({ open, onClose }: props) => {
                     </div>
                 </div>
                 <div className="sm:flex sm:space-x-8 lg:space-x-24">
-                    <div className="w-full mb-12 sm:mb-0 sm:flex-grow">
+                    <div className="w-full mb-12 sm:mb-0 sm:grow">
                         <Checkbox
                             checked={isAgree}
                             onChange={setIsAgree}
@@ -455,7 +455,7 @@ const FirstStakeContent = ({ open, onClose }: props) => {
                             }
                         />
                     </div>
-                    <div className="w-full sm:w-[17.8125rem] flex-shrink-0">
+                    <div className="w-full sm:w-[17.8125rem] shrink-0">
                         <div className="border-notch">
                             <button
                                 className={`clip-corner-1 clip-corner-tl transition w-full h-12 flex items-center justify-center text-sm font-bold text-white ${
@@ -496,7 +496,7 @@ function FirstStakeModal({ open, onClose }: props) {
                     <BaseModal.CloseBtn />
                 </div>
                 {open && (
-                    <div className="flex-grow overflow-auto">
+                    <div className="grow overflow-auto">
                         <FirstStakeContent open={open} onClose={onClose} />
                     </div>
                 )}

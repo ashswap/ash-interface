@@ -165,7 +165,7 @@ function InfoLayout({ children }: any) {
                         )}
                     </Transition>
                     <aside
-                        className={`flex-shrink-0 fixed top-0 left-0 h-screen bg-ash-dark-600 py-9 flex flex-col z-10 transition-all ${
+                        className={`shrink-0 fixed top-0 left-0 h-screen bg-ash-dark-600 py-9 flex flex-col z-10 transition-all ${
                             openSidebar
                                 ? "w-52 xl:w-60 pl-4 xl:pl-12"
                                 : "w-18 pl-4"
@@ -182,7 +182,7 @@ function InfoLayout({ children }: any) {
                             )}
                         </button>
                         <div
-                            className={`relative flex-shrink-0 mb-5 ${
+                            className={`relative shrink-0 mb-5 ${
                                 openSidebar ? "w-14 h-14" : "w-10 h-10"
                             }`}
                         >
@@ -193,7 +193,7 @@ function InfoLayout({ children }: any) {
                                 objectFit="contain"
                             ></Image>
                         </div>
-                        <div className="flex-grow overflow-auto">
+                        <div className="grow overflow-auto">
                             <ul>
                                 <li>
                                     <NavLink
@@ -252,7 +252,7 @@ function InfoLayout({ children }: any) {
                             </li> */}
                             </ul>
                         </div>
-                        {/* <div className="flex-shrink-0 flex flex-col space-y-2">
+                        {/* <div className="shrink-0 flex flex-col space-y-2">
                         <div className="text-ash-gray-500 text-xs mb-8">
                             <span className="inline-block rounded-full bg-ash-green-500 w-2 h-2 mr-2"></span>
                             <span>Updated 4 mins ago</span>
@@ -271,7 +271,7 @@ function InfoLayout({ children }: any) {
                 </div>
 
                 <div
-                    className={`flex-grow px-4 lg:px-9 lg:py-6 relative overflow-x-hidden mr-32 ${
+                    className={`grow px-4 lg:px-9 lg:py-6 relative overflow-x-hidden mr-32 ${
                         openSidebar ? "ml-18 lg:ml-52 xl:ml-60" : "ml-18"
                     }`}
                 >
@@ -285,7 +285,7 @@ function InfoLayout({ children }: any) {
                     </div> */}
                     {children}
                 </div>
-                <aside className="flex-shrink-0 fixed top-0 right-0 h-screen overflow-auto w-32 bg-ash-dark-600 px-4 py-6 text-white">
+                <aside className="shrink-0 fixed top-0 right-0 h-screen overflow-auto w-32 bg-ash-dark-600 px-4 py-6 text-white">
                     <div className="bg-ash-dark-400 p-2 flex flex-col mb-4">
                         {/* <Image
                             src={ImgAvatar}
@@ -354,7 +354,7 @@ function InfoLayout({ children }: any) {
     return (
         <div>
             <header className="sticky top-0 left-0 right-0 z-20 w-full h-[4.5rem] flex items-center justify-between px-6 text-white bg-ash-dark-400">
-                <div className="mr-5 flex-shrink-0">
+                <div className="mr-5 shrink-0">
                     <Image
                         src={ImgLogo}
                         alt="ash logo"
@@ -362,15 +362,15 @@ function InfoLayout({ children }: any) {
                         height={42}
                     />
                 </div>
-                <div className="flex-grow flex items-center space-x-1 overflow-hidden">
+                <div className="grow flex items-center space-x-1 overflow-hidden">
                     <Input
                         backgroundClassName="bg-ash-dark-700/70"
-                        className="text-white text-2xs h-10 px-4 flex-grow overflow-hidden"
+                        className="text-white text-2xs h-10 px-4 grow overflow-hidden"
                         suffix={<ICSearch />}
                         placeholder="Search token, pair"
                         size={5}
                     />
-                    {/* <button className="bg-ash-dark-600 h-10 w-24 flex items-center justify-center flex-shrink-0">
+                    {/* <button className="bg-ash-dark-600 h-10 w-24 flex items-center justify-center shrink-0">
                         <ICStar className="inline text-[#FFC10D] w-4 h-4 mr-3" />
                         <span className="text-2xs font-bold">Saved</span>
                     </button> */}
@@ -389,7 +389,7 @@ function InfoLayout({ children }: any) {
                             dropdownBtn={(address, setMDrawer) => {
                                 return (
                                     <button
-                                        className="flex items-center bg-ash-dark-600 h-10 px-3 flex-shrink-0"
+                                        className="flex items-center bg-ash-dark-600 h-10 px-3 shrink-0"
                                         onClick={() =>
                                             screenSizes.isMobile &&
                                             setMDrawer(true)
@@ -410,7 +410,7 @@ function InfoLayout({ children }: any) {
                 </div>
             </header>
             <div className="pb-[4.5rem]">{children}</div>
-            <nav className="fixed bottom-0 left-0 right-0 w-full text-white bg-black/40 backdrop-filter backdrop-blur-xl">
+            <nav className="fixed bottom-0 left-0 right-0 w-full text-white bg-black/40 backdrop-blur-xl">
                 <ul className="flex">
                     <MNavLink
                         href={{ pathname: "/info" }}

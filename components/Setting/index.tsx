@@ -44,7 +44,7 @@ const Setting = (props: Props) => {
             </div>
             <div className="flex items-center h-12 px-5 bg-ash-dark-400 text-white text-sm">
                 <InputCurrency
-                    className="flex-grow bg-transparent outline-none"
+                    className="grow bg-transparent outline-none"
                     placeholder="Custom"
                     value={displaySlip}
                     onChange={(e) => {

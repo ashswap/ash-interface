@@ -136,9 +136,16 @@ const TokenSelect = ({
                 >
                     <div className="flex items-center">
                         <div className="w-3.5 h-3.5 relative overflow-hidden rounded-full">
-                            <Image src={pivotToken.icon} alt={pivotToken.name} layout="fill" objectFit="contain" />
+                            <Image
+                                src={pivotToken.icon}
+                                alt={pivotToken.name}
+                                layout="fill"
+                                objectFit="contain"
+                            />
                         </div>
-                        <div className="text-sm text-white ml-1 mt-0.5">{pivotToken.name}</div>
+                        <div className="text-sm text-white ml-1 mt-0.5">
+                            {pivotToken.name}
+                        </div>
                     </div>
                     <ICClose
                         className="cursor-pointer w-2 h-auto text-ash-gray-600"
@@ -184,8 +191,14 @@ const TokenSelect = ({
                 >
                     {value ? (
                         <div className="flex items-center">
-                            <Avatar src={value.icon} alt={value.name} className="w-4 h-4"/>
-                            <div className="mt-0.5 ml-2 text-xs sm:text-sm font-bold">{value.name}</div>
+                            <Avatar
+                                src={value.icon}
+                                alt={value.name}
+                                className="w-4 h-4"
+                            />
+                            <div className="mt-0.5 ml-2 text-xs sm:text-sm font-bold">
+                                {value.name}
+                            </div>
                         </div>
                     ) : (
                         <div className="text-xs sm:text-sm">Select a token</div>
@@ -203,7 +216,7 @@ const TokenSelect = ({
                 <div className="flex justify-end">
                     <BaseModal.CloseBtn />
                 </div>
-                <div className="flex-shrink-0 px-6 pt-1 pb-6">
+                <div className="shrink-0 px-6 pt-1 pb-6">
                     <div className="font-bold text-lg text-white">
                         {modalTitle}
                     </div>
@@ -255,7 +268,13 @@ const TokenSelect = ({
                                         renderPivotToken()}
 
                                     <Input
-                                        placeholder={pivotToken ? type === "to" ? "swap to" : "swap from" : "Search or try usdt-usdc"}
+                                        placeholder={
+                                            pivotToken
+                                                ? type === "to"
+                                                    ? "swap to"
+                                                    : "swap from"
+                                                : "Search or try usdt-usdc"
+                                        }
                                         suffix={<Search />}
                                         outline
                                         autoFocus
@@ -291,7 +310,7 @@ const TokenSelect = ({
                     </div>
                 </div>
 
-                <div className="flex-grow overflow-auto px-6 pb-7 min-h-[35vh] sm:min-h-[initial]">
+                <div className="grow overflow-auto px-6 pb-7 min-h-[35vh] sm:min-h-[initial]">
                     {validPools ? (
                         <OnboardTooltip
                             open={

@@ -109,7 +109,7 @@ const ListPool = (props: Props) => {
                                 className={`flex items-center bg-ash-dark-600 text-text-input-3 h-12 text-2xs sm:text-xs border-b border-ash-dark-400`}
                             >
                                 <div className="w-8/12 px-4 sm:px-11 flex items-center">
-                                    <div className="flex-grow flex space-x-4">
+                                    <div className="grow flex space-x-4">
                                         <div className="w-7/12 sm:w-1/2">
                                             #Pool
                                         </div>

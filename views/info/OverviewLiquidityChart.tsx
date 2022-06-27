@@ -71,7 +71,8 @@ function OverviewLiquidityChart() {
         [timeUnit]
     );
     const rangeFormat = useMemo(() => {
-        const payload = activePayload || displayChartData[displayChartData.length - 1];
+        const payload =
+            activePayload || displayChartData[displayChartData.length - 1];
         if (!payload) return "";
         if (timeUnit === "D")
             return moment.unix(payload.timestamp).format("DD MMM, yyyy");
@@ -86,7 +87,7 @@ function OverviewLiquidityChart() {
     }, [activePayload, timeUnit, displayChartData]);
     return (
         <div className="flex flex-col h-full overflow-hidden">
-            <div className="flex-grow relative">
+            <div className="grow relative">
                 <ResponsiveContainer>
                     <AreaChart
                         data={displayChartData}
@@ -142,9 +143,7 @@ function OverviewLiquidityChart() {
                             tickLine={false}
                             padding={{ top: 20, bottom: 20 }}
                             domain={[0, (max: number) => max * 1.5]}
-                            tickFormatter={(val: number) =>
-                                formatAmount(val)
-                            }
+                            tickFormatter={(val: number) => formatAmount(val)}
                             width={50}
                             tick={{ fill: "#B7B7D7", fontSize: sm ? 12 : 10 }}
                         />
@@ -195,7 +194,7 @@ function OverviewLiquidityChart() {
                     </div>
                 </div>
             </div>
-            <div className="text-ash-gray-500 flex space-x-2 flex-shrink-0">
+            <div className="text-ash-gray-500 flex space-x-2 shrink-0">
                 {CHART_INTERVAL.map((unit) => {
                     return (
                         <button
