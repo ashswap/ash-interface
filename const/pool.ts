@@ -1,11 +1,9 @@
 import IPool from "interface/pool";
-import IconBTC from "assets/images/btc-icon.png";
-import IconWBTC from "assets/images/wbtc-icon.png";
-import IconUSDC from "assets/images/usdc-icon.png";
-import IconWUSDC from "assets/images/wusdc-icon.png";
-import IconUSDT from "assets/images/usdt-icon.png";
 import { ENVIRONMENT } from "./env";
 import { MAIAR_POOLS } from "./maiarPools";
+import { TOKENS_MAP } from "./tokens";
+import { CHAIN_ID } from "./dappConfig";
+import { IToken } from "interface/token";
 
 const devnet: IPool[] = [
     {
@@ -13,78 +11,39 @@ const devnet: IPool[] = [
             "erd1qqqqqqqqqqqqqpgqzxcjxnxsw99lzdjqtcak5x8x39pkxkz0rmcqyl76wx",
         lpToken: {
             id: "LPT-999601",
-            icon: "",
-            name: "LPT-999601",
+            chainId: CHAIN_ID.DEVNET,
+            symbol: "LPT-USDC-USDT",
+            name: "Ashswap LP",
             decimals: 18,
+            icon: "",
         },
-        tokens: [
-            {
-                id: "USDC-d5181d",
-                icon: IconUSDC,
-                name: "USDC",
-                decimals: 6,
-                coingeckoId: "usd-coin",
-            },
-            {
-                id: "USDT-a55fa7",
-                icon: IconUSDT,
-                name: "USDT",
-                decimals: 6,
-                coingeckoId: "tether",
-            },
-        ],
+        tokens: [TOKENS_MAP["USDC-d5181d"], TOKENS_MAP["USDT-a55fa7"]],
     },
     {
         address:
             "erd1qqqqqqqqqqqqqpgq9wj92y9sfw0dua57664hdc5gd656h95yrmcqtnqv5l",
         lpToken: {
             id: "LPT-ea941a",
-            icon: "",
-            name: "LPT-ea941a",
+            chainId: CHAIN_ID.DEVNET,
+            symbol: "LPT-USDC-wUSDC",
+            name: "Ashswap LP",
             decimals: 18,
+            icon: "",
         },
-        tokens: [
-            {
-                id: "USDC-d5181d",
-                icon: IconUSDC,
-                name: "USDC",
-                decimals: 6,
-                coingeckoId: "usd-coin",
-            },
-            {
-                id: "WUSDC-3124eb",
-                icon: IconWUSDC,
-                name: "wUSDC",
-                decimals: 6,
-                coingeckoId: "usd-coin",
-            },
-        ],
+        tokens: [TOKENS_MAP["USDC-d5181d"], TOKENS_MAP["WUSDC-3124eb"]],
     },
     {
         address:
             "erd1qqqqqqqqqqqqqpgqla72lhk8szfdh2l2nt9vflt803uz3prsrmcq2w885d",
         lpToken: {
             id: "LPT-8860c3",
-            icon: "",
-            name: "LPT-8860c3",
+            chainId: CHAIN_ID.DEVNET,
+            symbol: "LPT-renBTC-wBTC",
+            name: "Ashswap LP",
             decimals: 18,
+            icon: "",
         },
-        tokens: [
-            {
-                id: "RENBTC-0b6973",
-                icon: IconBTC,
-                name: "renBTC",
-                decimals: 8,
-                coingeckoId: "bitcoin",
-            },
-            {
-                id: "WBTC-9bdb9b",
-                icon: IconWBTC,
-                name: "wBTC",
-                decimals: 8,
-                coingeckoId: "wrapped-bitcoin",
-            },
-        ],
+        tokens: [TOKENS_MAP["RENBTC-0b6973"], TOKENS_MAP["WBTC-9bdb9b"]],
     },
 ];
 
@@ -94,81 +53,59 @@ const testnet: IPool[] = [
             "erd1qqqqqqqqqqqqqpgqup9ww85el3d609x96nuvev7axv3y7kcyj9ts6ny2us",
         lpToken: {
             id: "LPT-f0204d",
-            icon: "",
-            name: "LPT-f0204d",
+            chainId: CHAIN_ID.TESTNET,
+            symbol: "LPT-USDC-USDT",
+            name: "Ashswap LP",
             decimals: 18,
+            icon: "",
         },
-        tokens: [
-            {
-                id: "USDC-cbf0b9",
-                icon: IconUSDC,
-                name: "USDC",
-                decimals: 6,
-                coingeckoId: "usd-coin",
-            },
-            {
-                id: "USDT-8d1668",
-                icon: IconUSDT,
-                name: "USDT",
-                decimals: 6,
-                coingeckoId: "tether",
-            },
-        ],
+        tokens: [TOKENS_MAP["USDC-cbf0b9"], TOKENS_MAP["USDT-8d1668"]],
     },
     {
         address:
             "erd1qqqqqqqqqqqqqpgqsteq4s8cspwhy3tfd2kn6sed87ktql3xj9tspx4qgs",
         lpToken: {
             id: "LPT-75f818",
-            icon: "",
-            name: "LPT-75f818",
+            chainId: CHAIN_ID.TESTNET,
+            symbol: "LPT-USDC-wUSDC",
+            name: "Ashswap LP",
             decimals: 18,
+            icon: "",
         },
-        tokens: [
-            {
-                id: "USDC-cbf0b9",
-                icon: IconUSDC,
-                name: "USDC",
-                decimals: 6,
-                coingeckoId: "usd-coin",
-            },
-            {
-                id: "WUSDC-365a33",
-                icon: IconWUSDC,
-                name: "wUSDC",
-                decimals: 6,
-                coingeckoId: "usd-coin",
-            },
-        ],
+        tokens: [TOKENS_MAP["USDC-cbf0b9"], TOKENS_MAP["WUSDC-365a33"]],
     },
     {
         address:
             "erd1qqqqqqqqqqqqqpgqythjwuvwqw4qxl73fd8zzk2kh4wqfqgxj9tscants9",
         lpToken: {
             id: "LPT-2acb85",
-            icon: "",
-            name: "LPT-2acb85",
+            chainId: CHAIN_ID.TESTNET,
+            symbol: "LPT-renBTC-wBTC",
+            name: "Ashswap LP",
             decimals: 18,
+            icon: "",
         },
-        tokens: [
-            {
-                id: "RENBTC-36935a",
-                icon: IconBTC,
-                name: "BTC",
-                decimals: 8,
-                coingeckoId: "bitcoin",
-            },
-            {
-                id: "WBTC-ebec12",
-                icon: IconWBTC,
-                name: "wBTC",
-                decimals: 8,
-                coingeckoId: "wrapped-bitcoin",
-            },
-        ],
+        tokens: [TOKENS_MAP["RENBTC-36935a"], TOKENS_MAP["WBTC-ebec12"]],
     },
 ];
 
-const pools = ENVIRONMENT.NETWORK == "devnet" ? [...devnet, ...MAIAR_POOLS] : [...testnet, ...MAIAR_POOLS];
+const pools =
+    ENVIRONMENT.NETWORK == "devnet"
+        ? [...devnet, ...MAIAR_POOLS]
+        : [...testnet, ...MAIAR_POOLS];
 
 export default pools;
+const getTokenFromPools = (...pools: IPool[]) => {
+    const map = new Map<string, IToken>();
+    pools.map((pool) => {
+        pool.tokens.map((token) => {
+            map.set(token.id, token);
+        });
+    });
+    return Array.from(map.values());
+};
+
+export const IN_POOL_TOKENS = getTokenFromPools(...pools);
+export const IN_POOL_TOKENS_MAP = Object.fromEntries(
+    IN_POOL_TOKENS.map((t) => [t.id, t])
+);

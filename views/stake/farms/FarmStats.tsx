@@ -83,7 +83,7 @@ function FarmStats({ onClickAll }: { onClickAll?: () => void }) {
                         <div className="flex items-center">
                             <Avatar
                                 src={ASH_TOKEN.icon}
-                                alt={ASH_TOKEN.name}
+                                alt={ASH_TOKEN.symbol}
                                 className="w-4.5 h-4.5 mr-2"
                             />
                             <div className="text-white text-lg font-bold">

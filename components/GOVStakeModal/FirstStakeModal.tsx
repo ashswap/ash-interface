@@ -135,11 +135,11 @@ const FirstStakeContent = ({ open, onClose }: props) => {
                                 <div className="bg-ash-dark-400/30 h-14 lg:h-18 px-4 lg:px-7 flex items-center">
                                     <Avatar
                                         src={ASH_TOKEN.icon}
-                                        alt={ASH_TOKEN.name}
+                                        alt={ASH_TOKEN.symbol}
                                         className="w-3.5 h-3.5 lg:w-7 lg:h-7 mr-3"
                                     />
                                     <div className="text-white text-sm lg:text-lg font-bold">
-                                        {ASH_TOKEN.name}
+                                        {ASH_TOKEN.symbol}
                                     </div>
                                 </div>
                             </div>
@@ -176,7 +176,7 @@ const FirstStakeContent = ({ open, onClose }: props) => {
                                             )}
                                             options={{ notation: "standard" }}
                                         />{" "}
-                                        {ASH_TOKEN.name}
+                                        {ASH_TOKEN.symbol}
                                     </span>
                                 </div>
                             </div>

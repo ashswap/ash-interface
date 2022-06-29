@@ -113,7 +113,7 @@ export const farmToDisplayState = selector<FarmRecord[]>({
         if (deboundKeyword.trim()) {
             result = farmRecords.filter((p) =>
                 p.pool.tokens.some((t) =>
-                    t.name
+                    t.symbol
                         .toLowerCase()
                         .includes(deboundKeyword.trim().toLowerCase())
                 )

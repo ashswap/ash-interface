@@ -55,17 +55,17 @@ const PoolRecord = ({
                             <div className="shrink-0 flex">
                                 <Avatar
                                     src={token1?.icon || ""}
-                                    alt={token1?.name}
+                                    alt={token1?.symbol}
                                     className="w-4 h-4 lg:w-6 lg:h-6"
                                 />
                                 <Avatar
                                     src={token2?.icon || ""}
-                                    alt={token2?.name}
+                                    alt={token2?.symbol}
                                     className="w-4 h-4 lg:w-6 lg:h-6 -ml-1"
                                 />
                             </div>
                             <div className="ml-2 lg:ml-4 font-bold text-xs lg:text-sm text-white truncate">
-                                {token1?.name} & {token2?.name}
+                                {token1?.symbol} & {token2?.symbol}
                             </div>
                         </div>
                     </div>

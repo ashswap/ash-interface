@@ -1,7 +1,7 @@
 import {
     getProxyProvider,
     useGetAccountInfo,
-    useGetLoginInfo
+    useGetLoginInfo,
 } from "@elrondnetwork/dapp-core";
 import IconRight from "assets/svg/right-white.svg";
 import { addLPSessionIdAtom } from "atoms/addLiquidity";
@@ -62,7 +62,7 @@ const TokenInput = ({
                     />
                     <div className="hidden sm:block overflow-hidden">
                         <div className="text-sm font-bold text-white sm:pb-1">
-                            {token.name}
+                            {token.symbol}
                         </div>
                         <div className="text-text-input-3 text-xs truncate leading-tight">
                             <TextAmt number={tokenInPool} />
@@ -70,7 +70,7 @@ const TokenInput = ({
                         </div>
                     </div>
                     <div className="block sm:hidden text-xs font-bold text-white">
-                        {token.name}
+                        {token.symbol}
                     </div>
                 </div>
 
@@ -113,7 +113,7 @@ const TokenInput = ({
                             options={{ notation: "standard" }}
                         />
                         &nbsp;
-                        {token.name}
+                        {token.symbol}
                     </span>
                 </div>
             </div>
@@ -302,20 +302,20 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
                 <div className="mr-2">
                     {/* <div className="text-text-input-3 text-xs">Deposit</div> */}
                     <div className="flex flex-row items-baseline text-lg sm:text-2xl font-bold">
-                        <span>{pool.tokens[0].name}</span>
+                        <span>{pool.tokens[0].symbol}</span>
                         <span className="text-sm px-3">&</span>
-                        <span>{pool.tokens[1].name}</span>
+                        <span>{pool.tokens[1].symbol}</span>
                     </div>
                 </div>
                 <div className="flex flex-row justify-between items-center">
                     <Avatar
                         src={pool.tokens[0].icon}
-                        alt={pool.tokens[0].name}
+                        alt={pool.tokens[0].symbol}
                         className="w-6 h-6 sm:w-9 sm:h-9"
                     />
                     <Avatar
                         src={pool.tokens[1].icon}
-                        alt={pool.tokens[1].name}
+                        alt={pool.tokens[1].symbol}
                         className="w-6 h-6 sm:w-9 sm:h-9 -ml-1 sm:ml-[-0.375rem]"
                     />
                 </div>

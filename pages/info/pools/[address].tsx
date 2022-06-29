@@ -1,6 +1,6 @@
 import {
     AccountInfoSliceNetworkType,
-    useGetNetworkConfig
+    useGetNetworkConfig,
 } from "@elrondnetwork/dapp-core";
 import ICArrowRight from "assets/svg/arrow-right.svg";
 import ICCopy from "assets/svg/copy.svg";
@@ -83,23 +83,23 @@ function PoolDetailPage({ pool }: Props) {
                 <li>
                     <ICArrowRight className="inline mr-1 text-ash-gray-500" />
                     <span className="text-ash-gray-500">
-                        {token1.name} & {token2.name}
+                        {token1.symbol} & {token2.symbol}
                     </span>
                 </li>
             </ul>
             <div className="flex items-center mb-4 lg:mb-5">
                 <div className="text-2xl lg:text-4xl font-bold mr-4 lg:mr-7">
-                    {token1.name} & {token2.name}
+                    {token1.symbol} & {token2.symbol}
                 </div>
                 <div className="flex">
                     <Avatar
                         src={token1.icon}
-                        alt={token1.name}
+                        alt={token1.symbol}
                         className="w-6 h-6 lg:w-8 lg:h-8"
                     />
                     <Avatar
                         src={token2.icon}
-                        alt={token2.name}
+                        alt={token2.symbol}
                         className="w-6 h-6 lg:w-8 lg:h-8 -ml-1.5"
                     />
                 </div>
@@ -117,7 +117,7 @@ function PoolDetailPage({ pool }: Props) {
                     </div>
                 </div>
                 <div className="flex items-center bg-ash-dark-600 h-8 lg:h-10 px-2.5 lg:px-4 mr-2 mb-2">
-                    <div className="text-xs lg:text-sm">{token1.name}</div>
+                    <div className="text-xs lg:text-sm">{token1.symbol}</div>
                     <div className="text-2xs lg:text-xs text-stake-gray-500 px-2.5 border-r border-r-stake-gray-500">
                         {token1.id}
                     </div>
@@ -128,7 +128,7 @@ function PoolDetailPage({ pool }: Props) {
                     </div>
                 </div>
                 <div className="flex items-center bg-ash-dark-600 h-8 lg:h-10 px-2.5 lg:px-4 mr-2 mb-2">
-                    <div className="text-xs lg:text-sm">{token2.name}</div>
+                    <div className="text-xs lg:text-sm">{token2.symbol}</div>
                     <div className="text-2xs lg:text-xs text-stake-gray-500 px-2.5 border-r border-r-stake-gray-500">
                         {token2.id}
                     </div>
@@ -185,12 +185,12 @@ function PoolDetailPage({ pool }: Props) {
                                     {formatAmount(stats?.token_1_amount)}{" "}
                                 </span>
                                 <span className="text-stake-gray-500">
-                                    {token1.name}
+                                    {token1.symbol}
                                 </span>
                             </div>
                             <Avatar
                                 src={token1.icon}
-                                alt={token1.name}
+                                alt={token1.symbol}
                                 className="w-4.5 h-4.5 sm:w-6 sm:h-6"
                             />
                         </div>
@@ -200,12 +200,12 @@ function PoolDetailPage({ pool }: Props) {
                                     {formatAmount(stats?.token_2_amount)}{" "}
                                 </span>
                                 <span className="text-stake-gray-500">
-                                    {token2.name}
+                                    {token2.symbol}
                                 </span>
                             </div>
                             <Avatar
                                 src={token2.icon}
-                                alt={token2.name}
+                                alt={token2.symbol}
                                 className="w-4.5 h-4.5 sm:w-6 sm:h-6"
                             />
                         </div>

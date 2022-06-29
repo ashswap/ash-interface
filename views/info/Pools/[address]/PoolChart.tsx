@@ -33,8 +33,8 @@ function PoolChart({ pool }: Props) {
                         >
                             {type.startsWith("ratio")
                                 ? type === "ratio12"
-                                    ? `${token1.name}/${token2.name}`
-                                    : `${token2.name}/${token1.name}`
+                                    ? `${token1.symbol}/${token2.symbol}`
+                                    : `${token2.symbol}/${token1.symbol}`
                                 : type}
                         </button>
                     );

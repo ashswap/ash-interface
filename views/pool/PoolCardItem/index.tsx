@@ -1,6 +1,6 @@
 import {
     AccountInfoSliceNetworkType,
-    useGetNetworkConfig
+    useGetNetworkConfig,
 } from "@elrondnetwork/dapp-core";
 import Down from "assets/svg/down-white.svg";
 import { PoolsState } from "atoms/poolsState";
@@ -45,20 +45,20 @@ function PoolCardItem({
                         Deposit
                     </div>
                     <div className="flex flex-row items-baseline text-2xl font-bold">
-                        <span>{pool.tokens[0].name}</span>
+                        <span>{pool.tokens[0].symbol}</span>
                         <span className="text-sm px-3">&</span>
-                        <span>{pool.tokens[1].name}</span>
+                        <span>{pool.tokens[1].symbol}</span>
                     </div>
                 </div>
                 <div className="flex flex-row justify-between items-center">
                     <Avatar
                         src={pool.tokens[0].icon}
-                        alt={pool.tokens[0].name}
+                        alt={pool.tokens[0].symbol}
                         className="w-[3.25rem] h-[3.25rem]"
                     />
                     <Avatar
                         src={pool.tokens[1].icon}
-                        alt={pool.tokens[1].name}
+                        alt={pool.tokens[1].symbol}
                         className="w-[3.25rem] h-[3.25rem] -ml-2.5"
                     />
                 </div>

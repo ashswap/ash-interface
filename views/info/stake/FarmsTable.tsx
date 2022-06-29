@@ -56,7 +56,7 @@ const FarmRecord = ({
                                 />
                             </div>
                             <div className="ml-2 lg:ml-4 font-bold text-xs lg:text-sm text-white truncate">
-                                {token1?.name} & {token2?.name}
+                                {token1?.symbol} & {token2?.symbol}
                             </div>
                         </div>
                     </div>

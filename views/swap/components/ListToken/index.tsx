@@ -20,12 +20,12 @@ const ListToken = (props: Props) => {
                     <div className="flex items-center space-x-4">
                         <Avatar
                             src={token.token.icon}
-                            alt={token.token.name}
+                            alt={token.token.symbol}
                             className="w-7 h-7"
                         />
                         <div>
                             <div className="text-sm font-bold text-white">
-                                {token.token.name}
+                                {token.token.symbol}
                             </div>
                             <div className="text-2xs text-ash-gray-600">
                                 {token.token.name}
@@ -36,7 +36,7 @@ const ListToken = (props: Props) => {
                         {toEGLD(token.token, token.balance.toString()).toFixed(
                             5
                         )}
-                        &nbsp;{token.token.name}
+                        &nbsp;{token.token.symbol}
                     </div>
                 </div>
             ))}

@@ -55,12 +55,12 @@ const StakedPoolListItem = ({
                                     <div className="flex items-center mr-2 sm:mr-0">
                                         <Avatar
                                             src={pool.tokens[0].icon}
-                                            alt={pool.tokens[0].name}
+                                            alt={pool.tokens[0].symbol}
                                             className="h-4 w-4 sm:h-6 sm:w-6 lg:h-9 lg:w-9 rounded-full"
                                         />
                                         <Avatar
                                             src={pool.tokens[1].icon}
-                                            alt={pool.tokens[1].name}
+                                            alt={pool.tokens[1].symbol}
                                             className="h-4 w-4 sm:h-6 sm:w-6 lg:h-9 lg:w-9 rounded-full -ml-1 lg:ml-[-0.375rem]"
                                         />
                                     </div>
@@ -70,7 +70,7 @@ const StakedPoolListItem = ({
                                     <div className="sm:flex sm:flex-col font-bold text-xs lg:text-lg truncate">
                                         <span className="sm:flex flex-row items-center">
                                             <span className="w-20">
-                                                {pool.tokens[0].name}
+                                                {pool.tokens[0].symbol}
                                             </span>
                                             <span className="hidden sm:inline text-earn text-xs">
                                                 {fValue0}
@@ -85,7 +85,7 @@ const StakedPoolListItem = ({
                                         {/* <span>&nbsp;&&nbsp;</span> */}
                                         <span className="sm:flex flex-row items-center">
                                             <span className="w-20">
-                                                {pool.tokens[1].name}
+                                                {pool.tokens[1].symbol}
                                             </span>
                                             <span className="hidden sm:inline text-earn text-xs">
                                                 {fValue1}
@@ -252,7 +252,7 @@ const StakedPoolListItem = ({
                             <div>
                                 <div className="font-bold mb-8">
                                     <div className="text-2xl">
-                                        {pool.tokens[0].name}
+                                        {pool.tokens[0].symbol}
                                     </div>
                                     <div className="flex items-center">
                                         <div className="text-earn text-lg mr-3">
@@ -266,7 +266,7 @@ const StakedPoolListItem = ({
                                 </div>
                                 <div className="font-bold mb-9">
                                     <div className="text-2xl">
-                                        {pool.tokens[1].name}
+                                        {pool.tokens[1].symbol}
                                     </div>
                                     <div className="flex items-center">
                                         <div className="text-earn text-lg mr-3">
@@ -304,12 +304,12 @@ const StakedPoolListItem = ({
                                     <div className="flex items-center justify-end mb-14">
                                         <Avatar
                                             src={pool.tokens[0].icon}
-                                            alt={pool.tokens[0].name}
+                                            alt={pool.tokens[0].symbol}
                                             className="w-[3.25rem] h-[3.25rem] rounded-full"
                                         />
                                         <Avatar
                                             src={pool.tokens[1].icon}
-                                            alt={pool.tokens[1].name}
+                                            alt={pool.tokens[1].symbol}
                                             className="w-[3.25rem] h-[3.25rem] rounded-full ml-[-0.375rem]"
                                         />
                                     </div>
@@ -400,8 +400,8 @@ const StakedPoolListItem = ({
                             <div className="flex justify-between items-center h-9 space-x-4 px-4">
                                 <div className="text-2xs">LP Token</div>
                                 <div className="text-sm">
-                                    {fOwnLiquidity} {pool.tokens[0].name}-
-                                    {pool.tokens[1].name}
+                                    {fOwnLiquidity} {pool.tokens[0].symbol}-
+                                    {pool.tokens[1].symbol}
                                 </div>
                             </div>
                             <div className="flex justify-between items-center h-9 space-x-4 px-4">

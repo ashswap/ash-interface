@@ -1,6 +1,6 @@
 import {
     AccountInfoSliceNetworkType,
-    useGetNetworkConfig
+    useGetNetworkConfig,
 } from "@elrondnetwork/dapp-core";
 import ICChevronDown from "assets/svg/chevron-down.svg";
 import ICChevronUp from "assets/svg/chevron-up.svg";
@@ -45,7 +45,7 @@ function StakedPoolCardItem({
                 <div className="mr-5">
                     <div className="mt-5 mb-8">
                         <div className="text-2xl font-bold text-white">
-                            {pool.tokens[0].name}
+                            {pool.tokens[0].symbol}
                         </div>
                         <div className="text-earn font-bold text-lg leading-tight">
                             <TextAmt
@@ -58,7 +58,7 @@ function StakedPoolCardItem({
                     </div>
                     <div className="mb-8">
                         <div className="text-2xl font-bold text-white">
-                            {pool.tokens[1].name}
+                            {pool.tokens[1].symbol}
                         </div>
                         <div className="text-earn font-bold text-lg leading-tight">
                             <TextAmt
@@ -88,12 +88,12 @@ function StakedPoolCardItem({
                     <div className="absolute top-0 right-0 flex flex-row justify-between items-center">
                         <Avatar
                             src={pool.tokens[0].icon}
-                            alt={pool.tokens[0].name}
+                            alt={pool.tokens[0].symbol}
                             className="w-[3.25rem] h-[3.25rem]"
                         />
                         <Avatar
                             src={pool.tokens[1].icon}
-                            alt={pool.tokens[1].name}
+                            alt={pool.tokens[1].symbol}
                             className="w-[3.25rem] h-[3.25rem] -ml-2.5"
                         />
                     </div>
@@ -199,7 +199,7 @@ function StakedPoolCardItem({
                                         ownLiquidity || 0
                                     )}
                                 />{" "}
-                                {pool.tokens[0].name}-{pool.tokens[1].name}
+                                {pool.tokens[0].symbol}-{pool.tokens[1].symbol}
                             </div>
                         </div>
                         <div className="flex flex-row justify-between items-center h-12 px-4">

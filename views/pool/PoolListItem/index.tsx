@@ -37,12 +37,12 @@ function PoolListItem({
                             <div className="flex flex-row justify-between items-center mr-2 sm:mr-0">
                                 <Avatar
                                     src={pool.tokens[0].icon}
-                                    alt={pool.tokens[0].name}
+                                    alt={pool.tokens[0].symbol}
                                     className="h-4 w-4 sm:h-6 sm:w-6 lg:h-9 lg:w-9 rounded-full"
                                 />
                                 <Avatar
                                     src={pool.tokens[1].icon}
-                                    alt={pool.tokens[1].name}
+                                    alt={pool.tokens[1].symbol}
                                     className="h-4 w-4 sm:h-6 sm:w-6 lg:h-9 lg:w-9 rounded-full -ml-1 lg:ml-[-0.375rem]"
                                 />
                             </div>
@@ -50,11 +50,11 @@ function PoolListItem({
                                 &
                             </div>
                             <div className="sm:flex sm:flex-col font-bold text-xs lg:text-lg truncate">
-                                <span>{pool.tokens[0].name}</span>
+                                <span>{pool.tokens[0].symbol}</span>
                                 <span className="inline sm:hidden">
                                     &nbsp;&&nbsp;
                                 </span>
-                                <span>{pool.tokens[1].name}</span>
+                                <span>{pool.tokens[1].symbol}</span>
                             </div>
                         </div>
                         <div className="w-[18%] sm:w-2/12 text-xs sm:text-sm flex flex-row items-center text-yellow-600">
@@ -146,25 +146,25 @@ function PoolListItem({
                                 </div>
                                 <div className="flex items-baseline">
                                     <div className="text-2xl font-bold">
-                                        {pool.tokens[0].name}
+                                        {pool.tokens[0].symbol}
                                     </div>
                                     <div className="text-sm font-bold">
                                         &nbsp;&&nbsp;
                                     </div>
                                     <div className="text-2xl font-bold">
-                                        {pool.tokens[1].name}
+                                        {pool.tokens[1].symbol}
                                     </div>
                                 </div>
                             </div>
                             <div className="flex">
                                 <Avatar
                                     src={pool.tokens[0].icon}
-                                    alt={pool.tokens[0].name}
+                                    alt={pool.tokens[0].symbol}
                                     className="h-[3.25rem] w-[3.25rem] rounded-full"
                                 />
                                 <Avatar
                                     src={pool.tokens[1].icon}
-                                    alt={pool.tokens[1].name}
+                                    alt={pool.tokens[1].symbol}
                                     className="h-[3.25rem] w-[3.25rem] rounded-full -ml-2"
                                 />
                             </div>

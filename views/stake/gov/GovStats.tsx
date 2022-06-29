@@ -174,7 +174,8 @@ function GovStats() {
                                                     rewardLPToken.tokens[0].icon
                                                 }
                                                 alt={
-                                                    rewardLPToken.tokens[0].name
+                                                    rewardLPToken.tokens[0]
+                                                        .symbol
                                                 }
                                                 className="w-[1.125rem] h-[1.125rem]"
                                             />
@@ -183,7 +184,8 @@ function GovStats() {
                                                     rewardLPToken.tokens[1].icon
                                                 }
                                                 alt={
-                                                    rewardLPToken.tokens[1].name
+                                                    rewardLPToken.tokens[1]
+                                                        .symbol
                                                 }
                                                 className="w-[1.125rem] h-[1.125rem] -ml-1 mr-2"
                                             />
@@ -238,7 +240,7 @@ function GovStats() {
                                     </div> */}
                                     <Avatar
                                         src={ASH_TOKEN.icon}
-                                        alt={ASH_TOKEN.name}
+                                        alt={ASH_TOKEN.symbol}
                                         className="w-[1.125rem] h-[1.125rem] mr-2"
                                     />
                                     <div className="text-lg text-white font-bold">
@@ -422,7 +424,7 @@ function GovStats() {
                                 </div> */}
                                 <Avatar
                                     src={ASH_TOKEN.icon}
-                                    alt={ASH_TOKEN.name}
+                                    alt={ASH_TOKEN.symbol}
                                     className="w-[1.125rem] h-[1.125rem] mr-2"
                                 />
                                 <div className="text-white text-lg font-bold">
@@ -596,21 +598,21 @@ function GovStats() {
                                 <div className="flex items-center mb-9">
                                     <Avatar
                                         src={rewardLPToken.tokens[0].icon}
-                                        alt={rewardLPToken.tokens[0].name}
+                                        alt={rewardLPToken.tokens[0].symbol}
                                         className="w-8 h-8"
                                     />
                                     <Avatar
                                         src={rewardLPToken.tokens[1].icon}
-                                        alt={rewardLPToken.tokens[1].name}
+                                        alt={rewardLPToken.tokens[1].symbol}
                                         className="w-8 h-8 -ml-1 mr-2"
                                     />
                                 </div>
                                 <div className="text-center text-ash-gray-500 text-lg font-bold">
                                     <TextAmt number={rewardValue} />
                                     &nbsp; LP-
-                                    {rewardLPToken.tokens[0].name}
-                                    {rewardLPToken.tokens[1].name} has been sent
-                                    to your wallet
+                                    {rewardLPToken.tokens[0].symbol}
+                                    {rewardLPToken.tokens[1].symbol} has been
+                                    sent to your wallet
                                 </div>
                             </>
                         )}

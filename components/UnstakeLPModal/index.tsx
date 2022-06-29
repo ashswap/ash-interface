@@ -76,8 +76,8 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
     }, [stakedData, farmTokenSupply, ashPerBlock, unStakeAmt]);
 
     const lpName = useMemo(() => {
-        return `LP-${token0.name}${token1.name}`;
-    }, [token0.name, token1.name]);
+        return `LP-${token0.symbol}${token1.symbol}`;
+    }, [token0.symbol, token1.symbol]);
     const insufficientFarmToken = useMemo(() => {
         if (!stakedData?.totalStakedLP) return true;
         return unStakeAmt.gt(stakedData?.totalStakedLP);
@@ -143,12 +143,12 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
                                 <div className="flex mr-2">
                                     <Avatar
                                         src={token0.icon}
-                                        alt={token0.name}
+                                        alt={token0.symbol}
                                         className="w-4 h-4"
                                     />
                                     <Avatar
                                         src={token1.icon}
-                                        alt={token1.name}
+                                        alt={token1.symbol}
                                         className="w-4 h-4 -ml-1"
                                     />
                                 </div>

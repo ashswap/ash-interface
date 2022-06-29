@@ -68,7 +68,7 @@ export const poolToDisplayState = selector<PoolRecord[]>({
         if (deboundKeyword.trim()) {
             result = poolRecords.filter((p) =>
                 p.pool.tokens.some((t) =>
-                    t.name
+                    t.symbol
                         .toLowerCase()
                         .includes(deboundKeyword.trim().toLowerCase())
                 )

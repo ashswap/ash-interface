@@ -6,7 +6,7 @@ import {
     useGetLoginInfo,
     useGetNetworkConfig,
     useGetPendingTransactions,
-    useGetSignedTransactions
+    useGetSignedTransactions,
 } from "@elrondnetwork/dapp-core";
 import { SendTransactionReturnType } from "@elrondnetwork/dapp-core/dist/services/transactions";
 import {
@@ -15,14 +15,19 @@ import {
     ApiProvider,
     BigUIntValue,
     BytesValue,
-    ContractFunction, GasLimit,
+    ContractFunction,
+    GasLimit,
     ProxyProvider,
     Query,
     TokenIdentifierValue,
     Transaction,
-    TypedValue
+    TypedValue,
 } from "@elrondnetwork/erdjs/out";
-import { walletBalanceState, walletLPMapState, walletTokenPriceState } from "atoms/walletState";
+import {
+    walletBalanceState,
+    walletLPMapState,
+    walletTokenPriceState,
+} from "atoms/walletState";
 import BigNumber from "bignumber.js";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 import { blockTimeMs } from "const/dappConfig";
@@ -33,7 +38,7 @@ import { toEGLD, toEGLDD } from "helper/balance";
 import { fetcher } from "helper/common";
 import {
     sendTransactions,
-    useCreateTransaction
+    useCreateTransaction,
 } from "helper/transactionMethods";
 import useLPValue from "hooks/usePoolContract/useLPValue";
 import { DappSendTransactionsPropsType } from "interface/dappCore";
@@ -48,7 +53,7 @@ import {
     useContext,
     useEffect,
     useMemo,
-    useState
+    useState,
 } from "react";
 import { useRecoilValue } from "recoil";
 import useSWR from "swr";
@@ -291,7 +296,7 @@ const FarmsProvider = ({ children }: any) => {
                 const farmTokenSupply = await getFarmTokenSupply(
                     f.farm_address
                 );
-                const {lpValueUsd: totalLiquidityValue} = await getLPValue(
+                const { lpValueUsd: totalLiquidityValue } = await getLPValue(
                     farmTokenSupply,
                     p
                 );
@@ -585,7 +590,7 @@ const FarmsProvider = ({ children }: any) => {
                         successMessage: `Claim succeed ${toEGLDD(
                             ASH_TOKEN.decimals,
                             stakedData.totalRewardAmt
-                        )} ${ASH_TOKEN.name}`,
+                        )} ${ASH_TOKEN.symbol}`,
                     },
                 };
                 const result = await sendTransactions(payload);
@@ -623,7 +628,7 @@ const FarmsProvider = ({ children }: any) => {
                 successMessage: `Claim succeed ${toEGLDD(
                     ASH_TOKEN.decimals,
                     totalASH
-                )} ${ASH_TOKEN.name}`,
+                )} ${ASH_TOKEN.symbol}`,
             },
         };
         const result = await sendTransactions(payload);
@@ -675,7 +680,7 @@ const FarmsProvider = ({ children }: any) => {
         if (deboundKeyword.trim()) {
             result = farmRecords.filter((p) =>
                 p.pool.tokens.some((t) =>
-                    t.name
+                    t.symbol
                         .toLowerCase()
                         .includes(deboundKeyword.trim().toLowerCase())
                 )

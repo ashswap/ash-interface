@@ -2,7 +2,7 @@ import BigNumber from "bignumber.js";
 import Avatar from "components/Avatar";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 import pools from "const/pool";
-import { IN_POOL_TOKENS } from "const/tokens";
+import { IN_POOL_TOKENS } from "const/pool";
 import { randomHexColor } from "helper/color";
 import { fetcher } from "helper/common";
 import { IToken } from "interface/token";
@@ -10,7 +10,7 @@ import { useCallback, useMemo, useState } from "react";
 import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
 import useSWR from "swr";
 import TokensSelectorForChart, {
-    TokenOptionChart
+    TokenOptionChart,
 } from "../components/TokensSelectorForChart";
 
 type RawChartRecord = {
@@ -58,10 +58,10 @@ const TokenLegend = ({
             </div>
             <Avatar
                 src={token.icon}
-                alt={token.name}
+                alt={token.symbol}
                 className="w-3 h-3 mr-1 shrink-0"
             />
-            <div className="font-bold text-xs">{token.name}</div>
+            <div className="font-bold text-xs">{token.symbol}</div>
         </div>
     );
 };
@@ -183,7 +183,7 @@ function LiquidityByTokensChart() {
                                 key={p.address}
                                 pool={p}
                                 checked={selectedPools.has(p.address)}
-                                label={p.tokens.map((t) => t.name).join("-")}
+                                label={p.tokens.map((t) => t.symbol).join("-")}
                                 onChange={(val) => onSelectPool(val, p.address)}
                             />
                         );

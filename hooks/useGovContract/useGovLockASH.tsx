@@ -48,7 +48,7 @@ const useGovLockASH = () => {
                             successMessage: `Lock succeed ${toEGLD(
                                 ASH_TOKEN,
                                 weiAmt?.toString() || "0"
-                            )} ${ASH_TOKEN.name}, unlock on ${moment
+                            )} ${ASH_TOKEN.symbol}, unlock on ${moment
                                 .unix(unlockTimestamp.toNumber())
                                 .format("DD MMM, yyyy")}`,
                         },

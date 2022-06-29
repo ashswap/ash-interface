@@ -94,10 +94,10 @@ const HistoryModal = ({ open, onClose }: Props) => {
                             msg: `Swap Success ${toEGLD(
                                 tokenIn,
                                 token_amount_in
-                            ).decimalPlaces(7)} ${tokenIn.name} to ${toEGLD(
+                            ).decimalPlaces(7)} ${tokenIn.symbol} to ${toEGLD(
                                 tokenOut,
                                 token_amount_out
-                            ).decimalPlaces(7)} ${tokenOut.name}`,
+                            ).decimalPlaces(7)} ${tokenOut.symbol}`,
                             txHash: transaction_hash,
                             status: "success",
                         };
@@ -128,10 +128,10 @@ const HistoryModal = ({ open, onClose }: Props) => {
                             } Success ${toEGLD(
                                 token1,
                                 first_token_amount
-                            ).decimalPlaces(7)} ${token1?.name} and ${toEGLD(
+                            ).decimalPlaces(7)} ${token1?.symbol} and ${toEGLD(
                                 token2,
                                 second_token_amount
-                            ).decimalPlaces(7)} ${token2.name}`,
+                            ).decimalPlaces(7)} ${token2.symbol}`,
                             txHash: transaction_hash,
                             status: "success",
                         };

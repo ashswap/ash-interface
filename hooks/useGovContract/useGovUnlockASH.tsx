@@ -6,7 +6,7 @@ import { ASH_TOKEN } from "const/tokens";
 import { toEGLDD } from "helper/balance";
 import {
     sendTransactions,
-    useCreateTransaction
+    useCreateTransaction,
 } from "helper/transactionMethods";
 import { DappSendTransactionsPropsType } from "interface/dappCore";
 import moment from "moment";
@@ -38,7 +38,7 @@ const useGovUnlockASH = () => {
                             successMessage: `Unlock success ${toEGLDD(
                                 ASH_TOKEN.decimals,
                                 lockedAmt
-                            )} ${ASH_TOKEN.name}`,
+                            )} ${ASH_TOKEN.symbol}`,
                         },
                     };
                     return await sendTransactions(payload);

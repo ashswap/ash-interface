@@ -92,20 +92,20 @@ function FarmCard({ farmData, viewType }: props) {
                                 Stake LP
                             </div>
                             <div className="font-bold text-2xl text-white truncate">
-                                {token0.name}
+                                {token0.symbol}
                                 <span className="text-sm"> & </span>
-                                {token1.name}
+                                {token1.symbol}
                             </div>
                         </div>
                         <div className="flex">
                             <Avatar
                                 src={token0.icon}
-                                alt={token0.name}
+                                alt={token0.symbol}
                                 className="w-[3.25rem] h-[3.25rem]"
                             />
                             <Avatar
                                 src={token1.icon}
-                                alt={token1.name}
+                                alt={token1.symbol}
                                 className="w-[3.25rem] h-[3.25rem] -ml-2"
                             />
                         </div>
@@ -140,7 +140,7 @@ function FarmCard({ farmData, viewType }: props) {
                                 }
                             >
                                 <div className="inline-block text-xs text-ash-gray-500 font-bold underline mb-2">
-                                    {ASH_TOKEN.name} Farmed
+                                    {ASH_TOKEN.symbol} Farmed
                                 </div>
                             </CardTooltip>
                             <div
@@ -291,19 +291,19 @@ function FarmCard({ farmData, viewType }: props) {
                                 <div className="flex">
                                     <Avatar
                                         src={token0.icon}
-                                        alt={token0.name}
+                                        alt={token0.symbol}
                                         className="w-4 h-4 md:w-6 md:h-6 lg:w-9 lg:h-9"
                                     />
                                     <Avatar
                                         src={token1.icon}
-                                        alt={token1.name}
+                                        alt={token1.symbol}
                                         className="w-4 h-4 -ml-1 md:w-6 md:h-6 lg:w-9 lg:h-9 md:-ml-3 lg:-ml-4.5 md:mt-3 lg:mt-4.5"
                                     />
                                 </div>
                                 <div className="flex md:flex-col text-xs lg:text-lg font-bold md:space-y-2 leading-tight">
-                                    <div>{token0.name}</div>
+                                    <div>{token0.symbol}</div>
                                     <div className="md:hidden"> & </div>
-                                    <div>{token1.name}</div>
+                                    <div>{token1.symbol}</div>
                                 </div>
                             </div>
                             {/* emission APR */}

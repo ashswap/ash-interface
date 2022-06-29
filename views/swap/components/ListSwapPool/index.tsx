@@ -16,15 +16,15 @@ const Token = ({ token }: { token: IToken }) => {
         <div className="flex items-center space-x-4">
             <Avatar
                 src={token.icon}
-                alt={token.name}
+                alt={token.symbol}
                 className="w-7 h-7 shrink-0"
             />
             <div className="overflow-hidden">
                 <div className="text-sm font-bold text-white truncate">
-                    {token.name}
+                    {token.symbol}
                 </div>
                 <div className="text-2xs text-ash-gray-600 truncate">
-                    {token.name}
+                    {token.symbol}
                 </div>
             </div>
         </div>

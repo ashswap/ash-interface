@@ -1,25 +1,24 @@
-import ICClose from "assets/svg/close.svg";
 import ICChevronDown from "assets/svg/chevron-down.svg";
+import ICClose from "assets/svg/close.svg";
 import Search from "assets/svg/search.svg";
 import { walletBalanceState } from "atoms/walletState";
 import BigNumber from "bignumber.js";
+import Avatar from "components/Avatar";
 import BaseModal from "components/BaseModal";
 import Input from "components/Input";
-import ListSwapPool from "views/swap/components/ListSwapPool";
-import ListToken from "views/swap/components/ListToken";
-import Token from "components/Token";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
-import { IN_POOL_TOKENS_MAP } from "const/tokens";
+import { IN_POOL_TOKENS_MAP } from "const/pool";
 import { useOnboarding } from "hooks/useOnboarding";
 import { useScreenSize } from "hooks/useScreenSize";
 import IPool from "interface/pool";
 import { IToken } from "interface/token";
 import { TokenBalance } from "interface/tokenBalance";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
+import { useDebounce } from "use-debounce";
+import ListSwapPool from "views/swap/components/ListSwapPool";
+import ListToken from "views/swap/components/ListToken";
 import styles from "./TokenSelect.module.css";
-import Image from "next/image";
-import Avatar from "components/Avatar";
 
 interface Props {
     onChange?: (t: IToken) => void;
@@ -41,11 +40,8 @@ const TokenSelect = ({
     resetPivotToken,
 }: Props) => {
     const [open, setOpen] = useState<boolean>(false);
-    const [filtedTokenBalances, setFiltedTokenBalances] = useState<
-        TokenBalance[]
-    >([]);
-    const [filtedValidPools, setFiltedValidPools] = useState<IPool[]>([]);
     const [keyword, setKeyword] = useState<string>("");
+    const [debounceKeyword] = useDebounce(keyword, 100);
     const tokens = IN_POOL_TOKENS_MAP;
     const balances = useRecoilValue(walletBalanceState);
     const screenSize = useScreenSize();
@@ -77,29 +73,6 @@ const TokenSelect = ({
         return tokenBalances;
     }, [tokens, balances]);
 
-    const onChangeKeyword = useCallback(
-        (keyword: string) => {
-            setKeyword(keyword);
-            setFiltedTokenBalances(
-                tokenBalances.filter((t) =>
-                    t.token.name.toLowerCase().includes(keyword.toLowerCase())
-                )
-            );
-
-            if (validPools && pivotToken) {
-                setFiltedValidPools(
-                    validPools?.filter((p) =>
-                        p.tokens
-                            .filter((t) => t.id !== pivotToken?.id)[0]
-                            .name.toLowerCase()
-                            .includes(keyword.toLowerCase())
-                    )
-                );
-            }
-        },
-        [tokenBalances, validPools, pivotToken]
-    );
-
     const onSelectToken = (t: IToken) => {
         setOpen(false);
 
@@ -108,15 +81,23 @@ const TokenSelect = ({
         }
     };
 
-    useEffect(() => {
-        setFiltedTokenBalances(tokenBalances);
-    }, [tokenBalances]);
+    const filteredTokenBalances = useMemo(() => {
+        return tokenBalances.filter((t) =>
+            t.token.symbol.toLowerCase().includes(debounceKeyword.toLowerCase())
+        );
+    }, [tokenBalances, debounceKeyword]);
 
-    useEffect(() => {
-        if (validPools) {
-            setFiltedValidPools(validPools);
+    const filteredPools = useMemo(() => {
+        if (validPools && pivotToken) {
+            return validPools.filter((p) =>
+                    p.tokens
+                        .filter((t) => t.id !== pivotToken?.id)[0]
+                        .symbol.toLowerCase()
+                        .includes(debounceKeyword.toLowerCase())
+                )
         }
-    }, [validPools]);
+        return [];
+    }, [validPools, pivotToken, debounceKeyword]);
 
     useEffect(() => {
         if (value) setOnboardedSearchToken(true);
@@ -137,11 +118,11 @@ const TokenSelect = ({
                     <div className="flex items-center">
                         <Avatar
                             src={pivotToken.icon}
-                            alt={pivotToken.name}
+                            alt={pivotToken.symbol}
                             className="w-3.5 h-3.5"
                         />
                         <div className="text-sm text-white ml-1 mt-0.5">
-                            {pivotToken.name}
+                            {pivotToken.symbol}
                         </div>
                     </div>
                     <ICClose
@@ -190,11 +171,11 @@ const TokenSelect = ({
                         <div className="flex items-center">
                             <Avatar
                                 src={value.icon}
-                                alt={value.name}
+                                alt={value.symbol}
                                 className="w-4 h-4"
                             />
                             <div className="mt-0.5 ml-2 text-xs sm:text-sm font-bold">
-                                {value.name}
+                                {value.symbol}
                             </div>
                         </div>
                     ) : (
@@ -277,7 +258,7 @@ const TokenSelect = ({
                                         autoFocus
                                         value={keyword}
                                         onChange={(e) => {
-                                            onChangeKeyword(e.target.value);
+                                            setKeyword(e.target.value);
                                             if (type === "from") {
                                                 setOnboardedSearchToken(true);
                                             } else {
@@ -295,7 +276,7 @@ const TokenSelect = ({
                         </div>
                     </OnboardTooltip>
 
-                    {validPools && filtedValidPools.length === 0 && (
+                    {validPools && filteredPools.length === 0 && (
                         <>
                             <div className="text-insufficent-fund text-base mb-14 mt-4">
                                 That doesn&apos;t look like a supported swap!
@@ -314,7 +295,7 @@ const TokenSelect = ({
                                 type === "to" &&
                                 screenSize.lg &&
                                 validPools &&
-                                filtedValidPools.length === 0 &&
+                                filteredPools.length === 0 &&
                                 onboardingAvailablePair
                             }
                             placement="right"
@@ -341,9 +322,9 @@ const TokenSelect = ({
                             <div>
                                 <ListSwapPool
                                     items={
-                                        filtedValidPools.length === 0
+                                        filteredPools.length === 0
                                             ? validPools
-                                            : filtedValidPools
+                                            : filteredPools
                                     }
                                     pivotToken={pivotToken!}
                                     isPivotFirst={type === "to"}
@@ -361,7 +342,7 @@ const TokenSelect = ({
                     ) : (
                         <ListToken
                             className=""
-                            items={filtedTokenBalances}
+                            items={filteredTokenBalances}
                             onSelect={(t) => onSelectToken(t.token)}
                         />
                     )}

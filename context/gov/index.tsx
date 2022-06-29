@@ -2,7 +2,7 @@ import {
     getApiProvider,
     getProxyProvider,
     useGetAccountInfo,
-    useGetLoginInfo
+    useGetLoginInfo,
 } from "@elrondnetwork/dapp-core";
 import { SendTransactionReturnType } from "@elrondnetwork/dapp-core/dist/services/transactions";
 import {
@@ -16,7 +16,7 @@ import {
     Query,
     TokenIdentifierValue,
     Transaction,
-    U64Value
+    U64Value,
 } from "@elrondnetwork/erdjs";
 import BigNumber from "bignumber.js";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
@@ -28,7 +28,7 @@ import { toEGLD, toEGLDD, toWei } from "helper/balance";
 import { queryContractParser } from "helper/serializer";
 import {
     sendTransactions,
-    useCreateTransaction
+    useCreateTransaction,
 } from "helper/transactionMethods";
 import useLPValue from "hooks/usePoolContract/useLPValue";
 import { DappSendTransactionsPropsType } from "interface/dappCore";
@@ -39,7 +39,7 @@ import {
     useCallback,
     useContext,
     useEffect,
-    useState
+    useState,
 } from "react";
 const estimateVeASH = (weiAmt: BigNumber, lockSeconds: number) => {
     if (ENVIRONMENT.NETWORK === "devnet") {
@@ -161,7 +161,7 @@ const StakeGovProvider = ({ children }: any) => {
                         successMessage: `Lock succeed ${toEGLD(
                             ASH_TOKEN,
                             weiAmt?.toString() || "0"
-                        )} ${ASH_TOKEN.name}, unlock on ${moment
+                        )} ${ASH_TOKEN.symbol}, unlock on ${moment
                             .unix(unlockTimestamp.toNumber())
                             .format("DD MMM, yyyy")}`,
                     },
@@ -321,7 +321,7 @@ const StakeGovProvider = ({ children }: any) => {
                     successMessage: `Lock succeed ${toEGLD(
                         ASH_TOKEN,
                         weiAmt?.toString() || "0"
-                    )} ${ASH_TOKEN.name}, unlock on ${moment
+                    )} ${ASH_TOKEN.symbol}, unlock on ${moment
                         .unix(
                             unlockTimestamp?.toNumber() || unlockTS?.toNumber()
                         )
@@ -400,7 +400,7 @@ const StakeGovProvider = ({ children }: any) => {
                     successMessage: `Unlock success ${toEGLDD(
                         ASH_TOKEN.decimals,
                         lockedAmt
-                    )} ${ASH_TOKEN.name}`,
+                    )} ${ASH_TOKEN.symbol}`,
                 },
             };
             return await sendTransactions(payload);
@@ -415,7 +415,10 @@ const StakeGovProvider = ({ children }: any) => {
             setRewardValue(new BigNumber(0));
             return;
         }
-        const {lpValueUsd: value} = await getLPValue(rewardLPAmt, rewardLPToken);
+        const { lpValueUsd: value } = await getLPValue(
+            rewardLPAmt,
+            rewardLPToken
+        );
         setRewardValue(value || new BigNumber(0));
     }, [rewardLPAmt, rewardLPToken, getLPValue]);
 

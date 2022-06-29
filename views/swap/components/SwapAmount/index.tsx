@@ -255,7 +255,7 @@ const SwapAmount = (props: Props) => {
                             {formatAmount(balance.toNumber(), {
                                 notation: "standard",
                             })}{" "}
-                            {token.name}
+                            {token.symbol}
                         </span>
                     </div>
                     <div className="font-medium text-white">

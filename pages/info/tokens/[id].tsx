@@ -1,6 +1,6 @@
 import {
     AccountInfoSliceNetworkType,
-    useGetNetworkConfig
+    useGetNetworkConfig,
 } from "@elrondnetwork/dapp-core";
 import { Tooltip } from "antd";
 import ICArrowRight from "assets/svg/arrow-right.svg";
@@ -10,7 +10,7 @@ import ICSwap from "assets/svg/swap.svg";
 import Avatar from "components/Avatar";
 import InfoLayout from "components/Layout/Info";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
-import { IN_POOL_TOKENS } from "const/tokens";
+import { IN_POOL_TOKENS } from "const/pool";
 import { fetcher } from "helper/common";
 import { formatAmount } from "helper/number";
 import { PoolStatsRecord } from "interface/poolStats";
@@ -82,24 +82,26 @@ const TokenDetailPage: Page<props> = ({ token }: props) => {
                     </li>
                     <li>
                         <ICArrowRight className="inline mr-1 text-ash-gray-500" />
-                        <span className="text-ash-gray-500">{token?.name}</span>
+                        <span className="text-ash-gray-500">
+                            {token?.symbol}
+                        </span>
                     </li>
                 </ul>
                 <div className="flex flex-col space-y-5 lg:space-y-0 lg:flex-row items-start lg:items-center mb-[2.375rem]">
                     <div className="flex items-center">
                         <h1 className="text-2xl lg:text-4xl font-bold text-white mr-4">
-                            {token.name}
+                            {token.symbol}
                         </h1>
                         <Avatar
                             src={token.icon}
-                            alt={token.name}
+                            alt={token.symbol}
                             className="w-6 h-6 lg:w-8 lg:h-8 mr-5"
                         />
                     </div>
                     <div className="flex items-center flex-row-reverse lg:flex-row">
                         <div className="bg-ash-dark-600 h-10 flex items-center px-4 mr-2">
                             <div className="mr-3 text-xs md:text-sm">
-                                {token.name} Coin
+                                {token.symbol} Coin
                             </div>
                             <div className="text-ash-gray-500 text-2xs md:text-xs">
                                 {token.id}

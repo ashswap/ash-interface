@@ -1,7 +1,7 @@
 import {
     transactionServices,
     useGetAccountInfo,
-    useGetLoginInfo
+    useGetLoginInfo,
 } from "@elrondnetwork/dapp-core";
 import {
     Address,
@@ -9,7 +9,7 @@ import {
     ContractFunction,
     GasLimit,
     TokenIdentifierValue,
-    Transaction
+    Transaction,
 } from "@elrondnetwork/erdjs";
 import Fire from "assets/images/fire.png";
 import ICArrowDownRounded from "assets/svg/arrow-down-rounded.svg";
@@ -38,7 +38,7 @@ import { queryPoolContract } from "helper/contracts/pool";
 import { formatAmount } from "helper/number";
 import {
     sendTransactions,
-    useCreateTransaction
+    useCreateTransaction,
 } from "helper/transactionMethods";
 import { useConnectWallet } from "hooks/useConnectWallet";
 import useMounted from "hooks/useMounted";
@@ -93,19 +93,19 @@ const MaiarPoolTooltip = ({
                                         <div className="font-bold text-sm leading-tight">
                                             <Avatar
                                                 src={pool.tokens[0].icon}
-                                                alt={pool.tokens[0].name}
+                                                alt={pool.tokens[0].symbol}
                                                 className="w-4 h-4"
                                             />
                                             &nbsp;
-                                            {pool.tokens[0].name}
+                                            {pool.tokens[0].symbol}
                                             <span> - </span>
                                             <Avatar
                                                 src={pool.tokens[1].icon}
-                                                alt={pool.tokens[1].name}
+                                                alt={pool.tokens[1].symbol}
                                                 className="w-4 h-4"
                                             />
                                             &nbsp;
-                                            {pool.tokens[1].name}
+                                            {pool.tokens[1].symbol}
                                             <span>
                                                 {" "}
                                                 only available in Battle of
@@ -318,10 +318,10 @@ const Swap = () => {
                     successMessage: `Swap succeed ${formatAmount(
                         toEGLDD(tokenFrom.decimals, rawValueFrom).toNumber(),
                         { notation: "standard" }
-                    )} ${tokenFrom.name} to ${formatAmount(
+                    )} ${tokenFrom.symbol} to ${formatAmount(
                         toEGLDD(tokenTo.decimals, rawValueTo).toNumber(),
                         { notation: "standard" }
-                    )} ${tokenTo.name}`,
+                    )} ${tokenTo.symbol}`,
                 },
             };
             const { error, sessionId } = await sendTransactions(payload);
@@ -561,7 +561,7 @@ const Swap = () => {
                                             </div>
                                         </div>
                                         <div>
-                                            1 {tokenFrom?.name} ={" "}
+                                            1 {tokenFrom?.symbol} ={" "}
                                             {pool && rates && (
                                                 <TextAmt
                                                     number={
@@ -583,7 +583,7 @@ const Swap = () => {
                                                     }}
                                                 />
                                             )}{" "}
-                                            {tokenTo?.name}
+                                            {tokenTo?.symbol}
                                         </div>
                                     </div>
                                 </OnboardTooltip>
@@ -657,7 +657,7 @@ const Swap = () => {
                                                     }}
                                                     decimalClassName="text-stake-gray-500"
                                                 />
-                                                &nbsp;{tokenTo?.name}
+                                                &nbsp;{tokenTo?.symbol}
                                             </div>
                                         </div>
                                         <div className="bg-black flex flex-row items-center justify-between h-10 pl-5 pr-6">
@@ -736,7 +736,7 @@ const Swap = () => {
                                                     ) : (
                                                         "0.00"
                                                     )}{" "}
-                                                    {tokenFrom?.name}
+                                                    {tokenFrom?.symbol}
                                                 </div>
                                             ) : (
                                                 <div
@@ -761,7 +761,7 @@ const Swap = () => {
                                                     ) : (
                                                         "0.00"
                                                     )}{" "}
-                                                    {tokenTo?.name}
+                                                    {tokenTo?.symbol}
                                                 </div>
                                             )}
                                         </div>
@@ -794,7 +794,7 @@ const Swap = () => {
                                                     <span className="text-insufficent-fund">
                                                         {account.balance === "0"
                                                             ? "EGLD"
-                                                            : tokenFrom?.name}
+                                                            : tokenFrom?.symbol}
                                                     </span>{" "}
                                                     BALANCE
                                                 </span>

@@ -16,7 +16,7 @@ import {
     useContext,
     useEffect,
     useMemo,
-    useState
+    useState,
 } from "react";
 import { useRecoilValue } from "recoil";
 import useSWR from "swr";
@@ -108,7 +108,7 @@ const PoolsProvider = ({ children }: any) => {
             };
             const ownLP = balances[p.lpToken.id]?.balance || new BigNumber(0);
             if (ownLP.gt(0)) {
-                const {amt0, amt1, lpValueUsd} = await getLPValue(ownLP, p);
+                const { amt0, amt1, lpValueUsd } = await getLPValue(ownLP, p);
                 record.liquidityData = {
                     ownLiquidity: ownLP,
                     capacityPercent: getPortion(p.lpToken.id, ownLP),
@@ -131,7 +131,7 @@ const PoolsProvider = ({ children }: any) => {
         if (deboundKeyword.trim()) {
             result = poolRecords.filter((p) =>
                 p.pool.tokens.some((t) =>
-                    t.name
+                    t.symbol
                         .toLowerCase()
                         .includes(deboundKeyword.trim().toLowerCase())
                 )

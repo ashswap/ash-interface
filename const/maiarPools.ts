@@ -1,9 +1,7 @@
-import IconAsh from "assets/images/ash-icon.png";
-import IconUSDC from "assets/images/usdc-icon.png";
-import IconUSDT from "assets/images/usdt-icon.png";
-import IconWBTC from "assets/images/wbtc-icon.png";
 import IPool from "interface/pool";
+import { CHAIN_ID } from "./dappConfig";
 import { ENVIRONMENT } from "./env";
+import { TOKENS_MAP } from "./tokens";
 
 export const devnet: IPool[] = [
     {
@@ -11,24 +9,13 @@ export const devnet: IPool[] = [
             "erd1qqqqqqqqqqqqqpgq9efzwnujjm6f75pccujr2jp4j5csym0vrmcqg9r3ff",
         lpToken: {
             id: "LPT-8d3117",
-            icon: "#fff",
-            name: "LPT-8d3117",
+            chainId: CHAIN_ID.DEVNET,
+            symbol: "LPT-ASH-USDT",
+            name: "Maiar LP",
             decimals: 18,
+            icon: "#fff",
         },
-        tokens: [
-            {
-                id: "ASH-4ce444",
-                icon: IconAsh,
-                name: "ASH",
-                decimals: 18,
-            },
-            {
-                id: "USDT-a55fa7",
-                icon: IconUSDT,
-                name: "USDT",
-                decimals: 6,
-            },
-        ],
+        tokens: [TOKENS_MAP["ASH-4ce444"], TOKENS_MAP["USDT-a55fa7"]],
         isMaiarPool: true,
     },
     {
@@ -36,25 +23,14 @@ export const devnet: IPool[] = [
             "erd1qqqqqqqqqqqqqpgqkec4u8tkq4tztu30vvk889dnnddex5k8rmcqqnw6a4",
         lpToken: {
             id: "LPT-a31851",
-            icon: "#fff",
-            name: "LPT-a31851",
+            chainId: CHAIN_ID.DEVNET,
+            symbol: "LPT-wBTC-USDC",
+            name: "Maiar LP",
             decimals: 18,
+            icon: "#fff",
         },
-        tokens: [
-            {
-                id: "WBTC-9bdb9b",
-                icon: IconWBTC,
-                name: "wBTC",
-                decimals: 8,
-            },
-            {
-                id: "USDC-d5181d",
-                icon: IconUSDC,
-                name: "USDC",
-                decimals: 6,
-            },
-        ],
-        isMaiarPool: true
+        tokens: [TOKENS_MAP["WBTC-9bdb9b"], TOKENS_MAP["USDC-d5181d"]],
+        isMaiarPool: true,
     },
 ];
 
@@ -64,24 +40,13 @@ export const testnet: IPool[] = [
             "erd1qqqqqqqqqqqqqpgqwsmx0d2x20v855ljrh55swg9q4tr06y5j9ts38pupx",
         lpToken: {
             id: "LPT-d8005f",
-            icon: "#fff",
-            name: "LPT-d8005f",
+            chainId: CHAIN_ID.TESTNET,
+            symbol: "LPT-ASH-USDT",
+            name: "Maiar LP",
             decimals: 18,
+            icon: "#fff",
         },
-        tokens: [
-            {
-                id: "ASH-f01858",
-                icon: IconAsh,
-                name: "ASH",
-                decimals: 18,
-            },
-            {
-                id: "USDT-8d1668",
-                icon: IconUSDT,
-                name: "USDT",
-                decimals: 6,
-            },
-        ],
+        tokens: [TOKENS_MAP["ASH-f01858"], TOKENS_MAP["USDT-8d1668"]],
         isMaiarPool: true,
     },
     {
@@ -89,25 +54,14 @@ export const testnet: IPool[] = [
             "erd1qqqqqqqqqqqqqpgqvv2p4u35v5yayn0s6ksf8ug97uf64dduj9tskx0eve",
         lpToken: {
             id: "LPT-8b0f7b",
-            icon: "#fff",
-            name: "LPT-8b0f7b",
+            chainId: CHAIN_ID.TESTNET,
+            symbol: "LPT-wBTC-USDC",
+            name: "Maiar LP",
             decimals: 18,
+            icon: "#fff",
         },
-        tokens: [
-            {
-                id: "WBTC-ebec12",
-                icon: IconWBTC,
-                name: "wBTC",
-                decimals: 8,
-            },
-            {
-                id: "USDC-cbf0b9",
-                icon: IconUSDC,
-                name: "USDC",
-                decimals: 6,
-            },
-        ],
-        isMaiarPool: true
+        tokens: [TOKENS_MAP["WBTC-ebec12"], TOKENS_MAP["USDC-cbf0b9"]],
+        isMaiarPool: true,
     },
 ];
 

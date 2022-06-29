@@ -4,9 +4,11 @@ import {
     ArgSerializer,
     BigUIntValue,
     ContractFunction,
-    EndpointParameterDefinition, ProxyProvider,
-    Query, TypeExpressionParser,
-    TypeMapper
+    EndpointParameterDefinition,
+    ProxyProvider,
+    Query,
+    TypeExpressionParser,
+    TypeMapper,
 } from "@elrondnetwork/erdjs";
 import { Slider } from "antd";
 import IconRight from "assets/svg/right-yellow.svg";
@@ -23,9 +25,7 @@ import Token from "components/Token";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
 import { useSwap } from "context/swap";
 import { toEGLD, toEGLDD, toWei } from "helper/balance";
-import {
-    useCreateTransaction
-} from "helper/transactionMethods";
+import { useCreateTransaction } from "helper/transactionMethods";
 import { useFetchBalances } from "hooks/useFetchBalances";
 import { useOnboarding } from "hooks/useOnboarding";
 import usePoolRemoveLP from "hooks/usePoolContract/usePoolRemoveLP";
@@ -227,12 +227,20 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
             <div className="flex flex-row items-center mb-3">
                 <div className="mr-3">
                     <div className="text-text-input-3 text-xs">
-                        {pool.tokens[0].name} & {pool.tokens[1].name}
+                        {pool.tokens[0].symbol} & {pool.tokens[1].symbol}
                     </div>
                 </div>
                 <div className="flex flex-row justify-between items-center">
-                    <Avatar src={pool.tokens[0].icon} alt={pool.tokens[0].name} className="w-3.5 h-3.5" />
-                    <Avatar src={pool.tokens[1].icon} alt={pool.tokens[1].name} className="w-3.5 h-3.5 -ml-1" />
+                    <Avatar
+                        src={pool.tokens[0].icon}
+                        alt={pool.tokens[0].symbol}
+                        className="w-3.5 h-3.5"
+                    />
+                    <Avatar
+                        src={pool.tokens[1].icon}
+                        alt={pool.tokens[1].symbol}
+                        className="w-3.5 h-3.5 -ml-1"
+                    />
                 </div>
             </div>
             <div className="flex items-baseline text-2xl font-bold text-yellow-700">
@@ -352,7 +360,7 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
                                         )}
                                         options={{ notation: "standard" }}
                                     />{" "}
-                                    {pool.tokens[0].name}
+                                    {pool.tokens[0].symbol}
                                 </span>
                             </div>
                         </div>
@@ -380,7 +388,7 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
                                         )}
                                         options={{ notation: "standard" }}
                                     />{" "}
-                                    {pool.tokens[1].name}
+                                    {pool.tokens[1].symbol}
                                 </span>
                             </div>
                         </div>

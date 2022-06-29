@@ -46,7 +46,7 @@ const usePoolAddLP = () => {
                     msg = `Add liquidity success ${formatAmount(
                         toEGLDD(pool.tokens[1].decimals, v1).toNumber(),
                         { notation: "standard" }
-                    )} ${pool.tokens[1].name}`;
+                    )} ${pool.tokens[1].symbol}`;
                 } else if (v1.eq(0)) {
                     tx = await createTx(new Address(pool.address), {
                         func: new ContractFunction("ESDTTransfer"),
@@ -67,7 +67,7 @@ const usePoolAddLP = () => {
                     msg = `Add liquidity success ${formatAmount(
                         toEGLDD(pool.tokens[0].decimals, v0).toNumber(),
                         { notation: "standard" }
-                    )} ${pool.tokens[0].name}`;
+                    )} ${pool.tokens[0].symbol}`;
                 } else {
                     tx = await createTx(new Address(address), {
                         func: new ContractFunction("MultiESDTNFTTransfer"),
@@ -99,10 +99,10 @@ const usePoolAddLP = () => {
                     msg = `Add liquidity Success ${formatAmount(
                         toEGLDD(pool.tokens[0].decimals, v0).toNumber(),
                         { notation: "standard" }
-                    )} ${pool.tokens[0].name} and ${formatAmount(
+                    )} ${pool.tokens[0].symbol} and ${formatAmount(
                         toEGLDD(pool.tokens[1].decimals, v1).toNumber(),
                         { notation: "standard" }
-                    )} ${pool.tokens[1].name}`;
+                    )} ${pool.tokens[1].symbol}`;
                 }
 
                 const payload: DappSendTransactionsPropsType = {

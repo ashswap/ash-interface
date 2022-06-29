@@ -34,10 +34,10 @@ const QuickSelect = (props: Props) => {
                         >
                             <Avatar
                                 src={t.icon}
-                                alt={t.name}
+                                alt={t.symbol}
                                 className="w-4 h-4"
                             />
-                            <div>{t.name}</div>
+                            <div>{t.symbol}</div>
                         </div>
                     ))}
                 </div>
