@@ -5,6 +5,7 @@ import ICPlus from "assets/svg/plus.svg";
 import { farmLoadingMapState, FarmsState } from "atoms/farmsState";
 import BigNumber from "bignumber.js";
 import BaseModal from "components/BaseModal";
+import GlowingButton from "components/GlowingButton";
 import StakeLPModal from "components/StakeLPModal";
 import TextAmt from "components/TextAmt";
 import CardTooltip from "components/Tooltip/CardTooltip";
@@ -166,12 +167,9 @@ function FarmCard({ farmData, viewType }: props) {
                                 />
                             </div>
                         </div>
-                        <button
-                            className={`clip-corner-1 clip-corner-br w-[7.25rem] h-14 text-center flex items-center justify-center text-sm font-bold ${
-                                stakedData?.totalRewardAmt.gt(0)
-                                    ? "bg-ash-cyan-500 text-ash-dark-400"
-                                    : "bg-ash-dark-400/30 cursor-not-allowed"
-                            }`}
+                        <GlowingButton
+                            theme="cyan"
+                            className={`clip-corner-1 clip-corner-br w-[7.25rem] h-14 text-sm font-bold`}
                             disabled={!stakedData?.totalRewardAmt.gt(0)}
                             onClick={() =>
                                 stakedData?.totalRewardAmt.gt(0) &&
@@ -181,7 +179,7 @@ function FarmCard({ farmData, viewType }: props) {
                             }
                         >
                             Harvest
-                        </button>
+                        </GlowingButton>
                     </div>
                     <div className="flex items-center justify-between mb-11">
                         <div>
@@ -217,25 +215,26 @@ function FarmCard({ farmData, viewType }: props) {
                             {stakedData ? (
                                 <div className="flex space-x-2 h-14 items-center">
                                     <button
-                                        className="w-[3.375rem] h-[3.375rem] clip-corner-1 clip-corner-br bg-ash-dark-400 flex items-center justify-center"
+                                        className="w-[3.375rem] h-[3.375rem] clip-corner-1 clip-corner-br bg-ash-dark-400 hover:bg-ash-dark-300 active:bg-ash-dark-600 transition-all flex items-center justify-center"
                                         onClick={() => setOpenUnstakeLP(true)}
                                     >
                                         <ICMinus className="w-3 h-auto text-yellow-600" />
                                     </button>
                                     <button
-                                        className="w-[3.375rem] h-[3.375rem] clip-corner-1 clip-corner-bl bg-ash-dark-400 flex items-center justify-center"
+                                        className="w-[3.375rem] h-[3.375rem] clip-corner-1 clip-corner-bl bg-ash-dark-400 hover:bg-ash-dark-300 active:bg-ash-dark-600 transition-all flex items-center justify-center"
                                         onClick={() => setOpenStakeLP(true)}
                                     >
                                         <ICPlus className="w-3 h-auto text-ash-cyan-500" />
                                     </button>
                                 </div>
                             ) : (
-                                <button
-                                    className={`clip-corner-1 clip-corner-br w-[7.25rem] h-14 text-center flex items-center justify-center text-sm font-bold bg-ash-cyan-500 text-ash-dark-400 underline`}
+                                <GlowingButton
+                                    theme="cyan"
+                                    className={`clip-corner-1 clip-corner-br w-[7.25rem] h-14 text-sm font-bold underline`}
                                     onClick={() => setOpenStakeLP(true)}
                                 >
                                     Stake LP
-                                </button>
+                                </GlowingButton>
                             )}
                         </div>
                     </div>
@@ -350,12 +349,9 @@ function FarmCard({ farmData, viewType }: props) {
                             </div>
                         </div>
                         <div className="hidden sm:flex items-center space-x-2">
-                            <button
-                                className={`clip-corner-1 clip-corner-br h-10 lg:h-12 w-[5.5rem] lg:w-[6.5rem] flex items-center justify-center text-center font-bold text-xs ${
-                                    stakedData?.totalRewardAmt.gt(0)
-                                        ? "text-ash-cyan-500 bg-ash-dark-400"
-                                        : "text-ash-gray-600 bg-ash-dark-400/30 cursor-not-allowed"
-                                }`}
+                            <GlowingButton
+                                theme="cyan"
+                                className={`clip-corner-1 clip-corner-br h-10 lg:h-12 w-[5.5rem] lg:w-[6.5rem] font-bold text-xs`}
                                 disabled={!stakedData?.totalRewardAmt.gt(0)}
                                 onClick={() =>
                                     stakedData?.totalRewardAmt.gt(0) &&
@@ -363,29 +359,30 @@ function FarmCard({ farmData, viewType }: props) {
                                 }
                             >
                                 Harvest
-                            </button>
+                            </GlowingButton>
                             {stakedData ? (
                                 <div className="flex space-x-2 py-0.5">
                                     <button
-                                        className="w-10 lg:w-12 h-10 lg:h-12 clip-corner-1 clip-corner-br bg-ash-dark-400 flex items-center justify-center"
+                                        className="w-10 lg:w-12 h-10 lg:h-12 clip-corner-1 clip-corner-br bg-ash-dark-400 hover:bg-ash-dark-300 active:bg-ash-dark-600 transition-all flex items-center justify-center"
                                         onClick={() => setOpenUnstakeLP(true)}
                                     >
                                         <ICMinus className="w-3 h-auto text-yellow-600" />
                                     </button>
                                     <button
-                                        className="w-10 lg:w-12 h-10 lg:h-12 clip-corner-1 clip-corner-bl bg-ash-dark-400 flex items-center justify-center"
+                                        className="w-10 lg:w-12 h-10 lg:h-12 clip-corner-1 clip-corner-bl bg-ash-dark-400 hover:bg-ash-dark-300 active:bg-ash-dark-600 transition-all flex items-center justify-center"
                                         onClick={() => setOpenStakeLP(true)}
                                     >
                                         <ICPlus className="w-3 h-auto text-ash-cyan-500" />
                                     </button>
                                 </div>
                             ) : (
-                                <button
-                                    className={`clip-corner-1 clip-corner-br h-10 lg:h-12 w-[5.5rem] lg:w-[6.5rem] flex items-center justify-center text-center font-bold underline bg-ash-cyan-500 text-ash-dark-400 text-xs`}
+                                <GlowingButton
+                                theme="cyan"
+                                    className={`clip-corner-1 clip-corner-br h-10 lg:h-12 w-[5.5rem] lg:w-[6.5rem] font-bold underline text-xs`}
                                     onClick={() => setOpenStakeLP(true)}
                                 >
                                     Stake LP
-                                </button>
+                                </GlowingButton>
                             )}
                         </div>
                     </div>

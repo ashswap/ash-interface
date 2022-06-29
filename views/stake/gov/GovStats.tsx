@@ -18,6 +18,7 @@ import {
 } from "atoms/govState";
 import { walletTokenPriceState } from "atoms/walletState";
 import BaseModal from "components/BaseModal";
+import GlowingButton from "components/GlowingButton";
 import GOVStakeModal from "components/GOVStakeModal";
 import TextAmt from "components/TextAmt";
 import CardTooltip from "components/Tooltip/CardTooltip";
@@ -35,7 +36,7 @@ import { useScreenSize } from "hooks/useScreenSize";
 import moment from "moment";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
 import useSWR from "swr";
 const ExpiredLockTooltip = ({
@@ -125,18 +126,16 @@ function GovStats() {
                         </button> */}
                     {loggedIn && (
                         <ExpiredLockTooltip disabled={!canUnlockASH}>
-                            <button
-                                className={`h-12 px-6 flex items-center justify-center ${
-                                    canUnlockASH
-                                        ? "bg-ash-dark-400 text-stake-gray-500 cursor-not-allowed"
-                                        : "bg-pink-600 text-white"
-                                }`}
+                            <GlowingButton
+                                theme="pink"
+                                className={`h-12 px-6`}
+                                disabled={canUnlockASH}
                                 onClick={() =>
                                     !canUnlockASH && setOpenStakeGov(true)
                                 }
                             >
                                 Add / Manage Stake
-                            </button>
+                            </GlowingButton>
                         </ExpiredLockTooltip>
                     )}
                 </div>
@@ -202,12 +201,9 @@ function GovStats() {
                                     </div>
                                 </div>
                             </div>
-                            <button
-                                className={`text-sm font-bold w-full h-[3.375rem] flex items-center justify-center ${
-                                    canClaim
-                                        ? "bg-ash-cyan-500 text-ash-dark-400"
-                                        : "bg-ash-dark-400 text-white cursor-not-allowed"
-                                }`}
+                            <GlowingButton
+                                theme="cyan"
+                                className={`text-sm font-bold w-full h-[3.375rem]`}
                                 disabled={!canClaim}
                                 onClick={() =>
                                     canClaim &&
@@ -218,7 +214,7 @@ function GovStats() {
                                 }
                             >
                                 Harvest
-                            </button>
+                            </GlowingButton>
                         </div>
                         <div className="bg-ash-dark-400/30 px-[1.25rem] pt-7 pb-5">
                             <div className="px-5 mb-7">
@@ -259,13 +255,14 @@ function GovStats() {
                                 </div>
                             </div>
                             {canUnlockASH ? (
-                                <button
-                                    className="bg-yellow-600 text-white text-sm font-bold w-full h-[3.375rem] flex items-center justify-center"
+                                <GlowingButton
+                                    theme="yellow"
+                                    className="text-sm font-bold w-full h-[3.375rem]"
                                     onClick={() => unlockASH()}
                                 >
                                     <ICUnlock className="w-6 h-6 mr-2" />
                                     <span>Withdraw</span>
-                                </button>
+                                </GlowingButton>
                             ) : (
                                 <button
                                     className="bg-ash-dark-400 text-stake-gray-500 text-sm font-bold w-full h-[3.375rem] flex items-center justify-center cursor-not-allowed"
@@ -372,18 +369,16 @@ function GovStats() {
                     {mounted &&
                         (loggedIn ? (
                             <ExpiredLockTooltip disabled={!canUnlockASH}>
-                                <button
-                                    className={`text-sm md:text-lg font-bold w-full h-14 md:h-[4.5rem] flex items-center justify-center mt-3 ${
-                                        canUnlockASH
-                                            ? "bg-ash-dark-400 text-stake-gray-500 cursor-not-allowed"
-                                            : "bg-pink-600 text-white"
-                                    }`}
+                                <GlowingButton
+                                    theme="pink"
+                                    className={`text-sm md:text-lg font-bold w-full h-14 md:h-[4.5rem] mt-3`}
+                                    disabled={canUnlockASH}
                                     onClick={() =>
                                         !canUnlockASH && setOpenStakeGov(true)
                                     }
                                 >
                                     Add / Manage Stake
-                                </button>
+                                </GlowingButton>
                             </ExpiredLockTooltip>
                         ) : (
                             <button

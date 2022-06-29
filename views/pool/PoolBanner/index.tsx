@@ -1,10 +1,5 @@
-import Blur from "assets/images/blur-alt.png";
 import IconClose from "assets/svg/close.svg";
-import Button from "components/Button";
-import IconButton from "components/IconButton";
-import Image from "next/image";
 import { useState } from "react";
-import styles from "./PoolBanner.module.css";
 
 const PoolBanner = () => {
     const [show, setShow] = useState<boolean>(true);

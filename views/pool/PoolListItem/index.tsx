@@ -2,12 +2,11 @@ import IconDown from "assets/svg/down-white.svg";
 import { PoolsState } from "atoms/poolsState";
 import AddLiquidityModal from "components/AddLiquidityModal";
 import BaseModal from "components/BaseModal";
-import Button from "components/Button";
 import usePoolDataFormat from "hooks/usePoolDataFormat";
 import { useScreenSize } from "hooks/useScreenSize";
 import { Unarray } from "interface/utilities";
 import Image from "next/image";
-import React, { useState } from "react";
+import { useState } from "react";
 
 function PoolListItem({
     poolData,
@@ -77,14 +76,13 @@ function PoolListItem({
                     </div>
                     <div className="hidden sm:flex items-center w-[20%] pl-4">
                         <div className="grow">
-                            <Button
-                                bottomRightCorner
+                            <button
                                 style={{ height: 48 }}
                                 className="h-12 text-xs"
                                 onClick={() => setOpenAddLiquidity(true)}
                             >
                                 DEPOSIT
-                            </Button>
+                            </button>
                         </div>
                         <div
                             className="w-24 flex flex-row items-center justify-center gap-2 select-none cursor-pointer text-xs"

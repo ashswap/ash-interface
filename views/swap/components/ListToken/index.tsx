@@ -15,7 +15,7 @@ const ListToken = (props: Props) => {
             {props.items.map(token => (
                 <div
                     key={token.token.id}
-                    className="flex items-center justify-between cursor-pointer rounded-lg bg-ash-dark-400 h-14 px-4"
+                    className="flex items-center justify-between cursor-pointer rounded-lg bg-ash-dark-400 hover:bg-ash-dark-350 hover:colored-drop-shadow-sm hover:colored-drop-shadow-ash-dark-350/75 transition-all h-14 px-4"
                     onClick={() => props.onSelect && props.onSelect(token)}
                 >
                     <div className="flex items-center space-x-4">

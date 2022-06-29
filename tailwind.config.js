@@ -21,6 +21,8 @@ module.exports = {
                 "bg-hover": "#211D36",
                 "bg-overlay": "#7B61FF",
                 "ash-dark": {
+                    300: "#292540",
+                    350: "#221F35",
                     400: "#191629",
                     500: "#212036",
                     600: "#12101D",
@@ -60,8 +62,14 @@ module.exports = {
                 "ash-purple": {
                     500: "#7B61FF"
                 },
+                "ash-light-blue": {
+                    500: "#7FE7FF"
+                },
                 "ash-blue": {
                     500: "#2175FF"
+                },
+                "ash-steel": {
+                    500: "#46ABC9"
                 },
                 "ash-cyan": {
                     500: "#00FFFF"
@@ -88,5 +96,7 @@ module.exports = {
     plugins: [
         require('@tailwindcss/line-clamp'),
         require('./tailwindPlugins/clip-corner'),
+        require('./tailwindPlugins/colored-drop-shadow'),
+        require('./tailwindPlugins/border-notch'),
     ],
 }

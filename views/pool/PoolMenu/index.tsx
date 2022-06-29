@@ -1,26 +1,25 @@
 import { poolStakedOnlyState } from "atoms/poolsState";
 import { useRecoilState } from "recoil";
-import styles from "./PoolMenu.module.css";
 
 const PoolMenu = () => {
     const [stakedOnly, setStakedOnly] = useRecoilState(poolStakedOnlyState);
 
     return (
         <div
-            className={`${styles.container} text-black dark:text-text-input-3`}
+            className={`flex flex-row gap-6 justify-start select-none text-lg font-bold text-black dark:text-text-input-3`}
         >
-            <div
-                className={`${styles.btn} ${!stakedOnly ? styles.active : ""}`}
+            <button
+                className={`${!stakedOnly ? "text-pink-650" : ""}`}
                 onClick={() => setStakedOnly(false)}
             >
                 All Pools
-            </div>
-            <div
-                className={`${styles.btn} ${stakedOnly ? styles.active : ""}`}
+            </button>
+            <button
+                className={`${stakedOnly ? "text-pink-650" : ""}`}
                 onClick={() => setStakedOnly(true)}
             >
                 Your Pools
-            </div>
+            </button>
         </div>
     );
 };

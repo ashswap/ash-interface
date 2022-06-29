@@ -6,6 +6,8 @@ import {
 import Down from "assets/svg/down-white.svg";
 import { PoolsState } from "atoms/poolsState";
 import AddLiquidityModal from "components/AddLiquidityModal";
+import BaseButton from "components/BaseButton";
+import GlowingButton from "components/GlowingButton";
 import TextAmt from "components/TextAmt";
 import CardTooltip from "components/Tooltip/CardTooltip";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
@@ -101,15 +103,18 @@ function PoolCardItem({
                 }
             >
                 <div>
-                    <button
-                        className="w-full clip-corner-1 clip-corner-br bg-pink-600 h-14 text-sm font-bold text-white underline"
+                    <GlowingButton
+                        theme="pink"
+                        className="w-full clip-corner-1 clip-corner-br h-14 text-sm font-bold text-white underline"
+                        wrapperClassName="hover:colored-drop-shadow-xs"
                         onClick={() => {
                             setOpenAddLiquidity(true);
                             setOnboardedPoolDeposit(true);
                         }}
                     >
                         Deposit
-                    </button>
+                    </GlowingButton>
+                    
                 </div>
             </OnboardTooltip>
 

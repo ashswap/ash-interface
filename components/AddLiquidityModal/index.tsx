@@ -1,7 +1,7 @@
 import {
     getProxyProvider,
     useGetAccountInfo,
-    useGetLoginInfo,
+    useGetLoginInfo
 } from "@elrondnetwork/dapp-core";
 import IconRight from "assets/svg/right-white.svg";
 import { addLPSessionIdAtom } from "atoms/addLiquidity";
@@ -9,8 +9,8 @@ import { PoolsState } from "atoms/poolsState";
 import { walletBalanceState, walletTokenPriceState } from "atoms/walletState";
 import BigNumber from "bignumber.js";
 import BaseModal from "components/BaseModal";
-import Button from "components/Button";
 import Checkbox from "components/Checkbox";
+import GlowingButton from "components/GlowingButton";
 import InputCurrency from "components/InputCurrency";
 import TextAmt from "components/TextAmt";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
@@ -444,17 +444,19 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
                 </OnboardTooltip>
 
                 <div className="w-full sm:w-1/3">
-                    <Button
-                        topLeftCorner
-                        style={{ height: 48 }}
-                        outline
-                        disable={!canAddLP}
-                        onClick={canAddLP ? addLP : () => {}}
-                    >
-                        {account.balance === "0"
-                            ? "INSUFFICIENT EGLD BALANCE"
-                            : "DEPOSIT"}
-                    </Button>
+                    <div className="border-notch-x border-notch-white/50">
+                        <GlowingButton
+                            theme="pink"
+                            className="w-full h-12 uppercase font-bold clip-corner-1 clip-corner-tl"
+                            wrapperClassName="hover:colored-drop-shadow-xs"
+                            disabled={!canAddLP}
+                            onClick={canAddLP ? addLP : () => {}}
+                        >
+                            {account.balance === "0"
+                                ? "INSUFFICIENT EGLD BALANCE"
+                                : "DEPOSIT"}
+                        </GlowingButton>
+                    </div>
                 </div>
             </div>
         </div>

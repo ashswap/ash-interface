@@ -14,16 +14,16 @@ import {
 import Fire from "assets/images/fire.png";
 import ICChevronDown from "assets/svg/chevron-down.svg";
 import ICChevronUp from "assets/svg/chevron-up.svg";
-import Clock from "assets/svg/clock.svg";
+import ICClock from "assets/svg/clock.svg";
 import IconClose from "assets/svg/close.svg";
-import Revert from "assets/svg/revert.svg";
+import ICArrowDownRounded from "assets/svg/arrow-down-rounded.svg";
 import IconRight from "assets/svg/right-white.svg";
-import SettingActiveIcon from "assets/svg/setting-active.svg";
-import SettingIcon from "assets/svg/setting.svg";
+import ICSetting from "assets/svg/setting.svg";
 import IconWallet from "assets/svg/wallet.svg";
 import BigNumber from "bignumber.js";
+import BaseButton from "components/BaseButton";
 import BaseModal from "components/BaseModal";
-import Button from "components/Button";
+import GlowingButton from "components/GlowingButton";
 import HistoryModal from "components/HistoryModal";
 import IconButton from "components/IconButton";
 import Setting from "components/Setting";
@@ -450,8 +450,8 @@ const Swap = () => {
                                         }
                                     >
                                         <div>
-                                            <IconButton
-                                                icon={<Clock />}
+                                            <BaseButton
+                                                className="w-10 h-10 bg-ash-dark-400 hover:bg-ash-dark-300 active:bg-ash-dark-600 text-white"
                                                 onClick={() => {
                                                     if (loggedIn) {
                                                         openHistoryModal(
@@ -460,17 +460,25 @@ const Swap = () => {
                                                     }
                                                     setOnboardedHistory(true);
                                                 }}
-                                            />
+                                            >
+                                                <ICClock />
+                                            </BaseButton>
                                         </div>
                                     </OnboardTooltip>
-                                    <IconButton
-                                        icon={<SettingIcon />}
-                                        activeIcon={<SettingActiveIcon />}
+                                    <BaseButton
+                                        className="w-10 h-10 bg-ash-dark-400 hover:bg-ash-dark-300 active:bg-ash-dark-600 text-white"
                                         onClick={() =>
                                             setShowSetting((state) => !state)
                                         }
-                                        active={showSetting}
-                                    />
+                                    >
+                                        <ICSetting
+                                            className={`${
+                                                showSetting
+                                                    ? "text-pink-600"
+                                                    : "text-white"
+                                            }`}
+                                        />
+                                    </BaseButton>
                                 </div>
                             </div>
                             <MaiarPoolTooltip pool={pool}>
@@ -491,12 +499,12 @@ const Swap = () => {
                                             position: "relative",
                                         }}
                                     >
-                                        <div
-                                            className={styles.revert}
+                                        <BaseButton
+                                            className="w-7 h-7 rounded-lg bg-ash-dark-600 hover:bg-ash-dark-300 active:bg-ash-dark-600 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[1]"
                                             onClick={revertToken}
                                         >
-                                            <Revert />
-                                        </div>
+                                            <ICArrowDownRounded />
+                                        </BaseButton>
                                     </div>
                                     <SwapAmount
                                         bottomRightCorner
@@ -761,55 +769,49 @@ const Swap = () => {
                                     </>
                                 )}
 
-                            {mounted &&
-                                (isInsufficentFund ||
-                                account.balance === "0" ? (
-                                    <Button
-                                        leftIcon={
-                                            !loggedIn ? <IconWallet /> : <></>
+                            {mounted && (
+                                <div className="border-notch-x border-notch-white/50 mt-12">
+                                    <GlowingButton
+                                        theme="pink"
+                                        className="w-full clip-corner-1 clip-corner-tl uppercase h-12 text-xs sm:text-sm font-bold"
+                                        disabled={
+                                            swapping ||
+                                            fetchingAmtOut ||
+                                            isInsufficentFund ||
+                                            account.balance === "0"
                                         }
-                                        rightIcon={
-                                            loggedIn ? <IconRight /> : <></>
-                                        }
-                                        topLeftCorner
-                                        style={{ height: 48 }}
-                                        className="mt-12"
-                                        disable
-                                        outline
-                                    >
-                                        <span className="text-text-input-3">
-                                            INSUFFICIENT{" "}
-                                            <span className="text-insufficent-fund">
-                                                {account.balance === "0"
-                                                    ? "EGLD"
-                                                    : tokenFrom?.name}
-                                            </span>{" "}
-                                            BALANCE
-                                        </span>
-                                    </Button>
-                                ) : (
-                                    <Button
-                                        leftIcon={
-                                            !loggedIn ? <IconWallet /> : <></>
-                                        }
-                                        rightIcon={
-                                            loggedIn ? <IconRight /> : <></>
-                                        }
-                                        topLeftCorner
-                                        style={{ height: 48 }}
-                                        className="mt-12 text-xs sm:text-sm"
-                                        outline
-                                        disable={swapping || fetchingAmtOut}
                                         onClick={
                                             loggedIn
                                                 ? swap
                                                 : () => connectWallet()
                                         }
-                                        glowOnHover
                                     >
-                                        {loggedIn ? "SWAP" : "CONNECT WALLET"}
-                                    </Button>
-                                ))}
+                                        <div className="flex items-center space-x-2.5">
+                                            {!loggedIn && <IconWallet />}
+                                            {isInsufficentFund ||
+                                            account.balance === "0" ? (
+                                                <span className="text-text-input-3">
+                                                    INSUFFICIENT{" "}
+                                                    <span className="text-insufficent-fund">
+                                                        {account.balance === "0"
+                                                            ? "EGLD"
+                                                            : tokenFrom?.name}
+                                                    </span>{" "}
+                                                    BALANCE
+                                                </span>
+                                            ) : (
+                                                <span className="mt-0.5">
+                                                    {loggedIn
+                                                        ? "SWAP"
+                                                        : "CONNECT WALLET"}
+                                                </span>
+                                            )}
+
+                                            {loggedIn && <IconRight />}
+                                        </div>
+                                    </GlowingButton>
+                                </div>
+                            )}
 
                             <div
                                 className="text-xs font-bold text-center"
@@ -858,13 +860,13 @@ const Swap = () => {
                         <BaseModal.CloseBtn />
                     </div>
                     <Setting />
-                    <Button
-                        className="uppercase text-xs mt-10"
-                        textClassName="h-10"
+                    <BaseButton
+                        theme="pink"
+                        className="uppercase text-xs font-bold mt-10 h-12 w-full"
                         onClick={() => setShowSetting(false)}
                     >
                         Confirm
-                    </Button>
+                    </BaseButton>
                 </BaseModal>
             )}
         </div>

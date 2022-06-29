@@ -6,10 +6,10 @@ import {
 import { walletBalanceState, walletLPMapState } from "atoms/walletState";
 import BigNumber from "bignumber.js";
 import BasicLayout from "components/Layout/Basic";
-import ListPool from "components/ListPool";
-import PoolBanner from "components/PoolBanner";
-import PoolFilter, { ViewType } from "components/PoolFilter";
-import PoolMenu from "components/PoolMenu";
+import ListPool from "views/pool/ListPool";
+import PoolBanner from "views/pool/PoolBanner";
+import PoolFilter, { ViewType } from "views/pool/PoolFilter";
+import PoolMenu from "views/pool/PoolMenu";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 import { blockTimeMs } from "const/dappConfig";
 import pools from "const/pool";

@@ -28,7 +28,7 @@ const QuickSelect = (props: Props) => {
                         //     className="flex-1 select-none cursor-pointer"
                         //     onClick={() => onSelectToken(t)}
                         // />
-                        <div key={t.id} className="rounded-lg bg-ash-dark-600 flex items-center space-x-2 w-20 text-2xs font-bold cursor-pointer p-2.5 mr-2" onClick={() => onSelectToken(t)}>
+                        <div key={t.id} className="rounded-lg bg-ash-dark-600 hover:bg-ash-dark-700 transition-all flex items-center space-x-2 w-20 text-2xs font-bold cursor-pointer p-2.5 mr-2" onClick={() => onSelectToken(t)}>
                             <div className="w-4 h-4 rounded-full relative overflow-hidden">
                                 <Image src={t.icon} alt={t.name} layout="fill" objectFit="contain"/>
                             </div>

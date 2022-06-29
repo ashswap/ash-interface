@@ -1,8 +1,8 @@
 import ImgAshSleep from "assets/images/ash-sleep.png";
 import { poolStakedOnlyState, poolToDisplayState } from "atoms/poolsState";
-import PoolCardItem from "components/PoolCardItem";
-import { ViewType } from "components/PoolFilter";
-import PoolListItem from "components/PoolListItem";
+import PoolCardItem from "views/pool/PoolCardItem";
+import { ViewType } from "views/pool/PoolFilter";
+import PoolListItem from "views/pool/PoolListItem";
 import StakedPoolCardItem from "components/StakedPoolCardItem";
 import StakedPoolListItem from "components/StakedPoolListItem";
 import IPool from "interface/pool";
@@ -10,7 +10,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { useMemo } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
-import styles from "./ListPool.module.css";
 
 interface Props {
     items: IPool[];
@@ -37,7 +36,7 @@ const ListPool = (props: Props) => {
         <div className={props.className}>
             {props.view === ViewType.Card ? (
                 <>
-                    <div className={`${styles.containerCard}`}>
+                    <div className={`grid gap-4 lg:gap-[1.875rem] grid-cols-[repeat(auto-fill,minmax(320px,1fr))] sm:grid-cols-[repeat(auto-fill,minmax(350px,1fr))]`}>
                         {!stakedOnly &&
                             poolToDisplay.map((p, i) => {
                                 return (
@@ -104,7 +103,7 @@ const ListPool = (props: Props) => {
             ) : (
                 <>
                     {stakedPools?.length > 0 && (
-                        <div className={`${styles.containerList} mb-2 md:mb-8`}>
+                        <div className={`flex flex-col mb-2 md:mb-8`}>
                             <div
                                 className={`flex items-center bg-ash-dark-600 text-text-input-3 h-12 text-2xs sm:text-xs border-b border-ash-dark-400`}
                             >
@@ -146,13 +145,13 @@ const ListPool = (props: Props) => {
                         </div>
                     )}
                     {!stakedOnly && nonStakedPools?.length > 0 && (
-                        <div className={`${styles.containerList}`}>
+                        <div className={`flex flex-col`}>
                             <div className="bg-ash-dark-600 px-4 lg:pl-11 lg:pr-3 text-2xs sm:text-xs border-b border-ash-dark-400">
                                 <div
                                     className={`flex text-text-input-3 h-12 items-center w-full sm:w-[80%] space-x-1`}
                                 >
                                     <div className="hidden sm:block w-3/12">
-                                        Deposite
+                                        Deposit
                                     </div>
                                     <div className="sm:hidden w-[45%]">
                                         #Pool
