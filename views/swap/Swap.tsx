@@ -1,7 +1,7 @@
 import {
     transactionServices,
     useGetAccountInfo,
-    useGetLoginInfo,
+    useGetLoginInfo
 } from "@elrondnetwork/dapp-core";
 import {
     Address,
@@ -9,18 +9,19 @@ import {
     ContractFunction,
     GasLimit,
     TokenIdentifierValue,
-    Transaction,
+    Transaction
 } from "@elrondnetwork/erdjs";
 import Fire from "assets/images/fire.png";
+import ICArrowDownRounded from "assets/svg/arrow-down-rounded.svg";
 import ICChevronDown from "assets/svg/chevron-down.svg";
 import ICChevronUp from "assets/svg/chevron-up.svg";
 import ICClock from "assets/svg/clock.svg";
 import IconClose from "assets/svg/close.svg";
-import ICArrowDownRounded from "assets/svg/arrow-down-rounded.svg";
 import IconRight from "assets/svg/right-white.svg";
 import ICSetting from "assets/svg/setting.svg";
 import IconWallet from "assets/svg/wallet.svg";
 import BigNumber from "bignumber.js";
+import Avatar from "components/Avatar";
 import BaseButton from "components/BaseButton";
 import BaseModal from "components/BaseModal";
 import GlowingButton from "components/GlowingButton";
@@ -37,7 +38,7 @@ import { queryPoolContract } from "helper/contracts/pool";
 import { formatAmount } from "helper/number";
 import {
     sendTransactions,
-    useCreateTransaction,
+    useCreateTransaction
 } from "helper/transactionMethods";
 import { useConnectWallet } from "hooks/useConnectWallet";
 import useMounted from "hooks/useMounted";
@@ -90,20 +91,18 @@ const MaiarPoolTooltip = ({
                                 <div className="clip-corner-4 clip-corner-bl bg-ash-dark-600 p-[1px] max-w-full sm:max-w-[23rem] backdrop-blur-[30px]">
                                     <div className="clip-corner-4 clip-corner-bl bg-ash-dark-400 px-12 py-6">
                                         <div className="font-bold text-sm leading-tight">
-                                            <Image
+                                            <Avatar
                                                 src={pool.tokens[0].icon}
                                                 alt={pool.tokens[0].name}
-                                                width={16}
-                                                height={16}
+                                                className="w-4 h-4"
                                             />
                                             &nbsp;
                                             {pool.tokens[0].name}
                                             <span> - </span>
-                                            <Image
+                                            <Avatar
                                                 src={pool.tokens[1].icon}
                                                 alt={pool.tokens[1].name}
-                                                width={16}
-                                                height={16}
+                                                className="w-4 h-4"
                                             />
                                             &nbsp;
                                             {pool.tokens[1].name}

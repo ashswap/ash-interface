@@ -1,11 +1,11 @@
 import IconDown from "assets/svg/down-white.svg";
 import { PoolsState } from "atoms/poolsState";
 import AddLiquidityModal from "components/AddLiquidityModal";
+import Avatar from "components/Avatar";
 import BaseModal from "components/BaseModal";
 import usePoolDataFormat from "hooks/usePoolDataFormat";
 import { useScreenSize } from "hooks/useScreenSize";
 import { Unarray } from "interface/utilities";
-import Image from "next/image";
 import { useState } from "react";
 
 function PoolListItem({
@@ -35,18 +35,16 @@ function PoolListItem({
                     <div className="flex items-center overflow-hidden w-full sm:w-[80%] space-x-1">
                         <div className="w-[45%] sm:w-3/12 flex flex-row items-center overflow-hidden">
                             <div className="flex flex-row justify-between items-center mr-2 sm:mr-0">
-                                <div className="h-4 w-4 sm:h-6 sm:w-6 lg:h-9 lg:w-9 rounded-full">
-                                    <Image
-                                        src={pool.tokens[0].icon}
-                                        alt="token icon"
-                                    />
-                                </div>
-                                <div className="h-4 w-4 sm:h-6 sm:w-6 lg:h-9 lg:w-9 rounded-full -ml-1 lg:ml-[-0.375rem]">
-                                    <Image
-                                        src={pool.tokens[1].icon}
-                                        alt="token icon"
-                                    />
-                                </div>
+                                <Avatar
+                                    src={pool.tokens[0].icon}
+                                    alt={pool.tokens[0].name}
+                                    className="h-4 w-4 sm:h-6 sm:w-6 lg:h-9 lg:w-9 rounded-full"
+                                />
+                                <Avatar
+                                    src={pool.tokens[1].icon}
+                                    alt={pool.tokens[1].name}
+                                    className="h-4 w-4 sm:h-6 sm:w-6 lg:h-9 lg:w-9 rounded-full -ml-1 lg:ml-[-0.375rem]"
+                                />
                             </div>
                             <div className="text-2xs hidden sm:block px-3 font-bold">
                                 &
@@ -159,18 +157,16 @@ function PoolListItem({
                                 </div>
                             </div>
                             <div className="flex">
-                                <div className="h-[3.25rem] w-[3.25rem] rounded-full">
-                                    <Image
-                                        src={pool.tokens[0].icon}
-                                        alt="token icon"
-                                    />
-                                </div>
-                                <div className="h-[3.25rem] w-[3.25rem] rounded-full -ml-2">
-                                    <Image
-                                        src={pool.tokens[1].icon}
-                                        alt="token icon"
-                                    />
-                                </div>
+                                <Avatar
+                                    src={pool.tokens[0].icon}
+                                    alt={pool.tokens[0].name}
+                                    className="h-[3.25rem] w-[3.25rem] rounded-full"
+                                />
+                                <Avatar
+                                    src={pool.tokens[1].icon}
+                                    alt={pool.tokens[1].name}
+                                    className="h-[3.25rem] w-[3.25rem] rounded-full -ml-2"
+                                />
                             </div>
                         </div>
                         <div className="flex justify-between mb-12">

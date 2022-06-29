@@ -18,6 +18,7 @@ import { useRouter } from "next/router";
 import ImgLogo from "public/images/m-logo.png";
 import React, { useCallback, useEffect, useState } from "react";
 import { Transition } from "@headlessui/react";
+import Avatar from "components/Avatar";
 type NavLinkProps = {
     active: boolean;
     collapsed?: boolean;
@@ -318,11 +319,10 @@ function InfoLayout({ children }: any) {
                                             setMDrawer(true)
                                         }
                                     >
-                                        <Image
+                                        <Avatar
                                             src={ImgAvatar}
                                             alt="avatar"
-                                            width={32}
-                                            height={32}
+                                            className="w-8 h-8"
                                         />
 
                                         <div className="mt-2 flex items-center justify-between font-bold text-xs w-full">
@@ -395,11 +395,10 @@ function InfoLayout({ children }: any) {
                                             setMDrawer(true)
                                         }
                                     >
-                                        <Image
+                                        <Avatar
                                             src={ImgAvatar}
                                             alt="account avatar"
-                                            width={14}
-                                            height={14}
+                                            className="w-3.5 h-3.5"
                                         />
                                         <ICChevronDown className="inline w-2 h-2 ml-2.5" />
                                     </button>

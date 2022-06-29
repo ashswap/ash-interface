@@ -4,6 +4,7 @@ import { accIsInsufficientEGLDState } from "atoms/dappState";
 import { govTotalSupplyVeASH } from "atoms/govState";
 import { walletBalanceState } from "atoms/walletState";
 import BigNumber from "bignumber.js";
+import Avatar from "components/Avatar";
 import BaseModal from "components/BaseModal";
 import Checkbox from "components/Checkbox";
 import GlowingButton from "components/GlowingButton";
@@ -132,14 +133,11 @@ const FirstStakeContent = ({ open, onClose }: props) => {
                                     Token
                                 </div>
                                 <div className="bg-ash-dark-400/30 h-14 lg:h-18 px-4 lg:px-7 flex items-center">
-                                    <div className="w-3.5 h-3.5 lg:w-7 lg:h-7 rounded-full relative mr-3">
-                                        <Image
-                                            src={ASH_TOKEN.icon}
-                                            alt={ASH_TOKEN.name}
-                                            layout="fill"
-                                            objectFit="contain"
-                                        />
-                                    </div>
+                                    <Avatar
+                                        src={ASH_TOKEN.icon}
+                                        alt={ASH_TOKEN.name}
+                                        className="w-3.5 h-3.5 lg:w-7 lg:h-7 mr-3"
+                                    />
                                     <div className="text-white text-sm lg:text-lg font-bold">
                                         {ASH_TOKEN.name}
                                     </div>

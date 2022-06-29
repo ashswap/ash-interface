@@ -1,6 +1,13 @@
 import { Transition, TransitionClasses } from "@headlessui/react";
 import IconClose from "assets/svg/close.svg";
-import { createContext, Fragment, useContext, useMemo, useState } from "react";
+import {
+    createContext,
+    Fragment,
+    useContext,
+    useEffect,
+    useMemo,
+    useState,
+} from "react";
 import Modal, { Props } from "react-modal";
 const TRANSITIONS: Record<string, TransitionClasses> = {
     center: {
@@ -47,6 +54,20 @@ const BaseModal = (props: BaseModalType) => {
             ] || {}
         );
     }, [transition, type]);
+    useEffect(() => {
+        if (typeof window !== "undefined") {
+            if (
+                props.isOpen &&
+                window.innerWidth > window.document.body.clientWidth
+            ) {
+                window.document.body.style.paddingRight =
+                    window.innerWidth - window.document.body.clientWidth + "px";
+            } else {
+                window.document.body.style.paddingRight = "";
+            }
+            window.document.body.style.overflow = props.isOpen ? "hidden" : "";
+        }
+    }, [props.isOpen]);
     return (
         <ModalContext.Provider value={{ ...props }}>
             <Transition show={props.isOpen} as={"div"}>
@@ -55,7 +76,7 @@ const BaseModal = (props: BaseModalType) => {
                     shouldCloseOnOverlayClick={true}
                     closeTimeoutMS={200}
                     {...reactModalProps}
-                    bodyOpenClassName={`${reactModalProps.bodyOpenClassName} overflow-hidden sm:pr-1.5`}
+                    bodyOpenClassName={`${reactModalProps.bodyOpenClassName}`}
                     overlayElement={(props, contentElement) => (
                         <div
                             {...props}

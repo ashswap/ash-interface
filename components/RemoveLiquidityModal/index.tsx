@@ -14,6 +14,7 @@ import { accIsInsufficientEGLDState } from "atoms/dappState";
 import { PoolsState } from "atoms/poolsState";
 import { walletLPMapState } from "atoms/walletState";
 import BigNumber from "bignumber.js";
+import Avatar from "components/Avatar";
 import BaseModal from "components/BaseModal";
 import GlowingButton from "components/GlowingButton";
 import InputCurrency from "components/InputCurrency";
@@ -230,17 +231,8 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
                     </div>
                 </div>
                 <div className="flex flex-row justify-between items-center">
-                    <div className={styles.tokenIcon}>
-                        <Image src={pool.tokens[0].icon} alt="token icon" />
-                    </div>
-                    <div
-                        className={styles.tokenIcon}
-                        style={{
-                            marginLeft: "-3px",
-                        }}
-                    >
-                        <Image src={pool.tokens[1].icon} alt="token icon" />
-                    </div>
+                    <Avatar src={pool.tokens[0].icon} alt={pool.tokens[0].name} className="w-3.5 h-3.5" />
+                    <Avatar src={pool.tokens[1].icon} alt={pool.tokens[1].name} className="w-3.5 h-3.5 -ml-1" />
                 </div>
             </div>
             <div className="flex items-baseline text-2xl font-bold text-yellow-700">

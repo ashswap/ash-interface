@@ -2,14 +2,14 @@ import { useGetAccountInfo } from "@elrondnetwork/dapp-core";
 import ImgEgldIcon from "assets/images/egld-icon.png";
 import { walletBalanceState } from "atoms/walletState";
 import BigNumber from "bignumber.js";
+import Avatar from "components/Avatar";
 import TextAmt from "components/TextAmt";
 import { ENVIRONMENT } from "const/env";
 import pools from "const/pool";
 import { TOKENS } from "const/tokens";
 import { toEGLDD } from "helper/balance";
 import { IToken } from "interface/token";
-import Image from "next/image";
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import { useRecoilValue } from "recoil";
 type TokenWithBalance = IToken & {
     balance: BigNumber;
@@ -17,7 +17,7 @@ type TokenWithBalance = IToken & {
 const TokenBalance = ({data}: {data: Omit<TokenWithBalance, "id">}) => {
     return <div className="flex justify-between px-6 py-2">
         <div className="flex items-center mr-2">
-            {data.icon ? <Image src={data.icon} alt={data.name} width={14} height={14}/> : <div className="w-3.5 h-3.5 rounded-full bg-ash-dark-400"></div>}
+            {data.icon ? <Avatar src={data.icon} alt={data.name} className="w-3.5 h-3.5"/> : <div className="w-3.5 h-3.5 rounded-full bg-ash-dark-400"></div>}
             <span className="text-white text-xs font-bold ml-2">{data.name}</span>
         </div>
         <div className="text-stake-gray-500 text-xs">

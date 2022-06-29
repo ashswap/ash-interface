@@ -1,27 +1,27 @@
-import InfoLayout from "components/Layout/Info";
-import pools from "const/pool";
-import { GetServerSideProps } from "next";
-import Link from "next/link";
-import React, { ReactElement, useMemo } from "react";
-import ICArrowRight from "assets/svg/arrow-right.svg";
-import ICCopy from "assets/svg/copy.svg";
-import ICSwap from "assets/svg/swap.svg";
-import ICPlus from "assets/svg/plus.svg";
-import ICNewTabRound from "assets/svg/new-tab-round.svg";
-import IPool from "interface/pool";
-import Image from "next/image";
-import CopyBtn from "components/CopyBtn";
 import {
     AccountInfoSliceNetworkType,
-    useGetNetworkConfig,
+    useGetNetworkConfig
 } from "@elrondnetwork/dapp-core";
+import ICArrowRight from "assets/svg/arrow-right.svg";
+import ICCopy from "assets/svg/copy.svg";
+import ICNewTabRound from "assets/svg/new-tab-round.svg";
+import ICPlus from "assets/svg/plus.svg";
+import ICSwap from "assets/svg/swap.svg";
+import Avatar from "components/Avatar";
+import CopyBtn from "components/CopyBtn";
+import InfoLayout from "components/Layout/Info";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
+import pools from "const/pool";
 import { fetcher } from "helper/common";
-import useSWR from "swr";
 import { formatAmount } from "helper/number";
-import PoolChart from "views/info/Pools/[address]/PoolChart";
-import TxsTable from "views/info/components/TxsTable";
+import IPool from "interface/pool";
 import { TxStatsRecord } from "interface/txStats";
+import { GetServerSideProps } from "next";
+import Link from "next/link";
+import { ReactElement, useMemo } from "react";
+import useSWR from "swr";
+import TxsTable from "views/info/components/TxsTable";
+import PoolChart from "views/info/Pools/[address]/PoolChart";
 type PoolStats = {
     apr_day: number;
     apr_month: number;
@@ -92,22 +92,16 @@ function PoolDetailPage({ pool }: Props) {
                     {token1.name} & {token2.name}
                 </div>
                 <div className="flex">
-                    <div className="w-6 h-6 lg:w-8 lg:h-8 relative">
-                        <Image
-                            src={token1.icon}
-                            alt={token1.name}
-                            layout="fill"
-                            objectFit="contain"
-                        />
-                    </div>
-                    <div className="w-6 h-6 lg:w-8 lg:h-8 relative -ml-1.5">
-                        <Image
-                            src={token2.icon}
-                            alt={token2.name}
-                            layout="fill"
-                            objectFit="contain"
-                        />
-                    </div>
+                    <Avatar
+                        src={token1.icon}
+                        alt={token1.name}
+                        className="w-6 h-6 lg:w-8 lg:h-8"
+                    />
+                    <Avatar
+                        src={token2.icon}
+                        alt={token2.name}
+                        className="w-6 h-6 lg:w-8 lg:h-8 -ml-1.5"
+                    />
                 </div>
             </div>
             <div className="flex flex-wrap mb-9 lg:mb-20">
@@ -194,14 +188,11 @@ function PoolDetailPage({ pool }: Props) {
                                     {token1.name}
                                 </span>
                             </div>
-                            <div className="w-4.5 h-4.5 sm:w-6 sm:h-6 relative">
-                                <Image
-                                    src={token1.icon}
-                                    alt={token1.name}
-                                    layout="fill"
-                                    objectFit="contain"
-                                />
-                            </div>
+                            <Avatar
+                                src={token1.icon}
+                                alt={token1.name}
+                                className="w-4.5 h-4.5 sm:w-6 sm:h-6"
+                            />
                         </div>
                         <div className="flex items-center justify-between text-sm sm:text-lg">
                             <div>
@@ -212,14 +203,11 @@ function PoolDetailPage({ pool }: Props) {
                                     {token2.name}
                                 </span>
                             </div>
-                            <div className="w-4.5 h-4.5 sm:w-6 sm:h-6 relative">
-                                <Image
-                                    src={token2.icon}
-                                    alt={token2.name}
-                                    layout="fill"
-                                    objectFit="contain"
-                                />
-                            </div>
+                            <Avatar
+                                src={token2.icon}
+                                alt={token2.name}
+                                className="w-4.5 h-4.5 sm:w-6 sm:h-6"
+                            />
                         </div>
                     </div>
                     <div className="px-4 md:px-[1.625rem] py-4 md:pt-5 md:pb-8 bg-ash-dark-600 flex flex-col justify-between">

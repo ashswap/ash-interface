@@ -4,13 +4,13 @@ import ICMinus from "assets/svg/minus.svg";
 import ICPlus from "assets/svg/plus.svg";
 import { PoolsState } from "atoms/poolsState";
 import AddLiquidityModal from "components/AddLiquidityModal";
+import Avatar from "components/Avatar";
 import BaseModal from "components/BaseModal";
 import RemoveLiquidityModal from "components/RemoveLiquidityModal";
 import TextAmt from "components/TextAmt";
 import usePoolDataFormat from "hooks/usePoolDataFormat";
 import { useScreenSize } from "hooks/useScreenSize";
 import { Unarray } from "interface/utilities";
-import Image from "next/image";
 import { useEffect, useState } from "react";
 
 const StakedPoolListItem = ({
@@ -53,18 +53,16 @@ const StakedPoolListItem = ({
                             <div className="w-7/12 sm:w-1/2 overflow-hidden">
                                 <div className="flex items-center">
                                     <div className="flex items-center mr-2 sm:mr-0">
-                                        <div className="h-4 w-4 sm:h-6 sm:w-6 lg:h-9 lg:w-9 rounded-full">
-                                            <Image
-                                                src={pool.tokens[0].icon}
-                                                alt="token icon"
-                                            />
-                                        </div>
-                                        <div className="h-4 w-4 sm:h-6 sm:w-6 lg:h-9 lg:w-9 rounded-full -ml-1 lg:ml-[-0.375rem]">
-                                            <Image
-                                                src={pool.tokens[1].icon}
-                                                alt="token icon"
-                                            />
-                                        </div>
+                                        <Avatar
+                                            src={pool.tokens[0].icon}
+                                            alt={pool.tokens[0].name}
+                                            className="h-4 w-4 sm:h-6 sm:w-6 lg:h-9 lg:w-9 rounded-full"
+                                        />
+                                        <Avatar
+                                            src={pool.tokens[1].icon}
+                                            alt={pool.tokens[1].name}
+                                            className="h-4 w-4 sm:h-6 sm:w-6 lg:h-9 lg:w-9 rounded-full -ml-1 lg:ml-[-0.375rem]"
+                                        />
                                     </div>
                                     <div className="text-2xs hidden sm:block px-3 font-bold">
                                         &
@@ -304,18 +302,16 @@ const StakedPoolListItem = ({
                             <div>
                                 <div>
                                     <div className="flex items-center justify-end mb-14">
-                                        <div className="w-[3.25rem] h-[3.25rem] rounded-full">
-                                            <Image
-                                                src={pool.tokens[0].icon}
-                                                alt="token icon"
-                                            />
-                                        </div>
-                                        <div className="w-[3.25rem] h-[3.25rem] rounded-full ml-[-0.375rem]">
-                                            <Image
-                                                src={pool.tokens[1].icon}
-                                                alt="token icon"
-                                            />
-                                        </div>
+                                        <Avatar
+                                            src={pool.tokens[0].icon}
+                                            alt={pool.tokens[0].name}
+                                            className="w-[3.25rem] h-[3.25rem] rounded-full"
+                                        />
+                                        <Avatar
+                                            src={pool.tokens[1].icon}
+                                            alt={pool.tokens[1].name}
+                                            className="w-[3.25rem] h-[3.25rem] rounded-full ml-[-0.375rem]"
+                                        />
                                     </div>
                                     <div className="mb-9">
                                         <div className="text-ash-gray-500 text-xs mb-4">

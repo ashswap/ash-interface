@@ -135,14 +135,11 @@ const TokenSelect = ({
                     style={{ padding: "18px 12px 18px 18px" }}
                 >
                     <div className="flex items-center">
-                        <div className="w-3.5 h-3.5 relative overflow-hidden rounded-full">
-                            <Image
-                                src={pivotToken.icon}
-                                alt={pivotToken.name}
-                                layout="fill"
-                                objectFit="contain"
-                            />
-                        </div>
+                        <Avatar
+                            src={pivotToken.icon}
+                            alt={pivotToken.name}
+                            className="w-3.5 h-3.5"
+                        />
                         <div className="text-sm text-white ml-1 mt-0.5">
                             {pivotToken.name}
                         </div>

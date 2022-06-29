@@ -1,16 +1,16 @@
 import BigNumber from "bignumber.js";
+import Avatar from "components/Avatar";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 import pools from "const/pool";
 import { IN_POOL_TOKENS } from "const/tokens";
 import { randomHexColor } from "helper/color";
 import { fetcher } from "helper/common";
 import { IToken } from "interface/token";
-import Image from "next/image";
-import React, { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
 import useSWR from "swr";
 import TokensSelectorForChart, {
-    TokenOptionChart,
+    TokenOptionChart
 } from "../components/TokensSelectorForChart";
 
 type RawChartRecord = {
@@ -56,14 +56,11 @@ const TokenLegend = ({
             >
                 {percent}%
             </div>
-            <div className="mr-1 shrink-0">
-                <Image
-                    src={token.icon}
-                    alt={token.name}
-                    width={11}
-                    height={11}
-                />
-            </div>
+            <Avatar
+                src={token.icon}
+                alt={token.name}
+                className="w-3 h-3 mr-1 shrink-0"
+            />
             <div className="font-bold text-xs">{token.name}</div>
         </div>
     );

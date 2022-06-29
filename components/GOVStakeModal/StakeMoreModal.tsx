@@ -9,6 +9,7 @@ import {
 } from "atoms/govState";
 import { walletBalanceState } from "atoms/walletState";
 import BigNumber from "bignumber.js";
+import Avatar from "components/Avatar";
 import BaseModal from "components/BaseModal";
 import Checkbox from "components/Checkbox";
 import GlowingButton from "components/GlowingButton";
@@ -248,14 +249,11 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                                 <div className="text-ash-gray-500 text-xs lg:text-sm font-bold mb-2 lg:mb-4 flex items-center">
                                     <div className="mr-1">Current</div>
                                     <div className="flex items-center">
-                                        <div className="w-3 h-3 rounded-full relative mr-1">
-                                            <Image
-                                                src={ASH_TOKEN.icon}
-                                                alt={ASH_TOKEN.name}
-                                                layout="fill"
-                                                objectFit="contain"
-                                            />
-                                        </div>
+                                        <Avatar
+                                            src={ASH_TOKEN.icon}
+                                            alt={ASH_TOKEN.name}
+                                            className="w-3 h-3 mr-1"
+                                        />
                                         <div>{ASH_TOKEN.name} Staked</div>
                                     </div>
                                 </div>

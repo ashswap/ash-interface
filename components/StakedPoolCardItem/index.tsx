@@ -1,6 +1,6 @@
 import {
     AccountInfoSliceNetworkType,
-    useGetNetworkConfig,
+    useGetNetworkConfig
 } from "@elrondnetwork/dapp-core";
 import ICChevronDown from "assets/svg/chevron-down.svg";
 import ICChevronUp from "assets/svg/chevron-up.svg";
@@ -8,14 +8,14 @@ import ICMinus from "assets/svg/minus.svg";
 import ICPlus from "assets/svg/plus.svg";
 import { PoolsState } from "atoms/poolsState";
 import AddLiquidityModal from "components/AddLiquidityModal";
+import Avatar from "components/Avatar";
 import RemoveLiquidityModal from "components/RemoveLiquidityModal";
 import TextAmt from "components/TextAmt";
 import CardTooltip from "components/Tooltip/CardTooltip";
 import { toEGLDD } from "helper/balance";
 import { formatAmount } from "helper/number";
 import { Unarray } from "interface/utilities";
-import Image from "next/image";
-import React, { useState } from "react";
+import { useState } from "react";
 
 function StakedPoolCardItem({
     poolData,
@@ -86,12 +86,16 @@ function StakedPoolCardItem({
                 </div>
                 <div className="grow flex flex-col justify-end relative">
                     <div className="absolute top-0 right-0 flex flex-row justify-between items-center">
-                        <div className="w-[3.25rem]">
-                            <Image src={pool.tokens[0].icon} alt="token icon" />
-                        </div>
-                        <div className="w-[3.25rem] -ml-2.5">
-                            <Image src={pool.tokens[1].icon} alt="token icon" />
-                        </div>
+                        <Avatar
+                            src={pool.tokens[0].icon}
+                            alt={pool.tokens[0].name}
+                            className="w-[3.25rem] h-[3.25rem]"
+                        />
+                        <Avatar
+                            src={pool.tokens[1].icon}
+                            alt={pool.tokens[1].name}
+                            className="w-[3.25rem] h-[3.25rem] -ml-2.5"
+                        />
                     </div>
                     <div className="mb-8">
                         <div className="text-stake-gray-500 text-xs underline mb-4 inline-block">
