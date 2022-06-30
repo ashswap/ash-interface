@@ -19,6 +19,10 @@ import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import styles from "./Nav.module.css";
+import ICGovStatsSquare from "assets/svg/gov-stats-square.svg";
+import ICGovFarmSquare from "assets/svg/gov-farm-square.svg";
+import ICGovBoostSquare from "assets/svg/gov-boost-square.svg";
+import ICGovVoteSquare from "assets/svg/gov-vote-square.svg";
 const SOCIALS = [
     {
         name: "Liquidity Stake",
@@ -122,80 +126,18 @@ function StakeMenu() {
                                                 </div>
                                                 <div className="flex flex-col space-y-2 text-stake-gray-500 text-xs font-bold">
                                                     <div className="flex">
-                                                        <svg
-                                                            width="12"
-                                                            height="12"
-                                                            viewBox="0 0 12 12"
-                                                            fill="none"
-                                                            xmlns="http://www.w3.org/2000/svg"
-                                                            className="mr-2"
-                                                        >
-                                                            <rect
-                                                                width="12"
-                                                                height="12"
-                                                                fill="#B7B7D7"
-                                                                fillOpacity="0.1"
-                                                            />
-                                                            <path
-                                                                d="M0.0146484 6.48232L1.11491 4.99959L2.02328 4.99959L8.52855 4.99959L7.92254 6.97656L0.0146484 6.97656L0.0146484 6.48232Z"
-                                                                fill="#B7B7D7"
-                                                            />
-                                                            <path
-                                                                d="M7.42828 6.97615L8.02678 4.99918L8.90329 4.99918L11.9807 4.99918L8.7956 7.76694L6.0498 8.95312L7.42828 6.97615Z"
-                                                                fill="#B7B7D7"
-                                                            />
-                                                        </svg>
+                                                        <ICGovStatsSquare className="w-3 h-3 text-stake-gray-500 mr-2" />
                                                         <div>
                                                             Earning transaction
                                                             fees
                                                         </div>
                                                     </div>
                                                     <div className="flex">
-                                                        <svg
-                                                            width="12"
-                                                            height="12"
-                                                            viewBox="0 0 12 12"
-                                                            fill="none"
-                                                            xmlns="http://www.w3.org/2000/svg"
-                                                            className="mr-2"
-                                                        >
-                                                            <rect
-                                                                width="12"
-                                                                height="12"
-                                                                fill="#B7B7D7"
-                                                                fillOpacity="0.1"
-                                                            />
-                                                            <path
-                                                                fillRule="evenodd"
-                                                                clipRule="evenodd"
-                                                                d="M8.92897 3.73302L3.40835 4.25714L1 3.73285L3.93901 2.00553L11.0001 0.902344L8.92897 3.73302ZM3.68798 10.8945L1.58366 10.9086L1.12904 10.576L4.51197 6.12445L7.73616 5.53372L4.29932 10.059L3.68798 10.8945Z"
-                                                                fill="#B7B7D7"
-                                                            />
-                                                        </svg>
-
+                                                        <ICGovBoostSquare className="w-3 h-3 text-stake-gray-500 mr-2" />
                                                         <div>Yield boost</div>
                                                     </div>
                                                     <div className="flex">
-                                                        <svg
-                                                            width="12"
-                                                            height="12"
-                                                            viewBox="0 0 12 12"
-                                                            fill="none"
-                                                            xmlns="http://www.w3.org/2000/svg"
-                                                            className="mr-2"
-                                                        >
-                                                            <rect
-                                                                width="12"
-                                                                height="12"
-                                                                fill="#B7B7D7"
-                                                                fillOpacity="0.1"
-                                                            />
-                                                            <path
-                                                                d="M4.50007 6.44011L6.8148 6.42455L7.48727 5.50546L11.2677 0.527758L7.72117 1.17756L4 6.07422L4.50007 6.44011Z"
-                                                                fill="#B7B7D7"
-                                                            />
-                                                        </svg>
-
+                                                        <ICGovFarmSquare className="w-3 h-3 text-stake-gray-500 mr-2" />
                                                         <div>
                                                             Vote{" "}
                                                             <span className="text-ash-cyan-500">
@@ -205,28 +147,7 @@ function StakeMenu() {
                                                         </div>
                                                     </div>
                                                     <div className="flex">
-                                                        <svg
-                                                            width="12"
-                                                            height="12"
-                                                            viewBox="0 0 12 12"
-                                                            fill="none"
-                                                            xmlns="http://www.w3.org/2000/svg"
-                                                            className="mr-2"
-                                                        >
-                                                            <rect
-                                                                width="12"
-                                                                height="12"
-                                                                fill="#B7B7D7"
-                                                                fillOpacity="0.1"
-                                                            />
-                                                            <path
-                                                                fillRule="evenodd"
-                                                                clipRule="evenodd"
-                                                                d="M3.8148 6.89679L1.50007 6.91235L1 6.54646L4.72117 1.6498L8.26774 1L4.48727 5.97771L3.8148 6.89679ZM6.8148 10.8968L4.50007 10.9123L4 10.5465L7.72117 5.64981L11.2677 5L7.48727 9.97771L6.8148 10.8968Z"
-                                                                fill="#B7B7D7"
-                                                            />
-                                                        </svg>
-
+                                                        <ICGovVoteSquare className="w-3 h-3 text-stake-gray-500 mr-2" />
                                                         <div>
                                                             Create Proposals
                                                         </div>

@@ -78,6 +78,9 @@ function BoostBar({ height = 32, min= 1, max=2.5, value=1, children, disabled }:
         const topDeltaX = tan33 * (height - leftDelta);
         return topDeltaX + 5;
     }, [height]);
+    const validValue = useMemo(() => {
+        return Math.max(Math.min(max, value), min);
+    }, [min, max, value]);
     return (
         <div className="relative">
             <div>
@@ -92,7 +95,7 @@ function BoostBar({ height = 32, min= 1, max=2.5, value=1, children, disabled }:
                 style={{
                     filter: !disabled ? "drop-shadow(0px 8px 25px rgba(255, 0, 92, 0.25))" : "",
                     minWidth,
-                    width: `${value === min ? minWidth + "px" : 10 + ((value - min)*90/(max - min)) + "%"}`
+                    width: `${validValue === min ? minWidth + "px" : 10 + ((validValue - min)*90/(max - min)) + "%"}`
                 }}
             >
                 <Polygon height={height} className={`${disabled ? "" : "bg-pink-600"}`} />

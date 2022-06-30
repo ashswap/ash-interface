@@ -68,3 +68,4 @@ const testnet: IFarm[] = [
 ];
 
 export const FARMS = ENVIRONMENT.NETWORK == "devnet" ? devnet : testnet;
+export const FARMS_MAP = Object.fromEntries(FARMS.map(f => [f.farm_address, f]));

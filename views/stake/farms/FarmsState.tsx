@@ -55,6 +55,7 @@ export type FarmRecord = {
         }[];
         totalStakedLP: BigNumber;
         totalRewardAmt: BigNumber;
+        totalStakedLPValue: BigNumber;
     };
     ashPerBlock: BigNumber;
     farmTokenSupply: BigNumber;
@@ -232,16 +233,18 @@ const FarmsState = () => {
                         getReward(f, t.balance, t.tokenId)
                     );
                     const totalRewards = await Promise.all(rewards);
+                    const totalStakedLP = farmTokens.reduce(
+                        (total, val) => total.plus(val.balance),
+                        new BigNumber(0)
+                    )
                     record.stakedData = {
                         farmTokens,
-                        totalStakedLP: farmTokens.reduce(
-                            (total, val) => total.plus(val.balance),
-                            new BigNumber(0)
-                        ),
+                        totalStakedLP,
                         totalRewardAmt: totalRewards.reduce(
                             (total, val) => total.plus(val),
                             new BigNumber(0)
                         ),
+                        totalStakedLPValue: totalStakedLP.multipliedBy(totalLiquidityValue.div(farmTokenSupply))
                     };
                 }
                 return record;

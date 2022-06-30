@@ -1,5 +1,5 @@
 import ICArrowRight from "assets/svg/arrow-right.svg";
-import StakeLayout from "components/Layout/stake";
+import GovLayout from "components/Layout/Gov";
 import { ENVIRONMENT } from "const/env";
 import React, { ReactElement } from "react";
 import VotePowerChart from "views/components/VotePowerChart";
@@ -38,6 +38,6 @@ function GovPage() {
     );
 }
 GovPage.getLayout = function getLayout(page: ReactElement) {
-    return <StakeLayout>{page}</StakeLayout>;
+    return <GovLayout>{page}</GovLayout>;
 };
 export default GovPage;

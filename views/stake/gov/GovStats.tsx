@@ -40,6 +40,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
 import useSWR from "swr";
+import GovMenu from "./components/GovMenu";
 const ExpiredLockTooltip = ({
     children,
     disabled,
@@ -117,29 +118,11 @@ function GovStats() {
     }, [unlockTS, lockedAmt]);
     return (
         <>
-            <div className="flex justify-between">
+            <div className="mb-7">
                 <h1 className="text-pink-600 text-2xl md:text-5xl font-bold mb-7 md:mb-11">
                     Governance Stake
                 </h1>
-                <div className="hidden md:flex space-x-2">
-                    {/* <button className="bg-pink-600/20 text-pink-600 h-12 px-6 flex items-center justify-center">
-                            Weekly Summary
-                        </button> */}
-                    {loggedIn && (
-                        <ExpiredLockTooltip disabled={!canUnlockASH}>
-                            <GlowingButton
-                                theme="pink"
-                                className={`h-12 px-6`}
-                                disabled={canUnlockASH}
-                                onClick={() =>
-                                    !canUnlockASH && setOpenStakeGov(true)
-                                }
-                            >
-                                Add / Manage Stake
-                            </GlowingButton>
-                        </ExpiredLockTooltip>
-                    )}
-                </div>
+                <GovMenu/>
             </div>
             <div className="flex flex-col md:flex-row">
                 <div className="md:w-[21.875rem] shrink-0 flex flex-col px-7 lg:px-9 pb-9 pt-7 lg:pt-14 bg-stake-dark-400 mb-4 md:mb-0 md:mr-4 lg:mr-[1.875rem]">

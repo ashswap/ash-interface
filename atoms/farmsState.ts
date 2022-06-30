@@ -6,7 +6,7 @@ import { IFarm } from "interface/farm";
 import IPool from "interface/pool";
 import { PoolStatsRecord } from "interface/poolStats";
 import { Dispatch, SetStateAction } from "react";
-import { atom, selector } from "recoil";
+import { atom, selector, selectorFamily } from "recoil";
 import { ViewType } from "views/stake/farms/FarmFilter";
 
 type FarmRecord = {
@@ -22,6 +22,7 @@ type FarmRecord = {
         }[];
         totalStakedLP: BigNumber;
         totalRewardAmt: BigNumber;
+        totalStakedLPValue: BigNumber;
     };
     ashPerBlock: BigNumber;
     farmTokenSupply: BigNumber;
@@ -145,5 +146,23 @@ export const farmToDisplayState = selector<FarmRecord[]>({
     },
     cachePolicy_UNSTABLE: {
         eviction: "most-recent"
+    }
+});
+
+export const farmMapAddressState = selector({
+    key: "farm_data_map_address",
+    get: ({get}) => {
+        const farmRecords = get(farmRecordsState);
+        return Object.fromEntries(farmRecords.map(f => [f.farm.farm_address, f]));
+    },
+    cachePolicy_UNSTABLE: {
+        eviction: "most-recent"
+    }
+});
+
+export const farmQuery = selectorFamily({
+    key: "farm_single_selector_by_address",
+    get: (address: string) => ({get}) => {
+        return get(farmMapAddressState)[address];
     }
 });
