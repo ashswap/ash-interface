@@ -94,7 +94,6 @@ const pools =
         ? [...devnet, ...MAIAR_POOLS]
         : [...testnet, ...MAIAR_POOLS];
 
-export default pools;
 const getTokenFromPools = (...pools: IPool[]) => {
     const map = new Map<string, IToken>();
     pools.map((pool) => {
@@ -109,3 +108,4 @@ export const IN_POOL_TOKENS = getTokenFromPools(...pools);
 export const IN_POOL_TOKENS_MAP = Object.fromEntries(
     IN_POOL_TOKENS.map((t) => [t.id, t])
 );
+export default pools;

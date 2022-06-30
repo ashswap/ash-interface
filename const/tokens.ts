@@ -69,7 +69,7 @@ const DEVNET_TOKENS: IToken[] = [
 
 const TESTNET_TOKENS: IToken[] = [
     {
-        id: "ASH-4ce444",
+        id: "ASH-f01858",
         chainId: TESTNET,
         symbol: "ASH",
         name: "Ashswap Token",
