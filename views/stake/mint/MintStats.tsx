@@ -1,32 +1,27 @@
-import React, { useState } from "react";
+import ImgMintRisk from "assets/images/mint-stake-risk.png";
+import ImgUsdt from "assets/images/usdt-icon.png";
 import ICMinus from "assets/svg/minus.svg";
 import ICPlus from "assets/svg/plus.svg";
-import ImgUsdt from "assets/images/usdt-icon.png";
-import Image from "next/image";
-import ImgMintRisk from "assets/images/mint-stake-risk.png";
+import Avatar from "components/Avatar";
 import MintAOCModal from "components/MintAOCModal";
+import Image from "next/image";
+import { useState } from "react";
 
 const LPStat = () => {
     return (
         <div className="flex justify-between items-end">
             <div>
                 <div className="flex items-center mb-4">
-                    <div className="rounded-full overflow-hidden w-4 h-4">
-                        <Image
-                            src={ImgUsdt}
-                            alt="token icon"
-                            width={16}
-                            height={16}
-                        />
-                    </div>
-                    <div className="rounded-full overflow-hidden w-4 h-4 -ml-1">
-                        <Image
-                            src={ImgUsdt}
-                            alt="token icon"
-                            width={16}
-                            height={16}
-                        />
-                    </div>
+                    <Avatar
+                        src={ImgUsdt}
+                        alt="token icon"
+                        className="w-4 h-4"
+                    />
+                    <Avatar
+                        src={ImgUsdt}
+                        alt="token icon"
+                        className="w-4 h-4 -ml-1"
+                    />
                     <div className="text-stake-gray-500 text-sm font-bold ml-1.5">
                         LP-USDTUSDC
                     </div>

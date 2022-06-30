@@ -1,17 +1,13 @@
 import ICArrowLeft from "assets/svg/arrow-left.svg";
 import ICArrowRight from "assets/svg/arrow-right.svg";
-import ICStarOutline from "assets/svg/star-outline.svg";
-import ICStar from "assets/svg/star.svg";
+import Avatar from "components/Avatar";
 import pools from "const/pool";
-import { fetcher } from "helper/common";
 import { formatAmount } from "helper/number";
 import { useScreenSize } from "hooks/useScreenSize";
 import IPool from "interface/pool";
 import { PoolStatsRecord } from "interface/poolStats";
-import Image from "next/image";
 import Link from "next/link";
-import React, { useCallback, useMemo, useState } from "react";
-import useSWR from "swr";
+import { useCallback, useMemo, useState } from "react";
 const currencyFormater = new Intl.NumberFormat("en-US", {
     maximumFractionDigits: 2,
 });
@@ -57,25 +53,19 @@ const PoolRecord = ({
                     <div className="flex-1 overflow-hidden">
                         <div className="flex items-center mr-2 overflow-hidden">
                             <div className="shrink-0 flex">
-                                <div className="w-4 h-4 lg:w-6 lg:h-6">
-                                    <Image
-                                        src={token1?.icon || ""}
-                                        alt="token"
-                                        width={24}
-                                        height={24}
-                                    />
-                                </div>
-                                <div className="w-4 h-4 lg:w-6 lg:h-6 -ml-1">
-                                    <Image
-                                        src={token2?.icon || ""}
-                                        alt="token"
-                                        width={24}
-                                        height={24}
-                                    />
-                                </div>
+                                <Avatar
+                                    src={token1?.icon || ""}
+                                    alt={token1?.symbol}
+                                    className="w-4 h-4 lg:w-6 lg:h-6"
+                                />
+                                <Avatar
+                                    src={token2?.icon || ""}
+                                    alt={token2?.symbol}
+                                    className="w-4 h-4 lg:w-6 lg:h-6 -ml-1"
+                                />
                             </div>
                             <div className="ml-2 lg:ml-4 font-bold text-xs lg:text-sm text-white truncate">
-                                {token1?.name} & {token2?.name}
+                                {token1?.symbol} & {token2?.symbol}
                             </div>
                         </div>
                     </div>

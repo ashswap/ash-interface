@@ -1,13 +1,14 @@
 import {
     getProxyProvider,
     useGetAccountInfo,
-    useGetLoginInfo
+    useGetLoginInfo,
 } from "@elrondnetwork/dapp-core";
 import IconRight from "assets/svg/right-white.svg";
 import { addLPSessionIdAtom } from "atoms/addLiquidity";
 import { PoolsState } from "atoms/poolsState";
 import { walletBalanceState, walletTokenPriceState } from "atoms/walletState";
 import BigNumber from "bignumber.js";
+import Avatar from "components/Avatar";
 import BaseModal from "components/BaseModal";
 import Checkbox from "components/Checkbox";
 import GlowingButton from "components/GlowingButton";
@@ -21,7 +22,6 @@ import usePoolAddLP from "hooks/usePoolContract/usePoolAddLP";
 import { useScreenSize } from "hooks/useScreenSize";
 import { IToken } from "interface/token";
 import { Unarray } from "interface/utilities";
-import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
@@ -55,12 +55,14 @@ const TokenInput = ({
                 <div
                     className={`flex items-center w-24 sm:w-1/3 px-4 sm:px-0 border-r border-r-ash-gray-500 sm:border-r-0`}
                 >
-                    <div className="w-5 h-5 rounded-full mr-2 shrink-0">
-                        <Image src={token.icon} alt="token icon" />
-                    </div>
+                    <Avatar
+                        src={token.icon}
+                        alt="token icon"
+                        className="w-5 h-5 mr-2 shrink-0"
+                    />
                     <div className="hidden sm:block overflow-hidden">
                         <div className="text-sm font-bold text-white sm:pb-1">
-                            {token.name}
+                            {token.symbol}
                         </div>
                         <div className="text-text-input-3 text-xs truncate leading-tight">
                             <TextAmt number={tokenInPool} />
@@ -68,7 +70,7 @@ const TokenInput = ({
                         </div>
                     </div>
                     <div className="block sm:hidden text-xs font-bold text-white">
-                        {token.name}
+                        {token.symbol}
                     </div>
                 </div>
 
@@ -111,7 +113,7 @@ const TokenInput = ({
                             options={{ notation: "standard" }}
                         />
                         &nbsp;
-                        {token.name}
+                        {token.symbol}
                     </span>
                 </div>
             </div>
@@ -300,28 +302,22 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
                 <div className="mr-2">
                     {/* <div className="text-text-input-3 text-xs">Deposit</div> */}
                     <div className="flex flex-row items-baseline text-lg sm:text-2xl font-bold">
-                        <span>{pool.tokens[0].name}</span>
+                        <span>{pool.tokens[0].symbol}</span>
                         <span className="text-sm px-3">&</span>
-                        <span>{pool.tokens[1].name}</span>
+                        <span>{pool.tokens[1].symbol}</span>
                     </div>
                 </div>
                 <div className="flex flex-row justify-between items-center">
-                    <div className="w-6 h-6 sm:w-9 sm:h-9 rounded-full">
-                        <Image
-                            src={pool.tokens[0].icon}
-                            width={52}
-                            height={52}
-                            alt="token icon"
-                        />
-                    </div>
-                    <div className="w-6 h-6 sm:w-9 sm:h-9 rounded-full -ml-1 sm:ml-[-0.375rem]">
-                        <Image
-                            src={pool.tokens[1].icon}
-                            width={52}
-                            height={52}
-                            alt="token icon"
-                        />
-                    </div>
+                    <Avatar
+                        src={pool.tokens[0].icon}
+                        alt={pool.tokens[0].symbol}
+                        className="w-6 h-6 sm:w-9 sm:h-9"
+                    />
+                    <Avatar
+                        src={pool.tokens[1].icon}
+                        alt={pool.tokens[1].symbol}
+                        className="w-6 h-6 sm:w-9 sm:h-9 -ml-1 sm:ml-[-0.375rem]"
+                    />
                 </div>
             </div>
             <div className="my-10">
@@ -475,11 +471,9 @@ const AddLiquidityModal = (props: Props) => {
             <div className="flex justify-end mb-6">
                 <BaseModal.CloseBtn />
             </div>
-            {open && (
-                <div className="grow overflow-auto">
-                    <AddLiquidityContent {...props} />
-                </div>
-            )}
+            <div className="grow overflow-auto">
+                <AddLiquidityContent {...props} />
+            </div>
         </BaseModal>
     );
 };

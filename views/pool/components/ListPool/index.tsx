@@ -1,10 +1,10 @@
 import ImgAshSleep from "assets/images/ash-sleep.png";
 import { poolStakedOnlyState, poolToDisplayState } from "atoms/poolsState";
-import PoolCardItem from "views/pool/PoolCardItem";
-import { ViewType } from "views/pool/PoolFilter";
-import PoolListItem from "views/pool/PoolListItem";
-import StakedPoolCardItem from "components/StakedPoolCardItem";
-import StakedPoolListItem from "components/StakedPoolListItem";
+import PoolCardItem from "views/pool/components/PoolCardItem";
+import { ViewType } from "views/pool/components/PoolFilter";
+import PoolListItem from "views/pool/components/PoolListItem";
+import StakedPoolCardItem from "views/pool/components/StakedPoolCardItem";
+import StakedPoolListItem from "views/pool/components/StakedPoolListItem";
 import IPool from "interface/pool";
 import Image from "next/image";
 import Link from "next/link";

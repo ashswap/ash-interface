@@ -17,6 +17,7 @@ import {
     govVeASHAmtState,
 } from "atoms/govState";
 import { walletTokenPriceState } from "atoms/walletState";
+import Avatar from "components/Avatar";
 import BaseModal from "components/BaseModal";
 import GlowingButton from "components/GlowingButton";
 import GOVStakeModal from "components/GOVStakeModal";
@@ -168,24 +169,26 @@ function GovStats() {
                                 <div className="flex items-center">
                                     {rewardLPToken && (
                                         <div className="flex items-center">
-                                            <div className="w-[1.125rem] h-[1.125rem]">
-                                                <Image
-                                                    src={
-                                                        rewardLPToken.tokens[0]
-                                                            .icon
-                                                    }
-                                                    alt="token icon"
-                                                />
-                                            </div>
-                                            <div className="w-[1.125rem] h-[1.125rem] -ml-1 mr-2">
-                                                <Image
-                                                    src={
-                                                        rewardLPToken.tokens[1]
-                                                            .icon
-                                                    }
-                                                    alt="token icon"
-                                                />
-                                            </div>
+                                            <Avatar
+                                                src={
+                                                    rewardLPToken.tokens[0].icon
+                                                }
+                                                alt={
+                                                    rewardLPToken.tokens[0]
+                                                        .symbol
+                                                }
+                                                className="w-[1.125rem] h-[1.125rem]"
+                                            />
+                                            <Avatar
+                                                src={
+                                                    rewardLPToken.tokens[1].icon
+                                                }
+                                                alt={
+                                                    rewardLPToken.tokens[1]
+                                                        .symbol
+                                                }
+                                                className="w-[1.125rem] h-[1.125rem] -ml-1 mr-2"
+                                            />
                                         </div>
                                     )}
                                     <div className="text-lg">
@@ -235,14 +238,11 @@ function GovStats() {
                                     {/* <div className="w-[1.125rem] h-[1.125rem] mr-2">
                                         <Image src={ImgUsdt} alt="token icon" />
                                     </div> */}
-                                    <div className="w-[1.125rem] h-[1.125rem] mr-2 rounded-full relative">
-                                        <Image
-                                            src={ASH_TOKEN.icon}
-                                            alt={ASH_TOKEN.name}
-                                            layout="fill"
-                                            objectFit="contain"
-                                        />
-                                    </div>
+                                    <Avatar
+                                        src={ASH_TOKEN.icon}
+                                        alt={ASH_TOKEN.symbol}
+                                        className="w-[1.125rem] h-[1.125rem] mr-2"
+                                    />
                                     <div className="text-lg text-white font-bold">
                                         <TextAmt
                                             number={toEGLDD(
@@ -422,14 +422,11 @@ function GovStats() {
                                 {/* <div className="w-[1.125rem] h-[1.125rem] mr-2">
                                     <Image src={ImgUsdt} alt="token icon" />
                                 </div> */}
-                                <div className="w-[1.125rem] h-[1.125rem] mr-2 rounded-full relative">
-                                    <Image
-                                        src={ASH_TOKEN.icon}
-                                        alt={ASH_TOKEN.name}
-                                        layout="fill"
-                                        objectFit="contain"
-                                    />
-                                </div>
+                                <Avatar
+                                    src={ASH_TOKEN.icon}
+                                    alt={ASH_TOKEN.symbol}
+                                    className="w-[1.125rem] h-[1.125rem] mr-2"
+                                />
                                 <div className="text-white text-lg font-bold">
                                     <TextAmt
                                         number={toEGLDD(
@@ -599,27 +596,23 @@ function GovStats() {
                         {rewardLPToken && (
                             <>
                                 <div className="flex items-center mb-9">
-                                    <div className="w-8 h-8">
-                                        <Image
-                                            src={rewardLPToken.tokens[0].icon}
-                                            layout="responsive"
-                                            alt="token icon"
-                                        />
-                                    </div>
-                                    <div className="w-8 h-8 -ml-1 mr-2">
-                                        <Image
-                                            src={rewardLPToken.tokens[1].icon}
-                                            layout="responsive"
-                                            alt="token icon"
-                                        />
-                                    </div>
+                                    <Avatar
+                                        src={rewardLPToken.tokens[0].icon}
+                                        alt={rewardLPToken.tokens[0].symbol}
+                                        className="w-8 h-8"
+                                    />
+                                    <Avatar
+                                        src={rewardLPToken.tokens[1].icon}
+                                        alt={rewardLPToken.tokens[1].symbol}
+                                        className="w-8 h-8 -ml-1 mr-2"
+                                    />
                                 </div>
                                 <div className="text-center text-ash-gray-500 text-lg font-bold">
                                     <TextAmt number={rewardValue} />
                                     &nbsp; LP-
-                                    {rewardLPToken.tokens[0].name}
-                                    {rewardLPToken.tokens[1].name} has been sent
-                                    to your wallet
+                                    {rewardLPToken.tokens[0].symbol}
+                                    {rewardLPToken.tokens[1].symbol} has been
+                                    sent to your wallet
                                 </div>
                             </>
                         )}

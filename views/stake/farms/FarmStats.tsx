@@ -1,5 +1,6 @@
 import { farmRecordsState, farmStakedOnlyState } from "atoms/farmsState";
 import BigNumber from "bignumber.js";
+import Avatar from "components/Avatar";
 import GlowingButton from "components/GlowingButton";
 import TextAmt from "components/TextAmt";
 import CardTooltip from "components/Tooltip/CardTooltip";
@@ -80,14 +81,11 @@ function FarmStats({ onClickAll }: { onClickAll?: () => void }) {
                             </div>
                         </CardTooltip>
                         <div className="flex items-center">
-                            <div className="w-4.5 h-4.5 rounded-full relative mr-2">
-                                <Image
-                                    src={ASH_TOKEN.icon}
-                                    alt={ASH_TOKEN.name}
-                                    layout="fill"
-                                    objectFit="contain"
-                                />
-                            </div>
+                            <Avatar
+                                src={ASH_TOKEN.icon}
+                                alt={ASH_TOKEN.symbol}
+                                className="w-4.5 h-4.5 mr-2"
+                            />
                             <div className="text-white text-lg font-bold">
                                 <TextAmt
                                     number={toEGLDD(

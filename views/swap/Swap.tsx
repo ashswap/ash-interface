@@ -12,15 +12,16 @@ import {
     Transaction,
 } from "@elrondnetwork/erdjs";
 import Fire from "assets/images/fire.png";
+import ICArrowDownRounded from "assets/svg/arrow-down-rounded.svg";
 import ICChevronDown from "assets/svg/chevron-down.svg";
 import ICChevronUp from "assets/svg/chevron-up.svg";
 import ICClock from "assets/svg/clock.svg";
 import IconClose from "assets/svg/close.svg";
-import ICArrowDownRounded from "assets/svg/arrow-down-rounded.svg";
 import IconRight from "assets/svg/right-white.svg";
 import ICSetting from "assets/svg/setting.svg";
 import IconWallet from "assets/svg/wallet.svg";
 import BigNumber from "bignumber.js";
+import Avatar from "components/Avatar";
 import BaseButton from "components/BaseButton";
 import BaseModal from "components/BaseModal";
 import GlowingButton from "components/GlowingButton";
@@ -90,23 +91,21 @@ const MaiarPoolTooltip = ({
                                 <div className="clip-corner-4 clip-corner-bl bg-ash-dark-600 p-[1px] max-w-full sm:max-w-[23rem] backdrop-blur-[30px]">
                                     <div className="clip-corner-4 clip-corner-bl bg-ash-dark-400 px-12 py-6">
                                         <div className="font-bold text-sm leading-tight">
-                                            <Image
+                                            <Avatar
                                                 src={pool.tokens[0].icon}
-                                                alt={pool.tokens[0].name}
-                                                width={16}
-                                                height={16}
+                                                alt={pool.tokens[0].symbol}
+                                                className="w-4 h-4"
                                             />
                                             &nbsp;
-                                            {pool.tokens[0].name}
+                                            {pool.tokens[0].symbol}
                                             <span> - </span>
-                                            <Image
+                                            <Avatar
                                                 src={pool.tokens[1].icon}
-                                                alt={pool.tokens[1].name}
-                                                width={16}
-                                                height={16}
+                                                alt={pool.tokens[1].symbol}
+                                                className="w-4 h-4"
                                             />
                                             &nbsp;
-                                            {pool.tokens[1].name}
+                                            {pool.tokens[1].symbol}
                                             <span>
                                                 {" "}
                                                 only available in Battle of
@@ -319,10 +318,10 @@ const Swap = () => {
                     successMessage: `Swap succeed ${formatAmount(
                         toEGLDD(tokenFrom.decimals, rawValueFrom).toNumber(),
                         { notation: "standard" }
-                    )} ${tokenFrom.name} to ${formatAmount(
+                    )} ${tokenFrom.symbol} to ${formatAmount(
                         toEGLDD(tokenTo.decimals, rawValueTo).toNumber(),
                         { notation: "standard" }
-                    )} ${tokenTo.name}`,
+                    )} ${tokenTo.symbol}`,
                 },
             };
             const { error, sessionId } = await sendTransactions(payload);
@@ -562,7 +561,7 @@ const Swap = () => {
                                             </div>
                                         </div>
                                         <div>
-                                            1 {tokenFrom?.name} ={" "}
+                                            1 {tokenFrom?.symbol} ={" "}
                                             {pool && rates && (
                                                 <TextAmt
                                                     number={
@@ -584,7 +583,7 @@ const Swap = () => {
                                                     }}
                                                 />
                                             )}{" "}
-                                            {tokenTo?.name}
+                                            {tokenTo?.symbol}
                                         </div>
                                     </div>
                                 </OnboardTooltip>
@@ -658,7 +657,7 @@ const Swap = () => {
                                                     }}
                                                     decimalClassName="text-stake-gray-500"
                                                 />
-                                                &nbsp;{tokenTo?.name}
+                                                &nbsp;{tokenTo?.symbol}
                                             </div>
                                         </div>
                                         <div className="bg-black flex flex-row items-center justify-between h-10 pl-5 pr-6">
@@ -737,7 +736,7 @@ const Swap = () => {
                                                     ) : (
                                                         "0.00"
                                                     )}{" "}
-                                                    {tokenFrom?.name}
+                                                    {tokenFrom?.symbol}
                                                 </div>
                                             ) : (
                                                 <div
@@ -762,7 +761,7 @@ const Swap = () => {
                                                     ) : (
                                                         "0.00"
                                                     )}{" "}
-                                                    {tokenTo?.name}
+                                                    {tokenTo?.symbol}
                                                 </div>
                                             )}
                                         </div>
@@ -795,7 +794,7 @@ const Swap = () => {
                                                     <span className="text-insufficent-fund">
                                                         {account.balance === "0"
                                                             ? "EGLD"
-                                                            : tokenFrom?.name}
+                                                            : tokenFrom?.symbol}
                                                     </span>{" "}
                                                     BALANCE
                                                 </span>

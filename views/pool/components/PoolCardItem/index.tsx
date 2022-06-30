@@ -1,12 +1,11 @@
-
 import {
     AccountInfoSliceNetworkType,
-    useGetNetworkConfig
+    useGetNetworkConfig,
 } from "@elrondnetwork/dapp-core";
 import Down from "assets/svg/down-white.svg";
 import { PoolsState } from "atoms/poolsState";
 import AddLiquidityModal from "components/AddLiquidityModal";
-import BaseButton from "components/BaseButton";
+import Avatar from "components/Avatar";
 import GlowingButton from "components/GlowingButton";
 import TextAmt from "components/TextAmt";
 import CardTooltip from "components/Tooltip/CardTooltip";
@@ -15,8 +14,7 @@ import { formatAmount } from "helper/number";
 import { useOnboarding } from "hooks/useOnboarding";
 import { useScreenSize } from "hooks/useScreenSize";
 import { Unarray } from "interface/utilities";
-import Image from "next/image";
-import React, { useState } from "react";
+import { useState } from "react";
 
 function PoolCardItem({
     poolData,
@@ -47,18 +45,22 @@ function PoolCardItem({
                         Deposit
                     </div>
                     <div className="flex flex-row items-baseline text-2xl font-bold">
-                        <span>{pool.tokens[0].name}</span>
+                        <span>{pool.tokens[0].symbol}</span>
                         <span className="text-sm px-3">&</span>
-                        <span>{pool.tokens[1].name}</span>
+                        <span>{pool.tokens[1].symbol}</span>
                     </div>
                 </div>
                 <div className="flex flex-row justify-between items-center">
-                    <div className="w-[3.25rem]">
-                        <Image src={pool.tokens[0].icon} alt="token icon" />
-                    </div>
-                    <div className="w-[3.25rem] -ml-2.5">
-                        <Image src={pool.tokens[1].icon} alt="token icon" />
-                    </div>
+                    <Avatar
+                        src={pool.tokens[0].icon}
+                        alt={pool.tokens[0].symbol}
+                        className="w-[3.25rem] h-[3.25rem]"
+                    />
+                    <Avatar
+                        src={pool.tokens[1].icon}
+                        alt={pool.tokens[1].symbol}
+                        className="w-[3.25rem] h-[3.25rem] -ml-2.5"
+                    />
                 </div>
             </div>
             <div className="flex flex-row my-12 justify-between items-center">
@@ -114,7 +116,6 @@ function PoolCardItem({
                     >
                         Deposit
                     </GlowingButton>
-                    
                 </div>
             </OnboardTooltip>
 

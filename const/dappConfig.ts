@@ -20,3 +20,8 @@ export const DAPP_CONFIG: CustomNetworkType =
     ENVIRONMENT.NETWORK === "testnet"
         ? fallbackNetworkConfigurations.testnet
         : defaultDevnet;
+export const CHAIN_ID = {
+    DEVNET: "D",
+    TESTNET: "T",
+    MAINNET: "1"
+} as const;

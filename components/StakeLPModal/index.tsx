@@ -3,6 +3,7 @@ import { accIsInsufficientEGLDState } from "atoms/dappState";
 import { FarmsState } from "atoms/farmsState";
 import { walletBalanceState } from "atoms/walletState";
 import BigNumber from "bignumber.js";
+import Avatar from "components/Avatar";
 import BaseModal from "components/BaseModal";
 import Checkbox from "components/Checkbox";
 import GlowingButton from "components/GlowingButton";
@@ -15,8 +16,7 @@ import { formatAmount } from "helper/number";
 import useEnterFarm from "hooks/useFarmContract/useEnterFarm";
 import { useScreenSize } from "hooks/useScreenSize";
 import { Unarray } from "interface/utilities";
-import Image from "next/image";
-import React, { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
 type props = {
     open: boolean;
@@ -52,8 +52,8 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
         return totalAshPerDay.multipliedBy(shareOfFarm);
     }, [stakeAmt, farmTokenSupply, ashPerBlock]);
     const lpName = useMemo(() => {
-        return `LP-${token0.name}${token1.name}`;
-    }, [token0.name, token1.name]);
+        return `LP-${token0.symbol}${token1.symbol}`;
+    }, [token0.symbol, token1.symbol]);
     const insufficientLP = useMemo(() => {
         return (
             !LPBalance ||
@@ -86,20 +86,16 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
                             </div>
                             <div className="bg-ash-dark-400/30 h-14 lg:h-18 px-6 flex items-center">
                                 <div className="flex mr-2">
-                                    <div className="w-4 h-4">
-                                        <Image
-                                            src={token0.icon}
-                                            alt={`${token0.name} icon`}
-                                            layout="responsive"
-                                        />
-                                    </div>
-                                    <div className="w-4 h-4 -ml-1">
-                                        <Image
-                                            src={token1.icon}
-                                            alt={`${token1.name} icon`}
-                                            layout="responsive"
-                                        />
-                                    </div>
+                                    <Avatar
+                                        src={token0.icon}
+                                        alt={token0.symbol}
+                                        className="w-4 h-4"
+                                    />
+                                    <Avatar
+                                        src={token1.icon}
+                                        alt={token1.symbol}
+                                        className="w-4 h-4 -ml-1"
+                                    />
                                 </div>
                                 <div className="text-ash-gray-500 text-sm lg:text-lg font-bold">
                                     {lpName}

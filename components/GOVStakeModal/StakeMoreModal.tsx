@@ -9,6 +9,7 @@ import {
 } from "atoms/govState";
 import { walletBalanceState } from "atoms/walletState";
 import BigNumber from "bignumber.js";
+import Avatar from "components/Avatar";
 import BaseModal from "components/BaseModal";
 import Checkbox from "components/Checkbox";
 import GlowingButton from "components/GlowingButton";
@@ -240,7 +241,7 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                                             options={{ notation: "standard" }}
                                         />
                                         &nbsp;
-                                        {ASH_TOKEN.name}
+                                        {ASH_TOKEN.symbol}
                                     </span>
                                 </div>
                             </div>
@@ -248,15 +249,12 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                                 <div className="text-ash-gray-500 text-xs lg:text-sm font-bold mb-2 lg:mb-4 flex items-center">
                                     <div className="mr-1">Current</div>
                                     <div className="flex items-center">
-                                        <div className="w-3 h-3 rounded-full relative mr-1">
-                                            <Image
-                                                src={ASH_TOKEN.icon}
-                                                alt={ASH_TOKEN.name}
-                                                layout="fill"
-                                                objectFit="contain"
-                                            />
-                                        </div>
-                                        <div>{ASH_TOKEN.name} Staked</div>
+                                        <Avatar
+                                            src={ASH_TOKEN.icon}
+                                            alt={ASH_TOKEN.symbol}
+                                            className="w-3 h-3 mr-1"
+                                        />
+                                        <div>{ASH_TOKEN.symbol} Staked</div>
                                     </div>
                                 </div>
                                 <div className="bg-stake-dark-500 h-14 lg:h-18 px-6 flex items-center justify-end text-ash-gray-500">

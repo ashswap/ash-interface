@@ -8,14 +8,14 @@ import ICMinus from "assets/svg/minus.svg";
 import ICPlus from "assets/svg/plus.svg";
 import { PoolsState } from "atoms/poolsState";
 import AddLiquidityModal from "components/AddLiquidityModal";
+import Avatar from "components/Avatar";
 import RemoveLiquidityModal from "components/RemoveLiquidityModal";
 import TextAmt from "components/TextAmt";
 import CardTooltip from "components/Tooltip/CardTooltip";
 import { toEGLDD } from "helper/balance";
 import { formatAmount } from "helper/number";
 import { Unarray } from "interface/utilities";
-import Image from "next/image";
-import React, { useState } from "react";
+import { useState } from "react";
 
 function StakedPoolCardItem({
     poolData,
@@ -45,7 +45,7 @@ function StakedPoolCardItem({
                 <div className="mr-5">
                     <div className="mt-5 mb-8">
                         <div className="text-2xl font-bold text-white">
-                            {pool.tokens[0].name}
+                            {pool.tokens[0].symbol}
                         </div>
                         <div className="text-earn font-bold text-lg leading-tight">
                             <TextAmt
@@ -58,7 +58,7 @@ function StakedPoolCardItem({
                     </div>
                     <div className="mb-8">
                         <div className="text-2xl font-bold text-white">
-                            {pool.tokens[1].name}
+                            {pool.tokens[1].symbol}
                         </div>
                         <div className="text-earn font-bold text-lg leading-tight">
                             <TextAmt
@@ -86,12 +86,16 @@ function StakedPoolCardItem({
                 </div>
                 <div className="grow flex flex-col justify-end relative">
                     <div className="absolute top-0 right-0 flex flex-row justify-between items-center">
-                        <div className="w-[3.25rem]">
-                            <Image src={pool.tokens[0].icon} alt="token icon" />
-                        </div>
-                        <div className="w-[3.25rem] -ml-2.5">
-                            <Image src={pool.tokens[1].icon} alt="token icon" />
-                        </div>
+                        <Avatar
+                            src={pool.tokens[0].icon}
+                            alt={pool.tokens[0].symbol}
+                            className="w-[3.25rem] h-[3.25rem]"
+                        />
+                        <Avatar
+                            src={pool.tokens[1].icon}
+                            alt={pool.tokens[1].symbol}
+                            className="w-[3.25rem] h-[3.25rem] -ml-2.5"
+                        />
                     </div>
                     <div className="mb-8">
                         <div className="text-stake-gray-500 text-xs underline mb-4 inline-block">
@@ -195,7 +199,7 @@ function StakedPoolCardItem({
                                         ownLiquidity || 0
                                     )}
                                 />{" "}
-                                {pool.tokens[0].name}-{pool.tokens[1].name}
+                                {pool.tokens[0].symbol}-{pool.tokens[1].symbol}
                             </div>
                         </div>
                         <div className="flex flex-row justify-between items-center h-12 px-4">

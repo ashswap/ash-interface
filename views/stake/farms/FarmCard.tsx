@@ -4,6 +4,7 @@ import ICMinus from "assets/svg/minus.svg";
 import ICPlus from "assets/svg/plus.svg";
 import { farmLoadingMapState, FarmsState } from "atoms/farmsState";
 import BigNumber from "bignumber.js";
+import Avatar from "components/Avatar";
 import BaseModal from "components/BaseModal";
 import GlowingButton from "components/GlowingButton";
 import StakeLPModal from "components/StakeLPModal";
@@ -17,8 +18,7 @@ import { formatAmount } from "helper/number";
 import useFarmClaimReward from "hooks/useFarmContract/useFarmClaimReward";
 import { useScreenSize } from "hooks/useScreenSize";
 import { Unarray } from "interface/utilities";
-import Image from "next/image";
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { ViewType } from "./FarmFilter";
 
@@ -92,26 +92,22 @@ function FarmCard({ farmData, viewType }: props) {
                                 Stake LP
                             </div>
                             <div className="font-bold text-2xl text-white truncate">
-                                {token0.name}
+                                {token0.symbol}
                                 <span className="text-sm"> & </span>
-                                {token1.name}
+                                {token1.symbol}
                             </div>
                         </div>
                         <div className="flex">
-                            <div className="w-[3.25rem] h-[3.25rem] relative">
-                                <Image
-                                    src={token0.icon}
-                                    alt={`${token0.name} icon`}
-                                    layout="responsive"
-                                />
-                            </div>
-                            <div className="w-[3.25rem] h-[3.25rem] relative -ml-2">
-                                <Image
-                                    src={token1.icon}
-                                    alt={`${token1.name} icon`}
-                                    layout="responsive"
-                                />
-                            </div>
+                            <Avatar
+                                src={token0.icon}
+                                alt={token0.symbol}
+                                className="w-[3.25rem] h-[3.25rem]"
+                            />
+                            <Avatar
+                                src={token1.icon}
+                                alt={token1.symbol}
+                                className="w-[3.25rem] h-[3.25rem] -ml-2"
+                            />
                         </div>
                     </div>
                     <div className="mb-12">
@@ -144,7 +140,7 @@ function FarmCard({ farmData, viewType }: props) {
                                 }
                             >
                                 <div className="inline-block text-xs text-ash-gray-500 font-bold underline mb-2">
-                                    {ASH_TOKEN.name} Farmed
+                                    {ASH_TOKEN.symbol} Farmed
                                 </div>
                             </CardTooltip>
                             <div
@@ -293,25 +289,21 @@ function FarmCard({ farmData, viewType }: props) {
                         <div className="grow flex items-center space-x-2">
                             <div className="flex space-x-2 md:space-x-6 grow overflow-hidden">
                                 <div className="flex">
-                                    <div className="w-4 h-4 md:w-6 md:h-6 lg:w-9 lg:h-9">
-                                        <Image
-                                            src={token0.icon}
-                                            alt={`${token0.name} icon`}
-                                            layout="responsive"
-                                        />
-                                    </div>
-                                    <div className="w-4 h-4 -ml-1 md:w-6 md:h-6 lg:w-9 lg:h-9 md:-ml-3 lg:-ml-4.5 md:mt-3 lg:mt-4.5">
-                                        <Image
-                                            src={token1.icon}
-                                            alt={`${token1.name} icon`}
-                                            layout="responsive"
-                                        />
-                                    </div>
+                                    <Avatar
+                                        src={token0.icon}
+                                        alt={token0.symbol}
+                                        className="w-4 h-4 md:w-6 md:h-6 lg:w-9 lg:h-9"
+                                    />
+                                    <Avatar
+                                        src={token1.icon}
+                                        alt={token1.symbol}
+                                        className="w-4 h-4 -ml-1 md:w-6 md:h-6 lg:w-9 lg:h-9 md:-ml-3 lg:-ml-4.5 md:mt-3 lg:mt-4.5"
+                                    />
                                 </div>
                                 <div className="flex md:flex-col text-xs lg:text-lg font-bold md:space-y-2 leading-tight">
-                                    <div>{token0.name}</div>
+                                    <div>{token0.symbol}</div>
                                     <div className="md:hidden"> & </div>
-                                    <div>{token1.name}</div>
+                                    <div>{token1.symbol}</div>
                                 </div>
                             </div>
                             {/* emission APR */}
@@ -377,7 +369,7 @@ function FarmCard({ farmData, viewType }: props) {
                                 </div>
                             ) : (
                                 <GlowingButton
-                                theme="cyan"
+                                    theme="cyan"
                                     className={`clip-corner-1 clip-corner-br h-10 lg:h-12 w-[5.5rem] lg:w-[6.5rem] font-bold underline text-xs`}
                                     onClick={() => setOpenStakeLP(true)}
                                 >

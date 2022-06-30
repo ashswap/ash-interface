@@ -3,11 +3,9 @@ import ICArrowRight from "assets/svg/arrow-right.svg";
 import ICStarOutline from "assets/svg/star-outline.svg";
 import ICStar from "assets/svg/star.svg";
 import { ENVIRONMENT } from "const/env";
-import { IN_POOL_TOKENS } from "const/tokens";
+import { IN_POOL_TOKENS } from "const/pool";
 import { fetcher } from "helper/common";
-import {
-    formatAmount,
-} from "helper/number";
+import { formatAmount } from "helper/number";
 import { useScreenSize } from "hooks/useScreenSize";
 import { IToken } from "interface/token";
 import { TokenStatsRecord } from "interface/tokenStats";
@@ -71,11 +69,11 @@ const TokenRecord = ({
                         height={24}
                     /> */}
                             <div className="ml-2.5 font-bold text-sm">
-                                {tokenData?.token?.name}
+                                {tokenData?.token?.symbol}
                             </div>
                         </div>
                         <div className="hidden lg:block text-2xs text-ash-gray-500 truncate">
-                            {tokenData?.token?.name} Coin
+                            {tokenData?.token?.symbol} Coin
                         </div>
                     </div>
                     <div className="flex-1 overflow-hidden text-right">
@@ -137,8 +135,8 @@ function TokenTable({
     const sortedTokenRecords: TokenStatsRecord[] = useMemo(() => {
         if (sortBy === "name") {
             return [...tokenRecords].sort((x, y) => {
-                const strX = x?.token?.name || "";
-                const strY = y?.token?.name || "";
+                const strX = x?.token?.symbol || "";
+                const strY = y?.token?.symbol || "";
                 return strY > strX ? -1 : strX > strY ? 1 : 0;
             });
         }

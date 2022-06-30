@@ -9,12 +9,12 @@ import ICChevronUp from "assets/svg/chevron-up.svg";
 import IconCopy from "assets/svg/copy.svg";
 import IconDisconnect from "assets/svg/disconnect.svg";
 import { walletIsOpenConnectModalState } from "atoms/walletState";
+import Avatar from "components/Avatar";
 import BaseModal from "components/BaseModal";
 import BasePopover from "components/BasePopover";
 import { useConnectWallet } from "hooks/useConnectWallet";
 import useMounted from "hooks/useMounted";
 import { useScreenSize } from "hooks/useScreenSize";
-import Image from "next/image";
 import {
     Dispatch,
     SetStateAction,
@@ -109,12 +109,7 @@ function AddressMenu({ infoLayout, dropdownBtn, connectBtn }: AddressMenuProp) {
                                         }
                                     >
                                         <div className="flex items-center mr-2.5">
-                                            <Image
-                                                src={ImgAvatar}
-                                                alt="avatar"
-                                                width={24}
-                                                height={24}
-                                            />
+                                            <Avatar src={ImgAvatar} alt="avatar" className="w-6 h-6"/>
                                             <span className="ml-2.5">
                                                 {address.slice(0, 8) +
                                                     "..." +

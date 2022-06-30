@@ -3,13 +3,13 @@ import ImgUsdt from "assets/images/usdt-icon.png";
 import ICChevronDown from "assets/svg/chevron-down.svg";
 import ICChevronRight from "assets/svg/chevron-right.svg";
 import { accIsInsufficientEGLDState } from "atoms/dappState";
+import Avatar from "components/Avatar";
 import BaseModal from "components/BaseModal";
 import BasePopover from "components/BasePopover";
 import Checkbox from "components/Checkbox";
 import InputCurrency from "components/InputCurrency";
 import { useScreenSize } from "hooks/useScreenSize";
-import Image from "next/image";
-import React, { useState } from "react";
+import { useState } from "react";
 import { useRecoilValue } from "recoil";
 import { theme } from "tailwind.config";
 type props = {
@@ -49,22 +49,16 @@ function MintAOCModal({ open, onClose }: props) {
                                             button={() => (
                                                 <button className="w-full h-18 flex items-center justify-between px-7 bg-ash-dark-600">
                                                     <div className="flex items-center">
-                                                        <div>
-                                                            <Image
-                                                                src={ImgUsdt}
-                                                                alt="Token icon"
-                                                                width={16}
-                                                                height={16}
-                                                            />
-                                                        </div>
-                                                        <div className="-ml-1">
-                                                            <Image
-                                                                src={ImgUsdt}
-                                                                alt="Token icon"
-                                                                width={16}
-                                                                height={16}
-                                                            />
-                                                        </div>
+                                                        <Avatar
+                                                            src={ImgUsdt}
+                                                            alt="Token icon"
+                                                            className="w-4 h-4"
+                                                        />
+                                                        <Avatar
+                                                            src={ImgUsdt}
+                                                            alt="Token icon"
+                                                            className="w-4 h-4 -ml-1"
+                                                        />
                                                         <div className="text-lg font-bold text-stake-gray-500 ml-2">
                                                             Select
                                                         </div>
@@ -97,11 +91,10 @@ function MintAOCModal({ open, onClose }: props) {
                                     </div>
                                 </div>
                                 <div className="bg-ash-gray-500/10 h-20 pl-7 pr-[2.375rem] flex items-center justify-between">
-                                    <Image
+                                    <Avatar
                                         src={ImgUsdt}
                                         alt="Token icon"
-                                        width={29}
-                                        height={29}
+                                        className="w-7 h-7"
                                     />
                                     <div className="text-ash-gray-500 text-2xl font-bold">
                                         3.31961451234 ASH

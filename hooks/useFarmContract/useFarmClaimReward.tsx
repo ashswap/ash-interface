@@ -92,7 +92,7 @@ const useFarmClaimReward = () => {
                             successMessage: `Claim succeed ${toEGLDD(
                                 ASH_TOKEN.decimals,
                                 stakedData.totalRewardAmt
-                            )} ${ASH_TOKEN.name}`,
+                            )} ${ASH_TOKEN.symbol}`,
                         },
                     };
                     const result = await sendTransactions(payload);
@@ -111,44 +111,55 @@ const useFarmClaimReward = () => {
         [createClaimRewardTxs]
     );
 
-    const claimAllFarmsReward = useRecoilCallback(({snapshot, set}) => async () => {
-        const farmRecords = await snapshot.getPromise(farmRecordsState);
+    const claimAllFarmsReward = useRecoilCallback(
+        ({ snapshot, set }) =>
+            async () => {
+                const farmRecords = await snapshot.getPromise(farmRecordsState);
 
-        let txs: Transaction[] = [];
-        let totalASH = new BigNumber(0);
-        const farmsAddress: string[] = [];
-        for (let i = 0; i < farmRecords.length; i++) {
-            const val = farmRecords[i];
-            if (val?.stakedData?.totalRewardAmt.gt(0)) {
-                const temp = await createClaimRewardTxs(val);
-                txs = [...txs, ...temp];
-                totalASH = totalASH.plus(val.stakedData.totalRewardAmt);
-                farmsAddress.push(val.farm.farm_address);
+                let txs: Transaction[] = [];
+                let totalASH = new BigNumber(0);
+                const farmsAddress: string[] = [];
+                for (let i = 0; i < farmRecords.length; i++) {
+                    const val = farmRecords[i];
+                    if (val?.stakedData?.totalRewardAmt.gt(0)) {
+                        const temp = await createClaimRewardTxs(val);
+                        txs = [...txs, ...temp];
+                        totalASH = totalASH.plus(val.stakedData.totalRewardAmt);
+                        farmsAddress.push(val.farm.farm_address);
+                    }
+                }
+                const payload: DappSendTransactionsPropsType = {
+                    transactions: txs,
+                    transactionsDisplayInfo: {
+                        successMessage: `Claim succeed ${toEGLDD(
+                            ASH_TOKEN.decimals,
+                            totalASH
+                        )} ${ASH_TOKEN.symbol}`,
+                    },
+                };
+                const result = await sendTransactions(payload);
+                if (result.sessionId)
+                    set(farmSessionIdMapState, (val) => ({
+                        ...val,
+                        ...Object.fromEntries(
+                            farmsAddress.map((farm_address) => [
+                                farm_address,
+                                [
+                                    ...(val[farm_address] || []),
+                                    result.sessionId!,
+                                ],
+                            ])
+                        ),
+                    }));
             }
-        }
-        const payload: DappSendTransactionsPropsType = {
-            transactions: txs,
-            transactionsDisplayInfo: {
-                successMessage: `Claim succeed ${toEGLDD(
-                    ASH_TOKEN.decimals,
-                    totalASH
-                )} ${ASH_TOKEN.name}`,
-            },
-        };
-        const result = await sendTransactions(payload);
-        if (result.sessionId)
-            set(farmSessionIdMapState, (val) => ({
-                ...val,
-                ...Object.fromEntries(
-                    farmsAddress.map((farm_address) => [
-                        farm_address,
-                        [...(val[farm_address] || []), result.sessionId!],
-                    ])
-                ),
-            }));
-    })
+    );
 
-    return { claimReward, createClaimRewardTx, createClaimRewardTxs, claimAllFarmsReward };
+    return {
+        claimReward,
+        createClaimRewardTx,
+        createClaimRewardTxs,
+        claimAllFarmsReward,
+    };
 };
 
 export default useFarmClaimReward;

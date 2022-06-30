@@ -1,10 +1,8 @@
 // import Token from "components/Token";
+import ICArrowRightRounded from "assets/svg/arrow-right-rounded.svg";
+import Avatar from "components/Avatar";
 import IPool from "interface/pool";
 import { IToken } from "interface/token";
-import Image from "next/image";
-import { createContext, useContext } from "react";
-import styles from "./ListSwapPool.module.css";
-import ICArrowRightRounded from "assets/svg/arrow-right-rounded.svg";
 interface Props {
     items: IPool[];
     className?: string | undefined;
@@ -16,20 +14,17 @@ interface Props {
 const Token = ({ token }: { token: IToken }) => {
     return (
         <div className="flex items-center space-x-4">
-            <div className="w-7 h-7 relative shrink-0">
-                <Image
-                    src={token.icon}
-                    alt={token.name}
-                    layout="fill"
-                    objectFit="contain"
-                />
-            </div>
+            <Avatar
+                src={token.icon}
+                alt={token.symbol}
+                className="w-7 h-7 shrink-0"
+            />
             <div className="overflow-hidden">
                 <div className="text-sm font-bold text-white truncate">
-                    {token.name}
+                    {token.symbol}
                 </div>
                 <div className="text-2xs text-ash-gray-600 truncate">
-                    {token.name}
+                    {token.symbol}
                 </div>
             </div>
         </div>

@@ -54,10 +54,10 @@ const usePoolRemoveLP = () => {
                         successMessage: `Remove Liquidity Success ${formatAmount(
                             toEGLDD(pool.tokens[0].decimals, v0).toNumber(),
                             { notation: "standard" }
-                        )} ${pool.tokens[0].name} and ${formatAmount(
+                        )} ${pool.tokens[0].symbol} and ${formatAmount(
                             toEGLDD(pool.tokens[1].decimals, v1).toNumber(),
                             { notation: "standard" }
-                        )} ${pool.tokens[1].name}`,
+                        )} ${pool.tokens[1].symbol}`,
                     },
                 };
                 return await sendTransactions(payload);

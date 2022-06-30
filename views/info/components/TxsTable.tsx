@@ -1,4 +1,7 @@
-import { AccountInfoSliceNetworkType, useGetNetworkConfig } from "@elrondnetwork/dapp-core";
+import {
+    AccountInfoSliceNetworkType,
+    useGetNetworkConfig,
+} from "@elrondnetwork/dapp-core";
 import ICArrowLeft from "assets/svg/arrow-left.svg";
 import ICArrowRight from "assets/svg/arrow-right.svg";
 import ICChevronDown from "assets/svg/chevron-down.svg";
@@ -56,8 +59,8 @@ const TxRecord = ({ txStats }: { txStats: TxStatsRecord }) => {
                     rel="noreferrer"
                 >
                     <span className="text-pink-600">
-                        {label.action} {token1.name} {label.separator}{" "}
-                        {token2.name}
+                        {label.action} {token1.symbol} {label.separator}{" "}
+                        {token2.symbol}
                     </span>
                 </a>
             </div>
@@ -70,13 +73,13 @@ const TxRecord = ({ txStats }: { txStats: TxStatsRecord }) => {
             <div className="text-right hidden md:block">
                 <span className="text-white">
                     {formatAmount(toEGLDD(token1.decimals, amt1).toNumber())}{" "}
-                    {token1.name}
+                    {token1.symbol}
                 </span>
             </div>
             <div className="text-right hidden md:block">
                 <span className="text-white">
                     {formatAmount(toEGLDD(token2.decimals, amt2).toNumber())}{" "}
-                    {token2.name}
+                    {token2.symbol}
                 </span>
             </div>
             <div className="text-right hidden xl:block">
