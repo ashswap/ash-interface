@@ -92,4 +92,18 @@ const testnet: IPool[] = [
 const pools = ENVIRONMENT.NETWORK == "devnet" ? [...devnet, ...MAIAR_POOLS] : [...testnet, ...MAIAR_POOLS];
 export const POOLS_MAP_ADDRESS = Object.fromEntries(pools.map(p => [p.address, p]));
 export const POOLS_MAP_LP = Object.fromEntries(pools.map(p => [p.lpToken.id, p]));
+const getTokenFromPools = (...pools: IPool[]) => {
+    const map = new Map<string, IToken>();
+    pools.map((pool) => {
+        pool.tokens.map((token) => {
+            map.set(token.id, token);
+        });
+    });
+    return Array.from(map.values());
+};
+
+export const IN_POOL_TOKENS = getTokenFromPools(...pools);
+export const IN_POOL_TOKENS_MAP = Object.fromEntries(
+    IN_POOL_TOKENS.map((t) => [t.id, t])
+);
 export default pools;

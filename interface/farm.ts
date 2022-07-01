@@ -6,4 +6,5 @@ export interface IFarm {
     farming_token_decimal: number;
     farm_token_id: string;
     farm_token_decimal: number;
+    active: boolean;
 }

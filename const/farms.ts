@@ -11,6 +11,7 @@ const devnet: IFarm[] = [
         farming_token_decimal: 18,
         farm_token_id: "FUU-368c44",
         farm_token_decimal: 18,
+        active: true,
     },
     {
         farm_address:
@@ -21,6 +22,7 @@ const devnet: IFarm[] = [
         farming_token_decimal: 18,
         farm_token_id: "FUW-dd21b6",
         farm_token_decimal: 18,
+        active: true,
     },
     {
         farm_address:
@@ -31,6 +33,7 @@ const devnet: IFarm[] = [
         farming_token_decimal: 18,
         farm_token_id: "FRW-dd4067",
         farm_token_decimal: 18,
+        active: true,
     },
 ];
 
@@ -44,6 +47,7 @@ const testnet: IFarm[] = [
         farming_token_decimal: 18,
         farm_token_id: "FUU-6bd7c3",
         farm_token_decimal: 18,
+        active: true,
     },
     {
         farm_address:
@@ -54,6 +58,7 @@ const testnet: IFarm[] = [
         farming_token_decimal: 18,
         farm_token_id: "FUW-2b7274",
         farm_token_decimal: 18,
+        active: true,
     },
     {
         farm_address:
@@ -64,8 +69,10 @@ const testnet: IFarm[] = [
         farming_token_decimal: 18,
         farm_token_id: "FRW-857544",
         farm_token_decimal: 18,
+        active: true,
     },
 ];
 
 export const FARMS = ENVIRONMENT.NETWORK == "devnet" ? devnet : testnet;
+export const ACTIVE_FARMS = FARMS.filter(f => f.active);
 export const FARMS_MAP = Object.fromEntries(FARMS.map(f => [f.farm_address, f]));

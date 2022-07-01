@@ -8,11 +8,11 @@ import ICGovVoteSquare from "assets/svg/gov-vote-square.svg";
 import ActiveLink from "components/Link/ActiveLink";
 function GovMenu() {
     return (
-        <div className="flex space-x-2">
-            <ActiveLink href="/stake/gov">
+        <div className="-mx-6 px-6 sm:px-0 sm:mx-0 scrollbar-hide flex space-x-2 overflow-auto">
+            <ActiveLink href="/stake/gov" className="shrink-0">
                 {({ active }) => (
                     <div
-                        className={`flex items-center h-12 px-6 bg-ash-dark-600 text-sm font-bold ${
+                        className={`flex items-center h-8 sm:h-12 px-6 bg-ash-dark-600 text-xs sm:text-sm font-bold ${
                             active ? "text-pink-600" : "text-stake-gray-500"
                         }`}
                     >
@@ -21,10 +21,10 @@ function GovMenu() {
                     </div>
                 )}
             </ActiveLink>
-            <ActiveLink href="/stake/gov/boost" exact>
+            <ActiveLink href="/stake/gov/boost" exact className="shrink-0">
                 {({ active }) => (
                     <div
-                        className={`flex items-center h-12 px-6 bg-ash-dark-600 text-sm font-bold ${
+                        className={`flex items-center h-8 sm:h-12 px-6 bg-ash-dark-600 text-xs sm:text-sm font-bold ${
                             active ? "text-pink-600" : "text-stake-gray-500"
                         }`}
                     >
@@ -33,10 +33,10 @@ function GovMenu() {
                     </div>
                 )}
             </ActiveLink>
-            <ActiveLink href="/stake/gov/farm" exact>
+            <ActiveLink href="/stake/gov/farm" exact className="shrink-0">
                 {({ active }) => (
                     <div
-                        className={`flex items-center h-12 px-6 bg-ash-dark-600 text-sm font-bold ${
+                        className={`flex items-center h-8 sm:h-12 px-6 bg-ash-dark-600 text-xs sm:text-sm font-bold ${
                             active ? "text-pink-600" : "text-stake-gray-500"
                         }`}
                     >
@@ -45,10 +45,10 @@ function GovMenu() {
                     </div>
                 )}
             </ActiveLink>
-            <ActiveLink href="/stake/gov/vote" exact>
+            <ActiveLink href="/stake/gov/vote" exact className="shrink-0">
                 {({ active }) => (
                     <div
-                        className={`flex items-center h-12 px-6 bg-ash-dark-600 text-sm font-bold ${
+                        className={`flex items-center h-8 sm:h-12 px-6 bg-ash-dark-600 text-xs sm:text-sm font-bold ${
                             active ? "text-pink-600" : "text-stake-gray-500"
                         }`}
                     >
