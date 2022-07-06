@@ -1,22 +1,23 @@
 import {
     getProxyProvider,
-    useGetPendingTransactions,
+    useGetPendingTransactions
 } from "@elrondnetwork/dapp-core";
 import { SendTransactionReturnType } from "@elrondnetwork/dapp-core/dist/services/transactions";
 import {
     Address,
     ContractFunction,
     ProxyProvider,
-    Query,
+    Query
 } from "@elrondnetwork/erdjs/out";
-import { accIsLoggedInState } from "atoms/dappState";
 import {
     farmBlockRewardMapState,
     farmDeboundKeywordState,
     farmKeywordState,
     farmLoadingMapState,
+    FarmRecord,
     farmRecordsState,
     farmSessionIdMapState,
+    FarmToken
 } from "atoms/farmsState";
 import { walletBalanceState, walletTokenPriceState } from "atoms/walletState";
 import BigNumber from "bignumber.js";
@@ -27,41 +28,21 @@ import pools from "const/pool";
 import { ASH_TOKEN } from "const/tokens";
 import { toEGLDD } from "helper/balance";
 import { fetcher } from "helper/common";
+import { decodeNestedStringHex } from "helper/serializer";
 import useFarmReward from "hooks/useFarmContract/useFarmReward";
 import useInterval from "hooks/useInterval";
 import useLPValue from "hooks/usePoolContract/useLPValue";
-import { IFarm } from "interface/farm";
+import { FarmTokenAttrsStruct, IFarm } from "interface/farm";
 import IPool from "interface/pool";
 import { PoolStatsRecord } from "interface/poolStats";
 import { Dispatch, SetStateAction, useCallback, useEffect } from "react";
 import {
-    useRecoilCallback,
-    useRecoilState,
-    useRecoilValue,
-    useSetRecoilState,
+    useRecoilCallback, useRecoilValue,
+    useSetRecoilState
 } from "recoil";
 import useSWR from "swr";
 import { useDebounce } from "use-debounce";
-export type FarmRecord = {
-    pool: IPool;
-    farm: IFarm;
-    poolStats?: PoolStatsRecord;
-    stakedData?: {
-        farmTokens: {
-            tokenId: string;
-            collection: string;
-            nonce: BigNumber;
-            balance: BigNumber;
-        }[];
-        totalStakedLP: BigNumber;
-        totalRewardAmt: BigNumber;
-        totalStakedLPValue: BigNumber;
-    };
-    ashPerBlock: BigNumber;
-    farmTokenSupply: BigNumber;
-    totalLiquidityValue: BigNumber;
-    emissionAPR: BigNumber;
-};
+
 export type FarmsState = {
     farmRecords: FarmRecord[];
     farmToDisplay: FarmRecord[];
@@ -173,6 +154,19 @@ const FarmsState = () => {
         []
     );
 
+    const getTotalLPLocked = useCallback(async (farm: IFarm) => {
+        const proxyProvider: ProxyProvider = getProxyProvider();
+        const esdts = await proxyProvider.getAddressEsdtList(
+            new Address(farm.farm_address)
+        );
+        return (
+            esdts.find(
+                (esdt) =>
+                    esdt.tokenIdentifier === farm.farming_token_id
+            )?.balance || new BigNumber(0)
+        );
+    }, []);
+
     const getFarmRecord = useRecoilCallback(
         ({ snapshot, set }) =>
             async (f: IFarm, p: IPool) => {
@@ -183,12 +177,12 @@ const FarmsState = () => {
                 const tokenPrices = await snapshot.getPromise(
                     walletTokenPriceState
                 );
-
+                const lpLockedAmt = await getTotalLPLocked(f);
                 const farmTokenSupply = await getFarmTokenSupply(
                     f.farm_address
                 );
                 const { lpValueUsd: totalLiquidityValue } = await getLPValue(
-                    farmTokenSupply,
+                    lpLockedAmt,
                     p
                 );
                 const ashPerBlock =
@@ -203,6 +197,7 @@ const FarmsState = () => {
                     .multipliedBy(tokenPrices[ASH_TOKEN.id] || 0)
                     .multipliedBy(100)
                     .div(totalLiquidityValue);
+                
                 const record: FarmRecord = {
                     pool: p,
                     farm: f,
@@ -211,20 +206,36 @@ const FarmsState = () => {
                     ),
                     ashPerBlock,
                     farmTokenSupply,
+                    lpLockedAmt,
                     totalLiquidityValue,
                     emissionAPR,
                 };
-                const farmTokens = Object.keys(balances)
+                const farmTokens: FarmToken[] = Object.keys(balances)
                     .filter((tokenId) => tokenId.startsWith(f.farm_token_id))
-                    .map((id) => ({
-                        tokenId: id,
-                        collection: f.farm_token_id,
-                        nonce: new BigNumber(
-                            id.replace(f.farm_token_id + "-", ""),
-                            16
-                        ),
-                        balance: balances[id]?.balance || new BigNumber(0),
-                    }));
+                    .map((id) => {
+                        const attributes = decodeNestedStringHex(
+                            balances[id]?.attributes?.toString("hex") || "",
+                            FarmTokenAttrsStruct
+                        );
+                        const perLP = attributes.initial_farm_amount.div(
+                            attributes.initial_farming_amount
+                        );
+                        const balance = balances[id]?.balance || new BigNumber(0);
+                        return {
+                            tokenId: id,
+                            collection: f.farm_token_id,
+                            nonce: new BigNumber(
+                                id.replace(f.farm_token_id + "-", ""),
+                                16
+                            ),
+                            balance,
+                            attributes,
+                            boost: perLP.div(0.4),
+                            perLP,
+                            lpAmt: balance.div(perLP).integerValue(BigNumber.ROUND_FLOOR),
+                            farmAddress: f.farm_address
+                        };
+                    });
                 const isFarmed = farmTokens.some(({ balance }) =>
                     balance.gt(0)
                 );
@@ -234,9 +245,9 @@ const FarmsState = () => {
                     );
                     const totalRewards = await Promise.all(rewards);
                     const totalStakedLP = farmTokens.reduce(
-                        (total, val) => total.plus(val.balance),
+                        (total, val) => total.plus(val.balance.div(val.perLP).integerValue(BigNumber.ROUND_FLOOR)),
                         new BigNumber(0)
-                    )
+                    );
                     record.stakedData = {
                         farmTokens,
                         totalStakedLP,
@@ -244,12 +255,20 @@ const FarmsState = () => {
                             (total, val) => total.plus(val),
                             new BigNumber(0)
                         ),
-                        totalStakedLPValue: totalStakedLP.multipliedBy(totalLiquidityValue.div(farmTokenSupply))
+                        totalStakedLPValue: totalStakedLP.multipliedBy(
+                            totalLiquidityValue.div(lpLockedAmt)
+                        ),
+                        boost: farmTokens
+                            .reduce(
+                                (total, f) => total.plus(f.balance),
+                                new BigNumber(0)
+                            )
+                            .div(totalStakedLP).div(0.4)
                     };
                 }
                 return record;
             },
-        [getLPValue, poolStatsRecords, getReward, getFarmTokenSupply]
+        [getLPValue, poolStatsRecords, getReward, getFarmTokenSupply, getTotalLPLocked]
     );
 
     const getFarmRecords = useRecoilCallback(

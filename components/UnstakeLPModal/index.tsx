@@ -91,11 +91,12 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
         );
     }, [isAgree, unStakeAmt, insufficientFarmToken, insufficientEGLD]);
     const unStake = useCallback(async () => {
-        const { sessionId } = await exitFarm(unStakeAmt, farm);
+        if(!stakedData?.totalStakedLP) return;
+        const { sessionId } = await exitFarm(unStakeAmt, farm, unStakeAmt.eq(stakedData.totalStakedLP));
         if (sessionId && onClose) {
             onClose();
         }
-    }, [exitFarm, unStakeAmt, farm, onClose]);
+    }, [exitFarm, unStakeAmt, farm, onClose, stakedData]);
     const onChangePct = useCallback(
         (pct: number) => {
             if (!stakedData) return;

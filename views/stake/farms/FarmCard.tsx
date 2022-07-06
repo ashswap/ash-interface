@@ -200,10 +200,10 @@ function FarmCard({ farmData, viewType }: props) {
                                 </CardTooltip>
                             </div>
                             <div className="w-[120px] -mr-1">
-                                <BoostBar height={32} value={1}>
+                                <BoostBar height={32} value={farmData.stakedData?.boost.toNumber() || 1}>
                                     <div className="px-4 h-full flex items-center justify-end text-lg font-bold text-stake-gray-500">
                                         <span>x</span>
-                                        <span className="text-white">1</span>
+                                        <span className="text-white">{formatAmount(farmData.stakedData?.boost.toNumber() || 1)}</span>
                                         <ICGovBoost className="w-3.5 h-3.5 inline-block -mt-0.5 ml-1" />
                                     </div>
                                 </BoostBar>
@@ -211,7 +211,7 @@ function FarmCard({ farmData, viewType }: props) {
                             {isExpand && (
                                 <div className="flex flex-col items-end text-xs font-bold text-stake-gray-500 leading-tight mt-2">
                                     <div>Current / Max</div>
-                                    <div>x1 / 2.5</div>
+                                    <div>x{formatAmount(farmData.stakedData?.boost.toNumber() || 1)} / 2.5</div>
                                 </div>
                             )}
                         </div>
@@ -455,13 +455,13 @@ function FarmCard({ farmData, viewType }: props) {
                             <div className="pr-2.5 sm:pr-3.5 text-right text-white text-xs lg:text-lg font-bold">
                                 <BoostBar
                                     height={screenSize?.isMobile ? 24 : 32}
-                                    value={1}
+                                    value={farmData?.stakedData?.boost.toNumber() || 1}
                                 >
                                     <div className="px-4 h-full flex items-center justify-end text-xs sm:text-lg font-bold text-stake-gray-500">
                                         <span className="text-2xs sm:text-lg">
                                             x
                                         </span>
-                                        <span className="text-white">1</span>
+                                        <span className="text-white">{formatAmount(farmData?.stakedData?.boost.toNumber() || 1)}</span>
                                         <ICGovBoost className="w-3.5 h-3.5 inline-block -mt-0.5 ml-1" />
                                     </div>
                                 </BoostBar>
@@ -545,7 +545,7 @@ function FarmCard({ farmData, viewType }: props) {
                                     {isExpand && (
                                         <div className="flex flex-col items-end text-2xs md:text-xs font-bold text-stake-gray-500 leading-tight mt-2">
                                             <div>Current / Max</div>
-                                            <div>x1 / 2.5</div>
+                                            <div>x{formatAmount(farmData.stakedData?.boost.toNumber() || 1)} / 2.5</div>
                                         </div>
                                     )}
                                 </div>

@@ -1,4 +1,4 @@
-import { Address, AddressValue, BigUIntValue, ContractFunction, GasLimit, TokenIdentifierValue, TypedValue } from "@elrondnetwork/erdjs/out";
+import { Address, AddressValue, BigUIntValue, BooleanValue, ContractFunction, GasLimit, TokenIdentifierValue, TypedValue } from "@elrondnetwork/erdjs/out";
 import { accAddressState, accIsLoggedInState } from "atoms/dappState";
 import { farmRecordsState, farmSessionIdMapState } from "atoms/farmsState";
 import BigNumber from "bignumber.js";
@@ -10,7 +10,7 @@ import { useRecoilCallback } from "recoil";
 
 const useEnterFarm = () => {
     const createTransaction = useCreateTransaction();
-    const func = useRecoilCallback(({snapshot, set}) => async (amtWei: BigNumber, farm: IFarm) => {
+    const func = useRecoilCallback(({snapshot, set}) => async (amtWei: BigNumber, farm: IFarm, selfBoost: boolean = false) => {
         const loggedIn = await snapshot.getPromise(accIsLoggedInState);
         const address = await snapshot.getPromise(accAddressState);
         const farmRecords = await snapshot.getPromise(farmRecordsState);
@@ -22,7 +22,7 @@ const useEnterFarm = () => {
                 const farmTokenInWallet =
                     farmRecords.find(
                         (f) => f.farm.farm_address === farm.farm_address
-                    )?.stakedData?.farmTokens || [];
+                    )?.stakedData?.farmTokens.filter(f => f.attributes.booster === address) || [];
                 // console.log('in', farmTokenInWallet);
                 const farmTokenArgs = farmTokenInWallet.reduce(
                     (total: TypedValue[], val) => {
@@ -40,7 +40,7 @@ const useEnterFarm = () => {
                 );
                 const tx = await createTransaction(new Address(address), {
                     func: new ContractFunction("MultiESDTNFTTransfer"),
-                    gasLimit: new GasLimit(9_000_000),
+                    gasLimit: new GasLimit(20_000_000),
                     args: [
                         new AddressValue(new Address(farm.farm_address)),
                         new BigUIntValue(
@@ -56,6 +56,7 @@ const useEnterFarm = () => {
                         ...farmTokenArgs,
 
                         new TokenIdentifierValue(Buffer.from("enterFarm")),
+                        new BooleanValue(selfBoost)
                     ],
                 });
                 const payload: DappSendTransactionsPropsType = {

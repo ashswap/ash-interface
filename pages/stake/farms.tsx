@@ -4,12 +4,14 @@ import React, { ReactElement, useRef } from "react";
 import FarmLayout from "views/stake/farms/FarmLayout";
 import FarmsState from "views/stake/farms/FarmsState";
 import FarmStats from "views/stake/farms/FarmStats";
+import GovState from "views/stake/gov/GovRecoilState";
 
 function FarmsPage() {
     const farmLayoutContainerRef = useRef<HTMLDivElement>(null);
     return (
         <>
             <FarmsState />
+            <GovState/>
             <div className="ash-container text-white pt-[1.875rem]">
                 <ul className="flex space-x-1 mb-4 md:mb-[3.25rem] text-sm md:text-lg font-bold">
                     <li>Stake</li>

@@ -45,9 +45,7 @@ const LOCK_CONFIG_DEV = {
 };
 const LOCK_CONFIG_TEST = {
     predefinedLockPeriod: [
-        // test purpose
-        { value: 30 * 60, label: "30 minutes" },
-        { value: 1 * 7 * 24 * 60 * 60, label: "7 days" },
+        { value: 7 * 24 * 60 * 60, label: "7 days" },
         { value: 30 * 24 * 60 * 60, label: "30 days" },
         { value: 1 * 365 * 24 * 60 * 60, label: "1 year" },
         { value: 2 * 365 * 24 * 60 * 60, label: "2 years" },
@@ -55,8 +53,8 @@ const LOCK_CONFIG_TEST = {
         { value: 4 * 365 * 24 * 60 * 60, label: "4 years" },
     ],
     maxLock: 4 * 365 * 24 * 60 * 60,
-    minLock: 30 * 60,
-    sliderStep: 60,
+    minLock: 7 * 24 * 60 * 60,
+    sliderStep: 24 * 60 * 60,
 };
 const LOCK_CONFIG =
     ENVIRONMENT.NETWORK === "devnet" ? LOCK_CONFIG_DEV : LOCK_CONFIG_TEST;

@@ -4,13 +4,15 @@ import {
     BigUIntValue,
     ContractFunction,
     GasLimit,
-    TokenIdentifierValue,
-    Transaction
+    TokenIdentifierValue, TypedValue
 } from "@elrondnetwork/erdjs/out";
 import { accAddressState, accIsLoggedInState } from "atoms/dappState";
-import { farmRecordsState, farmSessionIdMapState } from "atoms/farmsState";
+import {
+    farmRecordsState,
+    farmSessionIdMapState,
+    FarmToken
+} from "atoms/farmsState";
 import BigNumber from "bignumber.js";
-import { FarmRecord } from "views/stake/farms/FarmsState";
 import { toEGLDD } from "helper/balance";
 import {
     sendTransactions,
@@ -18,12 +20,10 @@ import {
 } from "helper/transactionMethods";
 import { DappSendTransactionsPropsType } from "interface/dappCore";
 import { IFarm } from "interface/farm";
+import { TokenPayment } from "interface/tokenPayment";
 import { useRecoilCallback } from "recoil";
 import useFarmReward from "./useFarmReward";
-const calcUnstakeEntries = (
-    weiAmt: BigNumber,
-    farmTokens: Required<FarmRecord>["stakedData"]["farmTokens"]
-) => {
+const calcUnstakeEntries = (weiAmt: BigNumber, farmTokens: FarmToken[]) => {
     let sum = new BigNumber(0);
     return farmTokens
         .map((ft) => {
@@ -31,16 +31,19 @@ const calcUnstakeEntries = (
                 return { unstakeAmt: new BigNumber(0), farmToken: ft };
             }
             const remain = weiAmt.minus(sum);
-            const amt = ft.balance.lte(remain) ? ft.balance : remain;
+            const lpBalance = ft.balance.div(ft.perLP).integerValue(BigNumber.ROUND_FLOOR);
+            const amt = lpBalance.lte(remain)
+                ? lpBalance
+                : remain;
             sum = sum.plus(amt);
-            return { unstakeAmt: amt, farmToken: ft };
+            return { unstakeAmt: amt.eq(remain) ? amt.multipliedBy(ft.perLP).integerValue(BigNumber.ROUND_FLOOR) : ft.balance, farmToken: ft };
         })
         .filter(({ unstakeAmt }) => unstakeAmt.gt(0));
 };
 const useExitFarm = () => {
     const createTransaction = useCreateTransaction();
     const getReward = useFarmReward();
-    
+
     const createExitFarmTx = useRecoilCallback(
         ({ snapshot, set }) =>
             async (
@@ -67,9 +70,50 @@ const useExitFarm = () => {
             },
         []
     );
+
+    const createExitFarmTxMulti = useRecoilCallback(
+        ({ snapshot }) =>
+            async (tokens: Array<Required<TokenPayment>>, farm: IFarm) => {
+                const loggedIn = await snapshot.getPromise(accIsLoggedInState);
+                const address: string = await snapshot.getPromise(
+                    accAddressState
+                );
+
+                if (!loggedIn)
+                    throw new Error("Connect wallet to claim reward");
+
+                const farmTokenArgs = tokens.reduce(
+                    (total: TypedValue[], val) => {
+                        total = [
+                            ...total,
+                            new TokenIdentifierValue(
+                                Buffer.from(val.collection)
+                            ),
+                            new BigUIntValue(val.nonce),
+                            new BigUIntValue(val.amount.integerValue(BigNumber.ROUND_FLOOR)),
+                        ];
+                        return total;
+                    },
+                    []
+                );
+                return await createTransaction(new Address(address), {
+                    func: new ContractFunction("MultiESDTNFTTransfer"),
+                    gasLimit: new GasLimit(20_000_000),
+                    args: [
+                        new AddressValue(new Address(farm.farm_address)),
+                        new BigUIntValue(new BigNumber(tokens.length)),
+
+                        ...farmTokenArgs,
+                        new TokenIdentifierValue(Buffer.from("exitFarm")),
+                    ],
+                });
+            },
+        [createTransaction]
+    );
+
     const exitFarm = useRecoilCallback(
         ({ snapshot, set }) =>
-            async (lpAmt: BigNumber, farm: IFarm) => {
+            async (lpAmt: BigNumber, farm: IFarm, unstakeMax: boolean = false) => {
                 const loggedIn = await snapshot.getPromise(accIsLoggedInState);
                 const farmRecords = await snapshot.getPromise(farmRecordsState);
 
@@ -82,20 +126,22 @@ const useExitFarm = () => {
                         return { sessionId: "" };
                     const { stakedData } = farmRecord;
                     const farmTokens = stakedData.farmTokens || [];
-                    let txs: Transaction[] = [];
-                    const entries = calcUnstakeEntries(lpAmt, farmTokens);
-                    const exitFarmTxCreators = entries.map(
-                        ({ farmToken: { collection, nonce }, unstakeAmt }) =>
-                            createExitFarmTx(
-                                unstakeAmt,
-                                collection,
-                                nonce,
-                                farm
-                            )
-                    );
-                    txs = await Promise.all(exitFarmTxCreators);
+                    const entries = unstakeMax ? farmTokens.map(t => ({unstakeAmt: t.balance, farmToken: t})) : calcUnstakeEntries(lpAmt, farmTokens);
                     const payload: DappSendTransactionsPropsType = {
-                        transactions: txs.filter((tx) => !!tx) as Transaction[],
+                        transactions: await createExitFarmTxMulti(
+                            entries.map(
+                                ({
+                                    farmToken: { collection, nonce, tokenId },
+                                    unstakeAmt,
+                                }) => ({
+                                    amount: unstakeAmt,
+                                    collection,
+                                    nonce: nonce.toNumber(),
+                                    tokenId,
+                                })
+                            ),
+                            farm
+                        ),
                         transactionsDisplayInfo: {
                             successMessage: `Unstake succeed ${toEGLDD(
                                 farm.farming_token_decimal,
@@ -118,9 +164,8 @@ const useExitFarm = () => {
                 }
                 return { sessionId: "" };
             },
-        [createExitFarmTx]
+        [createExitFarmTxMulti]
     );
-
 
     const estimateRewardOnExit = useRecoilCallback(
         ({ snapshot, set }) =>
@@ -146,7 +191,7 @@ const useExitFarm = () => {
             },
         [getReward]
     );
-    return {createExitFarmTx, exitFarm, estimateRewardOnExit};
+    return { createExitFarmTx, exitFarm, estimateRewardOnExit };
 };
 
 export default useExitFarm;

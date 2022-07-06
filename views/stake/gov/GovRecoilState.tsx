@@ -106,7 +106,7 @@ const GovState = () => {
                     address: new Address(
                         ASHSWAP_CONFIG.dappContract.voteEscrowedContract
                     ),
-                    func: new ContractFunction("locked"),
+                    func: new ContractFunction("getLocked"),
                     args: [new AddressValue(new Address(address))],
                 })
             )

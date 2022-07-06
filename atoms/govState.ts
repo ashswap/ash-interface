@@ -23,7 +23,7 @@ export const govUnlockTSState = atom<BigNumber>({
 });
 
 export const govTotalSupplyVeASH = atom<BigNumber>({
-    key: "gov_tota_supply_veash",
+    key: "gov_total_supply_veash",
     default: new BigNumber(0),
 });
 

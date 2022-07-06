@@ -49,14 +49,13 @@ const EXTEND_DEV = {
 const EXTEND_TEST = {
     options: [
         // test purpose
-        { value: 30 * 60, label: "+ minutes" },
-        { value: 24 * 60 * 60, label: "+ 1 day" },
+        { value: 7 * 24 * 60 * 60, label: "+ 7 days" },
         { value: 1 * 365 * 24 * 60 * 60, label: "+ 1 year" },
         { value: 2 * 365 * 24 * 60 * 60, label: "+ 2 years" },
         { value: 3 * 365 * 24 * 60 * 60, label: "+ 3 years" },
     ],
     maxLock: 4 * 365 * 24 * 60 * 60,
-    minLock: 30 * 60,
+    minLock: 7 * 24 * 60 * 60,
 };
 const EXTEND_CONFIG =
     ENVIRONMENT.NETWORK === "devnet" ? EXTEND_DEV : EXTEND_TEST;

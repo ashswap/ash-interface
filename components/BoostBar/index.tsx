@@ -110,10 +110,10 @@ function BoostBar(props: BoostBarProps) {
         return topDeltaX + 5;
     }, [height]);
     const validValue = useMemo(() => {
-        return Math.max(Math.min(max, value), min);
+        return Math.floor((Math.max(Math.min(max, value), min)) * 100) / 100;
     }, [min, max, value]);
     const validNewValue = useMemo(() => {
-        return newVal ? Math.max(Math.min(max, newVal), min) : 0;
+        return Math.floor((newVal ? Math.max(Math.min(max, newVal), min) : 0) * 100) / 100;
     }, [min, max, newVal]);
     const valueWidth = useMemo(() => {
         return validValue === min
@@ -211,6 +211,8 @@ const VeLine = () => {
         currentVe,
         expectedVe,
         maxVe,
+        validNewValue,
+        validValue
     } = useContext(BoostBarContext);
     const tan33 = Math.tan((33 * Math.PI) / 180);
     const bottomDeltaX = tan33 * height;
@@ -255,7 +257,7 @@ const VeLine = () => {
                         {formatAmount(maxVe)} ve
                     </div>
                 </div>
-                {!disabled && (
+                {validNewValue > validValue && !disabled && (
                     <div
                         className="absolute inset-0 text-[#FF00E5]"
                         style={{
@@ -299,7 +301,7 @@ const TopLabel = () => {
                         New boost:{" "}
                     </span>
                     <span className="underline text-[#FF00E5]">
-                        x{validNewValue}
+                        x{formatAmount(validNewValue)}
                     </span>
                 </div>
             )}

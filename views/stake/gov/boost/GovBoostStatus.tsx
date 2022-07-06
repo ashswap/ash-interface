@@ -1,23 +1,38 @@
-import BoostBar, { BoostBarProps } from "components/BoostBar";
-import React, { useEffect, useMemo, useState } from "react";
-import ICGovBoost from "assets/svg/gov-boost.svg";
-import ICEqualSquare from "assets/svg/equal-square.svg";
-import ICHexagonDuo from "assets/svg/hexagon-duo.svg";
 import ICChevronRight from "assets/svg/chevron-right.svg";
-import { IFarm } from "interface/farm";
-import pools from "const/pool";
-import Image from "next/image";
-import { ACTIVE_FARMS, FARMS } from "const/farms";
-import CardTooltip from "components/Tooltip/CardTooltip";
-import GovVeASHStats from "../components/GovVeASHStats";
-import Link from "next/link";
-import useRouteModal from "hooks/useRouteModal";
-import BoostCalcModal from "./BoostCalcModal";
-import { useRouter } from "next/router";
+import ICEqualSquare from "assets/svg/equal-square.svg";
+import ICGovBoost from "assets/svg/gov-boost.svg";
+import ICHexagonDuo from "assets/svg/hexagon-duo.svg";
+import { accAddressState } from "atoms/dappState";
+import {
+    farmOwnerTokensQuery,
+    FarmRecord,
+    farmRecordsState,
+    FarmToken,
+    farmTransferedTokensState,
+} from "atoms/farmsState";
+import BigNumber from "bignumber.js";
 import Avatar from "components/Avatar";
 import BaseButton from "components/BaseButton";
+import BoostBar, { BoostBarProps } from "components/BoostBar";
 import GlowingButton from "components/GlowingButton";
+import pools from "const/pool";
+import { VE_ASH_DECIMALS } from "const/tokens";
+import { toEGLDD } from "helper/balance";
+import { formatAmount } from "helper/number";
+import { sendTransactions } from "helper/transactionMethods";
+import {
+    useFarmBoostOwnerState,
+    useFarmBoostTransferState,
+} from "hooks/useFarmBoostState";
+import useFarmClaimReward from "hooks/useFarmContract/useFarmClaimReward";
+import useRouteModal from "hooks/useRouteModal";
 import { useScreenSize } from "hooks/useScreenSize";
+import { FarmBoostInfo } from "interface/farm";
+import { useRouter } from "next/router";
+import { useEffect, useMemo, useState } from "react";
+import { useRecoilCallback, useRecoilValue } from "recoil";
+import FarmBoostTooltip from "views/stake/farms/FarmBoostTooltip";
+import BoostCalcModal from "./BoostCalcModal";
 
 const BoostBarValue = (
     props: Omit<BoostBarProps, "min" | "max" | "height">
@@ -32,7 +47,9 @@ const BoostBarValue = (
                     <div>Max</div>
                 ) : (
                     <div className="flex items-center">
-                        <span className="mr-1">x{props.value}</span>
+                        <span className="mr-1">
+                            x{formatAmount(props.value)}
+                        </span>
                         <ICGovBoost className="-mt-0.5" />
                     </div>
                 )}
@@ -46,21 +63,40 @@ const BoostBarValue = (
 };
 
 const FarmRecord = ({
-    farm,
-    isOwner,
+    farmData,
     label,
+    veConsume,
+    currentBoost,
+    expectedBoost,
+    maxBoost,
+    veAvailable,
+    onSelfBoostTransferedToken,
+    booster,
+    lpAmt,
 }: {
-    farm: IFarm;
-    isOwner: boolean;
+    farmData: FarmRecord;
     label?: string;
+    veConsume: BigNumber;
+    currentBoost?: FarmBoostInfo;
+    expectedBoost?: FarmBoostInfo;
+    maxBoost?: FarmBoostInfo;
+    veAvailable?: BigNumber;
+    onSelfBoostTransferedToken?: () => {};
+    booster: string;
+    lpAmt: BigNumber;
 }) => {
+    const accAddress = useRecoilValue(accAddressState);
+    const farm = farmData.farm;
     const pool = useMemo(() => {
         return pools.find((p) => p.lpToken.id === farm.farming_token_id);
     }, [farm]);
+    const isOwner = useMemo(
+        () => booster === accAddress,
+        [booster, accAddress]
+    );
     if (!pool) return null;
     const [token1, token2] = pool.tokens;
-    const boostValue = 1.5;
-    const newBoostValue = 1.7;
+
     return (
         <div className="grid grid-cols-[minmax(0,auto)_1fr] sm:grid-cols-[minmax(0,auto)_1fr_2fr] md:grid-cols-[minmax(0,auto)_7.5rem_minmax(9.75rem,1fr)_0.8fr_2fr] lg:grid-cols-[minmax(0,auto)_10.5rem_minmax(9.75rem,1fr)_1fr_2fr] items-center">
             <div className="relative mr-4">
@@ -71,13 +107,22 @@ const FarmRecord = ({
                             : "fill-stake-dark-500"
                     }`}
                 />
-                <div
-                    className={`absolute inset-0 flex items-center justify-center underline font-bold text-lg ${
-                        isOwner ? "text-ash-dark-600" : "text-stake-gray-500"
-                    }`}
+                <FarmBoostTooltip
+                    farmData={farmData}
+                    booster={booster}
+                    lpAmt={lpAmt}
+                    onSelfBoostTransferedToken={onSelfBoostTransferedToken}
                 >
-                    {label ? label : isOwner ? "O" : "T"}
-                </div>
+                    <div
+                        className={`absolute inset-0 flex items-center justify-center underline font-bold text-lg ${
+                            isOwner
+                                ? "text-ash-dark-600"
+                                : "text-stake-gray-500"
+                        }`}
+                    >
+                        {label ? label : isOwner ? "O" : "T"}
+                    </div>
+                </FarmBoostTooltip>
                 <div className="absolute flex bottom-0 translate-y-1/2 left-1/2 -translate-x-1/2">
                     <Avatar
                         src={token1.icon}
@@ -99,10 +144,15 @@ const FarmRecord = ({
                     veASH consumes
                 </div>
                 <div
-                    className={`text-right h-[2.625rem] ${
+                    className={`text-right h-[2.625rem] flex items-center justify-end px-4 ${
                         isOwner ? "bg-ash-dark-400/30" : "bg-stake-dark-500"
                     }`}
-                ></div>
+                >
+                    {formatAmount(
+                        toEGLDD(VE_ASH_DECIMALS, veConsume).toNumber(),
+                        { notation: "standard" }
+                    )}
+                </div>
                 <div className="text-right text-xs font-medium">
                     {isOwner ? (
                         <>
@@ -110,7 +160,14 @@ const FarmRecord = ({
                                 Available:{" "}
                             </span>
                             <span className="text-ash-cyan-500 underline">
-                                3,987 veASH
+                                {formatAmount(
+                                    toEGLDD(
+                                        VE_ASH_DECIMALS,
+                                        veAvailable || 0
+                                    ).toNumber(),
+                                    { notation: "standard" }
+                                )}{" "}
+                                veASH
                             </span>
                         </>
                     ) : (
@@ -125,14 +182,75 @@ const FarmRecord = ({
             </div>
             <div className={`${isOwner ? "" : "mb-6"}`}>
                 <BoostBarValue
-                    value={boostValue}
-                    newVal={newBoostValue}
+                    value={currentBoost?.boost}
+                    newVal={expectedBoost?.boost}
                     disabled={!isOwner}
                     veLine={isOwner}
                     topLabel
+                    currentVe={toEGLDD(
+                        VE_ASH_DECIMALS,
+                        currentBoost?.veForBoost || 0
+                    ).toNumber()}
+                    expectedVe={toEGLDD(
+                        VE_ASH_DECIMALS,
+                        expectedBoost?.veForBoost || 0
+                    ).toNumber()}
+                    maxVe={toEGLDD(
+                        VE_ASH_DECIMALS,
+                        maxBoost?.veForBoost || 0
+                    ).toNumber()}
                 />
             </div>
         </div>
+    );
+};
+
+const FarmRecordOwner = ({ farmData }: { farmData: FarmRecord }) => {
+    const { currentFarmBoost, expectedFarmBoost, maxFarmBoost, availableVe } =
+        useFarmBoostOwnerState(farmData);
+    const ownerTokens = useRecoilValue(
+        farmOwnerTokensQuery(farmData.farm.farm_address)
+    );
+    const lpAmt = useMemo(() => {
+        return ownerTokens.reduce(
+            (total, t) => total.plus(t.lpAmt),
+            new BigNumber(0)
+        );
+    }, [ownerTokens]);
+    return (
+        <FarmRecord
+            farmData={farmData}
+            veConsume={expectedFarmBoost.veForBoost}
+            currentBoost={currentFarmBoost}
+            expectedBoost={expectedFarmBoost}
+            maxBoost={maxFarmBoost}
+            veAvailable={availableVe}
+            lpAmt={lpAmt}
+            booster={ownerTokens[0].attributes.booster}
+        />
+    );
+};
+
+const FarmRecordTransfer = ({
+    farmToken,
+    farmData,
+}: {
+    farmToken: FarmToken;
+    farmData: FarmRecord;
+}) => {
+    const { currentFarmBoost, selfBoost } = useFarmBoostTransferState(
+        farmToken,
+        farmData
+    );
+    return (
+        <FarmRecord
+            farmData={farmData}
+            veConsume={currentFarmBoost.veForBoost}
+            currentBoost={currentFarmBoost}
+            lpAmt={farmToken.lpAmt}
+            booster={farmToken.attributes.booster}
+            onSelfBoostTransferedToken={() => selfBoost()}
+        />
     );
 };
 function GovBoostStatus() {
@@ -141,7 +259,47 @@ function GovBoostStatus() {
         useRouteModal("calc_boost");
     const [openCalc, setOpenCalc] = useState(false);
     useEffect(() => setOpenCalc(showModal), [showModal]);
-    useEffect(() => console.log(modalParams), [modalParams]);
+    const accAddress = useRecoilValue(accAddressState);
+    const farmRecords = useRecoilValue(farmRecordsState);
+    const farmTransferedTokens = useRecoilValue(farmTransferedTokensState);
+    const { createClaimRewardTxMulti } = useFarmClaimReward();
+    const boostOwnerFarmTokens = useRecoilCallback(
+        ({ snapshot }) =>
+            async () => {
+                const farmRecords = await snapshot.getPromise(farmRecordsState);
+                const accAddress = await snapshot.getPromise(accAddressState);
+                const txsPromises = farmRecords
+                    .filter((record) => !!record.stakedData)
+                    .map((record) => {
+                        const ownerTokens =
+                            record.stakedData?.farmTokens.filter(
+                                (f) => f.attributes.booster === accAddress
+                            ) || [];
+                        return { ownerTokens, farm: record.farm };
+                    })
+                    .filter(({ ownerTokens }) => ownerTokens.length > 0)
+                    .map(({ ownerTokens, farm }) =>
+                        createClaimRewardTxMulti(ownerTokens, farm, true)
+                    );
+                sendTransactions({
+                    transactions: await Promise.all(txsPromises),
+                    transactionsDisplayInfo: {
+                        successMessage: "All farm tokens are boosted.",
+                    },
+                });
+            },
+        [createClaimRewardTxMulti]
+    );
+    const farmRecordsWithOwnerTokens = useMemo(() => {
+        return farmRecords.filter(
+            (record) =>
+                (
+                    record.stakedData?.farmTokens.filter(
+                        (t) => t.attributes.booster === accAddress
+                    ) || []
+                ).length > 0
+        );
+    }, [farmRecords, accAddress]);
     return (
         <>
             <div className="bg-stake-dark-300 p-6 sm:px-11 sm:pb-8 sm:pt-14">
@@ -149,11 +307,10 @@ function GovBoostStatus() {
                     Your boost status
                 </div>
                 <div className="space-y-9">
-                    {ACTIVE_FARMS.map((f) => (
-                        <FarmRecord
-                            key={f.farm_address}
-                            farm={f}
-                            isOwner={true}
+                    {farmRecordsWithOwnerTokens.map((f) => (
+                        <FarmRecordOwner
+                            key={f.farm.farm_address}
+                            farmData={f}
                         />
                     ))}
                 </div>
@@ -170,23 +327,33 @@ function GovBoostStatus() {
                         theme="pink"
                         className="h-12 w-full px-2 sm:px-12 uppercase text-sm font-bold text-white overflow-hidden"
                         wrapperClassName="grow sm:grow-0 overflow-hidden"
+                        disabled={farmRecordsWithOwnerTokens.length === 0}
+                        onClick={() => boostOwnerFarmTokens()}
                     >
                         <span className="mr-4 truncate">Confirm new boost</span>
                         <ICChevronRight className="w-2 h-auto" />
                     </GlowingButton>
                 </div>
             </div>
-            <div className="bg-ash-dark-600 p-6 sm:px-11 sm:py-14">
-                <div className="space-y-9">
-                    {ACTIVE_FARMS.map((f) => (
-                        <FarmRecord
-                            key={f.farm_address}
-                            farm={f}
-                            isOwner={false}
-                        />
-                    ))}
+            {farmTransferedTokens.length > 0 && (
+                <div className="bg-ash-dark-600 p-6 sm:px-11 sm:py-14">
+                    <div className="space-y-9">
+                        {farmRecords.map((f) =>
+                            f.stakedData?.farmTokens
+                                .filter(
+                                    (t) => t.attributes.booster !== accAddress
+                                )
+                                .map((t) => (
+                                    <FarmRecordTransfer
+                                        key={t.tokenId}
+                                        farmData={f}
+                                        farmToken={t}
+                                    />
+                                ))
+                        )}
+                    </div>
                 </div>
-            </div>
+            )}
             <BoostCalcModal
                 isOpen={showModal}
                 onRequestClose={() => onCloseModal()}
