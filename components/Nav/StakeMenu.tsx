@@ -188,7 +188,7 @@ function StakeMenu() {
                         <OnboardTooltip
                             open={onboaringFarmFromAddedLp && isSuccessful}
                             placement="bottom-start"
-                            zIndex={10}
+                            zIndex={20}
                             onArrowClick={() =>
                                 setOnboardedFarmFromAddedLp(true)
                             }
