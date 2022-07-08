@@ -152,9 +152,11 @@ const BaseTooltip = (props: BaseTooltipProps) => {
     ]);
 
     useEffect(() => {
+        let cleanup = () => {};
         if (refs.reference.current && refs.floating.current && open) {
-            autoUpdate(refs.reference.current, refs.floating.current, update);
+            cleanup = autoUpdate(refs.reference.current, refs.floating.current, update);
         }
+        return () => cleanup();
     }, [refs.reference, refs.floating, update, open]);
     const { x: arrowX, y: arrowY, centerOffset } = middlewareData.arrow || {};
     const staticSide = useMemo(() => {

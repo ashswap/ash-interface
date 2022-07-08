@@ -1,6 +1,6 @@
 import BaseModal, { BaseModalType } from "components/BaseModal";
 import { useScreenSize } from "hooks/useScreenSize";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 
 import ICChevronDown from "assets/svg/chevron-down.svg";
 import ICChevronRight from "assets/svg/chevron-right.svg";
@@ -12,7 +12,7 @@ import {
     farmOwnerTokensQuery,
     FarmRecord,
     FarmToken,
-    farmTransferedTokensQuery
+    farmTransferedTokensQuery,
 } from "atoms/farmsState";
 import BigNumber from "bignumber.js";
 import Avatar from "components/Avatar";
@@ -25,12 +25,14 @@ import { toEGLDD } from "helper/balance";
 import { formatAmount } from "helper/number";
 import {
     useFarmBoostOwnerState,
-    useFarmBoostTransferState
+    useFarmBoostTransferState,
 } from "hooks/useFarmBoostState";
 import useFarmBoost from "hooks/useFarmContract/useFarmBoost";
 import { FarmBoostInfo } from "interface/farm";
 import { useRecoilValue } from "recoil";
 import FarmBoostTooltip from "./FarmBoostTooltip";
+import Link from "next/link";
+import useRouteModal from "hooks/useRouteModal";
 
 const BoostBarValue = (
     props: Omit<BoostBarProps, "min" | "max" | "height">
@@ -131,7 +133,10 @@ const FarmBoostRecord = ({
                     }`}
                 >
                     {formatAmount(
-                        toEGLDD(VE_ASH_DECIMALS, veConsume).toNumber(),
+                        toEGLDD(
+                            VE_ASH_DECIMALS,
+                            BigNumber.max(veConsume, 0)
+                        ).toNumber(),
                         { notation: "standard" }
                     )}
                 </div>
@@ -186,32 +191,6 @@ const FarmBoostRecord = ({
     );
 };
 
-const FarmRecordOwner = ({ farmData }: { farmData: FarmRecord }) => {
-    const { currentFarmBoost, expectedFarmBoost, maxFarmBoost, availableVe } =
-        useFarmBoostOwnerState(farmData);
-    const ownerTokens = useRecoilValue(
-        farmOwnerTokensQuery(farmData.farm.farm_address)
-    );
-    const lpAmt = useMemo(() => {
-        return ownerTokens.reduce(
-            (total, t) => total.plus(t.lpAmt),
-            new BigNumber(0)
-        );
-    }, [ownerTokens]);
-    return (
-        <FarmBoostRecord
-            farmData={farmData}
-            veConsume={expectedFarmBoost.veForBoost}
-            currentBoost={currentFarmBoost}
-            expectedBoost={expectedFarmBoost}
-            maxBoost={maxFarmBoost}
-            veAvailable={availableVe}
-            lpAmt={lpAmt}
-            booster={ownerTokens[0].attributes.booster}
-        />
-    );
-};
-
 const FarmRecordTransfer = ({
     farmToken,
     farmData,
@@ -226,7 +205,7 @@ const FarmRecordTransfer = ({
     return (
         <FarmBoostRecord
             farmData={farmData}
-            veConsume={currentFarmBoost.veForBoost}
+            veConsume={new BigNumber(0)}
             currentBoost={currentFarmBoost}
             lpAmt={farmToken.lpAmt}
             booster={farmToken.attributes.booster}
@@ -241,6 +220,7 @@ type FarmBoostInfoType = {
 const FarmBoostInfo = ({ farmData }: FarmBoostInfoType) => {
     const { pool, farm } = farmData;
     const [token1, token2] = pool?.tokens;
+    const { encode } = useRouteModal("calc_boost");
     const boostFarmToken = useFarmBoost();
     const ownerTokens = useRecoilValue(
         farmOwnerTokensQuery(farmData.farm.farm_address)
@@ -248,6 +228,15 @@ const FarmBoostInfo = ({ farmData }: FarmBoostInfoType) => {
     const transferedTokens = useRecoilValue(
         farmTransferedTokensQuery(farmData.farm.farm_address)
     );
+
+    const { currentFarmBoost, expectedFarmBoost, maxFarmBoost, availableVe } =
+        useFarmBoostOwnerState(farmData);
+    const lpAmt = useMemo(() => {
+        return ownerTokens.reduce(
+            (total, t) => total.plus(t.lpAmt),
+            new BigNumber(0)
+        );
+    }, [ownerTokens]);
 
     return (
         <div>
@@ -274,21 +263,49 @@ const FarmBoostInfo = ({ farmData }: FarmBoostInfoType) => {
                 {ownerTokens.length > 0 && (
                     <>
                         <div className="mt-10 mb-36">
-                            <FarmRecordOwner
+                            <FarmBoostRecord
                                 farmData={farmData}
+                                veConsume={expectedFarmBoost.veForBoost.minus(
+                                    currentFarmBoost.veForBoost
+                                )}
+                                currentBoost={currentFarmBoost}
+                                expectedBoost={expectedFarmBoost}
+                                maxBoost={maxFarmBoost}
+                                veAvailable={availableVe}
+                                lpAmt={lpAmt}
+                                booster={ownerTokens[0].attributes.booster}
                             />
                         </div>
                         <div className="flex sm:justify-end space-x-2">
-                            <BaseButton className="h-12 w-12 sm:w-auto bg-ash-dark-400 px-1 sm:px-6 uppercase text-sm font-bold">
-                                <ICEqualSquare className="text-white w-4.5 h-4.5" />
-                                <span className="hidden sm:inline ml-1">
-                                    Calculate
-                                </span>
-                            </BaseButton>
+                            <Link
+                                href={{
+                                    pathname: "/stake/gov/boost",
+                                    query: {
+                                        p: encode({
+                                            farmAddress: farm.farm_address,
+                                        }),
+                                    },
+                                }}
+                            >
+                                <a>
+                                    <BaseButton className="h-12 w-12 sm:w-auto bg-ash-dark-400 px-1 sm:px-6 uppercase text-sm font-bold text-white">
+                                        <ICEqualSquare className="text-white w-4.5 h-4.5" />
+                                        <span className="hidden sm:inline ml-1">
+                                            Calculate
+                                        </span>
+                                    </BaseButton>
+                                </a>
+                            </Link>
+
                             <GlowingButton
                                 theme="pink"
                                 className="h-12 w-full px-12 uppercase text-sm font-bold text-white"
                                 wrapperClassName="grow sm:grow-0"
+                                disabled={
+                                    !ownerTokens.length ||
+                                    expectedFarmBoost.boost <=
+                                        currentFarmBoost.boost
+                                }
                                 onClick={() =>
                                     ownerTokens &&
                                     boostFarmToken(farm, ownerTokens, true)

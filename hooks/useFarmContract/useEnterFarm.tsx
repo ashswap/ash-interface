@@ -40,7 +40,7 @@ const useEnterFarm = () => {
                 );
                 const tx = await createTransaction(new Address(address), {
                     func: new ContractFunction("MultiESDTNFTTransfer"),
-                    gasLimit: new GasLimit(20_000_000),
+                    gasLimit: new GasLimit(15_000_000 + farmTokenInWallet.length * 2_000_000),
                     args: [
                         new AddressValue(new Address(farm.farm_address)),
                         new BigUIntValue(

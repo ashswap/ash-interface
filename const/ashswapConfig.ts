@@ -9,9 +9,9 @@ const dappContractDevnet = {
 
 const dappContractTestnet = {
     voteEscrowedContract:
-        "erd1qqqqqqqqqqqqqpgqhtkdam0zga9zyva0ykjyv8s6pqn6apfyj9tsvsj7xj",
+        "erd1qqqqqqqqqqqqqpgq9gra9jwhp78smw4urff30rpp67rsgkekj9tsku2v9n",
     feeDistributor:
-        "erd1qqqqqqqqqqqqqpgqq5axhcjsfwgjdd4zrxf57s73tffjn6gjj9tsm4dt7k",
+        "erd1qqqqqqqqqqqqqpgqwe94lqzwwr9yxagkra8lylgk7u3m0r50j9tsw8faw4",
 };
 
 const dappContract =

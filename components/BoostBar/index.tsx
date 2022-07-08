@@ -81,6 +81,7 @@ export type BoostBarProps = {
     expectedVe?: number;
     maxVe?: number;
     topLabel?: boolean;
+    hiddenCurrentBar?: boolean;
 };
 const BoostBarContext = createContext<
     BoostBarProps & {
@@ -101,6 +102,7 @@ function BoostBar(props: BoostBarProps) {
         disabled,
         veLine,
         topLabel,
+        hiddenCurrentBar,
     } = props;
     const tan33 = Math.tan((33 * Math.PI) / 180);
     const minWidth = useMemo(() => {
@@ -110,10 +112,14 @@ function BoostBar(props: BoostBarProps) {
         return topDeltaX + 5;
     }, [height]);
     const validValue = useMemo(() => {
-        return Math.floor((Math.max(Math.min(max, value), min)) * 100) / 100;
+        return Math.floor(Math.max(Math.min(max, value), min) * 100) / 100;
     }, [min, max, value]);
     const validNewValue = useMemo(() => {
-        return Math.floor((newVal ? Math.max(Math.min(max, newVal), min) : 0) * 100) / 100;
+        return (
+            Math.floor(
+                (newVal ? Math.max(Math.min(max, newVal), min) : 0) * 100
+            ) / 100
+        );
     }, [min, max, newVal]);
     const valueWidth = useMemo(() => {
         return validValue === min
@@ -166,24 +172,27 @@ function BoostBar(props: BoostBarProps) {
                             />
                         </div>
                     )}
-                    <div
-                        className="absolute inset-0"
-                        style={{
-                            filter:
-                                disabled || typeof newVal !== "undefined"
-                                    ? ""
-                                    : "drop-shadow(0px 8px 25px rgba(255, 0, 92, 0.25))",
-                            minWidth,
-                            width: valueWidth,
-                        }}
-                    >
-                        <Polygon
-                            height={height}
-                            className={`${
-                                disabled ? "bg-[#757391]" : "bg-pink-600"
-                            }`}
-                        />
-                    </div>
+                    {!hiddenCurrentBar && (
+                        <div
+                            className="absolute inset-0"
+                            style={{
+                                filter:
+                                    disabled || typeof newVal !== "undefined"
+                                        ? ""
+                                        : "drop-shadow(0px 8px 25px rgba(255, 0, 92, 0.25))",
+                                minWidth,
+                                width: valueWidth,
+                            }}
+                        >
+                            <Polygon
+                                height={height}
+                                className={`${
+                                    disabled ? "bg-[#757391]" : "bg-pink-600"
+                                }`}
+                            />
+                        </div>
+                    )}
+
                     <div className="absolute inset-0">
                         <Polygon
                             height={height}
@@ -212,7 +221,7 @@ const VeLine = () => {
         expectedVe,
         maxVe,
         validNewValue,
-        validValue
+        validValue,
     } = useContext(BoostBarContext);
     const tan33 = Math.tan((33 * Math.PI) / 180);
     const bottomDeltaX = tan33 * height;
@@ -279,11 +288,16 @@ const TopLabel = () => {
         disabled,
         max = 2.5,
         min = 1,
-        height
+        height,
     } = useContext(BoostBarContext);
     const tan33 = Math.tan((33 * Math.PI) / 180);
     return (
-        <div className="relative mb-1" style={{marginLeft: `${tan33 * (height! - Math.min(10, height!))}px`}}>
+        <div
+            className="relative mb-1"
+            style={{
+                marginLeft: `${tan33 * (height! - Math.min(10, height!))}px`,
+            }}
+        >
             <div className="flex justify-between text-stake-gray-500 underline font-bold text-xs">
                 <div>C</div>
                 <div>Max</div>
