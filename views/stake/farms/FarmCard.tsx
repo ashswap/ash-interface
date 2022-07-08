@@ -112,7 +112,7 @@ function FarmCard({ farmData, viewType }: props) {
     const stakedLPValue = useMemo(() => {
         return new BigNumber(farmData.stakedData?.totalStakedLP || 0)
             .multipliedBy(farmData.totalLiquidityValue)
-            .div(farmData.farmTokenSupply);
+            .div(farmData.lpLockedAmt);
     }, [farmData]);
 
     const cardElement = (
@@ -192,18 +192,32 @@ function FarmCard({ farmData, viewType }: props) {
                                     }
                                 >
                                     <span
-                                        className="underline text-xs font-bold text-stake-gray-500 cursor-pointer"
-                                        onClick={() => setOpenBoostInfo(true)}
+                                        className={`underline text-xs font-bold text-stake-gray-500 ${farmData.stakedData && "cursor-pointer"}`}
+                                        onClick={() => farmData.stakedData && setOpenBoostInfo(true)}
                                     >
                                         Farm Boost
                                     </span>
                                 </CardTooltip>
                             </div>
-                            <div className="w-[120px] -mr-1">
-                                <BoostBar height={32} value={farmData.stakedData?.boost.toNumber() || 1}>
+                            <div
+                                className={`w-[120px] -mr-1 ${farmData.stakedData && "cursor-pointer"}`}
+                                onClick={() => farmData.stakedData && setOpenBoostInfo(true)}
+                            >
+                                <BoostBar
+                                    height={32}
+                                    value={
+                                        farmData.stakedData?.boost.toNumber() ||
+                                        1
+                                    }
+                                >
                                     <div className="px-4 h-full flex items-center justify-end text-lg font-bold text-stake-gray-500">
                                         <span>x</span>
-                                        <span className="text-white">{formatAmount(farmData.stakedData?.boost.toNumber() || 1)}</span>
+                                        <span className="text-white">
+                                            {formatAmount(
+                                                farmData.stakedData?.boost.toNumber() ||
+                                                    1
+                                            )}
+                                        </span>
                                         <ICGovBoost className="w-3.5 h-3.5 inline-block -mt-0.5 ml-1" />
                                     </div>
                                 </BoostBar>
@@ -211,7 +225,14 @@ function FarmCard({ farmData, viewType }: props) {
                             {isExpand && (
                                 <div className="flex flex-col items-end text-xs font-bold text-stake-gray-500 leading-tight mt-2">
                                     <div>Current / Max</div>
-                                    <div>x{formatAmount(farmData.stakedData?.boost.toNumber() || 1)} / 2.5</div>
+                                    <div>
+                                        x
+                                        {formatAmount(
+                                            farmData.stakedData?.boost.toNumber() ||
+                                                1
+                                        )}{" "}
+                                        / 2.5
+                                    </div>
                                 </div>
                             )}
                         </div>
@@ -223,7 +244,7 @@ function FarmCard({ farmData, viewType }: props) {
                                     <div>Total ASH available to harvest.</div>
                                 }
                             >
-                                <div className="inline-block text-xs text-ash-gray-500 font-bold underline mb-2">
+                                <div className="inline-block text-xs text-stake-gray-500 font-bold underline mb-2">
                                     {ASH_TOKEN.symbol} Farmed
                                 </div>
                             </CardTooltip>
@@ -453,18 +474,31 @@ function FarmCard({ farmData, viewType }: props) {
                                 %
                             </div>
                             <div className="pr-2.5 sm:pr-3.5 text-right text-white text-xs lg:text-lg font-bold">
-                                <BoostBar
-                                    height={screenSize?.isMobile ? 24 : 32}
-                                    value={farmData?.stakedData?.boost.toNumber() || 1}
+                                <div
+                                    className={`${farmData.stakedData && "cursor-pointer"}`}
+                                    onClick={() => farmData.stakedData && setOpenBoostInfo(true)}
                                 >
-                                    <div className="px-4 h-full flex items-center justify-end text-xs sm:text-lg font-bold text-stake-gray-500">
-                                        <span className="text-2xs sm:text-lg">
-                                            x
-                                        </span>
-                                        <span className="text-white">{formatAmount(farmData?.stakedData?.boost.toNumber() || 1)}</span>
-                                        <ICGovBoost className="w-3.5 h-3.5 inline-block -mt-0.5 ml-1" />
-                                    </div>
-                                </BoostBar>
+                                    <BoostBar
+                                        height={screenSize?.isMobile ? 24 : 32}
+                                        value={
+                                            farmData?.stakedData?.boost.toNumber() ||
+                                            1
+                                        }
+                                    >
+                                        <div className="px-4 h-full flex items-center justify-end text-xs sm:text-lg font-bold text-stake-gray-500">
+                                            <span className="text-2xs sm:text-lg">
+                                                x
+                                            </span>
+                                            <span className="text-white">
+                                                {formatAmount(
+                                                    farmData?.stakedData?.boost.toNumber() ||
+                                                        1
+                                                )}
+                                            </span>
+                                            <ICGovBoost className="w-3.5 h-3.5 inline-block -mt-0.5 ml-1" />
+                                        </div>
+                                    </BoostBar>
+                                </div>
                             </div>
                             {/* ash Earned */}
                             <div
@@ -545,7 +579,14 @@ function FarmCard({ farmData, viewType }: props) {
                                     {isExpand && (
                                         <div className="flex flex-col items-end text-2xs md:text-xs font-bold text-stake-gray-500 leading-tight mt-2">
                                             <div>Current / Max</div>
-                                            <div>x{formatAmount(farmData.stakedData?.boost.toNumber() || 1)} / 2.5</div>
+                                            <div>
+                                                x
+                                                {formatAmount(
+                                                    farmData.stakedData?.boost.toNumber() ||
+                                                        1
+                                                )}{" "}
+                                                / 2.5
+                                            </div>
                                         </div>
                                     )}
                                 </div>

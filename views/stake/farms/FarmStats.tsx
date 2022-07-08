@@ -76,7 +76,7 @@ function FarmStats({ onClickAll }: { onClickAll?: () => void }) {
                                 </div>
                             }
                         >
-                            <div className="text-ash-gray-500 text-sm font-bold underline mb-6">
+                            <div className="text-stake-gray-500 text-sm font-bold underline mb-6">
                                 TOTAL FARM REWARD
                             </div>
                         </CardTooltip>
@@ -114,11 +114,11 @@ function FarmStats({ onClickAll }: { onClickAll?: () => void }) {
                 </h2>
                 <div className="sm:flex md:block lg:flex items-end sm:gap-x-7.5">
                     <div className="bg-ash-dark-400/30 px-9 py-7 flex-1">
-                        <div className="text-ash-gray-500 text-sm font-bold mb-6">
+                        <div className="text-stake-gray-500 text-sm font-bold mb-6">
                             TOTAL VALUE OF LOCKED LP
                         </div>
                         <div className="text-lg">
-                            <span className="text-ash-gray-500">$ </span>
+                            <span className="text-stake-gray-500">$ </span>
                             <span className="text-white font-bold">
                                 <TextAmt
                                     number={TVL}

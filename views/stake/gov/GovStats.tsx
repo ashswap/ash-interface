@@ -122,7 +122,7 @@ function GovStats() {
                 <h1 className="text-pink-600 text-2xl md:text-5xl font-bold mb-7 md:mb-11">
                     Governance Stake
                 </h1>
-                <GovMenu/>
+                <GovMenu />
             </div>
             <div className="flex flex-col md:flex-row">
                 <div className="md:w-[21.875rem] shrink-0 flex flex-col px-7 lg:px-9 pb-9 pt-7 lg:pt-14 bg-stake-dark-400 mb-4 md:mb-0 md:mr-4 lg:mr-[1.875rem]">
@@ -352,16 +352,19 @@ function GovStats() {
                     {mounted &&
                         (loggedIn ? (
                             <ExpiredLockTooltip disabled={!canUnlockASH}>
-                                <GlowingButton
-                                    theme="pink"
-                                    className={`text-sm md:text-lg font-bold w-full h-14 md:h-[4.5rem] mt-3`}
-                                    disabled={canUnlockASH}
-                                    onClick={() =>
-                                        !canUnlockASH && setOpenStakeGov(true)
-                                    }
-                                >
-                                    Add / Manage Stake
-                                </GlowingButton>
+                                <span>
+                                    <GlowingButton
+                                        theme="pink"
+                                        className={`text-sm md:text-lg font-bold w-full h-14 md:h-[4.5rem] mt-3`}
+                                        disabled={canUnlockASH}
+                                        onClick={() =>
+                                            !canUnlockASH &&
+                                            setOpenStakeGov(true)
+                                        }
+                                    >
+                                        Add / Manage Stake
+                                    </GlowingButton>
+                                </span>
                             </ExpiredLockTooltip>
                         ) : (
                             <button

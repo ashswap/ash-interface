@@ -134,7 +134,7 @@ export const useFarmBoostOwnerState = (farmData: FarmRecord) => {
                 setAvailableVe(
                     lockedAshAmt
                         .div(4 * 365 * 24 * 3600)
-                        .minus(slopeUsed.minus(slopeRefill))
+                        .minus(slopeUsed)
                         .multipliedBy(unlockTs.minus(moment().unix()))
                 );
                 setExpectedFarmBoost(boostInfo);
@@ -142,7 +142,7 @@ export const useFarmBoostOwnerState = (farmData: FarmRecord) => {
                 const veForMaxBoost = lpAmt
                     .multipliedBy(veSupply)
                     .div(farmingLocked);
-                setMaxFarmBoost({ veForBoost: veForMaxBoost, boost: 2.5 });
+                setMaxFarmBoost({ veForBoost: BigNumber.max(veForMaxBoost, 0), boost: 2.5 });
             },
         [calcBoost, farmData, getSlopeUsed]
     );
@@ -179,7 +179,7 @@ export const useFarmBoostOwnerState = (farmData: FarmRecord) => {
                         .div(totalLP)
                         .div(0.4)
                         .toNumber(),
-                    veForBoost: ve,
+                    veForBoost: BigNumber.max(ve, 0),
                 });
             },
         [farmData]

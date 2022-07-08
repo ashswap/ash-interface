@@ -15,6 +15,7 @@ import Avatar from "components/Avatar";
 import BaseButton from "components/BaseButton";
 import BoostBar, { BoostBarProps } from "components/BoostBar";
 import GlowingButton from "components/GlowingButton";
+import { ACTIVE_FARMS } from "const/farms";
 import pools from "const/pool";
 import { VE_ASH_DECIMALS } from "const/tokens";
 import { toEGLDD } from "helper/balance";
@@ -28,8 +29,9 @@ import useFarmClaimReward from "hooks/useFarmContract/useFarmClaimReward";
 import useRouteModal from "hooks/useRouteModal";
 import { useScreenSize } from "hooks/useScreenSize";
 import { FarmBoostInfo } from "interface/farm";
+import Link from "next/link";
 import { useRouter } from "next/router";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRecoilCallback, useRecoilValue } from "recoil";
 import FarmBoostTooltip from "views/stake/farms/FarmBoostTooltip";
 import BoostCalcModal from "./BoostCalcModal";
@@ -205,7 +207,13 @@ const FarmRecord = ({
     );
 };
 
-const FarmRecordOwner = ({ farmData }: { farmData: FarmRecord }) => {
+const FarmRecordOwner = ({
+    farmData,
+    canBoostChange,
+}: {
+    farmData: FarmRecord;
+    canBoostChange?: (canBoost: boolean, farmAddress: string) => void;
+}) => {
     const { currentFarmBoost, expectedFarmBoost, maxFarmBoost, availableVe } =
         useFarmBoostOwnerState(farmData);
     const ownerTokens = useRecoilValue(
@@ -217,10 +225,19 @@ const FarmRecordOwner = ({ farmData }: { farmData: FarmRecord }) => {
             new BigNumber(0)
         );
     }, [ownerTokens]);
+    const canBoost = useMemo(() => {
+        return expectedFarmBoost.boost > currentFarmBoost.boost;
+    }, [expectedFarmBoost, currentFarmBoost]);
+    useEffect(
+        () => canBoostChange?.(canBoost, farmData.farm.farm_address),
+        [canBoostChange, canBoost, farmData.farm.farm_address]
+    );
     return (
         <FarmRecord
             farmData={farmData}
-            veConsume={expectedFarmBoost.veForBoost}
+            veConsume={expectedFarmBoost.veForBoost.minus(
+                currentFarmBoost.veForBoost
+            )}
             currentBoost={currentFarmBoost}
             expectedBoost={expectedFarmBoost}
             maxBoost={maxFarmBoost}
@@ -245,7 +262,7 @@ const FarmRecordTransfer = ({
     return (
         <FarmRecord
             farmData={farmData}
-            veConsume={currentFarmBoost.veForBoost}
+            veConsume={new BigNumber(0)}
             currentBoost={currentFarmBoost}
             lpAmt={farmToken.lpAmt}
             booster={farmToken.attributes.booster}
@@ -258,6 +275,7 @@ function GovBoostStatus() {
     const { encode, modalParams, showModal, onCloseModal } =
         useRouteModal("calc_boost");
     const [openCalc, setOpenCalc] = useState(false);
+    const [canBoostMap, setCanBoostMap] = useState<Record<string, boolean>>({});
     useEffect(() => setOpenCalc(showModal), [showModal]);
     const accAddress = useRecoilValue(accAddressState);
     const farmRecords = useRecoilValue(farmRecordsState);
@@ -300,6 +318,12 @@ function GovBoostStatus() {
                 ).length > 0
         );
     }, [farmRecords, accAddress]);
+    const updateCanBoostMap = useCallback(
+        (canBoost: boolean, farmAddress: string) => {
+            setCanBoostMap((val) => ({ ...val, [farmAddress]: canBoost }));
+        },
+        []
+    );
     return (
         <>
             <div className="bg-stake-dark-300 p-6 sm:px-11 sm:pb-8 sm:pt-14">
@@ -311,6 +335,7 @@ function GovBoostStatus() {
                         <FarmRecordOwner
                             key={f.farm.farm_address}
                             farmData={f}
+                            canBoostChange={updateCanBoostMap}
                         />
                     ))}
                 </div>
@@ -319,15 +344,27 @@ function GovBoostStatus() {
                     for maximum boosting action.
                 </div>
                 <div className="flex sm:justify-end space-x-2">
-                    <BaseButton className="h-12 w-12 shrink-0 sm:w-auto bg-ash-dark-400 px-1 sm:px-6 uppercase text-sm font-bold">
-                        <ICEqualSquare className="text-white w-4.5 h-4.5" />
-                        <span className="hidden sm:inline ml-1">Calculate</span>
-                    </BaseButton>
+                    <Link href={{query: {p: encode({farmAddress: ACTIVE_FARMS[0].farm_address})}}} scroll={false} passHref>
+                        <a>
+                            <BaseButton className="h-12 w-12 shrink-0 sm:w-auto bg-ash-dark-400 px-1 sm:px-6 uppercase text-sm font-bold text-white">
+                                <ICEqualSquare className="text-white w-4.5 h-4.5" />
+                                <span className="hidden sm:inline ml-1">
+                                    Calculate
+                                </span>
+                            </BaseButton>
+                        </a>
+                    </Link>
+
                     <GlowingButton
                         theme="pink"
                         className="h-12 w-full px-2 sm:px-12 uppercase text-sm font-bold text-white overflow-hidden"
                         wrapperClassName="grow sm:grow-0 overflow-hidden"
-                        disabled={farmRecordsWithOwnerTokens.length === 0}
+                        disabled={
+                            farmRecordsWithOwnerTokens.length === 0 ||
+                            Object.values(canBoostMap).every(
+                                (canBoost) => !canBoost
+                            )
+                        }
                         onClick={() => boostOwnerFarmTokens()}
                     >
                         <span className="mr-4 truncate">Confirm new boost</span>

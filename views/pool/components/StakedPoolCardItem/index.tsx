@@ -41,7 +41,7 @@ function StakedPoolCardItem({
         <div
             className={`bg-ash-dark-700 clip-corner-4 clip-corner-tr pt-8 pb-5 px-6 sm:px-11 text-white`}
         >
-            <div className="flex flex-row pb-9 border-b border-dashed border-ash-gray-500">
+            <div className="flex justify-between pb-9 border-b border-dashed border-ash-gray-500">
                 <div className="mr-5">
                     <div className="mt-5 mb-8">
                         <div className="text-2xl font-bold text-white">
@@ -84,7 +84,7 @@ function StakedPoolCardItem({
                         </button>
                     </div>
                 </div>
-                <div className="grow flex flex-col justify-end relative">
+                <div className="flex flex-col justify-end relative">
                     <div className="absolute top-0 right-0 flex flex-row justify-between items-center">
                         <Avatar
                             src={pool.tokens[0].icon}
@@ -97,45 +97,51 @@ function StakedPoolCardItem({
                             className="w-[3.25rem] h-[3.25rem] -ml-2.5"
                         />
                     </div>
-                    <div className="mb-8">
-                        <div className="text-stake-gray-500 text-xs underline mb-4 inline-block">
-                            <CardTooltip
-                                content={<>Your deposit value in USD</>}
-                            >
-                                <span>Estimate in USD</span>
-                            </CardTooltip>
-                        </div>
+                    <div className="min-w-[8rem]">
+                        <div className="mb-8">
+                            <div className="text-stake-gray-500 text-xs underline mb-4 inline-block">
+                                <CardTooltip
+                                    content={<>Your deposit value in USD</>}
+                                >
+                                    <span>Estimate in USD</span>
+                                </CardTooltip>
+                            </div>
 
-                        <div className="text-lg leading-tight">
-                            <span className="text-stake-gray-500">$</span>
-                            <span className="text-white font-bold">
-                                <TextAmt
-                                    number={lpValueUsd || 0}
-                                    decimalClassName="text-stake-gray-500"
-                                />
-                            </span>
+                            <div className="text-lg leading-tight">
+                                <span className="text-stake-gray-500">$</span>
+                                <span className="text-white font-bold">
+                                    <TextAmt
+                                        number={lpValueUsd || 0}
+                                        decimalClassName="text-stake-gray-500"
+                                    />
+                                </span>
+                            </div>
                         </div>
-                    </div>
-                    <div>
-                        <div className="text-stake-gray-500 text-xs underline mb-4 block">
-                            <CardTooltip
-                                content={
-                                    <>
-                                        Percentage of your deposit to the total
-                                        liquidity in this pool. It depends on
-                                        the reward that you&apos;ll receive.
-                                    </>
-                                }
-                            >
-                                <span>Your capacity</span>
-                            </CardTooltip>
-                        </div>
+                        <div>
+                            <div className="text-stake-gray-500 text-xs underline mb-4 block">
+                                <CardTooltip
+                                    content={
+                                        <>
+                                            Percentage of your deposit to the
+                                            total liquidity in this pool. It
+                                            depends on the reward that
+                                            you&apos;ll receive.
+                                        </>
+                                    }
+                                >
+                                    <span>Your capacity</span>
+                                </CardTooltip>
+                            </div>
 
-                        <div className="text-lg text-white font-bold leading-snug">
-                            {formatAmount(capacityPercent?.toNumber() || 0, {
-                                notation: "standard",
-                            })}
-                            %
+                            <div className="text-lg text-white font-bold leading-snug">
+                                {formatAmount(
+                                    capacityPercent?.toNumber() || 0,
+                                    {
+                                        notation: "standard",
+                                    }
+                                )}
+                                %
+                            </div>
                         </div>
                     </div>
                 </div>

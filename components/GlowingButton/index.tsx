@@ -11,14 +11,15 @@ const yellowWrapperClassName =
 const THEME = {
     pink: pinkWrapperClassName,
     cyan: cyanWrapperClassName,
-    yellow: yellowWrapperClassName
+    yellow: yellowWrapperClassName,
 };
 export type GlowingButtonProps = BaseButtonProps & {
-    wrapperClassName?: string
+    wrapperClassName?: string;
 };
-function GlowingButton({ ...props }: GlowingButtonProps) {
-    const wrapperClassName = useMemo(() => {
-        const baseClassName = "relative transition-all active:colored-drop-shadow-none";
+function GlowingButton({ wrapperClassName, ...props }: GlowingButtonProps) {
+    const wrapperClassNameMerge = useMemo(() => {
+        const baseClassName =
+            "relative transition-all active:colored-drop-shadow-none";
         const themeClassName = props.theme ? THEME[props.theme] : "";
         const modifierClassName = props.disabled
             ? "hover:colored-drop-shadow-none hover:colored-drop-shadow-transparent"
@@ -27,12 +28,14 @@ function GlowingButton({ ...props }: GlowingButtonProps) {
             baseClassName,
             themeClassName,
             modifierClassName,
-            props.wrapperClassName
+            wrapperClassName
         );
-    }, [props.theme, props.wrapperClassName, props.disabled]);
-    return <span className={wrapperClassName}>
-        <BaseButton {...props}/>
-    </span>;
+    }, [props.theme, wrapperClassName, props.disabled]);
+    return (
+        <span className={wrapperClassNameMerge}>
+            <BaseButton {...props} />
+        </span>
+    );
 }
 
 export default GlowingButton;

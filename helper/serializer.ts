@@ -114,7 +114,6 @@ export const decodeNestedStringHex = <T>(data: string, data_structure: ElrondStr
                 32
             );
             index = newIndex;
-            console.log(index, encoded_str);
             value = new Address(encoded_str).bech32();
         } else if (type_elem === ElrondType.TOKEN_IDENTIFIER) {
             const [encoded_str, newIndex] = getArbitraryWidthHexString(
