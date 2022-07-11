@@ -33,7 +33,7 @@ function GovMenu() {
                     </div>
                 )}
             </ActiveLink>
-            <ActiveLink href="/stake/gov/farm" exact className="shrink-0">
+            {/* <ActiveLink href="/stake/gov/farm" exact className="shrink-0">
                 {({ active }) => (
                     <div
                         className={`flex items-center h-8 sm:h-12 px-6 bg-ash-dark-600 text-xs sm:text-sm font-bold ${
@@ -56,7 +56,7 @@ function GovMenu() {
                         Proposal Voting
                     </div>
                 )}
-            </ActiveLink>
+            </ActiveLink> */}
         </div>
     );
 }

@@ -8,9 +8,9 @@ import { IToken } from "interface/token";
 const devnet: IPool[] = [
     {
         address:
-            "erd1qqqqqqqqqqqqqpgqzxcjxnxsw99lzdjqtcak5x8x39pkxkz0rmcqyl76wx",
+            "erd1qqqqqqqqqqqqqpgq3xmeur9f8s4j6lj0yhv9e38ghllfp55hrmcqtnx6q3",
         lpToken: {
-            id: "LPT-999601",
+            id: "LPT-9467c3",
             chainId: CHAIN_ID.DEVNET,
             symbol: "LPT-USDC-USDT",
             name: "Ashswap LP",
@@ -21,9 +21,9 @@ const devnet: IPool[] = [
     },
     {
         address:
-            "erd1qqqqqqqqqqqqqpgq9wj92y9sfw0dua57664hdc5gd656h95yrmcqtnqv5l",
+            "erd1qqqqqqqqqqqqqpgqugd66zhe3k9e0nzwe9v2yegxsjvp6hy8rmcqss20g6",
         lpToken: {
-            id: "LPT-ea941a",
+            id: "LPT-d50bed",
             chainId: CHAIN_ID.DEVNET,
             symbol: "LPT-USDC-wUSDC",
             name: "Ashswap LP",
@@ -34,9 +34,9 @@ const devnet: IPool[] = [
     },
     {
         address:
-            "erd1qqqqqqqqqqqqqpgqla72lhk8szfdh2l2nt9vflt803uz3prsrmcq2w885d",
+            "erd1qqqqqqqqqqqqqpgqnm7kycd97aklkckpnx0c6vg9k3fv4jy5rmcq9g9xw6",
         lpToken: {
-            id: "LPT-8860c3",
+            id: "LPT-3b7ee0",
             chainId: CHAIN_ID.DEVNET,
             symbol: "LPT-renBTC-wBTC",
             name: "Ashswap LP",
