@@ -392,9 +392,7 @@ function GovStats() {
                                 PERCENTAGE of total ASH Locked
                             </div>
                             <div className="text-white text-lg font-bold leading-tight">
-                                {formatAmount(totalLockedPct, {
-                                    notation: "standard",
-                                })}
+                                {formatAmount(totalLockedPct)}
                                 %
                             </div>
                         </div>
