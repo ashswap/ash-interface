@@ -65,7 +65,7 @@ function LockPeriod({
                 <DatePicker
                     className="invisible w-0 h-0 p-0 border-0 absolute left-0 bottom-0"
                     dropdownClassName="bg-pink-600 left-0 "
-                    open={ENVIRONMENT.NETWORK !== "devnet" && openDatePicker}
+                    open={openDatePicker}
                     popupStyle={{ left: "0px" }}
                     suffixIcon={undefined}
                     inputReadOnly={true}

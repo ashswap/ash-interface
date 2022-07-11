@@ -1,7 +1,6 @@
 import ICArrowRight from "assets/svg/arrow-right.svg";
 import GovLayout from "components/Layout/Gov";
-import { ENVIRONMENT } from "const/env";
-import React, { ReactElement } from "react";
+import { ReactElement } from "react";
 import VotePowerChart from "views/components/VotePowerChart";
 import WeeklyFeeTable from "views/components/WeeklyFeeTable";
 import GovState from "views/stake/gov/GovRecoilState";
@@ -27,9 +26,7 @@ function GovPage() {
                 </div>
                 <div>
                     <h2 className="text-lg font-bold text-white mb-5 lg:mb-7">
-                        {ENVIRONMENT.NETWORK === "devnet"
-                            ? "Daily Summary"
-                            : "Weekly Summary"}
+                        Weekly Summary
                     </h2>
                     <WeeklyFeeTable />
                 </div>

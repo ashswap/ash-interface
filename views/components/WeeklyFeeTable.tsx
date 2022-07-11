@@ -1,12 +1,11 @@
-import { fetcher } from "helper/common";
-import React, { useMemo, useState } from "react";
-import useSWR from "swr";
 import ICArrowLeft from "assets/svg/arrow-left.svg";
 import ICArrowRight from "assets/svg/arrow-right.svg";
-import moment from "moment";
-import { formatAmount } from "helper/number";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
-import { ENVIRONMENT } from "const/env";
+import { fetcher } from "helper/common";
+import { formatAmount } from "helper/number";
+import moment from "moment";
+import { useMemo, useState } from "react";
+import useSWR from "swr";
 type FeeRecord = {
     from_timestamp: number;
     to_timestamp: number;
@@ -23,25 +22,11 @@ const Row = ({ order, feeData }: { order: number; feeData: FeeRecord }) => {
         <div className="grid grid-cols-[2rem,1fr,1fr] gap-x-4 sm:gap-x-8 lg:gap-x-28 items-center h-12 bg-ash-dark-600 px-4.5 lg:px-6 text-stake-gray-500 text-xs">
             <div className="text-right">{order}</div>
             <div className="">
-                {ENVIRONMENT.NETWORK === "devnet" ? (
-                    <>
-                        <span className="text-white">
-                            {from.format("DD MMM, yyyy")}
-                        </span>
-                    </>
-                ) : (
-                    <>
-                        <span className="text-white">
-                            {from.format("DD MMM, ")}
-                        </span>
-                        <span>{from.format("yyyy")}</span>
-                        <span> - </span>
-                        <span className="text-white">
-                            {to.format("DD MMM, ")}
-                        </span>
-                        <span>{to.format("yyyy")}</span>
-                    </>
-                )}
+                <span className="text-white">{from.format("DD MMM, ")}</span>
+                <span>{from.format("yyyy")}</span>
+                <span> - </span>
+                <span className="text-white">{to.format("DD MMM, ")}</span>
+                <span>{to.format("yyyy")}</span>
             </div>
             <div className="text-right">
                 $
@@ -65,20 +50,12 @@ function WeeklyFeeTable() {
     const records = useMemo(() => {
         const map: Record<number, FeeRecord[]> = {};
         (data || []).map((val) => {
-            if (ENVIRONMENT.NETWORK === "devnet") {
-                const key = moment
-                    .unix(val.from_timestamp)
-                    .endOf("days")
-                    .unix();
-                map[key] = [...(map[key] || []), val];
-            } else {
-                const key = moment
-                    .unix(val.from_timestamp)
-                    .weekday(0)
-                    .endOf("days")
-                    .unix();
-                map[key] = [...(map[key] || []), val];
-            }
+            const key = moment
+                .unix(val.from_timestamp)
+                .weekday(0)
+                .endOf("days")
+                .unix();
+            map[key] = [...(map[key] || []), val];
         });
         return Object.entries(map)
             .map(([k, val]) => {

@@ -5,7 +5,7 @@ import {
     govLockedAmtState,
     govTotalSupplyVeASH,
     govUnlockTSState,
-    govVeASHAmtState,
+    govVeASHAmtState
 } from "atoms/govState";
 import { walletBalanceState } from "atoms/walletState";
 import BigNumber from "bignumber.js";
@@ -18,7 +18,6 @@ import Switch from "components/Switch";
 import TextAmt from "components/TextAmt";
 import CardTooltip from "components/Tooltip/CardTooltip";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
-import { ENVIRONMENT } from "const/env";
 import { ASH_TOKEN, VE_ASH_DECIMALS } from "const/tokens";
 import { toEGLDD, toWei } from "helper/balance";
 import { estimateVeASH } from "helper/voteEscrow";
@@ -27,7 +26,6 @@ import useMediaQuery from "hooks/useMediaQuery";
 import { useOnboarding } from "hooks/useOnboarding";
 import { useScreenSize } from "hooks/useScreenSize";
 import moment from "moment";
-import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
 import LockPeriod, { lockPeriodFormater } from "./LockPeriod";
@@ -35,21 +33,11 @@ type props = {
     open: boolean;
     onClose: () => void;
 };
-const EXTEND_DEV = {
+const EXTEND_CONFIG = {
     options: [
         // test purpose
-        { value: 12 * 60 * 60, label: "+ 12 hours" },
-        { value: 24 * 60 * 60, label: "+ 1 day" },
-        { value: 3 * 24 * 60 * 60, label: "+ 3 days" },
-        { value: 1 * 7 * 24 * 60 * 60, label: "+ 1 week" },
-    ],
-    maxLock: 2 * 7 * 24 * 60 * 60,
-    minLock: 12 * 60 * 60,
-};
-const EXTEND_TEST = {
-    options: [
-        // test purpose
-        { value: 7 * 24 * 60 * 60, label: "+ 7 days" },
+        { value: 7 * 24 * 60 * 60, label: "+ 1 week" },
+        { value: 4 * 7 * 24 * 60 * 60, label: "+ 4 weeks" },
         { value: 1 * 365 * 24 * 60 * 60, label: "+ 1 year" },
         { value: 2 * 365 * 24 * 60 * 60, label: "+ 2 years" },
         { value: 3 * 365 * 24 * 60 * 60, label: "+ 3 years" },
@@ -57,8 +45,6 @@ const EXTEND_TEST = {
     maxLock: 4 * 365 * 24 * 60 * 60,
     minLock: 7 * 24 * 60 * 60,
 };
-const EXTEND_CONFIG =
-    ENVIRONMENT.NETWORK === "devnet" ? EXTEND_DEV : EXTEND_TEST;
 const StakeMoreContent = ({ open, onClose }: props) => {
     const lockedAmt = useRecoilValue(govLockedAmtState);
     const unlockTS = useRecoilValue(govUnlockTSState);

@@ -43,9 +43,7 @@ function StakePage() {
                 </div>
                 <div className="mb-16 lg:mb-28">
                     <h2 className="text-lg font-bold text-white mb-5 lg:mb-7">
-                        {ENVIRONMENT.NETWORK === "devnet"
-                            ? "Daily Summary"
-                            : "Weekly Summary"}
+                        Weekly Summary
                     </h2>
                     <WeeklyFeeTable />
                 </div>

@@ -65,11 +65,6 @@ function VotePowerChart() {
         return chartData;
     }, [chartData]);
     const defaultIndex = useMemo(() => {
-        if(ENVIRONMENT.NETWORK === "devnet"){
-            return displayChartData.findIndex((val) =>
-            moment.unix(val.timestamp).isSame(moment(), "days")
-        );
-        }
         return displayChartData.findIndex((val) =>
             moment.unix(val.timestamp).isSame(moment(), "years")
         );
@@ -81,9 +76,6 @@ function VotePowerChart() {
     // Xaxis formatter
     const tickFormatter = useCallback((val, index: number) => {
         const time = moment.unix(val);
-        if(ENVIRONMENT.NETWORK === "devnet"){
-            return time.format("DD/MM/yyyy");
-        }
         return time.format("yyyy");
     }, []);
     const activePayload = useMemo(() => {
