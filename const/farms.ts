@@ -4,34 +4,34 @@ import { ENVIRONMENT } from "./env";
 const devnet: IFarm[] = [
     {
         farm_address:
-            "erd1qqqqqqqqqqqqqpgqjynk4kc89vhn8wg42fn6j6ny3t4k87nurmcqne35um",
+            "erd1qqqqqqqqqqqqqpgq6rscqc3e84us44nr27mzdhlqlhf6g0ptrmcq8hmmnr",
         reward_token_id: "ASH-4ce444",
         reward_token_decimal: 18,
-        farming_token_id: "LPT-999601",
+        farming_token_id: "LPT-9467c3",
         farming_token_decimal: 18,
-        farm_token_id: "FUU-368c44",
+        farm_token_id: "FUU-450457",
         farm_token_decimal: 18,
         active: true,
     },
     {
         farm_address:
-            "erd1qqqqqqqqqqqqqpgqsn5d6l90xnml6gh3lr2d8gft5kjssx85rmcqlexapt",
+            "erd1qqqqqqqqqqqqqpgqut8cua5jf23nqa9jkhngrv3ppr6e6zcrrmcq646xrs",
         reward_token_id: "ASH-4ce444",
         reward_token_decimal: 18,
-        farming_token_id: "LPT-ea941a",
+        farming_token_id: "LPT-d50bed",
         farming_token_decimal: 18,
-        farm_token_id: "FUW-dd21b6",
+        farm_token_id: "FUU-fd8656",
         farm_token_decimal: 18,
         active: true,
     },
     {
         farm_address:
-            "erd1qqqqqqqqqqqqqpgqsxwkxy0eqzm30zx0cd0shk47kg3fe4drrmcqhekhv7",
+            "erd1qqqqqqqqqqqqqpgqynyr26ryu046v3x0zxv6cn2sjjmkq2xarmcq7hgrz2",
         reward_token_id: "ASH-4ce444",
         reward_token_decimal: 18,
-        farming_token_id: "LPT-8860c3",
+        farming_token_id: "LPT-3b7ee0",
         farming_token_decimal: 18,
-        farm_token_id: "FRW-dd4067",
+        farm_token_id: "FUU-67343f",
         farm_token_decimal: 18,
         active: true,
     },

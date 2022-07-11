@@ -1,12 +1,10 @@
-import { ENVIRONMENT } from "const/env";
 import { CHART_INTERVAL } from "const/time";
 import { ChartTimeUnitType } from "interface/chart";
 import { IToken } from "interface/token";
 import { ValueOf } from "interface/utilities";
-import React, { useState } from "react";
+import { useState } from "react";
 import TokenLiquidityChart from "./TokenLiquidityChart";
 import TokenPriceAreaChart from "./TokenPriceAreaChart";
-import TokenPriceChart from "./TokenPriceChart";
 import TokenVolumeChart from "./TokenVolumeChart";
 
 const CHART_TYPES = {
@@ -14,10 +12,7 @@ const CHART_TYPES = {
     VOLUME: "Volume",
     PRICE: "Price",
 } as const;
-const ChartTypeArr =
-    ENVIRONMENT.NETWORK === "devnet"
-        ? Object.values(CHART_TYPES).filter((val) => val !== "Price")
-        : Object.values(CHART_TYPES);
+const ChartTypeArr = Object.values(CHART_TYPES);
 type ChartType = ValueOf<typeof CHART_TYPES>;
 function TokenChart({ token }: { token: IToken }) {
     const [chartType, setChartType] = useState<ChartType>("Liquidity");

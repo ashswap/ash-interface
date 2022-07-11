@@ -13,7 +13,7 @@ export const shardId = 1;
 export const blockTimeMs = 6000;
 
 let defaultDevnet: CustomNetworkType = fallbackNetworkConfigurations.devnet;
-defaultDevnet.apiAddress = "https://api-elrond-devnet.ashswap.io";
+// defaultDevnet.apiAddress = "https://api-elrond-devnet.ashswap.io";
 defaultDevnet.apiTimeout = "10000";
 
 export const DAPP_CONFIG: CustomNetworkType =
