@@ -30,10 +30,10 @@ export const formatAmount = (
 ) => {
     const {
         notation = "compact",
-        displayThreshold,
+        displayThreshold = 0.01,
         tokenPrecision,
         isInteger,
-    } = options || { notation: "compact" };
+    } = options || { notation: "compact", displayThreshold: 0.01 };
     if (amount === 0) {
         if (isInteger) {
             return "0";

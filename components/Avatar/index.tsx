@@ -5,13 +5,13 @@ type Props = JSX.IntrinsicElements["span"] & Pick<ImageProps, "src" | "alt">;
 function Avatar({ src, alt, ...props }: Props) {
     const className = useMemo(() => {
         return twMerge(
-            "relative w-full h-full rounded-full overflow-hidden",
+            "relative w-full h-full rounded-full overflow-hidden bg-stake-dark-300",
             props.className
         );
     }, [props.className]);
     return (
         <span {...props} className={className}>
-            <Image src={src} alt={alt} layout="fill" objectFit="cover" />
+            {src && <Image src={src} alt={alt} layout="fill" objectFit="cover" />}
         </span>
     );
 }
