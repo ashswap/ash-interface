@@ -1,6 +1,6 @@
 import BaseModal, { BaseModalType } from "components/BaseModal";
 import { useScreenSize } from "hooks/useScreenSize";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import ICChevronDown from "assets/svg/chevron-down.svg";
 import ICChevronRight from "assets/svg/chevron-right.svg";
@@ -33,6 +33,9 @@ import { useRecoilValue } from "recoil";
 import FarmBoostTooltip from "./FarmBoostTooltip";
 import Link from "next/link";
 import useRouteModal from "hooks/useRouteModal";
+import { useOnboarding } from "hooks/useOnboarding";
+import OnboardTooltip from "components/Tooltip/OnboardTooltip";
+import Delayed from "components/Delayed";
 
 const BoostBarValue = (
     props: Omit<BoostBarProps, "min" | "max" | "height">
@@ -85,6 +88,7 @@ const FarmBoostRecord = ({
     booster: string;
     lpAmt: BigNumber;
 }) => {
+    const [dismissedTooltip, setDismissedTooltip] = useState(false);
     const accAddress = useRecoilValue(accAddressState);
     const farm = farmData.farm;
     const pool = useMemo(() => {
@@ -94,6 +98,9 @@ const FarmBoostRecord = ({
         () => booster === accAddress,
         [booster, accAddress]
     );
+    const zeroVeTooltip = useMemo(() => {
+        return isOwner && veAvailable?.eq(0) && !dismissedTooltip;
+    }, [isOwner, veAvailable, dismissedTooltip]);
     if (!pool) return null;
 
     return (
@@ -142,20 +149,45 @@ const FarmBoostRecord = ({
                 </div>
                 <div className="text-right text-xs font-medium">
                     {isOwner ? (
-                        <>
-                            <span className="text-stake-gray-500 underline">
-                                Available:{" "}
+                        <OnboardTooltip
+                            delayOpen={500}
+                            offset={30}
+                            placement="bottom-end"
+                            open={zeroVeTooltip}
+                            onArrowClick={() => setDismissedTooltip(true)}
+                            content={
+                                <OnboardTooltip.Panel className="max-w-[15rem]">
+                                    <div className="text-white text-xs font-bold my-3 px-5">
+                                        <span className="">
+                                            veASH is needed for Farm Boost.{" "}
+                                        </span>
+                                        <Link href="/stake/gov">
+                                            <a>
+                                                <span className="underline text-stake-green-500">
+                                                    Stake ASH
+                                                </span>
+                                            </a>
+                                        </Link>
+                                        <span> to get it now!</span>
+                                    </div>
+                                </OnboardTooltip.Panel>
+                            }
+                        >
+                            <span>
+                                <span className="text-stake-gray-500 underline">
+                                    Available:{" "}
+                                </span>
+                                <span className="text-ash-cyan-500 underline">
+                                    {formatAmount(
+                                        toEGLDD(
+                                            VE_ASH_DECIMALS,
+                                            veAvailable || 0
+                                        ).toNumber()
+                                    )}{" "}
+                                    ve
+                                </span>
                             </span>
-                            <span className="text-ash-cyan-500 underline">
-                                {formatAmount(
-                                    toEGLDD(
-                                        VE_ASH_DECIMALS,
-                                        veAvailable || 0
-                                    ).toNumber()
-                                )}{" "}
-                                veASH
-                            </span>
-                        </>
+                        </OnboardTooltip>
                     ) : (
                         <>&nbsp;</>
                     )}
@@ -265,9 +297,11 @@ const FarmBoostInfo = ({ farmData }: FarmBoostInfoType) => {
                         <div className="mt-10 mb-36">
                             <FarmBoostRecord
                                 farmData={farmData}
-                                veConsume={expectedFarmBoost.veForBoost.minus(
-                                    currentFarmBoost.veForBoost
-                                )}
+                                veConsume={
+                                    expectedFarmBoost.veForBoost.minus(
+                                        currentFarmBoost.veForBoost
+                                    )
+                                }
                                 currentBoost={currentFarmBoost}
                                 expectedBoost={expectedFarmBoost}
                                 maxBoost={maxFarmBoost}
