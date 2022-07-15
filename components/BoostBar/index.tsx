@@ -1,5 +1,8 @@
+import CardTooltip from "components/Tooltip/CardTooltip";
+import OnboardTooltip from "components/Tooltip/OnboardTooltip";
 import { formatAmount } from "helper/number";
-import React, { createContext, useContext, useMemo } from "react";
+import { useOnboarding } from "hooks/useOnboarding";
+import React, { createContext, useContext, useEffect, useMemo } from "react";
 
 const Polygon = ({
     height,
@@ -82,6 +85,7 @@ export type BoostBarProps = {
     maxVe?: number;
     topLabel?: boolean;
     hiddenCurrentBar?: boolean;
+    withOnboarding?: boolean;
 };
 const BoostBarContext = createContext<
     BoostBarProps & {
@@ -103,6 +107,7 @@ function BoostBar(props: BoostBarProps) {
         veLine,
         topLabel,
         hiddenCurrentBar,
+        withOnboarding,
     } = props;
     const tan33 = Math.tan((33 * Math.PI) / 180);
     const minWidth = useMemo(() => {
@@ -134,6 +139,8 @@ function BoostBar(props: BoostBarProps) {
     const deltaWidth = useMemo(() => {
         return `calc(${newValueWidth} - ${valueWidth} + ${tan33 * height}px)`;
     }, [newValueWidth, valueWidth, height, tan33]);
+    const [onboaringExpectedVe, setOnboardedExpectedVe] =
+        useOnboarding("farm_expected_ve");
     return (
         <BoostBarContext.Provider
             value={{
@@ -155,26 +162,52 @@ function BoostBar(props: BoostBarProps) {
                     </div>
 
                     {validNewValue > validValue && (
-                        <div
-                            className="absolute inset-0"
-                            style={{
-                                filter: "drop-shadow(0px 4px 10px #FF00E5)",
-                                minWidth,
-                                width: deltaWidth,
-                                marginLeft: `calc(${valueWidth} - ${
-                                    tan33 * height
-                                }px)`,
-                            }}
+                        <OnboardTooltip
+                            disabled={!withOnboarding}
+                            open={onboaringExpectedVe}
+                            onArrowClick={() => setOnboardedExpectedVe(true)}
+                            delayOpen={3000}
+                            offset={50}
+                            zIndex={999}
+                            placement="bottom-start"
+                            content={
+                                <OnboardTooltip.Panel className="max-w-[15rem]">
+                                    <div className="px-5 my-3 text-xs font-bold">
+                                        <span className="text-stake-green-500">
+                                            All of veASH
+                                        </span>{" "}
+                                        will be consumed for{" "}
+                                        <span className="text-stake-green-500">
+                                            maximizing
+                                        </span>{" "}
+                                        your boost.
+                                    </div>
+                                </OnboardTooltip.Panel>
+                            }
                         >
-                            <Polygon
-                                height={height}
-                                className={`${disabled ? "" : "bg-[#FF00E5]"}`}
-                            />
-                        </div>
+                            <div
+                                className="absolute inset-0 transition-all"
+                                style={{
+                                    filter: "drop-shadow(0px 4px 10px #FF00E5)",
+                                    minWidth,
+                                    width: deltaWidth,
+                                    marginLeft: `calc(${valueWidth} - ${
+                                        tan33 * height
+                                    }px)`,
+                                }}
+                            >
+                                <Polygon
+                                    height={height}
+                                    className={`${
+                                        disabled ? "" : "bg-[#FF00E5]"
+                                    }`}
+                                />
+                            </div>
+                        </OnboardTooltip>
                     )}
                     {!hiddenCurrentBar && (
                         <div
-                            className="absolute inset-0"
+                            className="absolute inset-0 transition-all"
                             style={{
                                 filter:
                                     disabled || typeof newVal !== "undefined"
@@ -289,6 +322,9 @@ const TopLabel = () => {
         max = 2.5,
         min = 1,
         height,
+        currentVe,
+        expectedVe,
+        maxVe,
     } = useContext(BoostBarContext);
     const tan33 = Math.tan((33 * Math.PI) / 180);
     return (
@@ -299,24 +335,81 @@ const TopLabel = () => {
             }}
         >
             <div className="flex justify-between text-stake-gray-500 underline font-bold text-xs">
-                <div>C</div>
-                <div>Max</div>
+                <CardTooltip
+                    autoPlacement
+                    content={
+                        <div className="text-stake-gray-500 text-xs font-bold max-w-[15rem]">
+                            <div className="mb-4">C = Current Boost</div>
+                            <div className="text-pink-600 text-lg mb-8">
+                                x{validValue}
+                            </div>
+                            <div className="mb-4">
+                                veASH used for Current Boost
+                            </div>
+                            <div className="text-pink-600 text-lg">
+                                {formatAmount(currentVe)} ve
+                            </div>
+                        </div>
+                    }
+                >
+                    <div>C</div>
+                </CardTooltip>
+                <CardTooltip
+                    autoPlacement
+                    content={
+                        <div className="text-stake-gray-500 text-xs font-bold max-w-[15rem]">
+                            <div className="mb-4">Max = Max boost possible</div>
+                            <div className="text-white text-lg mb-8">x2.5</div>
+                            <div className="mb-4">
+                                veASH needed for max boost
+                            </div>
+                            <div className="text-white text-lg">
+                                {formatAmount(maxVe)} ve
+                            </div>
+                        </div>
+                    }
+                >
+                    <div>Max</div>
+                </CardTooltip>
             </div>
             {validNewValue > validValue && !disabled && (
                 <div
                     className="text-xs font-bold absolute inset-0 text-right"
                     style={{
-                        paddingRight: `min(max(${
+                        right: `min(max(${
                             ((max - validNewValue) * 100) / (max - min)
                         }%, 3rem), 100% - 7rem)`,
+                        left: "1rem",
                     }}
                 >
-                    <span className="underline text-stake-gray-500">
-                        New boost:{" "}
-                    </span>
-                    <span className="underline text-[#FF00E5]">
-                        x{formatAmount(validNewValue)}
-                    </span>
+                    <CardTooltip
+                        autoPlacement
+                        content={
+                            <div className="text-stake-gray-500 text-xs font-bold max-w-[15rem]">
+                                <div className="mb-4">
+                                    New boost after confirmed
+                                </div>
+                                <div className="text-[#FF00E5] text-lg mb-8">
+                                    x{validNewValue}
+                                </div>
+                                <div className="mb-4">
+                                    veASH used for new boost
+                                </div>
+                                <div className="text-[#FF00E5] text-lg">
+                                    {formatAmount(expectedVe)} ve
+                                </div>
+                            </div>
+                        }
+                    >
+                        <span>
+                            <span className="underline text-stake-gray-500">
+                                New boost:{" "}
+                            </span>
+                            <span className="underline text-[#FF00E5]">
+                                x{formatAmount(validNewValue)}
+                            </span>
+                        </span>
+                    </CardTooltip>
                 </div>
             )}
         </div>

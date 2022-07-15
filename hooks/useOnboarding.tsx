@@ -1,8 +1,10 @@
+import { userOnboardingState } from "atoms/storage";
 import storage from "helper/storage";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useRecoilState, useSetRecoilState } from "recoil";
 
 // note: undefined or false -> the onboarding UI has not been shown yet
-type UserOnboardingStatus = {
+export type UserOnboardingStatus = {
     stake_gov_1st?: boolean;
     stake_gov_extend_lock_time?: boolean;
     stake_lp?: boolean;
@@ -20,26 +22,39 @@ type UserOnboardingStatus = {
     pool_withdraw_input?: boolean;
     pool_withdraw_estimate?: boolean;
     pool_farm_from_added_lp?: boolean;
+    farm_zero_available_ve?: boolean;
+    farm_expected_ve?: boolean;
+    farm_transfered_token_guide?: boolean;
 };
 export const useOnboarding = (key: keyof UserOnboardingStatus) => {
-    const [state, setState] = useState<boolean>(false);
+    const [onboardingState, setStorageUserOnboardingState] =
+        useRecoilState(userOnboardingState);
     useEffect(() => {
-        const data: UserOnboardingStatus = storage.local.getItem("userOnboarding");
+        const data: UserOnboardingStatus =
+            storage.local.getItem("userOnboarding");
         setTimeout(() => {
-            setState(!data?.[key]);
+            setStorageUserOnboardingState((state) => ({
+                ...state,
+                [key]: !data?.[key],
+            }));
         }, 1000);
-        
-    }, [key]);
+    }, [key, setStorageUserOnboardingState]);
     const _setState = useCallback(
         (val: boolean) => {
-            const newLocalState = { ...storage.local.getItem("userOnboarding"), [key]: val };
+            const newLocalState = {
+                ...storage.local.getItem("userOnboarding"),
+                [key]: val,
+            };
             storage.local.setItem({
                 key: "userOnboarding",
                 data: newLocalState,
             });
-            setState(!val);
+            setStorageUserOnboardingState((state) => ({
+                ...state,
+                [key]: !val,
+            }));
         },
-        [key]
+        [key, setStorageUserOnboardingState]
     );
-    return [state, _setState] as [typeof state, typeof _setState];
+    return [!!onboardingState[key], _setState] as [boolean, typeof _setState];
 };

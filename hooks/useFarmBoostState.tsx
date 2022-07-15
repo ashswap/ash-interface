@@ -1,4 +1,4 @@
-import { getProxyProvider } from "@elrondnetwork/dapp-core";
+import { getProxyProvider, transactionServices } from "@elrondnetwork/dapp-core";
 import { Address, ProxyProvider } from "@elrondnetwork/erdjs/out";
 import { accAddressState } from "atoms/dappState";
 import { farmOwnerTokensQuery, FarmRecord, FarmToken } from "atoms/farmsState";
@@ -16,6 +16,8 @@ import useGetSlopeUsed from "./useFarmContract/useGetSlopeUsed";
 import useGovGetLocked from "./useGovContract/useGovGetLocked";
 
 export const useFarmBoostTransferState = (farmToken: FarmToken, farmData: FarmRecord) => {
+    const [boostId, setBoostId] = useState<string | null>(null);
+    const {isPending: isBoosting} = transactionServices.useTrackTransactionStatus({transactionId: boostId});
     const [currentFarmBoost, setCurrentFarmBoost] = useState<FarmBoostInfo>({
         veForBoost: new BigNumber(0),
         boost: 1,
@@ -48,19 +50,22 @@ export const useFarmBoostTransferState = (farmToken: FarmToken, farmData: FarmRe
         const ownerTokens = await snapshot.getPromise(farmOwnerTokensQuery(farmData.farm.farm_address));
         const tokens = [...ownerTokens, farmToken];
         const tx = await createClaimRewardTxMulti(tokens, farmData.farm, true);
-        return sendTransactions({
+        const result = await sendTransactions({
             transactions: tx,
             transactionsDisplayInfo: {
                 successMessage: "Success to boost yourself"
             }
-        })
+        });
+        const {sessionId, error} = result;
+        setBoostId(sessionId);
+        return result;
     }, [createClaimRewardTxMulti, farmData, farmToken]);
 
     useEffect(() => {
         getCurrentBoost();
     }, [getCurrentBoost]);
 
-    return { currentFarmBoost, selfBoost };
+    return { currentFarmBoost, selfBoost, boostId, isBoosting };
 };
 
 export const useFarmBoostOwnerState = (farmData: FarmRecord) => {

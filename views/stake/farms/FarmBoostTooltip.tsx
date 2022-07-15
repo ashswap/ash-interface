@@ -43,7 +43,7 @@ function FarmBoostTooltip({
     booster: string;
     farmData: FarmRecord;
     lpAmt: BigNumber;
-    onSelfBoostTransferedToken?: () => {}
+    onSelfBoostTransferedToken?: () => {};
 }) {
     const farm = farmData.farm;
     const pool = useMemo(() => {
@@ -60,7 +60,7 @@ function FarmBoostTooltip({
         <CardTooltip
             placement="right"
             content={
-                <div className="max-w-xs px-6 py-2">
+                <div className="max-w-xs px-0 py-0 sm:px-6 sm:py-2">
                     <div className="mb-12">
                         <div className="text-xs font-bold mb-4 text-stake-gray-500">
                             Owner & boosted by

@@ -61,6 +61,8 @@ export type BaseTooltipProps = {
               },
               staticSide: "top" | "left" | "bottom" | "right"
           ) => JSX.Element);
+    delayOpen?: number;
+    offset?: Parameters<typeof offset>[0];
     arrowStyle?: (
         pos: {
             x?: number;
@@ -84,28 +86,35 @@ const BaseTooltip = (props: BaseTooltipProps) => {
         onOpenChange: onOpenChangeProp,
         arrow: customArrow,
         autoPlacement: useAutoPlacement,
+        delayOpen = 0,
+        offset: offsetParam = 20,
     } = props;
     const [_open, _setOpen] = useState(false);
     const arrowRef = useRef(null);
     const [sizeState, setSizeState] = useState<Dimensions & ElementRects>();
     const [isOverflow, setIsOverflow] = useState(false);
-    const open = useMemo(() => {
-        if(isOverflow) return false;
+    const [open, setOpen] = useState(false);
+    const computedOpen = useMemo(() => {
+        if (isOverflow) return false;
         return Object.prototype.hasOwnProperty.call(props, "open")
-            ? openProp
+            ? !!openProp
             : _open;
     }, [openProp, _open, props, isOverflow]);
+    useEffect(() => {
+        const timer = setTimeout(
+            () => {
+                setOpen(computedOpen);
+            },
+            computedOpen ? delayOpen : 0
+        );
+        return () => clearTimeout(timer);
+    }, [delayOpen, computedOpen]);
     const onOpenChange = useCallback(
         (val: boolean) => {
             _setOpen(val);
-            if (
-                Object.prototype.hasOwnProperty.call(props, "onOpenChange") &&
-                typeof onOpenChangeProp === "function"
-            ) {
-                onOpenChangeProp(val);
-            }
+            onOpenChangeProp?.(val);
         },
-        [onOpenChangeProp, props]
+        [onOpenChangeProp]
     );
     const {
         x,
@@ -123,7 +132,7 @@ const BaseTooltip = (props: BaseTooltipProps) => {
         open,
         onOpenChange,
         middleware: [
-            offset(20),
+            offset(offsetParam),
             arrow({ element: arrowRef }),
             size({
                 apply(args) {
@@ -134,7 +143,7 @@ const BaseTooltip = (props: BaseTooltipProps) => {
                 ? autoPlacement()
                 : flip({ fallbackStrategy: "initialPlacement" }),
             shift({ padding: 8 }),
-            hide()
+            hide(),
         ],
         strategy: strategyProp,
     });
@@ -154,7 +163,11 @@ const BaseTooltip = (props: BaseTooltipProps) => {
     useEffect(() => {
         let cleanup = () => {};
         if (refs.reference.current && refs.floating.current && open) {
-            cleanup = autoUpdate(refs.reference.current, refs.floating.current, update);
+            cleanup = autoUpdate(
+                refs.reference.current,
+                refs.floating.current,
+                update
+            );
         }
         return () => cleanup();
     }, [refs.reference, refs.floating, update, open]);
@@ -182,7 +195,9 @@ const BaseTooltip = (props: BaseTooltipProps) => {
                             top: y ?? "",
                             left: x ?? "",
                             zIndex: zIndex ?? theme.extend.zIndex.tooltip,
-                            visibility: middlewareData.hide?.referenceHidden ? "hidden" : "visible"
+                            visibility: middlewareData.hide?.referenceHidden
+                                ? "hidden"
+                                : "visible",
                         },
                     })}
                 >

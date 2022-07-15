@@ -1,5 +1,6 @@
 import { Transition, TransitionClasses } from "@headlessui/react";
 import IconClose from "assets/svg/close.svg";
+import moment from "moment";
 import {
     createContext,
     Fragment,
@@ -39,12 +40,20 @@ Modal.setAppElement("body");
 export type BaseModalType = Props & {
     transition?: "btt" | "center" | "none";
     type?: "modal" | "drawer_btt" | "drawer_ttb" | "drawer_ltr" | "drawer_rtl";
+    destroyOnClose?: boolean;
 };
 const ModalContext = createContext<BaseModalType>({ isOpen: false });
 
 const BaseModal = (props: BaseModalType) => {
-    const { transition, type = "modal", ...reactModalProps } = props;
+    const {
+        transition,
+        type = "modal",
+        destroyOnClose,
+        ...reactModalProps
+    } = props;
     const [animating, setAnimating] = useState(false);
+    const [key, setKey] = useState(0);
+    const [initialized, setInitialized] = useState(false);
     const trans = useMemo(() => {
         return (
             TRANSITIONS[
@@ -68,6 +77,12 @@ const BaseModal = (props: BaseModalType) => {
             window.document.body.style.overflow = props.isOpen ? "hidden" : "";
         }
     }, [props.isOpen]);
+
+    useEffect(() => {
+        if (props.isOpen) {
+            setInitialized(true);
+        }
+    }, [props.isOpen]);
     return (
         <ModalContext.Provider value={{ ...props }}>
             <Transition show={props.isOpen} as={"div"}>
@@ -88,11 +103,22 @@ const BaseModal = (props: BaseModalType) => {
                             </div>
                         </div>
                     )}
-                    contentElement={(props, children) => (
-                        <div {...props} style={{}} className="">
-                            {children}
-                        </div>
-                    )}
+                    contentElement={(propsContent, children) => {
+                        if (!initialized) return <div></div>;
+                        const content = (
+                            <div {...propsContent} style={{}} className="">
+                                {children}
+                            </div>
+                        );
+                        if (destroyOnClose) {
+                            return props.isOpen || animating ? (
+                                content
+                            ) : (
+                                <div></div>
+                            );
+                        }
+                        return content;
+                    }}
                 >
                     <Transition.Child
                         as={Fragment}
