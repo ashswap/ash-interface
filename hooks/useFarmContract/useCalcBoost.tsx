@@ -1,26 +1,7 @@
-import { getProxyProvider } from "@elrondnetwork/dapp-core";
-import {
-    Address,
-    AddressValue,
-    ContractFunction,
-    ProxyProvider,
-    Query,
-} from "@elrondnetwork/erdjs/out";
-import { accAddressState } from "atoms/dappState";
-import { FarmToken } from "atoms/farmsState";
-import {
-    govLockedAmtState,
-    govTotalSupplyVeASH,
-    govUnlockTSState,
-    govVeASHAmtState,
-} from "atoms/govState";
 import BigNumber from "bignumber.js";
-import { FARM_DIV_SAFETY_CONST } from "const/farms";
-import { queryContractParser } from "helper/serializer";
-import { FarmBoostInfo, IFarm } from "interface/farm";
+import { FarmBoostInfo } from "interface/farm";
 import moment from "moment";
 import { useRecoilCallback } from "recoil";
-import useGetSlopeUsed from "./useGetSlopeUsed";
 
 const useCalcBoost = () => {
     const func = useRecoilCallback(
@@ -32,7 +13,7 @@ const useCalcBoost = () => {
                 veSupply: BigNumber,
                 lockedAshAmt: BigNumber,
                 unlockTs: BigNumber,
-                farmingLocked: BigNumber,
+                farmingLocked: BigNumber
             ) => {
                 const currentTs = moment().unix();
                 const boostInfo: FarmBoostInfo = {
@@ -65,9 +46,12 @@ const useCalcBoost = () => {
                     lpAmt
                 );
                 const boost = boostedFarmAmount.div(lpAmt).div(0.4).toNumber();
+                const veForMaxBoost = lpAmt
+                    .multipliedBy(veSupply)
+                    .div(farmingLocked);
                 return {
-                    veForBoost,
-                    boost
+                    veForBoost: BigNumber.min(veForBoost, veForMaxBoost),
+                    boost,
                 };
             },
         []

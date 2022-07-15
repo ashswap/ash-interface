@@ -35,6 +35,11 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRecoilCallback, useRecoilValue } from "recoil";
 import FarmBoostTooltip from "views/stake/farms/FarmBoostTooltip";
 import BoostCalcModal from "./BoostCalcModal";
+import ImgASHSleep from "assets/images/ash-sleep.png";
+import Image from "next/image";
+import { transactionServices } from "@elrondnetwork/dapp-core";
+import { Transition } from "@headlessui/react";
+import { TRANSITIONS } from "const/transitions";
 
 const BoostBarValue = (
     props: Omit<BoostBarProps, "min" | "max" | "height">
@@ -251,14 +256,19 @@ const FarmRecordOwner = ({
 const FarmRecordTransfer = ({
     farmToken,
     farmData,
+    onBoosting,
 }: {
     farmToken: FarmToken;
     farmData: FarmRecord;
+    onBoosting?: (val: boolean) => void;
 }) => {
-    const { currentFarmBoost, selfBoost } = useFarmBoostTransferState(
-        farmToken,
-        farmData
-    );
+    const { currentFarmBoost, selfBoost, isBoosting } =
+        useFarmBoostTransferState(farmToken, farmData);
+
+    useEffect(() => {
+        onBoosting?.(!!isBoosting);
+    }, [isBoosting, onBoosting]);
+
     return (
         <FarmRecord
             farmData={farmData}
@@ -271,10 +281,14 @@ const FarmRecordTransfer = ({
     );
 };
 function GovBoostStatus() {
-    const router = useRouter();
     const { encode, modalParams, showModal, onCloseModal } =
         useRouteModal("calc_boost");
     const [openCalc, setOpenCalc] = useState(false);
+    const [boostId, setBoostId] = useState<string | null>(null);
+    const { isPending } = transactionServices.useTrackTransactionStatus({
+        transactionId: boostId,
+    });
+    const [isSelfBoostTToken, setIsBoostTToken] = useState(false);
     const [canBoostMap, setCanBoostMap] = useState<Record<string, boolean>>({});
     useEffect(() => setOpenCalc(showModal), [showModal]);
     const accAddress = useRecoilValue(accAddressState);
@@ -299,12 +313,13 @@ function GovBoostStatus() {
                     .map(({ ownerTokens, farm }) =>
                         createClaimRewardTxMulti(ownerTokens, farm, true)
                     );
-                sendTransactions({
+                const { sessionId, error } = await sendTransactions({
                     transactions: await Promise.all(txsPromises),
                     transactionsDisplayInfo: {
                         successMessage: "All farm tokens are boosted.",
                     },
                 });
+                setBoostId(sessionId);
             },
         [createClaimRewardTxMulti]
     );
@@ -326,71 +341,129 @@ function GovBoostStatus() {
     );
     return (
         <>
-            <div className="bg-stake-dark-300 p-6 sm:px-11 sm:pb-8 sm:pt-14">
-                <div className="text-white font-bold text-lg sm:text-2xl mb-14">
-                    Your boost status
-                </div>
-                <div className="space-y-9">
-                    {farmRecordsWithOwnerTokens.map((f) => (
-                        <FarmRecordOwner
-                            key={f.farm.farm_address}
-                            farmData={f}
-                            canBoostChange={updateCanBoostMap}
-                        />
-                    ))}
-                </div>
-                <div className="bg-stake-dark-500 py-4 px-8 text-yellow-600 text-xs font-bold mt-12 mb-8">
-                    Boosting system will automatically uses all of your veASH
-                    for maximum boosting action.
-                </div>
-                <div className="flex sm:justify-end space-x-2">
-                    <Link href={{query: {p: encode({farmAddress: ACTIVE_FARMS[0].farm_address})}}} scroll={false} passHref>
-                        <a>
-                            <BaseButton className="h-12 w-12 shrink-0 sm:w-auto bg-ash-dark-400 px-1 sm:px-6 uppercase text-sm font-bold text-white">
-                                <ICEqualSquare className="text-white w-4.5 h-4.5" />
-                                <span className="hidden sm:inline ml-1">
-                                    Calculate
-                                </span>
-                            </BaseButton>
-                        </a>
-                    </Link>
-
-                    <GlowingButton
-                        theme="pink"
-                        className="h-12 w-full px-2 sm:px-12 uppercase text-sm font-bold text-white overflow-hidden"
-                        wrapperClassName="grow sm:grow-0 overflow-hidden"
-                        disabled={
-                            farmRecordsWithOwnerTokens.length === 0 ||
-                            Object.values(canBoostMap).every(
-                                (canBoost) => !canBoost
-                            )
-                        }
-                        onClick={() => boostOwnerFarmTokens()}
-                    >
-                        <span className="mr-4 truncate">Confirm new boost</span>
-                        <ICChevronRight className="w-2 h-auto" />
-                    </GlowingButton>
-                </div>
-            </div>
-            {farmTransferedTokens.length > 0 && (
-                <div className="bg-ash-dark-600 p-6 sm:px-11 sm:py-14">
-                    <div className="space-y-9">
-                        {farmRecords.map((f) =>
-                            f.stakedData?.farmTokens
-                                .filter(
-                                    (t) => t.attributes.booster !== accAddress
-                                )
-                                .map((t) => (
-                                    <FarmRecordTransfer
-                                        key={t.tokenId}
+            <div className="relative">
+                <div className="bg-stake-dark-300 p-6 sm:px-11 sm:pb-8 sm:pt-14">
+                    <div className="text-white font-bold text-lg sm:text-2xl mb-14">
+                        Your boost status
+                    </div>
+                    {farmRecordsWithOwnerTokens.length > 0 ? (
+                        <>
+                            <div className="space-y-9">
+                                {farmRecordsWithOwnerTokens.map((f) => (
+                                    <FarmRecordOwner
+                                        key={f.farm.farm_address}
                                         farmData={f}
-                                        farmToken={t}
+                                        canBoostChange={updateCanBoostMap}
                                     />
-                                ))
-                        )}
+                                ))}
+                            </div>
+                            <div className="bg-stake-dark-500 py-4 px-8 text-yellow-600 text-xs font-bold mt-12 mb-8">
+                                Boosting system will automatically uses all of
+                                your veASH for maximum boosting action.
+                            </div>
+                        </>
+                    ) : (
+                        <div className="flex items-center justify-center pb-28">
+                            <div className="w-36">
+                                <Image
+                                    src={ImgASHSleep}
+                                    alt="ash sleep"
+                                    layout="responsive"
+                                    className="mix-blend-luminosity"
+                                />
+                            </div>
+                            <div className="text-lg font-bold text-stake-gray-500">
+                                <div>You&apos;ve not enter any farm yet</div>
+                                <div>
+                                    Go{" "}
+                                    <Link href="/stake/farms">
+                                        <a>
+                                            <span className="underline text-ash-cyan-500">
+                                                stake LP-Tokens
+                                            </span>
+                                        </a>
+                                    </Link>{" "}
+                                    now
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    <div className="flex sm:justify-end space-x-2">
+                        <Link
+                            href={{
+                                query: {
+                                    p: encode({
+                                        farmAddress:
+                                            ACTIVE_FARMS[0].farm_address,
+                                    }),
+                                },
+                            }}
+                            scroll={false}
+                            passHref
+                        >
+                            <a>
+                                <BaseButton className="h-12 w-12 shrink-0 sm:w-auto bg-ash-dark-400 px-1 sm:px-6 uppercase text-sm font-bold text-white">
+                                    <ICEqualSquare className="text-white w-4.5 h-4.5" />
+                                    <span className="hidden sm:inline ml-1">
+                                        Calculate
+                                    </span>
+                                </BaseButton>
+                            </a>
+                        </Link>
+
+                        <GlowingButton
+                            theme="pink"
+                            className="h-12 w-full px-2 sm:px-12 uppercase text-sm font-bold text-white overflow-hidden"
+                            wrapperClassName="grow sm:grow-0 overflow-hidden"
+                            disabled={
+                                farmRecordsWithOwnerTokens.length === 0 ||
+                                Object.values(canBoostMap).every(
+                                    (canBoost) => !canBoost
+                                )
+                            }
+                            onClick={() => boostOwnerFarmTokens()}
+                        >
+                            <span className="mr-4 truncate">
+                                Confirm new boost
+                            </span>
+                            <ICChevronRight className="w-2 h-auto" />
+                        </GlowingButton>
                     </div>
                 </div>
-            )}
+                {farmTransferedTokens.length > 0 && (
+                    <div className="bg-ash-dark-600 p-6 sm:px-11 sm:py-14">
+                        <div className="space-y-9">
+                            {farmRecords.map((f) =>
+                                f.stakedData?.farmTokens
+                                    .filter(
+                                        (t) =>
+                                            t.attributes.booster !== accAddress
+                                    )
+                                    .map((t) => (
+                                        <FarmRecordTransfer
+                                            key={t.tokenId}
+                                            farmData={f}
+                                            farmToken={t}
+                                            onBoosting={(val) =>
+                                                setIsBoostTToken(val)
+                                            }
+                                        />
+                                    ))
+                            )}
+                        </div>
+                    </div>
+                )}
+                <Transition
+                    show={isPending || isSelfBoostTToken}
+                    {...TRANSITIONS.fadeIn}
+                    {...TRANSITIONS.fadeOut}
+                >
+                    <div className="absolute inset-0 z-modal flex items-center justify-center bg-stake-dark-400/90 backdrop-blur-[20px]">
+                        <div className="w-[140px] h-[140px] rounded-full border-[20px] border-pink-600 border-t-ash-dark-600 animate-spin"></div>
+                    </div>
+                </Transition>
+            </div>
             <BoostCalcModal
                 isOpen={showModal}
                 onRequestClose={() => onCloseModal()}

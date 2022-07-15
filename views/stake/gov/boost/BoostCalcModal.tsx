@@ -5,7 +5,7 @@ import { farmQuery } from "atoms/farmsState";
 import {
     govTotalSupplyVeASH,
     govUnlockTSState,
-    govVeASHAmtState
+    govVeASHAmtState,
 } from "atoms/govState";
 import BigNumber from "bignumber.js";
 import BaseModal, { BaseModalType } from "components/BaseModal";
@@ -15,8 +15,9 @@ import InputCurrency from "components/InputCurrency";
 import { FARMS } from "const/farms";
 import pools, { POOLS_MAP_LP } from "const/pool";
 import { VE_ASH_DECIMALS } from "const/tokens";
-import { toEGLDD } from "helper/balance";
+import { toEGLDD, toWei } from "helper/balance";
 import { formatAmount } from "helper/number";
+import { estimateVeASH } from "helper/voteEscrow";
 import useGetSlopeUsed from "hooks/useFarmContract/useGetSlopeUsed";
 import useInputNumberString from "hooks/useInputNumberString";
 import { useScreenSize } from "hooks/useScreenSize";
@@ -51,7 +52,7 @@ const calcVeForMaxBoost = (
 
 const calcLockedASH = (ve: BigNumber, lockDuration: number) => {
     return ve.multipliedBy(4 * 365 * 24 * 3600).div(lockDuration);
-}
+};
 
 const LockOptions = [
     { value: 4 * 365 * 24 * 3600, label: "4 years" },
@@ -68,13 +69,12 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
     const [lpValue, setLpValue] = useState(new BigNumber(0));
     const [TVL, setTVL] = useState(new BigNumber(0));
     const [totalVeASH, setTotalVeASH] = useState(new BigNumber(0));
-    const [ownVeASH, setOwnVeASH] = useState(new BigNumber(0));
+    const [ashInput, setAshInput] = useState(new BigNumber(0));
     const [slopeUsed, setSlopeUsed] = useState(new BigNumber(0));
     const [isUserInput, setIsUserInput] = useState(false);
     const [selectedLock, setSelectedLock] = useState(LockOptions[0]);
 
     const farmData = useRecoilValue(farmQuery(farmAddress || ""));
-    const ownVeASHRecoil = useRecoilValue(govVeASHAmtState);
     const veASHSupplyRecoil = useRecoilValue(govTotalSupplyVeASH);
     const unlockTS = useRecoilValue(govUnlockTSState);
     const accAddress = useRecoilValue(accAddressState);
@@ -82,7 +82,7 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
     const [lpValueStr, setLpValueStr] = useInputNumberString(lpValue);
     const [TVLStr, setTVLStr] = useInputNumberString(TVL);
     const [totalVeStr, setTotalVeStr] = useInputNumberString(totalVeASH);
-    const [ownVeStr, setOwnVeStr] = useInputNumberString(ownVeASH);
+    const [ashInputStr, setAshInputStr] = useInputNumberString(ashInput);
 
     const getSlopeUsed = useGetSlopeUsed();
 
@@ -107,40 +107,37 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
         return calcVeForMaxBoost(lpValue, TVL, totalVeASH);
     }, [lpValue, TVL, totalVeASH]);
 
-    const ashForMaxBoost = useMemo(() => {
-        return calcLockedASH(veForMaxBoost, selectedLock.value);
-    }, [veForMaxBoost, selectedLock.value]);
-
     useEffect(() => {
         if (farmAddress && !isUserInput) {
             setLpValue(
                 farmData?.stakedData?.totalStakedLPValue || new BigNumber(0)
             );
             setTVL(farmData?.totalLiquidityValue || new BigNumber(0));
-            setOwnVeASH(
-                toEGLDD(VE_ASH_DECIMALS, ownVeASHRecoil.minus(veUsed)) ||
-                    new BigNumber(0)
-            );
             setTotalVeASH(
                 toEGLDD(VE_ASH_DECIMALS, veASHSupplyRecoil) || new BigNumber(0)
             );
         }
-    }, [
-        farmAddress,
-        farmData,
-        veASHSupplyRecoil,
-        ownVeASHRecoil,
-        isUserInput,
-        veUsed,
-    ]);
+    }, [farmAddress, farmData, veASHSupplyRecoil, isUserInput, veUsed]);
 
     useEffect(() => {
         setIsUserInput(false);
     }, [farmAddress]);
 
+    const veAshInput = useMemo(() => {
+        return toEGLDD(
+            VE_ASH_DECIMALS,
+            estimateVeASH(
+                ashInput.multipliedBy(
+                    new BigNumber(10).exponentiatedBy(VE_ASH_DECIMALS)
+                ),
+                selectedLock.value
+            )
+        );
+    }, [ashInput, selectedLock]);
+
     const boost = useMemo(
-        () => calcBoost(lpValue, TVL, ownVeASH, totalVeASH),
-        [lpValue, TVL, ownVeASH, totalVeASH]
+        () => calcBoost(lpValue, TVL, veAshInput, totalVeASH),
+        [lpValue, TVL, veAshInput, totalVeASH]
     );
     const farm = useMemo(() => {
         return FARMS.find((f) => f.farm_address === farmAddress);
@@ -154,7 +151,7 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
     return (
         <div className="px-2 sm:px-12 py-4">
             <div className="flex justify-between mb-14">
-                <div>
+                <div className="shrink-0">
                     <div className="flex items-center mb-4">
                         {token1 && token2 ? (
                             <>
@@ -184,7 +181,7 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
                         className="absolute text-white left-0 mt-2 w-max overflow-auto bg-ash-dark-700 "
                         options={{ placement: "bottom-start" }}
                         button={() => (
-                            <div className="text-sm font-bold text-stake-gray-500 cursor-pointer flex">
+                            <div className="text-xs sm:text-sm font-bold text-stake-gray-500 cursor-pointer flex">
                                 {pool ? (
                                     <>
                                         {token1?.symbol}-{token2?.symbol}
@@ -231,19 +228,21 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
                         }}
                     </BasePopover>
                 </div>
-                <div className="text-right"></div>
+                <div className="text-right text-2xl font-bold text-white ml-4">
+                    Calculate your boost
+                </div>
             </div>
 
             <div className="flex">
                 <div className="flex-grow">
-                    <div className="w-2/3 relative">
+                    <div className="w-3/4 sm:w-2/3 relative">
                         <div className="flex flex-col mb-4">
                             <div className="text-xs font-bold text-stake-gray-500 mb-2">
                                 Your LP deposit value
                             </div>
                             <div className="relative">
                                 <InputCurrency
-                                    className="bg-ash-dark-400 text-right h-10 px-7 text-stake-gray-500 outline-none text-sm w-full"
+                                    className="bg-ash-dark-400 text-right h-10 px-2 sm:px-7 text-stake-gray-500 outline-none text-sm w-full"
                                     placeholder="0"
                                     value={lpValueStr}
                                     onChange={(e) => {
@@ -254,7 +253,7 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
                                         );
                                     }}
                                 />
-                                <div className="absolute right-0 w-1/4 border-t border-ash-gray-600 translate-x-full top-1/2"></div>
+                                <div className="absolute right-0 w-1/6 sm:w-1/4 border-t border-ash-gray-600 translate-x-full top-1/2"></div>
                             </div>
                         </div>
                         <div className="flex flex-col mb-4">
@@ -263,7 +262,7 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
                             </div>
                             <div className="relative">
                                 <InputCurrency
-                                    className="bg-ash-dark-400 text-right h-10 px-7 text-stake-gray-500 outline-none text-sm w-full"
+                                    className="bg-ash-dark-400 text-right h-10 px-2 sm:px-7 text-stake-gray-500 outline-none text-sm w-full"
                                     placeholder="0"
                                     value={TVLStr}
                                     onChange={(e) => {
@@ -272,7 +271,7 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
                                         setTVL(new BigNumber(e.target.value));
                                     }}
                                 />
-                                <div className="absolute right-0 w-1/2 border-t border-ash-gray-600 translate-x-full top-1/2">
+                                <div className="absolute right-0 w-1/3 sm:w-1/2 border-t border-ash-gray-600 translate-x-full top-1/2">
                                     <div className="absolute -right-1 -top-4.5 text-ash-gray-600 text-2xl">
                                         &rsaquo;
                                     </div>
@@ -285,7 +284,7 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
                             </div>
                             <div className="relative">
                                 <InputCurrency
-                                    className="bg-ash-dark-400 text-right h-10 px-7 text-stake-gray-500 outline-none text-sm w-full"
+                                    className="bg-ash-dark-400 text-right h-10 px-2 sm:px-7 text-stake-gray-500 outline-none text-sm w-full"
                                     placeholder="0"
                                     value={totalVeStr}
                                     onChange={(e) => {
@@ -296,19 +295,24 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
                                         );
                                     }}
                                 />
-                                <div className="absolute right-0 w-1/4 border-t border-ash-gray-600 translate-x-full top-1/2"></div>
+                                <div className="absolute right-0 w-1/6 sm:w-1/4 border-t border-ash-gray-600 translate-x-full top-1/2"></div>
                             </div>{" "}
                         </div>
-                        <div className="absolute top-11 bottom-5 right-0 w-1/4 translate-x-full border-r border-ash-gray-600"></div>
+                        <div className="absolute top-11 bottom-5 right-0 w-1/6 sm:w-1/4 translate-x-full border-r border-ash-gray-600"></div>
                     </div>
                     <div className="w-1/3"></div>
                 </div>
-                <div className="w-36 pl-1 flex flex-col justify-center text-right">
+                <div className="w-32 sm:w-36 pl-1 flex flex-col justify-center text-right shrink-0">
                     <div className="relative z-10">
                         <div className="text-xs font-bold text-stake-gray-500 underline mb-2">
                             Max boost possible
                         </div>
-                        <BoostBar height={40} value={2.5} disabled>
+                        <BoostBar
+                            height={40}
+                            value={2.5}
+                            disabled
+                            hiddenCurrentBar
+                        >
                             <div className="px-4 h-full flex items-center justify-end text-lg font-bold text-stake-gray-500">
                                 <span>x</span>
                                 <span className="text-white">2.50</span>
@@ -325,87 +329,84 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
                                     {formatAmount(veForMaxBoost.toNumber())}
                                 </span>
                             </div>
-                            <div className="text-xs font-semibold text-stake-gray-500 mb-1 mt-2">
-                                ~{formatAmount(ashForMaxBoost.toNumber())} ASH
-                            </div>
-                            <div className="flex items-center">
-                                <div className="text-xs font-semibold text-stake-gray-500 mr-1">
-                                    locked for
-                                </div>
-                                <BasePopover
-                                    className="absolute text-white left-0 overflow-auto bg-ash-dark-700 w-full"
-                                    options={{ placement: "bottom" }}
-                                    button={() => (
-                                        <div className="text-2xs font-bold text-stake-gray-500 bg-ash-dark-400 cursor-pointer flex items-center justify-between h-6 w-18 px-2">
-                                            {selectedLock.label}
-                                            <ICChevronDown className="w-2 h-auto ml-1" />
-                                        </div>
-                                    )}
-                                >
-                                    {({ close }) => {
-                                        return (
-                                            <ul className="py-2">
-                                                {LockOptions.map((opt) => {
-                                                    return (
-                                                        <li
-                                                            key={opt.value}
-                                                            className="relative w-full"
-                                                        >
-                                                            <button
-                                                                className="w-full py-1 text-left px-3 text-2xs font-bold"
-                                                                onClick={() => {
-                                                                    setSelectedLock(
-                                                                        opt
-                                                                    );
-                                                                    close();
-                                                                }}
-                                                            >
-                                                                {opt.label}
-                                                            </button>
-                                                            {opt.value ===
-                                                                selectedLock.value && (
-                                                                <span className="absolute w-[3px] h-5 bg-ash-cyan-500 top-1/2 -translate-y-1/2 left-0"></span>
-                                                            )}
-                                                        </li>
-                                                    );
-                                                })}
-                                            </ul>
-                                        );
-                                    }}
-                                </BasePopover>
-                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div className="relative h-10 mt-16 mb-3">
-                <div className="absolute -top-3 right-0 h-full border-l border-ash-gray-600">
-                    <div className="absolute -right-1 -bottom-1.5 text-ash-gray-600 text-sm">
+            <div className="relative h-10 mt-5 mb-3">
+                <div className="absolute -top-3 right-1 h-full border-l border-ash-gray-600">
+                    <div className="absolute -right-1.5 -bottom-1.5 text-ash-gray-600 text-sm">
                         &#x2304;
                     </div>
                 </div>
             </div>
             <div className="flex items-end mb-16">
                 <div className="flex-grow">
-                    <div className="w-2/3">
+                    <div className="w-3/4 sm:w-2/3">
                         <div className="flex flex-col">
                             <div className="text-xs font-bold text-stake-gray-500 mb-2">
-                                Your current veASH
+                                ASH needed for stake
                             </div>
                             <div className="relative">
-                                <InputCurrency
-                                    className="bg-ash-dark-400 text-right h-10 px-7 text-stake-gray-500 outline-none text-sm w-full"
-                                    placeholder="0"
-                                    value={ownVeStr}
-                                    onChange={(e) => {
-                                        setIsUserInput(true);
-                                        setOwnVeStr(e.target.value);
-                                        setOwnVeASH(
-                                            new BigNumber(e.target.value)
-                                        );
-                                    }}
-                                />
-                                <div className="absolute right-0 w-1/2 border-t border-ash-gray-600 translate-x-full top-1/2">
+                                <div className="flex items-center bg-ash-dark-400 h-10 pl-2">
+                                    <BasePopover
+                                        className="absolute text-white left-0 overflow-auto bg-ash-dark-700 w-full"
+                                        options={{ placement: "bottom" }}
+                                        button={() => (
+                                            <div className="text-2xs font-bold text-stake-gray-500 bg-stake-gray-500/10 cursor-pointer flex items-center justify-between h-6 w-18 px-2">
+                                                {selectedLock.label}
+                                                <ICChevronDown className="w-2 h-auto ml-1" />
+                                            </div>
+                                        )}
+                                    >
+                                        {({ close }) => {
+                                            return (
+                                                <ul className="py-2">
+                                                    {LockOptions.map((opt) => {
+                                                        return (
+                                                            <li
+                                                                key={opt.value}
+                                                                className="relative w-full"
+                                                            >
+                                                                <button
+                                                                    className="w-full py-1 text-left px-3 text-2xs font-bold"
+                                                                    onClick={() => {
+                                                                        setSelectedLock(
+                                                                            opt
+                                                                        );
+                                                                        close();
+                                                                    }}
+                                                                >
+                                                                    {opt.label}
+                                                                </button>
+                                                                {opt.value ===
+                                                                    selectedLock.value && (
+                                                                    <span className="absolute w-[3px] h-5 bg-ash-cyan-500 top-1/2 -translate-y-1/2 left-0"></span>
+                                                                )}
+                                                            </li>
+                                                        );
+                                                    })}
+                                                </ul>
+                                            );
+                                        }}
+                                    </BasePopover>
+                                    <InputCurrency
+                                        className="bg-transparent text-right h-10 px-2 sm:px-7 text-stake-gray-500 outline-none text-sm w-full"
+                                        placeholder="0"
+                                        value={ashInputStr}
+                                        onChange={(e) => {
+                                            setIsUserInput(true);
+                                            setAshInputStr(e.target.value);
+                                            setAshInput(
+                                                new BigNumber(e.target.value)
+                                            );
+                                        }}
+                                    />
+                                </div>
+                                <div className="absolute inset-x-0 -bottom-1 translate-y-full text-right text-xs font-semibold text-stake-gray-500">
+                                    ~{formatAmount(veAshInput.toNumber())} veASH
+                                </div>
+                                <div className="absolute right-0 w-1/3 sm:w-1/2 border-t border-ash-gray-600 translate-x-full top-1/2">
                                     <div className="absolute -right-1 -top-4.5 text-ash-gray-600 text-2xl">
                                         &rsaquo;
                                     </div>
@@ -414,7 +415,7 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
                         </div>
                     </div>
                 </div>
-                <div className="w-36 pl-1 flex flex-col justify-center text-right">
+                <div className="w-32 sm:w-36 pl-1 flex flex-col justify-center text-right shrink-0">
                     <div className="text-xs font-bold text-stake-gray-500 underline mb-2">
                         Boost
                     </div>

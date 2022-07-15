@@ -1,6 +1,6 @@
 import BaseModal, { BaseModalType } from "components/BaseModal";
 import { useScreenSize } from "hooks/useScreenSize";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import ICChevronDown from "assets/svg/chevron-down.svg";
 import ICChevronRight from "assets/svg/chevron-right.svg";
@@ -36,6 +36,10 @@ import useRouteModal from "hooks/useRouteModal";
 import { useOnboarding } from "hooks/useOnboarding";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
 import Delayed from "components/Delayed";
+import { useTrackTransactionStatus } from "@elrondnetwork/dapp-core/dist/services/transactions";
+import { transactionServices } from "@elrondnetwork/dapp-core";
+import { Transition } from "@headlessui/react";
+import { TRANSITIONS } from "const/transitions";
 
 const BoostBarValue = (
     props: Omit<BoostBarProps, "min" | "max" | "height">
@@ -76,6 +80,8 @@ const FarmBoostRecord = ({
     onSelfBoostTransferedToken,
     booster,
     lpAmt,
+    isBoosting,
+    onboarding,
 }: {
     farmData: FarmRecord;
     label?: string;
@@ -87,8 +93,14 @@ const FarmBoostRecord = ({
     onSelfBoostTransferedToken?: () => {};
     booster: string;
     lpAmt: BigNumber;
+    isBoosting?: boolean;
+    onboarding?: boolean;
 }) => {
-    const [dismissedTooltip, setDismissedTooltip] = useState(false);
+    const [onboardingZeroVe, setOnboardedZeroVe] = useOnboarding(
+        "farm_zero_available_ve"
+    );
+    const [onboardingTransferedToken, setOnboardedTransferedToken] =
+        useOnboarding("farm_transfered_token_guide");
     const accAddress = useRecoilValue(accAddressState);
     const farm = farmData.farm;
     const pool = useMemo(() => {
@@ -99,8 +111,8 @@ const FarmBoostRecord = ({
         [booster, accAddress]
     );
     const zeroVeTooltip = useMemo(() => {
-        return isOwner && veAvailable?.eq(0) && !dismissedTooltip;
-    }, [isOwner, veAvailable, dismissedTooltip]);
+        return isOwner && veAvailable?.eq(0) && onboardingZeroVe;
+    }, [isOwner, veAvailable, onboardingZeroVe]);
     if (!pool) return null;
 
     return (
@@ -134,27 +146,60 @@ const FarmBoostRecord = ({
                 <div className="text-white text-xs font-bold">
                     veASH consumes
                 </div>
-                <div
-                    className={`text-right h-[2.625rem] px-4 flex items-center justify-end ${
-                        isOwner ? "bg-ash-dark-400/30" : "bg-stake-dark-500"
-                    }`}
+                <OnboardTooltip
+                    disabled={isBoosting || isOwner || !onboarding}
+                    delayOpen={4000}
+                    offset={30}
+                    zIndex={999}
+                    placement="bottom-start"
+                    open={onboardingTransferedToken}
+                    onArrowClick={() => setOnboardedTransferedToken(true)}
+                    content={
+                        <OnboardTooltip.Panel className="max-w-[18rem]">
+                            <div className="px-5 my-3 text-xs font-bold text-white">
+                                <div>
+                                    This is{" "}
+                                    <span className="text-stake-green-500">
+                                        Transferred Token
+                                    </span>{" "}
+                                    that you have received from another wallet.
+                                </div>
+                                <div>
+                                    This token(s) has been boosted by owner. You
+                                    can{" "}
+                                    <span className="text-stake-green-500">
+                                        change the owner & booster
+                                    </span>{" "}
+                                    by hover on the token
+                                </div>
+                            </div>
+                        </OnboardTooltip.Panel>
+                    }
                 >
-                    {formatAmount(
-                        toEGLDD(
-                            VE_ASH_DECIMALS,
-                            BigNumber.max(veConsume, 0)
-                        ).toNumber(),
-                        { notation: "standard" }
-                    )}
-                </div>
+                    <div
+                        className={`text-right h-[2.625rem] px-4 flex items-center justify-end ${
+                            isOwner ? "bg-ash-dark-400/30" : "bg-stake-dark-500"
+                        }`}
+                    >
+                        {formatAmount(
+                            toEGLDD(
+                                VE_ASH_DECIMALS,
+                                BigNumber.max(veConsume, 0)
+                            ).toNumber(),
+                            { notation: "standard" }
+                        )}
+                    </div>
+                </OnboardTooltip>
                 <div className="text-right text-xs font-medium">
                     {isOwner ? (
                         <OnboardTooltip
-                            delayOpen={500}
+                            disabled={isBoosting}
+                            delayOpen={3000}
                             offset={30}
+                            zIndex={999}
                             placement="bottom-end"
                             open={zeroVeTooltip}
-                            onArrowClick={() => setDismissedTooltip(true)}
+                            onArrowClick={() => setOnboardedZeroVe(true)}
                             content={
                                 <OnboardTooltip.Panel className="max-w-[15rem]">
                                     <div className="text-white text-xs font-bold my-3 px-5">
@@ -217,6 +262,7 @@ const FarmBoostRecord = ({
                         VE_ASH_DECIMALS,
                         maxBoost?.veForBoost || 0
                     ).toNumber()}
+                    withOnboarding={isOwner}
                 />
             </div>
         </div>
@@ -226,14 +272,31 @@ const FarmBoostRecord = ({
 const FarmRecordTransfer = ({
     farmToken,
     farmData,
+    onBoosting,
+    onboarding,
 }: {
     farmToken: FarmToken;
     farmData: FarmRecord;
+    onBoosting?: (val: boolean) => void;
+    onboarding?: boolean;
 }) => {
+    const [boostId, setBoostId] = useState<string | null>(null);
+    const { isPending } = transactionServices.useTrackTransactionStatus({
+        transactionId: boostId,
+    });
     const { currentFarmBoost, selfBoost } = useFarmBoostTransferState(
         farmToken,
         farmData
     );
+    const selfBoostHandle = useCallback(async () => {
+        const { sessionId, error } = await selfBoost();
+        setBoostId(sessionId);
+    }, [selfBoost]);
+    const boosting = useMemo(
+        () => !!(boostId && isPending),
+        [boostId, isPending]
+    );
+    useEffect(() => onBoosting?.(boosting), [onBoosting, boosting]);
     return (
         <FarmBoostRecord
             farmData={farmData}
@@ -241,7 +304,8 @@ const FarmRecordTransfer = ({
             currentBoost={currentFarmBoost}
             lpAmt={farmToken.lpAmt}
             booster={farmToken.attributes.booster}
-            onSelfBoostTransferedToken={() => selfBoost()}
+            onSelfBoostTransferedToken={() => selfBoostHandle()}
+            onboarding={onboarding}
         />
     );
 };
@@ -252,6 +316,11 @@ type FarmBoostInfoType = {
 const FarmBoostInfo = ({ farmData }: FarmBoostInfoType) => {
     const { pool, farm } = farmData;
     const [token1, token2] = pool?.tokens;
+    const [boostId, setBoostId] = useState<string | null>(null);
+    const [isSelfBoostTToken, setIsSelfBoostTToken] = useState(false);
+    const { isPending } = transactionServices.useTrackTransactionStatus({
+        transactionId: boostId,
+    });
     const { encode } = useRouteModal("calc_boost");
     const boostFarmToken = useFarmBoost();
     const ownerTokens = useRecoilValue(
@@ -269,100 +338,122 @@ const FarmBoostInfo = ({ farmData }: FarmBoostInfoType) => {
             new BigNumber(0)
         );
     }, [ownerTokens]);
-
+    const boostOwnerFarmToken = useCallback(async () => {
+        const { sessionId, error } = await boostFarmToken(farm, ownerTokens);
+        setBoostId(sessionId);
+    }, [boostFarmToken, farm, ownerTokens]);
+    const isBoosting = useMemo(
+        () => !!(boostId && isPending) || isSelfBoostTToken,
+        [boostId, isPending, isSelfBoostTToken]
+    );
     return (
         <div>
-            <div className="px-10 sm:px-16 pb-10 sm:pb-16">
-                <div className="text-2xl font-bold text-white mb-6 sm:mb-8">
-                    Boost Panel
-                </div>
-                <div className="flex items-center text-sm font-bold text-stake-gray-500">
-                    <Avatar
-                        src={token1.icon}
-                        alt={token1.name}
-                        className="w-5 h-5"
-                    />
-                    <Avatar
-                        src={token2.icon}
-                        alt={token2.name}
-                        className="w-5 h-5 -ml-0.5 mr-2"
-                    />
-                    <div className="mr-2">
-                        {token1.symbol}-{token2.symbol}
-                    </div>
-                    <ICChevronDown />
-                </div>
-                {ownerTokens.length > 0 && (
-                    <>
-                        <div className="mt-10 mb-36">
-                            <FarmBoostRecord
-                                farmData={farmData}
-                                veConsume={
-                                    expectedFarmBoost.veForBoost.minus(
-                                        currentFarmBoost.veForBoost
-                                    )
-                                }
-                                currentBoost={currentFarmBoost}
-                                expectedBoost={expectedFarmBoost}
-                                maxBoost={maxFarmBoost}
-                                veAvailable={availableVe}
-                                lpAmt={lpAmt}
-                                booster={ownerTokens[0].attributes.booster}
-                            />
-                        </div>
-                        <div className="flex sm:justify-end space-x-2">
-                            <Link
-                                href={{
-                                    pathname: "/stake/gov/boost",
-                                    query: {
-                                        p: encode({
-                                            farmAddress: farm.farm_address,
-                                        }),
-                                    },
-                                }}
-                            >
-                                <a>
-                                    <BaseButton className="h-12 w-12 sm:w-auto bg-ash-dark-400 px-1 sm:px-6 uppercase text-sm font-bold text-white">
-                                        <ICEqualSquare className="text-white w-4.5 h-4.5" />
-                                        <span className="hidden sm:inline ml-1">
-                                            Calculate
-                                        </span>
-                                    </BaseButton>
-                                </a>
-                            </Link>
-
-                            <GlowingButton
-                                theme="pink"
-                                className="h-12 w-full px-12 uppercase text-sm font-bold text-white"
-                                wrapperClassName="grow sm:grow-0"
-                                disabled={
-                                    !ownerTokens.length ||
-                                    expectedFarmBoost.boost <=
-                                        currentFarmBoost.boost
-                                }
-                                onClick={() =>
-                                    ownerTokens &&
-                                    boostFarmToken(farm, ownerTokens, true)
-                                }
-                            >
-                                <span className="mr-4">Confirm new boost</span>
-                                <ICChevronRight className="w-2 h-auto" />
-                            </GlowingButton>
-                        </div>
-                    </>
-                )}
+            <div className="px-10 sm:px-16 text-2xl font-bold text-white mb-6 sm:mb-8">
+                Boost Panel
             </div>
-            {transferedTokens.length > 0 && (
-                <div className="bg-ash-dark-600 p-10 sm:p-16 space-y-5">
-                    {transferedTokens.map((t) => (
-                        <FarmRecordTransfer
-                            key={t.tokenId}
-                            farmData={farmData}
-                            farmToken={t}
+            <div className="relative">
+                <div className="px-10 sm:px-16 pb-10 sm:pb-16">
+                    <div className="flex items-center text-sm font-bold text-stake-gray-500">
+                        <Avatar
+                            src={token1.icon}
+                            alt={token1.name}
+                            className="w-5 h-5"
                         />
-                    ))}
+                        <Avatar
+                            src={token2.icon}
+                            alt={token2.name}
+                            className="w-5 h-5 -ml-0.5 mr-2"
+                        />
+                        <div className="mr-2">
+                            {token1.symbol}-{token2.symbol}
+                        </div>
+                        <ICChevronDown />
+                    </div>
+                    {ownerTokens.length > 0 && (
+                        <>
+                            <div className="mt-10 mb-36">
+                                <FarmBoostRecord
+                                    farmData={farmData}
+                                    veConsume={expectedFarmBoost.veForBoost.minus(
+                                        currentFarmBoost.veForBoost
+                                    )}
+                                    currentBoost={currentFarmBoost}
+                                    expectedBoost={expectedFarmBoost}
+                                    maxBoost={maxFarmBoost}
+                                    veAvailable={BigNumber.max(availableVe, 0)}
+                                    lpAmt={lpAmt}
+                                    booster={ownerTokens[0].attributes.booster}
+                                    isBoosting={isBoosting}
+                                />
+                            </div>
+                            <div className="flex sm:justify-end space-x-2">
+                                <Link
+                                    href={{
+                                        pathname: "/stake/gov/boost",
+                                        query: {
+                                            p: encode({
+                                                farmAddress: farm.farm_address,
+                                            }),
+                                        },
+                                    }}
+                                >
+                                    <a>
+                                        <BaseButton className="h-12 w-12 sm:w-auto bg-ash-dark-400 px-1 sm:px-6 uppercase text-sm font-bold text-white">
+                                            <ICEqualSquare className="text-white w-4.5 h-4.5" />
+                                            <span className="hidden sm:inline ml-1">
+                                                Calculate
+                                            </span>
+                                        </BaseButton>
+                                    </a>
+                                </Link>
+
+                                <GlowingButton
+                                    theme="pink"
+                                    className="h-12 w-full px-4 sm:px-12 uppercase text-sm font-bold text-white"
+                                    wrapperClassName="grow sm:grow-0"
+                                    disabled={
+                                        !ownerTokens.length ||
+                                        expectedFarmBoost.boost <=
+                                            currentFarmBoost.boost
+                                    }
+                                    onClick={() =>
+                                        ownerTokens && boostOwnerFarmToken()
+                                    }
+                                >
+                                    <span className="mr-4">
+                                        Confirm new boost
+                                    </span>
+                                    <ICChevronRight className="w-2 h-auto" />
+                                </GlowingButton>
+                            </div>
+                        </>
+                    )}
                 </div>
-            )}
+                {transferedTokens.length > 0 && (
+                    <div className="bg-ash-dark-600 p-10 sm:p-16 space-y-5">
+                        {transferedTokens.map((t, i) => (
+                            <FarmRecordTransfer
+                                key={t.tokenId}
+                                farmData={farmData}
+                                farmToken={t}
+                                onBoosting={(isBoosting) =>
+                                    setIsSelfBoostTToken(isBoosting)
+                                }
+                                onboarding={i === 0}
+                            />
+                        ))}
+                    </div>
+                )}
+                <Transition
+                    show={isBoosting}
+                    {...TRANSITIONS.fadeIn}
+                    {...TRANSITIONS.fadeOut}
+                >
+                    <div className="absolute inset-0 z-modal flex items-center justify-center bg-stake-dark-400/90 backdrop-blur-[20px]">
+                        <div className="w-[140px] h-[140px] rounded-full border-[20px] border-pink-600 border-t-ash-dark-600 animate-spin"></div>
+                    </div>
+                </Transition>
+            </div>
         </div>
     );
 };
@@ -373,7 +464,7 @@ function FarmBoostInfoModal({ farmData, ...modalProps }: props) {
         <BaseModal
             {...modalProps}
             type={screenSize.isMobile ? "drawer_btt" : "modal"}
-            className={`bg-stake-dark-400 clip-corner-4 clip-corner-tl text-white flex flex-col overflow-hidden max-h-full w-screen max-w-[60rem] mx-auto`}
+            className={`bg-stake-dark-400 clip-corner-4 clip-corner-tl text-white flex flex-col overflow-hidden max-h-full w-screen max-w-[60rem] sm:mx-auto`}
         >
             <div className="flex justify-end mb-3.5 p-4">
                 <BaseModal.CloseBtn />
