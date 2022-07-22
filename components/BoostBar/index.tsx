@@ -2,7 +2,7 @@ import CardTooltip from "components/Tooltip/CardTooltip";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
 import { formatAmount } from "helper/number";
 import { useOnboarding } from "hooks/useOnboarding";
-import React, { createContext, useContext, useEffect, useMemo } from "react";
+import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 const Polygon = ({
     height,
@@ -93,9 +93,11 @@ const BoostBarContext = createContext<
         validNewValue: number;
         deltaWidth?: string;
         valueWidth?: string;
+        hovered?: boolean;
     }
 >({ validValue: 0, validNewValue: 0 });
 function BoostBar(props: BoostBarProps) {
+    const [hovered, setHovered] = useState(false);
     const {
         height = 32,
         min = 1,
@@ -149,11 +151,12 @@ function BoostBar(props: BoostBarProps) {
                 validNewValue,
                 valueWidth,
                 deltaWidth,
+                hovered
             }}
         >
             <div>
                 {topLabel && <TopLabel />}
-                <div className="relative">
+                <div className="relative" onMouseEnter={() => setHovered(true)}>
                     <div>
                         <Polygon
                             height={height}
@@ -164,7 +167,7 @@ function BoostBar(props: BoostBarProps) {
                     {validNewValue > validValue && (
                         <OnboardTooltip
                             disabled={!withOnboarding}
-                            open={onboaringExpectedVe}
+                            open={onboaringExpectedVe && hovered}
                             onArrowClick={() => setOnboardedExpectedVe(true)}
                             delayOpen={3000}
                             offset={50}
@@ -338,7 +341,7 @@ const TopLabel = () => {
                 <CardTooltip
                     autoPlacement
                     content={
-                        <div className="text-stake-gray-500 text-xs font-bold max-w-[15rem]">
+                        <div className="text-stake-gray-500 text-xs font-bold">
                             <div className="mb-4">C = Current Boost</div>
                             <div className="text-pink-600 text-lg mb-8">
                                 x{validValue}
@@ -346,8 +349,13 @@ const TopLabel = () => {
                             <div className="mb-4">
                                 veASH used for Current Boost
                             </div>
-                            <div className="text-pink-600 text-lg">
+                            <div className="text-pink-600 text-lg mb-8">
                                 {formatAmount(currentVe)} ve
+                            </div>
+                            <div className="bg-ash-dark-600 p-2 text-2xs font-bold text-stake-gray-500 inline-block">
+                                Current boost is showing your boost status of
+                                this farm. This boost will not be changed unless
+                                you use smart-contract (re-boost, stake more...)
                             </div>
                         </div>
                     }
@@ -357,14 +365,27 @@ const TopLabel = () => {
                 <CardTooltip
                     autoPlacement
                     content={
-                        <div className="text-stake-gray-500 text-xs font-bold max-w-[15rem]">
+                        <div className="text-stake-gray-500 text-xs font-bold">
                             <div className="mb-4">Max = Max boost possible</div>
-                            <div className="text-white text-lg mb-8">x2.5</div>
+                            <div className="text-white text-lg mb-8">x{max}</div>
                             <div className="mb-4">
                                 veASH needed for max boost
                             </div>
-                            <div className="text-white text-lg">
+                            <div className="text-white text-lg mb-8">
                                 {formatAmount(maxVe)} ve
+                            </div>
+                            <div className="bg-ash-dark-600 p-2 text-2xs font-bold text-stake-gray-500 inline-block">
+                                Max boost possible shows the maximum of boost
+                                that you can reach. It&apos;s not always be 2,5
+                                times, go{" "}
+                                <span className="text-stake-green-500">
+                                    calculator
+                                </span>{" "}
+                                or{" "}
+                                <span className="text-stake-green-500">
+                                    Boost Guide
+                                </span>{" "}
+                                to learn more.
                             </div>
                         </div>
                     }
@@ -385,7 +406,7 @@ const TopLabel = () => {
                     <CardTooltip
                         autoPlacement
                         content={
-                            <div className="text-stake-gray-500 text-xs font-bold max-w-[15rem]">
+                            <div className="text-stake-gray-500 text-xs font-bold">
                                 <div className="mb-4">
                                     New boost after confirmed
                                 </div>
@@ -395,8 +416,12 @@ const TopLabel = () => {
                                 <div className="mb-4">
                                     veASH used for new boost
                                 </div>
-                                <div className="text-[#FF00E5] text-lg">
+                                <div className="text-[#FF00E5] text-lg mb-8">
                                     {formatAmount(expectedVe)} ve
+                                </div>
+                                <div className="bg-ash-dark-600 p-2 text-2xs font-bold text-stake-gray-500 inline-block">
+                                    You will reach the new boost after veASH do
+                                    its work.
                                 </div>
                             </div>
                         }

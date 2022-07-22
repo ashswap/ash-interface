@@ -28,6 +28,9 @@ import pools from "const/pool";
 import { ASH_TOKEN } from "const/tokens";
 import { toEGLDD } from "helper/balance";
 import { fetcher } from "helper/common";
+import {
+    calcYieldBoostFromFarmToken,
+} from "helper/farmBooster";
 import { decodeNestedStringHex } from "helper/serializer";
 import useFarmReward from "hooks/useFarmContract/useFarmReward";
 import useInterval from "hooks/useInterval";
@@ -217,6 +220,9 @@ const FarmsState = () => {
                         );
                         const balance =
                             balances[id]?.balance || new BigNumber(0);
+                        const lpAmt = balance
+                            .div(perLP)
+                            .integerValue(BigNumber.ROUND_FLOOR);
                         return {
                             tokenId: id,
                             collection: f.farm_token_id,
@@ -226,11 +232,15 @@ const FarmsState = () => {
                             ),
                             balance,
                             attributes,
-                            boost: perLP.div(0.4),
+                            weightBoost: perLP.div(0.4),
+                            yieldBoost: calcYieldBoostFromFarmToken(
+                                farmTokenSupply,
+                                balance,
+                                lpAmt,
+                                f
+                            ),
                             perLP,
-                            lpAmt: balance
-                                .div(perLP)
-                                .integerValue(BigNumber.ROUND_FLOOR),
+                            lpAmt,
                             farmAddress: f.farm_address,
                         };
                     });
@@ -251,6 +261,10 @@ const FarmsState = () => {
                             ),
                         new BigNumber(0)
                     );
+                    const farmBalance = farmTokens.reduce(
+                        (total, f) => total.plus(f.balance),
+                        new BigNumber(0)
+                    );
                     record.stakedData = {
                         farmTokens,
                         totalStakedLP,
@@ -261,13 +275,13 @@ const FarmsState = () => {
                         totalStakedLPValue: totalStakedLP
                             .multipliedBy(totalLiquidityValue)
                             .div(lpLockedAmt),
-                        boost: farmTokens
-                            .reduce(
-                                (total, f) => total.plus(f.balance),
-                                new BigNumber(0)
-                            )
-                            .div(totalStakedLP)
-                            .div(0.4),
+                        weightBoost: farmBalance.div(totalStakedLP).div(0.4),
+                        yieldBoost: calcYieldBoostFromFarmToken(
+                            farmTokenSupply,
+                            farmBalance,
+                            totalStakedLP,
+                            f
+                        ),
                     };
                 }
                 return record;
