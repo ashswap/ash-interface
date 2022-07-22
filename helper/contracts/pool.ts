@@ -23,7 +23,7 @@ const getAmountOut = async (
         const { returnData } = await proxy.queryContract(
             new Query({
                 address: new Address(poolAddress),
-                func: new ContractFunction("getAmountOut"),
+                func: new ContractFunction("estimateAmountOut"),
                 args: [
                     new TokenIdentifierValue(Buffer.from(tokenFromId)),
                     new TokenIdentifierValue(Buffer.from(tokenToId)),
@@ -134,7 +134,7 @@ const getTokenInLP = async (ownLiquidity: BigNumber, poolAddress: string) => {
         .queryContract(
             new Query({
                 address: new Address(poolAddress),
-                func: new ContractFunction("getRemoveLiquidityTokens"),
+                func: new ContractFunction("estimateRemoveLiquidity"),
                 args: [
                     new BigUIntValue(ownLiquidity),
                     new BigUIntValue(new BigNumber(0)),
