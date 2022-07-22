@@ -40,34 +40,7 @@ import Image from "next/image";
 import { transactionServices } from "@elrondnetwork/dapp-core";
 import { Transition } from "@headlessui/react";
 import { TRANSITIONS } from "const/transitions";
-
-const BoostBarValue = (
-    props: Omit<BoostBarProps, "min" | "max" | "height">
-) => {
-    const MAX = 2.5;
-    const MIN = 1;
-    const { isMobile } = useScreenSize();
-    return (
-        <BoostBar {...props} height={isMobile ? 36 : 42} min={MIN} max={MAX}>
-            <div className="flex items-center justify-between px-6 text-white h-full font-bold text-xs">
-                {(props.value || 1) >= MAX ? (
-                    <div>Max</div>
-                ) : (
-                    <div className="flex items-center">
-                        <span className="mr-1">
-                            x{formatAmount(props.value)}
-                        </span>
-                        <ICGovBoost className="-mt-0.5" />
-                    </div>
-                )}
-                <div className="flex items-center">
-                    <span className="mr-1">x{MAX}</span>
-                    <ICGovBoost className="-mt-0.5" />
-                </div>
-            </div>
-        </BoostBar>
-    );
-};
+import AdvanceBoostBar from "components/BoostBar/AdvanceBoostBar";
 
 const FarmRecord = ({
     farmData,
@@ -188,7 +161,8 @@ const FarmRecord = ({
                 </div>
             </div>
             <div className={`${isOwner ? "" : "mb-6"}`}>
-                <BoostBarValue
+                <AdvanceBoostBar
+                    max={maxBoost?.boost}
                     value={currentBoost?.boost}
                     newVal={expectedBoost?.boost}
                     disabled={!isOwner}

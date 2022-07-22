@@ -1,4 +1,7 @@
+import { farmQuery } from "atoms/farmsState";
+import { govLockedAmtState, govUnlockTSState } from "atoms/govState";
 import BigNumber from "bignumber.js";
+import { calcYieldBoost } from "helper/farmBooster";
 import { FarmBoostInfo } from "interface/farm";
 import moment from "moment";
 import { useRecoilCallback } from "recoil";
@@ -13,7 +16,9 @@ const useCalcBoost = () => {
                 veSupply: BigNumber,
                 lockedAshAmt: BigNumber,
                 unlockTs: BigNumber,
-                farmingLocked: BigNumber
+                farmingLocked: BigNumber,
+                farmSupply: BigNumber,
+                farmBalance: BigNumber,
             ) => {
                 const currentTs = moment().unix();
                 const boostInfo: FarmBoostInfo = {
@@ -33,25 +38,12 @@ const useCalcBoost = () => {
                 const veForBoost = slopeForBoost.multipliedBy(
                     unlockTs.minus(currentTs)
                 );
-
-                const boostedFarmAmount = BigNumber.min(
-                    lpAmt
-                        .multipliedBy(0.4)
-                        .plus(
-                            farmingLocked
-                                .multipliedBy(veForBoost)
-                                .multipliedBy(0.6)
-                                .div(veSupply)
-                        ),
-                    lpAmt
-                );
-                const boost = boostedFarmAmount.div(lpAmt).div(0.4).toNumber();
                 const veForMaxBoost = lpAmt
                     .multipliedBy(veSupply)
                     .div(farmingLocked);
                 return {
                     veForBoost: BigNumber.min(veForBoost, veForMaxBoost),
-                    boost,
+                    boost: calcYieldBoost(lpAmt, farmingLocked, veForBoost, veSupply, farmSupply, farmBalance),
                 };
             },
         []

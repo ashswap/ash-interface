@@ -2,10 +2,11 @@ import BaseModal, { BaseModalType } from "components/BaseModal";
 import { useScreenSize } from "hooks/useScreenSize";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import ICChevronDown from "assets/svg/chevron-down.svg";
+import { transactionServices } from "@elrondnetwork/dapp-core";
+import { Transition } from "@headlessui/react";
 import ICChevronRight from "assets/svg/chevron-right.svg";
 import ICEqualSquare from "assets/svg/equal-square.svg";
-import ICGovBoost from "assets/svg/gov-boost.svg";
+
 import ICHexagonDuo from "assets/svg/hexagon-duo.svg";
 import { accAddressState } from "atoms/dappState";
 import {
@@ -19,8 +20,10 @@ import Avatar from "components/Avatar";
 import BaseButton from "components/BaseButton";
 import BoostBar, { BoostBarProps } from "components/BoostBar";
 import GlowingButton from "components/GlowingButton";
+import OnboardTooltip from "components/Tooltip/OnboardTooltip";
 import pools from "const/pool";
 import { VE_ASH_DECIMALS } from "const/tokens";
+import { TRANSITIONS } from "const/transitions";
 import { toEGLDD } from "helper/balance";
 import { formatAmount } from "helper/number";
 import {
@@ -28,46 +31,13 @@ import {
     useFarmBoostTransferState,
 } from "hooks/useFarmBoostState";
 import useFarmBoost from "hooks/useFarmContract/useFarmBoost";
+import { useOnboarding } from "hooks/useOnboarding";
+import useRouteModal from "hooks/useRouteModal";
 import { FarmBoostInfo } from "interface/farm";
+import Link from "next/link";
 import { useRecoilValue } from "recoil";
 import FarmBoostTooltip from "./FarmBoostTooltip";
-import Link from "next/link";
-import useRouteModal from "hooks/useRouteModal";
-import { useOnboarding } from "hooks/useOnboarding";
-import OnboardTooltip from "components/Tooltip/OnboardTooltip";
-import Delayed from "components/Delayed";
-import { useTrackTransactionStatus } from "@elrondnetwork/dapp-core/dist/services/transactions";
-import { transactionServices } from "@elrondnetwork/dapp-core";
-import { Transition } from "@headlessui/react";
-import { TRANSITIONS } from "const/transitions";
-
-const BoostBarValue = (
-    props: Omit<BoostBarProps, "min" | "max" | "height">
-) => {
-    const MAX = 2.5;
-    const MIN = 1;
-    const { isMobile } = useScreenSize();
-    return (
-        <BoostBar {...props} height={isMobile ? 36 : 42} min={MIN} max={MAX}>
-            <div className="flex items-center justify-between px-6 text-white h-full font-bold text-xs">
-                {(props.value || 1) >= MAX ? (
-                    <div>Max</div>
-                ) : (
-                    <div className="flex items-center">
-                        <span className="mr-1">
-                            x{formatAmount(props.value)}
-                        </span>
-                        <ICGovBoost className="-mt-0.5" />
-                    </div>
-                )}
-                <div className="flex items-center">
-                    <span className="mr-1">x{MAX}</span>
-                    <ICGovBoost className="-mt-0.5" />
-                </div>
-            </div>
-        </BoostBar>
-    );
-};
+import AdvanceBoostBar from "components/BoostBar/AdvanceBoostBar";
 
 const FarmBoostRecord = ({
     farmData,
@@ -244,7 +214,10 @@ const FarmBoostRecord = ({
                 </div>
             </div>
             <div className={`${isOwner ? "" : "mb-6"}`}>
-                <BoostBarValue
+                <AdvanceBoostBar
+                    farmAddress={farmData.farm.farm_address}
+                    onboardMaxBoost={isOwner}
+                    max={maxBoost?.boost}
                     value={currentBoost?.boost}
                     newVal={expectedBoost?.boost}
                     disabled={!isOwner}
@@ -284,7 +257,7 @@ const FarmRecordTransfer = ({
     const { isPending } = transactionServices.useTrackTransactionStatus({
         transactionId: boostId,
     });
-    const { currentFarmBoost, selfBoost } = useFarmBoostTransferState(
+    const { currentFarmBoost, maxFarmBoost, selfBoost } = useFarmBoostTransferState(
         farmToken,
         farmData
     );
@@ -302,6 +275,7 @@ const FarmRecordTransfer = ({
             farmData={farmData}
             veConsume={new BigNumber(0)}
             currentBoost={currentFarmBoost}
+            maxBoost={maxFarmBoost}
             lpAmt={farmToken.lpAmt}
             booster={farmToken.attributes.booster}
             onSelfBoostTransferedToken={() => selfBoostHandle()}
@@ -367,7 +341,7 @@ const FarmBoostInfo = ({ farmData }: FarmBoostInfoType) => {
                         <div className="mr-2">
                             {token1.symbol}-{token2.symbol}
                         </div>
-                        <ICChevronDown />
+                        {/* <ICChevronDown /> */}
                     </div>
                     {ownerTokens.length > 0 && (
                         <>

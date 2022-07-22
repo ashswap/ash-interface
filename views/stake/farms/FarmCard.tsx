@@ -192,30 +192,38 @@ function FarmCard({ farmData, viewType }: props) {
                                     }
                                 >
                                     <span
-                                        className={`underline text-xs font-bold text-stake-gray-500 ${farmData.stakedData && "cursor-pointer"}`}
-                                        onClick={() => farmData.stakedData && setOpenBoostInfo(true)}
+                                        className={`underline text-xs font-bold text-stake-gray-500 ${
+                                            farmData.stakedData &&
+                                            "cursor-pointer"
+                                        }`}
+                                        onClick={() =>
+                                            farmData.stakedData &&
+                                            setOpenBoostInfo(true)
+                                        }
                                     >
                                         Farm Boost
                                     </span>
                                 </CardTooltip>
                             </div>
                             <div
-                                className={`w-[120px] -mr-1 ${farmData.stakedData && "cursor-pointer"}`}
-                                onClick={() => farmData.stakedData && setOpenBoostInfo(true)}
+                                className={`w-[120px] -mr-1 ${
+                                    farmData.stakedData && "cursor-pointer"
+                                }`}
+                                onClick={() =>
+                                    farmData.stakedData &&
+                                    setOpenBoostInfo(true)
+                                }
                             >
                                 <BoostBar
                                     height={32}
-                                    value={
-                                        farmData.stakedData?.boost.toNumber() ||
-                                        1
-                                    }
+                                    value={farmData.stakedData?.yieldBoost || 1}
                                 >
                                     <div className="px-4 h-full flex items-center justify-end text-lg font-bold text-stake-gray-500">
                                         <span>x</span>
                                         <span className="text-white">
                                             {formatAmount(
-                                                farmData.stakedData?.boost.toNumber() ||
-                                                    1
+                                                farmData.stakedData
+                                                    ?.yieldBoost || 1
                                             )}
                                         </span>
                                         <ICGovBoost className="w-3.5 h-3.5 inline-block -mt-0.5 ml-1" />
@@ -228,8 +236,7 @@ function FarmCard({ farmData, viewType }: props) {
                                     <div>
                                         x
                                         {formatAmount(
-                                            farmData.stakedData?.boost.toNumber() ||
-                                                1
+                                            farmData.stakedData?.yieldBoost || 1
                                         )}{" "}
                                         / 2.5
                                     </div>
@@ -475,13 +482,18 @@ function FarmCard({ farmData, viewType }: props) {
                             </div>
                             <div className="pr-2.5 sm:pr-3.5 text-right text-white text-xs lg:text-lg font-bold">
                                 <div
-                                    className={`${farmData.stakedData && "cursor-pointer"}`}
-                                    onClick={() => farmData.stakedData && setOpenBoostInfo(true)}
+                                    className={`${
+                                        farmData.stakedData && "cursor-pointer"
+                                    }`}
+                                    onClick={() =>
+                                        farmData.stakedData &&
+                                        setOpenBoostInfo(true)
+                                    }
                                 >
                                     <BoostBar
                                         height={screenSize?.isMobile ? 24 : 32}
                                         value={
-                                            farmData?.stakedData?.boost.toNumber() ||
+                                            farmData?.stakedData?.yieldBoost ||
                                             1
                                         }
                                     >
@@ -491,8 +503,8 @@ function FarmCard({ farmData, viewType }: props) {
                                             </span>
                                             <span className="text-white">
                                                 {formatAmount(
-                                                    farmData?.stakedData?.boost.toNumber() ||
-                                                        1
+                                                    farmData?.stakedData
+                                                        ?.yieldBoost || 1
                                                 )}
                                             </span>
                                             <ICGovBoost className="w-3.5 h-3.5 inline-block -mt-0.5 ml-1" />
@@ -582,8 +594,8 @@ function FarmCard({ farmData, viewType }: props) {
                                             <div>
                                                 x
                                                 {formatAmount(
-                                                    farmData.stakedData?.boost.toNumber() ||
-                                                        1
+                                                    farmData.stakedData
+                                                        ?.yieldBoost || 1
                                                 )}{" "}
                                                 / 2.5
                                             </div>

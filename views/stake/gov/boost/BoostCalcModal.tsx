@@ -1,58 +1,27 @@
+import { offset } from "@popperjs/core";
 import ICChevronDown from "assets/svg/chevron-down.svg";
 import ICGovBoost from "assets/svg/gov-boost.svg";
-import { accAddressState } from "atoms/dappState";
-import { farmQuery } from "atoms/farmsState";
-import {
-    govTotalSupplyVeASH,
-    govUnlockTSState,
-    govVeASHAmtState,
-} from "atoms/govState";
+import { farmPoolQuery, farmQuery } from "atoms/farmsState";
+import { govTotalSupplyVeASH, govVeASHAmtState } from "atoms/govState";
 import BigNumber from "bignumber.js";
 import BaseModal, { BaseModalType } from "components/BaseModal";
 import BasePopover from "components/BasePopover";
 import BoostBar from "components/BoostBar";
 import InputCurrency from "components/InputCurrency";
+import CardTooltip from "components/Tooltip/CardTooltip";
 import { FARMS } from "const/farms";
-import pools, { POOLS_MAP_LP } from "const/pool";
+import { POOLS_MAP_LP } from "const/pool";
 import { VE_ASH_DECIMALS } from "const/tokens";
-import { toEGLDD, toWei } from "helper/balance";
+import { toEGLDD } from "helper/balance";
+import { calcYieldBoost } from "helper/farmBooster";
 import { formatAmount } from "helper/number";
 import { estimateVeASH } from "helper/voteEscrow";
-import useGetSlopeUsed from "hooks/useFarmContract/useGetSlopeUsed";
 import useInputNumberString from "hooks/useInputNumberString";
 import { useScreenSize } from "hooks/useScreenSize";
-import moment from "moment";
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
 import FarmsState from "views/stake/farms/FarmsState";
-const calcBoost = (
-    lpAmt: BigNumber,
-    totalLP: BigNumber,
-    ve: BigNumber,
-    totalVe: BigNumber
-) => {
-    const farmAmt = BigNumber.min(
-        lpAmt
-            .multipliedBy(0.4)
-            .plus(totalLP.multipliedBy(0.6).multipliedBy(ve).div(totalVe)),
-        lpAmt
-    );
-    const boost = farmAmt.div(lpAmt).div(0.4);
-    return BigNumber.max(boost.isNaN() ? 1 : boost, 1);
-};
-
-const calcVeForMaxBoost = (
-    lpAmt: BigNumber,
-    totalLP: BigNumber,
-    totalVe: BigNumber
-) => {
-    return totalVe.multipliedBy(lpAmt).div(totalLP);
-};
-
-const calcLockedASH = (ve: BigNumber, lockDuration: number) => {
-    return ve.multipliedBy(4 * 365 * 24 * 3600).div(lockDuration);
-};
 
 const LockOptions = [
     { value: 4 * 365 * 24 * 3600, label: "4 years" },
@@ -67,61 +36,70 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
         farmAddressProp
     );
     const [lpValue, setLpValue] = useState(new BigNumber(0));
-    const [TVL, setTVL] = useState(new BigNumber(0));
-    const [totalVeASH, setTotalVeASH] = useState(new BigNumber(0));
+    const [TVLExcludeOwnLP, setTVLExcludeOwnLP] = useState(new BigNumber(0));
+    const [totalCurrentVeASH, setTotalCurrentVeASH] = useState(
+        new BigNumber(0)
+    );
     const [ashInput, setAshInput] = useState(new BigNumber(0));
-    const [slopeUsed, setSlopeUsed] = useState(new BigNumber(0));
     const [isUserInput, setIsUserInput] = useState(false);
     const [selectedLock, setSelectedLock] = useState(LockOptions[0]);
 
     const farmData = useRecoilValue(farmQuery(farmAddress || ""));
     const veASHSupplyRecoil = useRecoilValue(govTotalSupplyVeASH);
-    const unlockTS = useRecoilValue(govUnlockTSState);
-    const accAddress = useRecoilValue(accAddressState);
+    const pool = useRecoilValue(farmPoolQuery(farmAddress || ""));
 
     const [lpValueStr, setLpValueStr] = useInputNumberString(lpValue);
-    const [TVLStr, setTVLStr] = useInputNumberString(TVL);
-    const [totalVeStr, setTotalVeStr] = useInputNumberString(totalVeASH);
+    const [TVLStr, setTVLStr] = useInputNumberString(TVLExcludeOwnLP);
+    const [totalCurrentVeStr, setTotalCurrentVeStr] =
+        useInputNumberString(totalCurrentVeASH);
     const [ashInputStr, setAshInputStr] = useInputNumberString(ashInput);
-
-    const getSlopeUsed = useGetSlopeUsed();
 
     useEffect(() => {
         setFarmAddress(farmAddressProp);
     }, [farmAddressProp]);
 
-    useEffect(() => {
-        if (!farmAddress) return;
-        getSlopeUsed(farmAddress, accAddress).then((slope) =>
-            setSlopeUsed(slope)
+    const currentFarmSupply = useMemo(() => {
+        if (!farmData) return new BigNumber(0);
+        return toEGLDD(
+            farmData.farm.farm_token_decimal,
+            farmData.farmTokenSupply
         );
-    }, [farmAddress, accAddress, getSlopeUsed]);
+    }, [farmData]);
 
-    const unlockTSNum = useMemo(() => unlockTS.toNumber(), [unlockTS]);
-
-    const veUsed = useMemo(() => {
-        return slopeUsed.multipliedBy(unlockTSNum - moment().unix());
-    }, [unlockTSNum, slopeUsed]);
+    const existFarmTokenBal = useMemo(() => {
+        if (!farmData) return new BigNumber(0);
+        return toEGLDD(
+            farmData.farm.farm_token_decimal,
+            farmData.stakedData?.farmTokens.reduce(
+                (total, t) => total.plus(t.balance),
+                new BigNumber(0)
+            ) || 0
+        );
+    }, [farmData]);
 
     const veForMaxBoost = useMemo(() => {
-        return calcVeForMaxBoost(lpValue, TVL, totalVeASH);
-    }, [lpValue, TVL, totalVeASH]);
+        return totalCurrentVeASH.multipliedBy(lpValue).div(TVLExcludeOwnLP);
+    }, [lpValue, totalCurrentVeASH, TVLExcludeOwnLP]);
 
-    useEffect(() => {
-        if (farmAddress && !isUserInput) {
-            setLpValue(
-                farmData?.stakedData?.totalStakedLPValue || new BigNumber(0)
-            );
-            setTVL(farmData?.totalLiquidityValue || new BigNumber(0));
-            setTotalVeASH(
-                toEGLDD(VE_ASH_DECIMALS, veASHSupplyRecoil) || new BigNumber(0)
-            );
-        }
-    }, [farmAddress, farmData, veASHSupplyRecoil, isUserInput, veUsed]);
-
-    useEffect(() => {
-        setIsUserInput(false);
-    }, [farmAddress]);
+    const maxYieldBoost = useMemo(() => {
+        if (veForMaxBoost.eq(0)) return 1;
+        const totalLP = lpValue.plus(TVLExcludeOwnLP);
+        return calcYieldBoost(
+            lpValue,
+            totalLP,
+            veForMaxBoost,
+            totalCurrentVeASH.plus(veForMaxBoost),
+            currentFarmSupply,
+            existFarmTokenBal
+        );
+    }, [
+        lpValue,
+        veForMaxBoost,
+        TVLExcludeOwnLP,
+        totalCurrentVeASH,
+        currentFarmSupply,
+        existFarmTokenBal,
+    ]);
 
     const veAshInput = useMemo(() => {
         return toEGLDD(
@@ -135,17 +113,44 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
         );
     }, [ashInput, selectedLock]);
 
-    const boost = useMemo(
-        () => calcBoost(lpValue, TVL, veAshInput, totalVeASH),
-        [lpValue, TVL, veAshInput, totalVeASH]
-    );
-    const farm = useMemo(() => {
-        return FARMS.find((f) => f.farm_address === farmAddress);
+    const boost = useMemo(() => {
+        return calcYieldBoost(
+            lpValue,
+            lpValue.plus(TVLExcludeOwnLP),
+            veAshInput,
+            totalCurrentVeASH.plus(veAshInput),
+            currentFarmSupply,
+            existFarmTokenBal
+        );
+    }, [
+        lpValue,
+        TVLExcludeOwnLP,
+        veAshInput,
+        totalCurrentVeASH,
+        currentFarmSupply,
+        existFarmTokenBal,
+    ]);
+
+    useEffect(() => {
+        if (farmAddress && !isUserInput) {
+            setLpValue(
+                farmData?.stakedData?.totalStakedLPValue || new BigNumber(0)
+            );
+            setTVLExcludeOwnLP(
+                farmData?.totalLiquidityValue.minus(
+                    farmData?.stakedData?.totalStakedLPValue || new BigNumber(0)
+                ) || new BigNumber(0)
+            );
+            setTotalCurrentVeASH(
+                toEGLDD(VE_ASH_DECIMALS, veASHSupplyRecoil) || new BigNumber(0)
+            );
+        }
+    }, [farmAddress, farmData, veASHSupplyRecoil, isUserInput]);
+
+    useEffect(() => {
+        setIsUserInput(false);
     }, [farmAddress]);
-    const pool = useMemo(() => {
-        if (!farm) return null;
-        return pools.find((p) => p.lpToken.id === farm.farming_token_id)!;
-    }, [farm]);
+
     const [token1, token2] = pool?.tokens || [];
 
     return (
@@ -178,8 +183,13 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
                         )}
                     </div>
                     <BasePopover
-                        className="absolute text-white left-0 mt-2 w-max overflow-auto bg-ash-dark-700 "
-                        options={{ placement: "bottom-start" }}
+                        className="absolute text-white left-0 top-2 w-max overflow-auto bg-ash-dark-700 "
+                        options={{
+                            placement: "bottom-start",
+                            modifiers: [
+                                { ...offset, options: { offset: [0, 8] } },
+                            ],
+                        }}
                         button={() => (
                             <div className="text-xs sm:text-sm font-bold text-stake-gray-500 cursor-pointer flex">
                                 {pool ? (
@@ -258,7 +268,18 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
                         </div>
                         <div className="flex flex-col mb-4">
                             <div className="text-xs font-bold text-stake-gray-500 mb-2">
-                                Total Farm liquidity
+                                <CardTooltip
+                                    content={
+                                        <>
+                                            Total volume locked of this farm in
+                                            AshSwap platforms
+                                        </>
+                                    }
+                                >
+                                    <span className="underline">
+                                        Total Farm liquidity
+                                    </span>
+                                </CardTooltip>
                             </div>
                             <div className="relative">
                                 <InputCurrency
@@ -268,7 +289,9 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
                                     onChange={(e) => {
                                         setIsUserInput(true);
                                         setTVLStr(e.target.value);
-                                        setTVL(new BigNumber(e.target.value));
+                                        setTVLExcludeOwnLP(
+                                            new BigNumber(e.target.value)
+                                        );
                                     }}
                                 />
                                 <div className="absolute right-0 w-1/3 sm:w-1/2 border-t border-ash-gray-600 translate-x-full top-1/2">
@@ -286,11 +309,11 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
                                 <InputCurrency
                                     className="bg-ash-dark-400 text-right h-10 px-2 sm:px-7 text-stake-gray-500 outline-none text-sm w-full"
                                     placeholder="0"
-                                    value={totalVeStr}
+                                    value={totalCurrentVeStr}
                                     onChange={(e) => {
                                         setIsUserInput(true);
-                                        setTotalVeStr(e.target.value);
-                                        setTotalVeASH(
+                                        setTotalCurrentVeStr(e.target.value);
+                                        setTotalCurrentVeASH(
                                             new BigNumber(e.target.value || 0)
                                         );
                                     }}
@@ -305,24 +328,86 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
                 <div className="w-32 sm:w-36 pl-1 flex flex-col justify-center text-right shrink-0">
                     <div className="relative z-10">
                         <div className="text-xs font-bold text-stake-gray-500 underline mb-2">
-                            Max boost possible
+                            <CardTooltip
+                                content={
+                                    <>
+                                        Max boost possible shows the maximum of
+                                        boost that you can reach. It&apos;s not
+                                        always be 2,5 times, go calculator or
+                                        Boost Guide to learn more.
+                                    </>
+                                }
+                            >
+                                <span>Max boost possible</span>
+                            </CardTooltip>
                         </div>
                         <BoostBar
                             height={40}
-                            value={2.5}
+                            value={maxYieldBoost}
                             disabled
                             hiddenCurrentBar
                         >
                             <div className="px-4 h-full flex items-center justify-end text-lg font-bold text-stake-gray-500">
                                 <span>x</span>
-                                <span className="text-white">2.50</span>
+                                <span className="text-white">
+                                    {formatAmount(maxYieldBoost)}
+                                </span>
                                 <ICGovBoost className="w-3.5 h-3.5 inline-block -mt-0.5 ml-1" />
                             </div>
                         </BoostBar>
                         <div className="absolute inset-x-0 -bottom-3.5 translate-y-full flex flex-col items-end">
-                            <div className="text-xs font-bold text-stake-gray-500 underline mb-2">
-                                veASH for max boost
-                            </div>
+                            <CardTooltip
+                                content={
+                                    <div className="text-xs text-white space-y-2">
+                                        <div>
+                                            {formatAmount(
+                                                veForMaxBoost.toNumber()
+                                            )}{" "}
+                                            ASH locked for 4{" "}
+                                            <span className="text-stake-green-500">
+                                                years
+                                            </span>
+                                        </div>
+                                        <div>
+                                            {formatAmount(
+                                                veForMaxBoost
+                                                    .div(0.75)
+                                                    .toNumber()
+                                            )}{" "}
+                                            ASH locked for 3{" "}
+                                            <span className="text-stake-green-500">
+                                                years
+                                            </span>
+                                        </div>
+                                        <div>
+                                            {formatAmount(
+                                                veForMaxBoost
+                                                    .div(0.5)
+                                                    .toNumber()
+                                            )}{" "}
+                                            ASH locked for 2{" "}
+                                            <span className="text-stake-green-500">
+                                                years
+                                            </span>
+                                        </div>
+                                        <div>
+                                            {formatAmount(
+                                                veForMaxBoost
+                                                    .div(0.25)
+                                                    .toNumber()
+                                            )}{" "}
+                                            ASH locked for 1{" "}
+                                            <span className="text-stake-green-500">
+                                                year
+                                            </span>
+                                        </div>
+                                    </div>
+                                }
+                            >
+                                <div className="text-xs font-bold text-pink-600 underline mb-2">
+                                    veASH for max boost
+                                </div>
+                            </CardTooltip>
                             <div className="flex items-center text-pink-600">
                                 <ICChevronDown className="w-2 h-auto mr-2" />
                                 <span className="text-lg font-bold">
@@ -334,8 +419,8 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
                 </div>
             </div>
             <div className="relative h-10 mt-5 mb-3">
-                <div className="absolute -top-3 right-1 h-full border-l border-ash-gray-600">
-                    <div className="absolute -right-1.5 -bottom-1.5 text-ash-gray-600 text-sm">
+                <div className="absolute -top-3 right-1.5 h-full border-l border-ash-gray-600">
+                    <div className="absolute -left-1 -bottom-1.5 text-ash-gray-600 text-sm">
                         &#x2304;
                     </div>
                 </div>
@@ -345,7 +430,18 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
                     <div className="w-3/4 sm:w-2/3">
                         <div className="flex flex-col">
                             <div className="text-xs font-bold text-stake-gray-500 mb-2">
-                                ASH needed for stake
+                                <CardTooltip
+                                    content={
+                                        <>
+                                            ASH/veASH you will use for boost up
+                                            your farm.
+                                        </>
+                                    }
+                                >
+                                    <span className="underline">
+                                        ASH consumes for boost
+                                    </span>
+                                </CardTooltip>
                             </div>
                             <div className="relative">
                                 <div className="flex items-center bg-ash-dark-400 h-10 pl-2">
@@ -422,13 +518,13 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
                     <BoostBar
                         height={40}
                         value={0}
-                        newVal={boost.toNumber()}
+                        newVal={boost}
                         hiddenCurrentBar
                     >
                         <div className="px-4 h-full flex items-center justify-end text-lg font-bold text-stake-gray-500">
                             <span>x</span>
                             <span className="text-white">
-                                {formatAmount(boost.toNumber())}
+                                {formatAmount(boost)}
                             </span>
                             <ICGovBoost className="w-3.5 h-3.5 inline-block -mt-0.5 ml-1" />
                         </div>
