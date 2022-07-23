@@ -1,4 +1,4 @@
-import { SendTransactionReturnType } from "@elrondnetwork/dapp-core/dist/services/transactions";
+import { SendTransactionReturnType } from "@elrondnetwork/dapp-core/types";
 import BigNumber from "bignumber.js";
 import { FARMS } from "const/farms";
 import pools from "const/pool";

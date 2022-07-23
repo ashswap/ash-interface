@@ -1,5 +1,3 @@
-import { farmQuery } from "atoms/farmsState";
-import { govLockedAmtState, govUnlockTSState } from "atoms/govState";
 import BigNumber from "bignumber.js";
 import { calcYieldBoost } from "helper/farmBooster";
 import { FarmBoostInfo } from "interface/farm";

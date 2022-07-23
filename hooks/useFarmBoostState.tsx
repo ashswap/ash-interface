@@ -1,8 +1,4 @@
-import {
-    getProxyProvider,
-    transactionServices,
-} from "@elrondnetwork/dapp-core";
-import { Address, ProxyProvider } from "@elrondnetwork/erdjs/out";
+import { Address } from "@elrondnetwork/erdjs/out";
 import { accAddressState } from "atoms/dappState";
 import { farmOwnerTokensQuery, FarmRecord, FarmToken } from "atoms/farmsState";
 import {
@@ -15,6 +11,8 @@ import {
     calcYieldBoost,
     calcYieldBoostFromFarmToken,
 } from "helper/farmBooster";
+import { FARM_DIV_SAFETY_CONST } from "const/farms";
+import { getProxyNetworkProvider } from "helper/proxy/util";
 import { sendTransactions } from "helper/transactionMethods";
 import { FarmBoostInfo, IFarm } from "interface/farm";
 import moment from "moment";
@@ -24,6 +22,7 @@ import useCalcBoost from "./useFarmContract/useCalcBoost";
 import useFarmClaimReward from "./useFarmContract/useFarmClaimReward";
 import useGetSlopeUsed from "./useFarmContract/useGetSlopeUsed";
 import useGovGetLocked from "./useGovContract/useGovGetLocked";
+import { useTrackTransactionStatus } from "@elrondnetwork/dapp-core/hooks";
 
 export const useFarmBoostTransferState = (
     farmToken: FarmToken,
@@ -31,7 +30,7 @@ export const useFarmBoostTransferState = (
 ) => {
     const [boostId, setBoostId] = useState<string | null>(null);
     const { isPending: isBoosting } =
-        transactionServices.useTrackTransactionStatus({
+        useTrackTransactionStatus({
             transactionId: boostId,
         });
     const [currentFarmBoost, setCurrentFarmBoost] = useState<FarmBoostInfo>({
@@ -162,17 +161,13 @@ export const useFarmBoostOwnerState = (farmData: FarmRecord) => {
                     address
                 );
 
-                const proxyProvider: ProxyProvider = getProxyProvider();
+                const proxyProvider = getProxyNetworkProvider();
                 const getTotalFarmingLocked = async (farm: IFarm) => {
-                    const esdts = await proxyProvider.getAddressEsdtList(
-                        new Address(farm.farm_address)
+                    const res = await proxyProvider.getFungibleTokenOfAccount(
+                        new Address(farm.farm_address),
+                        farm.farming_token_id
                     );
-                    return (
-                        esdts.find(
-                            (esdt) =>
-                                esdt.tokenIdentifier === farm.farming_token_id
-                        )?.balance || new BigNumber(0)
-                    );
+                    return res.balance;
                 };
                 const farmingLocked = await getTotalFarmingLocked(
                     farmData.farm
