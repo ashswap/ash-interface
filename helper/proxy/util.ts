@@ -31,7 +31,7 @@ let elrondProxyProvider: ElrondProxyProvider | null = null;
 export const getElrondProxyProvider = () => {
     const network: AccountInfoSliceNetworkType = getNetworkConfig();
     if (!elrondProxyProvider) {
-        elrondProxyProvider = new ElrondProxyProvider(network.apiAddress);
+        elrondProxyProvider = new ElrondProxyProvider(network.apiAddress, {timeout: +network.apiTimeout});
     }
     return elrondProxyProvider;
 };

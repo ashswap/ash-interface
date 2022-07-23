@@ -104,7 +104,6 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
             router.events.off("routeChangeComplete", handleRouteChange);
         };
     }, [router.events]);
-    console.log("abs");
     return (
         <>
             {/* Global Site Tag (gtag.js) - Google Analytics */}

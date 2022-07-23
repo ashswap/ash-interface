@@ -25,12 +25,13 @@ const buildUrlParams = (
         .join("&");
     return `?${params}`;
 };
+
 export default class ElrondProxyProvider {
     apiProvider: ApiNetworkProvider;
     proxyProvider: ProxyNetworkProvider;
-    constructor(apiAddress: string) {
-        this.apiProvider = new ApiNetworkProvider(apiAddress);
-        this.proxyProvider = new ProxyNetworkProvider(apiAddress);
+    constructor(apiAddress: string, config?: {timeout?: number}) {
+        this.apiProvider = new ApiNetworkProvider(apiAddress, config);
+        this.proxyProvider = new ProxyNetworkProvider(apiAddress, config);
     }
 
     async getNFTsOfAccount<T extends NFTType>(

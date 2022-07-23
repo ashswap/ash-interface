@@ -167,7 +167,7 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
         const v0 = toWei(pool.tokens[0], value0 || "0");
         const v1 = toWei(pool.tokens[1], value1 || "0");
         try {
-            const { sessionId } = await addPoolLP(pool, v0, v1);
+            const { sessionId } = await addPoolLP(pool, [v0, v1]);
             setAddLPSessionId(sessionId || "");
             if (sessionId) onClose?.();
         } catch (error) {

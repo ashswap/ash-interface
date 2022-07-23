@@ -120,7 +120,6 @@ const GovState = () => {
                 const address = await snapshot.getPromise(accAddressState);
 
                 if (!loggedIn) return;
-                console.log("query");
                 getProxyNetworkProvider()
                     .queryContract(
                         new Query({

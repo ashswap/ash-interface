@@ -4,10 +4,12 @@ import {
     BigUIntValue,
     ContractFunction,
     TokenIdentifierValue,
+    TokenPayment,
 } from "@elrondnetwork/erdjs/out";
 import { accAddressState } from "atoms/dappState";
 import BigNumber from "bignumber.js";
 import { toEGLDD, toWei } from "helper/balance";
+import PoolContract from "helper/contracts/pool";
 import { formatAmount } from "helper/number";
 import {
     sendTransactions,
@@ -101,7 +103,30 @@ const usePoolAddLP = () => {
         [createTx]
     );
 
-    return addLP;
+    const addLPV2 = useRecoilCallback(
+        () => async (pool: IPool, tokensWei: BigNumber[]) => {
+            const payments = pool.tokens
+                .map((t, i) =>
+                    TokenPayment.fungibleFromBigInteger(
+                        t.id,
+                        tokensWei[i],
+                        t.decimals
+                    )
+                )
+                .filter((p) => p.amountAsBigInteger.gt(0));
+            const poolContract = new PoolContract(pool.address);
+            const tx = await poolContract.addLiquidity(payments, tokensWei);
+            return await sendTransactions({
+                transactions: tx,
+                transactionsDisplayInfo: {
+                    successMessage: "transaction success from add LP V2",
+                },
+            });
+        },
+        []
+    );
+
+    return addLPV2;
 };
 
 export default usePoolAddLP;

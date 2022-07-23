@@ -7,6 +7,7 @@ import {
     SmartContract,
     SmartContractAbi,
     TokenIdentifierValue,
+    TokenPayment,
 } from "@elrondnetwork/erdjs";
 import BigNumber from "bignumber.js";
 import { queryContractParser } from "helper/serializer";
@@ -15,6 +16,7 @@ import Contract from "./contract";
 import poolAbi from "assets/abi/pool.abi.json";
 import { getProxyNetworkProvider } from "../proxy/util";
 import { ContractQueryResponse } from "@elrondnetwork/erdjs-network-providers/out";
+import { getAddress } from "@elrondnetwork/dapp-core/utils";
 
 const getAmountOutMaiarPool = async (
     poolAddress: string,
@@ -178,6 +180,28 @@ class PoolContract extends Contract {
             interaction.getEndpoint()
         );
         return firstValue?.valueOf();
+    }
+
+    async addLiquidity(
+        tokenPayments: TokenPayment[],
+        tokensAmtMin: BigNumber[],
+        receiver = Address.Zero()
+    ) {
+        const sender = await getAddress();
+        let interaction = this.contract.methods.addLiquidity([
+            ...tokensAmtMin,
+            receiver,
+        ]);
+        if (tokenPayments.length === 1) {
+            interaction.withSingleESDTTransfer(tokenPayments[0]);
+        } else {
+            interaction.withMultiESDTNFTTransfer(
+                tokenPayments,
+                new Address(sender)
+            );
+        }
+        interaction = this.interceptInteraction(interaction.withGasLimit(10_000_000));
+        return interaction.check().buildTransaction();
     }
 }
 
