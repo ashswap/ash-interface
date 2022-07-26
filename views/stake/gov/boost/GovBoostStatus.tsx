@@ -1,6 +1,8 @@
+import { transactionServices } from "@elrondnetwork/dapp-core";
+import { Transition } from "@headlessui/react";
+import ImgASHSleep from "assets/images/ash-sleep.png";
 import ICChevronRight from "assets/svg/chevron-right.svg";
 import ICEqualSquare from "assets/svg/equal-square.svg";
-import ICGovBoost from "assets/svg/gov-boost.svg";
 import ICHexagonDuo from "assets/svg/hexagon-duo.svg";
 import { accAddressState } from "atoms/dappState";
 import {
@@ -8,39 +10,33 @@ import {
     FarmRecord,
     farmRecordsState,
     FarmToken,
-    farmTransferedTokensState,
+    farmTransferedTokensState
 } from "atoms/farmsState";
 import BigNumber from "bignumber.js";
 import Avatar from "components/Avatar";
 import BaseButton from "components/BaseButton";
-import BoostBar, { BoostBarProps } from "components/BoostBar";
+import AdvanceBoostBar from "components/BoostBar/AdvanceBoostBar";
 import GlowingButton from "components/GlowingButton";
 import { ACTIVE_FARMS } from "const/farms";
 import pools from "const/pool";
 import { VE_ASH_DECIMALS } from "const/tokens";
+import { TRANSITIONS } from "const/transitions";
 import { toEGLDD } from "helper/balance";
 import { formatAmount } from "helper/number";
 import { sendTransactions } from "helper/transactionMethods";
 import {
     useFarmBoostOwnerState,
-    useFarmBoostTransferState,
+    useFarmBoostTransferState
 } from "hooks/useFarmBoostState";
 import useFarmClaimReward from "hooks/useFarmContract/useFarmClaimReward";
 import useRouteModal from "hooks/useRouteModal";
-import { useScreenSize } from "hooks/useScreenSize";
 import { FarmBoostInfo } from "interface/farm";
+import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRecoilCallback, useRecoilValue } from "recoil";
 import FarmBoostTooltip from "views/stake/farms/FarmBoostTooltip";
 import BoostCalcModal from "./BoostCalcModal";
-import ImgASHSleep from "assets/images/ash-sleep.png";
-import Image from "next/image";
-import { transactionServices } from "@elrondnetwork/dapp-core";
-import { Transition } from "@headlessui/react";
-import { TRANSITIONS } from "const/transitions";
-import AdvanceBoostBar from "components/BoostBar/AdvanceBoostBar";
 
 const FarmRecord = ({
     farmData,
@@ -214,9 +210,13 @@ const FarmRecordOwner = ({
     return (
         <FarmRecord
             farmData={farmData}
-            veConsume={expectedFarmBoost.veForBoost.minus(
-                currentFarmBoost.veForBoost
-            )}
+            veConsume={
+                expectedFarmBoost.boost > currentFarmBoost.boost
+                    ? expectedFarmBoost.veForBoost.minus(
+                          currentFarmBoost.veForBoost
+                      )
+                    : new BigNumber(0)
+            }
             currentBoost={currentFarmBoost}
             expectedBoost={expectedFarmBoost}
             maxBoost={maxFarmBoost}
@@ -380,7 +380,7 @@ function GovBoostStatus() {
                                 <BaseButton className="h-12 w-12 shrink-0 sm:w-auto bg-ash-dark-400 px-1 sm:px-6 uppercase text-sm font-bold text-white">
                                     <ICEqualSquare className="text-white w-4.5 h-4.5" />
                                     <span className="hidden sm:inline ml-1">
-                                        Calculate
+                                        Calculator
                                     </span>
                                 </BaseButton>
                             </a>

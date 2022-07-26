@@ -1,8 +1,17 @@
 import CardTooltip from "components/Tooltip/CardTooltip";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
+import { ACTIVE_FARMS } from "const/farms";
 import { formatAmount } from "helper/number";
 import { useOnboarding } from "hooks/useOnboarding";
-import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+import useRouteModal from "hooks/useRouteModal";
+import Link from "next/link";
+import React, {
+    createContext,
+    useContext,
+    useEffect,
+    useMemo,
+    useState,
+} from "react";
 
 const Polygon = ({
     height,
@@ -151,7 +160,7 @@ function BoostBar(props: BoostBarProps) {
                 validNewValue,
                 valueWidth,
                 deltaWidth,
-                hovered
+                hovered,
             }}
         >
             <div>
@@ -296,7 +305,7 @@ const VeLine = () => {
                             disabled ? "text-ash-gray-600" : "text-pink-600"
                         }`}
                     >
-                        {formatAmount(currentVe)} ve
+                        {(validNewValue > validValue) ? <></> : <>{formatAmount(currentVe)} ve</>}
                     </div>
                     <div className="text-ash-gray-600">
                         {formatAmount(maxVe)} ve
@@ -330,6 +339,7 @@ const TopLabel = () => {
         maxVe,
     } = useContext(BoostBarContext);
     const tan33 = Math.tan((33 * Math.PI) / 180);
+    const {encode} = useRouteModal("calc_boost");
     return (
         <div
             className="relative mb-1"
@@ -364,10 +374,12 @@ const TopLabel = () => {
                 </CardTooltip>
                 <CardTooltip
                     autoPlacement
-                    content={
+                    content={({close}) => 
                         <div className="text-stake-gray-500 text-xs font-bold">
                             <div className="mb-4">Max = Max boost possible</div>
-                            <div className="text-white text-lg mb-8">x{max}</div>
+                            <div className="text-white text-lg mb-8">
+                                x{max}
+                            </div>
                             <div className="mb-4">
                                 veASH needed for max boost
                             </div>
@@ -375,12 +387,16 @@ const TopLabel = () => {
                                 {formatAmount(maxVe)} ve
                             </div>
                             <div className="bg-ash-dark-600 p-2 text-2xs font-bold text-stake-gray-500 inline-block">
-                                Max boost possible shows the maximum of boost
-                                that you can reach. It&apos;s not always be 2,5
-                                times, go{" "}
+                                Max boost possible shows the maximum boost that
+                                you can reach. It&apos;s not always been 2.5
+                                times. Go to&nbsp;
+                                <Link href={{pathname: "/stake/gov/boost", query: {p: encode({farmAddress: ACTIVE_FARMS[0].farm_address})}}}>
+                                <a onClick={close}>
                                 <span className="text-stake-green-500">
                                     calculator
-                                </span>{" "}
+                                </span>
+                                </a>
+                                </Link>{" "}
                                 or{" "}
                                 <span className="text-stake-green-500">
                                     Boost Guide
