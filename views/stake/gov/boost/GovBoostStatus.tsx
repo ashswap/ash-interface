@@ -1,4 +1,4 @@
-import { transactionServices } from "@elrondnetwork/dapp-core";
+import { useTrackTransactionStatus } from "@elrondnetwork/dapp-core/hooks";
 import { Transition } from "@headlessui/react";
 import ImgASHSleep from "assets/images/ash-sleep.png";
 import ICChevronRight from "assets/svg/chevron-right.svg";
@@ -10,7 +10,7 @@ import {
     FarmRecord,
     farmRecordsState,
     FarmToken,
-    farmTransferedTokensState
+    farmTransferedTokensState,
 } from "atoms/farmsState";
 import BigNumber from "bignumber.js";
 import Avatar from "components/Avatar";
@@ -26,7 +26,7 @@ import { formatAmount } from "helper/number";
 import { sendTransactions } from "helper/transactionMethods";
 import {
     useFarmBoostOwnerState,
-    useFarmBoostTransferState
+    useFarmBoostTransferState,
 } from "hooks/useFarmBoostState";
 import useFarmClaimReward from "hooks/useFarmContract/useFarmClaimReward";
 import useRouteModal from "hooks/useRouteModal";
@@ -259,7 +259,7 @@ function GovBoostStatus() {
         useRouteModal("calc_boost");
     const [openCalc, setOpenCalc] = useState(false);
     const [boostId, setBoostId] = useState<string | null>(null);
-    const { isPending } = transactionServices.useTrackTransactionStatus({
+    const { isPending } = useTrackTransactionStatus({
         transactionId: boostId,
     });
     const [isSelfBoostTToken, setIsBoostTToken] = useState(false);

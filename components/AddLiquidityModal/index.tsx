@@ -15,7 +15,6 @@ import InputCurrency from "components/InputCurrency";
 import TextAmt from "components/TextAmt";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
 import { toEGLDD, toWei } from "helper/balance";
-import { getProxyNetworkProvider } from "helper/proxy/util";
 import { useCreateTransaction } from "helper/transactionMethods";
 import { useOnboarding } from "hooks/useOnboarding";
 import usePoolAddLP from "hooks/usePoolContract/usePoolAddLP";
@@ -136,7 +135,6 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
     // end recoil
     const loggedIn = useRecoilValue(accIsLoggedInState);
     const isInsufficientEGLD = useRecoilValue(accIsInsufficientEGLDState);
-    const proxy = getProxyNetworkProvider();
     const { pool, poolStats, liquidityData } = poolData;
     const [onboardingDepositInput, setOnboardedDepositInput] =
         useOnboarding("pool_deposit_input");

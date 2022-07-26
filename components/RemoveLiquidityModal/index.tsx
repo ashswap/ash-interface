@@ -59,7 +59,6 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
     const [displayInputLiquidity, setDisplayInputLiquidity] =
         useState<string>("");
     const [removing, setRemoving] = useState(false);
-    const proxy = getProxyNetworkProvider();
     const [onboardingWithdrawInput, setOnboardedWithdrawInput] = useOnboarding(
         "pool_withdraw_input"
     );
@@ -138,6 +137,7 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
     );
 
     useEffect(() => {
+        const proxy = getProxyNetworkProvider();
         if (!proxy || liquidityDebounce.eq(0) || liquidityDebounce.isNaN()) {
             return;
         }
@@ -187,7 +187,7 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
                 );
             })
             .catch((error) => console.log(error));
-    }, [liquidityDebounce, pool, proxy]);
+    }, [liquidityDebounce, pool]);
 
     const removeLP = useCallback(async () => {
         if (removing || liquidity.eq(0)) return;

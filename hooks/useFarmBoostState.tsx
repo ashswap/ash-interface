@@ -1,18 +1,18 @@
+import { useTrackTransactionStatus } from "@elrondnetwork/dapp-core/hooks";
 import { Address } from "@elrondnetwork/erdjs/out";
 import { accAddressState } from "atoms/dappState";
 import { farmOwnerTokensQuery, FarmRecord, FarmToken } from "atoms/farmsState";
 import {
     govLockedAmtState,
     govTotalSupplyVeASH,
-    govUnlockTSState,
+    govUnlockTSState
 } from "atoms/govState";
 import BigNumber from "bignumber.js";
 import {
     calcYieldBoost,
-    calcYieldBoostFromFarmToken,
+    calcYieldBoostFromFarmToken
 } from "helper/farmBooster";
-import { FARM_DIV_SAFETY_CONST } from "const/farms";
-import { getProxyNetworkProvider } from "helper/proxy/util";
+import { getApiNetworkProvider } from "helper/proxy/util";
 import { sendTransactions } from "helper/transactionMethods";
 import { FarmBoostInfo, IFarm } from "interface/farm";
 import moment from "moment";
@@ -22,7 +22,6 @@ import useCalcBoost from "./useFarmContract/useCalcBoost";
 import useFarmClaimReward from "./useFarmContract/useFarmClaimReward";
 import useGetSlopeUsed from "./useFarmContract/useGetSlopeUsed";
 import useGovGetLocked from "./useGovContract/useGovGetLocked";
-import { useTrackTransactionStatus } from "@elrondnetwork/dapp-core/hooks";
 
 export const useFarmBoostTransferState = (
     farmToken: FarmToken,
@@ -161,17 +160,6 @@ export const useFarmBoostOwnerState = (farmData: FarmRecord) => {
                     address
                 );
 
-                const proxyProvider = getProxyNetworkProvider();
-                const getTotalFarmingLocked = async (farm: IFarm) => {
-                    const res = await proxyProvider.getFungibleTokenOfAccount(
-                        new Address(farm.farm_address),
-                        farm.farming_token_id
-                    );
-                    return res.balance;
-                };
-                const farmingLocked = await getTotalFarmingLocked(
-                    farmData.farm
-                );
                 const farmBalance = ownerTokens.reduce(
                     (total, t) => total.plus(t.balance),
                     new BigNumber(0)
@@ -183,7 +171,7 @@ export const useFarmBoostOwnerState = (farmData: FarmRecord) => {
                     veSupply,
                     lockedAshAmt,
                     unlockTs,
-                    farmingLocked,
+                    farmData.lpLockedAmt,
                     farmData.farmTokenSupply,
                     farmBalance
                 );
@@ -197,13 +185,13 @@ export const useFarmBoostOwnerState = (farmData: FarmRecord) => {
 
                 const veForMaxBoost = lpAmt
                     .multipliedBy(veSupply)
-                    .div(farmingLocked);
+                    .div(farmData.lpLockedAmt);
 
                 setMaxFarmBoost({
                     veForBoost: veForMaxBoost,
                     boost: calcYieldBoost(
                         lpAmt,
-                        farmingLocked,
+                        farmData.lpLockedAmt,
                         veForMaxBoost,
                         veSupply,
                         farmData.farmTokenSupply,

@@ -157,18 +157,20 @@ const FarmsState = () => {
 
     const getTotalLPLocked = useCallback(async (farm: IFarm) => {
         const apiProvider = getApiNetworkProvider();
-        const res = await apiProvider.getFungibleTokenOfAccount(
+        const {balance} = await apiProvider.getFungibleTokenOfAccount(
             new Address(farm.farm_address),
             farm.farming_token_id
-        );
-        return res.balance || new BigNumber(0);
+        ).catch(err => {
+            return {balance: new BigNumber(0)}
+        });
+        return balance || new BigNumber(0);
     }, []);
 
     const getFarmRecord = useRecoilCallback(
         ({ snapshot, set }) =>
             async (f: IFarm, p: IPool) => {
-                const balances = await snapshot.getPromise(walletBalanceState);
                 const accAddress = await snapshot.getPromise(accAddressState);
+                const balances = await snapshot.getPromise(walletBalanceState);
                 const blockRewardMap = await snapshot.getPromise(
                     farmBlockRewardMapState
                 );
@@ -208,20 +210,15 @@ const FarmsState = () => {
                     totalLiquidityValue,
                     emissionAPR,
                 };
+                if(!accAddress) return record;
                 const collectionTokens =
                     await getElrondProxyProvider().getNFTsOfAccount(
                         accAddress,
                         { collections: f.farm_token_id, type: "MetaESDT" }
                     );
-                const collectionTokenMap = Object.fromEntries(
-                    collectionTokens.map((t) => [t.identifier, t])
-                );
-                const farmTokensPromises: Promise<FarmToken>[] = Object.keys(
-                    balances
-                )
-                    .filter((tokenId) => tokenId.startsWith(f.farm_token_id))
-                    .map(async (id) => {
-                        const token = collectionTokenMap[id];
+                    
+                const farmTokens: FarmToken[] = collectionTokens
+                    .map((token) => {
                         const attributes = decodeNestedStringBase64(
                             token.attributes || "",
                             FarmTokenAttrsStruct
@@ -235,8 +232,8 @@ const FarmsState = () => {
                             .div(perLP)
                             .integerValue(BigNumber.ROUND_FLOOR);
                         return {
-                            tokenId: id,
-                            collection: f.farm_token_id,
+                            tokenId: token.identifier,
+                            collection: token.collection,
                             nonce: new BigNumber(token.nonce),
                             balance,
                             attributes,
@@ -252,8 +249,6 @@ const FarmsState = () => {
                             farmAddress: f.farm_address,
                         };
                     });
-
-                const farmTokens = await Promise.all(farmTokensPromises);
                 const isFarmed = farmTokens.some(({ balance }) =>
                     balance.gt(0)
                 );
