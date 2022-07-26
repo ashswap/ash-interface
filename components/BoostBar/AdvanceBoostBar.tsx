@@ -50,12 +50,13 @@ const AdvanceBoostBar = ({
             </div>
             <div
                 style={{
-                    width: `${((MAX - max) * 100) / MAX}%`,
+                    width: `${((MAX - max) * 100) / (MAX - MIN)}%`,
+                    maxWidth: `calc(100% - 10rem)`,
                     height: `${(isMobile ? 34 : 40) + (props.disabled ? 2 : 0) }px`,
                     background:
                         "transparent repeating-linear-gradient( 45deg, rgba(117, 115, 145, 0.3), rgba(117, 115, 145, 0.3) 4px, transparent 2px, transparent 7px )",
                 }}
-                className={`skew-x-[-33deg] scale-x-105 -translate-x-3 relative ${props.veLine ? "-translate-y-0.5" : "translate-y-2.5"}`}
+                className={`shrink-0 skew-x-[-33deg] -translate-x-3 relative ${props.veLine ? "-translate-y-0.5" : "translate-y-2.5"}`}
             >
                 <OnboardTooltip
                     disabled={!onboardMaxBoost}

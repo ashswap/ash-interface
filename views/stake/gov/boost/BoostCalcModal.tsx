@@ -49,7 +49,6 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
     const pool = useRecoilValue(farmPoolQuery(farmAddress || ""));
 
     const [lpValueStr, setLpValueStr] = useInputNumberString(lpValue);
-    const [TVLStr, setTVLStr] = useInputNumberString(TVLExcludeOwnLP);
     const [totalCurrentVeStr, setTotalCurrentVeStr] =
         useInputNumberString(totalCurrentVeASH);
     const [ashInputStr, setAshInputStr] = useInputNumberString(ashInput);
@@ -283,16 +282,10 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
                             </div>
                             <div className="relative">
                                 <InputCurrency
-                                    className="bg-ash-dark-400 text-right h-10 px-2 sm:px-7 text-stake-gray-500 outline-none text-sm w-full"
+                                    className="bg-ash-dark-400 text-right h-10 px-2 sm:px-7 text-stake-gray-500 outline-none text-sm w-full disabled:cursor-not-allowed"
                                     placeholder="0"
-                                    value={TVLStr}
-                                    onChange={(e) => {
-                                        setIsUserInput(true);
-                                        setTVLStr(e.target.value);
-                                        setTVLExcludeOwnLP(
-                                            new BigNumber(e.target.value)
-                                        );
-                                    }}
+                                    value={TVLExcludeOwnLP.toFixed(3)}
+                                    disabled
                                 />
                                 <div className="absolute right-0 w-1/3 sm:w-1/2 border-t border-ash-gray-600 translate-x-full top-1/2">
                                     <div className="absolute -right-1 -top-4.5 text-ash-gray-600 text-2xl">

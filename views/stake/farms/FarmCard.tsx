@@ -192,27 +192,16 @@ function FarmCard({ farmData, viewType }: props) {
                                     }
                                 >
                                     <span
-                                        className={`underline text-xs font-bold text-stake-gray-500 ${
-                                            farmData.stakedData &&
-                                            "cursor-pointer"
-                                        }`}
-                                        onClick={() =>
-                                            farmData.stakedData &&
-                                            setOpenBoostInfo(true)
-                                        }
+                                        className={`underline text-xs font-bold text-stake-gray-500 cursor-pointer`}
+                                        onClick={() => setOpenBoostInfo(true)}
                                     >
                                         Farm Boost
                                     </span>
                                 </CardTooltip>
                             </div>
                             <div
-                                className={`w-[120px] -mr-1 ${
-                                    farmData.stakedData && "cursor-pointer"
-                                }`}
-                                onClick={() =>
-                                    farmData.stakedData &&
-                                    setOpenBoostInfo(true)
-                                }
+                                className={`w-[120px] -mr-1 cursor-pointer`}
+                                onClick={() => setOpenBoostInfo(true)}
                             >
                                 <BoostBar
                                     height={32}
@@ -482,13 +471,8 @@ function FarmCard({ farmData, viewType }: props) {
                             </div>
                             <div className="pr-2.5 sm:pr-3.5 text-right text-white text-xs lg:text-lg font-bold">
                                 <div
-                                    className={`${
-                                        farmData.stakedData && "cursor-pointer"
-                                    }`}
-                                    onClick={() =>
-                                        farmData.stakedData &&
-                                        setOpenBoostInfo(true)
-                                    }
+                                    className="cursor-pointer"
+                                    onClick={() => setOpenBoostInfo(true)}
                                 >
                                     <BoostBar
                                         height={screenSize?.isMobile ? 24 : 32}

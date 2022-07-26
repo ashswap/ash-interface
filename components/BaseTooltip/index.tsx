@@ -45,7 +45,7 @@ export type BaseTooltipProps = {
     open?: boolean;
     content:
         | JSX.Element
-        | ((args: { size?: Dimensions & ElementRects }) => JSX.Element);
+        | ((args: { size?: Dimensions & ElementRects, close: () => void }) => JSX.Element);
     children: JSX.Element;
     placement?: Placement;
     strategy?: Strategy;
@@ -211,7 +211,7 @@ const BaseTooltip = (props: BaseTooltipProps) => {
                         leaveTo="opacity-0 scale-95"
                     >
                         {typeof content === "function"
-                            ? content({ size: sizeState })
+                            ? content({ size: sizeState, close: () => onOpenChange(false) })
                             : content}
                         <div
                             ref={arrowRef}

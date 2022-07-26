@@ -1,11 +1,11 @@
+import { transactionServices } from "@elrondnetwork/dapp-core";
+import { Transition } from "@headlessui/react";
+import ImgASHSleep from "assets/images/ash-sleep.png";
+import ICChevronRight from "assets/svg/chevron-right.svg";
+import ICEqualSquare from "assets/svg/equal-square.svg";
 import BaseModal, { BaseModalType } from "components/BaseModal";
 import { useScreenSize } from "hooks/useScreenSize";
 import { useCallback, useEffect, useMemo, useState } from "react";
-
-import { transactionServices } from "@elrondnetwork/dapp-core";
-import { Transition } from "@headlessui/react";
-import ICChevronRight from "assets/svg/chevron-right.svg";
-import ICEqualSquare from "assets/svg/equal-square.svg";
 
 import ICHexagonDuo from "assets/svg/hexagon-duo.svg";
 import { accAddressState } from "atoms/dappState";
@@ -13,12 +13,12 @@ import {
     farmOwnerTokensQuery,
     FarmRecord,
     FarmToken,
-    farmTransferedTokensQuery,
+    farmTransferedTokensQuery
 } from "atoms/farmsState";
 import BigNumber from "bignumber.js";
 import Avatar from "components/Avatar";
 import BaseButton from "components/BaseButton";
-import BoostBar, { BoostBarProps } from "components/BoostBar";
+import AdvanceBoostBar from "components/BoostBar/AdvanceBoostBar";
 import GlowingButton from "components/GlowingButton";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
 import pools from "const/pool";
@@ -28,16 +28,16 @@ import { toEGLDD } from "helper/balance";
 import { formatAmount } from "helper/number";
 import {
     useFarmBoostOwnerState,
-    useFarmBoostTransferState,
+    useFarmBoostTransferState
 } from "hooks/useFarmBoostState";
 import useFarmBoost from "hooks/useFarmContract/useFarmBoost";
 import { useOnboarding } from "hooks/useOnboarding";
 import useRouteModal from "hooks/useRouteModal";
 import { FarmBoostInfo } from "interface/farm";
+import Image from "next/image";
 import Link from "next/link";
 import { useRecoilValue } from "recoil";
 import FarmBoostTooltip from "./FarmBoostTooltip";
-import AdvanceBoostBar from "components/BoostBar/AdvanceBoostBar";
 
 const FarmBoostRecord = ({
     farmData,
@@ -257,10 +257,8 @@ const FarmRecordTransfer = ({
     const { isPending } = transactionServices.useTrackTransactionStatus({
         transactionId: boostId,
     });
-    const { currentFarmBoost, maxFarmBoost, selfBoost } = useFarmBoostTransferState(
-        farmToken,
-        farmData
-    );
+    const { currentFarmBoost, maxFarmBoost, selfBoost } =
+        useFarmBoostTransferState(farmToken, farmData);
     const selfBoostHandle = useCallback(async () => {
         const { sessionId, error } = await selfBoost();
         setBoostId(sessionId);
@@ -286,8 +284,9 @@ const FarmRecordTransfer = ({
 
 type FarmBoostInfoType = {
     farmData: FarmRecord;
+    onClose?: (event: any) => void;
 };
-const FarmBoostInfo = ({ farmData }: FarmBoostInfoType) => {
+const FarmBoostInfo = ({ farmData, onClose }: FarmBoostInfoType) => {
     const { pool, farm } = farmData;
     const [token1, token2] = pool?.tokens;
     const [boostId, setBoostId] = useState<string | null>(null);
@@ -343,14 +342,19 @@ const FarmBoostInfo = ({ farmData }: FarmBoostInfoType) => {
                         </div>
                         {/* <ICChevronDown /> */}
                     </div>
-                    {ownerTokens.length > 0 && (
+                    {ownerTokens.length > 0 ? (
                         <>
                             <div className="mt-10 mb-36">
                                 <FarmBoostRecord
                                     farmData={farmData}
-                                    veConsume={expectedFarmBoost.veForBoost.minus(
-                                        currentFarmBoost.veForBoost
-                                    )}
+                                    veConsume={
+                                        expectedFarmBoost.boost >
+                                        currentFarmBoost.boost
+                                            ? expectedFarmBoost.veForBoost.minus(
+                                                  currentFarmBoost.veForBoost
+                                              )
+                                            : new BigNumber(0)
+                                    }
                                     currentBoost={currentFarmBoost}
                                     expectedBoost={expectedFarmBoost}
                                     maxBoost={maxFarmBoost}
@@ -375,7 +379,7 @@ const FarmBoostInfo = ({ farmData }: FarmBoostInfoType) => {
                                         <BaseButton className="h-12 w-12 sm:w-auto bg-ash-dark-400 px-1 sm:px-6 uppercase text-sm font-bold text-white">
                                             <ICEqualSquare className="text-white w-4.5 h-4.5" />
                                             <span className="hidden sm:inline ml-1">
-                                                Calculate
+                                                Calculator
                                             </span>
                                         </BaseButton>
                                     </a>
@@ -401,6 +405,35 @@ const FarmBoostInfo = ({ farmData }: FarmBoostInfoType) => {
                                 </GlowingButton>
                             </div>
                         </>
+                    ) : (
+                        <div className="py-20">
+                            <div className="flex items-center justify-center">
+                                <div className="w-32 lg:w-36">
+                                    <Image
+                                        src={ImgASHSleep}
+                                        alt="ash sleep"
+                                        layout="responsive"
+                                        className="mix-blend-luminosity"
+                                    />
+                                </div>
+                                <div className="text-sm lg:text-lg font-bold text-stake-gray-500">
+                                    <div>
+                                        You&apos;ve not enter any farm yet
+                                    </div>
+                                    <div>
+                                        Go{" "}
+                                        <Link href="/stake/gov">
+                                            <a onClick={onClose}>
+                                                <span className="underline text-ash-cyan-500">
+                                                    stake LP-Tokens
+                                                </span>
+                                            </a>
+                                        </Link>{" "}
+                                        now
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     )}
                 </div>
                 {transferedTokens.length > 0 && (
@@ -444,7 +477,10 @@ function FarmBoostInfoModal({ farmData, ...modalProps }: props) {
                 <BaseModal.CloseBtn />
             </div>
             <div className="flex-grow overflow-auto">
-                <FarmBoostInfo farmData={farmData} />
+                <FarmBoostInfo
+                    farmData={farmData}
+                    onClose={modalProps.onRequestClose}
+                />
             </div>
         </BaseModal>
     );
