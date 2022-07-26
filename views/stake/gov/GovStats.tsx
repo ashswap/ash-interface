@@ -15,7 +15,7 @@ import {
     govTotalLockedPctState,
     govTotalSupplyVeASH,
     govUnlockTSState,
-    govVeASHAmtState,
+    govVeASHAmtState
 } from "atoms/govState";
 import { walletTokenPriceState } from "atoms/walletState";
 import Avatar from "components/Avatar";
@@ -85,8 +85,8 @@ function GovStats() {
         onSuccess: () => setOpenHarvestResult(true),
     });
 
-    const claimReward = useGovClaimReward();
-    const unlockASH = useGovUnlockASH();
+    const { claimReward } = useGovClaimReward();
+    const { unlockASH } = useGovUnlockASH();
     const loggedIn = useRecoilValue(accIsLoggedInState);
     const mounted = useMounted();
     const connectWallet = useConnectWallet();

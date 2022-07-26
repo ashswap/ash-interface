@@ -1,12 +1,5 @@
 import {
-    Address,
-    ArgSerializer,
-    BigUIntValue,
-    ContractFunction,
-    EndpointParameterDefinition,
-    Query,
-    TypeExpressionParser,
-    TypeMapper
+    TokenPayment
 } from "@elrondnetwork/erdjs";
 import { Slider } from "antd";
 import IconRight from "assets/svg/right-yellow.svg";
@@ -23,8 +16,13 @@ import Token from "components/Token";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
 import { useSwap } from "context/swap";
 import { toEGLD, toEGLDD, toWei } from "helper/balance";
+import PoolContract from "helper/contracts/pool";
+import { formatAmount } from "helper/number";
 import { getProxyNetworkProvider } from "helper/proxy/util";
-import { useCreateTransaction } from "helper/transactionMethods";
+import {
+    sendTransactions,
+    useCreateTransaction
+} from "helper/transactionMethods";
 import { useFetchBalances } from "hooks/useFetchBalances";
 import { useOnboarding } from "hooks/useOnboarding";
 import usePoolRemoveLP from "hooks/usePoolContract/usePoolRemoveLP";
@@ -51,18 +49,18 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
     const [value1, setValue1] = useState<string>("");
     const [liquidityDebounce] = useDebounce(liquidity, 500);
     const screenSize = useScreenSize();
-    const fetchBalances = useFetchBalances();
     const lpTokens = useRecoilValue(walletLPMapState);
     const insufficientEGLD = useRecoilValue(accIsInsufficientEGLDState);
-    const createTx = useCreateTransaction();
+    const {removeLP, trackingData} = usePoolRemoveLP(true);
     const { slippage } = useSwap();
     const [displayInputLiquidity, setDisplayInputLiquidity] =
         useState<string>("");
-    const [removing, setRemoving] = useState(false);
+
     const [onboardingWithdrawInput, setOnboardedWithdrawInput] = useOnboarding(
         "pool_withdraw_input"
     );
-    const removePoolLP = usePoolRemoveLP();
+
+    const removing = useMemo(() => !!trackingData.isPending, [trackingData.isPending]);
 
     const pricePerLP = useMemo(() => {
         // warning: mocking - change to 0 after pool analytic API success
@@ -141,72 +139,31 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
         if (!proxy || liquidityDebounce.eq(0) || liquidityDebounce.isNaN()) {
             return;
         }
-
-        proxy
-            .queryContract(
-                new Query({
-                    address: new Address(pool.address),
-                    func: new ContractFunction("getRemoveLiquidityTokens"),
-                    args: [
-                        new BigUIntValue(liquidityDebounce),
-                        new BigUIntValue(new BigNumber(0)),
-                        new BigUIntValue(new BigNumber(0)),
-                    ],
-                })
-            )
-            .then(({ returnData }) => {
-                let resultHex = Buffer.from(returnData[0], "base64").toString(
-                    "hex"
-                );
-                let parser = new TypeExpressionParser();
-                let mapper = new TypeMapper();
-                let serializer = new ArgSerializer();
-
-                let type = parser.parse("tuple2<BigUint,BigUint>");
-                let mappedType = mapper.mapType(type);
-
-                let endpointDefinitions = [
-                    new EndpointParameterDefinition("foo", "bar", mappedType),
-                ];
-                let values = serializer.stringToValues(
-                    resultHex,
-                    endpointDefinitions
-                );
-
-                setValue0(
-                    toEGLD(
-                        pool.tokens[0],
-                        values[0].valueOf().field0.toString()
-                    ).toString()
-                );
-                setValue1(
-                    toEGLD(
-                        pool.tokens[1],
-                        values[0].valueOf().field1.toString()
-                    ).toString()
-                );
-            })
-            .catch((error) => console.log(error));
+        const poolContract = new PoolContract(pool.address);
+        poolContract.getRemoveLiquidityTokens(liquidityDebounce).then(({first_token_amount, second_token_amount}) => {
+            setValue0(
+                toEGLD(
+                    pool.tokens[0],
+                    first_token_amount.toString()
+                ).toString()
+            );
+            setValue1(
+                toEGLD(
+                    pool.tokens[1],
+                    second_token_amount.toString()
+                ).toString()
+            );
+        }).catch(err => console.error(err));
     }, [liquidityDebounce, pool]);
 
-    const removeLP = useCallback(async () => {
+    const removeLPHandle = useCallback(async () => {
         if (removing || liquidity.eq(0)) return;
-        setRemoving(true);
         try {
-            const [token0, token1] = pool.tokens;
-            const { sessionId } = await removePoolLP(
-                pool,
-                liquidity,
-                toWei(token0, value0),
-                toWei(token1, value1),
-                slippage
-            );
+            const {sessionId} = await removeLP(pool, liquidity, [value0, value1], slippage);
             if (sessionId) onClose?.();
         } catch (error) {
             // TODO: extension close without response
             console.error(error);
-        } finally {
-            setRemoving(false);
         }
     }, [
         value0,
@@ -216,7 +173,7 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
         onClose,
         liquidity,
         removing,
-        removePoolLP,
+        removeLP
     ]);
 
     return (
@@ -403,7 +360,7 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
                         <GlowingButton
                             theme="yellow"
                             className="w-full h-12 font-bold clip-corner-1 clip-corner-tl"
-                            onClick={removeLP}
+                            onClick={removeLPHandle}
                             disabled={removing || liquidity.eq(0)}
                         >
                             {insufficientEGLD

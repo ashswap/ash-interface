@@ -42,6 +42,7 @@ import {
 import { useConnectWallet } from "hooks/useConnectWallet";
 import useMounted from "hooks/useMounted";
 import { useOnboarding } from "hooks/useOnboarding";
+import usePoolSwap from "hooks/usePoolContract/usePoolSwap";
 import { useScreenSize } from "hooks/useScreenSize";
 import { DappSendTransactionsPropsType } from "interface/dappCore";
 import IPool from "interface/pool";
@@ -147,19 +148,18 @@ const Swap = () => {
     const [isOpenHistoryModal, openHistoryModal] = useState<boolean>(false);
     const [fee, setFee] = useState<number>(0);
     const [isOpenFairPrice, setIsOpenFairPrice] = useState(false);
-    const [swapping, setSwapping] = useState(false);
-    const [swapId, setSwapId] = useState("");
     const [onboardingHistory, setOnboardedHistory] =
         useOnboarding("swap_history");
-    const { isPending, isSuccessful } = useTrackTransactionStatus({
-        transactionId: swapId,
-    });
     const [fetchingAmtOut, setFetchingAmtOut] = useState(false);
+    const {
+        swap,
+        trackingData: { isPending: swapping, isSuccessful },
+        sessionId: swapId,
+    } = usePoolSwap(true);
 
     const connectWallet = useConnectWallet();
     const loggedIn = useRecoilValue(accIsLoggedInState);
     const isInsufficientEGLD = useRecoilValue(accIsInsufficientEGLDState);
-    const createTx = useCreateTransaction();
 
     const [onboardingFairPrice, setOnboaredFairPrice] =
         useOnboarding("swap_fair_price");
@@ -265,7 +265,7 @@ const Swap = () => {
         });
     }, [pool, setRates]);
 
-    const swap = useCallback(async () => {
+    const swapHandle = useCallback(async () => {
         if (
             !loggedIn ||
             !tokenFrom ||
@@ -278,81 +278,31 @@ const Swap = () => {
         }
 
         if (rawValueFrom.eq(0) || rawValueFrom.isNaN()) return;
-        const minAmtOut = new BigNumber(
+        const minWeiOut = new BigNumber(
             Math.floor(rawValueTo.multipliedBy(1 - slippage).toNumber())
         );
-        if (minAmtOut.eq(0) || minAmtOut.isNaN()) return;
-        setSwapping(true);
-
+        if (minWeiOut.eq(0) || minWeiOut.isNaN()) return;
         try {
-            let tx: Transaction;
-            if (pool.isMaiarPool) {
-                tx = await createTx(new Address(pool.address), {
-                    func: new ContractFunction("ESDTTransfer"),
-                    gasLimit: 8_000_000,
-                    args: [
-                        new TokenIdentifierValue(tokenFrom.id),
-                        new BigUIntValue(rawValueFrom),
-                        new TokenIdentifierValue("swapTokensFixedInput"),
-                        new TokenIdentifierValue(tokenTo.id),
-                        new BigUIntValue(minAmtOut),
-                    ],
-                });
-            } else {
-                tx = await createTx(new Address(pool?.address), {
-                    func: new ContractFunction("ESDTTransfer"),
-                    gasLimit: 8_000_000,
-                    args: [
-                        new TokenIdentifierValue(tokenFrom.id),
-                        new BigUIntValue(rawValueFrom),
-                        new TokenIdentifierValue("exchange"),
-                        new TokenIdentifierValue(tokenTo.id),
-                        new BigUIntValue(minAmtOut),
-                    ],
-                });
-            }
-
-            const payload: DappSendTransactionsPropsType = {
-                transactions: tx,
-                transactionsDisplayInfo: {
-                    successMessage: `Swap succeed ${formatAmount(
-                        toEGLDD(tokenFrom.decimals, rawValueFrom).toNumber(),
-                        { notation: "standard" }
-                    )} ${tokenFrom.symbol} to ${formatAmount(
-                        toEGLDD(tokenTo.decimals, rawValueTo).toNumber(),
-                        { notation: "standard" }
-                    )} ${tokenTo.symbol}`,
-                },
-            };
-            const { error, sessionId } = await sendTransactions(payload);
-            if (onboardingHistory && sessionId) {
-                setSwapId(sessionId);
-            }
+            await swap(pool, tokenFrom, tokenTo, rawValueFrom, minWeiOut);
         } catch (error) {
-            console.log(error);
-            // TODO: extension close without response
-            // notification.warn({
-            //     message: error as string,
-            //     duration: 10
-            // });
+            console.error(error);
         }
+
         setValueTo("");
         setValueFrom("");
-        setSwapping(false);
     }, [
         loggedIn,
-        pool,
-        rawValueFrom,
         tokenFrom,
         tokenTo,
         swapping,
-        createTx,
+        pool,
+        fetchingAmtOut,
+        slippage,
+        rawValueFrom,
+        rawValueTo,
+        swap,
         setValueTo,
         setValueFrom,
-        slippage,
-        rawValueTo,
-        onboardingHistory,
-        fetchingAmtOut,
     ]);
 
     const priceImpact = useMemo(() => {
@@ -781,7 +731,7 @@ const Swap = () => {
                                         }
                                         onClick={
                                             loggedIn
-                                                ? swap
+                                                ? swapHandle
                                                 : () => connectWallet()
                                         }
                                     >

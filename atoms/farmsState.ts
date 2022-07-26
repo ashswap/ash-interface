@@ -15,6 +15,7 @@ export type FarmToken = {
     nonce: BigNumber;
     balance: BigNumber;
     attributes: FarmTokenAttrs;
+    attrsRaw: string;
     weightBoost: BigNumber;
     yieldBoost: number;
     perLP: BigNumber;

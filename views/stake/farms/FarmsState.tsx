@@ -10,9 +10,9 @@ import {
     FarmRecord,
     farmRecordsState,
     farmSessionIdMapState,
-    FarmToken,
+    FarmToken
 } from "atoms/farmsState";
-import { walletBalanceState, walletTokenPriceState } from "atoms/walletState";
+import { walletTokenPriceState } from "atoms/walletState";
 import BigNumber from "bignumber.js";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 import { blockTimeMs } from "const/dappConfig";
@@ -21,19 +21,16 @@ import pools from "const/pool";
 import { ASH_TOKEN } from "const/tokens";
 import { toEGLDD } from "helper/balance";
 import { fetcher } from "helper/common";
+import { ContractManager } from "helper/contracts/contractManager";
+import { calcYieldBoostFromFarmToken } from "helper/farmBooster";
 import {
-    calcYieldBoostFromFarmToken,
-} from "helper/farmBooster";
-import { 
     getApiNetworkProvider,
     getElrondProxyProvider,
-    getProxyNetworkProvider,
+    getProxyNetworkProvider
 } from "helper/proxy/util";
 import {
-    decodeNestedStringBase64,
-    decodeNestedStringHex,
+    decodeNestedStringBase64
 } from "helper/serializer";
-import useFarmReward from "hooks/useFarmContract/useFarmReward";
 import useInterval from "hooks/useInterval";
 import useLPValue from "hooks/usePoolContract/useLPValue";
 import { FarmTokenAttrsStruct, IFarm } from "interface/farm";
@@ -74,8 +71,6 @@ const FarmsState = () => {
     const sessionIdsMap = useRecoilValue(farmSessionIdMapState);
     const setDeboundKeyword = useSetRecoilState(farmDeboundKeywordState);
     const setLoadingMap = useSetRecoilState(farmLoadingMapState);
-
-    const getReward = useFarmReward();
 
     const [deboundKeyword] = useDebounce(keyword, 500);
 
@@ -157,12 +152,14 @@ const FarmsState = () => {
 
     const getTotalLPLocked = useCallback(async (farm: IFarm) => {
         const apiProvider = getApiNetworkProvider();
-        const {balance} = await apiProvider.getFungibleTokenOfAccount(
-            new Address(farm.farm_address),
-            farm.farming_token_id
-        ).catch(err => {
-            return {balance: new BigNumber(0)}
-        });
+        const { balance } = await apiProvider
+            .getFungibleTokenOfAccount(
+                new Address(farm.farm_address),
+                farm.farming_token_id
+            )
+            .catch((err) => {
+                return { balance: new BigNumber(0) };
+            });
         return balance || new BigNumber(0);
     }, []);
 
@@ -170,7 +167,6 @@ const FarmsState = () => {
         ({ snapshot, set }) =>
             async (f: IFarm, p: IPool) => {
                 const accAddress = await snapshot.getPromise(accAddressState);
-                const balances = await snapshot.getPromise(walletBalanceState);
                 const blockRewardMap = await snapshot.getPromise(
                     farmBlockRewardMapState
                 );
@@ -210,15 +206,15 @@ const FarmsState = () => {
                     totalLiquidityValue,
                     emissionAPR,
                 };
-                if(!accAddress) return record;
+                if (!accAddress) return record;
                 const collectionTokens =
                     await getElrondProxyProvider().getNFTsOfAccount(
                         accAddress,
                         { collections: f.farm_token_id, type: "MetaESDT" }
                     );
-                    
-                const farmTokens: FarmToken[] = collectionTokens
-                    .map((token) => {
+
+                const farmTokens: FarmToken[] = collectionTokens.map(
+                    (token) => {
                         const attributes = decodeNestedStringBase64(
                             token.attributes || "",
                             FarmTokenAttrsStruct
@@ -226,8 +222,7 @@ const FarmsState = () => {
                         const perLP = attributes.initial_farm_amount.div(
                             attributes.initial_farming_amount
                         );
-                        const balance =
-                            token.balance || new BigNumber(0);
+                        const balance = token.balance || new BigNumber(0);
                         const lpAmt = balance
                             .div(perLP)
                             .integerValue(BigNumber.ROUND_FLOOR);
@@ -237,6 +232,7 @@ const FarmsState = () => {
                             nonce: new BigNumber(token.nonce),
                             balance,
                             attributes,
+                            attrsRaw: token.attributes,
                             weightBoost: perLP.div(0.4),
                             yieldBoost: calcYieldBoostFromFarmToken(
                                 farmTokenSupply,
@@ -248,13 +244,20 @@ const FarmsState = () => {
                             lpAmt,
                             farmAddress: f.farm_address,
                         };
-                    });
+                    }
+                );
                 const isFarmed = farmTokens.some(({ balance }) =>
                     balance.gt(0)
                 );
                 if (isFarmed) {
+                    const farmContract = ContractManager.getFarmContract(
+                        f.farm_address
+                    );
                     const rewards = farmTokens.map((t) =>
-                        getReward(f, t.balance, t.tokenId)
+                        farmContract.calculateRewardsForGivenPosition(
+                            t.balance,
+                            t.attributes
+                        )
                     );
                     const totalRewards = await Promise.all(rewards);
                     const totalStakedLP = farmTokens.reduce(
@@ -291,13 +294,7 @@ const FarmsState = () => {
                 }
                 return record;
             },
-        [
-            getLPValue,
-            poolStatsRecords,
-            getReward,
-            getFarmTokenSupply,
-            getTotalLPLocked,
-        ]
+        [getLPValue, poolStatsRecords, getFarmTokenSupply, getTotalLPLocked]
     );
 
     const getFarmRecords = useRecoilCallback(

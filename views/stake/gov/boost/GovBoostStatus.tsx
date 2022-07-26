@@ -1,4 +1,5 @@
 import { useTrackTransactionStatus } from "@elrondnetwork/dapp-core/hooks";
+import { TokenPayment } from "@elrondnetwork/erdjs/out";
 import { Transition } from "@headlessui/react";
 import ImgASHSleep from "assets/images/ash-sleep.png";
 import ICChevronRight from "assets/svg/chevron-right.svg";
@@ -22,13 +23,13 @@ import pools from "const/pool";
 import { VE_ASH_DECIMALS } from "const/tokens";
 import { TRANSITIONS } from "const/transitions";
 import { toEGLDD } from "helper/balance";
+import { ContractManager } from "helper/contracts/contractManager";
 import { formatAmount } from "helper/number";
 import { sendTransactions } from "helper/transactionMethods";
 import {
     useFarmBoostOwnerState,
     useFarmBoostTransferState,
 } from "hooks/useFarmBoostState";
-import useFarmClaimReward from "hooks/useFarmContract/useFarmClaimReward";
 import useRouteModal from "hooks/useRouteModal";
 import { FarmBoostInfo } from "interface/farm";
 import Image from "next/image";
@@ -268,7 +269,6 @@ function GovBoostStatus() {
     const accAddress = useRecoilValue(accAddressState);
     const farmRecords = useRecoilValue(farmRecordsState);
     const farmTransferedTokens = useRecoilValue(farmTransferedTokensState);
-    const { createClaimRewardTxMulti } = useFarmClaimReward();
     const boostOwnerFarmTokens = useRecoilCallback(
         ({ snapshot }) =>
             async () => {
@@ -285,7 +285,17 @@ function GovBoostStatus() {
                     })
                     .filter(({ ownerTokens }) => ownerTokens.length > 0)
                     .map(({ ownerTokens, farm }) =>
-                        createClaimRewardTxMulti(ownerTokens, farm, true)
+                        ContractManager.getFarmContract(
+                            farm.farm_address
+                        ).claimRewards(
+                            ownerTokens.map((t) =>
+                                TokenPayment.metaEsdtFromBigInteger(
+                                    t.collection,
+                                    t.nonce.toNumber(),
+                                    t.balance
+                                )
+                            )
+                        )
                     );
                 const { sessionId, error } = await sendTransactions({
                     transactions: await Promise.all(txsPromises),
@@ -295,7 +305,7 @@ function GovBoostStatus() {
                 });
                 setBoostId(sessionId);
             },
-        [createClaimRewardTxMulti]
+        []
     );
     const farmRecordsWithOwnerTokens = useMemo(() => {
         return farmRecords.filter(

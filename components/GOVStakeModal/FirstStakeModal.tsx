@@ -46,7 +46,7 @@ const FirstStakeContent = ({ open, onClose }: props) => {
     const balances = useRecoilValue(walletBalanceState);
     const insufficientEGLD = useRecoilValue(accIsInsufficientEGLDState);
     const totalSupplyVeASH = useRecoilValue(govTotalSupplyVeASH);
-    const lockASH = useGovLockASH();
+    const {createLock: lockASH} = useGovLockASH();
     const [lockPeriod, setLockPeriod] = useState(LOCK_CONFIG.minLock); // in seconds
     const [isAgree, setIsAgree] = useState(false);
     const ASHBalance = useMemo(

@@ -113,16 +113,16 @@ export const queryPoolContract = {
     getReserveMaiarPool,
 };
 class PoolContract extends Contract {
-    address: Address;
-    contract: SmartContract;
+    // address: Address;
+    // contract: SmartContract;
     constructor(address: string) {
-        super();
-        this.address = new Address(address);
-        const abiRegistry = AbiRegistry.create(poolAbi as any);
-        this.contract = new SmartContract({
-            address: this.address,
-            abi: new SmartContractAbi(abiRegistry),
-        });
+        super(address, poolAbi);
+        // this.address = new Address(address);
+        // const abiRegistry = AbiRegistry.create(poolAbi as any);
+        // this.contract = new SmartContract({
+        //     address: this.address,
+        //     abi: new SmartContractAbi(abiRegistry),
+        // });
     }
 
     async getTotalSupply() {
@@ -202,6 +202,18 @@ class PoolContract extends Contract {
         }
         interaction = this.interceptInteraction(interaction.withGasLimit(10_000_000));
         return interaction.check().buildTransaction();
+    }
+
+    async removeLiquidity(tokenPayment: TokenPayment, tokensAmtMin: BigNumber[]) {
+        let interaction = this.contract.methods.removeLiquidity(tokensAmtMin);
+        interaction.withSingleESDTTransfer(tokenPayment).withGasLimit(9_000_000);
+        return this.interceptInteraction(interaction).check().buildTransaction();
+    }
+
+    async exchange(tokenPayment: TokenPayment, tokenToId: string, minWeiOut: BigNumber) {
+        let interaction = this.contract.methods.exchange([tokenToId, minWeiOut]);
+        interaction.withSingleESDTTransfer(tokenPayment).withGasLimit(8_000_000);
+        return this.interceptInteraction(interaction).check().buildTransaction();
     }
 }
 

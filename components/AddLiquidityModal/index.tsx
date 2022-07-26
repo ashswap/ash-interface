@@ -15,7 +15,9 @@ import InputCurrency from "components/InputCurrency";
 import TextAmt from "components/TextAmt";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
 import { toEGLDD, toWei } from "helper/balance";
-import { useCreateTransaction } from "helper/transactionMethods";
+import {
+    useCreateTransaction
+} from "helper/transactionMethods";
 import { useOnboarding } from "hooks/useOnboarding";
 import usePoolAddLP from "hooks/usePoolContract/usePoolAddLP";
 import { useScreenSize } from "hooks/useScreenSize";
@@ -166,6 +168,7 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
         const v1 = toWei(pool.tokens[1], value1 || "0");
         try {
             const { sessionId } = await addPoolLP(pool, [v0, v1]);
+
             setAddLPSessionId(sessionId || "");
             if (sessionId) onClose?.();
         } catch (error) {
@@ -173,16 +176,7 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
         } finally {
             setAdding(false);
         }
-    }, [
-        value0,
-        value1,
-        pool,
-        onClose,
-        adding,
-        loggedIn,
-        addPoolLP,
-        setAddLPSessionId,
-    ]);
+    }, [value0, value1, pool, onClose, adding, loggedIn, addPoolLP, setAddLPSessionId]);
 
     const balance0 = useMemo(() => {
         return (

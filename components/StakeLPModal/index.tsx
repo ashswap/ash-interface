@@ -32,7 +32,7 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
     const insufficientEGLD = useRecoilValue(accIsInsufficientEGLDState);
     const [stakeAmt, setStakeAmt] = useState<BigNumber>(new BigNumber(0));
     const [rawStakeAmt, setRawStakeAmt] = useState("");
-    const enterFarm = useEnterFarm();
+    const {enterFarm} = useEnterFarm();
     const LPBalance = useMemo(
         () => balances[pool.lpToken.id],
         [balances, pool.lpToken]

@@ -1,19 +1,15 @@
 import {
-    Address,
-    AddressValue,
-    ContractFunction,
+    Address
 } from "@elrondnetwork/erdjs/out";
 import { accAddressState, accIsLoggedInState } from "atoms/dappState";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
-import {
-    sendTransactions,
-    useCreateTransaction,
-} from "helper/transactionMethods";
+import FeeDistributorContract from "helper/contracts/feeDistributorContract";
+import useSendTxsWithTrackStatus from "hooks/useSendTxsWithTrackStatus";
 import { DappSendTransactionsPropsType } from "interface/dappCore";
 import { useRecoilCallback } from "recoil";
 
-const useGovClaimReward = () => {
-    const createTransaction = useCreateTransaction();
+const useGovClaimReward = (trackStatus = false) => {
+    const {sendTransactions, trackingData, sessionId} = useSendTxsWithTrackStatus(trackStatus);
     const claimReward = useRecoilCallback(
         ({ snapshot, set }) =>
             async () => {
@@ -22,23 +18,9 @@ const useGovClaimReward = () => {
 
                 if (!loggedIn) return { sessionId: "" };
                 try {
-                    const tx1 = await createTransaction(
-                        new Address(ASHSWAP_CONFIG.dappContract.feeDistributor),
-                        {
-                            func: new ContractFunction(
-                                "checkpoint_total_supply"
-                            ),
-                            gasLimit: 7_000_000,
-                        }
-                    );
-                    const tx2 = await createTransaction(
-                        new Address(ASHSWAP_CONFIG.dappContract.feeDistributor),
-                        {
-                            func: new ContractFunction("claim"),
-                            gasLimit: 500_000_000,
-                            args: [new AddressValue(new Address(address))],
-                        }
-                    );
+                    const fdContract = new FeeDistributorContract(ASHSWAP_CONFIG.dappContract.feeDistributor);
+                    const tx1 = await fdContract.checkpointTotalSupply();
+                    const tx2 = await fdContract.claim(new Address(address));
                     const payload: DappSendTransactionsPropsType = {
                         transactions: [tx1, tx2],
                         transactionsDisplayInfo: {
@@ -51,10 +33,10 @@ const useGovClaimReward = () => {
                     return { sessionId: "" };
                 }
             },
-        [createTransaction]
+        [sendTransactions]
     );
 
-    return claimReward;
+    return {claimReward, trackingData, sessionId};
 };
 
 export default useGovClaimReward;

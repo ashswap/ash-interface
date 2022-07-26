@@ -6,22 +6,14 @@ import TextAmt from "components/TextAmt";
 import CardTooltip from "components/Tooltip/CardTooltip";
 import { ASH_TOKEN } from "const/tokens";
 import { toEGLDD } from "helper/balance";
-import useFarmClaimReward from "hooks/useFarmContract/useFarmClaimReward";
-import Image from "next/image";
-import React, {
-    useCallback,
-    useEffect,
-    useMemo,
-    useRef,
-    useState,
-} from "react";
+import useFarmClaimAll from "hooks/useFarmContract/useFarmClaimAll";
+import { useCallback, useMemo, useState } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 
 function FarmStats({ onClickAll }: { onClickAll?: () => void }) {
     const [harvesting, setHarvesting] = useState(false);
     const farmRecords = useRecoilValue(farmRecordsState);
-    const { claimReward, claimAllFarmsReward: claimAllReward } =
-        useFarmClaimReward();
+    const { claimAllFarmsReward: claimAllReward } = useFarmClaimAll();
     const setStakedOnly = useSetRecoilState(farmStakedOnlyState);
     const TVL = useMemo(() => {
         return farmRecords.reduce(
@@ -35,10 +27,7 @@ function FarmStats({ onClickAll }: { onClickAll?: () => void }) {
             new BigNumber(0)
         );
     }, [farmRecords]);
-    const claimRewardRef = useRef(claimReward);
-    useEffect(() => {
-        claimRewardRef.current = claimReward;
-    }, [claimReward]);
+
     const harvestAll = useCallback(async () => {
         if (harvesting || totalReward.eq(0)) return;
         setHarvesting(true);
