@@ -1,71 +1,57 @@
-import {
-    Address,
-    BigUIntValue,
-    ContractFunction,
-    GasLimit,
-    TokenIdentifierValue,
-} from "@elrondnetwork/erdjs/out";
+import { TokenPayment } from "@elrondnetwork/erdjs/out";
 import BigNumber from "bignumber.js";
-import { toEGLDD, toWei } from "helper/balance";
+import { toWei } from "helper/balance";
+import PoolContract from "helper/contracts/pool";
 import { formatAmount } from "helper/number";
-import {
-    sendTransactions,
-    useCreateTransaction,
-} from "helper/transactionMethods";
-import { DappSendTransactionsPropsType } from "interface/dappCore";
+import useSendTxsWithTrackStatus from "hooks/useSendTxsWithTrackStatus";
 import IPool from "interface/pool";
 import { useRecoilCallback } from "recoil";
 
-const usePoolRemoveLP = () => {
-    const createTx = useCreateTransaction();
-    const removeLP = useRecoilCallback(
-        ({ snapshot }) =>
+const usePoolRemoveLP = (trackStatus = false) => {
+    const { sendTransactions, trackingData, sessionId } =
+        useSendTxsWithTrackStatus(trackStatus);
+    const func = useRecoilCallback(
+        () =>
             async (
                 pool: IPool,
                 liquidity: BigNumber,
-                v0: BigNumber,
-                v1: BigNumber,
+                estimatedAmtOut: BigNumber.Value[],
                 slippage: number
             ) => {
-                let tx = await createTx(new Address(pool.address), {
-                    func: new ContractFunction("ESDTTransfer"),
-                    gasLimit: new GasLimit(9_000_000),
-                    args: [
-                        new TokenIdentifierValue(Buffer.from(pool.lpToken.id)),
-                        new BigUIntValue(liquidity),
-                        new TokenIdentifierValue(
-                            Buffer.from("removeLiquidity")
-                        ),
-                        new BigUIntValue(
-                            new BigNumber(
-                                v0.multipliedBy(1 - slippage).toFixed(0)
-                            )
-                        ),
-                        new BigUIntValue(
-                            new BigNumber(
-                                v1.multipliedBy(1 - slippage).toFixed(0)
-                            )
-                        ),
-                    ],
-                });
-                const payload: DappSendTransactionsPropsType = {
+                const tokenPayment = TokenPayment.fungibleFromBigInteger(
+                    pool.lpToken.id,
+                    liquidity,
+                    pool.lpToken.decimals
+                );
+                const tokensAmtMin = estimatedAmtOut.map((v, i) =>
+                    toWei(pool.tokens[i], v.toString())
+                        .multipliedBy(1 - slippage)
+                        .integerValue(BigNumber.ROUND_DOWN)
+                );
+
+                const tx = await new PoolContract(pool.address).removeLiquidity(
+                    tokenPayment,
+                    tokensAmtMin
+                );
+                return await sendTransactions({
                     transactions: tx,
                     transactionsDisplayInfo: {
                         successMessage: `Remove Liquidity Success ${formatAmount(
-                            toEGLDD(pool.tokens[0].decimals, v0).toNumber(),
+                            +estimatedAmtOut[0].toString(),
                             { notation: "standard" }
                         )} ${pool.tokens[0].symbol} and ${formatAmount(
-                            toEGLDD(pool.tokens[1].decimals, v1).toNumber(),
-                            { notation: "standard" }
+                            +estimatedAmtOut[1].toString(),
+                            {
+                                notation: "standard",
+                            }
                         )} ${pool.tokens[1].symbol}`,
                     },
-                };
-                return await sendTransactions(payload);
+                });
             },
-        [createTx]
+        [sendTransactions]
     );
 
-    return removeLP;
+    return { removeLP: func, trackingData, sessionId };
 };
 
 export default usePoolRemoveLP;

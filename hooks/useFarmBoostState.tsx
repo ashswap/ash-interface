@@ -1,8 +1,5 @@
-import {
-    getProxyProvider,
-    transactionServices,
-} from "@elrondnetwork/dapp-core";
-import { Address, ProxyProvider } from "@elrondnetwork/erdjs/out";
+import { useTrackTransactionStatus } from "@elrondnetwork/dapp-core/hooks";
+import { TokenPayment } from "@elrondnetwork/erdjs/out";
 import { accAddressState } from "atoms/dappState";
 import { farmOwnerTokensQuery, FarmRecord, FarmToken } from "atoms/farmsState";
 import {
@@ -11,18 +8,17 @@ import {
     govUnlockTSState,
 } from "atoms/govState";
 import BigNumber from "bignumber.js";
+import { ContractManager } from "helper/contracts/contractManager";
 import {
     calcYieldBoost,
     calcYieldBoostFromFarmToken,
 } from "helper/farmBooster";
 import { sendTransactions } from "helper/transactionMethods";
-import { FarmBoostInfo, IFarm } from "interface/farm";
+import { FarmBoostInfo } from "interface/farm";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import { useRecoilCallback } from "recoil";
 import useCalcBoost from "./useFarmContract/useCalcBoost";
-import useFarmClaimReward from "./useFarmContract/useFarmClaimReward";
-import useGetSlopeUsed from "./useFarmContract/useGetSlopeUsed";
 import useGovGetLocked from "./useGovContract/useGovGetLocked";
 
 export const useFarmBoostTransferState = (
@@ -30,10 +26,9 @@ export const useFarmBoostTransferState = (
     farmData: FarmRecord
 ) => {
     const [boostId, setBoostId] = useState<string | null>(null);
-    const { isPending: isBoosting } =
-        transactionServices.useTrackTransactionStatus({
-            transactionId: boostId,
-        });
+    const { isPending: isBoosting } = useTrackTransactionStatus({
+        transactionId: boostId,
+    });
     const [currentFarmBoost, setCurrentFarmBoost] = useState<FarmBoostInfo>({
         veForBoost: new BigNumber(0),
         boost: 1,
@@ -43,7 +38,6 @@ export const useFarmBoostTransferState = (
         boost: 2.5,
     });
     const getLocked = useGovGetLocked();
-    const { createClaimRewardTxMulti } = useFarmClaimReward();
     const getCurrentBoost = useRecoilCallback(
         ({ snapshot }) =>
             async () => {
@@ -88,16 +82,20 @@ export const useFarmBoostTransferState = (
     const selfBoost = useRecoilCallback(
         ({ snapshot }) =>
             async () => {
-                const ownerAddress = await snapshot.getPromise(accAddressState);
                 const ownerTokens = await snapshot.getPromise(
                     farmOwnerTokensQuery(farmData.farm.farm_address)
                 );
                 const tokens = [...ownerTokens, farmToken];
-                const tx = await createClaimRewardTxMulti(
-                    tokens,
-                    farmData.farm,
-                    true
+                const tokenPayments = tokens.map((t) =>
+                    TokenPayment.metaEsdtFromBigInteger(
+                        t.collection,
+                        t.nonce.toNumber(),
+                        t.balance
+                    )
                 );
+                const tx = await ContractManager.getFarmContract(
+                    farmData.farm.farm_address
+                ).claimRewards(tokenPayments, true);
                 const result = await sendTransactions({
                     transactions: tx,
                     transactionsDisplayInfo: {
@@ -108,7 +106,7 @@ export const useFarmBoostTransferState = (
                 setBoostId(sessionId);
                 return result;
             },
-        [createClaimRewardTxMulti, farmData, farmToken]
+        [farmData, farmToken]
     );
 
     useEffect(() => {
@@ -133,7 +131,6 @@ export const useFarmBoostOwnerState = (farmData: FarmRecord) => {
     });
     const [availableVe, setAvailableVe] = useState<BigNumber>(new BigNumber(0));
     const calcBoost = useCalcBoost();
-    const getSlopeUsed = useGetSlopeUsed();
     const calcBoostOwner = useRecoilCallback(
         ({ snapshot }) =>
             async () => {
@@ -157,26 +154,11 @@ export const useFarmBoostOwnerState = (farmData: FarmRecord) => {
                     (total, f) => total.plus(f.balance.div(f.perLP)),
                     new BigNumber(0)
                 );
-                const slopeUsed = await getSlopeUsed(
-                    farmData.farm.farm_address,
-                    address
-                );
 
-                const proxyProvider: ProxyProvider = getProxyProvider();
-                const getTotalFarmingLocked = async (farm: IFarm) => {
-                    const esdts = await proxyProvider.getAddressEsdtList(
-                        new Address(farm.farm_address)
-                    );
-                    return (
-                        esdts.find(
-                            (esdt) =>
-                                esdt.tokenIdentifier === farm.farming_token_id
-                        )?.balance || new BigNumber(0)
-                    );
-                };
-                const farmingLocked = await getTotalFarmingLocked(
-                    farmData.farm
-                );
+                const slopeUsed = await ContractManager.getFarmContract(
+                    farmData.farm.farm_address
+                ).getSlopeBoosted(address);
+
                 const farmBalance = ownerTokens.reduce(
                     (total, t) => total.plus(t.balance),
                     new BigNumber(0)
@@ -188,7 +170,7 @@ export const useFarmBoostOwnerState = (farmData: FarmRecord) => {
                     veSupply,
                     lockedAshAmt,
                     unlockTs,
-                    farmingLocked,
+                    farmData.lpLockedAmt,
                     farmData.farmTokenSupply,
                     farmBalance
                 );
@@ -202,13 +184,13 @@ export const useFarmBoostOwnerState = (farmData: FarmRecord) => {
 
                 const veForMaxBoost = lpAmt
                     .multipliedBy(veSupply)
-                    .div(farmingLocked);
+                    .div(farmData.lpLockedAmt);
 
                 setMaxFarmBoost({
                     veForBoost: veForMaxBoost,
                     boost: calcYieldBoost(
                         lpAmt,
-                        farmingLocked,
+                        farmData.lpLockedAmt,
                         veForMaxBoost,
                         veSupply,
                         farmData.farmTokenSupply,
@@ -216,7 +198,7 @@ export const useFarmBoostOwnerState = (farmData: FarmRecord) => {
                     ),
                 });
             },
-        [calcBoost, farmData, getSlopeUsed]
+        [calcBoost, farmData]
     );
     const getCurrentBoost = useRecoilCallback(
         ({ snapshot }) =>

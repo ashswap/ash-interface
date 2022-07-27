@@ -1,23 +1,20 @@
-import { transactionServices } from "@elrondnetwork/dapp-core";
+import { useTrackTransactionStatus } from "@elrondnetwork/dapp-core/hooks";
 import { Transition } from "@headlessui/react";
 import ImgASHSleep from "assets/images/ash-sleep.png";
 import ICChevronRight from "assets/svg/chevron-right.svg";
 import ICEqualSquare from "assets/svg/equal-square.svg";
-import BaseModal, { BaseModalType } from "components/BaseModal";
-import { useScreenSize } from "hooks/useScreenSize";
-import { useCallback, useEffect, useMemo, useState } from "react";
-
 import ICHexagonDuo from "assets/svg/hexagon-duo.svg";
 import { accAddressState } from "atoms/dappState";
 import {
     farmOwnerTokensQuery,
     FarmRecord,
     FarmToken,
-    farmTransferedTokensQuery
+    farmTransferedTokensQuery,
 } from "atoms/farmsState";
 import BigNumber from "bignumber.js";
 import Avatar from "components/Avatar";
 import BaseButton from "components/BaseButton";
+import BaseModal, { BaseModalType } from "components/BaseModal";
 import AdvanceBoostBar from "components/BoostBar/AdvanceBoostBar";
 import GlowingButton from "components/GlowingButton";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
@@ -28,14 +25,16 @@ import { toEGLDD } from "helper/balance";
 import { formatAmount } from "helper/number";
 import {
     useFarmBoostOwnerState,
-    useFarmBoostTransferState
+    useFarmBoostTransferState,
 } from "hooks/useFarmBoostState";
 import useFarmBoost from "hooks/useFarmContract/useFarmBoost";
 import { useOnboarding } from "hooks/useOnboarding";
 import useRouteModal from "hooks/useRouteModal";
+import { useScreenSize } from "hooks/useScreenSize";
 import { FarmBoostInfo } from "interface/farm";
 import Image from "next/image";
 import Link from "next/link";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
 import FarmBoostTooltip from "./FarmBoostTooltip";
 
@@ -254,7 +253,7 @@ const FarmRecordTransfer = ({
     onboarding?: boolean;
 }) => {
     const [boostId, setBoostId] = useState<string | null>(null);
-    const { isPending } = transactionServices.useTrackTransactionStatus({
+    const { isPending } = useTrackTransactionStatus({
         transactionId: boostId,
     });
     const { currentFarmBoost, maxFarmBoost, selfBoost } =
@@ -291,7 +290,7 @@ const FarmBoostInfo = ({ farmData, onClose }: FarmBoostInfoType) => {
     const [token1, token2] = pool?.tokens;
     const [boostId, setBoostId] = useState<string | null>(null);
     const [isSelfBoostTToken, setIsSelfBoostTToken] = useState(false);
-    const { isPending } = transactionServices.useTrackTransactionStatus({
+    const { isPending } = useTrackTransactionStatus({
         transactionId: boostId,
     });
     const { encode } = useRouteModal("calc_boost");

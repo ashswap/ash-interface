@@ -1,8 +1,6 @@
-import {
-    AccountInfoSliceNetworkType,
-    useGetNetworkConfig,
-} from "@elrondnetwork/dapp-core";
-import { accAddressState } from "atoms/dappState";
+import { AccountInfoSliceNetworkType } from "@elrondnetwork/dapp-core/types";
+import ICChevronRight from "assets/svg/chevron-right.svg";
+import { accAddressState, networkConfigState } from "atoms/dappState";
 import { FarmRecord } from "atoms/farmsState";
 import BigNumber from "bignumber.js";
 import TextAmt from "components/TextAmt";
@@ -10,9 +8,8 @@ import CardTooltip from "components/Tooltip/CardTooltip";
 import pools from "const/pool";
 import { toEGLDD } from "helper/balance";
 import { formatAmount } from "helper/number";
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import { useRecoilValue } from "recoil";
-import ICChevronRight from "assets/svg/chevron-right.svg";
 const EstimateInUSD = ({
     number,
     className,
@@ -51,7 +48,7 @@ function FarmBoostTooltip({
     }, [farm]);
     const accAddress = useRecoilValue(accAddressState);
     const networkConfig: AccountInfoSliceNetworkType =
-        useGetNetworkConfig().network;
+        useRecoilValue(networkConfigState).network;
     const isOwner = useMemo(
         () => booster === accAddress,
         [booster, accAddress]

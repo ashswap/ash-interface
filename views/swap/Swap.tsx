@@ -1,13 +1,8 @@
-import {
-    transactionServices,
-    useGetAccountInfo,
-    useGetLoginInfo,
-} from "@elrondnetwork/dapp-core";
+import { useTrackTransactionStatus } from "@elrondnetwork/dapp-core/hooks";
 import {
     Address,
     BigUIntValue,
     ContractFunction,
-    GasLimit,
     TokenIdentifierValue,
     Transaction,
 } from "@elrondnetwork/erdjs";
@@ -20,6 +15,10 @@ import IconClose from "assets/svg/close.svg";
 import IconRight from "assets/svg/right-white.svg";
 import ICSetting from "assets/svg/setting.svg";
 import IconWallet from "assets/svg/wallet.svg";
+import {
+    accIsInsufficientEGLDState,
+    accIsLoggedInState,
+} from "atoms/dappState";
 import BigNumber from "bignumber.js";
 import Avatar from "components/Avatar";
 import BaseButton from "components/BaseButton";
@@ -34,7 +33,7 @@ import OnboardTooltip from "components/Tooltip/OnboardTooltip";
 import { useSwap } from "context/swap";
 import { toEGLD, toEGLDD, toWei } from "helper/balance";
 import { cancellablePromise } from "helper/cancellablePromise";
-import { queryPoolContract } from "helper/contracts/pool";
+import PoolContract, { queryPoolContract } from "helper/contracts/pool";
 import { formatAmount } from "helper/number";
 import {
     sendTransactions,
@@ -43,11 +42,13 @@ import {
 import { useConnectWallet } from "hooks/useConnectWallet";
 import useMounted from "hooks/useMounted";
 import { useOnboarding } from "hooks/useOnboarding";
+import usePoolSwap from "hooks/usePoolContract/usePoolSwap";
 import { useScreenSize } from "hooks/useScreenSize";
 import { DappSendTransactionsPropsType } from "interface/dappCore";
 import IPool from "interface/pool";
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useRecoilValue } from "recoil";
 import { useDebounce } from "use-debounce";
 import SwapAmount from "./components/SwapAmount";
 import styles from "./Swap.module.css";
@@ -147,20 +148,18 @@ const Swap = () => {
     const [isOpenHistoryModal, openHistoryModal] = useState<boolean>(false);
     const [fee, setFee] = useState<number>(0);
     const [isOpenFairPrice, setIsOpenFairPrice] = useState(false);
-    const [swapping, setSwapping] = useState(false);
-    const [swapId, setSwapId] = useState("");
     const [onboardingHistory, setOnboardedHistory] =
         useOnboarding("swap_history");
-    const { isPending, isSuccessful } =
-        transactionServices.useTrackTransactionStatus({
-            transactionId: swapId,
-        });
     const [fetchingAmtOut, setFetchingAmtOut] = useState(false);
+    const {
+        swap,
+        trackingData: { isPending: swapping, isSuccessful },
+        sessionId: swapId,
+    } = usePoolSwap(true);
 
     const connectWallet = useConnectWallet();
-    const { isLoggedIn: loggedIn } = useGetLoginInfo();
-    const { account } = useGetAccountInfo();
-    const createTx = useCreateTransaction();
+    const loggedIn = useRecoilValue(accIsLoggedInState);
+    const isInsufficientEGLD = useRecoilValue(accIsInsufficientEGLDState);
 
     const [onboardingFairPrice, setOnboaredFairPrice] =
         useOnboarding("swap_fair_price");
@@ -243,19 +242,22 @@ const Swap = () => {
             return;
         }
 
+        const poolContract = new PoolContract(pool.address);
         Promise.all([
-            queryPoolContract.getAmountOut(
-                pool.address,
-                token1.id,
-                token2.id,
-                new BigNumber(10).exponentiatedBy(token1.decimals)
-            ),
-            queryPoolContract.getAmountOut(
-                pool.address,
-                token2.id,
-                token1.id,
-                new BigNumber(10).exponentiatedBy(token2.decimals)
-            ),
+            poolContract
+                .getAmountOut(
+                    token1.id,
+                    token2.id,
+                    new BigNumber(10).exponentiatedBy(token1.decimals)
+                )
+                .then((val) => val.amount_out),
+            poolContract
+                .getAmountOut(
+                    token2.id,
+                    token1.id,
+                    new BigNumber(10).exponentiatedBy(token2.decimals)
+                )
+                .then((val) => val.amount_out),
             queryPoolContract.getFeePct(pool),
         ]).then(([rate1, rate2, fee]) => {
             setRates([rate1, rate2]);
@@ -263,7 +265,7 @@ const Swap = () => {
         });
     }, [pool, setRates]);
 
-    const swap = useCallback(async () => {
+    const swapHandle = useCallback(async () => {
         if (
             !loggedIn ||
             !tokenFrom ||
@@ -276,83 +278,31 @@ const Swap = () => {
         }
 
         if (rawValueFrom.eq(0) || rawValueFrom.isNaN()) return;
-        const minAmtOut = new BigNumber(
+        const minWeiOut = new BigNumber(
             Math.floor(rawValueTo.multipliedBy(1 - slippage).toNumber())
         );
-        if (minAmtOut.eq(0) || minAmtOut.isNaN()) return;
-        setSwapping(true);
-
+        if (minWeiOut.eq(0) || minWeiOut.isNaN()) return;
         try {
-            let tx: Transaction;
-            if (pool.isMaiarPool) {
-                tx = await createTx(new Address(pool.address), {
-                    func: new ContractFunction("ESDTTransfer"),
-                    gasLimit: new GasLimit(8_000_000),
-                    args: [
-                        new TokenIdentifierValue(Buffer.from(tokenFrom.id)),
-                        new BigUIntValue(rawValueFrom),
-                        new TokenIdentifierValue(
-                            Buffer.from("swapTokensFixedInput")
-                        ),
-                        new TokenIdentifierValue(Buffer.from(tokenTo.id)),
-                        new BigUIntValue(minAmtOut),
-                    ],
-                });
-            } else {
-                tx = await createTx(new Address(pool?.address), {
-                    func: new ContractFunction("ESDTTransfer"),
-                    gasLimit: new GasLimit(8_000_000),
-                    args: [
-                        new TokenIdentifierValue(Buffer.from(tokenFrom.id)),
-                        new BigUIntValue(rawValueFrom),
-                        new TokenIdentifierValue(Buffer.from("exchange")),
-                        new TokenIdentifierValue(Buffer.from(tokenTo.id)),
-                        new BigUIntValue(minAmtOut),
-                    ],
-                });
-            }
-
-            const payload: DappSendTransactionsPropsType = {
-                transactions: tx,
-                transactionsDisplayInfo: {
-                    successMessage: `Swap succeed ${formatAmount(
-                        toEGLDD(tokenFrom.decimals, rawValueFrom).toNumber(),
-                        { notation: "standard" }
-                    )} ${tokenFrom.symbol} to ${formatAmount(
-                        toEGLDD(tokenTo.decimals, rawValueTo).toNumber(),
-                        { notation: "standard" }
-                    )} ${tokenTo.symbol}`,
-                },
-            };
-            const { error, sessionId } = await sendTransactions(payload);
-            if (onboardingHistory && sessionId) {
-                setSwapId(sessionId);
-            }
+            await swap(pool, tokenFrom, tokenTo, rawValueFrom, minWeiOut);
         } catch (error) {
-            console.log(error);
-            // TODO: extension close without response
-            // notification.warn({
-            //     message: error as string,
-            //     duration: 10
-            // });
+            console.error(error);
         }
+
         setValueTo("");
         setValueFrom("");
-        setSwapping(false);
     }, [
         loggedIn,
-        pool,
-        rawValueFrom,
         tokenFrom,
         tokenTo,
         swapping,
-        createTx,
+        pool,
+        fetchingAmtOut,
+        slippage,
+        rawValueFrom,
+        rawValueTo,
+        swap,
         setValueTo,
         setValueFrom,
-        slippage,
-        rawValueTo,
-        onboardingHistory,
-        fetchingAmtOut,
     ]);
 
     const priceImpact = useMemo(() => {
@@ -777,22 +727,22 @@ const Swap = () => {
                                             swapping ||
                                             fetchingAmtOut ||
                                             isInsufficentFund ||
-                                            account.balance === "0"
+                                            isInsufficientEGLD
                                         }
                                         onClick={
                                             loggedIn
-                                                ? swap
+                                                ? swapHandle
                                                 : () => connectWallet()
                                         }
                                     >
                                         <div className="flex items-center space-x-2.5">
                                             {!loggedIn && <IconWallet />}
                                             {isInsufficentFund ||
-                                            account.balance === "0" ? (
+                                            isInsufficientEGLD ? (
                                                 <span className="text-text-input-3">
                                                     INSUFFICIENT{" "}
                                                     <span className="text-insufficent-fund">
-                                                        {account.balance === "0"
+                                                        {isInsufficientEGLD
                                                             ? "EGLD"
                                                             : tokenFrom?.symbol}
                                                     </span>{" "}

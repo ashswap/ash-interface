@@ -50,7 +50,7 @@ const StakeMoreContent = ({ open, onClose }: props) => {
     const unlockTS = useRecoilValue(govUnlockTSState);
     const totalSupplyVeASH = useRecoilValue(govTotalSupplyVeASH);
     const veASH = useRecoilValue(govVeASHAmtState);
-    const lockMoreASH = useGovLockMore();
+    const {lockMoreASH} = useGovLockMore();
 
     const balances = useRecoilValue(walletBalanceState);
     const insufficientEGLD = useRecoilValue(accIsInsufficientEGLDState);

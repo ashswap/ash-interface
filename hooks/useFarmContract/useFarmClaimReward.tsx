@@ -1,137 +1,50 @@
 import {
-    Address,
-    AddressValue,
-    BigUIntValue,
-    BooleanValue,
-    ContractFunction,
-    GasLimit,
-    TokenIdentifierValue,
-    Transaction,
-    TypedValue,
+    TokenPayment
 } from "@elrondnetwork/erdjs/out";
-import { accAddressState, accIsLoggedInState } from "atoms/dappState";
-import { FarmRecord, farmRecordsState, farmSessionIdMapState, FarmToken } from "atoms/farmsState";
-import BigNumber from "bignumber.js";
+import {
+    farmQuery, farmSessionIdMapState
+} from "atoms/farmsState";
 import { ASH_TOKEN } from "const/tokens";
 
 import { toEGLDD } from "helper/balance";
-import {
-    sendTransactions,
-    useCreateTransaction,
-} from "helper/transactionMethods";
+import { ContractManager } from "helper/contracts/contractManager";
+import useSendTxsWithTrackStatus from "hooks/useSendTxsWithTrackStatus";
 import { DappSendTransactionsPropsType } from "interface/dappCore";
 import { IFarm } from "interface/farm";
 import { useRecoilCallback } from "recoil";
 
-const useFarmClaimReward = () => {
-    const createTransaction = useCreateTransaction();
-    const createClaimRewardTxMulti = useRecoilCallback(
-        ({ snapshot, set }) =>
-            async (
-                tokens: FarmToken[],
-                farm: IFarm,
-                selfBoost: boolean = false
-            ) => {
-                const loggedIn = await snapshot.getPromise(accIsLoggedInState);
-                const address: string = await snapshot.getPromise(accAddressState);
-
-                if (!loggedIn)
-                    throw new Error("Connect wallet to claim reward");
-
-                    const farmTokenArgs = tokens.reduce(
-                        (total: TypedValue[], val) => {
-                            total = [
-                                ...total,
-                                new TokenIdentifierValue(
-                                    Buffer.from(val.collection)
-                                ),
-                                new BigUIntValue(val.nonce),
-                                new BigUIntValue(val.balance),
-                            ];
-                            return total;
-                        },
-                        []
-                    );
-                return await createTransaction(new Address(address), {
-                    func: new ContractFunction("MultiESDTNFTTransfer"),
-                    gasLimit: new GasLimit(15_000_000 + tokens.length * 2_000_000),
-                    args: [
-                        new AddressValue(new Address(farm.farm_address)),
-                        new BigUIntValue(
-                            new BigNumber(tokens.length)
-                        ),
-
-                        ...farmTokenArgs,
-                        new TokenIdentifierValue(Buffer.from("claimRewards")),
-                        new BooleanValue(selfBoost)
-                    ],
-                });
-            },
-        [createTransaction]
-    );
+const useFarmClaimReward = (trackStatus = false) => {
+    const { sendTransactions, trackingData, sessionId } =
+        useSendTxsWithTrackStatus(trackStatus);
 
     const claimReward = useRecoilCallback(
         ({ snapshot, set }) =>
             async (farm: IFarm) => {
-                const farmRecords = await snapshot.getPromise(farmRecordsState);
-
-                const farmRecord = farmRecords.find(
-                    (val) => val.farm.farm_address === farm.farm_address
+                const farmRecord = await snapshot.getPromise(
+                    farmQuery(farm.farm_address)
                 );
+
                 if (!farmRecord || !farmRecord.stakedData)
-                    throw new Error("unable to claim reward");
+                    return { sessionId: "" };
 
-                try {
-                    const { stakedData } = farmRecord;
-                    const tx = await createClaimRewardTxMulti(farmRecord.stakedData.farmTokens, farm, false);
-                    const payload: DappSendTransactionsPropsType = {
-                        transactions: tx,
-                        transactionsDisplayInfo: {
-                            successMessage: `Claim succeed ${toEGLDD(
-                                ASH_TOKEN.decimals,
-                                stakedData.totalRewardAmt
-                            )} ${ASH_TOKEN.symbol}`,
-                        },
-                    };
-                    const result = await sendTransactions(payload);
-                    if (result.sessionId)
-                        set(farmSessionIdMapState, (val) => ({
-                            ...val,
-                            [farm.farm_address]: [
-                                ...(val[farm.farm_address] || []),
-                                result.sessionId!,
-                            ],
-                        }));
-                } catch (error) {
-                    console.error(error);
-                }
-            },
-        [createClaimRewardTxMulti]
-    );
-
-    const claimAllFarmsReward = useRecoilCallback(
-        ({ snapshot, set }) =>
-            async () => {
-                const farmRecords = await snapshot.getPromise(farmRecordsState);
-
-                let txs: Transaction[] = [];
-                let totalASH = new BigNumber(0);
-                const farmsAddress: string[] = [];
-                for (let i = 0; i < farmRecords.length; i++) {
-                    const val = farmRecords[i];
-                    if (val?.stakedData?.totalRewardAmt.gt(0)) {
-                        const temp = await createClaimRewardTxMulti(val.stakedData.farmTokens, val.farm, false);
-                        txs = [...txs, temp];
-                        totalASH = totalASH.plus(val.stakedData.totalRewardAmt);
-                        farmsAddress.push(val.farm.farm_address);
-                    }
-                }
+                const { stakedData } = farmRecord;
+                const tokenPayments = stakedData.farmTokens.map((t) =>
+                    TokenPayment.metaEsdtFromBigInteger(
+                        t.collection,
+                        t.nonce.toNumber(),
+                        t.balance,
+                        farm.farm_token_decimal
+                    )
+                );
+                const tx = await ContractManager.getFarmContract(
+                    farm.farm_address
+                ).claimRewards(tokenPayments, false);
                 const payload: DappSendTransactionsPropsType = {
-                    transactions: txs,
+                    transactions: tx,
                     transactionsDisplayInfo: {
                         successMessage: `Claim succeed ${toEGLDD(
                             ASH_TOKEN.decimals,
-                            totalASH
+                            stakedData.totalRewardAmt
                         )} ${ASH_TOKEN.symbol}`,
                     },
                 };
@@ -139,23 +52,19 @@ const useFarmClaimReward = () => {
                 if (result.sessionId)
                     set(farmSessionIdMapState, (val) => ({
                         ...val,
-                        ...Object.fromEntries(
-                            farmsAddress.map((farm_address) => [
-                                farm_address,
-                                [
-                                    ...(val[farm_address] || []),
-                                    result.sessionId!,
-                                ],
-                            ])
-                        ),
+                        [farm.farm_address]: [
+                            ...(val[farm.farm_address] || []),
+                            result.sessionId!,
+                        ],
                     }));
-            }
+            },
+        [sendTransactions]
     );
 
     return {
         claimReward,
-        claimAllFarmsReward,
-        createClaimRewardTxMulti
+        trackingData,
+        sessionId,
     };
 };
 

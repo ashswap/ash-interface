@@ -1,10 +1,10 @@
-import {
-    AccountInfoSliceNetworkType,
-    useGetAccountInfo,
-    useGetLoginInfo,
-    useGetNetworkConfig,
-} from "@elrondnetwork/dapp-core";
+import { AccountInfoSliceNetworkType } from "@elrondnetwork/dapp-core/types";
 import IconNewTab from "assets/svg/new-tab.svg";
+import {
+    accAddressState,
+    accIsLoggedInState,
+    networkConfigState,
+} from "atoms/dappState";
 import BaseModal from "components/BaseModal";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 import pools from "const/pool";
@@ -14,6 +14,7 @@ import { useScreenSize } from "hooks/useScreenSize";
 import IPool from "interface/pool";
 import { IToken } from "interface/token";
 import { useCallback, useEffect, useMemo } from "react";
+import { useRecoilValue } from "recoil";
 import useSWR from "swr";
 
 const getTokenFromPools = (...pools: IPool[]) => {
@@ -56,8 +57,8 @@ interface TXRecord {
 }
 
 const HistoryModal = ({ open, onClose }: Props) => {
-    const { isLoggedIn: loggedIn } = useGetLoginInfo();
-    const { address } = useGetAccountInfo();
+    const loggedIn = useRecoilValue(accIsLoggedInState);
+    const address = useRecoilValue(accAddressState);
     const { data: txHistory, mutate: refresh } = useSWR<TXRecord[]>(
         loggedIn
             ? `${ASHSWAP_CONFIG.ashApiBaseUrl}/user/${address}/transaction`
@@ -65,7 +66,8 @@ const HistoryModal = ({ open, onClose }: Props) => {
         fetcher
     );
     const screenSize = useScreenSize();
-    const network: AccountInfoSliceNetworkType = useGetNetworkConfig().network;
+    const network: AccountInfoSliceNetworkType =
+        useRecoilValue(networkConfigState).network;
 
     const displayTx = useMemo(() => {
         return (txHistory || [])
@@ -146,14 +148,17 @@ const HistoryModal = ({ open, onClose }: Props) => {
             refresh();
         }
     }, [open, refresh]);
-    const openTransaction = useCallback((txHash: string) => {
-        if (typeof window !== "undefined") {
-            window.open(
-                network.explorerAddress + "/transactions/" + txHash,
-                "_blank"
-            );
-        }
-    }, []);
+    const openTransaction = useCallback(
+        (txHash: string) => {
+            if (typeof window !== "undefined") {
+                window.open(
+                    network.explorerAddress + "/transactions/" + txHash,
+                    "_blank"
+                );
+            }
+        },
+        [network.explorerAddress]
+    );
 
     return (
         <BaseModal

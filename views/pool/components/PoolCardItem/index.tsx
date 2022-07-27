@@ -1,8 +1,6 @@
-import {
-    AccountInfoSliceNetworkType,
-    useGetNetworkConfig,
-} from "@elrondnetwork/dapp-core";
+import { AccountInfoSliceNetworkType } from "@elrondnetwork/dapp-core/types";
 import Down from "assets/svg/down-white.svg";
+import { networkConfigState } from "atoms/dappState";
 import { PoolsState } from "atoms/poolsState";
 import AddLiquidityModal from "components/AddLiquidityModal";
 import Avatar from "components/Avatar";
@@ -15,6 +13,7 @@ import { useOnboarding } from "hooks/useOnboarding";
 import { useScreenSize } from "hooks/useScreenSize";
 import { Unarray } from "interface/utilities";
 import { useState } from "react";
+import { useRecoilValue } from "recoil";
 
 function PoolCardItem({
     poolData,
@@ -26,7 +25,8 @@ function PoolCardItem({
     const { pool } = poolData;
     const [isExpand, setIsExpand] = useState<boolean>(false);
     const [openAddLiquidity, setOpenAddLiquidity] = useState<boolean>(false);
-    const network: AccountInfoSliceNetworkType = useGetNetworkConfig().network;
+    const network: AccountInfoSliceNetworkType =
+        useRecoilValue(networkConfigState).network;
     const {
         total_value_locked,
         apr_day: tradingAPR,

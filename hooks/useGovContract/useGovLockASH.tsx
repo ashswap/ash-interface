@@ -1,66 +1,43 @@
-import {
-    Address,
-    BigUIntValue,
-    ContractFunction,
-    GasLimit,
-    TokenIdentifierValue,
-    U64Value,
-} from "@elrondnetwork/erdjs/out";
+import { TokenPayment } from "@elrondnetwork/erdjs/out";
 import BigNumber from "bignumber.js";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 import { ASH_TOKEN } from "const/tokens";
 import { toEGLD } from "helper/balance";
-import {
-    sendTransactions,
-    useCreateTransaction,
-} from "helper/transactionMethods";
-import { DappSendTransactionsPropsType } from "interface/dappCore";
+import VotingEscrowContract from "helper/contracts/votingEscrowContract";
+import useSendTxsWithTrackStatus from "hooks/useSendTxsWithTrackStatus";
 import moment from "moment";
 import { useRecoilCallback } from "recoil";
 
-const useGovLockASH = () => {
-    const createTransaction = useCreateTransaction();
-    const lockASH = useRecoilCallback(
-        ({ snapshot, set }) =>
-            async (weiAmt: BigNumber, unlockTimestamp: BigNumber) => {
-                try {
-                    const payload: DappSendTransactionsPropsType = {
-                        transactions: await createTransaction(
-                            new Address(
-                                ASHSWAP_CONFIG.dappContract.voteEscrowedContract
-                            ),
-                            {
-                                func: new ContractFunction("ESDTTransfer"),
-                                gasLimit: new GasLimit(7_000_000),
-                                args: [
-                                    new TokenIdentifierValue(
-                                        Buffer.from(ASH_TOKEN.id)
-                                    ),
-                                    new BigUIntValue(weiAmt),
-                                    new TokenIdentifierValue(
-                                        Buffer.from("create_lock")
-                                    ),
-                                    new U64Value(unlockTimestamp),
-                                ],
-                            }
-                        ),
-                        transactionsDisplayInfo: {
-                            successMessage: `Lock succeed ${toEGLD(
-                                ASH_TOKEN,
-                                weiAmt?.toString() || "0"
-                            )} ${ASH_TOKEN.symbol}, unlock on ${moment
-                                .unix(unlockTimestamp.toNumber())
-                                .format("DD MMM, yyyy")}`,
-                        },
-                    };
-                    return sendTransactions(payload);
-                } catch (error) {
-                    console.error(error);
-                    return { sessionId: "" };
-                }
-            },
-        [createTransaction]
+const useGovLockASH = (trackStatus = false) => {
+    const { sendTransactions, trackingData, sessionId } =
+        useSendTxsWithTrackStatus(trackStatus);
+    const createLock = useRecoilCallback(
+        () => async (weiAmt: BigNumber, unlockTimestamp: BigNumber) => {
+            const veContract = new VotingEscrowContract(
+                ASHSWAP_CONFIG.dappContract.voteEscrowedContract
+            );
+            const tx = await veContract.createLock(
+                TokenPayment.fungibleFromBigInteger(
+                    ASH_TOKEN.id,
+                    weiAmt,
+                    ASH_TOKEN.decimals
+                ),
+                unlockTimestamp.toNumber()
+            );
+            return await sendTransactions({
+                transactions: tx,
+                transactionsDisplayInfo: {
+                    successMessage: `Lock succeed ${toEGLD(
+                        ASH_TOKEN,
+                        weiAmt?.toString() || "0"
+                    )} ${ASH_TOKEN.symbol}, unlock on ${moment
+                        .unix(unlockTimestamp.toNumber())
+                        .format("DD MMM, yyyy")}`,
+                },
+            });
+        },
+        [sendTransactions]
     );
-    return lockASH;
+    return { createLock, trackingData, sessionId };
 };
 export default useGovLockASH;
