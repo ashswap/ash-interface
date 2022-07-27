@@ -18,6 +18,7 @@ import Avatar from "components/Avatar";
 import BaseButton from "components/BaseButton";
 import AdvanceBoostBar from "components/BoostBar/AdvanceBoostBar";
 import GlowingButton from "components/GlowingButton";
+import CardTooltip from "components/Tooltip/CardTooltip";
 import { ACTIVE_FARMS } from "const/farms";
 import pools from "const/pool";
 import { VE_ASH_DECIMALS } from "const/tokens";
@@ -275,7 +276,11 @@ function GovBoostStatus() {
                 const farmRecords = await snapshot.getPromise(farmRecordsState);
                 const accAddress = await snapshot.getPromise(accAddressState);
                 const txsPromises = farmRecords
-                    .filter((record) => !!record.stakedData)
+                    .filter(
+                        (record) =>
+                            !!record.stakedData &&
+                            canBoostMap[record.farm.farm_address]
+                    )
                     .map((record) => {
                         const ownerTokens =
                             record.stakedData?.farmTokens.filter(
@@ -305,7 +310,7 @@ function GovBoostStatus() {
                 });
                 setBoostId(sessionId);
             },
-        []
+        [canBoostMap]
     );
     const farmRecordsWithOwnerTokens = useMemo(() => {
         return farmRecords.filter(
@@ -395,24 +400,41 @@ function GovBoostStatus() {
                                 </BaseButton>
                             </a>
                         </Link>
-
-                        <GlowingButton
-                            theme="pink"
-                            className="h-12 w-full px-2 sm:px-12 uppercase text-sm font-bold text-white overflow-hidden"
-                            wrapperClassName="grow sm:grow-0 overflow-hidden"
+                        <CardTooltip
                             disabled={
-                                farmRecordsWithOwnerTokens.length === 0 ||
-                                Object.values(canBoostMap).every(
-                                    (canBoost) => !canBoost
+                                farmRecordsWithOwnerTokens.length > 0 &&
+                                Object.values(canBoostMap).some(
+                                    (canBoost) => canBoost
                                 )
                             }
-                            onClick={() => boostOwnerFarmTokens()}
+                            content={
+                                <>
+                                    The estimated yield boost may be lower than
+                                    the current yield boost.
+                                </>
+                            }
                         >
-                            <span className="mr-4 truncate">
-                                Confirm new boost
-                            </span>
-                            <ICChevronRight className="w-2 h-auto" />
-                        </GlowingButton>
+                            <div>
+                                <GlowingButton
+                                    theme="pink"
+                                    className="h-12 w-full px-2 sm:px-12 uppercase text-sm font-bold text-white overflow-hidden"
+                                    wrapperClassName="grow sm:grow-0 overflow-hidden"
+                                    disabled={
+                                        farmRecordsWithOwnerTokens.length ===
+                                            0 ||
+                                        Object.values(canBoostMap).every(
+                                            (canBoost) => !canBoost
+                                        )
+                                    }
+                                    onClick={() => boostOwnerFarmTokens()}
+                                >
+                                    <span className="mr-4 truncate">
+                                        Confirm new boost
+                                    </span>
+                                    <ICChevronRight className="w-2 h-auto" />
+                                </GlowingButton>
+                            </div>
+                        </CardTooltip>
                     </div>
                 </div>
                 {farmTransferedTokens.length > 0 && (
