@@ -138,6 +138,7 @@ function BoostBar(props: BoostBarProps) {
         );
     }, [min, max, newVal]);
     const valueWidth = useMemo(() => {
+        if(max === min) return "100%";
         return validValue === min
             ? minWidth + "px"
             : 10 + ((validValue - min) * 90) / (max - min) + "%";

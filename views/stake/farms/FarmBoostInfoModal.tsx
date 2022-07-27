@@ -17,6 +17,7 @@ import BaseButton from "components/BaseButton";
 import BaseModal, { BaseModalType } from "components/BaseModal";
 import AdvanceBoostBar from "components/BoostBar/AdvanceBoostBar";
 import GlowingButton from "components/GlowingButton";
+import CardTooltip from "components/Tooltip/CardTooltip";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
 import pools from "const/pool";
 import { VE_ASH_DECIMALS } from "const/tokens";
@@ -383,25 +384,41 @@ const FarmBoostInfo = ({ farmData, onClose }: FarmBoostInfoType) => {
                                         </BaseButton>
                                     </a>
                                 </Link>
-
-                                <GlowingButton
-                                    theme="pink"
-                                    className="h-12 w-full px-4 sm:px-12 uppercase text-sm font-bold text-white"
-                                    wrapperClassName="grow sm:grow-0"
+                                <CardTooltip
                                     disabled={
-                                        !ownerTokens.length ||
-                                        expectedFarmBoost.boost <=
+                                        ownerTokens.length > 0 &&
+                                        expectedFarmBoost.boost >
                                             currentFarmBoost.boost
                                     }
-                                    onClick={() =>
-                                        ownerTokens && boostOwnerFarmToken()
+                                    content={
+                                        <>
+                                            The estimated yield boost may be
+                                            lower than the current yield boost.
+                                        </>
                                     }
                                 >
-                                    <span className="mr-4">
-                                        Confirm new boost
-                                    </span>
-                                    <ICChevronRight className="w-2 h-auto" />
-                                </GlowingButton>
+                                    <div>
+                                        <GlowingButton
+                                            theme="pink"
+                                            className="h-12 w-full px-4 sm:px-12 uppercase text-sm font-bold text-white"
+                                            wrapperClassName="grow sm:grow-0"
+                                            disabled={
+                                                !ownerTokens.length ||
+                                                expectedFarmBoost.boost <=
+                                                    currentFarmBoost.boost
+                                            }
+                                            onClick={() =>
+                                                ownerTokens &&
+                                                boostOwnerFarmToken()
+                                            }
+                                        >
+                                            <span className="mr-4">
+                                                Confirm new boost
+                                            </span>
+                                            <ICChevronRight className="w-2 h-auto" />
+                                        </GlowingButton>
+                                    </div>
+                                </CardTooltip>
                             </div>
                         </>
                     ) : (
