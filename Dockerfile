@@ -1,4 +1,4 @@
-FROM node:14.18.0 AS builder
+FROM node:16.16.0 AS builder
 ARG NETWORK=testnet
 ARG SENTRY_AUTH_TOKEN
 ARG TESTNET_PASS
