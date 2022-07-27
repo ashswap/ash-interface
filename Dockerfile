@@ -1,6 +1,8 @@
-FROM node:14.18.0 AS builder
+FROM node:16.16.0 AS builder
 ARG NETWORK=testnet
 ARG SENTRY_AUTH_TOKEN
+ARG TESTNET_PASS
+ENV NEXT_PUBLIC_TESTNET_PASS=${TESTNET_PASS}
 WORKDIR /app
 COPY package.json yarn.lock ./
 RUN yarn install --frozen-lockfile --network-concurrency 1

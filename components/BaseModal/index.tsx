@@ -1,21 +1,29 @@
 import { Transition, TransitionClasses } from "@headlessui/react";
 import IconClose from "assets/svg/close.svg";
-import { createContext, Fragment, useContext, useMemo, useState } from "react";
+import moment from "moment";
+import {
+    createContext,
+    Fragment,
+    useContext,
+    useEffect,
+    useMemo,
+    useState,
+} from "react";
 import Modal, { Props } from "react-modal";
 const TRANSITIONS: Record<string, TransitionClasses> = {
     center: {
         enter: "transition duration-200 ease-out",
-        enterFrom: "transform scale-95 opacity-0",
-        enterTo: "transform scale-100 opacity-100",
+        enterFrom: "scale-95 opacity-0",
+        enterTo: "scale-100 opacity-100",
         leave: "transition duration-75 ease-out",
-        leaveFrom: "transform scale-100 opacity-100",
-        leaveTo: "transform scale-95 opacity-0",
+        leaveFrom: "scale-100 opacity-100",
+        leaveTo: "scale-95 opacity-0",
     },
     btt: {
-        enter: "transition duration-300 ease-in-out transform",
+        enter: "transition duration-300 ease-in-out",
         enterFrom: "translate-y-full opacity-0",
         enterTo: "translate-y-0 opacity-100",
-        leave: "transition duration-300 ease-out transform",
+        leave: "transition duration-300 ease-out",
         leaveFrom: "translate-y-0 opacity-100",
         leaveTo: "translate-y-full opacity-0",
     },
@@ -29,15 +37,23 @@ const CONTAINER = {
     modal: "",
 };
 Modal.setAppElement("body");
-type BaseModalType = Props & {
+export type BaseModalType = Props & {
     transition?: "btt" | "center" | "none";
     type?: "modal" | "drawer_btt" | "drawer_ttb" | "drawer_ltr" | "drawer_rtl";
+    destroyOnClose?: boolean;
 };
 const ModalContext = createContext<BaseModalType>({ isOpen: false });
 
 const BaseModal = (props: BaseModalType) => {
-    const { transition, type = "modal", ...reactModalProps } = props;
+    const {
+        transition,
+        type = "modal",
+        destroyOnClose,
+        ...reactModalProps
+    } = props;
     const [animating, setAnimating] = useState(false);
+    const [key, setKey] = useState(0);
+    const [initialized, setInitialized] = useState(false);
     const trans = useMemo(() => {
         return (
             TRANSITIONS[
@@ -47,6 +63,26 @@ const BaseModal = (props: BaseModalType) => {
             ] || {}
         );
     }, [transition, type]);
+    useEffect(() => {
+        if (typeof window !== "undefined") {
+            if (
+                props.isOpen &&
+                window.innerWidth > window.document.body.clientWidth
+            ) {
+                window.document.body.style.paddingRight =
+                    window.innerWidth - window.document.body.clientWidth + "px";
+            } else {
+                window.document.body.style.paddingRight = "";
+            }
+            window.document.body.style.overflow = props.isOpen ? "hidden" : "";
+        }
+    }, [props.isOpen]);
+
+    useEffect(() => {
+        if (props.isOpen) {
+            setInitialized(true);
+        }
+    }, [props.isOpen]);
     return (
         <ModalContext.Provider value={{ ...props }}>
             <Transition show={props.isOpen} as={"div"}>
@@ -55,7 +91,7 @@ const BaseModal = (props: BaseModalType) => {
                     shouldCloseOnOverlayClick={true}
                     closeTimeoutMS={200}
                     {...reactModalProps}
-                    bodyOpenClassName={`${reactModalProps.bodyOpenClassName} overflow-hidden sm:pr-1.5`}
+                    bodyOpenClassName={`${reactModalProps.bodyOpenClassName}`}
                     overlayElement={(props, contentElement) => (
                         <div
                             {...props}
@@ -67,20 +103,31 @@ const BaseModal = (props: BaseModalType) => {
                             </div>
                         </div>
                     )}
-                    contentElement={(props, children) => (
-                        <div {...props} style={{}} className="">
-                            {children}
-                        </div>
-                    )}
+                    contentElement={(propsContent, children) => {
+                        if (!initialized) return <div></div>;
+                        const content = (
+                            <div {...propsContent} style={{}} className="">
+                                {children}
+                            </div>
+                        );
+                        if (destroyOnClose) {
+                            return props.isOpen || animating ? (
+                                content
+                            ) : (
+                                <div></div>
+                            );
+                        }
+                        return content;
+                    }}
                 >
                     <Transition.Child
                         as={Fragment}
                         enter="transition duration-300 ease-out"
-                        enterFrom="transform opacity-0"
-                        enterTo="transform opacity-100"
+                        enterFrom="opacity-0"
+                        enterTo="opacity-100"
                         leave="transition duration-100 ease-out"
-                        leaveFrom="transform opacity-100"
-                        leaveTo="transform opacity-0"
+                        leaveFrom="opacity-100"
+                        leaveTo="opacity-0"
                     >
                         <div className="bg-ash-purple-500/20 backdrop-blur-[30px] fixed z-[-1] inset-0 pointer-events-none"></div>
                     </Transition.Child>

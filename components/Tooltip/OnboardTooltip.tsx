@@ -1,4 +1,4 @@
-import React, { createContext, useContext } from "react";
+import React, { createContext, useContext, useState } from "react";
 import ICCaretLeft from "assets/svg/caret-left.svg";
 import ICCaretRight from "assets/svg/caret-right.svg";
 import ICCaretUp from "assets/svg/caret-up.svg";
@@ -54,19 +54,23 @@ const Arrow = ({
 type Props = Omit<BaseTooltipProps, "arrow"> & {
     onArrowClick?: () => void;
     disabled?: boolean;
+    activeOnHover?: boolean;
 };
 const OnboardTooltip = ({
     onArrowClick,
     arrowStyle,
     disabled,
+    activeOnHover,
     ...props
 }: Props) => {
+    const [hovered, setHovered] = useState(false);
     if (disabled) {
         return <>{props.children}</>;
     }
     return (
         <BaseTooltip
             {...props}
+            open={activeOnHover ? hovered && props.open : props.open}
             arrow={(pos, staticSide) => (
                 <>
                     <Arrow
@@ -80,7 +84,7 @@ const OnboardTooltip = ({
                 [staticSide]: "-11px",
             })}
         >
-            {props.children}
+            <span onMouseEnter={() => setHovered(true)}>{props.children}</span>
         </BaseTooltip>
     );
 };

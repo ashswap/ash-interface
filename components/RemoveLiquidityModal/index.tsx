@@ -1,16 +1,5 @@
-import { getProxyProvider } from "@elrondnetwork/dapp-core";
 import {
-    Address,
-    ArgSerializer,
-    BigUIntValue,
-    ContractFunction,
-    EndpointParameterDefinition,
-    GasLimit,
-    ProxyProvider,
-    Query,
-    TokenIdentifierValue,
-    TypeExpressionParser,
-    TypeMapper,
+    TokenPayment
 } from "@elrondnetwork/erdjs";
 import { Slider } from "antd";
 import IconRight from "assets/svg/right-yellow.svg";
@@ -18,30 +7,31 @@ import { accIsInsufficientEGLDState } from "atoms/dappState";
 import { PoolsState } from "atoms/poolsState";
 import { walletLPMapState } from "atoms/walletState";
 import BigNumber from "bignumber.js";
+import Avatar from "components/Avatar";
 import BaseModal from "components/BaseModal";
-import Button from "components/Button";
+import GlowingButton from "components/GlowingButton";
 import InputCurrency from "components/InputCurrency";
 import TextAmt from "components/TextAmt";
 import Token from "components/Token";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
 import { useSwap } from "context/swap";
 import { toEGLD, toEGLDD, toWei } from "helper/balance";
+import PoolContract from "helper/contracts/pool";
+import { formatAmount } from "helper/number";
+import { getProxyNetworkProvider } from "helper/proxy/util";
 import {
     sendTransactions,
-    useCreateTransaction,
+    useCreateTransaction
 } from "helper/transactionMethods";
 import { useFetchBalances } from "hooks/useFetchBalances";
 import { useOnboarding } from "hooks/useOnboarding";
 import usePoolRemoveLP from "hooks/usePoolContract/usePoolRemoveLP";
 import { useScreenSize } from "hooks/useScreenSize";
-import { DappSendTransactionsPropsType } from "interface/dappCore";
 import { Unarray } from "interface/utilities";
-import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { theme } from "tailwind.config";
 import { useDebounce } from "use-debounce";
-import styles from "./RemoveLiquidityModal.module.css";
 
 interface Props {
     open?: boolean;
@@ -59,19 +49,18 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
     const [value1, setValue1] = useState<string>("");
     const [liquidityDebounce] = useDebounce(liquidity, 500);
     const screenSize = useScreenSize();
-    const fetchBalances = useFetchBalances();
     const lpTokens = useRecoilValue(walletLPMapState);
     const insufficientEGLD = useRecoilValue(accIsInsufficientEGLDState);
-    const createTx = useCreateTransaction();
+    const {removeLP, trackingData} = usePoolRemoveLP(true);
     const { slippage } = useSwap();
     const [displayInputLiquidity, setDisplayInputLiquidity] =
         useState<string>("");
-    const [removing, setRemoving] = useState(false);
-    const proxy: ProxyProvider = getProxyProvider();
+
     const [onboardingWithdrawInput, setOnboardedWithdrawInput] = useOnboarding(
         "pool_withdraw_input"
     );
-    const removePoolLP = usePoolRemoveLP();
+
+    const removing = useMemo(() => !!trackingData.isPending, [trackingData.isPending]);
 
     const pricePerLP = useMemo(() => {
         // warning: mocking - change to 0 after pool analytic API success
@@ -146,75 +135,35 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
     );
 
     useEffect(() => {
+        const proxy = getProxyNetworkProvider();
         if (!proxy || liquidityDebounce.eq(0) || liquidityDebounce.isNaN()) {
             return;
         }
-
-        proxy
-            .queryContract(
-                new Query({
-                    address: new Address(pool.address),
-                    func: new ContractFunction("getRemoveLiquidityTokens"),
-                    args: [
-                        new BigUIntValue(liquidityDebounce),
-                        new BigUIntValue(new BigNumber(0)),
-                        new BigUIntValue(new BigNumber(0)),
-                    ],
-                })
-            )
-            .then(({ returnData }) => {
-                let resultHex = Buffer.from(returnData[0], "base64").toString(
-                    "hex"
-                );
-                let parser = new TypeExpressionParser();
-                let mapper = new TypeMapper();
-                let serializer = new ArgSerializer();
-
-                let type = parser.parse("tuple2<BigUint,BigUint>");
-                let mappedType = mapper.mapType(type);
-
-                let endpointDefinitions = [
-                    new EndpointParameterDefinition("foo", "bar", mappedType),
-                ];
-                let values = serializer.stringToValues(
-                    resultHex,
-                    endpointDefinitions
-                );
-
-                setValue0(
-                    toEGLD(
-                        pool.tokens[0],
-                        values[0].valueOf().field0.toString()
-                    ).toString()
-                );
-                setValue1(
-                    toEGLD(
-                        pool.tokens[1],
-                        values[0].valueOf().field1.toString()
-                    ).toString()
-                );
-            })
-            .catch((error) => console.log(error));
-    }, [liquidityDebounce, pool, proxy]);
-
-    const removeLP = useCallback(async () => {
-        if (removing || liquidity.eq(0)) return;
-        setRemoving(true);
-        try {
-            const [token0, token1] = pool.tokens;
-            const { sessionId } = await removePoolLP(
-                pool,
-                liquidity,
-                toWei(token0, value0),
-                toWei(token1, value1),
-                slippage
+        const poolContract = new PoolContract(pool.address);
+        poolContract.getRemoveLiquidityTokens(liquidityDebounce).then(({first_token_amount, second_token_amount}) => {
+            setValue0(
+                toEGLD(
+                    pool.tokens[0],
+                    first_token_amount.toString()
+                ).toString()
             );
+            setValue1(
+                toEGLD(
+                    pool.tokens[1],
+                    second_token_amount.toString()
+                ).toString()
+            );
+        }).catch(err => console.error(err));
+    }, [liquidityDebounce, pool]);
+
+    const removeLPHandle = useCallback(async () => {
+        if (removing || liquidity.eq(0)) return;
+        try {
+            const {sessionId} = await removeLP(pool, liquidity, [value0, value1], slippage);
             if (sessionId) onClose?.();
         } catch (error) {
             // TODO: extension close without response
             console.error(error);
-        } finally {
-            setRemoving(false);
         }
     }, [
         value0,
@@ -224,7 +173,7 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
         onClose,
         liquidity,
         removing,
-        removePoolLP,
+        removeLP
     ]);
 
     return (
@@ -232,21 +181,20 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
             <div className="flex flex-row items-center mb-3">
                 <div className="mr-3">
                     <div className="text-text-input-3 text-xs">
-                        {pool.tokens[0].name} & {pool.tokens[1].name}
+                        {pool.tokens[0].symbol} & {pool.tokens[1].symbol}
                     </div>
                 </div>
                 <div className="flex flex-row justify-between items-center">
-                    <div className={styles.tokenIcon}>
-                        <Image src={pool.tokens[0].icon} alt="token icon" />
-                    </div>
-                    <div
-                        className={styles.tokenIcon}
-                        style={{
-                            marginLeft: "-3px",
-                        }}
-                    >
-                        <Image src={pool.tokens[1].icon} alt="token icon" />
-                    </div>
+                    <Avatar
+                        src={pool.tokens[0].icon}
+                        alt={pool.tokens[0].symbol}
+                        className="w-3.5 h-3.5"
+                    />
+                    <Avatar
+                        src={pool.tokens[1].icon}
+                        alt={pool.tokens[1].symbol}
+                        className="w-3.5 h-3.5 -ml-1"
+                    />
                 </div>
             </div>
             <div className="flex items-baseline text-2xl font-bold text-yellow-700">
@@ -277,13 +225,13 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
                             )}
                         >
                             <div className="flex items-center space-x-1 bg-ash-dark-700 sm:bg-transparent pl-4 sm:pl-0">
-                                <div className="flex items-center font-bold w-24 flex-shrink-0 border-r border-r-ash-gray-500 sm:border-r-0">
+                                <div className="flex items-center font-bold w-24 shrink-0 border-r border-r-ash-gray-500 sm:border-r-0">
                                     <IconRight className="mr-4" />
                                     <span>TOTAL</span>
                                 </div>
                                 <div className="flex-1 flex items-center overflow-hidden bg-ash-dark-700 text-right text-lg h-[4.5rem] px-5 ">
                                     <InputCurrency
-                                        className="bg-transparent text-right flex-grow outline-none"
+                                        className="bg-transparent text-right grow outline-none"
                                         placeholder="0"
                                         value={displayInputLiquidity}
                                         onChange={(e) => {
@@ -366,7 +314,7 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
                                         )}
                                         options={{ notation: "standard" }}
                                     />{" "}
-                                    {pool.tokens[0].name}
+                                    {pool.tokens[0].symbol}
                                 </span>
                             </div>
                         </div>
@@ -394,7 +342,7 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
                                         )}
                                         options={{ notation: "standard" }}
                                     />{" "}
-                                    {pool.tokens[1].name}
+                                    {pool.tokens[1].symbol}
                                 </span>
                             </div>
                         </div>
@@ -408,19 +356,18 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
 
             <div className="sm:flex justify-end md:gap-8">
                 <div className="sm:w-1/2 md:w-1/3">
-                    <Button
-                        topLeftCorner
-                        style={{ height: 48 }}
-                        className="mt-1.5"
-                        outline
-                        onClick={removeLP}
-                        disable={removing || liquidity.eq(0)}
-                        primaryColor="yellow-700"
-                    >
-                        {insufficientEGLD
-                            ? "INSUFFICIENT EGLD BALANCE"
-                            : "WITHDRAW"}
-                    </Button>
+                    <div className="border-notch-x border-notch-white/50 mt-1.5">
+                        <GlowingButton
+                            theme="yellow"
+                            className="w-full h-12 font-bold clip-corner-1 clip-corner-tl"
+                            onClick={removeLPHandle}
+                            disabled={removing || liquidity.eq(0)}
+                        >
+                            {insufficientEGLD
+                                ? "INSUFFICIENT EGLD BALANCE"
+                                : "WITHDRAW"}
+                        </GlowingButton>
+                    </div>
                 </div>
             </div>
         </div>
@@ -440,7 +387,7 @@ const RemoveLiquidityModal = ({ open, onClose, poolData }: Props) => {
             <div className="flex justify-end">
                 <BaseModal.CloseBtn />
             </div>
-            <div className="flex-grow overflow-auto">
+            <div className="grow overflow-auto">
                 <RemoveLPContent
                     open={open}
                     onClose={onClose}

@@ -2,16 +2,16 @@ import { ENVIRONMENT } from "./env";
 
 const dappContractDevnet = {
     voteEscrowedContract:
-        "erd1qqqqqqqqqqqqqpgq5zj4cjyeafshqw08dagp6unn0q5nen65rmcqtnmwda",
+        "erd1qqqqqqqqqqqqqpgq4zlda4s332txctamdzm8r2etqt4lvk74rmcqr9frj3",
     feeDistributor:
-        "erd1qqqqqqqqqqqqqpgqg8zcrgrpaapn5k9yd5ll5m7a2wz8mhkkrmcqvclsfu",
+        "erd1qqqqqqqqqqqqqpgqe0dd4felchnrds3xv8tl338dmkh6lqs2rmcqsxnx4n",
 };
 
 const dappContractTestnet = {
     voteEscrowedContract:
-        "erd1qqqqqqqqqqqqqpgqhtkdam0zga9zyva0ykjyv8s6pqn6apfyj9tsvsj7xj",
+        "erd1qqqqqqqqqqqqqpgq9gra9jwhp78smw4urff30rpp67rsgkekj9tsku2v9n",
     feeDistributor:
-        "erd1qqqqqqqqqqqqqpgqq5axhcjsfwgjdd4zrxf57s73tffjn6gjj9tsm4dt7k",
+        "erd1qqqqqqqqqqqqqpgqwe94lqzwwr9yxagkra8lylgk7u3m0r50j9tsw8faw4",
 };
 
 const dappContract =

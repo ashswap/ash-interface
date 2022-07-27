@@ -59,7 +59,7 @@ function MintStakeCard() {
                     }}
                 ></div>
                 <div className="px-9 py-8 flex space-x-2">
-                    <button className="flex-grow h-14 px-4 bg-ash-dark-400 text-center flex items-center justify-center text-white text-sm font-bold cursor-pointer">
+                    <button className="grow h-14 px-4 bg-ash-dark-400 text-center flex items-center justify-center text-white text-sm font-bold cursor-pointer">
                         More Details
                     </button>
                     <Link href="/stake/mint">

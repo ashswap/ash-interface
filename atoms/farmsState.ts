@@ -1,30 +1,42 @@
-import { SendTransactionReturnType } from "@elrondnetwork/dapp-core/dist/services/transactions";
+import { SendTransactionReturnType } from "@elrondnetwork/dapp-core/types";
 import BigNumber from "bignumber.js";
 import { FARMS } from "const/farms";
 import pools from "const/pool";
-import { IFarm } from "interface/farm";
+import { FarmTokenAttrs, IFarm } from "interface/farm";
 import IPool from "interface/pool";
 import { PoolStatsRecord } from "interface/poolStats";
 import { Dispatch, SetStateAction } from "react";
-import { atom, selector } from "recoil";
+import { atom, selector, selectorFamily } from "recoil";
 import { ViewType } from "views/stake/farms/FarmFilter";
-
-type FarmRecord = {
+import { accAddressState } from "./dappState";
+export type FarmToken = {
+    tokenId: string;
+    collection: string;
+    nonce: BigNumber;
+    balance: BigNumber;
+    attributes: FarmTokenAttrs;
+    attrsRaw: string;
+    weightBoost: BigNumber;
+    yieldBoost: number;
+    perLP: BigNumber;
+    lpAmt: BigNumber;
+    farmAddress: string;
+};
+export type FarmRecord = {
     pool: IPool;
     farm: IFarm;
     poolStats?: PoolStatsRecord;
     stakedData?: {
-        farmTokens: {
-            tokenId: string;
-            collection: string;
-            nonce: BigNumber;
-            balance: BigNumber;
-        }[];
+        farmTokens: FarmToken[];
         totalStakedLP: BigNumber;
         totalRewardAmt: BigNumber;
+        totalStakedLPValue: BigNumber;
+        weightBoost: BigNumber;
+        yieldBoost: number;
     };
     ashPerBlock: BigNumber;
     farmTokenSupply: BigNumber;
+    lpLockedAmt: BigNumber;
     totalLiquidityValue: BigNumber;
     emissionAPR: BigNumber;
 };
@@ -80,7 +92,7 @@ export const farmStakedOnlyState = atom<boolean>({
 
 export const farmViewTypeState = atom<ViewType>({
     key: "farm_view_type",
-    default: ViewType.Card
+    default: ViewType.Card,
 });
 
 export const farmBlockRewardMapState = atom<Record<string, BigNumber>>({
@@ -113,7 +125,7 @@ export const farmToDisplayState = selector<FarmRecord[]>({
         if (deboundKeyword.trim()) {
             result = farmRecords.filter((p) =>
                 p.pool.tokens.some((t) =>
-                    t.name
+                    t.symbol
                         .toLowerCase()
                         .includes(deboundKeyword.trim().toLowerCase())
                 )
@@ -144,6 +156,115 @@ export const farmToDisplayState = selector<FarmRecord[]>({
         return result;
     },
     cachePolicy_UNSTABLE: {
-        eviction: "most-recent"
-    }
+        eviction: "most-recent",
+    },
+});
+
+export const farmTokensState = selector<FarmToken[]>({
+    key: "farm_tokens_list",
+    get: ({ get }) => {
+        const farmRecords = get(farmRecordsState);
+        return farmRecords.reduce(
+            (total: FarmToken[], record) => [
+                ...total,
+                ...(record.stakedData?.farmTokens || []),
+            ],
+            []
+        );
+    },
+    cachePolicy_UNSTABLE: {
+        eviction: "most-recent",
+    },
+});
+
+export const farmOwnerTokensState = selector<FarmToken[]>({
+    key: "farm_owner_tokens",
+    get: ({ get }) => {
+        const tokens = get(farmTokensState);
+        const address = get(accAddressState);
+        return tokens.filter((t) => t.attributes.booster === address);
+    },
+    cachePolicy_UNSTABLE: {
+        eviction: "most-recent",
+    },
+});
+
+export const farmTransferedTokensState = selector<FarmToken[]>({
+    key: "farm_transfered_tokens",
+    get: ({ get }) => {
+        const tokens = get(farmTokensState);
+        const address = get(accAddressState);
+        return tokens.filter((t) => t.attributes.booster !== address);
+    },
+    cachePolicy_UNSTABLE: {
+        eviction: "most-recent",
+    },
+});
+
+export const farmMapAddressState = selector({
+    key: "farm_data_map_address",
+    get: ({ get }) => {
+        const farmRecords = get(farmRecordsState);
+        return Object.fromEntries(
+            farmRecords.map((f) => [f.farm.farm_address, f])
+        );
+    },
+    cachePolicy_UNSTABLE: {
+        eviction: "most-recent",
+    },
+});
+
+export const farmQuery = selectorFamily({
+    key: "farm_single_selector_by_address",
+    get:
+        (address: string) =>
+        ({ get }) => {
+            return get(farmMapAddressState)[address];
+        },
+});
+
+export const farmOwnerTokensQuery = selectorFamily({
+    key: "farm_owner_tokens_query_by_farm_address",
+    get:
+        (farmAddress: string) =>
+        ({ get }) => {
+            const farmRecord = get(farmQuery(farmAddress));
+            const address = get(accAddressState);
+            return (
+                farmRecord.stakedData?.farmTokens?.filter(
+                    (f) => f.attributes.booster === address
+                ) || []
+            );
+        },
+    cachePolicy_UNSTABLE: {
+        eviction: "most-recent",
+    },
+});
+
+export const farmTransferedTokensQuery = selectorFamily({
+    key: "farm_transfered_tokens_query_by_farm_address",
+    get:
+        (farmAddress: string) =>
+        ({ get }) => {
+            const farmRecord = get(farmQuery(farmAddress));
+            const address = get(accAddressState);
+            return (
+                farmRecord.stakedData?.farmTokens?.filter(
+                    (f) => f.attributes.booster !== address
+                ) || []
+            );
+        },
+    cachePolicy_UNSTABLE: {
+        eviction: "most-recent",
+    },
+});
+
+export const farmPoolQuery = selectorFamily({
+    key: "farm_linked_pool_query_by_farm_address",
+    get:
+        (farmAddress: string) =>
+        ({ get }) => {
+            const farm = get(farmQuery(farmAddress));
+            return farm?.pool;
+        },
 });

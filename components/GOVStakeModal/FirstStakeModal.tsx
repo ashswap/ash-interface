@@ -4,8 +4,10 @@ import { accIsInsufficientEGLDState } from "atoms/dappState";
 import { govTotalSupplyVeASH } from "atoms/govState";
 import { walletBalanceState } from "atoms/walletState";
 import BigNumber from "bignumber.js";
+import Avatar from "components/Avatar";
 import BaseModal from "components/BaseModal";
 import Checkbox from "components/Checkbox";
+import GlowingButton from "components/GlowingButton";
 import InputCurrency from "components/InputCurrency";
 import TextAmt from "components/TextAmt";
 import CardTooltip from "components/Tooltip/CardTooltip";
@@ -19,8 +21,7 @@ import useMediaQuery from "hooks/useMediaQuery";
 import { useOnboarding } from "hooks/useOnboarding";
 import { useScreenSize } from "hooks/useScreenSize";
 import moment from "moment";
-import Image from "next/image";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { theme } from "tailwind.config";
 import LockPeriod, { lockPeriodFormater } from "./LockPeriod";
@@ -28,41 +29,24 @@ type props = {
     open: boolean;
     onClose: () => void;
 };
-const LOCK_CONFIG_DEV = {
+const LOCK_CONFIG = {
     predefinedLockPeriod: [
-        // test purpose
-        { value: 12 * 60 * 60, label: "12 hours" },
-        { value: 24 * 60 * 60, label: "1 day" },
-        { value: 3 * 24 * 60 * 60, label: "3 days" },
-        { value: 1 * 7 * 24 * 60 * 60, label: "1 week" },
-        { value: 2 * 7 * 24 * 60 * 60, label: "2 weeks" },
-    ],
-    maxLock: 2 * 7 * 24 * 60 * 60,
-    minLock: 12 * 60 * 60,
-    sliderStep: 60 * 60,
-};
-const LOCK_CONFIG_TEST = {
-    predefinedLockPeriod: [
-        // test purpose
-        { value: 30 * 60, label: "30 minutes" },
-        { value: 1 * 7 * 24 * 60 * 60, label: "7 days" },
-        { value: 30 * 24 * 60 * 60, label: "30 days" },
+        { value: 7 * 24 * 60 * 60, label: "1 week" },
+        { value: 4 * 7 * 24 * 60 * 60, label: "4 weeks" },
         { value: 1 * 365 * 24 * 60 * 60, label: "1 year" },
         { value: 2 * 365 * 24 * 60 * 60, label: "2 years" },
         { value: 3 * 365 * 24 * 60 * 60, label: "3 years" },
         { value: 4 * 365 * 24 * 60 * 60, label: "4 years" },
     ],
     maxLock: 4 * 365 * 24 * 60 * 60,
-    minLock: 30 * 60,
-    sliderStep: 60,
+    minLock: 7 * 24 * 60 * 60,
+    sliderStep: 24 * 60 * 60,
 };
-const LOCK_CONFIG =
-    ENVIRONMENT.NETWORK === "devnet" ? LOCK_CONFIG_DEV : LOCK_CONFIG_TEST;
 const FirstStakeContent = ({ open, onClose }: props) => {
     const balances = useRecoilValue(walletBalanceState);
     const insufficientEGLD = useRecoilValue(accIsInsufficientEGLDState);
     const totalSupplyVeASH = useRecoilValue(govTotalSupplyVeASH);
-    const lockASH = useGovLockASH();
+    const {createLock: lockASH} = useGovLockASH();
     const [lockPeriod, setLockPeriod] = useState(LOCK_CONFIG.minLock); // in seconds
     const [isAgree, setIsAgree] = useState(false);
     const ASHBalance = useMemo(
@@ -124,23 +108,20 @@ const FirstStakeContent = ({ open, onClose }: props) => {
                     Governance Stake
                 </div>
                 <div className="sm:flex sm:space-x-8 lg:space-x-24 mb-24">
-                    <div className="flex flex-col flex-grow mb-16 lg:mb-0">
+                    <div className="flex flex-col grow mb-16 lg:mb-0">
                         <div className="w-full flex sm:grid sm:grid-cols-2 sm:gap-x-4 lg:gap-x-7.5 mb-12">
                             <div className="w-1/3 sm:w-auto mr-5 sm:mr-0">
                                 <div className="text-ash-gray-500 text-xs lg:text-sm font-bold mb-2 lg:mb-4">
                                     Token
                                 </div>
                                 <div className="bg-ash-dark-400/30 h-14 lg:h-18 px-4 lg:px-7 flex items-center">
-                                    <div className="w-3.5 h-3.5 lg:w-7 lg:h-7 rounded-full relative mr-3">
-                                        <Image
-                                            src={ASH_TOKEN.icon}
-                                            alt={ASH_TOKEN.name}
-                                            layout="fill"
-                                            objectFit="contain"
-                                        />
-                                    </div>
+                                    <Avatar
+                                        src={ASH_TOKEN.icon}
+                                        alt={ASH_TOKEN.symbol}
+                                        className="w-3.5 h-3.5 lg:w-7 lg:h-7 mr-3"
+                                    />
                                     <div className="text-white text-sm lg:text-lg font-bold">
-                                        {ASH_TOKEN.name}
+                                        {ASH_TOKEN.symbol}
                                     </div>
                                 </div>
                             </div>
@@ -177,7 +158,7 @@ const FirstStakeContent = ({ open, onClose }: props) => {
                                             )}
                                             options={{ notation: "standard" }}
                                         />{" "}
-                                        {ASH_TOKEN.name}
+                                        {ASH_TOKEN.symbol}
                                     </span>
                                 </div>
                             </div>
@@ -212,67 +193,64 @@ const FirstStakeContent = ({ open, onClose }: props) => {
                                                 You cannot claim back your ASH
                                                 until the lock duration ends.
                                             </div>
-                                            {ENVIRONMENT.NETWORK !==
-                                                "devnet" && (
-                                                <ul>
-                                                    <li className="text-sm font-bold">
-                                                        <span className="text-stake-green-500">
-                                                            1
-                                                        </span>{" "}
-                                                        ASH locked for{" "}
-                                                        <span className="text-stake-green-500">
-                                                            4 years
-                                                        </span>{" "}
-                                                        ={" "}
-                                                        <span className="text-stake-green-500">
-                                                            1
-                                                        </span>{" "}
-                                                        veASH
-                                                    </li>
-                                                    <li className="text-sm font-bold">
-                                                        <span className="text-stake-green-500">
-                                                            1
-                                                        </span>{" "}
-                                                        ASH locked for{" "}
-                                                        <span className="text-stake-green-500">
-                                                            3 years
-                                                        </span>{" "}
-                                                        ={" "}
-                                                        <span className="text-stake-green-500">
-                                                            0.75
-                                                        </span>{" "}
-                                                        veASH
-                                                    </li>
-                                                    <li className="text-sm font-bold">
-                                                        <span className="text-stake-green-500">
-                                                            1
-                                                        </span>{" "}
-                                                        ASH locked for{" "}
-                                                        <span className="text-stake-green-500">
-                                                            2 years
-                                                        </span>{" "}
-                                                        ={" "}
-                                                        <span className="text-stake-green-500">
-                                                            0.5
-                                                        </span>{" "}
-                                                        veASH
-                                                    </li>
-                                                    <li className="text-sm font-bold">
-                                                        <span className="text-stake-green-500">
-                                                            1
-                                                        </span>{" "}
-                                                        ASH locked for{" "}
-                                                        <span className="text-stake-green-500">
-                                                            1 year
-                                                        </span>{" "}
-                                                        ={" "}
-                                                        <span className="text-stake-green-500">
-                                                            0.25
-                                                        </span>{" "}
-                                                        veASH
-                                                    </li>
-                                                </ul>
-                                            )}
+                                            <ul>
+                                                <li className="text-sm font-bold">
+                                                    <span className="text-stake-green-500">
+                                                        1
+                                                    </span>{" "}
+                                                    ASH locked for{" "}
+                                                    <span className="text-stake-green-500">
+                                                        4 years
+                                                    </span>{" "}
+                                                    ={" "}
+                                                    <span className="text-stake-green-500">
+                                                        1
+                                                    </span>{" "}
+                                                    veASH
+                                                </li>
+                                                <li className="text-sm font-bold">
+                                                    <span className="text-stake-green-500">
+                                                        1
+                                                    </span>{" "}
+                                                    ASH locked for{" "}
+                                                    <span className="text-stake-green-500">
+                                                        3 years
+                                                    </span>{" "}
+                                                    ={" "}
+                                                    <span className="text-stake-green-500">
+                                                        0.75
+                                                    </span>{" "}
+                                                    veASH
+                                                </li>
+                                                <li className="text-sm font-bold">
+                                                    <span className="text-stake-green-500">
+                                                        1
+                                                    </span>{" "}
+                                                    ASH locked for{" "}
+                                                    <span className="text-stake-green-500">
+                                                        2 years
+                                                    </span>{" "}
+                                                    ={" "}
+                                                    <span className="text-stake-green-500">
+                                                        0.5
+                                                    </span>{" "}
+                                                    veASH
+                                                </li>
+                                                <li className="text-sm font-bold">
+                                                    <span className="text-stake-green-500">
+                                                        1
+                                                    </span>{" "}
+                                                    ASH locked for{" "}
+                                                    <span className="text-stake-green-500">
+                                                        1 year
+                                                    </span>{" "}
+                                                    ={" "}
+                                                    <span className="text-stake-green-500">
+                                                        0.25
+                                                    </span>{" "}
+                                                    veASH
+                                                </li>
+                                            </ul>
                                         </div>
                                     </div>
                                 </div>
@@ -360,7 +338,7 @@ const FirstStakeContent = ({ open, onClose }: props) => {
                             </div>
                         </OnboardTooltip>
                     </div>
-                    <div className="w-full sm:w-1/3 lg:w-[17.8125rem] flex-shrink-0 bg-stake-dark-500 py-[2.375rem] px-10">
+                    <div className="w-full sm:w-1/3 lg:w-[17.8125rem] shrink-0 bg-stake-dark-500 py-[2.375rem] px-10">
                         <div className="text-white text-lg font-bold mb-16">
                             Estimate Staking
                         </div>
@@ -433,7 +411,7 @@ const FirstStakeContent = ({ open, onClose }: props) => {
                     </div>
                 </div>
                 <div className="sm:flex sm:space-x-8 lg:space-x-24">
-                    <div className="w-full mb-12 sm:mb-0 sm:flex-grow">
+                    <div className="w-full mb-12 sm:mb-0 sm:grow">
                         <Checkbox
                             checked={isAgree}
                             onChange={setIsAgree}
@@ -455,12 +433,11 @@ const FirstStakeContent = ({ open, onClose }: props) => {
                             }
                         />
                     </div>
-                    <div className="w-full sm:w-[17.8125rem] flex-shrink-0">
-                        <div className="border-notch">
-                            <button
-                                className={`clip-corner-1 clip-corner-tl transition w-full h-12 flex items-center justify-center text-sm font-bold text-white ${
-                                    canStake ? "bg-pink-600" : "bg-ash-dark-500"
-                                }`}
+                    <div className="w-full sm:w-[17.8125rem] shrink-0">
+                        <div className="border-notch-x border-notch-white/50">
+                            <GlowingButton
+                                theme="pink"
+                                className={`clip-corner-1 clip-corner-tl transition w-full h-12 flex items-center justify-center text-sm font-bold text-white`}
                                 disabled={!canStake}
                                 onClick={() => canStake && lock()}
                             >
@@ -474,7 +451,7 @@ const FirstStakeContent = ({ open, onClose }: props) => {
                                         <ICChevronRight className="w-2 h-auto" />
                                     </div>
                                 )}
-                            </button>
+                            </GlowingButton>
                         </div>
                     </div>
                 </div>
@@ -496,7 +473,7 @@ function FirstStakeModal({ open, onClose }: props) {
                     <BaseModal.CloseBtn />
                 </div>
                 {open && (
-                    <div className="flex-grow overflow-auto">
+                    <div className="grow overflow-auto">
                         <FirstStakeContent open={open} onClose={onClose} />
                     </div>
                 )}

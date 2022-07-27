@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useMemo } from "react";
+import { createContext, useContext, useState, useMemo, useEffect } from "react";
 import BigNumber from "bignumber.js";
 import pools from "const/pool";
 import { IToken } from "interface/token";
@@ -68,6 +68,12 @@ export function SwapProvider({ children }: Props) {
 
         return pool
     }, [tokenFrom, tokenTo]);
+
+    useEffect(() => {
+        if(!valueFrom){
+            setValueTo("");
+        }
+    }, [valueFrom]);
 
     const value: State = {
         ...initState,

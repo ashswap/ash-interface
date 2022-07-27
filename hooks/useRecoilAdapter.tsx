@@ -1,39 +1,28 @@
-import {
-    getApiProvider, useGetAccountInfo,
-    useGetLoginInfo
-} from "@elrondnetwork/dapp-core";
-import {
-    ApiProvider
-} from "@elrondnetwork/erdjs";
-import { accInfoState, accLoginInfoState } from "atoms/dappState";
-import {
-    walletLPMapState,
-    walletTokenPriceState
-} from "atoms/walletState";
+import { useSelector } from "@elrondnetwork/dapp-core/reduxStore/DappProviderContext";
+import { dappCoreState } from "atoms/dappState";
+import { walletLPMapState, walletTokenPriceState } from "atoms/walletState";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 import { blockTimeMs } from "const/dappConfig";
 import pools from "const/pool";
 import { TOKENS } from "const/tokens";
 import { toWei } from "helper/balance";
 import { arrayFetcher } from "helper/common";
+import { getApiNetworkProvider } from "helper/proxy/util";
 import { useFetchBalances } from "hooks/useFetchBalances";
 import { ITokenMap } from "interface/token";
-import {
-    useEffect
-} from "react";
+import { useEffect } from "react";
 import { useSetRecoilState } from "recoil";
 import useSWR from "swr";
+import useInterval from "./useInterval";
 
 export function useRecoilAdapter() {
-    // start copy from dappContext
-    const loginInfo = useGetLoginInfo();
-    const accInfo = useGetAccountInfo();
-    const apiProvider: ApiProvider = getApiProvider();
+    // copy whole dappContext to recoil
+    const store = useSelector((state) => state);
+    const apiProvider = getApiNetworkProvider();
     // end
 
     // recoil
-    const setLoginInfo = useSetRecoilState(accLoginInfoState);
-    const setAccInfo = useSetRecoilState(accInfoState);
+    const setDappState = useSetRecoilState(dappCoreState);
     const setTokenPrices = useSetRecoilState(walletTokenPriceState);
     const setLpTokens = useSetRecoilState(walletLPMapState);
     // end recoil
@@ -41,15 +30,12 @@ export function useRecoilAdapter() {
     const fetchBalances = useFetchBalances();
 
     // connect recoil state to dapp-core
-    useEffect(() => {
-        setAccInfo(accInfo);
-    }, [accInfo, setAccInfo]);
 
     useEffect(() => {
-        setLoginInfo(loginInfo);
-    }, [loginInfo, setLoginInfo]);
+        setDappState(store as any);
+    }, [setDappState, store]);
 
-    const { data: priceEntries } = useSWR(
+    const { data: priceEntries } = useSWR<number[]>(
         TOKENS.map((token) =>
             token.id
                 ? `${ASHSWAP_CONFIG.ashApiBaseUrl}/token/${token.id}/price`
@@ -70,7 +56,7 @@ export function useRecoilAdapter() {
         let tokens: ITokenMap = {};
         pools.map((p) => {
             if (!Object.prototype.hasOwnProperty.call(tokens, p.lpToken.id)) {
-                tokens[p.lpToken.id] = {...p.lpToken};
+                tokens[p.lpToken.id] = { ...p.lpToken };
             }
         });
 
@@ -81,8 +67,8 @@ export function useRecoilAdapter() {
                 tokenIds.push(tokenId);
                 promiseLpSupply.push(
                     apiProvider
-                        .getToken(tokenId)
-                        .then((val) => val.supply)
+                        .getDefinitionOfFungibleToken(tokenId)
+                        .then((val) => val.supply.toString())
                         .catch(() => "0")
                 );
             }
@@ -92,10 +78,7 @@ export function useRecoilAdapter() {
             results.map((supply, i) => {
                 tokens[tokenIds[i]] = {
                     ...tokens[tokenIds[i]],
-                    totalSupply: toWei(
-                        tokens[tokenIds[i]],
-                        supply || "0"
-                    )
+                    totalSupply: toWei(tokens[tokenIds[i]], supply || "0"),
                 };
             });
             setLpTokens(tokens);
@@ -103,11 +86,5 @@ export function useRecoilAdapter() {
     }, [apiProvider, setLpTokens]);
 
     // fetch token balance every block
-    useEffect(() => {
-        fetchBalances();
-        let interval = setInterval(fetchBalances, blockTimeMs);
-        return () => {
-            clearInterval(interval);
-        };
-    }, [fetchBalances]);
+    useInterval(fetchBalances, blockTimeMs);
 }

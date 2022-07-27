@@ -1,14 +1,7 @@
 import {
-    loginServices,
-    useGetLoginInfo
-} from "@elrondnetwork/dapp-core";
-import { walletIsOpenConnectModalState } from "atoms/walletState";
-import BaseModal from "components/BaseModal";
-import Image from "next/image";
-import platform from "platform";
-import QRCode from "qrcode";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useRecoilState } from "recoil";
+    useExtensionLogin,
+    useWalletConnectLogin,
+} from "@elrondnetwork/dapp-core/hooks";
 import connectWalletBg from "assets/images/connect-wallet-bg.png";
 import downloadAppGallery from "assets/images/download-app-gallery.png";
 import downloadAppStore from "assets/images/download-app-store.png";
@@ -16,7 +9,14 @@ import downloadPlayStore from "assets/images/download-play-store.png";
 import maiarLogo from "assets/images/maiar-logo.png";
 import ICConnectApp from "assets/svg/connect-app.svg";
 import ICConnectExtension from "assets/svg/connect-extension.svg";
-import styles from "./ConnectWalletModal.module.css";
+import { accIsLoggedInState } from "atoms/dappState";
+import { walletIsOpenConnectModalState } from "atoms/walletState";
+import BaseModal from "components/BaseModal";
+import Image from "next/image";
+import platform from "platform";
+import QRCode from "qrcode";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useRecoilState, useRecoilValue } from "recoil";
 
 const MAIAR_WALLET_LINK = {
     PLAY_STORE: "https://maiar.onelink.me/HLcx/52dcde54",
@@ -27,15 +27,15 @@ const MAIAR_WALLET_LINK = {
 };
 
 function ConnectWalletModal() {
-    const { isLoggedIn: loggedIn } = useGetLoginInfo();
-    const [ isOpenConnectWalletModal, setIsOpenConnectWalletModal ] =
+    const loggedIn = useRecoilValue(accIsLoggedInState);
+    const [isOpenConnectWalletModal, setIsOpenConnectWalletModal] =
         useRecoilState(walletIsOpenConnectModalState);
-    
+
     const [isOpenQR, setIsOpenQR] = useState(false);
     const [isOpenDownloadExtension, setIsOpenDownloadExtension] =
         useState(false);
     const [isOpenDownloadApp, setIsOpenDownloadApp] = useState(false);
-    const [extensionLogin] = loginServices.useExtensionLogin({
+    const [extensionLogin] = useExtensionLogin({
         callbackRoute: "",
     });
     useEffect(() => {
@@ -65,7 +65,7 @@ function ConnectWalletModal() {
                 <div className="flex justify-end">
                     <BaseModal.CloseBtn />
                 </div>
-                <div className="flex-grow px-3 py-8 overflow-auto">
+                <div className="grow px-3 py-8 overflow-auto">
                     <div
                         className="flex justify-center bg-no-repeat bg-left bg-contain py-8 overflow-hidden"
                         style={{
@@ -96,7 +96,7 @@ function ConnectWalletModal() {
                                 >
                                     <div className="mr-[1.625rem]">
                                         <ICConnectExtension
-                                            className={`${styles.connectIcon} w-16 inline text-ash-blue-500`}
+                                            className={`colored-drop-shadow-xs colored-drop-shadow-ash-blue-500 w-16 inline text-ash-blue-500`}
                                         />
                                     </div>
                                     <div className="text-sm font-bold uppercase">
@@ -112,7 +112,7 @@ function ConnectWalletModal() {
                                 >
                                     <div className="mr-[1.625rem] w-16 text-center">
                                         <ICConnectApp
-                                            className={`${styles.connectIcon} h-16 inline text-ash-blue-500`}
+                                            className={`colored-drop-shadow-xs colored-drop-shadow-ash-blue-500 h-16 inline text-ash-blue-500`}
                                         />
                                     </div>
                                     <div className="text-sm font-bold uppercase">
@@ -135,7 +135,7 @@ function ConnectWalletModal() {
                 <div className="flex justify-end">
                     <BaseModal.CloseBtn />
                 </div>
-                <div className="flex-grow flex flex-col items-center text-center py-10 px-6">
+                <div className="grow flex flex-col items-center text-center py-10 px-6">
                     <div className="text-lg sm:text-2xl font-bold mb-9">
                         Install{" "}
                         <span className="text-ash-blue-500">Maiar Wallet</span>{" "}
@@ -143,7 +143,7 @@ function ConnectWalletModal() {
                     </div>
                     <div className="flex items-center space-x-8 mb-[5.5rem]">
                         <ICConnectApp
-                            className={`${styles.dropShadowPink} text-pink-600 h-14 sm:h-[6.75rem] w-auto`}
+                            className={`colored-drop-shadow-xs colored-drop-shadow-pink-600 text-pink-600 h-14 sm:h-[6.75rem] w-auto`}
                         />
                         <div className="flex items-center space-x-1">
                             <div className="w-1.5 h-1.5 bg-pink-600"></div>
@@ -230,7 +230,7 @@ function ConnectWalletModal() {
                 <div className="flex justify-end">
                     <BaseModal.CloseBtn />
                 </div>
-                <div className="flex-grow flex flex-col items-center text-center pt-6 pb-10 px-2 sm:px-6">
+                <div className="grow flex flex-col items-center text-center pt-6 pb-10 px-2 sm:px-6">
                     <div className="text-lg sm:text-2xl font-bold mb-9">
                         Install{" "}
                         <span className="text-ash-blue-500">Maiar Wallet</span>{" "}
@@ -238,7 +238,7 @@ function ConnectWalletModal() {
                     </div>
                     <div className="flex items-center space-x-8 mb-[5.5rem]">
                         <ICConnectExtension
-                            className={`${styles.dropShadowPink} text-pink-600 w-14 sm:w-[6.75rem] h-auto`}
+                            className={`colored-drop-shadow-xs colored-drop-shadow-pink-600 text-pink-600 w-14 sm:w-[6.75rem] h-auto`}
                         />
                         <div className="flex items-center space-x-1">
                             <div className="w-1.5 h-1.5 bg-pink-600"></div>
@@ -304,7 +304,7 @@ const WalletConnect = ({
         initConnect,
         { error, isLoading, isLoggedIn, loginFailed },
         { uriDeepLink, walletConnectUri },
-    ] = loginServices.useWalletConnectLogin({
+    ] = useWalletConnectLogin({
         callbackRoute: "",
         logoutRoute: "",
     });

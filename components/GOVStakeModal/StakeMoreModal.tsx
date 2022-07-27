@@ -1,17 +1,23 @@
 import ICArrowTopRight from "assets/svg/arrow-top-right.svg";
 import ICChevronRight from "assets/svg/chevron-right.svg";
 import { accIsInsufficientEGLDState } from "atoms/dappState";
-import { govLockedAmtState, govTotalSupplyVeASH, govUnlockTSState, govVeASHAmtState } from "atoms/govState";
+import {
+    govLockedAmtState,
+    govTotalSupplyVeASH,
+    govUnlockTSState,
+    govVeASHAmtState
+} from "atoms/govState";
 import { walletBalanceState } from "atoms/walletState";
 import BigNumber from "bignumber.js";
+import Avatar from "components/Avatar";
 import BaseModal from "components/BaseModal";
 import Checkbox from "components/Checkbox";
+import GlowingButton from "components/GlowingButton";
 import InputCurrency from "components/InputCurrency";
 import Switch from "components/Switch";
 import TextAmt from "components/TextAmt";
 import CardTooltip from "components/Tooltip/CardTooltip";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
-import { ENVIRONMENT } from "const/env";
 import { ASH_TOKEN, VE_ASH_DECIMALS } from "const/tokens";
 import { toEGLDD, toWei } from "helper/balance";
 import { estimateVeASH } from "helper/voteEscrow";
@@ -20,49 +26,38 @@ import useMediaQuery from "hooks/useMediaQuery";
 import { useOnboarding } from "hooks/useOnboarding";
 import { useScreenSize } from "hooks/useScreenSize";
 import moment from "moment";
-import Image from "next/image";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
 import LockPeriod, { lockPeriodFormater } from "./LockPeriod";
 type props = {
     open: boolean;
     onClose: () => void;
 };
-const EXTEND_DEV = {
+const EXTEND_CONFIG = {
     options: [
         // test purpose
-        { value: 12 * 60 * 60, label: "+ 12 hours" },
-        { value: 24 * 60 * 60, label: "+ 1 day" },
-        { value: 3 * 24 * 60 * 60, label: "+ 3 days" },
-        { value: 1 * 7 * 24 * 60 * 60, label: "+ 1 week" },
-    ],
-    maxLock: 2 * 7 * 24 * 60 * 60,
-    minLock: 12 * 60 * 60,
-};
-const EXTEND_TEST = {
-    options: [
-        // test purpose
-        { value: 30 * 60, label: "+ minutes" },
-        { value: 24 * 60 * 60, label: "+ 1 day" },
+        { value: 7 * 24 * 60 * 60, label: "+ 1 week" },
+        { value: 4 * 7 * 24 * 60 * 60, label: "+ 4 weeks" },
         { value: 1 * 365 * 24 * 60 * 60, label: "+ 1 year" },
         { value: 2 * 365 * 24 * 60 * 60, label: "+ 2 years" },
         { value: 3 * 365 * 24 * 60 * 60, label: "+ 3 years" },
     ],
     maxLock: 4 * 365 * 24 * 60 * 60,
-    minLock: 30 * 60,
+    minLock: 7 * 24 * 60 * 60,
 };
-const EXTEND_CONFIG =
-    ENVIRONMENT.NETWORK === "devnet" ? EXTEND_DEV : EXTEND_TEST;
 const StakeMoreContent = ({ open, onClose }: props) => {
     const lockedAmt = useRecoilValue(govLockedAmtState);
     const unlockTS = useRecoilValue(govUnlockTSState);
     const totalSupplyVeASH = useRecoilValue(govTotalSupplyVeASH);
     const veASH = useRecoilValue(govVeASHAmtState);
-    const lockMoreASH = useGovLockMore();
+    const {lockMoreASH} = useGovLockMore();
 
     const balances = useRecoilValue(walletBalanceState);
     const insufficientEGLD = useRecoilValue(accIsInsufficientEGLDState);
-    const ASHBalance = useMemo(() => balances[ASH_TOKEN.id]?.balance || new BigNumber(0), [balances]);
+    const ASHBalance = useMemo(
+        () => balances[ASH_TOKEN.id]?.balance || new BigNumber(0),
+        [balances]
+    );
     const [lockAmt, setLockAmt] = useState<BigNumber>(new BigNumber(0));
     const [rawLockAmt, setRawLockAmt] = useState("");
     const [currentLockSeconds, setCurrentLockSeconds] = useState(0);
@@ -99,9 +94,7 @@ const StakeMoreContent = ({ open, onClose }: props) => {
     const setMaxLockAmt = useCallback(() => {
         if (!ASHBalance) return;
         setLockAmt(ASHBalance);
-        setRawLockAmt(
-            toEGLDD(ASH_TOKEN.decimals, ASHBalance).toString(10)
-        );
+        setRawLockAmt(toEGLDD(ASH_TOKEN.decimals, ASHBalance).toString(10));
     }, [ASHBalance]);
 
     const insufficientASH = useMemo(() => {
@@ -153,13 +146,7 @@ const StakeMoreContent = ({ open, onClose }: props) => {
             );
         }
         return estimateVeASH(lockedAmt.plus(lockAmt), currentLockSeconds);
-    }, [
-        extendLockPeriod,
-        lockedAmt,
-        lockAmt,
-        currentLockSeconds,
-        isExtend,
-    ]);
+    }, [extendLockPeriod, lockedAmt, lockAmt, currentLockSeconds, isExtend]);
     const estimatedCapacity = useMemo(() => {
         const pct = estimatedVeASH
             .multipliedBy(100)
@@ -200,7 +187,7 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                     Manage Your Governance Stake
                 </div>
                 <div className="sm:flex sm:space-x-8 lg:space-x-24 mb-24">
-                    <div className="flex flex-col flex-grow mb-16 lg:mb-0">
+                    <div className="flex flex-col grow mb-16 lg:mb-0">
                         <div className="w-full grid grid-cols-2 gap-x-4 lg:gap-x-7.5 mb-16 lg:mb-12">
                             <div>
                                 <div className="text-ash-gray-500 text-xs lg:text-sm font-bold mb-2 lg:mb-4">
@@ -239,7 +226,7 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                                             options={{ notation: "standard" }}
                                         />
                                         &nbsp;
-                                        {ASH_TOKEN.name}
+                                        {ASH_TOKEN.symbol}
                                     </span>
                                 </div>
                             </div>
@@ -247,15 +234,12 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                                 <div className="text-ash-gray-500 text-xs lg:text-sm font-bold mb-2 lg:mb-4 flex items-center">
                                     <div className="mr-1">Current</div>
                                     <div className="flex items-center">
-                                        <div className="w-3 h-3 rounded-full relative mr-1">
-                                            <Image
-                                                src={ASH_TOKEN.icon}
-                                                alt={ASH_TOKEN.name}
-                                                layout="fill"
-                                                objectFit="contain"
-                                            />
-                                        </div>
-                                        <div>{ASH_TOKEN.name} Staked</div>
+                                        <Avatar
+                                            src={ASH_TOKEN.icon}
+                                            alt={ASH_TOKEN.symbol}
+                                            className="w-3 h-3 mr-1"
+                                        />
+                                        <div>{ASH_TOKEN.symbol} Staked</div>
                                     </div>
                                 </div>
                                 <div className="bg-stake-dark-500 h-14 lg:h-18 px-6 flex items-center justify-end text-ash-gray-500">
@@ -438,7 +422,7 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                                                     return (
                                                         <button
                                                             key={opt.value}
-                                                            className={`border border-ash-gray-500 bg-ash-gray-500/10 h-11 lg:h-12 flex items-center justify-center px-1 text-ash-gray-500 text-xs lg:text-sm ${i === extendOpts.length - 1 ? "flex-grow" : "w-24"}`}
+                                                            className={`border border-ash-gray-500 bg-ash-gray-500/10 h-11 lg:h-12 flex items-center justify-center px-1 text-ash-gray-500 text-xs lg:text-sm ${i === extendOpts.length - 1 ? "grow" : "w-24"}`}
                                                             onClick={() => setExtendLockPeriod(opt.value)}
                                                         >
                                                             {opt.label}
@@ -451,7 +435,7 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                             )}
                         </div>
                     </div>
-                    <div className="w-full sm:w-1/3 lg:w-[17.8125rem] flex-shrink-0 bg-stake-dark-500 py-[2.375rem] px-10 sm:px-4 lg:px-10">
+                    <div className="w-full sm:w-1/3 lg:w-[17.8125rem] shrink-0 bg-stake-dark-500 py-[2.375rem] px-10 sm:px-4 lg:px-10">
                         <div className="text-white text-lg font-bold mb-16">
                             Estimate Staking
                         </div>
@@ -588,7 +572,7 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                     </div>
                 </div>
                 <div className="sm:flex sm:space-x-8 lg:space-x-24">
-                    <div className="w-full mb-12 sm:mb-0 sm:flex-grow">
+                    <div className="w-full mb-12 sm:mb-0 sm:grow">
                         <Checkbox
                             checked={isAgree}
                             onChange={setIsAgree}
@@ -610,12 +594,11 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                             }
                         />
                     </div>
-                    <div className="w-full sm:w-1/3 lg:w-[17.8125rem] flex-shrink-0">
-                        <div className="border-notch">
-                            <button
-                                className={`clip-corner-1 clip-corner-tl transition w-full h-12 flex items-center justify-center text-sm font-bold text-white ${
-                                    canStake ? "bg-pink-600" : "bg-ash-dark-500"
-                                }`}
+                    <div className="w-full sm:w-1/3 lg:w-[17.8125rem] shrink-0">
+                        <div className="border-notch-x border-notch-white/50">
+                            <GlowingButton
+                                theme="pink"
+                                className={`clip-corner-1 clip-corner-tl w-full h-12 text-sm font-bold`}
                                 disabled={!canStake}
                                 onClick={() => canStake && lockMore()}
                             >
@@ -629,7 +612,7 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                                         <ICChevronRight className="w-2 h-auto" />
                                     </div>
                                 )}
-                            </button>
+                            </GlowingButton>
                         </div>
                     </div>
                 </div>
@@ -652,7 +635,7 @@ function StakeMoreModal({ open, onClose }: props) {
                     <BaseModal.CloseBtn />
                 </div>
                 {open && (
-                    <div className="flex-grow overflow-auto">
+                    <div className="grow overflow-auto">
                         <StakeMoreContent open={open} onClose={onClose} />
                     </div>
                 )}

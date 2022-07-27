@@ -1,7 +1,8 @@
-import { AccountInfoSliceNetworkType, useGetNetworkConfig } from "@elrondnetwork/dapp-core";
+import { AccountInfoSliceNetworkType } from "@elrondnetwork/dapp-core/types";
 import ICArrowLeft from "assets/svg/arrow-left.svg";
 import ICArrowRight from "assets/svg/arrow-right.svg";
 import ICChevronDown from "assets/svg/chevron-down.svg";
+import { networkConfigState } from "atoms/dappState";
 import BasePopover from "components/BasePopover";
 import { TOKENS_MAP } from "const/tokens";
 import { toEGLDD } from "helper/balance";
@@ -9,7 +10,8 @@ import { formatAmount } from "helper/number";
 import { useScreenSize } from "hooks/useScreenSize";
 import { TxStatsRecord } from "interface/txStats";
 import moment from "moment";
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useRecoilValue } from "recoil";
 
 const actionLabelMap: Record<
     TxStatsRecord["name"],
@@ -28,7 +30,8 @@ const TxRecord = ({ txStats }: { txStats: TxStatsRecord }) => {
     const token2 = TOKENS_MAP[tokenId2];
     const label = actionLabelMap[txStats.name];
     const [time, setTime] = useState("");
-    const network: AccountInfoSliceNetworkType = useGetNetworkConfig().network;
+    const network: AccountInfoSliceNetworkType =
+        useRecoilValue(networkConfigState).network;
     useEffect(() => {
         const ts = moment.unix(txStats.timestamp);
         const func = () => {
@@ -56,8 +59,8 @@ const TxRecord = ({ txStats }: { txStats: TxStatsRecord }) => {
                     rel="noreferrer"
                 >
                     <span className="text-pink-600">
-                        {label.action} {token1.name} {label.separator}{" "}
-                        {token2.name}
+                        {label.action} {token1.symbol} {label.separator}{" "}
+                        {token2.symbol}
                     </span>
                 </a>
             </div>
@@ -70,13 +73,13 @@ const TxRecord = ({ txStats }: { txStats: TxStatsRecord }) => {
             <div className="text-right hidden md:block">
                 <span className="text-white">
                     {formatAmount(toEGLDD(token1.decimals, amt1).toNumber())}{" "}
-                    {token1.name}
+                    {token1.symbol}
                 </span>
             </div>
             <div className="text-right hidden md:block">
                 <span className="text-white">
                     {formatAmount(toEGLDD(token2.decimals, amt2).toNumber())}{" "}
-                    {token2.name}
+                    {token2.symbol}
                 </span>
             </div>
             <div className="text-right hidden xl:block">

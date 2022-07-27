@@ -1,12 +1,12 @@
 import BigNumber from "bignumber.js";
+import Avatar from "components/Avatar";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 import pools from "const/pool";
-import { IN_POOL_TOKENS } from "const/tokens";
+import { IN_POOL_TOKENS } from "const/pool";
 import { randomHexColor } from "helper/color";
 import { fetcher } from "helper/common";
 import { IToken } from "interface/token";
-import Image from "next/image";
-import React, { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
 import useSWR from "swr";
 import TokensSelectorForChart, {
@@ -47,28 +47,25 @@ const TokenLegend = ({
     return (
         <div className="flex items-center py-1.5">
             <div
-                className="w-4 h-4 rounded-full mr-2.5 flex-shrink-0"
+                className="w-4 h-4 rounded-full mr-2.5 shrink-0"
                 style={{ backgroundColor: color }}
             ></div>
             <div
-                className="font-bold text-sm w-9 text-right mr-9 flex-shrink-0"
+                className="font-bold text-sm w-9 text-right mr-9 shrink-0"
                 style={{ color }}
             >
                 {percent}%
             </div>
-            <div className="mr-1 flex-shrink-0">
-                <Image
-                    src={token.icon}
-                    alt={token.name}
-                    width={11}
-                    height={11}
-                />
-            </div>
-            <div className="font-bold text-xs">{token.name}</div>
+            <Avatar
+                src={token.icon}
+                alt={token.symbol}
+                className="w-3 h-3 mr-1 shrink-0"
+            />
+            <div className="font-bold text-xs">{token.symbol}</div>
         </div>
     );
 };
-const ashPools = pools.filter(p => !p.isMaiarPool);
+const ashPools = pools.filter((p) => !p.isMaiarPool);
 function LiquidityByTokensChart() {
     const [selectedPools, setSelectedPools] = useState<Set<string>>(
         new Set(ashPools.map((p) => p.address))
@@ -92,7 +89,9 @@ function LiquidityByTokensChart() {
                 const pct = +((liquidity * 100) / total).toFixed(2);
                 const record: ChartRecord = {
                     value: liquidity,
-                    token: IN_POOL_TOKENS.find((t) => t.id === tokenId) as IToken,
+                    token: IN_POOL_TOKENS.find(
+                        (t) => t.id === tokenId
+                    ) as IToken,
                     percent:
                         index === data.length - 1
                             ? new BigNumber(100).minus(spct).toNumber()
@@ -184,7 +183,7 @@ function LiquidityByTokensChart() {
                                 key={p.address}
                                 pool={p}
                                 checked={selectedPools.has(p.address)}
-                                label={p.tokens.map((t) => t.name).join("-")}
+                                label={p.tokens.map((t) => t.symbol).join("-")}
                                 onChange={(val) => onSelectPool(val, p.address)}
                             />
                         );

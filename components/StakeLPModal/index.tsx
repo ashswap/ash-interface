@@ -3,8 +3,10 @@ import { accIsInsufficientEGLDState } from "atoms/dappState";
 import { FarmsState } from "atoms/farmsState";
 import { walletBalanceState } from "atoms/walletState";
 import BigNumber from "bignumber.js";
+import Avatar from "components/Avatar";
 import BaseModal from "components/BaseModal";
 import Checkbox from "components/Checkbox";
+import GlowingButton from "components/GlowingButton";
 import InputCurrency from "components/InputCurrency";
 import TextAmt from "components/TextAmt";
 import { blockTimeMs } from "const/dappConfig";
@@ -14,8 +16,7 @@ import { formatAmount } from "helper/number";
 import useEnterFarm from "hooks/useFarmContract/useEnterFarm";
 import { useScreenSize } from "hooks/useScreenSize";
 import { Unarray } from "interface/utilities";
-import Image from "next/image";
-import React, { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
 type props = {
     open: boolean;
@@ -31,7 +32,7 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
     const insufficientEGLD = useRecoilValue(accIsInsufficientEGLDState);
     const [stakeAmt, setStakeAmt] = useState<BigNumber>(new BigNumber(0));
     const [rawStakeAmt, setRawStakeAmt] = useState("");
-    const enterFarm = useEnterFarm();
+    const {enterFarm} = useEnterFarm();
     const LPBalance = useMemo(
         () => balances[pool.lpToken.id],
         [balances, pool.lpToken]
@@ -51,8 +52,8 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
         return totalAshPerDay.multipliedBy(shareOfFarm);
     }, [stakeAmt, farmTokenSupply, ashPerBlock]);
     const lpName = useMemo(() => {
-        return `LP-${token0.name}${token1.name}`;
-    }, [token0.name, token1.name]);
+        return `LP-${token0.symbol}${token1.symbol}`;
+    }, [token0.symbol, token1.symbol]);
     const insufficientLP = useMemo(() => {
         return (
             !LPBalance ||
@@ -77,7 +78,7 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
                 Stake {lpName}
             </div>
             <div className="sm:flex sm:space-x-8 lg:space-x-24 mb-18">
-                <div className="flex flex-col flex-grow mb-16 lg:mb-0">
+                <div className="flex flex-col grow mb-16 lg:mb-0">
                     <div className="w-full grid md:grid-cols-2 gap-y-6 gap-x-4 lg:gap-x-7.5">
                         <div>
                             <div className="text-ash-gray-500 text-xs lg:text-sm font-bold mb-2 lg:mb-4">
@@ -85,20 +86,16 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
                             </div>
                             <div className="bg-ash-dark-400/30 h-14 lg:h-18 px-6 flex items-center">
                                 <div className="flex mr-2">
-                                    <div className="w-4 h-4">
-                                        <Image
-                                            src={token0.icon}
-                                            alt={`${token0.name} icon`}
-                                            layout="responsive"
-                                        />
-                                    </div>
-                                    <div className="w-4 h-4 -ml-1">
-                                        <Image
-                                            src={token1.icon}
-                                            alt={`${token1.name} icon`}
-                                            layout="responsive"
-                                        />
-                                    </div>
+                                    <Avatar
+                                        src={token0.icon}
+                                        alt={token0.symbol}
+                                        className="w-4 h-4"
+                                    />
+                                    <Avatar
+                                        src={token1.icon}
+                                        alt={token1.symbol}
+                                        className="w-4 h-4 -ml-1"
+                                    />
                                 </div>
                                 <div className="text-ash-gray-500 text-sm lg:text-lg font-bold">
                                     {lpName}
@@ -147,7 +144,7 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
                         </div>
                     </div>
                 </div>
-                <div className="w-full sm:w-1/3 lg:w-[17.8125rem] flex-shrink-0 bg-stake-dark-500 py-[2.375rem] px-10">
+                <div className="w-full sm:w-1/3 lg:w-[17.8125rem] shrink-0 bg-stake-dark-500 py-[2.375rem] px-10">
                     <div className="text-white text-lg font-bold mb-16">
                         Estimate Farming
                     </div>
@@ -181,7 +178,7 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
                 </div>
             </div>
             <div className="sm:flex sm:space-x-8 lg:space-x-24">
-                <div className="w-full mb-12 sm:mb-0 sm:flex-grow">
+                <div className="w-full mb-12 sm:mb-0 sm:grow">
                     <Checkbox
                         checked={isAgree}
                         onChange={setIsAgree}
@@ -203,14 +200,11 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
                         }
                     />
                 </div>
-                <div className="w-full sm:w-1/3 lg:w-[17.8125rem] flex-shrink-0">
-                    <div className="border-notch">
-                        <button
-                            className={`clip-corner-1 clip-corner-tl transition w-full h-12 flex items-center justify-center text-sm font-bold ${
-                                canStake
-                                    ? "bg-ash-cyan-500 text-stake-dark-400"
-                                    : "bg-ash-dark-500 text-white"
-                            }`}
+                <div className="w-full sm:w-1/3 lg:w-[17.8125rem] shrink-0">
+                    <div className="border-notch-x border-notch-white/50">
+                        <GlowingButton
+                            theme="cyan"
+                            className={`clip-corner-1 clip-corner-tl w-full h-12 text-sm font-bold`}
                             disabled={!canStake}
                             onClick={() => canStake && stake()}
                         >
@@ -222,7 +216,7 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
                                     <ICChevronRight className="w-2 h-auto" />
                                 </div>
                             )}
-                        </button>
+                        </GlowingButton>
                     </div>
                 </div>
             </div>
@@ -243,7 +237,7 @@ function StakeLPModal(props: props) {
                 <div className="flex justify-end mb-3.5">
                     <BaseModal.CloseBtn />
                 </div>
-                <div className="flex-grow overflow-auto">
+                <div className="grow overflow-auto">
                     <StakeLPContent {...props} />
                 </div>
             </BaseModal>

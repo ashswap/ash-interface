@@ -1,16 +1,16 @@
-import {
-    getProxyProvider,
-    useGetAccountInfo,
-    useGetLoginInfo
-} from "@elrondnetwork/dapp-core";
 import IconRight from "assets/svg/right-white.svg";
 import { addLPSessionIdAtom } from "atoms/addLiquidity";
+import {
+    accIsInsufficientEGLDState,
+    accIsLoggedInState
+} from "atoms/dappState";
 import { PoolsState } from "atoms/poolsState";
 import { walletBalanceState, walletTokenPriceState } from "atoms/walletState";
 import BigNumber from "bignumber.js";
+import Avatar from "components/Avatar";
 import BaseModal from "components/BaseModal";
-import Button from "components/Button";
 import Checkbox from "components/Checkbox";
+import GlowingButton from "components/GlowingButton";
 import InputCurrency from "components/InputCurrency";
 import TextAmt from "components/TextAmt";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
@@ -23,7 +23,6 @@ import usePoolAddLP from "hooks/usePoolContract/usePoolAddLP";
 import { useScreenSize } from "hooks/useScreenSize";
 import { IToken } from "interface/token";
 import { Unarray } from "interface/utilities";
-import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
@@ -57,12 +56,14 @@ const TokenInput = ({
                 <div
                     className={`flex items-center w-24 sm:w-1/3 px-4 sm:px-0 border-r border-r-ash-gray-500 sm:border-r-0`}
                 >
-                    <div className="w-5 h-5 rounded-full mr-2 flex-shrink-0">
-                        <Image src={token.icon} alt="token icon" />
-                    </div>
+                    <Avatar
+                        src={token.icon}
+                        alt="token icon"
+                        className="w-5 h-5 mr-2 shrink-0"
+                    />
                     <div className="hidden sm:block overflow-hidden">
                         <div className="text-sm font-bold text-white sm:pb-1">
-                            {token.name}
+                            {token.symbol}
                         </div>
                         <div className="text-text-input-3 text-xs truncate leading-tight">
                             <TextAmt number={tokenInPool} />
@@ -70,7 +71,7 @@ const TokenInput = ({
                         </div>
                     </div>
                     <div className="block sm:hidden text-xs font-bold text-white">
-                        {token.name}
+                        {token.symbol}
                     </div>
                 </div>
 
@@ -113,7 +114,7 @@ const TokenInput = ({
                             options={{ notation: "standard" }}
                         />
                         &nbsp;
-                        {token.name}
+                        {token.symbol}
                     </span>
                 </div>
             </div>
@@ -134,9 +135,8 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
     const balances = useRecoilValue(walletBalanceState);
     const tokenPrices = useRecoilValue(walletTokenPriceState);
     // end recoil
-    const { isLoggedIn: loggedIn } = useGetLoginInfo();
-    const { address, account } = useGetAccountInfo();
-    const proxy = getProxyProvider();
+    const loggedIn = useRecoilValue(accIsLoggedInState);
+    const isInsufficientEGLD = useRecoilValue(accIsInsufficientEGLDState);
     const { pool, poolStats, liquidityData } = poolData;
     const [onboardingDepositInput, setOnboardedDepositInput] =
         useOnboarding("pool_deposit_input");
@@ -167,7 +167,8 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
         const v0 = toWei(pool.tokens[0], value0 || "0");
         const v1 = toWei(pool.tokens[1], value1 || "0");
         try {
-            const { sessionId } = await addPoolLP(pool, v0, v1);
+            const { sessionId } = await addPoolLP(pool, [v0, v1]);
+
             setAddLPSessionId(sessionId || "");
             if (sessionId) onClose?.();
         } catch (error) {
@@ -175,16 +176,7 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
         } finally {
             setAdding(false);
         }
-    }, [
-        value0,
-        value1,
-        pool,
-        onClose,
-        adding,
-        loggedIn,
-        addPoolLP,
-        setAddLPSessionId,
-    ]);
+    }, [value0, value1, pool, onClose, adding, loggedIn, addPoolLP, setAddLPSessionId]);
 
     const balance0 = useMemo(() => {
         return (
@@ -280,7 +272,7 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
         const v1 = new BigNumber(value1 || "0");
         return (
             isAgree &&
-            account.balance !== "0" &&
+            !isInsufficientEGLD &&
             !isInsufficentFund0 &&
             !isInsufficentFund1 &&
             !adding &&
@@ -288,42 +280,36 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
         );
     }, [
         isAgree,
-        account.balance,
         isInsufficentFund0,
         isInsufficentFund1,
+        isInsufficientEGLD,
         adding,
         value0,
         value1,
     ]);
 
     return (
-        <div className="px-8 pb-16 sm:pb-7 flex-grow overflow-auto">
+        <div className="px-8 pb-16 sm:pb-7 grow overflow-auto">
             <div className="inline-flex justify-between items-center">
                 <div className="mr-2">
                     {/* <div className="text-text-input-3 text-xs">Deposit</div> */}
                     <div className="flex flex-row items-baseline text-lg sm:text-2xl font-bold">
-                        <span>{pool.tokens[0].name}</span>
+                        <span>{pool.tokens[0].symbol}</span>
                         <span className="text-sm px-3">&</span>
-                        <span>{pool.tokens[1].name}</span>
+                        <span>{pool.tokens[1].symbol}</span>
                     </div>
                 </div>
                 <div className="flex flex-row justify-between items-center">
-                    <div className="w-6 h-6 sm:w-9 sm:h-9 rounded-full">
-                        <Image
-                            src={pool.tokens[0].icon}
-                            width={52}
-                            height={52}
-                            alt="token icon"
-                        />
-                    </div>
-                    <div className="w-6 h-6 sm:w-9 sm:h-9 rounded-full -ml-1 sm:ml-[-0.375rem]">
-                        <Image
-                            src={pool.tokens[1].icon}
-                            width={52}
-                            height={52}
-                            alt="token icon"
-                        />
-                    </div>
+                    <Avatar
+                        src={pool.tokens[0].icon}
+                        alt={pool.tokens[0].symbol}
+                        className="w-6 h-6 sm:w-9 sm:h-9"
+                    />
+                    <Avatar
+                        src={pool.tokens[1].icon}
+                        alt={pool.tokens[1].symbol}
+                        className="w-6 h-6 sm:w-9 sm:h-9 -ml-1 sm:ml-[-0.375rem]"
+                    />
                 </div>
             </div>
             <div className="my-10">
@@ -446,17 +432,19 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
                 </OnboardTooltip>
 
                 <div className="w-full sm:w-1/3">
-                    <Button
-                        topLeftCorner
-                        style={{ height: 48 }}
-                        outline
-                        disable={!canAddLP}
-                        onClick={canAddLP ? addLP : () => {}}
-                    >
-                        {account.balance === "0"
-                            ? "INSUFFICIENT EGLD BALANCE"
-                            : "DEPOSIT"}
-                    </Button>
+                    <div className="border-notch-x border-notch-white/50">
+                        <GlowingButton
+                            theme="pink"
+                            className="w-full h-12 uppercase font-bold clip-corner-1 clip-corner-tl"
+                            wrapperClassName="hover:colored-drop-shadow-xs"
+                            disabled={!canAddLP}
+                            onClick={canAddLP ? addLP : () => {}}
+                        >
+                            {isInsufficientEGLD
+                                ? "INSUFFICIENT EGLD BALANCE"
+                                : "DEPOSIT"}
+                        </GlowingButton>
+                    </div>
                 </div>
             </div>
         </div>
@@ -475,11 +463,9 @@ const AddLiquidityModal = (props: Props) => {
             <div className="flex justify-end mb-6">
                 <BaseModal.CloseBtn />
             </div>
-            {open && (
-                <div className="flex-grow overflow-auto">
-                    <AddLiquidityContent {...props} />
-                </div>
-            )}
+            <div className="grow overflow-auto">
+                <AddLiquidityContent {...props} />
+            </div>
         </BaseModal>
     );
 };

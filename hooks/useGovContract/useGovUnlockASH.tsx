@@ -1,19 +1,17 @@
-import { Address, ContractFunction, GasLimit } from "@elrondnetwork/erdjs/out";
 import { accIsLoggedInState } from "atoms/dappState";
 import { govLockedAmtState, govUnlockTSState } from "atoms/govState";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 import { ASH_TOKEN } from "const/tokens";
 import { toEGLDD } from "helper/balance";
-import {
-    sendTransactions,
-    useCreateTransaction
-} from "helper/transactionMethods";
+import VotingEscrowContract from "helper/contracts/votingEscrowContract";
+import useSendTxsWithTrackStatus from "hooks/useSendTxsWithTrackStatus";
 import { DappSendTransactionsPropsType } from "interface/dappCore";
 import moment from "moment";
 import { useRecoilCallback } from "recoil";
 
-const useGovUnlockASH = () => {
-    const createTransaction = useCreateTransaction();
+const useGovUnlockASH = (trackStatus = false) => {
+    const { sendTransactions, trackingData, sessionId } =
+        useSendTxsWithTrackStatus(trackStatus);
     const unlockASH = useRecoilCallback(
         ({ snapshot, set }) =>
             async () => {
@@ -23,34 +21,24 @@ const useGovUnlockASH = () => {
 
                 if (!loggedIn || unlockTS.minus(moment().unix()).gt(0))
                     return { sessionId: "" };
-                try {
-                    const payload: DappSendTransactionsPropsType = {
-                        transactions: await createTransaction(
-                            new Address(
-                                ASHSWAP_CONFIG.dappContract.voteEscrowedContract
-                            ),
-                            {
-                                func: new ContractFunction("withdraw"),
-                                gasLimit: new GasLimit(7_000_000),
-                            }
-                        ),
-                        transactionsDisplayInfo: {
-                            successMessage: `Unlock success ${toEGLDD(
-                                ASH_TOKEN.decimals,
-                                lockedAmt
-                            )} ${ASH_TOKEN.name}`,
-                        },
-                    };
-                    return await sendTransactions(payload);
-                } catch (error) {
-                    console.error(error);
-                    return { sessionId: "" };
-                }
+                const veContract = new VotingEscrowContract(
+                    ASHSWAP_CONFIG.dappContract.voteEscrowedContract
+                );
+                const payload: DappSendTransactionsPropsType = {
+                    transactions: await veContract.withdraw(),
+                    transactionsDisplayInfo: {
+                        successMessage: `Unlock success ${toEGLDD(
+                            ASH_TOKEN.decimals,
+                            lockedAmt
+                        )} ${ASH_TOKEN.symbol}`,
+                    },
+                };
+                return await sendTransactions(payload);
             },
-        [createTransaction]
+        [sendTransactions]
     );
 
-    return unlockASH;
+    return { unlockASH, trackingData, sessionId };
 };
 
 export default useGovUnlockASH;

@@ -2,6 +2,7 @@ import ImgAvatar from "assets/images/avatar.png";
 import ICChevronDown from "assets/svg/chevron-down.svg";
 import ICWallet from "assets/svg/wallet.svg";
 import AddressMenu from "components/AddressMenu";
+import Avatar from "components/Avatar";
 import Nav from "components/Nav";
 import { useScreenSize } from "hooks/useScreenSize";
 import Image from "next/image";
@@ -57,11 +58,10 @@ const AppBar = () => {
                                 className="w-40 h-10 bg-ash-dark-600 hover:bg-ash-dark-500 flex items-center justify-center text-white font-bold"
                                 onClick={() => isMobile && setMDrawer(true)}
                             >
-                                <Image
+                                <Avatar
                                     src={ImgAvatar}
                                     alt="avatar"
-                                    width={16}
-                                    height={16}
+                                    className="w-4 h-4"
                                 />
                                 <span className="ml-2 mr-5">
                                     {address.slice(0, 4) +
@@ -75,7 +75,7 @@ const AppBar = () => {
                 />
             </div>
             <div className="block sm:hidden fixed z-20 bottom-6 inset-x-0">
-                <div className="bg-[#757391] bg-opacity-10 backdrop-filter backdrop-blur-[25px] p-1">
+                <div className="bg-[#757391] bg-opacity-10 backdrop-blur-[25px] p-1">
                     <Nav />
                 </div>
             </div>

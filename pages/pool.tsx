@@ -6,16 +6,17 @@ import {
 import { walletBalanceState, walletLPMapState } from "atoms/walletState";
 import BigNumber from "bignumber.js";
 import BasicLayout from "components/Layout/Basic";
-import ListPool from "components/ListPool";
-import PoolBanner from "components/PoolBanner";
-import PoolFilter, { ViewType } from "components/PoolFilter";
-import PoolMenu from "components/PoolMenu";
+import ListPool from "views/pool/components/ListPool";
+import PoolBanner from "views/pool/components/PoolBanner";
+import PoolFilter, { ViewType } from "views/pool/components/PoolFilter";
+import PoolMenu from "views/pool/components/PoolMenu";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 import { blockTimeMs } from "const/dappConfig";
 import pools from "const/pool";
 import { toEGLD } from "helper/balance";
 import { fetcher } from "helper/common";
 import { queryPoolContract } from "helper/contracts/pool";
+import useInterval from "hooks/useInterval";
 import useLPValue from "hooks/usePoolContract/useLPValue";
 import { useScreenSize } from "hooks/useScreenSize";
 import IPool from "interface/pool";
@@ -75,55 +76,52 @@ const PoolStateHook = () => {
         []
     );
 
+    const getPoolRecord = useRecoilCallback(
+        ({ snapshot, set }) =>
+            async (p: IPool) => {
+                const balances = await snapshot.getPromise(walletBalanceState);
+
+                let record: PoolRecord = {
+                    pool: p,
+                    poolStats: poolStatsRecords?.find(
+                        (stats) => stats.pool_address === p.address
+                    ),
+                };
+                const ownLP =
+                    balances[p.lpToken.id]?.balance || new BigNumber(0);
+                if (ownLP.gt(0)) {
+                    const { amt0, amt1, lpValueUsd } = await getLPValue(
+                        ownLP,
+                        p
+                    );
+                    record.liquidityData = {
+                        ownLiquidity: ownLP,
+                        capacityPercent: await getPortion(p.lpToken.id, ownLP),
+                        value0: amt0,
+                        value1: amt1,
+                        lpValueUsd,
+                    };
+                }
+                return record;
+            },
+        [getLPValue, getPortion, poolStatsRecords]
+    );
+
     const getPoolRecords = useRecoilCallback(
         ({ snapshot, set }) =>
             async () => {
-                const balances = await snapshot.getPromise(walletBalanceState);
-
                 const recordPromises: Promise<PoolRecord>[] = [];
                 for (let i = 0; i < pools.length; i++) {
                     const p = pools[i];
                     if (p.isMaiarPool) continue;
-                    const promiseFn = (async () => {
-                        let record: PoolRecord = {
-                            pool: p,
-                            poolStats: poolStatsRecords?.find(
-                                (stats) => stats.pool_address === p.address
-                            ),
-                        };
-                        const ownLP =
-                            balances[p.lpToken.id]?.balance || new BigNumber(0);
-                        if (ownLP.gt(0)) {
-                            const { amt0, amt1, lpValueUsd } = await getLPValue(
-                                ownLP,
-                                p
-                            );
-                            record.liquidityData = {
-                                ownLiquidity: ownLP,
-                                capacityPercent: await getPortion(
-                                    p.lpToken.id,
-                                    ownLP
-                                ),
-                                value0: amt0,
-                                value1: amt1,
-                                lpValueUsd,
-                            };
-                        }
-                        return record;
-                    })();
-                    recordPromises.push(promiseFn);
+                    recordPromises.push(getPoolRecord(p));
                 }
                 const records = await Promise.all(recordPromises);
                 set(poolRecordsState, records);
             },
-        [getPortion, getLPValue, poolStatsRecords]
+        [getPoolRecord]
     );
-
-    useEffect(() => {
-        getPoolRecords();
-        const interval = setInterval(getPoolRecords, blockTimeMs);
-        return () => clearInterval(interval);
-    }, [getPoolRecords]);
+    useInterval(getPoolRecords, blockTimeMs);
     return null;
 };
 

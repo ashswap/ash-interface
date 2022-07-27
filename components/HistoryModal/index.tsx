@@ -1,10 +1,10 @@
-import {
-    AccountInfoSliceNetworkType,
-    useGetAccountInfo,
-    useGetLoginInfo,
-    useGetNetworkConfig
-} from "@elrondnetwork/dapp-core";
+import { AccountInfoSliceNetworkType } from "@elrondnetwork/dapp-core/types";
 import IconNewTab from "assets/svg/new-tab.svg";
+import {
+    accAddressState,
+    accIsLoggedInState,
+    networkConfigState,
+} from "atoms/dappState";
 import BaseModal from "components/BaseModal";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 import pools from "const/pool";
@@ -14,6 +14,7 @@ import { useScreenSize } from "hooks/useScreenSize";
 import IPool from "interface/pool";
 import { IToken } from "interface/token";
 import { useCallback, useEffect, useMemo } from "react";
+import { useRecoilValue } from "recoil";
 import useSWR from "swr";
 
 const getTokenFromPools = (...pools: IPool[]) => {
@@ -56,8 +57,8 @@ interface TXRecord {
 }
 
 const HistoryModal = ({ open, onClose }: Props) => {
-    const { isLoggedIn: loggedIn } = useGetLoginInfo();
-    const { address } = useGetAccountInfo();
+    const loggedIn = useRecoilValue(accIsLoggedInState);
+    const address = useRecoilValue(accAddressState);
     const { data: txHistory, mutate: refresh } = useSWR<TXRecord[]>(
         loggedIn
             ? `${ASHSWAP_CONFIG.ashApiBaseUrl}/user/${address}/transaction`
@@ -65,7 +66,8 @@ const HistoryModal = ({ open, onClose }: Props) => {
         fetcher
     );
     const screenSize = useScreenSize();
-    const network: AccountInfoSliceNetworkType = useGetNetworkConfig().network;
+    const network: AccountInfoSliceNetworkType =
+        useRecoilValue(networkConfigState).network;
 
     const displayTx = useMemo(() => {
         return (txHistory || [])
@@ -94,10 +96,10 @@ const HistoryModal = ({ open, onClose }: Props) => {
                             msg: `Swap Success ${toEGLD(
                                 tokenIn,
                                 token_amount_in
-                            ).decimalPlaces(7)} ${tokenIn.name} to ${toEGLD(
+                            ).decimalPlaces(7)} ${tokenIn.symbol} to ${toEGLD(
                                 tokenOut,
                                 token_amount_out
-                            ).decimalPlaces(7)} ${tokenOut.name}`,
+                            ).decimalPlaces(7)} ${tokenOut.symbol}`,
                             txHash: transaction_hash,
                             status: "success",
                         };
@@ -128,10 +130,10 @@ const HistoryModal = ({ open, onClose }: Props) => {
                             } Success ${toEGLD(
                                 token1,
                                 first_token_amount
-                            ).decimalPlaces(7)} ${token1?.name} and ${toEGLD(
+                            ).decimalPlaces(7)} ${token1?.symbol} and ${toEGLD(
                                 token2,
                                 second_token_amount
-                            ).decimalPlaces(7)} ${token2.name}`,
+                            ).decimalPlaces(7)} ${token2.symbol}`,
                             txHash: transaction_hash,
                             status: "success",
                         };
@@ -146,14 +148,17 @@ const HistoryModal = ({ open, onClose }: Props) => {
             refresh();
         }
     }, [open, refresh]);
-    const openTransaction = useCallback((txHash: string) => {
-        if (typeof window !== "undefined") {
-            window.open(
-                network.explorerAddress + "/transactions/" + txHash,
-                "_blank"
-            );
-        }
-    }, []);
+    const openTransaction = useCallback(
+        (txHash: string) => {
+            if (typeof window !== "undefined") {
+                window.open(
+                    network.explorerAddress + "/transactions/" + txHash,
+                    "_blank"
+                );
+            }
+        },
+        [network.explorerAddress]
+    );
 
     return (
         <BaseModal
@@ -165,7 +170,7 @@ const HistoryModal = ({ open, onClose }: Props) => {
             <div className="flex justify-end mb-3">
                 <BaseModal.CloseBtn />
             </div>
-            <div className="flex-grow overflow-auto">
+            <div className="grow overflow-auto">
                 <div className="px-4">
                     <div className="font-bold text-2xl mb-5">History</div>
                     {displayTx.slice(0, 7).map((record) => {
@@ -187,7 +192,7 @@ const HistoryModal = ({ open, onClose }: Props) => {
                                     onClick={() => openTransaction(txHash)}
                                 >
                                     <div
-                                        className={`flex-shrink-0 mt-1.5 h-[5px] w-[5px] ${
+                                        className={`shrink-0 mt-1.5 h-[5px] w-[5px] ${
                                             status === "success"
                                                 ? "bg-ash-green-500"
                                                 : "bg-ash-purple-500"

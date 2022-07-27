@@ -1,18 +1,30 @@
-import { transactionServices, useGetLoginInfo } from "@elrondnetwork/dapp-core";
+import { useTrackTransactionStatus } from "@elrondnetwork/dapp-core/hooks";
 import ICCapacity from "assets/svg/capacity.svg";
 import ICChevronDown from "assets/svg/chevron-down.svg";
 import ICChevronUp from "assets/svg/chevron-up.svg";
 import ICLock from "assets/svg/lock.svg";
 import ICUnlock from "assets/svg/unlock.svg";
 import ICWallet from "assets/svg/wallet.svg";
-import { govLockedAmtState, govRewardLPAmtState, govRewardLPTokenState, govRewardLPValueState, govTotalLockedAmtState, govTotalLockedPctState, govTotalSupplyVeASH, govUnlockTSState, govVeASHAmtState } from "atoms/govState";
+import { accIsLoggedInState } from "atoms/dappState";
+import {
+    govLockedAmtState,
+    govRewardLPAmtState,
+    govRewardLPTokenState,
+    govRewardLPValueState,
+    govTotalLockedAmtState,
+    govTotalLockedPctState,
+    govTotalSupplyVeASH,
+    govUnlockTSState,
+    govVeASHAmtState
+} from "atoms/govState";
 import { walletTokenPriceState } from "atoms/walletState";
+import Avatar from "components/Avatar";
 import BaseModal from "components/BaseModal";
+import GlowingButton from "components/GlowingButton";
 import GOVStakeModal from "components/GOVStakeModal";
 import TextAmt from "components/TextAmt";
 import CardTooltip from "components/Tooltip/CardTooltip";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
-import { ENVIRONMENT } from "const/env";
 import { ASH_TOKEN, VE_ASH_DECIMALS } from "const/tokens";
 import { toEGLDD } from "helper/balance";
 import { fetcher } from "helper/common";
@@ -23,11 +35,11 @@ import useGovUnlockASH from "hooks/useGovContract/useGovUnlockASH";
 import useMounted from "hooks/useMounted";
 import { useScreenSize } from "hooks/useScreenSize";
 import moment from "moment";
-import Image from "next/image";
 import Link from "next/link";
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
 import useSWR from "swr";
+import GovMenu from "./components/GovMenu";
 const ExpiredLockTooltip = ({
     children,
     disabled,
@@ -68,14 +80,14 @@ function GovStats() {
     const [openStakeGov, setOpenStakeGov] = useState(false);
     const [openHarvestResult, setOpenHarvestResult] = useState(false);
     const [harvestId, setHarvestId] = useState("");
-    transactionServices.useTrackTransactionStatus({
+    useTrackTransactionStatus({
         transactionId: harvestId,
         onSuccess: () => setOpenHarvestResult(true),
     });
 
-    const claimReward = useGovClaimReward();
-    const unlockASH = useGovUnlockASH();
-    const { isLoggedIn: loggedIn } = useGetLoginInfo();
+    const { claimReward } = useGovClaimReward();
+    const { unlockASH } = useGovUnlockASH();
+    const loggedIn = useRecoilValue(accIsLoggedInState);
     const mounted = useMounted();
     const connectWallet = useConnectWallet();
     const tokenPrices = useRecoilValue(walletTokenPriceState);
@@ -105,34 +117,14 @@ function GovStats() {
     }, [unlockTS, lockedAmt]);
     return (
         <>
-            <div className="flex justify-between">
+            <div className="mb-7">
                 <h1 className="text-pink-600 text-2xl md:text-5xl font-bold mb-7 md:mb-11">
                     Governance Stake
                 </h1>
-                <div className="hidden md:flex space-x-2">
-                    {/* <button className="bg-pink-600/20 text-pink-600 h-12 px-6 flex items-center justify-center">
-                            Weekly Summary
-                        </button> */}
-                    {loggedIn && (
-                        <ExpiredLockTooltip disabled={!canUnlockASH}>
-                            <button
-                                className={`h-12 px-6 flex items-center justify-center ${
-                                    canUnlockASH
-                                        ? "bg-ash-dark-400 text-stake-gray-500 cursor-not-allowed"
-                                        : "bg-pink-600 text-white"
-                                }`}
-                                onClick={() =>
-                                    !canUnlockASH && setOpenStakeGov(true)
-                                }
-                            >
-                                Add / Manage Stake
-                            </button>
-                        </ExpiredLockTooltip>
-                    )}
-                </div>
+                <GovMenu />
             </div>
             <div className="flex flex-col md:flex-row">
-                <div className="md:w-[21.875rem] flex-shrink-0 flex flex-col px-7 lg:px-9 pb-9 pt-7 lg:pt-14 bg-stake-dark-400 mb-4 md:mb-0 md:mr-4 lg:mr-[1.875rem]">
+                <div className="md:w-[21.875rem] shrink-0 flex flex-col px-7 lg:px-9 pb-9 pt-7 lg:pt-14 bg-stake-dark-400 mb-4 md:mb-0 md:mr-4 lg:mr-[1.875rem]">
                     <h2 className="text-lg md:text-2xl mb-11 md:mb-11 font-bold text-white">
                         Your staked
                     </h2>
@@ -159,24 +151,26 @@ function GovStats() {
                                 <div className="flex items-center">
                                     {rewardLPToken && (
                                         <div className="flex items-center">
-                                            <div className="w-[1.125rem] h-[1.125rem]">
-                                                <Image
-                                                    src={
-                                                        rewardLPToken.tokens[0]
-                                                            .icon
-                                                    }
-                                                    alt="token icon"
-                                                />
-                                            </div>
-                                            <div className="w-[1.125rem] h-[1.125rem] -ml-1 mr-2">
-                                                <Image
-                                                    src={
-                                                        rewardLPToken.tokens[1]
-                                                            .icon
-                                                    }
-                                                    alt="token icon"
-                                                />
-                                            </div>
+                                            <Avatar
+                                                src={
+                                                    rewardLPToken.tokens[0].icon
+                                                }
+                                                alt={
+                                                    rewardLPToken.tokens[0]
+                                                        .symbol
+                                                }
+                                                className="w-[1.125rem] h-[1.125rem]"
+                                            />
+                                            <Avatar
+                                                src={
+                                                    rewardLPToken.tokens[1].icon
+                                                }
+                                                alt={
+                                                    rewardLPToken.tokens[1]
+                                                        .symbol
+                                                }
+                                                className="w-[1.125rem] h-[1.125rem] -ml-1 mr-2"
+                                            />
                                         </div>
                                     )}
                                     <div className="text-lg">
@@ -192,12 +186,9 @@ function GovStats() {
                                     </div>
                                 </div>
                             </div>
-                            <button
-                                className={`text-sm font-bold w-full h-[3.375rem] flex items-center justify-center ${
-                                    canClaim
-                                        ? "bg-ash-cyan-500 text-ash-dark-400"
-                                        : "bg-ash-dark-400 text-white cursor-not-allowed"
-                                }`}
+                            <GlowingButton
+                                theme="cyan"
+                                className={`text-sm font-bold w-full h-[3.375rem]`}
                                 disabled={!canClaim}
                                 onClick={() =>
                                     canClaim &&
@@ -208,7 +199,7 @@ function GovStats() {
                                 }
                             >
                                 Harvest
-                            </button>
+                            </GlowingButton>
                         </div>
                         <div className="bg-ash-dark-400/30 px-[1.25rem] pt-7 pb-5">
                             <div className="px-5 mb-7">
@@ -229,14 +220,11 @@ function GovStats() {
                                     {/* <div className="w-[1.125rem] h-[1.125rem] mr-2">
                                         <Image src={ImgUsdt} alt="token icon" />
                                     </div> */}
-                                    <div className="w-[1.125rem] h-[1.125rem] mr-2 rounded-full relative">
-                                        <Image
-                                            src={ASH_TOKEN.icon}
-                                            alt={ASH_TOKEN.name}
-                                            layout="fill"
-                                            objectFit="contain"
-                                        />
-                                    </div>
+                                    <Avatar
+                                        src={ASH_TOKEN.icon}
+                                        alt={ASH_TOKEN.symbol}
+                                        className="w-[1.125rem] h-[1.125rem] mr-2"
+                                    />
                                     <div className="text-lg text-white font-bold">
                                         <TextAmt
                                             number={toEGLDD(
@@ -249,13 +237,14 @@ function GovStats() {
                                 </div>
                             </div>
                             {canUnlockASH ? (
-                                <button
-                                    className="bg-yellow-600 text-white text-sm font-bold w-full h-[3.375rem] flex items-center justify-center"
+                                <GlowingButton
+                                    theme="yellow"
+                                    className="text-sm font-bold w-full h-[3.375rem]"
                                     onClick={() => unlockASH()}
                                 >
                                     <ICUnlock className="w-6 h-6 mr-2" />
                                     <span>Withdraw</span>
-                                </button>
+                                </GlowingButton>
                             ) : (
                                 <button
                                     className="bg-ash-dark-400 text-stake-gray-500 text-sm font-bold w-full h-[3.375rem] flex items-center justify-center cursor-not-allowed"
@@ -362,18 +351,19 @@ function GovStats() {
                     {mounted &&
                         (loggedIn ? (
                             <ExpiredLockTooltip disabled={!canUnlockASH}>
-                                <button
-                                    className={`text-sm md:text-lg font-bold w-full h-14 md:h-[4.5rem] flex items-center justify-center mt-3 ${
-                                        canUnlockASH
-                                            ? "bg-ash-dark-400 text-stake-gray-500 cursor-not-allowed"
-                                            : "bg-pink-600 text-white"
-                                    }`}
-                                    onClick={() =>
-                                        !canUnlockASH && setOpenStakeGov(true)
-                                    }
-                                >
-                                    Add / Manage Stake
-                                </button>
+                                <span>
+                                    <GlowingButton
+                                        theme="pink"
+                                        className={`text-sm md:text-lg font-bold w-full h-14 md:h-[4.5rem] mt-3`}
+                                        disabled={canUnlockASH}
+                                        onClick={() =>
+                                            !canUnlockASH &&
+                                            setOpenStakeGov(true)
+                                        }
+                                    >
+                                        Add / Manage Stake
+                                    </GlowingButton>
+                                </span>
                             </ExpiredLockTooltip>
                         ) : (
                             <button
@@ -385,7 +375,7 @@ function GovStats() {
                             </button>
                         ))}
                 </div>
-                <div className="flex-grow px-7 lg:px-16 pt-7 lg:pt-14 pb-9 bg-stake-dark-400">
+                <div className="grow px-7 lg:px-16 pt-7 lg:pt-14 pb-9 bg-stake-dark-400">
                     <h2 className="text-lg md:text-2xl mb-10 md:mb-11 font-bold text-white">
                         Overall stats
                     </h2>
@@ -403,10 +393,7 @@ function GovStats() {
                                 PERCENTAGE of total ASH Locked
                             </div>
                             <div className="text-white text-lg font-bold leading-tight">
-                                {formatAmount(totalLockedPct, {
-                                    notation: "standard",
-                                })}
-                                %
+                                {formatAmount(totalLockedPct)}%
                             </div>
                         </div>
                         <div className="bg-ash-dark-400/30 px-[2.375rem] py-7 flex flex-col justify-between">
@@ -417,14 +404,11 @@ function GovStats() {
                                 {/* <div className="w-[1.125rem] h-[1.125rem] mr-2">
                                     <Image src={ImgUsdt} alt="token icon" />
                                 </div> */}
-                                <div className="w-[1.125rem] h-[1.125rem] mr-2 rounded-full relative">
-                                    <Image
-                                        src={ASH_TOKEN.icon}
-                                        alt={ASH_TOKEN.name}
-                                        layout="fill"
-                                        objectFit="contain"
-                                    />
-                                </div>
+                                <Avatar
+                                    src={ASH_TOKEN.icon}
+                                    alt={ASH_TOKEN.symbol}
+                                    className="w-[1.125rem] h-[1.125rem] mr-2"
+                                />
                                 <div className="text-white text-lg font-bold">
                                     <TextAmt
                                         number={toEGLDD(
@@ -467,66 +451,54 @@ function GovStats() {
                             Stake ASH to receive veASH. You can both earn from
                             transaction fee & have a power for voting!
                         </div>
-                        {ENVIRONMENT.NETWORK !== "devnet" && (
-                            <ul>
-                                <li className="text-sm font-bold">
-                                    <span className="text-stake-green-500">
-                                        1
-                                    </span>{" "}
-                                    ASH locked for{" "}
-                                    <span className="text-stake-green-500">
-                                        4 years
-                                    </span>{" "}
-                                    ={" "}
-                                    <span className="text-stake-green-500">
-                                        1
-                                    </span>{" "}
-                                    veASH
-                                </li>
-                                <li className="text-sm font-bold">
-                                    <span className="text-stake-green-500">
-                                        1
-                                    </span>{" "}
-                                    ASH locked for{" "}
-                                    <span className="text-stake-green-500">
-                                        3 years
-                                    </span>{" "}
-                                    ={" "}
-                                    <span className="text-stake-green-500">
-                                        0.75
-                                    </span>{" "}
-                                    veASH
-                                </li>
-                                <li className="text-sm font-bold">
-                                    <span className="text-stake-green-500">
-                                        1
-                                    </span>{" "}
-                                    ASH locked for{" "}
-                                    <span className="text-stake-green-500">
-                                        2 years
-                                    </span>{" "}
-                                    ={" "}
-                                    <span className="text-stake-green-500">
-                                        0.5
-                                    </span>{" "}
-                                    veASH
-                                </li>
-                                <li className="text-sm font-bold">
-                                    <span className="text-stake-green-500">
-                                        1
-                                    </span>{" "}
-                                    ASH locked for{" "}
-                                    <span className="text-stake-green-500">
-                                        1 year
-                                    </span>{" "}
-                                    ={" "}
-                                    <span className="text-stake-green-500">
-                                        0.25
-                                    </span>{" "}
-                                    veASH
-                                </li>
-                            </ul>
-                        )}
+                        <ul>
+                            <li className="text-sm font-bold">
+                                <span className="text-stake-green-500">1</span>{" "}
+                                ASH locked for{" "}
+                                <span className="text-stake-green-500">
+                                    4 years
+                                </span>{" "}
+                                ={" "}
+                                <span className="text-stake-green-500">1</span>{" "}
+                                veASH
+                            </li>
+                            <li className="text-sm font-bold">
+                                <span className="text-stake-green-500">1</span>{" "}
+                                ASH locked for{" "}
+                                <span className="text-stake-green-500">
+                                    3 years
+                                </span>{" "}
+                                ={" "}
+                                <span className="text-stake-green-500">
+                                    0.75
+                                </span>{" "}
+                                veASH
+                            </li>
+                            <li className="text-sm font-bold">
+                                <span className="text-stake-green-500">1</span>{" "}
+                                ASH locked for{" "}
+                                <span className="text-stake-green-500">
+                                    2 years
+                                </span>{" "}
+                                ={" "}
+                                <span className="text-stake-green-500">
+                                    0.5
+                                </span>{" "}
+                                veASH
+                            </li>
+                            <li className="text-sm font-bold">
+                                <span className="text-stake-green-500">1</span>{" "}
+                                ASH locked for{" "}
+                                <span className="text-stake-green-500">
+                                    1 year
+                                </span>{" "}
+                                ={" "}
+                                <span className="text-stake-green-500">
+                                    0.25
+                                </span>{" "}
+                                veASH
+                            </li>
+                        </ul>
                     </div>
                     <div>
                         <div className="text-whtie text-sm font-bold mb-5">
@@ -541,7 +513,7 @@ function GovStats() {
                                 className="w-full h-14 lg:h-[4.25rem] px-4 lg:px-[2.375rem] flex items-center justify-between text-pink-600"
                                 onClick={() => setIsQAExpand((val) => !val)}
                             >
-                                <div className="line-clamp-2 text-xs lg:text-sm font-bold flex-grow text-left mr-4">
+                                <div className="line-clamp-2 text-xs lg:text-sm font-bold grow text-left mr-4">
                                     OMG? Does it mean user will lose money
                                     everyday?
                                 </div>
@@ -586,7 +558,7 @@ function GovStats() {
                 <div className="px-4 pt-4 flex justify-end mb-4">
                     <BaseModal.CloseBtn />
                 </div>
-                <div className="flex-grow overflow-auto pt-10">
+                <div className="grow overflow-auto pt-10">
                     <div className="px-[3.375rem] flex flex-col items-center pb-28 border-b border-dashed border-b-ash-gray-500">
                         <div className="text-2xl font-bold text-stake-green-500 mb-12">
                             Harvest successfully
@@ -594,27 +566,23 @@ function GovStats() {
                         {rewardLPToken && (
                             <>
                                 <div className="flex items-center mb-9">
-                                    <div className="w-8 h-8">
-                                        <Image
-                                            src={rewardLPToken.tokens[0].icon}
-                                            layout="responsive"
-                                            alt="token icon"
-                                        />
-                                    </div>
-                                    <div className="w-8 h-8 -ml-1 mr-2">
-                                        <Image
-                                            src={rewardLPToken.tokens[1].icon}
-                                            layout="responsive"
-                                            alt="token icon"
-                                        />
-                                    </div>
+                                    <Avatar
+                                        src={rewardLPToken.tokens[0].icon}
+                                        alt={rewardLPToken.tokens[0].symbol}
+                                        className="w-8 h-8"
+                                    />
+                                    <Avatar
+                                        src={rewardLPToken.tokens[1].icon}
+                                        alt={rewardLPToken.tokens[1].symbol}
+                                        className="w-8 h-8 -ml-1 mr-2"
+                                    />
                                 </div>
                                 <div className="text-center text-ash-gray-500 text-lg font-bold">
                                     <TextAmt number={rewardValue} />
                                     &nbsp; LP-
-                                    {rewardLPToken.tokens[0].name}
-                                    {rewardLPToken.tokens[1].name} has been sent
-                                    to your wallet
+                                    {rewardLPToken.tokens[0].symbol}
+                                    {rewardLPToken.tokens[1].symbol} has been
+                                    sent to your wallet
                                 </div>
                             </>
                         )}

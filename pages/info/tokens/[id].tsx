@@ -1,21 +1,23 @@
-import { AccountInfoSliceNetworkType, useGetNetworkConfig } from "@elrondnetwork/dapp-core";
+import { AccountInfoSliceNetworkType } from "@elrondnetwork/dapp-core/types";
 import { Tooltip } from "antd";
 import ICArrowRight from "assets/svg/arrow-right.svg";
 import ICCopy from "assets/svg/copy.svg";
 import ICNewTabRound from "assets/svg/new-tab-round.svg";
 import ICSwap from "assets/svg/swap.svg";
+import { networkConfigState } from "atoms/dappState";
+import Avatar from "components/Avatar";
 import InfoLayout from "components/Layout/Info";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
-import { IN_POOL_TOKENS } from "const/tokens";
+import { IN_POOL_TOKENS } from "const/pool";
 import { fetcher } from "helper/common";
 import { formatAmount } from "helper/number";
 import { PoolStatsRecord } from "interface/poolStats";
 import { IToken } from "interface/token";
 import { TxStatsRecord } from "interface/txStats";
 import { GetServerSideProps, NextPage } from "next";
-import Image from "next/image";
 import Link from "next/link";
-import React, { ReactElement } from "react";
+import { ReactElement } from "react";
+import { useRecoilValue } from "recoil";
 import useSWR from "swr";
 import PoolsTable from "views/info/components/PoolsTable";
 import TxsTable from "views/info/components/TxsTable";
@@ -44,7 +46,9 @@ const TokenDetailPage: Page<props> = ({ token }: props) => {
         { refreshInterval: 5 * 60 * 1000 }
     );
     const { data: pools } = useSWR<PoolStatsRecord[]>(
-        token.id ? `${ASHSWAP_CONFIG.ashApiBaseUrl}/token/${token.id}/pool` : null,
+        token.id
+            ? `${ASHSWAP_CONFIG.ashApiBaseUrl}/token/${token.id}/pool`
+            : null,
         fetcher,
         { refreshInterval: 5 * 60 * 1000 }
     );
@@ -55,7 +59,8 @@ const TokenDetailPage: Page<props> = ({ token }: props) => {
         fetcher,
         { refreshInterval: 5 * 60 * 1000 }
     );
-    const network: AccountInfoSliceNetworkType = useGetNetworkConfig().network;
+    const network: AccountInfoSliceNetworkType =
+        useRecoilValue(networkConfigState).network;
     return (
         <div>
             <div className="text-white py-7 max-w-6xl mx-auto px-6 sm:px-0">
@@ -77,22 +82,26 @@ const TokenDetailPage: Page<props> = ({ token }: props) => {
                     </li>
                     <li>
                         <ICArrowRight className="inline mr-1 text-ash-gray-500" />
-                        <span className="text-ash-gray-500">{token?.name}</span>
+                        <span className="text-ash-gray-500">
+                            {token?.symbol}
+                        </span>
                     </li>
                 </ul>
                 <div className="flex flex-col space-y-5 lg:space-y-0 lg:flex-row items-start lg:items-center mb-[2.375rem]">
                     <div className="flex items-center">
                         <h1 className="text-2xl lg:text-4xl font-bold text-white mr-4">
-                            {token.name}
+                            {token.symbol}
                         </h1>
-                        <div className="w-6 h-6 lg:w-8 lg:h-8 mr-5">
-                            <Image src={token.icon} alt={token.name} />
-                        </div>
+                        <Avatar
+                            src={token.icon}
+                            alt={token.symbol}
+                            className="w-6 h-6 lg:w-8 lg:h-8 mr-5"
+                        />
                     </div>
                     <div className="flex items-center flex-row-reverse lg:flex-row">
                         <div className="bg-ash-dark-600 h-10 flex items-center px-4 mr-2">
                             <div className="mr-3 text-xs md:text-sm">
-                                {token.name} Coin
+                                {token.symbol} Coin
                             </div>
                             <div className="text-ash-gray-500 text-2xs md:text-xs">
                                 {token.id}
@@ -219,7 +228,7 @@ const TokenDetailPage: Page<props> = ({ token }: props) => {
                             </div>
                         </div>
                     </div>
-                    <div className="flex-grow h-[23.5rem] xl:ml-4 overflow-hidden mb-12 md:mb-18">
+                    <div className="grow h-[23.5rem] xl:ml-4 overflow-hidden mb-12 md:mb-18">
                         <TokenChart token={token} />
                     </div>
                 </div>
@@ -250,6 +259,9 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
             props: { token },
         };
     }
-    return { props: {}, redirect: {permanent: true, destination: "/info/tokens"} };
+    return {
+        props: {},
+        redirect: { permanent: true, destination: "/info/tokens" },
+    };
 };
 export default TokenDetailPage;

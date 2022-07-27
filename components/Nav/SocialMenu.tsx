@@ -85,11 +85,11 @@ function SocialMenu() {
                             as={Fragment}
                             show={open}
                             enter="transition ease-out duration-100"
-                            enterFrom="transform opacity-0 scale-95"
-                            enterTo="transform opacity-100 scale-100"
+                            enterFrom="opacity-0 scale-95"
+                            enterTo="opacity-100 scale-100"
                             leave="transition ease-in duration-75"
-                            leaveFrom="transform opacity-100 scale-100"
-                            leaveTo="transform opacity-0 scale-95"
+                            leaveFrom="opacity-100 scale-100"
+                            leaveTo="opacity-0 scale-95"
                         >
                             <Menu.Items className="absolute left-0 top-[100%] mt-2 bg-ash-dark-700 py-6 w-[10.5rem] outline-none">
                                 {SOCIALS.map(({ url, image, name }) => {
@@ -105,7 +105,7 @@ function SocialMenu() {
                                                             : "hover:bg-ash-dark-500"
                                                     }`}
                                                 >
-                                                    <span className="flex-shrink-0 rounded">
+                                                    <span className="shrink-0 rounded">
                                                         <Image
                                                             src={image}
                                                             alt={name}
@@ -150,7 +150,7 @@ function SocialMenu() {
                         <div className="flex justify-end mb-3.5">
                             <BaseModal.CloseBtn />
                         </div>
-                        <div className="flex-grow overflow-auto">
+                        <div className="grow overflow-auto">
                             <div className="px-6 pb-[3.75rem]">
                                 <div className="mb-9 text-2xl font-bold">
                                     Social
@@ -165,7 +165,7 @@ function SocialMenu() {
                                                 rel="noreferrer"
                                             >
                                                 <div className="bg-ash-dark-400 px-6 h-12 flex items-center text-xs font-bold text-white">
-                                                    <span className="flex-shrink-0 rounded">
+                                                    <span className="shrink-0 rounded">
                                                         <Image
                                                             src={image}
                                                             alt={name}

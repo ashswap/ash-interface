@@ -9,7 +9,12 @@ interface Props {
     onClick?: () => void;
 }
 
-const Token = ({ token: { name, icon }, small, className, onClick }: Props) => {
+const Token = ({
+    token: { symbol: name, icon },
+    small,
+    className,
+    onClick,
+}: Props) => {
     return (
         <div
             className={`flex flex-row items-center ${

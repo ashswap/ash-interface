@@ -3,8 +3,10 @@ import ICChevronRight from "assets/svg/chevron-right.svg";
 import { accIsInsufficientEGLDState } from "atoms/dappState";
 import { FarmsState } from "atoms/farmsState";
 import BigNumber from "bignumber.js";
+import Avatar from "components/Avatar";
 import BaseModal from "components/BaseModal";
 import Checkbox from "components/Checkbox";
+import GlowingButton from "components/GlowingButton";
 import InputCurrency from "components/InputCurrency";
 import TextAmt from "components/TextAmt";
 import CardTooltip from "components/Tooltip/CardTooltip";
@@ -15,8 +17,7 @@ import { formatAmount } from "helper/number";
 import useExitFarm from "hooks/useFarmContract/useExitFarm";
 import { useScreenSize } from "hooks/useScreenSize";
 import { Unarray } from "interface/utilities";
-import Image from "next/image";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { theme } from "tailwind.config";
 import { useDebounce } from "use-debounce";
@@ -75,8 +76,8 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
     }, [stakedData, farmTokenSupply, ashPerBlock, unStakeAmt]);
 
     const lpName = useMemo(() => {
-        return `LP-${token0.name}${token1.name}`;
-    }, [token0.name, token1.name]);
+        return `LP-${token0.symbol}${token1.symbol}`;
+    }, [token0.symbol, token1.symbol]);
     const insufficientFarmToken = useMemo(() => {
         if (!stakedData?.totalStakedLP) return true;
         return unStakeAmt.gt(stakedData?.totalStakedLP);
@@ -90,11 +91,12 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
         );
     }, [isAgree, unStakeAmt, insufficientFarmToken, insufficientEGLD]);
     const unStake = useCallback(async () => {
-        const { sessionId } = await exitFarm(unStakeAmt, farm);
+        if(!stakedData?.totalStakedLP) return;
+        const { sessionId } = await exitFarm(unStakeAmt, farm, unStakeAmt.eq(stakedData.totalStakedLP));
         if (sessionId && onClose) {
             onClose();
         }
-    }, [exitFarm, unStakeAmt, farm, onClose]);
+    }, [exitFarm, unStakeAmt, farm, onClose, stakedData]);
     const onChangePct = useCallback(
         (pct: number) => {
             if (!stakedData) return;
@@ -132,7 +134,7 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
                 Unstake {lpName}
             </div>
             <div className="sm:flex sm:space-x-8 lg:space-x-24 mb-18">
-                <div className="flex flex-col flex-grow mb-16 sm:mb-0">
+                <div className="flex flex-col grow mb-16 sm:mb-0">
                     <div className="w-full grid md:grid-cols-2 gap-y-6 gap-x-4 lg:gap-x-7.5 mb-11">
                         <div>
                             <div className="text-ash-gray-500 text-xs lg:text-sm font-bold mb-2 lg:mb-4">
@@ -140,20 +142,16 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
                             </div>
                             <div className="bg-ash-dark-400/30 h-14 lg:h-18 px-6 flex items-center">
                                 <div className="flex mr-2">
-                                    <div className="w-4 h-4">
-                                        <Image
-                                            src={token0.icon}
-                                            alt={`${token0.name} icon`}
-                                            layout="responsive"
-                                        />
-                                    </div>
-                                    <div className="w-4 h-4 -ml-1">
-                                        <Image
-                                            src={token1.icon}
-                                            alt={`${token1.name} icon`}
-                                            layout="responsive"
-                                        />
-                                    </div>
+                                    <Avatar
+                                        src={token0.icon}
+                                        alt={token0.symbol}
+                                        className="w-4 h-4"
+                                    />
+                                    <Avatar
+                                        src={token1.icon}
+                                        alt={token1.symbol}
+                                        className="w-4 h-4 -ml-1"
+                                    />
                                 </div>
                                 <div className="text-ash-gray-500 text-sm lg:text-lg font-bold">
                                     {lpName}
@@ -262,7 +260,7 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
                         </div>
                     </div>
                 </div>
-                <div className="w-full sm:w-1/3 lg:w-[17.8125rem] flex-shrink-0 bg-stake-dark-500 py-[2.375rem] px-10">
+                <div className="w-full sm:w-1/3 lg:w-[17.8125rem] shrink-0 bg-stake-dark-500 py-[2.375rem] px-10">
                     <div className="text-white text-lg font-bold mb-16">
                         Estimated Decrease
                     </div>
@@ -318,7 +316,7 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
                 </div>
             </div>
             <div className="sm:flex sm:space-x-8 lg:space-x-24">
-                <div className="w-full mb-12 sm:mb-0 sm:flex-grow">
+                <div className="w-full mb-12 sm:mb-0 sm:grow">
                     <Checkbox
                         checked={isAgree}
                         onChange={setIsAgree}
@@ -340,14 +338,11 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
                         }
                     />
                 </div>
-                <div className="w-full sm:w-1/3 lg:w-[17.8125rem] flex-shrink-0">
-                    <div className="border-notch">
-                        <button
-                            className={`clip-corner-1 clip-corner-tl transition w-full h-12 flex items-center justify-center text-sm font-bold ${
-                                canUnstake
-                                    ? "bg-yellow-600 text-stake-dark-400"
-                                    : "bg-ash-dark-500 text-white"
-                            }`}
+                <div className="w-full sm:w-1/3 lg:w-[17.8125rem] shrink-0">
+                    <div className="border-notch-x border-notch-white/50">
+                        <GlowingButton
+                            theme="yellow"
+                            className={`clip-corner-1 clip-corner-tl w-full h-12 text-sm font-bold`}
                             disabled={!canUnstake}
                             onClick={() => canUnstake && unStake()}
                         >
@@ -359,7 +354,7 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
                                     <ICChevronRight className="w-2 h-auto" />
                                 </div>
                             )}
-                        </button>
+                        </GlowingButton>
                     </div>
                 </div>
             </div>
@@ -380,7 +375,7 @@ function UnstakeLPModal(props: props) {
                 <BaseModal.CloseBtn />
             </div>
             {open && (
-                <div className="flex-grow overflow-auto">
+                <div className="grow overflow-auto">
                     <UnstakeLPContent {...props} />
                 </div>
             )}

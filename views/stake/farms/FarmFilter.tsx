@@ -70,32 +70,32 @@ function FarmFilter() {
                 <div className={`flex flex-row justify-between mb-4 md:mb-0`}>
                     <div className="flex flex-row justify-center items-center overflow-hidden mr-2">
                         <button
-                            className={`mr-2 flex-shrink-0 ${
+                            className={`mr-2 transition-all shrink-0 ${
                                 viewType === ViewType.Card
                                     ? "text-ash-cyan-500"
-                                    : "text-ash-gray-500"
+                                    : "text-ash-gray-600 hover:text-[#B1AEDA]"
                             }`}
                             onClick={() => onChangeViewType(ViewType.Card)}
                         >
                             <ICGrid className="w-6 h-6" />
                         </button>
                         <button
-                            className={`mr-2 lg:mr-8 flex-shrink-0 ${
+                            className={`mr-2 transition-all lg:mr-8 shrink-0 ${
                                 viewType === ViewType.List
                                     ? "text-ash-cyan-500"
-                                    : "text-ash-gray-500"
+                                    : "text-ash-gray-600 hover:text-[#B1AEDA]"
                             }`}
                             onClick={() => onChangeViewType(ViewType.List)}
                         >
                             <ICList className="w-6 h-6" />
                         </button>
                         {screenSize.md && (
-                            <div className="flex-grow overflow-hidden">
+                            <div className="grow overflow-hidden">
                                 {SearchBox}
                             </div>
                         )}
                     </div>
-                    <div className="flex items-center space-x-2 flex-shrink-0">
+                    <div className="flex items-center space-x-2 shrink-0">
                         <div>
                             <BasePopover
                                 className="absolute w-full text-white left-0"
