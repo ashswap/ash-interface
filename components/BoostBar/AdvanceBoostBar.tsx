@@ -42,7 +42,7 @@ const AdvanceBoostBar = ({
                             </div>
                         )}
                         <div className="flex items-center">
-                            <span className="mr-1">x{max}</span>
+                            <span className="mr-1">x{formatAmount(max)}</span>
                             <ICGovBoost className="-mt-0.5" />
                         </div>
                     </div>
