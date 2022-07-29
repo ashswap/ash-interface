@@ -36,7 +36,9 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
         farmAddressProp
     );
     const [lpValue, setLpValue] = useState(new BigNumber(0));
-    const [TVLExcludeOwnLP, setTVLExcludeOwnLP] = useState(new BigNumber(0));
+    const [TVLExcludeOwnLPValue, setTVLExcludeOwnLPValue] = useState(
+        new BigNumber(0)
+    );
     const [totalCurrentVeASH, setTotalCurrentVeASH] = useState(
         new BigNumber(0)
     );
@@ -57,46 +59,59 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
         setFarmAddress(farmAddressProp);
     }, [farmAddressProp]);
 
-    const currentFarmSupply = useMemo(() => {
+    const currentFarmSupplyWei = useMemo(() => {
         if (!farmData) return new BigNumber(0);
-        return toEGLDD(
-            farmData.farm.farm_token_decimal,
-            farmData.farmTokenSupply
-        );
+        return farmData.farmTokenSupply;
     }, [farmData]);
 
     const existFarmTokenBal = useMemo(() => {
-        if (!farmData) return new BigNumber(0);
-        return toEGLDD(
-            farmData.farm.farm_token_decimal,
-            farmData.stakedData?.farmTokens.reduce(
+        return (
+            farmData?.stakedData?.farmTokens.reduce(
                 (total, t) => total.plus(t.balance),
                 new BigNumber(0)
-            ) || 0
+            ) || new BigNumber(0)
         );
     }, [farmData]);
 
+    const totalLPExcludeOwnLPWei = useMemo(() => {
+        if (!farmData) return new BigNumber(0);
+        return TVLExcludeOwnLPValue.multipliedBy(farmData.lpLockedAmt).div(
+            farmData.totalLiquidityValue
+        );
+    }, [farmData, TVLExcludeOwnLPValue]);
+
+    const lpWei = useMemo(() => {
+        if (!farmData) return new BigNumber(0);
+        return lpValue
+            .multipliedBy(farmData.lpLockedAmt)
+            .div(farmData.totalLiquidityValue);
+    }, [lpValue, farmData]);
+
     const veForMaxBoost = useMemo(() => {
-        return totalCurrentVeASH.multipliedBy(lpValue).div(TVLExcludeOwnLP);
-    }, [lpValue, totalCurrentVeASH, TVLExcludeOwnLP]);
+        return totalCurrentVeASH
+            .multipliedBy(lpValue)
+            .div(TVLExcludeOwnLPValue);
+    }, [lpValue, totalCurrentVeASH, TVLExcludeOwnLPValue]);
 
     const maxYieldBoost = useMemo(() => {
-        if (veForMaxBoost.eq(0)) return 1;
-        const totalLP = lpValue.plus(TVLExcludeOwnLP);
+        // if (veForMaxBoost.eq(0)) return 1;
+        const totalLP = lpWei.plus(totalLPExcludeOwnLPWei);
         return calcYieldBoost(
-            lpValue,
+            lpWei,
             totalLP,
-            veForMaxBoost,
-            totalCurrentVeASH.plus(veForMaxBoost),
-            currentFarmSupply,
+            veForMaxBoost.multipliedBy(10 ** VE_ASH_DECIMALS),
+            totalCurrentVeASH
+                .plus(veForMaxBoost)
+                .multipliedBy(10 ** VE_ASH_DECIMALS),
+            currentFarmSupplyWei,
             existFarmTokenBal
         );
     }, [
-        lpValue,
+        lpWei,
         veForMaxBoost,
-        TVLExcludeOwnLP,
+        totalLPExcludeOwnLPWei,
         totalCurrentVeASH,
-        currentFarmSupply,
+        currentFarmSupplyWei,
         existFarmTokenBal,
     ]);
 
@@ -114,19 +129,21 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
 
     const boost = useMemo(() => {
         return calcYieldBoost(
-            lpValue,
-            lpValue.plus(TVLExcludeOwnLP),
-            veAshInput,
-            totalCurrentVeASH.plus(veAshInput),
-            currentFarmSupply,
+            lpWei,
+            lpWei.plus(totalLPExcludeOwnLPWei),
+            veAshInput.multipliedBy(10 ** VE_ASH_DECIMALS),
+            totalCurrentVeASH
+                .plus(veAshInput)
+                .multipliedBy(10 ** VE_ASH_DECIMALS),
+            currentFarmSupplyWei,
             existFarmTokenBal
         );
     }, [
-        lpValue,
-        TVLExcludeOwnLP,
+        lpWei,
+        totalLPExcludeOwnLPWei,
         veAshInput,
         totalCurrentVeASH,
-        currentFarmSupply,
+        currentFarmSupplyWei,
         existFarmTokenBal,
     ]);
 
@@ -135,7 +152,7 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
             setLpValue(
                 farmData?.stakedData?.totalStakedLPValue || new BigNumber(0)
             );
-            setTVLExcludeOwnLP(
+            setTVLExcludeOwnLPValue(
                 farmData?.totalLiquidityValue.minus(
                     farmData?.stakedData?.totalStakedLPValue || new BigNumber(0)
                 ) || new BigNumber(0)
@@ -284,7 +301,7 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
                                 <InputCurrency
                                     className="bg-ash-dark-400 text-right h-10 px-2 sm:px-7 text-stake-gray-500 outline-none text-sm w-full disabled:cursor-not-allowed"
                                     placeholder="0"
-                                    value={TVLExcludeOwnLP.toFixed(3)}
+                                    value={TVLExcludeOwnLPValue.toFixed(3)}
                                     disabled
                                 />
                                 <div className="absolute right-0 w-1/3 sm:w-1/2 border-t border-ash-gray-600 translate-x-full top-1/2">
