@@ -1,18 +1,11 @@
 import ICArrowLeft from "assets/svg/arrow-left.svg";
 import ICArrowRight from "assets/svg/arrow-right.svg";
-import ICStarOutline from "assets/svg/star-outline.svg";
-import ICStar from "assets/svg/star.svg";
-import { ENVIRONMENT } from "const/env";
 import { IN_POOL_TOKENS } from "const/pool";
-import { fetcher } from "helper/common";
 import { formatAmount } from "helper/number";
 import { useScreenSize } from "hooks/useScreenSize";
-import { IToken } from "interface/token";
 import { TokenStatsRecord } from "interface/tokenStats";
-import Image from "next/image";
 import Link from "next/link";
-import React, { useCallback, useMemo, useState } from "react";
-import useSWR from "swr";
+import { useCallback, useMemo, useState } from "react";
 
 const TokenRecord = ({
     active,
@@ -127,7 +120,9 @@ function TokenTable({
     const tokenRecords: TokenStatsRecord[] = useMemo(() => {
         if (!data) return [];
         return data.map((val) => {
-            const token = IN_POOL_TOKENS.find((t) => t.id === val.token_id);
+            const token = IN_POOL_TOKENS.find(
+                (t) => t.identifier === val.token_id
+            );
             const record: TokenStatsRecord = { ...val, token };
             return record;
         });

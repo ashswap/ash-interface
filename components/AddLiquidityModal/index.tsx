@@ -5,7 +5,7 @@ import {
     accIsLoggedInState
 } from "atoms/dappState";
 import { PoolsState } from "atoms/poolsState";
-import { walletBalanceState, walletTokenPriceState } from "atoms/walletState";
+import { tokenMapState } from "atoms/tokensState";
 import BigNumber from "bignumber.js";
 import Avatar from "components/Avatar";
 import BaseModal from "components/BaseModal";
@@ -15,19 +15,18 @@ import InputCurrency from "components/InputCurrency";
 import TextAmt from "components/TextAmt";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
 import { toEGLDD, toWei } from "helper/balance";
-import {
-    useCreateTransaction
-} from "helper/transactionMethods";
+import { Fraction } from "helper/fraction/fraction";
+import { IESDTInfo } from "helper/token/token";
+import { TokenAmount } from "helper/token/tokenAmount";
 import { useOnboarding } from "hooks/useOnboarding";
 import usePoolAddLP from "hooks/usePoolContract/usePoolAddLP";
 import { useScreenSize } from "hooks/useScreenSize";
-import { IToken } from "interface/token";
+import produce from "immer";
 import { Unarray } from "interface/utilities";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { theme } from "tailwind.config";
-import { useDebounce } from "use-debounce";
 
 interface Props {
     open?: boolean;
@@ -35,7 +34,7 @@ interface Props {
     poolData: Unarray<PoolsState["poolToDisplay"]>;
 }
 interface TokenInputProps {
-    token: IToken;
+    token: IESDTInfo;
     value: string;
     isInsufficentFund: boolean;
     onChangeValue: (val: string) => void;
@@ -57,7 +56,7 @@ const TokenInput = ({
                     className={`flex items-center w-24 sm:w-1/3 px-4 sm:px-0 border-r border-r-ash-gray-500 sm:border-r-0`}
                 >
                     <Avatar
-                        src={token.icon}
+                        src={token.logoURI}
                         alt="token icon"
                         className="w-5 h-5 mr-2 shrink-0"
                     />
@@ -121,53 +120,37 @@ const TokenInput = ({
         </>
     );
 };
-const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
+const AddLiquidityContent = ({ onClose, poolData }: Props) => {
     const [isAgree, setAgree] = useState<boolean>(false);
-    const [value0, setValue0] = useState<string>("");
-    const [value0Debounce] = useDebounce(value0, 500);
-    const [value1, setValue1] = useState<string>("");
-    const [value1Debounce] = useDebounce(value1, 500);
+    const [inputValues, setInputValues] = useState(
+        poolData.pool.tokens.map(() => "")
+    );
     const [isProMode, setIsProMode] = useState(false);
     const [adding, setAdding] = useState(false);
-    const createTx = useCreateTransaction();
     const addPoolLP = usePoolAddLP();
     // recoil
-    const balances = useRecoilValue(walletBalanceState);
-    const tokenPrices = useRecoilValue(walletTokenPriceState);
-    // end recoil
+    const tokenMap = useRecoilValue(tokenMapState);
     const loggedIn = useRecoilValue(accIsLoggedInState);
     const isInsufficientEGLD = useRecoilValue(accIsInsufficientEGLDState);
-    const { pool, poolStats, liquidityData } = poolData;
+    const setAddLPSessionId = useSetRecoilState(addLPSessionIdAtom);
+    // end recoil
+    const { pool, liquidityData } = poolData;
     const [onboardingDepositInput, setOnboardedDepositInput] =
         useOnboarding("pool_deposit_input");
     const [onboardingPoolCheck, setOnboardedPoolCheck] = useOnboarding(
         "pool_deposit_checkbox"
     );
 
-    const setAddLPSessionId = useSetRecoilState(addLPSessionIdAtom);
     const screenSize = useScreenSize();
-    // reset when open modal
-    useEffect(() => {
-        if (open) {
-            setAgree(false);
-            setValue0("");
-            setValue1("");
-        }
-    }, [open]);
-
-    useEffect(() => {
-        if (new BigNumber(value0 || 0).plus(new BigNumber(value1 || 0)).gt(0)) {
-            setOnboardedDepositInput(true);
-        }
-    }, [value0, value1, setOnboardedDepositInput]);
 
     const addLP = useCallback(async () => {
         if (!loggedIn || adding) return;
         setAdding(true);
-        const v0 = toWei(pool.tokens[0], value0 || "0");
-        const v1 = toWei(pool.tokens[1], value1 || "0");
         try {
-            const { sessionId } = await addPoolLP(pool, [v0, v1]);
+            const { sessionId } = await addPoolLP(
+                pool,
+                pool.tokens.map((t, i) => toWei(t, inputValues[i] || "0"))
+            );
 
             setAddLPSessionId(sessionId || "");
             if (sessionId) onClose?.();
@@ -176,117 +159,64 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
         } finally {
             setAdding(false);
         }
-    }, [value0, value1, pool, onClose, adding, loggedIn, addPoolLP, setAddLPSessionId]);
+    }, [
+        inputValues,
+        pool,
+        onClose,
+        adding,
+        loggedIn,
+        addPoolLP,
+        setAddLPSessionId,
+    ]);
 
-    const balance0 = useMemo(() => {
-        return (
-            balances[pool.tokens[0].id]?.balance
-                .div(new BigNumber(10).exponentiatedBy(pool.tokens[0].decimals))
-                .toFixed(8)
-                .toString() || "0"
-        );
-    }, [balances, pool]);
-
-    const balance1 = useMemo(() => {
-        return (
-            balances[pool.tokens[1].id]?.balance
-                .div(new BigNumber(10).exponentiatedBy(pool.tokens[1].decimals))
-                .toFixed(8)
-                .toString() || "0"
-        );
-    }, [balances, pool]);
-
-    const isInsufficentFund0 = useMemo(() => {
-        if (value0 === "" || balance0 === "0") {
-            return false;
-        }
-
-        const v0 = new BigNumber(value0);
-        const b0 = new BigNumber(balance0);
-
-        return v0.gt(b0);
-    }, [value0, balance0]);
-
-    const isInsufficentFund1 = useMemo(() => {
-        if (value1 === "" || balance1 === "0") {
-            return false;
-        }
-
-        const v1 = new BigNumber(value1);
-        const b1 = new BigNumber(balance1);
-
-        return v1.gt(b1);
-    }, [value1, balance1]);
-
-    // useEffect(() => {
-    //     if (value0Debounce === "" || value1Debounce === "") {
-    //         return;
-    //     }
-
-    //     proxy
-    //         .queryContract(
-    //             new Query({
-    //                 address: new Address(pool.address),
-    //                 func: new ContractFunction("getAddLiquidityTokens"),
-    //                 args: [
-    //                     new BigUIntValue(
-    //                         new BigNumber(toWei(pool.tokens[0], value0Debounce))
-    //                     ),
-    //                     new BigUIntValue(
-    //                         new BigNumber(toWei(pool.tokens[1], value1Debounce))
-    //                     )
-    //                 ]
-    //             })
-    //         )
-    //         .then(({ returnData }) => {
-
-    //             let liquidity = new BigNumber(
-    //                 "0x" + Buffer.from(returnData[0], "base64").toString("hex")
-    //             );
-
-    //             setLiquidity(
-    //                 toEGLD(pool.lpToken, liquidity.toString()).toFixed(8)
-    //             );
-    //         });
-    // }, [value0Debounce, value1Debounce, pool, proxy]);
+    const tokenInputProps = useMemo(() => {
+        return pool.tokens.map((t, i) => {
+            const userInput = Fraction.fromBigNumber(inputValues[i] || 0);
+            const tokenAmt = new TokenAmount(
+                t,
+                tokenMap[t.identifier]?.balance || 0
+            );
+            const isInsufficientFund =
+                inputValues[i] === "" || tokenAmt.equalTo(0)
+                    ? false
+                    : userInput.greaterThan(tokenAmt);
+            return {
+                tokenAmt,
+                isInsufficientFund,
+                token: t,
+            };
+        });
+    }, [pool, tokenMap, inputValues]);
 
     const liquidityValue = useMemo(() => {
-        if (!value0Debounce && !value1Debounce) {
-            return new BigNumber(0);
-        }
-
-        let token0 = pool.tokens[0];
-        let token1 = pool.tokens[1];
-
-        let balance0 = new BigNumber(value0Debounce || "0");
-        let balance1 = new BigNumber(value1Debounce || "0");
-
-        const valueUsd0 = balance0.multipliedBy(tokenPrices[token0.id]);
-        const valueUsd1 = balance1.multipliedBy(tokenPrices[token1.id]);
-
-        return valueUsd0.plus(valueUsd1) || new BigNumber(0);
-    }, [pool, tokenPrices, value0Debounce, value1Debounce]);
+        return pool.tokens.reduce(
+            (total, t, i) =>
+                total.plus(
+                    new BigNumber(inputValues[i] || 0).multipliedBy(
+                        tokenMap[t.identifier]?.price || 0
+                    )
+                ),
+            new BigNumber(0)
+        );
+    }, [pool, tokenMap, inputValues]);
 
     const canAddLP = useMemo(() => {
-        const v0 = new BigNumber(value0 || "0");
-        const v1 = new BigNumber(value1 || "0");
         return (
             isAgree &&
             !isInsufficientEGLD &&
-            !isInsufficentFund0 &&
-            !isInsufficentFund1 &&
+            tokenInputProps.every((t) => !t.isInsufficientFund) &&
             !adding &&
-            !v0.plus(v1).eq(0)
+            !inputValues
+                .reduce((total, val) => total.plus(val || 0), new BigNumber(0))
+                .eq(0)
         );
-    }, [
-        isAgree,
-        isInsufficentFund0,
-        isInsufficentFund1,
-        isInsufficientEGLD,
-        adding,
-        value0,
-        value1,
-    ]);
+    }, [isAgree, isInsufficientEGLD, adding, inputValues, tokenInputProps]);
+
+    useEffect(() => {
+        if (liquidityValue.gt(0)) {
+            setOnboardedDepositInput(true);
+        }
+    }, [liquidityValue, setOnboardedDepositInput]);
 
     return (
         <div className="px-8 pb-16 sm:pb-7 grow overflow-auto">
@@ -301,12 +231,12 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
                 </div>
                 <div className="flex flex-row justify-between items-center">
                     <Avatar
-                        src={pool.tokens[0].icon}
+                        src={pool.tokens[0].logoURI}
                         alt={pool.tokens[0].symbol}
                         className="w-6 h-6 sm:w-9 sm:h-9"
                     />
                     <Avatar
-                        src={pool.tokens[1].icon}
+                        src={pool.tokens[1].logoURI}
                         alt={pool.tokens[1].symbol}
                         className="w-6 h-6 sm:w-9 sm:h-9 -ml-1 sm:ml-[-0.375rem]"
                     />
@@ -330,32 +260,35 @@ const AddLiquidityContent = ({ open, onClose, poolData }: Props) => {
                         )}
                     >
                         <div>
-                            <div className="py-1.5">
-                                <TokenInput
-                                    token={pool.tokens[0]}
-                                    tokenInPool={toEGLDD(
-                                        pool.tokens[0].decimals,
-                                        liquidityData?.value0 || 0
-                                    )}
-                                    value={value0}
-                                    onChangeValue={(val) => setValue0(val)}
-                                    isInsufficentFund={isInsufficentFund0}
-                                    balance={balance0}
-                                />
-                            </div>
-                            <div className="py-1.5">
-                                <TokenInput
-                                    token={pool.tokens[1]}
-                                    tokenInPool={toEGLDD(
-                                        pool.tokens[1].decimals,
-                                        liquidityData?.value1 || 0
-                                    )}
-                                    value={value1}
-                                    onChangeValue={(val) => setValue1(val)}
-                                    isInsufficentFund={isInsufficentFund1}
-                                    balance={balance1}
-                                />
-                            </div>
+                            {tokenInputProps.map((p, i) => {
+                                return (
+                                    <div
+                                        key={p.token.identifier}
+                                        className="py-1.5"
+                                    >
+                                        <TokenInput
+                                            token={p.token}
+                                            tokenInPool={toEGLDD(
+                                                pool.tokens[i].decimals,
+                                                liquidityData?.lpReserves[i] ||
+                                                    0
+                                            )}
+                                            value={inputValues[i]}
+                                            onChangeValue={(val) =>
+                                                setInputValues((state) =>
+                                                    produce(state, (draft) => {
+                                                        draft[i] = val;
+                                                    })
+                                                )
+                                            }
+                                            isInsufficentFund={
+                                                p.isInsufficientFund
+                                            }
+                                            balance={p.tokenAmt.toFixed(8)}
+                                        />
+                                    </div>
+                                );
+                            })}
                         </div>
                     </OnboardTooltip>
 

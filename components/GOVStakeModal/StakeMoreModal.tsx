@@ -5,9 +5,9 @@ import {
     govLockedAmtState,
     govTotalSupplyVeASH,
     govUnlockTSState,
-    govVeASHAmtState
+    govVeASHAmtState,
 } from "atoms/govState";
-import { walletBalanceState } from "atoms/walletState";
+import { tokenMapState } from "atoms/tokensState";
 import BigNumber from "bignumber.js";
 import Avatar from "components/Avatar";
 import BaseModal from "components/BaseModal";
@@ -50,13 +50,13 @@ const StakeMoreContent = ({ open, onClose }: props) => {
     const unlockTS = useRecoilValue(govUnlockTSState);
     const totalSupplyVeASH = useRecoilValue(govTotalSupplyVeASH);
     const veASH = useRecoilValue(govVeASHAmtState);
-    const {lockMoreASH} = useGovLockMore();
+    const { lockMoreASH } = useGovLockMore();
 
-    const balances = useRecoilValue(walletBalanceState);
+    const tokenMap = useRecoilValue(tokenMapState);
     const insufficientEGLD = useRecoilValue(accIsInsufficientEGLDState);
     const ASHBalance = useMemo(
-        () => balances[ASH_TOKEN.id]?.balance || new BigNumber(0),
-        [balances]
+        () => new BigNumber(tokenMap[ASH_TOKEN.identifier]?.balance || 0),
+        [tokenMap]
     );
     const [lockAmt, setLockAmt] = useState<BigNumber>(new BigNumber(0));
     const [rawLockAmt, setRawLockAmt] = useState("");
@@ -235,7 +235,7 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                                     <div className="mr-1">Current</div>
                                     <div className="flex items-center">
                                         <Avatar
-                                            src={ASH_TOKEN.icon}
+                                            src={ASH_TOKEN.logoURI}
                                             alt={ASH_TOKEN.symbol}
                                             className="w-3 h-3 mr-1"
                                         />

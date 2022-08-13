@@ -1,134 +1,12 @@
-import {
-    poolDeboundKeywordState,
-    poolKeywordState,
-    poolRecordsState,
-} from "atoms/poolsState";
-import { walletBalanceState, walletLPMapState } from "atoms/walletState";
-import BigNumber from "bignumber.js";
 import BasicLayout from "components/Layout/Basic";
+import pools from "const/pool";
+import type { NextPage } from "next";
 import ListPool from "views/pool/components/ListPool";
 import PoolBanner from "views/pool/components/PoolBanner";
-import PoolFilter, { ViewType } from "views/pool/components/PoolFilter";
+import PoolFilter from "views/pool/components/PoolFilter";
 import PoolMenu from "views/pool/components/PoolMenu";
-import { ASHSWAP_CONFIG } from "const/ashswapConfig";
-import { blockTimeMs } from "const/dappConfig";
-import pools from "const/pool";
-import { toEGLD } from "helper/balance";
-import { fetcher } from "helper/common";
-import { queryPoolContract } from "helper/contracts/pool";
-import useInterval from "hooks/useInterval";
-import useLPValue from "hooks/usePoolContract/useLPValue";
-import { useScreenSize } from "hooks/useScreenSize";
-import IPool from "interface/pool";
-import { PoolStatsRecord } from "interface/poolStats";
-import type { NextPage } from "next";
-import { useCallback, useEffect, useState } from "react";
-import { useRecoilCallback, useRecoilValue, useSetRecoilState } from "recoil";
-import useSWR from "swr";
-import { useDebounce } from "use-debounce";
-
-type PoolRecord = {
-    pool: IPool;
-    poolStats?: PoolStatsRecord;
-    /** if LP balance > 0 -> staked pool*/
-    liquidityData?: {
-        /** number of own LP token*/
-        ownLiquidity: BigNumber;
-        /** number of token 0 in own LP*/
-        value0: BigNumber;
-        /** number of token 1 in own LP*/
-        value1: BigNumber;
-        /** own LP over total LP*/
-        capacityPercent: BigNumber;
-        /** total liquidity in USD value*/
-        lpValueUsd: BigNumber;
-    };
-};
-const PoolStateHook = () => {
-    const keyword = useRecoilValue(poolKeywordState);
-    // const balances = useRecoilValue(walletBalanceState);
-    const lpTokens = useRecoilValue(walletLPMapState);
-    // const setPoolRecords = useSetRecoilState(poolRecordsState);
-    const setDeboundKeyword = useSetRecoilState(poolDeboundKeywordState);
-    const getLPValue = useLPValue();
-    const [deboundKeyword] = useDebounce(keyword, 500);
-
-    useEffect(() => {
-        setDeboundKeyword(deboundKeyword);
-    }, [deboundKeyword, setDeboundKeyword]);
-
-    // fetch pool stats
-    const { data: poolStatsRecords } = useSWR<PoolStatsRecord[]>(
-        `${ASHSWAP_CONFIG.ashApiBaseUrl}/pool`,
-        fetcher
-    );
-
-    const getPortion = useRecoilCallback(
-        ({ snapshot, set }) =>
-            async (lpTokenId: string, ownLiquidity: BigNumber) => {
-                const lpTokens = await snapshot.getPromise(walletLPMapState);
-                const lpToken = lpTokens[lpTokenId];
-                if (!lpToken) return new BigNumber(0);
-                return toEGLD(lpToken, ownLiquidity.toString())
-                    .multipliedBy(100)
-                    .div(lpToken.totalSupply!);
-            },
-        []
-    );
-
-    const getPoolRecord = useRecoilCallback(
-        ({ snapshot, set }) =>
-            async (p: IPool) => {
-                const balances = await snapshot.getPromise(walletBalanceState);
-
-                let record: PoolRecord = {
-                    pool: p,
-                    poolStats: poolStatsRecords?.find(
-                        (stats) => stats.pool_address === p.address
-                    ),
-                };
-                const ownLP =
-                    balances[p.lpToken.id]?.balance || new BigNumber(0);
-                if (ownLP.gt(0)) {
-                    const { amt0, amt1, lpValueUsd } = await getLPValue(
-                        ownLP,
-                        p
-                    );
-                    record.liquidityData = {
-                        ownLiquidity: ownLP,
-                        capacityPercent: await getPortion(p.lpToken.id, ownLP),
-                        value0: amt0,
-                        value1: amt1,
-                        lpValueUsd,
-                    };
-                }
-                return record;
-            },
-        [getLPValue, getPortion, poolStatsRecords]
-    );
-
-    const getPoolRecords = useRecoilCallback(
-        ({ snapshot, set }) =>
-            async () => {
-                const recordPromises: Promise<PoolRecord>[] = [];
-                for (let i = 0; i < pools.length; i++) {
-                    const p = pools[i];
-                    if (p.isMaiarPool) continue;
-                    recordPromises.push(getPoolRecord(p));
-                }
-                const records = await Promise.all(recordPromises);
-                set(poolRecordsState, records);
-            },
-        [getPoolRecord]
-    );
-    useInterval(getPoolRecords, blockTimeMs);
-    return null;
-};
 
 const Pools: NextPage = () => {
-    const [view, setView] = useState<ViewType>(ViewType.Card);
-    const { isMobile } = useScreenSize();
-
     return (
         <>
             <BasicLayout>
@@ -139,19 +17,11 @@ const Pools: NextPage = () => {
                     <div>
                         <PoolMenu />
                         {/* disable change view type if the screen size is sm, and auto set view type to list on SM screen */}
-                        <PoolFilter
-                            view={view}
-                            onChangeView={(view) => !isMobile && setView(view)}
-                        />
-                        <ListPool
-                            items={pools}
-                            view={view}
-                            className="pt-2 md:pt-8"
-                        />
+                        <PoolFilter />
+                        <ListPool items={pools} className="pt-2 md:pt-8" />
                     </div>
                 </div>
             </BasicLayout>
-            <PoolStateHook />
         </>
     );
 };

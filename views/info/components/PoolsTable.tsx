@@ -54,12 +54,12 @@ const PoolRecord = ({
                         <div className="flex items-center mr-2 overflow-hidden">
                             <div className="shrink-0 flex">
                                 <Avatar
-                                    src={token1?.icon || ""}
+                                    src={token1?.logoURI || ""}
                                     alt={token1?.symbol}
                                     className="w-4 h-4 lg:w-6 lg:h-6"
                                 />
                                 <Avatar
-                                    src={token2?.icon || ""}
+                                    src={token2?.logoURI || ""}
                                     alt={token2?.symbol}
                                     className="w-4 h-4 lg:w-6 lg:h-6 -ml-1"
                                 />

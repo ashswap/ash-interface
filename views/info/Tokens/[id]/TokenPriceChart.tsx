@@ -2,17 +2,17 @@ import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 import { MONTH_SHORT } from "const/time";
 import { fetcher } from "helper/common";
 import { formatAmount } from "helper/number";
+import { IESDTInfo } from "helper/token/token";
 import { ChartTimeUnitType } from "interface/chart";
-import { IToken } from "interface/token";
 import moment from "moment";
-import React, { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 import {
     Bar,
     BarChart,
     Cell,
     ResponsiveContainer,
     XAxis,
-    YAxis,
+    YAxis
 } from "recharts";
 import useSWR from "swr";
 type CandleChartRecord = {
@@ -23,17 +23,20 @@ type CandleChartRecord = {
     timestamp: number;
 };
 
-const FAKE_DATA: CandleChartRecord[] = new Array(30).fill("").map((val, i) => {
-    const high = Math.floor(Math.random() * 100000) + 2000;
-    const low = high - Math.floor(Math.random() * 2000);
-    return ({
-        high,
-        low,
-        open: high * (Math.random() + 0.1),
-        close: high * (Math.random() + 0.1),
-        timestamp: moment().subtract(i, "days").endOf("days").unix()
+const FAKE_DATA: CandleChartRecord[] = new Array(30)
+    .fill("")
+    .map((val, i) => {
+        const high = Math.floor(Math.random() * 100000) + 2000;
+        const low = high - Math.floor(Math.random() * 2000);
+        return {
+            high,
+            low,
+            open: high * (Math.random() + 0.1),
+            close: high * (Math.random() + 0.1),
+            timestamp: moment().subtract(i, "days").endOf("days").unix(),
+        };
     })
-}).reverse();
+    .reverse();
 
 const prepareData = (data: CandleChartRecord[]) => {
     return data.map(({ open, close, ...other }) => {
@@ -117,15 +120,15 @@ const TokenPriceChart = ({
     token,
     timeUnit,
 }: {
-    token: IToken;
+    token: IESDTInfo;
     timeUnit: ChartTimeUnitType;
 }) => {
     const { data } = useSWR<[number, number][]>(
-        token.id
-            ? `${ASHSWAP_CONFIG.ashApiBaseUrl}/token/${token.id}/graph-statistic?type=price`
+        token.identifier
+            ? `${ASHSWAP_CONFIG.ashApiBaseUrl}/token/${token.identifier}/graph-statistic?type=price`
             : null,
         fetcher,
-        {refreshInterval: 5 * 60 * 1000}
+        { refreshInterval: 5 * 60 * 1000 }
     );
     const displayChartData = useMemo(() => {
         const raw = prepareData(FAKE_DATA);
@@ -202,9 +205,7 @@ const TokenPriceChart = ({
                     tickLine={false}
                     padding={{ top: 20 }}
                     domain={[minValue, maxValue + (maxValue - minValue) * 0.2]}
-                    tickFormatter={(val: number) =>
-                        formatAmount(val)
-                    }
+                    tickFormatter={(val: number) => formatAmount(val)}
                     width={50}
                     tick={{ fill: "#B7B7D7", fontSize: 12 }}
                 />

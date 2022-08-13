@@ -1,8 +1,8 @@
-import { IToken } from "./token";
+import { IESDTInfo } from "helper/token/token";
 
 export default interface IPool {
     address: string;
-    tokens: IToken[];
-    lpToken: IToken;
+    tokens: IESDTInfo[];
+    lpToken: IESDTInfo;
     isMaiarPool?: boolean;
 }

@@ -1,16 +1,16 @@
 {
     "buildInfo": {
         "rustc": {
-            "version": "1.62.0-nightly",
-            "commitHash": "082e4ca49770ebc9cb0ee616f3726a67471be8cb",
-            "commitDate": "2022-04-26",
+            "version": "1.61.0-nightly",
+            "commitHash": "6a705566166debf5eff88c57140df607fa409aaa",
+            "commitDate": "2022-02-27",
             "channel": "Nightly",
-            "short": "rustc 1.62.0-nightly (082e4ca49 2022-04-26)"
+            "short": "rustc 1.61.0-nightly (6a7055661 2022-02-27)"
         },
         "contractCrate": {
             "name": "fee_distributor",
             "version": "0.0.0",
-            "git_version": "85a021a"
+            "git_version": "0df03be"
         },
         "framework": {
             "name": "elrond-wasm",
@@ -43,25 +43,6 @@
             "outputs": []
         },
         {
-            "name": "veForAt",
-            "mutability": "readonly",
-            "inputs": [
-                {
-                    "name": "_user",
-                    "type": "Address"
-                },
-                {
-                    "name": "_timestamp",
-                    "type": "u64"
-                }
-            ],
-            "outputs": [
-                {
-                    "type": "BigInt"
-                }
-            ]
-        },
-        {
             "name": "checkpoint_total_supply",
             "mutability": "mutable",
             "inputs": [],
@@ -83,7 +64,7 @@
             ]
         },
         {
-            "name": "getClaimableAmount",
+            "name": "getUserClaimableAmount",
             "mutability": "readonly",
             "inputs": [
                 {
@@ -98,16 +79,56 @@
             ]
         },
         {
-            "name": "accept_payments",
-            "mutability": "mutable",
-            "payableInTokens": [
-                "*"
+            "name": "getUserVeAt",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "_user",
+                    "type": "Address"
+                },
+                {
+                    "name": "_timestamp",
+                    "type": "u64"
+                }
             ],
-            "inputs": [],
-            "outputs": []
+            "outputs": [
+                {
+                    "type": "BigInt"
+                }
+            ]
         },
         {
-            "name": "startTime",
+            "name": "getGeneratedTokenAmount",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "token_id",
+                    "type": "TokenIdentifier"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getBurnedTokenAmount",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "token_id",
+                    "type": "TokenIdentifier"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getStartTime",
             "mutability": "readonly",
             "inputs": [],
             "outputs": [
@@ -117,7 +138,7 @@
             ]
         },
         {
-            "name": "timeCursor",
+            "name": "getTimeCursor",
             "mutability": "readonly",
             "inputs": [],
             "outputs": [
@@ -127,7 +148,7 @@
             ]
         },
         {
-            "name": "timeCursorOf",
+            "name": "getUserTimeCursor",
             "mutability": "readonly",
             "inputs": [
                 {
@@ -142,7 +163,7 @@
             ]
         },
         {
-            "name": "userEpochOf",
+            "name": "getUserEpoch",
             "mutability": "readonly",
             "inputs": [
                 {
@@ -157,7 +178,7 @@
             ]
         },
         {
-            "name": "lastTokenTime",
+            "name": "getLastTokenTime",
             "mutability": "readonly",
             "inputs": [],
             "outputs": [
@@ -167,7 +188,7 @@
             ]
         },
         {
-            "name": "tokensPerWeek",
+            "name": "getTokensPerWeek",
             "mutability": "readonly",
             "inputs": [
                 {
@@ -183,6 +204,7 @@
         },
         {
             "name": "setToken",
+            "onlyOwner": true,
             "mutability": "mutable",
             "inputs": [
                 {
@@ -193,7 +215,7 @@
             "outputs": []
         },
         {
-            "name": "token",
+            "name": "getToken",
             "mutability": "readonly",
             "inputs": [],
             "outputs": [
@@ -203,7 +225,7 @@
             ]
         },
         {
-            "name": "totalReceived",
+            "name": "getTotalReceived",
             "mutability": "readonly",
             "inputs": [],
             "outputs": [
@@ -213,7 +235,7 @@
             ]
         },
         {
-            "name": "tokenLastBalance",
+            "name": "getTokenLastBalance",
             "mutability": "readonly",
             "inputs": [],
             "outputs": [
@@ -223,7 +245,7 @@
             ]
         },
         {
-            "name": "veSupply",
+            "name": "getVeSupply",
             "mutability": "readonly",
             "inputs": [
                 {
@@ -258,7 +280,7 @@
             ]
         },
         {
-            "name": "admin",
+            "name": "getAdmin",
             "mutability": "readonly",
             "inputs": [],
             "outputs": [
@@ -266,39 +288,85 @@
                     "type": "Address"
                 }
             ]
-        },
-        {
-            "name": "getGeneratedTokenAmount",
-            "mutability": "readonly",
-            "inputs": [
-                {
-                    "name": "token_id",
-                    "type": "TokenIdentifier"
-                }
-            ],
-            "outputs": [
-                {
-                    "type": "BigUint"
-                }
-            ]
-        },
-        {
-            "name": "getBurnedTokenAmount",
-            "mutability": "readonly",
-            "inputs": [
-                {
-                    "name": "token_id",
-                    "type": "TokenIdentifier"
-                }
-            ],
-            "outputs": [
-                {
-                    "type": "BigUint"
-                }
-            ]
         }
     ],
     "events": [],
     "hasCallback": false,
-    "types": {}
+    "types": {
+        "CheckpointTokenEvent": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "caller",
+                    "type": "Address"
+                },
+                {
+                    "name": "block",
+                    "type": "u64"
+                },
+                {
+                    "name": "epoch",
+                    "type": "u64"
+                },
+                {
+                    "name": "timestamp",
+                    "type": "u64"
+                }
+            ]
+        },
+        "CheckpointTotalSupplyEvent": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "caller",
+                    "type": "Address"
+                },
+                {
+                    "name": "block",
+                    "type": "u64"
+                },
+                {
+                    "name": "epoch",
+                    "type": "u64"
+                },
+                {
+                    "name": "timestamp",
+                    "type": "u64"
+                }
+            ]
+        },
+        "ClaimEvent": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "caller",
+                    "type": "Address"
+                },
+                {
+                    "name": "block",
+                    "type": "u64"
+                },
+                {
+                    "name": "epoch",
+                    "type": "u64"
+                },
+                {
+                    "name": "timestamp",
+                    "type": "u64"
+                },
+                {
+                    "name": "user_epoch",
+                    "type": "u64"
+                },
+                {
+                    "name": "user_time_cursor",
+                    "type": "u64"
+                },
+                {
+                    "name": "amount",
+                    "type": "BigUint"
+                }
+            ]
+        }
+    }
 }

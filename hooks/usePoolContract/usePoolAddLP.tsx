@@ -14,29 +14,27 @@ const usePoolAddLP = () => {
             const payments = pool.tokens
                 .map((t, i) =>
                     TokenPayment.fungibleFromBigInteger(
-                        t.id,
+                        t.identifier,
                         tokensWei[i],
                         t.decimals
                     )
                 )
                 .filter((p) => p.amountAsBigInteger.gt(0));
             const tx = await poolContract.addLiquidity(payments, tokensWei);
+            const receipt = pool.tokens
+                .map(
+                    (t, i) =>
+                        `${formatAmount(
+                            toEGLDD(t.decimals, tokensWei[i]).toNumber(),
+                            { notation: "standard" }
+                        )} ${t.symbol}`
+                )
+                .join(", ")
+                .replace(/\,$/, "");
             return await sendTransactions({
                 transactions: tx,
                 transactionsDisplayInfo: {
-                    successMessage: `Add liquidity Success ${formatAmount(
-                        toEGLDD(
-                            pool.tokens[0].decimals,
-                            tokensWei[0]
-                        ).toNumber(),
-                        { notation: "standard" }
-                    )} ${pool.tokens[0].symbol} and ${formatAmount(
-                        toEGLDD(
-                            pool.tokens[1].decimals,
-                            tokensWei[1]
-                        ).toNumber(),
-                        { notation: "standard" }
-                    )} ${pool.tokens[1].symbol}`,
+                    successMessage: `Add liquidity Success ${receipt}`,
                 },
             });
         }

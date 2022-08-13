@@ -1,11 +1,3 @@
-import { useTrackTransactionStatus } from "@elrondnetwork/dapp-core/hooks";
-import {
-    Address,
-    BigUIntValue,
-    ContractFunction,
-    TokenIdentifierValue,
-    Transaction,
-} from "@elrondnetwork/erdjs";
 import Fire from "assets/images/fire.png";
 import ICArrowDownRounded from "assets/svg/arrow-down-rounded.svg";
 import ICChevronDown from "assets/svg/chevron-down.svg";
@@ -17,8 +9,9 @@ import ICSetting from "assets/svg/setting.svg";
 import IconWallet from "assets/svg/wallet.svg";
 import {
     accIsInsufficientEGLDState,
-    accIsLoggedInState,
+    accIsLoggedInState
 } from "atoms/dappState";
+import { ashRawPoolByAddressQuery, poolFeesQuery } from "atoms/poolsState";
 import BigNumber from "bignumber.js";
 import Avatar from "components/Avatar";
 import BaseButton from "components/BaseButton";
@@ -31,25 +24,25 @@ import TextAmt from "components/TextAmt";
 import CardTooltip from "components/Tooltip/CardTooltip";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
 import { useSwap } from "context/swap";
-import { toEGLD, toEGLDD, toWei } from "helper/balance";
-import { cancellablePromise } from "helper/cancellablePromise";
-import PoolContract, { queryPoolContract } from "helper/contracts/pool";
+import { toEGLDD } from "helper/balance";
+import { queryPoolContract } from "helper/contracts/pool";
+import { Fraction } from "helper/fraction/fraction";
+import { Percent } from "helper/fraction/percent";
 import { formatAmount } from "helper/number";
-import {
-    sendTransactions,
-    useCreateTransaction,
-} from "helper/transactionMethods";
+import { calculateEstimatedSwapOutputAmount } from "helper/stableswap/calculator/amounts";
+import { calculateSwapPrice } from "helper/stableswap/calculator/price";
+import { Price } from "helper/token/price";
+import { IESDTInfo } from "helper/token/token";
+import { TokenAmount } from "helper/token/tokenAmount";
 import { useConnectWallet } from "hooks/useConnectWallet";
 import useMounted from "hooks/useMounted";
 import { useOnboarding } from "hooks/useOnboarding";
 import usePoolSwap from "hooks/usePoolContract/usePoolSwap";
 import { useScreenSize } from "hooks/useScreenSize";
-import { DappSendTransactionsPropsType } from "interface/dappCore";
 import IPool from "interface/pool";
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useRecoilValue } from "recoil";
-import { useDebounce } from "use-debounce";
+import { useRecoilCallback, useRecoilValue } from "recoil";
 import SwapAmount from "./components/SwapAmount";
 import styles from "./Swap.module.css";
 const MaiarPoolTooltip = ({
@@ -93,7 +86,7 @@ const MaiarPoolTooltip = ({
                                     <div className="clip-corner-4 clip-corner-bl bg-ash-dark-400 px-12 py-6">
                                         <div className="font-bold text-sm leading-tight">
                                             <Avatar
-                                                src={pool.tokens[0].icon}
+                                                src={pool.tokens[0].logoURI}
                                                 alt={pool.tokens[0].symbol}
                                                 className="w-4 h-4"
                                             />
@@ -101,7 +94,7 @@ const MaiarPoolTooltip = ({
                                             {pool.tokens[0].symbol}
                                             <span> - </span>
                                             <Avatar
-                                                src={pool.tokens[1].icon}
+                                                src={pool.tokens[1].logoURI}
                                                 alt={pool.tokens[1].symbol}
                                                 className="w-4 h-4"
                                             />
@@ -138,24 +131,21 @@ const Swap = () => {
         setTokenFrom,
         setTokenTo,
         pool,
-        rates,
-        setRates,
         isInsufficentFund,
         slippage,
     } = useSwap();
-    const [valueFromDebound] = useDebounce(valueFrom, 500);
+    const fees = useRecoilValue(poolFeesQuery(pool?.address || ""));
     const [showSetting, setShowSetting] = useState<boolean>(false);
     const [isOpenHistoryModal, openHistoryModal] = useState<boolean>(false);
-    const [fee, setFee] = useState<number>(0);
     const [isOpenFairPrice, setIsOpenFairPrice] = useState(false);
     const [onboardingHistory, setOnboardedHistory] =
         useOnboarding("swap_history");
-    const [fetchingAmtOut, setFetchingAmtOut] = useState(false);
     const {
         swap,
         trackingData: { isPending: swapping, isSuccessful },
         sessionId: swapId,
     } = usePoolSwap(true);
+    const [priceImpact, setPriceImpact] = useState(0);
 
     const connectWallet = useConnectWallet();
     const loggedIn = useRecoilValue(accIsLoggedInState);
@@ -164,126 +154,167 @@ const Swap = () => {
     const [onboardingFairPrice, setOnboaredFairPrice] =
         useOnboarding("swap_fair_price");
 
-    useEffect(() => {
-        setShowSetting(false);
-        openHistoryModal(false);
-    }, [screenSize.isMobile]);
     const revertToken = () => {
         setTokenFrom(tokenTo);
         setTokenTo(tokenFrom);
     };
 
-    const rawValueFrom = useMemo(() => {
-        if (!valueFromDebound || !tokenFrom) {
-            return new BigNumber(0);
+    const tokenAmountFrom = useMemo(() => {
+        if (!valueFrom || !tokenFrom) {
+            return undefined;
         }
+        return new TokenAmount(
+            tokenFrom,
+            new BigNumber(10)
+                .exponentiatedBy(tokenFrom.decimals)
+                .multipliedBy(valueFrom)
+        );
+    }, [valueFrom, tokenFrom]);
 
-        return toWei(tokenFrom, valueFromDebound);
-    }, [valueFromDebound, tokenFrom]);
-
-    const rawValueTo = useMemo(() => {
+    const tokenAmountTo = useMemo(() => {
         if (!valueTo || !tokenTo) {
-            return new BigNumber(0);
+            return undefined;
         }
-
-        return toWei(tokenTo, valueTo);
+        return new TokenAmount(
+            tokenTo,
+            new BigNumber(10)
+                .exponentiatedBy(tokenTo.decimals)
+                .multipliedBy(valueTo)
+        );
     }, [valueTo, tokenTo]);
 
-    // calculate amount out
-    useEffect(() => {
-        if (!pool || !tokenFrom || !tokenTo || rawValueFrom.eq(0)) {
-            return;
-        }
+    const rate = useMemo(() => {
+        if (!tokenAmountFrom || !tokenAmountTo) return;
+        return new Price(tokenAmountTo, tokenAmountFrom);
+    }, [tokenAmountFrom, tokenAmountTo]);
 
-        const calcPromise = queryPoolContract.calculateAmountOut(
-            pool,
-            tokenFrom.id,
-            tokenTo.id,
-            rawValueFrom
-        );
-        const { promise, cancel } = cancellablePromise(calcPromise);
-        setFetchingAmtOut(true);
-        promise
-            .then((amtOut) => {
-                setValueTo(
-                    amtOut
-                        .div(
-                            new BigNumber(10).exponentiatedBy(tokenTo.decimals)
-                        )
-                        .toString(10)
+    const calcPriceImpact = useRecoilCallback(
+        ({ snapshot }) =>
+            async () => {
+                if (
+                    !pool ||
+                    !tokenFrom ||
+                    !tokenTo ||
+                    !tokenAmountFrom ||
+                    !tokenAmountTo
+                )
+                    return;
+                const rawPool = await snapshot.getPromise(
+                    ashRawPoolByAddressQuery(pool.address)
                 );
-            })
-            .catch(() => {})
-            .finally(() => setFetchingAmtOut(false));
-        return () => cancel();
-    }, [tokenFrom, tokenTo, pool, rawValueFrom, setValueTo]);
+                if (!rawPool) return;
+                const reserves = pool.tokens.map((t, i) => new TokenAmount(t, rawPool.reserves[i]));
+                const price = calculateSwapPrice(
+                    new BigNumber(rawPool?.ampFactor || 0),
+                    reserves,
+                    tokenFrom,
+                    tokenTo,
+                    fees
+                );
 
-    // find pools + fetch reserves
-    useEffect(() => {
-        if (!pool) {
-            return;
+                const rate = new Price(tokenAmountTo, tokenAmountFrom);
+                const priceImpact = new Fraction(1)
+                    .subtract(rate.divide(price.invert().asFraction))
+                    .multiply(100)
+                    .toBigNumber()
+                    .toNumber();
+                setPriceImpact(priceImpact);
+            },
+        [pool, tokenFrom, tokenTo, tokenAmountTo, tokenAmountFrom, fees]
+    );
+
+    const minimumReceive = useMemo(() => {
+        if (!tokenAmountTo) {
+            return new Fraction(0);
         }
-        const [token1, token2] = pool.tokens;
+        return new TokenAmount(tokenAmountTo.token, new Percent(100, 100).subtract(slippage).multiply(tokenAmountTo.raw).quotient)
+    }, [tokenAmountTo, slippage]);
+
+    useEffect(() => {
+        if (!tokenFrom) {
+            setValueFrom("");
+        }
+    }, [tokenFrom, setValueFrom]);
+    useEffect(() => {
+        if (!tokenTo) {
+            setValueTo("");
+        }
+    }, [tokenTo, setValueTo]);
+
+    useEffect(() => {
+        calcPriceImpact();
+    }, [calcPriceImpact]);
+
+    useEffect(() => {
+        setShowSetting(false);
+        openHistoryModal(false);
+    }, [screenSize.isMobile]);
+
+    const getAmountOut = useRecoilCallback(
+        ({ snapshot, set }) =>
+            async (
+                pool: IPool,
+                tokenAmountFrom: TokenAmount,
+                tokenTo: IESDTInfo
+            ) => {
+                const fees = await snapshot.getPromise(
+                    poolFeesQuery(pool.address || "")
+                );
+                const rawPool = await snapshot.getPromise(
+                    ashRawPoolByAddressQuery(pool.address || "")
+                );
+                if (!rawPool) return;
+                const reserves = pool.tokens.map((t, i) => new TokenAmount(t, rawPool.reserves[i]));
+                const estimated = calculateEstimatedSwapOutputAmount(
+                    new BigNumber(rawPool?.ampFactor || 0),
+                    reserves.find(
+                        (r) => r.token.identifier === tokenTo.identifier
+                    )!,
+                    reserves,
+                    tokenAmountFrom,
+                    fees
+                );
+                return estimated;
+            },
+        []
+    );
+
+    useEffect(() => {
+        if (!pool || !tokenTo || !tokenAmountFrom) return;
         if (pool.isMaiarPool) {
-            Promise.all([
-                queryPoolContract.getReserveMaiarPool(pool),
-                queryPoolContract.getFeePct(pool),
-            ]).then(([reserves, fee]) => {
-                const rate1 = toEGLDD(token2.decimals, reserves.token2).div(
-                    toEGLDD(token1.decimals, reserves.token1)
-                );
-                const rate2 = new BigNumber(1).div(rate1);
-                setRates([
-                    toWei(token2, rate1.toString()),
-                    toWei(token1, rate2.toString()),
-                ]);
-                setFee(fee.isNaN() ? 0 : fee.toNumber());
-            });
+            queryPoolContract
+                .getAmountOutMaiarPool(
+                    pool.address,
+                    tokenAmountFrom.token.identifier,
+                    tokenAmountFrom.raw
+                )
+                .then((res) => {
+                    setValueTo(toEGLDD(tokenTo.decimals, res).toString());
+                });
             return;
         }
-
-        const poolContract = new PoolContract(pool.address);
-        Promise.all([
-            poolContract
-                .getAmountOut(
-                    token1.id,
-                    token2.id,
-                    new BigNumber(10).exponentiatedBy(token1.decimals)
-                )
-                .then((val) => val.amount_out),
-            poolContract
-                .getAmountOut(
-                    token2.id,
-                    token1.id,
-                    new BigNumber(10).exponentiatedBy(token2.decimals)
-                )
-                .then((val) => val.amount_out),
-            queryPoolContract.getFeePct(pool),
-        ]).then(([rate1, rate2, fee]) => {
-            setRates([rate1, rate2]);
-            setFee(fee.isNaN() ? 0 : fee.toNumber());
-        });
-    }, [pool, setRates]);
+        getAmountOut(pool, tokenAmountFrom, tokenTo).then(
+            (estimated) =>
+                estimated && setValueTo(estimated.outputAmount.egld.toString())
+        );
+    }, [getAmountOut, setValueTo, pool, tokenTo, tokenAmountFrom]);
 
     const swapHandle = useCallback(async () => {
-        if (
-            !loggedIn ||
-            !tokenFrom ||
-            !tokenTo ||
-            swapping ||
-            !pool ||
-            fetchingAmtOut
-        ) {
+        if (!loggedIn || !tokenFrom || !tokenTo || swapping || !pool) {
             return;
         }
 
-        if (rawValueFrom.eq(0) || rawValueFrom.isNaN()) return;
-        const minWeiOut = new BigNumber(
-            Math.floor(rawValueTo.multipliedBy(1 - slippage).toNumber())
-        );
+        if (!tokenAmountFrom) return;
+        const minWeiOut = TokenAmount.isTokenAmount(minimumReceive) ? minimumReceive.raw : minimumReceive.numerator;
         if (minWeiOut.eq(0) || minWeiOut.isNaN()) return;
         try {
-            await swap(pool, tokenFrom, tokenTo, rawValueFrom, minWeiOut);
+            await swap(
+                pool,
+                tokenFrom,
+                tokenTo,
+                tokenAmountFrom.raw,
+                minWeiOut
+            );
         } catch (error) {
             console.error(error);
         }
@@ -296,61 +327,12 @@ const Swap = () => {
         tokenTo,
         swapping,
         pool,
-        fetchingAmtOut,
-        slippage,
-        rawValueFrom,
-        rawValueTo,
+        tokenAmountFrom,
+        minimumReceive,
         swap,
         setValueTo,
         setValueFrom,
     ]);
-
-    const priceImpact = useMemo(() => {
-        if (!pool || !rates || !tokenFrom || !rawValueFrom || !rawValueTo) {
-            return 0;
-        }
-
-        if (rawValueFrom.isZero()) {
-            return 0;
-        }
-
-        const rate =
-            tokenFrom?.id === pool.tokens[0].id
-                ? rates[0].toString()
-                : rates[1].toString();
-
-        const realOut = rawValueFrom
-            .div(new BigNumber(10).exponentiatedBy(tokenFrom.decimals))
-            .multipliedBy(rate);
-
-        return realOut
-            .minus(rawValueTo)
-            .abs()
-            .multipliedBy(100)
-            .div(realOut)
-            .toNumber();
-    }, [pool, rates, tokenFrom, rawValueFrom, rawValueTo]);
-
-    const minimumReceive = useMemo(() => {
-        if (!tokenTo || !rawValueTo) {
-            return new BigNumber(0);
-        }
-        return toEGLD(
-            tokenTo,
-            rawValueTo.multipliedBy(1 - slippage).toString()
-        );
-    }, [tokenTo, rawValueTo, slippage]);
-
-    useEffect(() => {
-        if (!tokenFrom) {
-            setValueFrom("");
-        }
-    }, [tokenFrom, setValueFrom]);
-    useEffect(() => {
-        if (!tokenTo) {
-            setValueTo("");
-        }
-    }, [tokenTo, setValueTo]);
 
     return (
         <div className="flex flex-col items-center pt-3.5 pb-12 px-6">
@@ -511,29 +493,22 @@ const Swap = () => {
                                             </div>
                                         </div>
                                         <div>
-                                            1 {tokenFrom?.symbol} ={" "}
-                                            {pool && rates && (
-                                                <TextAmt
-                                                    number={
-                                                        pool?.tokens[0].id ===
-                                                        tokenFrom.id
-                                                            ? toEGLD(
-                                                                  pool
-                                                                      .tokens[1],
-                                                                  rates[0].toString()
-                                                              )
-                                                            : toEGLD(
-                                                                  pool
-                                                                      .tokens[0],
-                                                                  rates[1].toString()
-                                                              )
-                                                    }
-                                                    options={{
-                                                        notation: "standard",
-                                                    }}
-                                                />
-                                            )}{" "}
-                                            {tokenTo?.symbol}
+                                            {rate ? (
+                                                <>
+                                                    1 {tokenFrom?.symbol} ={" "}
+                                                    {formatAmount(
+                                                        rate
+                                                            .toBigNumber()
+                                                            .toNumber(),
+                                                        {
+                                                            notation:
+                                                                "standard",
+                                                            displayThreshold: 0,
+                                                        }
+                                                    )}{" "}
+                                                    {tokenTo?.symbol}
+                                                </>
+                                            ) : null}
                                         </div>
                                     </div>
                                 </OnboardTooltip>
@@ -541,7 +516,7 @@ const Swap = () => {
 
                             {isOpenFairPrice &&
                                 pool &&
-                                rawValueFrom.gt(new BigNumber(0)) && (
+                                tokenAmountFrom?.greaterThan(0) && (
                                     <>
                                         <div className="bg-black flex flex-row items-center justify-between h-10 pl-5 pr-6">
                                             <CardTooltip
@@ -571,6 +546,7 @@ const Swap = () => {
                                             >
                                                 {formatAmount(priceImpact, {
                                                     notation: "standard",
+                                                    displayThreshold: 0,
                                                 })}
                                                 %
                                             </div>
@@ -601,7 +577,7 @@ const Swap = () => {
                                                 }
                                             >
                                                 <TextAmt
-                                                    number={minimumReceive}
+                                                    number={minimumReceive.toBigNumber()}
                                                     options={{
                                                         notation: "standard",
                                                     }}
@@ -636,9 +612,15 @@ const Swap = () => {
                                                     styles.swapResultValue
                                                 }
                                             >
-                                                {formatAmount(slippage * 100, {
-                                                    notation: "standard",
-                                                })}
+                                                {formatAmount(
+                                                    slippage
+                                                        .multiply(100)
+                                                        .toBigNumber()
+                                                        .toNumber(),
+                                                    {
+                                                        notation: "standard",
+                                                    }
+                                                )}
                                                 %
                                             </div>
                                         </div>
@@ -669,14 +651,13 @@ const Swap = () => {
                                                     }
                                                 >
                                                     {tokenFrom &&
-                                                    rawValueFrom ? (
+                                                    tokenAmountFrom ? (
                                                         <TextAmt
-                                                            number={toEGLDD(
-                                                                tokenFrom.decimals,
-                                                                rawValueFrom.multipliedBy(
-                                                                    fee
+                                                            number={tokenAmountFrom
+                                                                .multiply(
+                                                                    fees.swap
                                                                 )
-                                                            )}
+                                                                .toBigNumber()}
                                                             options={{
                                                                 notation:
                                                                     "standard",
@@ -694,14 +675,13 @@ const Swap = () => {
                                                         styles.swapResultValue
                                                     }
                                                 >
-                                                    {tokenTo && rawValueTo ? (
+                                                    {tokenAmountTo ? (
                                                         <TextAmt
-                                                            number={toEGLDD(
-                                                                tokenTo.decimals,
-                                                                rawValueTo.multipliedBy(
-                                                                    fee
+                                                            number={tokenAmountTo
+                                                                .multiply(
+                                                                    fees.swap
                                                                 )
-                                                            )}
+                                                                .toBigNumber()}
                                                             options={{
                                                                 notation:
                                                                     "standard",
@@ -725,7 +705,6 @@ const Swap = () => {
                                         className="w-full clip-corner-1 clip-corner-tl uppercase h-12 text-xs sm:text-sm font-bold"
                                         disabled={
                                             swapping ||
-                                            fetchingAmtOut ||
                                             isInsufficentFund ||
                                             isInsufficientEGLD
                                         }

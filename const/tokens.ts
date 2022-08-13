@@ -4,127 +4,121 @@ import IconUSDC from "assets/images/usdc-icon.png";
 import IconUSDT from "assets/images/usdt-icon.png";
 import IconWBTC from "assets/images/wbtc-icon.png";
 import IconWUSDC from "assets/images/wusdc-icon.png";
-import { IToken } from "interface/token";
-import { CHAIN_ID } from "./dappConfig";
+import { ChainId, ESDT, IESDTInfo } from "helper/token/token";
 import { ENVIRONMENT } from "./env";
-const { MAINNET, TESTNET, DEVNET } = CHAIN_ID;
 
 export const VE_ASH_DECIMALS = 18;
 
-const DEVNET_TOKENS: IToken[] = [
+const DEVNET_TOKENS: IESDTInfo[] = [
     {
-        id: "ASH-4ce444",
-        chainId: DEVNET,
+        identifier: "ASH-4ce444",
+        chainId: ChainId.Devnet,
         symbol: "ASH",
         name: "Ashswap Token",
         decimals: 18,
-        icon: ImgAshIcon,
+        logoURI: ImgAshIcon.src,
     },
     {
-        id: "USDT-a55fa7",
-        chainId: DEVNET,
+        identifier: "USDT-a55fa7",
+        chainId: ChainId.Devnet,
         symbol: "USDT",
         name: "Tether",
         decimals: 6,
-        coingeckoId: "tether",
-        icon: IconUSDT,
+        logoURI: IconUSDT.src,
     },
     {
-        id: "USDC-d5181d",
-        chainId: DEVNET,
+        identifier: "USDC-d5181d",
+        chainId: ChainId.Devnet,
         symbol: "USDC",
         name: "USD Coin",
         decimals: 6,
-        coingeckoId: "usd-coin",
-        icon: IconUSDC,
+        logoURI: IconUSDC.src,
     },
     {
-        id: "WUSDC-3124eb",
-        chainId: DEVNET,
+        identifier: "WUSDC-3124eb",
+        chainId: ChainId.Devnet,
         symbol: "wUSDC",
         name: "Wrapped USDC",
         decimals: 6,
-        coingeckoId: "usd-coin",
-        icon: IconWUSDC,
+        logoURI: IconWUSDC.src,
     },
     {
-        id: "RENBTC-0b6973",
-        chainId: DEVNET,
+        identifier: "RENBTC-0b6973",
+        chainId: ChainId.Devnet,
         symbol: "renBTC",
         name: "Ren BTC",
         decimals: 8,
-        coingeckoId: "bitcoin",
-        icon: IconBTC,
+        logoURI: IconBTC.src,
     },
     {
-        id: "WBTC-9bdb9b",
-        chainId: DEVNET,
+        identifier: "WBTC-9bdb9b",
+        chainId: ChainId.Devnet,
         symbol: "wBTC",
         name: "Wrapped BTC",
         decimals: 8,
-        coingeckoId: "wrapped-bitcoin",
-        icon: IconWBTC,
+        logoURI: IconWBTC.src,
     },
 ];
 
-const TESTNET_TOKENS: IToken[] = [
+const TESTNET_TOKENS: IESDTInfo[] = [
     {
-        id: "ASH-f01858",
-        chainId: TESTNET,
+        identifier: "ASH-f01858",
+        chainId: ChainId.Testnet,
         symbol: "ASH",
         name: "Ashswap Token",
         decimals: 18,
-        icon: ImgAshIcon,
+        logoURI: ImgAshIcon.src,
     },
     {
-        id: "USDT-8d1668",
-        chainId: TESTNET,
+        identifier: "USDT-8d1668",
+        chainId: ChainId.Testnet,
         symbol: "USDT",
         name: "Tether",
         decimals: 6,
-        coingeckoId: "tether",
-        icon: IconUSDT,
+        logoURI: IconUSDT.src,
     },
     {
-        id: "USDC-cbf0b9",
-        chainId: TESTNET,
+        identifier: "USDC-cbf0b9",
+        chainId: ChainId.Testnet,
         symbol: "USDC",
         name: "USD Coin",
         decimals: 6,
-        coingeckoId: "usd-coin",
-        icon: IconUSDC,
+        logoURI: IconUSDC.src,
     },
     {
-        id: "WUSDC-365a33",
-        chainId: TESTNET,
+        identifier: "WUSDC-365a33",
+        chainId: ChainId.Testnet,
         symbol: "wUSDC",
         name: "Wrapped USDC",
         decimals: 6,
-        coingeckoId: "usd-coin",
-        icon: IconWUSDC,
+        logoURI: IconWUSDC.src,
     },
     {
-        id: "RENBTC-36935a",
-        chainId: TESTNET,
+        identifier: "RENBTC-36935a",
+        chainId: ChainId.Testnet,
         symbol: "renBTC",
         name: "Ren BTC",
         decimals: 8,
-        coingeckoId: "bitcoin",
-        icon: IconBTC,
+        logoURI: IconBTC.src,
     },
     {
-        id: "WBTC-ebec12",
-        chainId: TESTNET,
+        identifier: "WBTC-ebec12",
+        chainId: ChainId.Testnet,
         symbol: "wBTC",
         name: "Wrapped BTC",
         decimals: 8,
-        coingeckoId: "wrapped-bitcoin",
-        icon: IconWBTC,
+        logoURI: IconWBTC.src,
     },
 ];
 
 export const TOKENS =
     ENVIRONMENT.NETWORK === "devnet" ? DEVNET_TOKENS : TESTNET_TOKENS;
-export const TOKENS_MAP = Object.fromEntries(TOKENS.map((t) => [t.id, t]));
-export const ASH_TOKEN: IToken =
+/**@deprecate */
+export const TOKENS_MAP = Object.fromEntries(
+    TOKENS.map((t) => [t.identifier, t])
+);
+/**@deprecate */
+export const ASH_TOKEN: IESDTInfo =
     TOKENS_MAP[ENVIRONMENT.NETWORK == "devnet" ? "ASH-4ce444" : "ASH-f01858"];
+export const ESDT_MAP = Object.fromEntries(TOKENS.map((t) => [t.identifier, new ESDT(t)]));
+export const ASH_ESDT = ESDT_MAP[ENVIRONMENT.NETWORK == "devnet" ? "ASH-4ce444" : "ASH-f01858"];

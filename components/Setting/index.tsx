@@ -1,8 +1,9 @@
+import BigNumber from "bignumber.js";
+import InputCurrency from "components/InputCurrency";
 import SlippageSelect from "components/SlippageSelect";
 import { useSwap } from "context/swap";
-import InputCurrency from "components/InputCurrency";
-import { useEffect, useState } from "react";
-import BigNumber from "bignumber.js";
+import { Percent } from "helper/fraction/percent";
+import { useState } from "react";
 
 interface Props {}
 
@@ -15,27 +16,27 @@ const Setting = (props: Props) => {
             <div className="font-normal text-xs mt-14">Slippage Tolerance</div>
             <div className="flex flex-row gap-1 my-5">
                 <SlippageSelect
-                    active={slippage === 0.001}
+                    active={slippage.equalTo(new Percent(100, 100_000))}
                     onClick={() => {
-                        setSlippage(0.001);
+                        setSlippage(new Percent(100, 100_000));
                         setDisplaySlip("0.1");
                     }}
                 >
                     0.1%
                 </SlippageSelect>
                 <SlippageSelect
-                    active={slippage === 0.005}
+                    active={slippage.equalTo(new Percent(500, 100_000))}
                     onClick={() => {
-                        setSlippage(0.005);
+                        setSlippage(new Percent(500, 100_000));
                         setDisplaySlip("0.5");
                     }}
                 >
                     0.5%
                 </SlippageSelect>
                 <SlippageSelect
-                    active={slippage === 0.01}
+                    active={slippage.equalTo(new Percent(1_000, 100_000))}
                     onClick={() => {
-                        setSlippage(0.01);
+                        setSlippage(new Percent(1_000, 100_000));
                         setDisplaySlip("1");
                     }}
                 >
@@ -51,7 +52,7 @@ const Setting = (props: Props) => {
                         const raw = e.target.value;
                         setDisplaySlip(raw);
                         if (raw) {
-                            if (raw === ".") setSlippage(0);
+                            if (raw === ".") setSlippage(new Percent(0));
                             else {
                                 const val = new BigNumber(raw)
                                     .div(100)
@@ -64,16 +65,17 @@ const Setting = (props: Props) => {
                                             .toString(10)
                                     );
                                 }
-                                setSlippage(valid);
+                                const [numerator, denominator] = new BigNumber(valid).toFraction();
+                                setSlippage(new Percent(numerator, denominator));
                             }
                         } else {
-                            setSlippage(0.01);
+                            setSlippage(new Percent(1_000, 100_000));
                         }
                     }}
                 />
                 <div>%</div>
             </div>
-            {slippage < 0.001 && (
+            {slippage.lessThan(new Percent(100, 100_000)) && (
                 <div className="text-insufficent-fund text-xs mt-12">
                     Your transactions may fail.
                 </div>

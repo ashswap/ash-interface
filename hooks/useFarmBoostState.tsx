@@ -1,13 +1,19 @@
 import { useTrackTransactionStatus } from "@elrondnetwork/dapp-core/hooks";
 import { TokenPayment } from "@elrondnetwork/erdjs/out";
 import { accAddressState } from "atoms/dappState";
-import { farmOwnerTokensQuery, FarmRecord, FarmToken } from "atoms/farmsState";
+import {
+    ashRawFarmQuery,
+    farmOwnerTokensQuery,
+    FarmRecord,
+    FarmToken,
+} from "atoms/farmsState";
 import {
     govLockedAmtState,
     govTotalSupplyVeASH,
     govUnlockTSState,
 } from "atoms/govState";
 import BigNumber from "bignumber.js";
+import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 import { ContractManager } from "helper/contracts/contractManager";
 import {
     calcYieldBoost,
@@ -19,7 +25,6 @@ import moment from "moment";
 import { useEffect, useState } from "react";
 import { useRecoilCallback } from "recoil";
 import useCalcBoost from "./useFarmContract/useCalcBoost";
-import useGovGetLocked from "./useGovContract/useGovGetLocked";
 
 export const useFarmBoostTransferState = (
     farmToken: FarmToken,
@@ -37,14 +42,15 @@ export const useFarmBoostTransferState = (
         veForBoost: new BigNumber(0),
         boost: 2.5,
     });
-    const getLocked = useGovGetLocked();
     const getCurrentBoost = useRecoilCallback(
         ({ snapshot }) =>
             async () => {
                 const ownerAddress = farmToken.attributes.booster;
-                const locked = await getLocked(ownerAddress);
+                const locked = await ContractManager.getVotingEscrowContract(
+                    ASHSWAP_CONFIG.dappContract.voteEscrowedContract
+                ).getUserLocked(ownerAddress);
                 const veSupply = await snapshot.getPromise(govTotalSupplyVeASH);
-                const unlockTs = new BigNumber(locked.end);
+                const unlockTs = locked.end;
 
                 const slope = farmToken.balance
                     .div(farmToken.attributes.initial_farm_amount)
@@ -76,7 +82,7 @@ export const useFarmBoostTransferState = (
                     ),
                 });
             },
-        [farmToken, getLocked, farmData]
+        [farmToken, farmData]
     );
 
     const selfBoost = useRecoilCallback(
@@ -93,11 +99,11 @@ export const useFarmBoostTransferState = (
                         t.balance
                     )
                 );
-                const tx = await ContractManager.getFarmContract(
+                const txs = await ContractManager.getFarmContract(
                     farmData.farm.farm_address
                 ).claimRewards(tokenPayments, true);
                 const result = await sendTransactions({
-                    transactions: tx,
+                    transactions: txs,
                     transactionsDisplayInfo: {
                         successMessage: "Success to boost yourself",
                     },
@@ -154,10 +160,12 @@ export const useFarmBoostOwnerState = (farmData: FarmRecord) => {
                     (total, f) => total.plus(f.balance.div(f.perLP)),
                     new BigNumber(0)
                 );
-
-                const slopeUsed = await ContractManager.getFarmContract(
-                    farmData.farm.farm_address
-                ).getSlopeBoosted(address);
+                const rawFarm = await snapshot.getPromise(
+                    ashRawFarmQuery(farmData.farm.farm_address)
+                );
+                const slopeUsed = new BigNumber(
+                    rawFarm?.account?.slopeBoosted || 0
+                );
 
                 const farmBalance = ownerTokens.reduce(
                     (total, t) => total.plus(t.balance),

@@ -1,16 +1,16 @@
 {
     "buildInfo": {
         "rustc": {
-            "version": "1.62.0-nightly",
-            "commitHash": "082e4ca49770ebc9cb0ee616f3726a67471be8cb",
-            "commitDate": "2022-04-26",
+            "version": "1.65.0-nightly",
+            "commitHash": "20ffea6938b5839c390252e07940b99e3b6a889a",
+            "commitDate": "2022-08-11",
             "channel": "Nightly",
-            "short": "rustc 1.62.0-nightly (082e4ca49 2022-04-26)"
+            "short": "rustc 1.65.0-nightly (20ffea693 2022-08-11)"
         },
         "contractCrate": {
             "name": "farm",
             "version": "0.0.0",
-            "git_version": "85a021a"
+            "git_version": "e6caf37-modified"
         },
         "framework": {
             "name": "elrond-wasm",
@@ -157,6 +157,18 @@
             "outputs": []
         },
         {
+            "name": "setMaxTokenToProcess",
+            "onlyOwner": true,
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "value",
+                    "type": "u64"
+                }
+            ],
+            "outputs": []
+        },
+        {
             "name": "getFarmTokenSupply",
             "mutability": "readonly",
             "inputs": [],
@@ -252,6 +264,16 @@
             ]
         },
         {
+            "name": "getMaxTokenToProcess",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
             "name": "registerFarmToken",
             "onlyOwner": true,
             "mutability": "mutable",
@@ -288,182 +310,16 @@
     "events": [],
     "hasCallback": true,
     "types": {
-        "ClaimRewardsEvent": {
+        "KeyValue": {
             "type": "struct",
             "fields": [
                 {
-                    "name": "caller",
+                    "name": "key",
                     "type": "Address"
                 },
                 {
-                    "name": "old_farm_token_id",
-                    "type": "TokenIdentifier"
-                },
-                {
-                    "name": "old_farm_token_nonce",
-                    "type": "u64"
-                },
-                {
-                    "name": "old_farm_token_amount",
+                    "name": "value",
                     "type": "BigUint"
-                },
-                {
-                    "name": "new_farm_token_id",
-                    "type": "TokenIdentifier"
-                },
-                {
-                    "name": "new_farm_token_nonce",
-                    "type": "u64"
-                },
-                {
-                    "name": "new_farm_token_amount",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "farm_supply",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "reward_token_id",
-                    "type": "TokenIdentifier"
-                },
-                {
-                    "name": "reward_token_nonce",
-                    "type": "u64"
-                },
-                {
-                    "name": "reward_token_amount",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "reward_reserve",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "block",
-                    "type": "u64"
-                },
-                {
-                    "name": "epoch",
-                    "type": "u64"
-                },
-                {
-                    "name": "timestamp",
-                    "type": "u64"
-                }
-            ]
-        },
-        "EnterFarmEvent": {
-            "type": "struct",
-            "fields": [
-                {
-                    "name": "caller",
-                    "type": "Address"
-                },
-                {
-                    "name": "farming_token_id",
-                    "type": "TokenIdentifier"
-                },
-                {
-                    "name": "farming_token_amount",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "farm_token_id",
-                    "type": "TokenIdentifier"
-                },
-                {
-                    "name": "farm_token_nonce",
-                    "type": "u64"
-                },
-                {
-                    "name": "farm_token_amount",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "farm_supply",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "reward_token_id",
-                    "type": "TokenIdentifier"
-                },
-                {
-                    "name": "reward_token_reserve",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "block",
-                    "type": "u64"
-                },
-                {
-                    "name": "epoch",
-                    "type": "u64"
-                },
-                {
-                    "name": "timestamp",
-                    "type": "u64"
-                }
-            ]
-        },
-        "ExitFarmEvent": {
-            "type": "struct",
-            "fields": [
-                {
-                    "name": "caller",
-                    "type": "Address"
-                },
-                {
-                    "name": "farming_token_id",
-                    "type": "TokenIdentifier"
-                },
-                {
-                    "name": "farming_token_amount",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "farm_token_id",
-                    "type": "TokenIdentifier"
-                },
-                {
-                    "name": "farm_token_nonce",
-                    "type": "u64"
-                },
-                {
-                    "name": "farm_token_amount",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "farm_supply",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "reward_token_id",
-                    "type": "TokenIdentifier"
-                },
-                {
-                    "name": "reward_token_nonce",
-                    "type": "u64"
-                },
-                {
-                    "name": "reward_token_amount",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "reward_reserve",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "block",
-                    "type": "u64"
-                },
-                {
-                    "name": "epoch",
-                    "type": "u64"
-                },
-                {
-                    "name": "timestamp",
-                    "type": "u64"
                 }
             ]
         },
@@ -489,6 +345,179 @@
                 {
                     "name": "initial_farming_amount",
                     "type": "BigUint"
+                }
+            ]
+        },
+        "EsdtTokenPayment": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "token_identifier",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "token_nonce",
+                    "type": "u64"
+                },
+                {
+                    "name": "amount",
+                    "type": "BigUint"
+                }
+            ]
+        },
+        "FarmToken": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "payment",
+                    "type": "EsdtTokenPayment"
+                },
+                {
+                    "name": "attributes",
+                    "type": "FarmTokenAttributes"
+                }
+            ]
+        },
+        "ClaimRewardsEvent": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "caller",
+                    "type": "Address"
+                },
+                {
+                    "name": "farm_supply",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "reward_token_id",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "reward_token_amount",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "reward_reserve",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "block",
+                    "type": "u64"
+                },
+                {
+                    "name": "epoch",
+                    "type": "u64"
+                },
+                {
+                    "name": "timestamp",
+                    "type": "u64"
+                },
+                {
+                    "name": "slope_boosted",
+                    "type": "List<KeyValue>"
+                },
+                {
+                    "name": "farm_token_output",
+                    "type": "List<FarmToken>"
+                }
+            ]
+        },
+        "EnterFarmEvent": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "caller",
+                    "type": "Address"
+                },
+                {
+                    "name": "farming_token_id",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "farming_token_amount",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "farm_supply",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "reward_token_id",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "reward_token_reserve",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "block",
+                    "type": "u64"
+                },
+                {
+                    "name": "epoch",
+                    "type": "u64"
+                },
+                {
+                    "name": "timestamp",
+                    "type": "u64"
+                },
+                {
+                    "name": "slope_boosted",
+                    "type": "List<KeyValue>"
+                },
+                {
+                    "name": "farm_token_output",
+                    "type": "List<FarmToken>"
+                }
+            ]
+        },
+        "ExitFarmEvent": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "caller",
+                    "type": "Address"
+                },
+                {
+                    "name": "farming_token_id",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "farming_token_amount",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "farm_supply",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "reward_token_id",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "reward_token_amount",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "reward_reserve",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "block",
+                    "type": "u64"
+                },
+                {
+                    "name": "epoch",
+                    "type": "u64"
+                },
+                {
+                    "name": "timestamp",
+                    "type": "u64"
+                },
+                {
+                    "name": "slope_boosted",
+                    "type": "List<KeyValue>"
                 }
             ]
         },

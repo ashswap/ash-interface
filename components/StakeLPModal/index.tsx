@@ -1,7 +1,7 @@
 import ICChevronRight from "assets/svg/chevron-right.svg";
 import { accIsInsufficientEGLDState } from "atoms/dappState";
-import { FarmsState } from "atoms/farmsState";
-import { walletBalanceState } from "atoms/walletState";
+import { FarmRecord } from "atoms/farmsState";
+import { lpTokenMapState } from "atoms/tokensState";
 import BigNumber from "bignumber.js";
 import Avatar from "components/Avatar";
 import BaseModal from "components/BaseModal";
@@ -15,34 +15,31 @@ import { toEGLDD, toWei } from "helper/balance";
 import { formatAmount } from "helper/number";
 import useEnterFarm from "hooks/useFarmContract/useEnterFarm";
 import { useScreenSize } from "hooks/useScreenSize";
-import { Unarray } from "interface/utilities";
 import { useCallback, useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
 type props = {
     open: boolean;
     onClose: () => void;
-    farmData: Unarray<FarmsState["farmRecords"]>;
+    farmData: FarmRecord;
 };
 const StakeLPContent = ({ open, onClose, farmData }: props) => {
-    const { pool, poolStats, farm, farmTokenSupply, ashPerBlock, emissionAPR } =
+    const { pool, farm, farmTokenSupply, ashPerBlock, emissionAPR } =
         farmData;
     const [token0, token1] = pool.tokens;
     const [isAgree, setIsAgree] = useState(false);
-    const balances = useRecoilValue(walletBalanceState);
+    const lpTokenMap = useRecoilValue(lpTokenMapState);
     const insufficientEGLD = useRecoilValue(accIsInsufficientEGLDState);
     const [stakeAmt, setStakeAmt] = useState<BigNumber>(new BigNumber(0));
     const [rawStakeAmt, setRawStakeAmt] = useState("");
-    const {enterFarm} = useEnterFarm();
+    const { enterFarm } = useEnterFarm();
     const LPBalance = useMemo(
-        () => balances[pool.lpToken.id],
-        [balances, pool.lpToken]
+        () => new BigNumber(lpTokenMap[pool.lpToken.identifier]?.balance || 0),
+        [lpTokenMap, pool.lpToken]
     );
     const setMaxStakeAmt = useCallback(() => {
         if (!LPBalance) return;
-        setStakeAmt(LPBalance.balance);
-        setRawStakeAmt(
-            toEGLDD(pool.lpToken.decimals, LPBalance.balance).toString(10)
-        );
+        setStakeAmt(LPBalance);
+        setRawStakeAmt(toEGLDD(pool.lpToken.decimals, LPBalance).toString(10));
     }, [LPBalance, pool]);
     const ashPerDay = useMemo(() => {
         const totalAshPerDay = ashPerBlock
@@ -55,11 +52,7 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
         return `LP-${token0.symbol}${token1.symbol}`;
     }, [token0.symbol, token1.symbol]);
     const insufficientLP = useMemo(() => {
-        return (
-            !LPBalance ||
-            LPBalance.balance.eq(0) ||
-            stakeAmt.gt(LPBalance.balance)
-        );
+        return !LPBalance || LPBalance.eq(0) || stakeAmt.gt(LPBalance);
     }, [LPBalance, stakeAmt]);
     const canStake = useMemo(() => {
         return (
@@ -87,12 +80,12 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
                             <div className="bg-ash-dark-400/30 h-14 lg:h-18 px-6 flex items-center">
                                 <div className="flex mr-2">
                                     <Avatar
-                                        src={token0.icon}
+                                        src={token0.logoURI}
                                         alt={token0.symbol}
                                         className="w-4 h-4"
                                     />
                                     <Avatar
-                                        src={token1.icon}
+                                        src={token1.logoURI}
                                         alt={token1.symbol}
                                         className="w-4 h-4 -ml-1"
                                     />
@@ -133,7 +126,7 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
                                             LPBalance
                                                 ? toEGLDD(
                                                       pool.lpToken.decimals,
-                                                      LPBalance.balance
+                                                      LPBalance
                                                   )
                                                 : 0
                                         }

@@ -34,7 +34,7 @@ const useFarmClaimAll = (trackStatus = false) => {
                         const temp = await ContractManager.getFarmContract(
                             val.farm.farm_address
                         ).claimRewards(tokenPayments, false);
-                        txs = [...txs, temp];
+                        txs = [...txs, ...temp];
                         totalASH = totalASH.plus(val.stakedData.totalRewardAmt);
                         farmsAddress.push(val.farm.farm_address);
                     }

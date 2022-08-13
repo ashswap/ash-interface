@@ -8,16 +8,15 @@ import { useScreenSize } from "hooks/useScreenSize";
 import { useValueChart } from "hooks/useValueChart";
 import { ChartTimeUnitType } from "interface/chart";
 import IPool from "interface/pool";
-import { IToken } from "interface/token";
 import moment from "moment";
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef } from "react";
 import {
     Area,
     AreaChart,
     ResponsiveContainer,
     Tooltip,
     XAxis,
-    YAxis,
+    YAxis
 } from "recharts";
 import useSWR from "swr";
 

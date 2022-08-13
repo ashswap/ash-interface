@@ -7,16 +7,15 @@ import { formatAmount } from "helper/number";
 import { useScreenSize } from "hooks/useScreenSize";
 import { useValueChart } from "hooks/useValueChart";
 import { ChartTimeUnitType, ValueChartRecord } from "interface/chart";
-import { IToken } from "interface/token";
 import moment from "moment";
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import {
     Bar,
     BarChart,
     ResponsiveContainer,
     Tooltip,
     XAxis,
-    YAxis,
+    YAxis
 } from "recharts";
 import useSWR from "swr";
 

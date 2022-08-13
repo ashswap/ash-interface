@@ -4,6 +4,7 @@ import ICGovBoost from "assets/svg/gov-boost.svg";
 import { farmPoolQuery, farmQuery } from "atoms/farmsState";
 import { govTotalSupplyVeASH, govVeASHAmtState } from "atoms/govState";
 import BigNumber from "bignumber.js";
+import Avatar from "components/Avatar";
 import BaseModal, { BaseModalType } from "components/BaseModal";
 import BasePopover from "components/BasePopover";
 import BoostBar from "components/BoostBar";
@@ -21,7 +22,6 @@ import { useScreenSize } from "hooks/useScreenSize";
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
-import FarmsState from "views/stake/farms/FarmsState";
 
 const LockOptions = [
     { value: 4 * 365 * 24 * 3600, label: "4 years" },
@@ -96,7 +96,7 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
     const maxYieldBoost = useMemo(() => {
         // if (veForMaxBoost.eq(0)) return 1;
         const totalLP = lpWei.plus(totalLPExcludeOwnLPWei);
-        return calcYieldBoost(
+        const boost = calcYieldBoost(
             lpWei,
             totalLP,
             veForMaxBoost.multipliedBy(10 ** VE_ASH_DECIMALS),
@@ -106,6 +106,7 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
             currentFarmSupplyWei,
             existFarmTokenBal
         );
+        return boost;
     }, [
         lpWei,
         veForMaxBoost,
@@ -176,20 +177,8 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
                     <div className="flex items-center mb-4">
                         {token1 && token2 ? (
                             <>
-                                <div className="w-9 h-9">
-                                    <Image
-                                        src={token1?.icon}
-                                        alt={token1?.name}
-                                        layout="responsive"
-                                    />
-                                </div>
-                                <div className="w-9 h-9 -ml-1">
-                                    <Image
-                                        src={token2?.icon}
-                                        alt={token2?.name}
-                                        layout="responsive"
-                                    />
-                                </div>
+                                <Avatar src={token1?.logoURI} alt={token1.name} className="w-9 h-9"/>
+                                <Avatar src={token2?.logoURI} alt={token2.name} className="w-9 h-9 -ml-1"/>
                             </>
                         ) : (
                             <>
@@ -551,8 +540,6 @@ function BoostCalcModal({
     const screenSize = useScreenSize();
     return (
         <>
-            {/* TODO: replace fetching farm state with whole new app state from service latter */}
-            {modalProps.isOpen && <FarmsState />}
             <BaseModal
                 {...modalProps}
                 type={screenSize.isMobile ? "drawer_btt" : "modal"}

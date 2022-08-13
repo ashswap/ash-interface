@@ -3,25 +3,25 @@ import IconNewTab from "assets/svg/new-tab.svg";
 import {
     accAddressState,
     accIsLoggedInState,
-    networkConfigState,
+    networkConfigState
 } from "atoms/dappState";
 import BaseModal from "components/BaseModal";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 import pools from "const/pool";
 import { toEGLD } from "helper/balance";
 import { fetcher } from "helper/common";
+import { IESDTInfo } from "helper/token/token";
 import { useScreenSize } from "hooks/useScreenSize";
 import IPool from "interface/pool";
-import { IToken } from "interface/token";
 import { useCallback, useEffect, useMemo } from "react";
 import { useRecoilValue } from "recoil";
 import useSWR from "swr";
 
 const getTokenFromPools = (...pools: IPool[]) => {
-    const map = new Map<string, IToken>();
+    const map = new Map<string, IESDTInfo>();
     pools.map((pool) => {
         pool.tokens.map((token) => {
-            map.set(token.id, token);
+            map.set(token.identifier, token);
         });
     });
     return Array.from(map.values());
@@ -81,8 +81,12 @@ const HistoryModal = ({ open, onClose }: Props) => {
                             token_in,
                             token_out,
                         } = record;
-                        const tokenIn = TOKENS.find((t) => t.id === token_in);
-                        const tokenOut = TOKENS.find((t) => t.id === token_out);
+                        const tokenIn = TOKENS.find(
+                            (t) => t.identifier === token_in
+                        );
+                        const tokenOut = TOKENS.find(
+                            (t) => t.identifier === token_out
+                        );
 
                         if (
                             !token_amount_in ||
@@ -112,10 +116,10 @@ const HistoryModal = ({ open, onClose }: Props) => {
                             second_token_id,
                         } = record;
                         const token1 = TOKENS.find(
-                            (t) => t.id === first_token_id
+                            (t) => t.identifier === first_token_id
                         );
                         const token2 = TOKENS.find(
-                            (t) => t.id === second_token_id
+                            (t) => t.identifier === second_token_id
                         );
                         if (
                             !first_token_amount ||

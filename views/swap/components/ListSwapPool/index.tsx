@@ -1,21 +1,21 @@
 // import Token from "components/Token";
 import ICArrowRightRounded from "assets/svg/arrow-right-rounded.svg";
 import Avatar from "components/Avatar";
+import { IESDTInfo } from "helper/token/token";
 import IPool from "interface/pool";
-import { IToken } from "interface/token";
 interface Props {
     items: IPool[];
     className?: string | undefined;
     onSelect?: (t: IPool) => void;
-    pivotToken: IToken;
+    pivotToken: IESDTInfo;
     isPivotFirst?: boolean;
 }
 
-const Token = ({ token }: { token: IToken }) => {
+const Token = ({ token }: { token: IESDTInfo }) => {
     return (
         <div className="flex items-center space-x-4">
             <Avatar
-                src={token.icon}
+                src={token.logoURI}
                 alt={token.symbol}
                 className="w-7 h-7 shrink-0"
             />
@@ -49,10 +49,15 @@ const ListSwapPool = (props: Props) => {
                         <ICArrowRightRounded className="w-2 h-auto text-white" />
                     </div>
                     {pool.tokens
-                        .filter((t) => t.id !== props.pivotToken.id)
+                        .filter(
+                            (t) => t.identifier !== props.pivotToken.identifier
+                        )
                         .slice(0, 1)
                         .map((t, index) => (
-                            <div key={t.id} className="flex-1 overflow-hidden">
+                            <div
+                                key={t.identifier}
+                                className="flex-1 overflow-hidden"
+                            >
                                 <Token token={t} />
                             </div>
                         ))}

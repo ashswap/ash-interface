@@ -6,7 +6,7 @@ import SignTxsModal from "components/SignTxsModal";
 import TxsToastList from "components/TxsToastList";
 import { DAPP_CONFIG } from "const/dappConfig";
 import { ENVIRONMENT } from "const/env";
-import { useRecoilAdapter } from "hooks/useRecoilAdapter";
+import { useRecoilAdapter } from "hooks/useRecoilAdapter/useRecoilAdapter";
 import { useRefreshAfterTxCompleted } from "hooks/useRefreshAfterTxCompleted";
 import useSentryUser from "hooks/useSentryUser";
 import { NextPage } from "next";

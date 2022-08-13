@@ -1,22 +1,18 @@
+import { getAddress } from "@elrondnetwork/dapp-core/utils";
 import {
-    AbiRegistry,
     Address,
     BigUIntValue,
     ContractFunction,
     Query,
-    SmartContract,
-    SmartContractAbi,
     TokenIdentifierValue,
     TokenPayment,
 } from "@elrondnetwork/erdjs";
+import poolAbi from "assets/abi/pool.abi.json";
 import BigNumber from "bignumber.js";
 import { queryContractParser } from "helper/serializer";
 import IPool from "interface/pool";
-import Contract from "./contract";
-import poolAbi from "assets/abi/pool.abi.json";
 import { getProxyNetworkProvider } from "../proxy/util";
-import { ContractQueryResponse } from "@elrondnetwork/erdjs-network-providers/out";
-import { getAddress } from "@elrondnetwork/dapp-core/utils";
+import Contract from "./contract";
 
 const getAmountOutMaiarPool = async (
     poolAddress: string,
@@ -75,66 +71,14 @@ const getReserveMaiarPool = async (pool: IPool) => {
     };
 };
 
-const getFeePct = async (pool: IPool) => {
-    const proxy = getProxyNetworkProvider();
-    try {
-        let feeRes: ContractQueryResponse;
-        if (pool.isMaiarPool) {
-            feeRes = await proxy.queryContract(
-                new Query({
-                    address: new Address(pool.address),
-                    func: new ContractFunction("getTotalFeePercent"),
-                })
-            );
-        } else {
-            feeRes = await proxy.queryContract(
-                new Query({
-                    address: new Address(pool.address),
-                    func: new ContractFunction("getSwapFeePercent"),
-                })
-            );
-        }
-        let fee = new BigNumber(
-            "0x" + Buffer.from(feeRes.returnData[0], "base64").toString("hex")
-        );
-
-        fee = fee.div(new BigNumber(100000));
-        return fee;
-    } catch (error) {
-        console.error(error);
-    }
-    return new BigNumber(0);
-};
-
 export const queryPoolContract = {
     getAmountOutMaiarPool,
     calculateAmountOut,
-    getFeePct,
     getReserveMaiarPool,
 };
 class PoolContract extends Contract {
-    // address: Address;
-    // contract: SmartContract;
     constructor(address: string) {
         super(address, poolAbi);
-        // this.address = new Address(address);
-        // const abiRegistry = AbiRegistry.create(poolAbi as any);
-        // this.contract = new SmartContract({
-        //     address: this.address,
-        //     abi: new SmartContractAbi(abiRegistry),
-        // });
-    }
-
-    async getTotalSupply() {
-        const interaction = this.contract.methods.getTotalSupply();
-        const query = interaction.check().buildQuery();
-        const res = await this.getProxy().queryContract(query);
-        const { firstValue } = this.resultParser.parseQueryResponse(
-            res,
-            interaction.getEndpoint()
-        );
-        const supply = firstValue?.valueOf() || new BigNumber(0);
-        return supply as BigNumber;
     }
 
     async getAmountOut(
@@ -162,26 +106,6 @@ class PoolContract extends Contract {
         return firstValue?.valueOf() as any;
     }
 
-    async getRemoveLiquidityTokens(lp: BigNumber): Promise<{
-        first_token_amount: BigNumber;
-        second_token_amount: BigNumber;
-        first_token_balance: BigNumber;
-        second_token_balance: BigNumber;
-    }> {
-        const interaction = this.contract.methods.estimateRemoveLiquidity([
-            lp,
-            new BigNumber(0),
-            new BigNumber(0),
-        ]);
-        const query = interaction.check().buildQuery();
-        const res = await this.getProxy().queryContract(query);
-        const { firstValue } = this.resultParser.parseQueryResponse(
-            res,
-            interaction.getEndpoint()
-        );
-        return firstValue?.valueOf();
-    }
-
     async addLiquidity(
         tokenPayments: TokenPayment[],
         tokensAmtMin: BigNumber[],
@@ -189,8 +113,8 @@ class PoolContract extends Contract {
     ) {
         const sender = await getAddress();
         let interaction = this.contract.methods.addLiquidity([
-            ...tokensAmtMin,
             receiver,
+            ...tokensAmtMin,
         ]);
         if (tokenPayments.length === 1) {
             interaction.withSingleESDTTransfer(tokenPayments[0]);
@@ -200,20 +124,40 @@ class PoolContract extends Contract {
                 new Address(sender)
             );
         }
-        interaction = this.interceptInteraction(interaction.withGasLimit(10_000_000));
+        interaction = this.interceptInteraction(
+            interaction.withGasLimit(10_000_000)
+        );
         return interaction.check().buildTransaction();
     }
 
-    async removeLiquidity(tokenPayment: TokenPayment, tokensAmtMin: BigNumber[]) {
+    async removeLiquidity(
+        tokenPayment: TokenPayment,
+        tokensAmtMin: BigNumber[]
+    ) {
         let interaction = this.contract.methods.removeLiquidity(tokensAmtMin);
-        interaction.withSingleESDTTransfer(tokenPayment).withGasLimit(9_000_000);
-        return this.interceptInteraction(interaction).check().buildTransaction();
+        interaction
+            .withSingleESDTTransfer(tokenPayment)
+            .withGasLimit(9_000_000);
+        return this.interceptInteraction(interaction)
+            .check()
+            .buildTransaction();
     }
 
-    async exchange(tokenPayment: TokenPayment, tokenToId: string, minWeiOut: BigNumber) {
-        let interaction = this.contract.methods.exchange([tokenToId, minWeiOut]);
-        interaction.withSingleESDTTransfer(tokenPayment).withGasLimit(8_000_000);
-        return this.interceptInteraction(interaction).check().buildTransaction();
+    async exchange(
+        tokenPayment: TokenPayment,
+        tokenToId: string,
+        minWeiOut: BigNumber
+    ) {
+        let interaction = this.contract.methods.exchange([
+            tokenToId,
+            minWeiOut,
+        ]);
+        interaction
+            .withSingleESDTTransfer(tokenPayment)
+            .withGasLimit(8_000_000);
+        return this.interceptInteraction(interaction)
+            .check()
+            .buildTransaction();
     }
 }
 

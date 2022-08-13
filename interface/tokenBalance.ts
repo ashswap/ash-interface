@@ -1,8 +1,8 @@
 import BigNumber from "bignumber.js";
-import { IToken } from "./token";
+import { IESDTInfo } from "helper/token/token";
 
 export interface TokenBalance {
-    token: IToken;
+    token: IESDTInfo;
     balance: BigNumber;
 }
 

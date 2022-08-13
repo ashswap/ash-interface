@@ -1,16 +1,16 @@
 {
     "buildInfo": {
         "rustc": {
-            "version": "1.62.0-nightly",
-            "commitHash": "082e4ca49770ebc9cb0ee616f3726a67471be8cb",
-            "commitDate": "2022-04-26",
+            "version": "1.65.0-nightly",
+            "commitHash": "2befdefdda0f2bc5ff93f7f95633c98841409098",
+            "commitDate": "2022-08-06",
             "channel": "Nightly",
-            "short": "rustc 1.62.0-nightly (082e4ca49 2022-04-26)"
+            "short": "rustc 1.65.0-nightly (2befdefdd 2022-08-06)"
         },
         "contractCrate": {
             "name": "pool",
             "version": "0.0.0",
-            "git_version": "85a021a"
+            "git_version": "5a1bf9e-modified"
         },
         "framework": {
             "name": "elrond-wasm",
@@ -29,23 +29,7 @@
                 "type": "Address"
             },
             {
-                "name": "token_1",
-                "type": "TokenIdentifier"
-            },
-            {
-                "name": "token_2",
-                "type": "TokenIdentifier"
-            },
-            {
-                "name": "rate_1",
-                "type": "BigUint"
-            },
-            {
-                "name": "rate_2",
-                "type": "BigUint"
-            },
-            {
-                "name": "inital_amp_factor",
+                "name": "initial_amp_factor",
                 "type": "u64"
             },
             {
@@ -55,6 +39,11 @@
             {
                 "name": "admin_fee_percent",
                 "type": "u64"
+            },
+            {
+                "name": "tokens",
+                "type": "variadic<PoolInitAttributes>",
+                "multi_arg": true
             }
         ],
         "outputs": []
@@ -68,27 +57,18 @@
             ],
             "inputs": [
                 {
-                    "name": "token_1_amount_min",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "token_2_amount_min",
-                    "type": "BigUint"
-                },
-                {
                     "name": "lp_token_receiver",
                     "type": "Address"
+                },
+                {
+                    "name": "amount_min_list",
+                    "type": "variadic<BigUint>",
+                    "multi_arg": true
                 }
             ],
             "outputs": [
                 {
-                    "type": "EsdtTokenPayment"
-                },
-                {
-                    "type": "EsdtTokenPayment"
-                },
-                {
-                    "type": "EsdtTokenPayment"
+                    "type": "List<EsdtTokenPayment>"
                 }
             ]
         },
@@ -97,17 +77,14 @@
             "mutability": "readonly",
             "inputs": [
                 {
-                    "name": "token_1_amount",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "token_2_amount",
-                    "type": "BigUint"
+                    "name": "amount_added_list",
+                    "type": "variadic<BigUint>",
+                    "multi_arg": true
                 }
             ],
             "outputs": [
                 {
-                    "type": "AddLiquidityViewResultType"
+                    "type": "List<AddLiquidityAttributes>"
                 }
             ]
         },
@@ -119,23 +96,14 @@
             ],
             "inputs": [
                 {
-                    "name": "token_1_amount_min",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "token_2_amount_min",
-                    "type": "BigUint"
+                    "name": "amount_min_list",
+                    "type": "variadic<BigUint>",
+                    "multi_arg": true
                 }
             ],
             "outputs": [
                 {
-                    "type": "EsdtTokenPayment"
-                },
-                {
-                    "type": "EsdtTokenPayment"
-                },
-                {
-                    "type": "EsdtTokenPayment"
+                    "type": "List<EsdtTokenPayment>"
                 }
             ]
         },
@@ -148,17 +116,14 @@
                     "type": "BigUint"
                 },
                 {
-                    "name": "token_1_amount_min",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "token_2_amount_min",
-                    "type": "BigUint"
+                    "name": "amount_min_list",
+                    "type": "variadic<BigUint>",
+                    "multi_arg": true
                 }
             ],
             "outputs": [
                 {
-                    "type": "RemoveLiquidityViewResultType"
+                    "type": "List<RemoveLiquidityAttributes>"
                 }
             ]
         },
@@ -180,10 +145,7 @@
             ],
             "outputs": [
                 {
-                    "type": "EsdtTokenPayment"
-                },
-                {
-                    "type": "EsdtTokenPayment"
+                    "type": "List<EsdtTokenPayment>"
                 }
             ]
         },
@@ -206,7 +168,7 @@
             ],
             "outputs": [
                 {
-                    "type": "GetAmountOutViewResultType"
+                    "type": "ExchangeAttributes"
                 }
             ]
         },
@@ -283,31 +245,6 @@
             ]
         },
         {
-            "name": "rates",
-            "mutability": "readonly",
-            "inputs": [
-                {
-                    "name": "index",
-                    "type": "u32"
-                }
-            ],
-            "outputs": [
-                {
-                    "type": "BigUint"
-                }
-            ]
-        },
-        {
-            "name": "precision",
-            "mutability": "readonly",
-            "inputs": [],
-            "outputs": [
-                {
-                    "type": "BigUint"
-                }
-            ]
-        },
-        {
             "name": "pause",
             "mutability": "mutable",
             "inputs": [],
@@ -356,6 +293,16 @@
             ]
         },
         {
+            "name": "getPrecision",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
             "name": "getTokens",
             "mutability": "readonly",
             "inputs": [],
@@ -366,12 +313,27 @@
             ]
         },
         {
-            "name": "balances",
+            "name": "getBalances",
             "mutability": "readonly",
             "inputs": [
                 {
-                    "name": "index",
-                    "type": "u32"
+                    "name": "token",
+                    "type": "TokenIdentifier"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getRates",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "token",
+                    "type": "TokenIdentifier"
                 }
             ],
             "outputs": [
@@ -455,35 +417,40 @@
     "events": [],
     "hasCallback": false,
     "types": {
-        "AddLiquidityViewResultType": {
+        "TokenAttributes": {
             "type": "struct",
             "fields": [
                 {
-                    "name": "mint_amount",
+                    "name": "reserve",
                     "type": "BigUint"
                 },
                 {
-                    "name": "total_first_token_fee",
+                    "name": "rate",
+                    "type": "BigUint"
+                }
+            ]
+        },
+        "AddLiquidityAttributes": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "token",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "attribute",
+                    "type": "TokenAttributes"
+                },
+                {
+                    "name": "amount_added",
                     "type": "BigUint"
                 },
                 {
-                    "name": "total_second_token_fee",
+                    "name": "total_fee",
                     "type": "BigUint"
                 },
                 {
-                    "name": "first_token_admin_fee",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "second_token_admin_fee",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "first_token_balance",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "second_token_balance",
+                    "name": "admin_fee",
                     "type": "BigUint"
                 }
             ]
@@ -505,19 +472,19 @@
                 }
             ]
         },
-        "GetAmountOutViewResultType": {
+        "ExchangeAttributes": {
             "type": "struct",
             "fields": [
                 {
-                    "name": "amount_out",
-                    "type": "BigUint"
+                    "name": "token",
+                    "type": "TokenIdentifier"
                 },
                 {
-                    "name": "token_in_balance",
-                    "type": "BigUint"
+                    "name": "attribute",
+                    "type": "TokenAttributes"
                 },
                 {
-                    "name": "token_out_balance",
+                    "name": "final_amount",
                     "type": "BigUint"
                 },
                 {
@@ -530,23 +497,36 @@
                 }
             ]
         },
-        "RemoveLiquidityViewResultType": {
+        "PoolInitAttributes": {
             "type": "struct",
             "fields": [
                 {
-                    "name": "first_token_amount",
+                    "name": "token",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "rate",
+                    "type": "BigUint"
+                }
+            ]
+        },
+        "RemoveLiquidityAttributes": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "token",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "attribute",
+                    "type": "TokenAttributes"
+                },
+                {
+                    "name": "amount_min",
                     "type": "BigUint"
                 },
                 {
-                    "name": "second_token_amount",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "first_token_balance",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "second_token_balance",
+                    "name": "amount_removed",
                     "type": "BigUint"
                 }
             ]

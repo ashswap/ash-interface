@@ -2,7 +2,7 @@ import { Slider } from "antd";
 import ICChevronRight from "assets/svg/chevron-right.svg";
 import { accIsInsufficientEGLDState } from "atoms/dappState";
 import { govTotalSupplyVeASH } from "atoms/govState";
-import { walletBalanceState } from "atoms/walletState";
+import { tokenMapState } from "atoms/tokensState";
 import BigNumber from "bignumber.js";
 import Avatar from "components/Avatar";
 import BaseModal from "components/BaseModal";
@@ -12,7 +12,6 @@ import InputCurrency from "components/InputCurrency";
 import TextAmt from "components/TextAmt";
 import CardTooltip from "components/Tooltip/CardTooltip";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
-import { ENVIRONMENT } from "const/env";
 import { ASH_TOKEN, VE_ASH_DECIMALS } from "const/tokens";
 import { toEGLD, toEGLDD, toWei } from "helper/balance";
 import { estimateVeASH } from "helper/voteEscrow";
@@ -43,15 +42,15 @@ const LOCK_CONFIG = {
     sliderStep: 24 * 60 * 60,
 };
 const FirstStakeContent = ({ open, onClose }: props) => {
-    const balances = useRecoilValue(walletBalanceState);
+    const tokenMap = useRecoilValue(tokenMapState);
     const insufficientEGLD = useRecoilValue(accIsInsufficientEGLDState);
     const totalSupplyVeASH = useRecoilValue(govTotalSupplyVeASH);
-    const {createLock: lockASH} = useGovLockASH();
+    const { createLock: lockASH } = useGovLockASH();
     const [lockPeriod, setLockPeriod] = useState(LOCK_CONFIG.minLock); // in seconds
     const [isAgree, setIsAgree] = useState(false);
     const ASHBalance = useMemo(
-        () => balances[ASH_TOKEN.id]?.balance || new BigNumber(0),
-        [balances]
+        () => new BigNumber(tokenMap[ASH_TOKEN.identifier]?.balance || 0),
+        [tokenMap]
     );
     const [lockAmt, setLockAmt] = useState<BigNumber>(new BigNumber(0));
     const [rawLockAmt, setRawLockAmt] = useState("");
@@ -116,7 +115,7 @@ const FirstStakeContent = ({ open, onClose }: props) => {
                                 </div>
                                 <div className="bg-ash-dark-400/30 h-14 lg:h-18 px-4 lg:px-7 flex items-center">
                                     <Avatar
-                                        src={ASH_TOKEN.icon}
+                                        src={ASH_TOKEN.logoURI}
                                         alt={ASH_TOKEN.symbol}
                                         className="w-3.5 h-3.5 lg:w-7 lg:h-7 mr-3"
                                     />

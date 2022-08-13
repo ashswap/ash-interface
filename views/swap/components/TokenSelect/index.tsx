@@ -1,17 +1,17 @@
 import ICChevronDown from "assets/svg/chevron-down.svg";
 import ICClose from "assets/svg/close.svg";
 import Search from "assets/svg/search.svg";
-import { walletBalanceState } from "atoms/walletState";
+import { tokenMapState } from "atoms/tokensState";
 import BigNumber from "bignumber.js";
 import Avatar from "components/Avatar";
 import BaseModal from "components/BaseModal";
 import Input from "components/Input";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
 import { IN_POOL_TOKENS_MAP } from "const/pool";
+import { IESDTInfo } from "helper/token/token";
 import { useOnboarding } from "hooks/useOnboarding";
 import { useScreenSize } from "hooks/useScreenSize";
 import IPool from "interface/pool";
-import { IToken } from "interface/token";
 import { TokenBalance } from "interface/tokenBalance";
 import { useEffect, useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
@@ -21,10 +21,10 @@ import ListToken from "views/swap/components/ListToken";
 import styles from "./TokenSelect.module.css";
 
 interface Props {
-    onChange?: (t: IToken) => void;
-    value?: IToken;
+    onChange?: (t: IESDTInfo) => void;
+    value?: IESDTInfo;
     validPools?: IPool[];
-    pivotToken?: IToken;
+    pivotToken?: IESDTInfo;
     modalTitle: string;
     type: "from" | "to";
     resetPivotToken: () => any;
@@ -43,7 +43,7 @@ const TokenSelect = ({
     const [keyword, setKeyword] = useState<string>("");
     const [debounceKeyword] = useDebounce(keyword, 100);
     const tokens = IN_POOL_TOKENS_MAP;
-    const balances = useRecoilValue(walletBalanceState);
+    const tokenMap = useRecoilValue(tokenMapState);
     const screenSize = useScreenSize();
     // user onboarding
     const [openOnboardSelectToken, setOnboardedSelectToken] =
@@ -65,15 +65,15 @@ const TokenSelect = ({
             if (Object.prototype.hasOwnProperty.call(tokens, tokenId)) {
                 const tokenBalance: TokenBalance = {
                     token: tokens[tokenId],
-                    balance: balances[tokenId]?.balance || new BigNumber(0),
+                    balance: new BigNumber(tokenMap[tokenId]?.balance || 0),
                 };
                 tokenBalances.push(tokenBalance);
             }
         }
         return tokenBalances;
-    }, [tokens, balances]);
+    }, [tokens, tokenMap]);
 
-    const onSelectToken = (t: IToken) => {
+    const onSelectToken = (t: IESDTInfo) => {
         setOpen(false);
 
         if (onChange) {
@@ -90,11 +90,11 @@ const TokenSelect = ({
     const filteredPools = useMemo(() => {
         if (validPools && pivotToken) {
             return validPools.filter((p) =>
-                    p.tokens
-                        .filter((t) => t.id !== pivotToken?.id)[0]
-                        .symbol.toLowerCase()
-                        .includes(debounceKeyword.toLowerCase())
-                )
+                p.tokens
+                    .filter((t) => t.identifier !== pivotToken?.identifier)[0]
+                    .symbol.toLowerCase()
+                    .includes(debounceKeyword.toLowerCase())
+            );
         }
         return [];
     }, [validPools, pivotToken, debounceKeyword]);
@@ -117,7 +117,7 @@ const TokenSelect = ({
                 >
                     <div className="flex items-center">
                         <Avatar
-                            src={pivotToken.icon}
+                            src={pivotToken.logoURI}
                             alt={pivotToken.symbol}
                             className="w-3.5 h-3.5"
                         />
@@ -170,7 +170,7 @@ const TokenSelect = ({
                     {value ? (
                         <div className="flex items-center">
                             <Avatar
-                                src={value.icon}
+                                src={value.logoURI}
                                 alt={value.symbol}
                                 className="w-4 h-4"
                             />
@@ -331,7 +331,9 @@ const TokenSelect = ({
                                     onSelect={(p) => {
                                         onSelectToken(
                                             p.tokens.filter(
-                                                (t) => t.id !== pivotToken?.id
+                                                (t) =>
+                                                    t.identifier !==
+                                                    pivotToken?.identifier
                                             )[0]
                                         );
                                         setOnboardedAvailablePair(true);
