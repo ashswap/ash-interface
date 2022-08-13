@@ -18,7 +18,7 @@ const useGovLockASH = (trackStatus = false) => {
             );
             const tx = await veContract.createLock(
                 TokenPayment.fungibleFromBigInteger(
-                    ASH_TOKEN.id,
+                    ASH_TOKEN.identifier,
                     weiAmt,
                     ASH_TOKEN.decimals
                 ),

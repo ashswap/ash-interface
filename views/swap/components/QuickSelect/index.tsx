@@ -1,15 +1,15 @@
 import Avatar from "components/Avatar";
-import { IToken } from "interface/token";
+import { IESDTInfo } from "helper/token/token";
 import styles from "./QuickSelect.module.css";
 
 interface Props {
     className?: string | undefined;
-    tokens: IToken[];
-    onChange?: (t: IToken) => void;
+    tokens: IESDTInfo[];
+    onChange?: (t: IESDTInfo) => void;
 }
 
 const QuickSelect = (props: Props) => {
-    const onSelectToken = (t: IToken) => {
+    const onSelectToken = (t: IESDTInfo) => {
         if (props.onChange) {
             props.onChange(t);
         }
@@ -28,12 +28,12 @@ const QuickSelect = (props: Props) => {
                         //     onClick={() => onSelectToken(t)}
                         // />
                         <div
-                            key={t.id}
+                            key={t.identifier}
                             className="rounded-lg bg-ash-dark-600 hover:bg-ash-dark-700 transition-all flex items-center space-x-2 w-20 text-2xs font-bold cursor-pointer p-2.5 mr-2"
                             onClick={() => onSelectToken(t)}
                         >
                             <Avatar
-                                src={t.icon}
+                                src={t.logoURI}
                                 alt={t.symbol}
                                 className="w-4 h-4"
                             />

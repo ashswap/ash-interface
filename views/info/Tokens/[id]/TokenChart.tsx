@@ -1,6 +1,6 @@
 import { CHART_INTERVAL } from "const/time";
+import { IESDTInfo } from "helper/token/token";
 import { ChartTimeUnitType } from "interface/chart";
-import { IToken } from "interface/token";
 import { ValueOf } from "interface/utilities";
 import { useState } from "react";
 import TokenLiquidityChart from "./TokenLiquidityChart";
@@ -14,7 +14,7 @@ const CHART_TYPES = {
 } as const;
 const ChartTypeArr = Object.values(CHART_TYPES);
 type ChartType = ValueOf<typeof CHART_TYPES>;
-function TokenChart({ token }: { token: IToken }) {
+function TokenChart({ token }: { token: IESDTInfo }) {
     const [chartType, setChartType] = useState<ChartType>("Liquidity");
     const [timeUnit, setTimeUnit] = useState<ChartTimeUnitType>("D");
     return (

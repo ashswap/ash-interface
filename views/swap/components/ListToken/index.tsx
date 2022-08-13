@@ -13,13 +13,13 @@ const ListToken = (props: Props) => {
         <div className={`space-y-4 ${props.className}`}>
             {props.items.map((token) => (
                 <div
-                    key={token.token.id}
+                    key={token.token.identifier}
                     className="flex items-center justify-between cursor-pointer rounded-lg bg-ash-dark-400 hover:bg-ash-dark-350 hover:colored-drop-shadow-sm hover:colored-drop-shadow-ash-dark-350/75 transition-all h-14 px-4"
                     onClick={() => props.onSelect && props.onSelect(token)}
                 >
                     <div className="flex items-center space-x-4">
                         <Avatar
-                            src={token.token.icon}
+                            src={token.token.logoURI}
                             alt={token.token.symbol}
                             className="w-7 h-7"
                         />

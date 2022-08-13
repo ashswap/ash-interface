@@ -102,9 +102,9 @@ const useExitFarm = (trackStatus = false) => {
                           )
                       )
                     : calcUnstakeEntries2(lpAmt, farmTokens);
-                const tx = await farmContract.exitFarm(entries);
+                const txs = await farmContract.exitFarm(entries);
                 const payload: DappSendTransactionsPropsType = {
-                    transactions: tx,
+                    transactions: txs,
                     transactionsDisplayInfo: {
                         successMessage: `Unstake succeed ${toEGLDD(
                             farm.farming_token_decimal,

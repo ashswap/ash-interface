@@ -44,7 +44,9 @@ function FarmBoostTooltip({
 }) {
     const farm = farmData.farm;
     const pool = useMemo(() => {
-        return pools.find((p) => p.lpToken.id === farm.farming_token_id);
+        return pools.find(
+            (p) => p.lpToken.identifier === farm.farming_token_id
+        );
     }, [farm]);
     const accAddress = useRecoilValue(accAddressState);
     const networkConfig: AccountInfoSliceNetworkType =

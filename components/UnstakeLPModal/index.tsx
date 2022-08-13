@@ -1,7 +1,7 @@
 import { Slider } from "antd";
 import ICChevronRight from "assets/svg/chevron-right.svg";
 import { accIsInsufficientEGLDState } from "atoms/dappState";
-import { FarmsState } from "atoms/farmsState";
+import { FarmRecord } from "atoms/farmsState";
 import BigNumber from "bignumber.js";
 import Avatar from "components/Avatar";
 import BaseModal from "components/BaseModal";
@@ -16,7 +16,6 @@ import { toEGLDD, toWei } from "helper/balance";
 import { formatAmount } from "helper/number";
 import useExitFarm from "hooks/useFarmContract/useExitFarm";
 import { useScreenSize } from "hooks/useScreenSize";
-import { Unarray } from "interface/utilities";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { theme } from "tailwind.config";
@@ -24,7 +23,7 @@ import { useDebounce } from "use-debounce";
 type props = {
     open: boolean;
     onClose: () => void;
-    farmData: Unarray<FarmsState["farmRecords"]>;
+    farmData: FarmRecord;
 };
 const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
     const {
@@ -91,8 +90,12 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
         );
     }, [isAgree, unStakeAmt, insufficientFarmToken, insufficientEGLD]);
     const unStake = useCallback(async () => {
-        if(!stakedData?.totalStakedLP) return;
-        const { sessionId } = await exitFarm(unStakeAmt, farm, unStakeAmt.eq(stakedData.totalStakedLP));
+        if (!stakedData?.totalStakedLP) return;
+        const { sessionId } = await exitFarm(
+            unStakeAmt,
+            farm,
+            unStakeAmt.eq(stakedData.totalStakedLP)
+        );
         if (sessionId && onClose) {
             onClose();
         }
@@ -143,12 +146,12 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
                             <div className="bg-ash-dark-400/30 h-14 lg:h-18 px-6 flex items-center">
                                 <div className="flex mr-2">
                                     <Avatar
-                                        src={token0.icon}
+                                        src={token0.logoURI}
                                         alt={token0.symbol}
                                         className="w-4 h-4"
                                     />
                                     <Avatar
-                                        src={token1.icon}
+                                        src={token1.logoURI}
                                         alt={token1.symbol}
                                         className="w-4 h-4 -ml-1"
                                     />

@@ -3,13 +3,11 @@ import GovLayout from "components/Layout/Gov";
 import { ReactElement } from "react";
 import VotePowerChart from "views/components/VotePowerChart";
 import WeeklyFeeTable from "views/components/WeeklyFeeTable";
-import GovState from "views/stake/gov/GovRecoilState";
 import GovStats from "views/stake/gov/GovStats";
 
 function GovPage() {
     return (
         <>
-            <GovState />
             <div className="ash-container text-white pt-[1.875rem]">
                 <ul className="flex space-x-1 mb-4 md:mb-[3.25rem] text-sm md:text-lg font-bold">
                     <li>Stake</li>

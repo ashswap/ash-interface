@@ -1,15 +1,12 @@
 import ICArrowRight from "assets/svg/arrow-right.svg";
 import GovLayout from "components/Layout/Gov";
-import React, { ReactElement } from "react";
-import FarmsState from "views/stake/farms/FarmsState";
+import { ReactElement } from "react";
 import GovBoostStatus from "views/stake/gov/boost/GovBoostStatus";
 import GovMenu from "views/stake/gov/components/GovMenu";
 
 function BoostPage() {
     return (
         <>
-            {/* fetching farm state */}
-            <FarmsState />
             <div className="ash-container text-white pt-[1.875rem]">
                 <ul className="flex space-x-1 mb-4 md:mb-[3.25rem] text-sm md:text-lg font-bold">
                     <li>Stake</li>

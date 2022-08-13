@@ -66,7 +66,9 @@ const FarmRecord = ({
     const accAddress = useRecoilValue(accAddressState);
     const farm = farmData.farm;
     const pool = useMemo(() => {
-        return pools.find((p) => p.lpToken.id === farm.farming_token_id);
+        return pools.find(
+            (p) => p.lpToken.identifier === farm.farming_token_id
+        );
     }, [farm]);
     const isOwner = useMemo(
         () => booster === accAddress,
@@ -103,12 +105,12 @@ const FarmRecord = ({
                 </FarmBoostTooltip>
                 <div className="absolute flex bottom-0 translate-y-1/2 left-1/2 -translate-x-1/2">
                     <Avatar
-                        src={token1.icon}
+                        src={token1.logoURI}
                         alt={token1.name}
                         className="w-4 h-4"
                     />
                     <Avatar
-                        src={token2.icon}
+                        src={token2.logoURI}
                         alt={token2.name}
                         className="w-4 h-4 -ml-0.5"
                     />
@@ -303,7 +305,7 @@ function GovBoostStatus() {
                         )
                     );
                 const { sessionId, error } = await sendTransactions({
-                    transactions: await Promise.all(txsPromises),
+                    transactions: (await Promise.all(txsPromises)).reduce((total, txs) => [...total, ...txs], []),
                     transactionsDisplayInfo: {
                         successMessage: "All farm tokens are boosted.",
                     },

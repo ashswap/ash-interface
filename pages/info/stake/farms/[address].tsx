@@ -94,12 +94,12 @@ function FarmDetailPage({ pool }: Props) {
                 </div>
                 <div className="flex">
                     <Avatar
-                        src={token1.icon}
+                        src={token1.logoURI}
                         alt={token1.symbol}
                         className="w-6 h-6 lg:w-8 lg:h-8"
                     />
                     <Avatar
-                        src={token2.icon}
+                        src={token2.logoURI}
                         alt={token2.symbol}
                         className="w-6 h-6 lg:w-8 lg:h-8 relative -ml-1.5"
                     />
@@ -120,10 +120,10 @@ function FarmDetailPage({ pool }: Props) {
                 <div className="flex items-center bg-ash-dark-600 h-8 lg:h-10 px-2.5 lg:px-4 mr-2 mb-2">
                     <div className="text-xs lg:text-sm">{token1.symbol}</div>
                     <div className="text-2xs lg:text-xs text-stake-gray-500 px-2.5 border-r border-r-stake-gray-500">
-                        {token1.id}
+                        {token1.identifier}
                     </div>
                     <div className="pl-2.5 flex lg:pl-5">
-                        <CopyBtn text={token1.id}>
+                        <CopyBtn text={token1.identifier}>
                             <ICCopy className="w-4 h-4 lg:w-5 lg:h-5" />
                         </CopyBtn>
                     </div>
@@ -131,10 +131,10 @@ function FarmDetailPage({ pool }: Props) {
                 <div className="flex items-center bg-ash-dark-600 h-8 lg:h-10 px-2.5 lg:px-4 mr-2 mb-2">
                     <div className="text-xs lg:text-sm">{token2.symbol}</div>
                     <div className="text-2xs lg:text-xs text-stake-gray-500 px-2.5 border-r border-r-stake-gray-500">
-                        {token2.id}
+                        {token2.identifier}
                     </div>
                     <div className="pl-2.5 flex lg:pl-5">
-                        <CopyBtn text={token2.id}>
+                        <CopyBtn text={token2.identifier}>
                             <ICCopy className="w-4 h-4 lg:w-5 lg:h-5" />
                         </CopyBtn>
                     </div>
@@ -190,7 +190,7 @@ function FarmDetailPage({ pool }: Props) {
                                 </span>
                             </div>
                             <Avatar
-                                src={token1.icon}
+                                src={token1.logoURI}
                                 alt={token1.symbol}
                                 className="w-4.5 h-4.5 sm:w-6 sm:h-6"
                             />
@@ -205,7 +205,7 @@ function FarmDetailPage({ pool }: Props) {
                                 </span>
                             </div>
                             <Avatar
-                                src={token2.icon}
+                                src={token2.logoURI}
                                 alt={token2.symbol}
                                 className="w-4.5 h-4.5 sm:w-6 sm:h-6"
                             />
@@ -271,7 +271,9 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
     const { address } = params || {};
     const farm = FARMS.find((f) => f.farm_address === address);
     if (farm) {
-        const pool = pools.find((t) => t.lpToken.id === farm.farming_token_id);
+        const pool = pools.find(
+            (t) => t.lpToken.identifier === farm.farming_token_id
+        );
         if (pool) {
             return {
                 props: { pool },

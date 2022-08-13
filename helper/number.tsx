@@ -1,3 +1,4 @@
+import BigNumber from "bignumber.js";
 import numeral from "numeral";
 
 // Returns first 2 digits after first non-zero decimal
@@ -59,7 +60,7 @@ export const formatAmount = (
         format = `0,0.${"0".repeat(precision)}`;
     }
 
-    if(isInteger){
+    if (isInteger) {
         format = amount < 1000 ? "0" : "0,0";
     }
 
@@ -67,4 +68,16 @@ export const formatAmount = (
 
     // toUpperCase is needed cause numeral doesn't have support for capital K M B out of the box
     return numeral(amountWithPrecision).format(format).toUpperCase();
+};
+
+export const formatToSignificant = (
+    value: BigNumber.Value,
+    significant: number = 6
+) => {
+    const _value = new BigNumber(value);
+    const int = _value.integerValue(BigNumber.ROUND_DOWN);
+    if (int.toString(10).length >= significant) {
+        return _value.toFixed(0);
+    }
+    return _value.toPrecision(significant).replace(/0+$/, "");
 };

@@ -1,16 +1,16 @@
 {
     "buildInfo": {
         "rustc": {
-            "version": "1.62.0-nightly",
-            "commitHash": "082e4ca49770ebc9cb0ee616f3726a67471be8cb",
-            "commitDate": "2022-04-26",
+            "version": "1.61.0-nightly",
+            "commitHash": "6a705566166debf5eff88c57140df607fa409aaa",
+            "commitDate": "2022-02-27",
             "channel": "Nightly",
-            "short": "rustc 1.62.0-nightly (082e4ca49 2022-04-26)"
+            "short": "rustc 1.61.0-nightly (6a7055661 2022-02-27)"
         },
         "contractCrate": {
             "name": "voting_escrow",
             "version": "0.0.0",
-            "git_version": "85a021a"
+            "git_version": "0df03be"
         },
         "framework": {
             "name": "elrond-wasm",
@@ -28,55 +28,6 @@
         "outputs": []
     },
     "endpoints": [
-        {
-            "name": "getLastUserSlope",
-            "mutability": "readonly",
-            "inputs": [
-                {
-                    "name": "addr",
-                    "type": "Address"
-                }
-            ],
-            "outputs": [
-                {
-                    "type": "BigInt"
-                }
-            ]
-        },
-        {
-            "name": "lockedEnd",
-            "mutability": "readonly",
-            "inputs": [
-                {
-                    "name": "addr",
-                    "type": "Address"
-                }
-            ],
-            "outputs": [
-                {
-                    "type": "u64"
-                }
-            ]
-        },
-        {
-            "name": "userPointHistoryTs",
-            "mutability": "readonly",
-            "inputs": [
-                {
-                    "name": "addr",
-                    "type": "Address"
-                },
-                {
-                    "name": "idx",
-                    "type": "u64"
-                }
-            ],
-            "outputs": [
-                {
-                    "type": "u64"
-                }
-            ]
-        },
         {
             "name": "checkpoint",
             "mutability": "mutable",
@@ -138,7 +89,7 @@
             "outputs": []
         },
         {
-            "name": "balanceOfAtTs",
+            "name": "getUserBalanceAtTs",
             "mutability": "readonly",
             "inputs": [
                 {
@@ -157,7 +108,7 @@
             ]
         },
         {
-            "name": "balanceOfAtBlock",
+            "name": "getUserBalanceOfAtBlock",
             "mutability": "readonly",
             "inputs": [
                 {
@@ -176,7 +127,56 @@
             ]
         },
         {
-            "name": "totalSupplyAtTs",
+            "name": "getUserLastSlope",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "addr",
+                    "type": "Address"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigInt"
+                }
+            ]
+        },
+        {
+            "name": "getUserLockedEnd",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "addr",
+                    "type": "Address"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "getUserPointHistoryTs",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "addr",
+                    "type": "Address"
+                },
+                {
+                    "name": "idx",
+                    "type": "u64"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "getTotalSupplyAtTs",
             "mutability": "readonly",
             "inputs": [
                 {
@@ -191,7 +191,7 @@
             ]
         },
         {
-            "name": "totalSupplyAtBlock",
+            "name": "getTotalSupplyAtBlock",
             "mutability": "readonly",
             "inputs": [
                 {
@@ -206,27 +206,7 @@
             ]
         },
         {
-            "name": "supply",
-            "mutability": "readonly",
-            "inputs": [],
-            "outputs": [
-                {
-                    "type": "BigUint"
-                }
-            ]
-        },
-        {
-            "name": "lockedToken",
-            "mutability": "readonly",
-            "inputs": [],
-            "outputs": [
-                {
-                    "type": "TokenIdentifier"
-                }
-            ]
-        },
-        {
-            "name": "getLocked",
+            "name": "getUserLocked",
             "mutability": "readonly",
             "inputs": [
                 {
@@ -244,6 +224,21 @@
             "name": "getEpoch",
             "mutability": "readonly",
             "inputs": [],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "getUserPointEpoch",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "address",
+                    "type": "Address"
+                }
+            ],
             "outputs": [
                 {
                     "type": "u64"
@@ -285,22 +280,7 @@
             ]
         },
         {
-            "name": "getUserPointEpoch",
-            "mutability": "readonly",
-            "inputs": [
-                {
-                    "name": "address",
-                    "type": "Address"
-                }
-            ],
-            "outputs": [
-                {
-                    "type": "u64"
-                }
-            ]
-        },
-        {
-            "name": "totalLock",
+            "name": "getTotalLocked",
             "mutability": "readonly",
             "inputs": [],
             "outputs": [
@@ -310,7 +290,17 @@
             ]
         },
         {
-            "name": "slopeChanges",
+            "name": "getLockedToken",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "TokenIdentifier"
+                }
+            ]
+        },
+        {
+            "name": "getSlopeChanges",
             "mutability": "readonly",
             "inputs": [
                 {
@@ -328,6 +318,202 @@
     "events": [],
     "hasCallback": false,
     "types": {
+        "CreateLockEvent": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "caller",
+                    "type": "Address"
+                },
+                {
+                    "name": "block_nonce",
+                    "type": "u64"
+                },
+                {
+                    "name": "block_epoch",
+                    "type": "u64"
+                },
+                {
+                    "name": "block_timestamp",
+                    "type": "u64"
+                },
+                {
+                    "name": "user_locked_old",
+                    "type": "LockedBalance"
+                },
+                {
+                    "name": "user_locked_new",
+                    "type": "LockedBalance"
+                },
+                {
+                    "name": "user_point_epoch",
+                    "type": "u64"
+                },
+                {
+                    "name": "user_point_history",
+                    "type": "Point"
+                },
+                {
+                    "name": "total_lock",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "last_point_history",
+                    "type": "Point"
+                },
+                {
+                    "name": "epoch",
+                    "type": "u64"
+                }
+            ]
+        },
+        "DepositForEvent": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "caller",
+                    "type": "Address"
+                },
+                {
+                    "name": "block_nonce",
+                    "type": "u64"
+                },
+                {
+                    "name": "block_epoch",
+                    "type": "u64"
+                },
+                {
+                    "name": "block_timestamp",
+                    "type": "u64"
+                },
+                {
+                    "name": "user_locked_old",
+                    "type": "LockedBalance"
+                },
+                {
+                    "name": "user_locked_new",
+                    "type": "LockedBalance"
+                },
+                {
+                    "name": "user_point_epoch",
+                    "type": "u64"
+                },
+                {
+                    "name": "user_point_history",
+                    "type": "Point"
+                },
+                {
+                    "name": "total_lock",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "last_point_history",
+                    "type": "Point"
+                },
+                {
+                    "name": "epoch",
+                    "type": "u64"
+                }
+            ]
+        },
+        "IncreaseAmountEvent": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "caller",
+                    "type": "Address"
+                },
+                {
+                    "name": "block_nonce",
+                    "type": "u64"
+                },
+                {
+                    "name": "block_epoch",
+                    "type": "u64"
+                },
+                {
+                    "name": "block_timestamp",
+                    "type": "u64"
+                },
+                {
+                    "name": "user_locked_old",
+                    "type": "LockedBalance"
+                },
+                {
+                    "name": "user_locked_new",
+                    "type": "LockedBalance"
+                },
+                {
+                    "name": "user_point_epoch",
+                    "type": "u64"
+                },
+                {
+                    "name": "user_point_history",
+                    "type": "Point"
+                },
+                {
+                    "name": "total_lock",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "last_point_history",
+                    "type": "Point"
+                },
+                {
+                    "name": "epoch",
+                    "type": "u64"
+                }
+            ]
+        },
+        "IncreaseUnlockTimeEvent": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "caller",
+                    "type": "Address"
+                },
+                {
+                    "name": "block_nonce",
+                    "type": "u64"
+                },
+                {
+                    "name": "block_epoch",
+                    "type": "u64"
+                },
+                {
+                    "name": "block_timestamp",
+                    "type": "u64"
+                },
+                {
+                    "name": "user_locked_old",
+                    "type": "LockedBalance"
+                },
+                {
+                    "name": "user_locked_new",
+                    "type": "LockedBalance"
+                },
+                {
+                    "name": "user_point_epoch",
+                    "type": "u64"
+                },
+                {
+                    "name": "user_point_history",
+                    "type": "Point"
+                },
+                {
+                    "name": "total_lock",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "last_point_history",
+                    "type": "Point"
+                },
+                {
+                    "name": "epoch",
+                    "type": "u64"
+                }
+            ]
+        },
         "LockedBalance": {
             "type": "struct",
             "fields": [
@@ -358,6 +544,51 @@
                 },
                 {
                     "name": "block",
+                    "type": "u64"
+                }
+            ]
+        },
+        "WithdrawEvent": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "caller",
+                    "type": "Address"
+                },
+                {
+                    "name": "block_nonce",
+                    "type": "u64"
+                },
+                {
+                    "name": "block_epoch",
+                    "type": "u64"
+                },
+                {
+                    "name": "block_timestamp",
+                    "type": "u64"
+                },
+                {
+                    "name": "user_locked_old",
+                    "type": "LockedBalance"
+                },
+                {
+                    "name": "user_point_epoch",
+                    "type": "u64"
+                },
+                {
+                    "name": "user_point_history",
+                    "type": "Point"
+                },
+                {
+                    "name": "total_lock",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "last_point_history",
+                    "type": "Point"
+                },
+                {
+                    "name": "epoch",
                     "type": "u64"
                 }
             ]

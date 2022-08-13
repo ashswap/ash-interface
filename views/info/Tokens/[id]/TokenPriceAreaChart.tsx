@@ -4,19 +4,19 @@ import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 import { MONTH_SHORT } from "const/time";
 import { fetcher } from "helper/common";
 import { formatAmount } from "helper/number";
+import { IESDTInfo } from "helper/token/token";
 import { useScreenSize } from "hooks/useScreenSize";
 import { useValueChart } from "hooks/useValueChart";
 import { ChartTimeUnitType } from "interface/chart";
-import { IToken } from "interface/token";
 import moment from "moment";
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef } from "react";
 import {
     Area,
     AreaChart,
     ResponsiveContainer,
     Tooltip,
     XAxis,
-    YAxis,
+    YAxis
 } from "recharts";
 import useSWR from "swr";
 
@@ -44,12 +44,12 @@ function TokenPriceAreaChart({
     token,
     timeUnit,
 }: {
-    token: IToken;
+    token: IESDTInfo;
     timeUnit: ChartTimeUnitType;
 }) {
     const { data } = useSWR<[number, number][]>(
-        token.id
-            ? `${ASHSWAP_CONFIG.ashApiBaseUrl}/token/${token.id}/graph-statistic?type=price`
+        token.identifier
+            ? `${ASHSWAP_CONFIG.ashApiBaseUrl}/token/${token.identifier}/graph-statistic?type=price`
             : null,
         fetcher
     );
@@ -128,9 +128,7 @@ function TokenPriceAreaChart({
                     tickLine={false}
                     padding={{ top: 20, bottom: 20 }}
                     domain={[0, (max: number) => max * 1.5]}
-                    tickFormatter={(val: number) =>
-                        formatAmount(val)
-                    }
+                    tickFormatter={(val: number) => formatAmount(val)}
                     width={50}
                     tick={{ fill: "#B7B7D7", fontSize: sm ? 12 : 10 }}
                 />

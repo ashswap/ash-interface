@@ -15,9 +15,9 @@ import {
     govTotalLockedPctState,
     govTotalSupplyVeASH,
     govUnlockTSState,
-    govVeASHAmtState
+    govVeASHAmtState,
 } from "atoms/govState";
-import { walletTokenPriceState } from "atoms/walletState";
+import { tokenMapState } from "atoms/tokensState";
 import Avatar from "components/Avatar";
 import BaseModal from "components/BaseModal";
 import GlowingButton from "components/GlowingButton";
@@ -69,7 +69,7 @@ function GovStats() {
     const totalLockedAmt = useRecoilValue(govTotalLockedAmtState);
     const rewardLPAmt = useRecoilValue(govRewardLPAmtState);
     const rewardLPToken = useRecoilValue(govRewardLPTokenState);
-    const rewardValue = useRecoilValue(govRewardLPValueState);
+    const rewardTokenAmount = useRecoilValue(govRewardLPValueState);
     const totalLockedPct = useRecoilValue(govTotalLockedPctState);
 
     const { data: adminFee24h } = useSWR<number>(
@@ -90,7 +90,7 @@ function GovStats() {
     const loggedIn = useRecoilValue(accIsLoggedInState);
     const mounted = useMounted();
     const connectWallet = useConnectWallet();
-    const tokenPrices = useRecoilValue(walletTokenPriceState);
+    const tokenMap = useRecoilValue(tokenMapState);
     const screenSize = useScreenSize();
     const capacityPct = useMemo(() => {
         if (totalSupplyVeASH.eq(0)) return "_";
@@ -101,10 +101,10 @@ function GovStats() {
         return (
             (adminFee24h * 365 * 100) /
             toEGLDD(ASH_TOKEN.decimals, totalLockedAmt)
-                .multipliedBy(tokenPrices[ASH_TOKEN.id])
+                .multipliedBy(tokenMap[ASH_TOKEN.identifier]?.price)
                 .toNumber()
         );
-    }, [adminFee24h, totalLockedAmt, tokenPrices]);
+    }, [adminFee24h, totalLockedAmt, tokenMap]);
     const canClaim = useMemo(() => {
         return rewardLPAmt && rewardLPAmt.gt(0);
     }, [rewardLPAmt]);
@@ -153,7 +153,8 @@ function GovStats() {
                                         <div className="flex items-center">
                                             <Avatar
                                                 src={
-                                                    rewardLPToken.tokens[0].icon
+                                                    rewardLPToken.tokens[0]
+                                                        .logoURI
                                                 }
                                                 alt={
                                                     rewardLPToken.tokens[0]
@@ -163,7 +164,8 @@ function GovStats() {
                                             />
                                             <Avatar
                                                 src={
-                                                    rewardLPToken.tokens[1].icon
+                                                    rewardLPToken.tokens[1]
+                                                        .logoURI
                                                 }
                                                 alt={
                                                     rewardLPToken.tokens[1]
@@ -179,7 +181,9 @@ function GovStats() {
                                         </span>
                                         <span className="text-white font-bold">
                                             <TextAmt
-                                                number={rewardValue}
+                                                number={rewardTokenAmount.toFixed(
+                                                    0
+                                                )}
                                                 decimalClassName="text-stake-gray-500"
                                             />
                                         </span>
@@ -221,7 +225,7 @@ function GovStats() {
                                         <Image src={ImgUsdt} alt="token icon" />
                                     </div> */}
                                     <Avatar
-                                        src={ASH_TOKEN.icon}
+                                        src={ASH_TOKEN.logoURI}
                                         alt={ASH_TOKEN.symbol}
                                         className="w-[1.125rem] h-[1.125rem] mr-2"
                                     />
@@ -405,7 +409,7 @@ function GovStats() {
                                     <Image src={ImgUsdt} alt="token icon" />
                                 </div> */}
                                 <Avatar
-                                    src={ASH_TOKEN.icon}
+                                    src={ASH_TOKEN.logoURI}
                                     alt={ASH_TOKEN.symbol}
                                     className="w-[1.125rem] h-[1.125rem] mr-2"
                                 />
@@ -567,18 +571,20 @@ function GovStats() {
                             <>
                                 <div className="flex items-center mb-9">
                                     <Avatar
-                                        src={rewardLPToken.tokens[0].icon}
+                                        src={rewardLPToken.tokens[0].logoURI}
                                         alt={rewardLPToken.tokens[0].symbol}
                                         className="w-8 h-8"
                                     />
                                     <Avatar
-                                        src={rewardLPToken.tokens[1].icon}
+                                        src={rewardLPToken.tokens[1].logoURI}
                                         alt={rewardLPToken.tokens[1].symbol}
                                         className="w-8 h-8 -ml-1 mr-2"
                                     />
                                 </div>
                                 <div className="text-center text-ash-gray-500 text-lg font-bold">
-                                    <TextAmt number={rewardValue} />
+                                    <TextAmt
+                                        number={rewardTokenAmount.toFixed(0)}
+                                    />
                                     &nbsp; LP-
                                     {rewardLPToken.tokens[0].symbol}
                                     {rewardLPToken.tokens[1].symbol} has been

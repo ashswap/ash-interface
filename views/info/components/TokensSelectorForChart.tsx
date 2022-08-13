@@ -2,8 +2,8 @@ import { Popover, Transition } from "@headlessui/react";
 import ICCheck from "assets/svg/check.svg";
 import ICChevronDown from "assets/svg/chevron-down.svg";
 import ICHexagonDuo from "assets/svg/hexagon-duo.svg";
+import { IESDTInfo } from "helper/token/token";
 import IPool from "interface/pool";
-import { IToken } from "interface/token";
 import { useState } from "react";
 import { usePopper } from "react-popper";
 export const TokenOptionChart = ({
@@ -14,7 +14,7 @@ export const TokenOptionChart = ({
     checked,
     onChange,
 }: {
-    token?: IToken;
+    token?: IESDTInfo;
     pool?: IPool;
     color?: string;
     label: string;

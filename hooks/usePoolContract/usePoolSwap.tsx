@@ -10,10 +10,10 @@ import BigNumber from "bignumber.js";
 import { toEGLDD } from "helper/balance";
 import { ContractManager } from "helper/contracts/contractManager";
 import { formatAmount } from "helper/number";
+import { IESDTInfo } from "helper/token/token";
 import { useCreateTransaction } from "helper/transactionMethods";
 import useSendTxsWithTrackStatus from "hooks/useSendTxsWithTrackStatus";
 import IPool from "interface/pool";
-import { IToken } from "interface/token";
 import { useRecoilCallback } from "recoil";
 
 const usePoolSwap = (trackStatus = false) => {
@@ -24,8 +24,8 @@ const usePoolSwap = (trackStatus = false) => {
         () =>
             async (
                 pool: IPool,
-                tokenIn: IToken,
-                tokenOut: IToken,
+                tokenIn: IESDTInfo,
+                tokenOut: IESDTInfo,
                 weiIn: BigNumber,
                 minWeiOut: BigNumber
             ) => {
@@ -35,10 +35,10 @@ const usePoolSwap = (trackStatus = false) => {
                         func: new ContractFunction("ESDTTransfer"),
                         gasLimit: 8_000_000,
                         args: [
-                            new TokenIdentifierValue(tokenIn.id),
+                            new TokenIdentifierValue(tokenIn.identifier),
                             new BigUIntValue(weiIn),
                             new TokenIdentifierValue("swapTokensFixedInput"),
-                            new TokenIdentifierValue(tokenOut.id),
+                            new TokenIdentifierValue(tokenOut.identifier),
                             new BigUIntValue(minWeiOut),
                         ],
                     });
@@ -47,13 +47,13 @@ const usePoolSwap = (trackStatus = false) => {
                         pool.address
                     );
                     const tokenPayment = TokenPayment.fungibleFromBigInteger(
-                        tokenIn.id,
+                        tokenIn.identifier,
                         weiIn,
                         tokenIn.decimals
                     );
                     tx = await poolContract.exchange(
                         tokenPayment,
-                        tokenOut.id,
+                        tokenOut.identifier,
                         minWeiOut
                     );
                 }

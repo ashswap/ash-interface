@@ -74,7 +74,9 @@ const FarmBoostRecord = ({
     const accAddress = useRecoilValue(accAddressState);
     const farm = farmData.farm;
     const pool = useMemo(() => {
-        return pools.find((p) => p.lpToken.id === farm.farming_token_id);
+        return pools.find(
+            (p) => p.lpToken.identifier === farm.farming_token_id
+        );
     }, [farm]);
     const isOwner = useMemo(
         () => booster === accAddress,
@@ -328,12 +330,12 @@ const FarmBoostInfo = ({ farmData, onClose }: FarmBoostInfoType) => {
                 <div className="px-10 sm:px-16 pb-10 sm:pb-16">
                     <div className="flex items-center text-sm font-bold text-stake-gray-500">
                         <Avatar
-                            src={token1.icon}
+                            src={token1.logoURI}
                             alt={token1.name}
                             className="w-5 h-5"
                         />
                         <Avatar
-                            src={token2.icon}
+                            src={token2.logoURI}
                             alt={token2.name}
                             className="w-5 h-5 -ml-0.5 mr-2"
                         />
