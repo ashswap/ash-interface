@@ -125,7 +125,7 @@ class PoolContract extends Contract {
             );
         }
         interaction = this.interceptInteraction(
-            interaction.withGasLimit(10_000_000)
+            interaction.withGasLimit(12_000_000)
         );
         return interaction.check().buildTransaction();
     }
