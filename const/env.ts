@@ -6,6 +6,7 @@ interface Environment {
     NETWORK: Network;
     TESTNET_PASS: string;
     ASH_GRAPHQL: string;
+    ASH_SOCKET: string;
 }
 
 export const ENVIRONMENT: Environment = {
@@ -13,5 +14,6 @@ export const ENVIRONMENT: Environment = {
     ASH_DOMAIN: process.env.NEXT_PUBLIC_ASH_DOMAIN!,
     NETWORK: process.env.NEXT_PUBLIC_NETWORK as Network,
     TESTNET_PASS: process.env.NEXT_PUBLIC_TESTNET_PASS!,
-    ASH_GRAPHQL: process.env.NEXT_PUBLIC_ASH_GRAPHQL!
+    ASH_GRAPHQL: process.env.NEXT_PUBLIC_ASH_GRAPHQL!,
+    ASH_SOCKET: process.env.NEXT_PUBLIC_ASH_SOCKET!
 };

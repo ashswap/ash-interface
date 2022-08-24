@@ -9,6 +9,7 @@ import React, { Fragment, useMemo } from "react";
 function SignTxsModal() {
     // ! useSignTransactions auto invoke provider for signing hence just use the hook only in once place globlally
     const { hasTransactions } = useSignTransactions();
+    // const { hasTransactions } = useSignTxs();
     const { loginMethod } = useGetLoginInfo();
 
     // if(!hasTransactions){
