@@ -1,17 +1,17 @@
 import {
     useGetPendingTransactions,
-    useGetSignedTransactions,
+    useGetSignedTransactions
 } from "@elrondnetwork/dapp-core/hooks";
 import {
     SignedTransactionsBodyType,
-    SignedTransactionsType,
+    SignedTransactionsType
 } from "@elrondnetwork/dapp-core/types";
 import {
     getToastsIdsFromStorage,
-    setToastsIdsToStorage,
+    setToastsIdsToStorage
 } from "helper/storage/session";
-import React, { useCallback, useEffect, useState } from "react";
-import ToastProgress from "./ToastProgress";
+
+import { useCallback, useEffect, useState } from "react";
 import TxToast from "./TxToast";
 
 export interface Props {
