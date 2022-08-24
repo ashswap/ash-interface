@@ -4,7 +4,6 @@ import {
 } from "@elrondnetwork/dapp-core/hooks";
 import { LoginMethodsEnum } from "@elrondnetwork/dapp-core/types";
 import { Transition } from "@headlessui/react";
-import { useSignTxs } from "hooks/useSignTxs";
 import React, { Fragment, useMemo } from "react";
 // listen for the txs to be signed in queue, if the queue is not empty prompt the modal for user
 function SignTxsModal() {
