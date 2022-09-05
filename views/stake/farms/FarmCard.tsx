@@ -321,16 +321,16 @@ function FarmCard({ farmData, viewType }: props) {
                             {stakedData ? (
                                 <div className="flex space-x-2 h-14 items-center">
                                     <button
-                                        className="w-[3.375rem] h-[3.375rem] clip-corner-1 clip-corner-bl bg-ash-dark-400 hover:bg-ash-dark-300 active:bg-ash-dark-600 transition-all flex items-center justify-center"
-                                        onClick={() => setOpenStakeLP(true)}
-                                    >
-                                        <ICPlus className="w-3 h-auto text-ash-cyan-500" />
-                                    </button>
-                                    <button
                                         className="w-[3.375rem] h-[3.375rem] clip-corner-1 clip-corner-br bg-ash-dark-400 hover:bg-ash-dark-300 active:bg-ash-dark-600 transition-all flex items-center justify-center"
                                         onClick={() => setOpenUnstakeLP(true)}
                                     >
                                         <ICMinus className="w-3 h-auto text-yellow-600" />
+                                    </button>
+                                    <button
+                                        className="w-[3.375rem] h-[3.375rem] clip-corner-1 clip-corner-bl bg-ash-dark-400 hover:bg-ash-dark-300 active:bg-ash-dark-600 transition-all flex items-center justify-center"
+                                        onClick={() => setOpenStakeLP(true)}
+                                    >
+                                        <ICPlus className="w-3 h-auto text-ash-cyan-500" />
                                     </button>
                                 </div>
                             ) : (
@@ -394,16 +394,16 @@ function FarmCard({ farmData, viewType }: props) {
     const farmBtn = stakedData ? (
         <div className="flex justify-end space-x-2 py-0.5">
             <button
-                className="w-10 lg:w-12 h-10 lg:h-12 clip-corner-1 clip-corner-bl bg-ash-dark-400 hover:bg-ash-dark-300 active:bg-ash-dark-600 transition-all flex items-center justify-center"
-                onClick={() => setOpenStakeLP(true)}
-            >
-                <ICPlus className="w-3 h-auto text-ash-cyan-500" />
-            </button>
-            <button
                 className="w-10 lg:w-12 h-10 lg:h-12 clip-corner-1 clip-corner-br bg-ash-dark-400 hover:bg-ash-dark-300 active:bg-ash-dark-600 transition-all flex items-center justify-center"
                 onClick={() => setOpenUnstakeLP(true)}
             >
                 <ICMinus className="w-3 h-auto text-yellow-600" />
+            </button>
+            <button
+                className="w-10 lg:w-12 h-10 lg:h-12 clip-corner-1 clip-corner-bl bg-ash-dark-400 hover:bg-ash-dark-300 active:bg-ash-dark-600 transition-all flex items-center justify-center"
+                onClick={() => setOpenStakeLP(true)}
+            >
+                <ICPlus className="w-3 h-auto text-ash-cyan-500" />
             </button>
         </div>
     ) : (
