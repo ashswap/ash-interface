@@ -205,9 +205,13 @@ const SwapAmount = (props: Props) => {
                                     ? theme.extend.colors["insufficent-fund"]
                                     : undefined,
                         }}
+                        decimals={token?.decimals}
                         onChange={(e) => {
-                            onChangeValue(e.target.value);
-                            setOnboardedInputAmt(true);
+                            if(!props.disableInput){
+
+                                onChangeValue(e.target.value);
+                                setOnboardedInputAmt(true);
+                            }
                         }}
                     />
                 </div>

@@ -202,6 +202,7 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                                             : "border-transparent"
                                     }`}
                                     value={rawLockAmt}
+                                    decimals={ASH_TOKEN.decimals}
                                     onChange={(e) => {
                                         const raw = e.target.value.trim();
                                         const lockAmt = toWei(ASH_TOKEN, raw);

@@ -23,8 +23,7 @@ type props = {
     farmData: FarmRecord;
 };
 const StakeLPContent = ({ open, onClose, farmData }: props) => {
-    const { pool, farm, farmTokenSupply, ashPerBlock, emissionAPR } =
-        farmData;
+    const { pool, farm, farmTokenSupply, ashPerBlock, emissionAPR } = farmData;
     const [token0, token1] = pool.tokens;
     const [isAgree, setIsAgree] = useState(false);
     const lpTokenMap = useRecoilValue(lpTokenMapState);
@@ -106,6 +105,7 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
                                         : "border-transparent"
                                 }`}
                                 value={rawStakeAmt}
+                                decimals={pool.lpToken.decimals}
                                 onChange={(e) => {
                                     const raw = e.target.value.trim();
                                     const lockAmt = toWei(pool.lpToken, raw);

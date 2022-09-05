@@ -13,7 +13,7 @@ const BasicLayout = ({ children }: { children: any }) => {
                     <BackgroundEffect />
                 </div>
             ) : null}
-            <div className="h-8 flex justify-center items-center bg-ash-dark-600 text-2xs text-stake-gray-500">
+            <div className="h-8 flex justify-center items-center bg-ash-dark-600 text-2xs text-center text-stake-gray-500">
                 <span>
                     Scam/Phishing verification:{" "}
                     <span className="text-pink-600">https://</span>{ENVIRONMENT.ASH_DOMAIN}

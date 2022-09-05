@@ -17,7 +17,7 @@ export const toWei = (token: IESDTInfo, valueStr: string) => {
         return new BigNumber(0);
     }
 
-    return amount;
+    return amount.integerValue(BigNumber.ROUND_DOWN);
 };
 
 export const toEGLD = (token: IESDTInfo, valueStr: string) => {

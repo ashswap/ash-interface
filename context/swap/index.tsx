@@ -70,6 +70,11 @@ export function SwapProvider({ children }: Props) {
     }, [tokenFrom, tokenTo]);
 
     useEffect(() => {
+        setValueFrom("");
+        setValueTo("");
+    }, [pool]);
+
+    useEffect(() => {
         if (!valueFrom) {
             setValueTo("");
         }

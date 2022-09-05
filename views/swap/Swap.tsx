@@ -167,7 +167,7 @@ const Swap = () => {
             tokenFrom,
             new BigNumber(10)
                 .exponentiatedBy(tokenFrom.decimals)
-                .multipliedBy(valueFrom)
+                .multipliedBy(valueFrom).integerValue(BigNumber.ROUND_DOWN)
         );
     }, [valueFrom, tokenFrom]);
 
@@ -280,7 +280,10 @@ const Swap = () => {
     );
 
     useEffect(() => {
-        if (!pool || !tokenTo || !tokenAmountFrom) return;
+        if (!pool || !tokenTo || !tokenAmountFrom) {
+            setTimeout(() => setValueTo(""), 0);
+            return;
+        }
         if (pool.isMaiarPool) {
             queryPoolContract
                 .getAmountOutMaiarPool(
