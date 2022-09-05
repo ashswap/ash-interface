@@ -39,7 +39,9 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRecoilCallback, useRecoilValue } from "recoil";
 import FarmBoostTooltip from "views/stake/farms/FarmBoostTooltip";
 import BoostCalcModal from "./BoostCalcModal";
-
+import ICArrowBarRight from "assets/svg/arrow-bar-right.svg";
+import ICChevronVRight from "assets/svg/chevron-v-right.svg";
+import ICCloseV from "assets/svg/close-v.svg";
 const FarmRecord = ({
     farmData,
     label,
@@ -74,6 +76,13 @@ const FarmRecord = ({
         () => booster === accAddress,
         [booster, accAddress]
     );
+    const canBoost = useMemo(() => {
+        return (
+            expectedBoost &&
+            currentBoost &&
+            expectedBoost.boost > currentBoost.boost
+        );
+    }, [expectedBoost, currentBoost]);
     if (!pool) return null;
     const [token1, token2] = pool.tokens;
 
@@ -120,45 +129,54 @@ const FarmRecord = ({
                 {token1.symbol}-{token2.symbol}
             </div>
             <div className="hidden md:block space-y-2">
-                <div className="text-white text-xs font-bold">
-                    veASH consumes
+                <div className="text-stake-gray-500 text-xs font-bold">veASH</div>
+                <div className="relative">
+                    <ICArrowBarRight
+                        className="w-full h-[2.625rem] text-stake-dark-500"
+                        preserveAspectRatio="xMaxYMid slice"
+                    />
+                    <div
+                        className={`text-sm text-right font-bold h-[2.625rem] pl-4 pr-8 flex items-center justify-end absolute inset-0`}
+                    >
+                        <span
+                            className={`${
+                                canBoost
+                                    ? "text-ash-pink-500"
+                                    : "text-ash-purple-500"
+                            }`}
+                        >
+                            {formatAmount(
+                                toEGLDD(
+                                    VE_ASH_DECIMALS,
+                                    BigNumber.max(veConsume, 0)
+                                ).toNumber(),
+                                { notation: "standard" }
+                            )}
+                        </span>
+                        <span className="text-ash-gray-600">&nbsp;ve</span>
+                    </div>
                 </div>
-                <div
-                    className={`text-right h-[2.625rem] flex items-center justify-end px-4 ${
-                        isOwner ? "bg-ash-dark-400/30" : "bg-stake-dark-500"
-                    }`}
-                >
-                    {formatAmount(
-                        toEGLDD(VE_ASH_DECIMALS, veConsume).toNumber(),
-                        { notation: "standard" }
-                    )}
-                </div>
-                <div className="text-right text-xs font-medium">
-                    {isOwner ? (
+                <div className="text-right text-xs font-medium">&nbsp;</div>
+            </div>
+            <div className="hidden md:flex justify-center">
+                {isOwner ? (
+                    canBoost ? (
                         <>
-                            <span className="text-stake-gray-500 underline">
-                                Available:{" "}
-                            </span>
-                            <span className="text-ash-cyan-500 underline">
-                                {formatAmount(
-                                    toEGLDD(
-                                        VE_ASH_DECIMALS,
-                                        veAvailable || 0
-                                    ).toNumber(),
-                                    { notation: "standard" }
-                                )}{" "}
-                                veASH
-                            </span>
+                            <ICChevronVRight className="text-stake-gray-500" />
+                            <ICChevronVRight className="text-ash-pink-500" />
                         </>
                     ) : (
-                        <>&nbsp;</>
-                    )}
-                </div>
-            </div>
-            <div className="hidden md:block border-t border-dashed border-stake-gray-500 relative">
-                <div className="absolute -right-1 -top-4.5 text-ash-gray-500 text-2xl">
-                    &rsaquo;
-                </div>
+                        <>
+                            <ICCloseV className="text-ash-purple-500 mr-1" />
+                            <ICCloseV className="text-ash-purple-500" />
+                        </>
+                    )
+                ) : (
+                    <>
+                        <ICChevronVRight className="text-stake-gray-500" />
+                        <ICChevronVRight className="text-stake-gray-500" />
+                    </>
+                )}
             </div>
             <div className={`${isOwner ? "" : "mb-6"}`}>
                 <AdvanceBoostBar
@@ -305,7 +323,9 @@ function GovBoostStatus() {
                         )
                     );
                 const { sessionId, error } = await sendTransactions({
-                    transactions: (await Promise.all(txsPromises)).reduce((total, txs) => [...total, ...txs], []),
+                    transactions: (
+                        await Promise.all(txsPromises)
+                    ).reduce((total, txs) => [...total, ...txs], []),
                     transactionsDisplayInfo: {
                         successMessage: "All farm tokens are boosted.",
                     },

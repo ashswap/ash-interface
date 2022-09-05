@@ -8,7 +8,7 @@ function BoostPage() {
     return (
         <>
             <div className="ash-container text-white pt-[1.875rem]">
-                <ul className="flex space-x-1 mb-4 md:mb-[3.25rem] text-sm md:text-lg font-bold">
+                <ul className="flex flex-wrap space-x-1 mb-4 md:mb-[3.25rem] text-sm md:text-lg font-bold">
                     <li>Stake</li>
                     <li>
                         <ICArrowRight className="inline mr-1" />
