@@ -12,7 +12,7 @@ import InputCurrency from "components/InputCurrency";
 import CardTooltip from "components/Tooltip/CardTooltip";
 import { FARMS } from "const/farms";
 import { POOLS_MAP_LP } from "const/pool";
-import { VE_ASH_DECIMALS } from "const/tokens";
+import { ASH_TOKEN, VE_ASH_DECIMALS } from "const/tokens";
 import { toEGLDD } from "helper/balance";
 import { calcYieldBoost } from "helper/farmBooster";
 import { formatAmount } from "helper/number";
@@ -260,6 +260,7 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
                                     className="bg-ash-dark-400 text-right h-10 px-2 sm:px-7 text-stake-gray-500 outline-none text-sm w-full"
                                     placeholder="0"
                                     value={lpValueStr}
+                                    decimals={pool.lpToken.decimals}
                                     onChange={(e) => {
                                         setIsUserInput(true);
                                         setLpValueStr(e.target.value);
@@ -309,6 +310,7 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
                                     className="bg-ash-dark-400 text-right h-10 px-2 sm:px-7 text-stake-gray-500 outline-none text-sm w-full"
                                     placeholder="0"
                                     value={totalCurrentVeStr}
+                                    decimals={VE_ASH_DECIMALS}
                                     onChange={(e) => {
                                         setIsUserInput(true);
                                         setTotalCurrentVeStr(e.target.value);
@@ -489,6 +491,7 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
                                         className="bg-transparent text-right h-10 px-2 sm:px-7 text-stake-gray-500 outline-none text-sm w-full"
                                         placeholder="0"
                                         value={ashInputStr}
+                                        decimals={ASH_TOKEN.decimals}
                                         onChange={(e) => {
                                             setIsUserInput(true);
                                             setAshInputStr(e.target.value);

@@ -10,7 +10,7 @@ export class TokenAmount extends Fraction {
      * amount _must_ be raw, i.e. in the native representation (wei)
      */
     constructor(readonly token: IESDTInfo, amount: BigNumber.Value) {
-        super(new BigNumber(amount), new BigNumber(10).exponentiatedBy(token.decimals));
+        super(new BigNumber(amount).integerValue(BigNumber.ROUND_DOWN), new BigNumber(10).exponentiatedBy(token.decimals));
         this.token = token;
     }
 

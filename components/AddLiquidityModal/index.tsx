@@ -83,6 +83,7 @@ const TokenInput = ({
                             ? `1px solid ${theme.extend.colors["insufficent-fund"]}`
                             : "",
                     }}
+                    decimals={token.decimals}
                     onChange={(e) => onChangeValue(e.target.value)}
                 />
             </div>

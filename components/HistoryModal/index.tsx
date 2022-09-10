@@ -61,7 +61,7 @@ const HistoryModal = ({ open, onClose }: Props) => {
     const address = useRecoilValue(accAddressState);
     const { data: txHistory, mutate: refresh } = useSWR<TXRecord[]>(
         loggedIn
-            ? `${ASHSWAP_CONFIG.ashApiBaseUrl}/user/${address}/transaction`
+            ? `${ASHSWAP_CONFIG.ashApiBaseUrl}/user/${address}/transaction?offset=0&limit=50`
             : null,
         fetcher
     );
@@ -169,15 +169,16 @@ const HistoryModal = ({ open, onClose }: Props) => {
             isOpen={open}
             onRequestClose={() => onClose && onClose()}
             type={screenSize.msm ? "drawer_btt" : "modal"}
-            className="clip-corner-4 clip-corner-tl bg-ash-dark-600 p-4 text-white sm:w-[32rem] w-full max-h-full mx-auto flex flex-col"
+            className="clip-corner-4 clip-corner-tl bg-ash-dark-600 p-4 text-white sm:w-[32rem] w-full max-h-full sm:max-h-[80vh] mx-auto flex flex-col"
         >
             <div className="flex justify-end mb-3">
                 <BaseModal.CloseBtn />
             </div>
+            <div className="px-4 font-bold text-2xl mb-5">History</div>
             <div className="grow overflow-auto">
                 <div className="px-4">
-                    <div className="font-bold text-2xl mb-5">History</div>
-                    {displayTx.slice(0, 7).map((record) => {
+                    
+                    {displayTx.slice(0, 50).map((record) => {
                         if (!record) {
                             return null;
                         }

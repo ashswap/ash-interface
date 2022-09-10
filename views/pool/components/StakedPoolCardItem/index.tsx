@@ -71,16 +71,16 @@ function StakedPoolCardItem({
                     </div>
                     <div className="flex">
                         <button
-                            className="clip-corner-1 clip-corner-bl bg-ash-dark-400 hover:bg-ash-dark-300 active:bg-ash-dark-600 transition-all w-14 h-14 flex items-center justify-center text-pink-600 mr-0.5"
-                            onClick={() => setOpenAddLiquidity(true)}
-                        >
-                            <ICPlus />
-                        </button>
-                        <button
-                            className="clip-corner-1 clip-corner-br bg-ash-dark-400 hover:bg-ash-dark-300 active:bg-ash-dark-600 transition-all w-14 h-14 flex items-center justify-center text-yellow-600"
+                            className="clip-corner-1 clip-corner-br bg-ash-dark-400 hover:bg-ash-dark-300 active:bg-ash-dark-600 transition-all w-14 h-14 flex items-center justify-center text-yellow-600 mr-0.5"
                             onClick={() => setOpenRemoveLiquidity(true)}
                         >
                             <ICMinus />
+                        </button>
+                        <button
+                            className="clip-corner-1 clip-corner-bl bg-ash-dark-400 hover:bg-ash-dark-300 active:bg-ash-dark-600 transition-all w-14 h-14 flex items-center justify-center text-pink-600"
+                            onClick={() => setOpenAddLiquidity(true)}
+                        >
+                            <ICPlus />
                         </button>
                     </div>
                 </div>

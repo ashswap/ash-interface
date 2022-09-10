@@ -4,8 +4,11 @@ const inputRegex = RegExp(`^\\d*(?:\\\\[.])?\\d*$`);
 function escapeRegExp(string: string): string {
     return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
 }
+type InputCurrencyProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type'> & {
+    decimals?: number;
+}
 function InputCurrency(
-    { onChange, ...rest }: Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type'>,
+    { onChange, decimals, ...rest }: InputCurrencyProps,
     ref: ForwardedRef<HTMLInputElement>
 ) {
     const _ref = useRef<HTMLInputElement>(null);
@@ -17,8 +20,13 @@ function InputCurrency(
         (e) => {
             const raw = e.target.value.replace(/,/g, ".");
             if (raw === "" || inputRegex.test(escapeRegExp(raw))) {
-                e.target.value = raw;
-                setPreviousVal(raw);
+                const numDecimals = raw.split('.')[1]?.length || 0;
+                if(typeof decimals === 'number' && decimals >= 0 && numDecimals > decimals){
+                    e.target.value = previousVal;
+                }else{
+                    e.target.value = raw;
+                    setPreviousVal(raw);
+                }
             } else {
                 e.target.value = previousVal;
             }
@@ -27,7 +35,7 @@ function InputCurrency(
                 onChange(e);
             }
         },
-        [onChange, previousVal]
+        [onChange, previousVal, decimals]
     );
 
     return (

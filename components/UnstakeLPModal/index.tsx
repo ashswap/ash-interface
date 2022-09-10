@@ -172,6 +172,7 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
                                         : "border-transparent"
                                 }`}
                                 value={rawStakeAmt}
+                                decimals={pool.lpToken.decimals}
                                 onChange={(e) => {
                                     const raw = e.target.value.trim();
                                     const amt = toWei(pool.lpToken, raw);

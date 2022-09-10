@@ -212,7 +212,7 @@ function BoostBar(props: BoostBarProps) {
                                 <Polygon
                                     height={height}
                                     className={`${
-                                        disabled ? "" : "bg-[#FF00E5]"
+                                        disabled ? "" : "bg-ash-pink-500"
                                     }`}
                                 />
                             </div>
@@ -287,7 +287,7 @@ const VeLine = () => {
                 {!disabled && (
                     <div
                         className={`absolute inset-0 border border-ash-dark-400 ${
-                            disabled ? "bg-[#757391]" : "bg-[#FF00E5]"
+                            disabled ? "bg-[#757391]" : "bg-ash-pink-500"
                         }`}
                         style={{
                             width: `calc(${deltaWidth} - ${bottomDeltaX}px)`,
@@ -314,7 +314,7 @@ const VeLine = () => {
                 </div>
                 {validNewValue > validValue && !disabled && (
                     <div
-                        className="absolute inset-0 text-[#FF00E5]"
+                        className="absolute inset-0 text-ash-pink-500"
                         style={{
                             marginLeft: `min(max(${valueWidth} - ${bottomDeltaX}px, 4rem), 100% - ${bottomDeltaX}px - 8rem)`,
                         }}
@@ -427,13 +427,13 @@ const TopLabel = () => {
                                 <div className="mb-4">
                                     New boost after confirmed
                                 </div>
-                                <div className="text-[#FF00E5] text-lg mb-8">
+                                <div className="text-ash-pink-500 text-lg mb-8">
                                     x{validNewValue}
                                 </div>
                                 <div className="mb-4">
                                     veASH used for new boost
                                 </div>
-                                <div className="text-[#FF00E5] text-lg mb-8">
+                                <div className="text-ash-pink-500 text-lg mb-8">
                                     {formatAmount(expectedVe)} ve
                                 </div>
                                 <div className="bg-ash-dark-600 p-2 text-2xs font-bold text-stake-gray-500 inline-block">
@@ -447,7 +447,7 @@ const TopLabel = () => {
                             <span className="underline text-stake-gray-500">
                                 New boost:{" "}
                             </span>
-                            <span className="underline text-[#FF00E5]">
+                            <span className="underline text-ash-pink-500">
                                 x{formatAmount(validNewValue)}
                             </span>
                         </span>
