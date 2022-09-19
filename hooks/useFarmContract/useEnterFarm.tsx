@@ -1,10 +1,6 @@
-import {
-    TokenPayment
-} from "@elrondnetwork/erdjs/out";
+import { TokenPayment } from "@elrondnetwork/erdjs/out";
 import { accAddressState, accIsLoggedInState } from "atoms/dappState";
-import {
-    farmQuery, farmSessionIdMapState
-} from "atoms/farmsState";
+import { farmQuery, farmSessionIdMapState } from "atoms/farmsState";
 import BigNumber from "bignumber.js";
 import { toEGLDD } from "helper/balance";
 import { ContractManager } from "helper/contracts/contractManager";
@@ -14,7 +10,8 @@ import { IFarm } from "interface/farm";
 import { useRecoilCallback } from "recoil";
 
 const useEnterFarm = (trackStatus = false) => {
-    const {sendTransactions, trackingData, sessionId} = useSendTxsWithTrackStatus(trackStatus);
+    const { sendTransactions, trackingData, sessionId } =
+        useSendTxsWithTrackStatus(trackStatus);
 
     const func = useRecoilCallback(
         ({ snapshot, set }) =>
@@ -31,7 +28,9 @@ const useEnterFarm = (trackStatus = false) => {
 
                 if (!amtWei || amtWei.eq(0) || !loggedIn || !address)
                     return { sessionId: "" };
-                const farmContract = ContractManager.getFarmContract(farm.farm_address);
+                const farmContract = ContractManager.getFarmContract(
+                    farm.farm_address
+                );
 
                 const farmTokenInWallet =
                     farmData.stakedData?.farmTokens.filter(
@@ -76,12 +75,12 @@ const useEnterFarm = (trackStatus = false) => {
                             result.sessionId!,
                         ],
                     }));
-                
+
                 return result;
             },
         [sendTransactions]
     );
-    return {enterFarm: func, trackingData, sessionId};
+    return { enterFarm: func, trackingData, sessionId };
 };
 
 export default useEnterFarm;

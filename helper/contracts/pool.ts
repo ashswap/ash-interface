@@ -108,13 +108,13 @@ class PoolContract extends Contract {
 
     async addLiquidity(
         tokenPayments: TokenPayment[],
-        tokensAmtMin: BigNumber[],
+        mintAmtMin: BigNumber,
         receiver = Address.Zero()
     ) {
         const sender = await getAddress();
         let interaction = this.contract.methods.addLiquidity([
+            mintAmtMin,
             receiver,
-            ...tokensAmtMin,
         ]);
         if (tokenPayments.length === 1) {
             interaction.withSingleESDTTransfer(tokenPayments[0]);

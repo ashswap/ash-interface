@@ -22,7 +22,7 @@ const useGetFarmTokens = (config?: SWRConfiguration) => {
         config
     );
     useEffect(() => {
-        if (!error && data) {
+        if (!error && data && Array.isArray(data)) {
             const map: Record<string, IMetaESDT[]> = Object.fromEntries(
                 FARMS.map((f) => [f.farm_token_id, []])
             );

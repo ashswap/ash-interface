@@ -17,7 +17,10 @@ defaultDevnet.apiTimeout = "10000";
 
 export const DAPP_CONFIG: CustomNetworkType =
     ENVIRONMENT.NETWORK === "testnet"
-        ? {...fallbackNetworkConfigurations.testnet, apiAddress: "https://api-elrond-testnet.ashswap.io"}
+        ? {
+              ...fallbackNetworkConfigurations.testnet,
+              apiAddress: "https://api-elrond-testnet.ashswap.io",
+          }
         : defaultDevnet;
 export const CHAIN_ID = {
     DEVNET: ChainId.Devnet,

@@ -1,5 +1,6 @@
 type Network = "testnet" | "devnet";
-
+type Env = "test" | "dev";
+// -> test-devnet(for internal testing) || dev-devnet (for users)
 interface Environment {
     ASH_API: string;
     ASH_DOMAIN: string;
@@ -7,6 +8,7 @@ interface Environment {
     TESTNET_PASS: string;
     ASH_GRAPHQL: string;
     ASH_SOCKET: string;
+    ENV: Env;
 }
 
 export const ENVIRONMENT: Environment = {
@@ -15,5 +17,6 @@ export const ENVIRONMENT: Environment = {
     NETWORK: process.env.NEXT_PUBLIC_NETWORK as Network,
     TESTNET_PASS: process.env.NEXT_PUBLIC_TESTNET_PASS!,
     ASH_GRAPHQL: process.env.NEXT_PUBLIC_ASH_GRAPHQL!,
-    ASH_SOCKET: process.env.NEXT_PUBLIC_ASH_SOCKET!
+    ASH_SOCKET: process.env.NEXT_PUBLIC_ASH_SOCKET!,
+    ENV: (process.env.NEXT_PUBLIC_ASH_ENV as Env) || "dev",
 };

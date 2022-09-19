@@ -107,7 +107,7 @@ function FarmBoostTooltip({
                             onClick={() => onSelfBoostTransferedToken?.()}
                         >
                             <span className="mr-4">
-                                I want to boost by my self
+                                I want to boost by myself
                             </span>
                             <ICChevronRight className="w-1.5 h-auto" />
                         </button>

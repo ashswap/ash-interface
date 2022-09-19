@@ -130,7 +130,9 @@ const FarmBoostRecord = ({
                 <div></div>
             )}
             <div className="hidden sm:block space-y-2">
-                <div className="text-stake-gray-500 text-xs font-bold">veASH</div>
+                <div className="text-stake-gray-500 text-xs font-bold">
+                    veASH
+                </div>
                 <OnboardTooltip
                     disabled={isBoosting || isOwner || !onboarding}
                     delayOpen={4000}
@@ -275,6 +277,7 @@ const FarmRecordTransfer = ({
             booster={farmToken.attributes.booster}
             onSelfBoostTransferedToken={() => selfBoostHandle()}
             onboarding={onboarding}
+            withHexIcon
         />
     );
 };
@@ -382,7 +385,13 @@ const FarmBoostInfo = ({ farmData, onClose }: FarmBoostInfoType) => {
                                             </div>
                                             <div className="text-white text-base md:text-lg font-bold">
                                                 {formatAmount(
-                                                    veConsume.toNumber(),
+                                                    toEGLDD(
+                                                        VE_ASH_DECIMALS,
+                                                        BigNumber.max(
+                                                            veConsume,
+                                                            0
+                                                        )
+                                                    ).toNumber(),
                                                     { notation: "standard" }
                                                 )}
                                             </div>
@@ -394,9 +403,7 @@ const FarmBoostInfo = ({ farmData, onClose }: FarmBoostInfoType) => {
                                             {veConsume.gt(0) ? (
                                                 <div className="text-ash-pink-500 text-base md:text-lg font-bold">
                                                     x
-                                                    {expectedFarmBoost.boost.toFixed(
-                                                        2
-                                                    )}
+                                                    {formatAmount(expectedFarmBoost.boost)}
                                                 </div>
                                             ) : (
                                                 <div className="text-ash-purple-500 text-base md:text-lg font-bold">

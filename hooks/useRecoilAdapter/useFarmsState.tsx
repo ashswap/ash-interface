@@ -194,6 +194,13 @@ const useFarmsState = () => {
                         const lpAmt = balance
                             .div(perLP)
                             .integerValue(BigNumber.ROUND_FLOOR);
+                        const yieldBoostRaw = calcYieldBoostFromFarmToken(
+                            farmTokenSupply,
+                            balance,
+                            lpAmt,
+                            f
+                        );
+
                         return {
                             tokenId: token.identifier,
                             collection: token.collection,
@@ -202,11 +209,9 @@ const useFarmsState = () => {
                             attributes,
                             attrsRaw: token.attributes,
                             weightBoost: perLP.div(0.4),
-                            yieldBoost: calcYieldBoostFromFarmToken(
-                                farmTokenSupply,
-                                balance,
-                                lpAmt,
-                                f
+                            yieldBoost: +new BigNumber(yieldBoostRaw).toFixed(
+                                2,
+                                BigNumber.ROUND_DOWN
                             ),
                             perLP,
                             lpAmt,
@@ -240,6 +245,12 @@ const useFarmsState = () => {
                         (total, f) => total.plus(f.balance),
                         new BigNumber(0)
                     );
+                    const yieldBoostRaw = calcYieldBoostFromFarmToken(
+                        farmTokenSupply,
+                        farmBalance,
+                        totalStakedLP,
+                        f
+                    );
                     record.stakedData = {
                         farmTokens,
                         totalStakedLP,
@@ -251,11 +262,9 @@ const useFarmsState = () => {
                             .multipliedBy(totalLiquidityValue)
                             .div(lpLockedAmt),
                         weightBoost: farmBalance.div(totalStakedLP).div(0.4),
-                        yieldBoost: calcYieldBoostFromFarmToken(
-                            farmTokenSupply,
-                            farmBalance,
-                            totalStakedLP,
-                            f
+                        yieldBoost: +new BigNumber(yieldBoostRaw).toFixed(
+                            2,
+                            BigNumber.ROUND_DOWN
                         ),
                     };
                 }

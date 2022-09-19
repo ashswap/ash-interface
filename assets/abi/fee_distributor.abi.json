@@ -10,7 +10,7 @@
         "contractCrate": {
             "name": "fee_distributor",
             "version": "0.0.0",
-            "git_version": "2ad619e-modified"
+            "git_version": "45566c6"
         },
         "framework": {
             "name": "elrond-wasm",
@@ -43,6 +43,25 @@
             "outputs": []
         },
         {
+            "name": "veForAt",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "_user",
+                    "type": "Address"
+                },
+                {
+                    "name": "_timestamp",
+                    "type": "u64"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigInt"
+                }
+            ]
+        },
+        {
             "name": "checkpoint_total_supply",
             "mutability": "mutable",
             "inputs": [],
@@ -64,61 +83,12 @@
             ]
         },
         {
-            "name": "getUserClaimableAmount",
+            "name": "getClaimableAmount",
             "mutability": "readonly",
             "inputs": [
                 {
                     "name": "addr",
                     "type": "Address"
-                }
-            ],
-            "outputs": [
-                {
-                    "type": "BigUint"
-                }
-            ]
-        },
-        {
-            "name": "getUserVeAt",
-            "mutability": "readonly",
-            "inputs": [
-                {
-                    "name": "_user",
-                    "type": "Address"
-                },
-                {
-                    "name": "_timestamp",
-                    "type": "u64"
-                }
-            ],
-            "outputs": [
-                {
-                    "type": "BigInt"
-                }
-            ]
-        },
-        {
-            "name": "getGeneratedTokenAmount",
-            "mutability": "readonly",
-            "inputs": [
-                {
-                    "name": "token_id",
-                    "type": "TokenIdentifier"
-                }
-            ],
-            "outputs": [
-                {
-                    "type": "BigUint"
-                }
-            ]
-        },
-        {
-            "name": "getBurnedTokenAmount",
-            "mutability": "readonly",
-            "inputs": [
-                {
-                    "name": "token_id",
-                    "type": "TokenIdentifier"
                 }
             ],
             "outputs": [
@@ -290,81 +260,60 @@
             ]
         }
     ],
-    "events": [],
+    "events": [
+        {
+            "identifier": "checkpointToken",
+            "inputs": [
+                {
+                    "name": "checkpoint_token",
+                    "type": "CheckpointTokenEvent"
+                }
+            ]
+        },
+        {
+            "identifier": "claimed",
+            "inputs": [
+                {
+                    "name": "recipient",
+                    "type": "Address",
+                    "indexed": true
+                },
+                {
+                    "name": "claimed",
+                    "type": "ClaimedEvent"
+                }
+            ]
+        }
+    ],
     "hasCallback": false,
     "types": {
         "CheckpointTokenEvent": {
             "type": "struct",
             "fields": [
                 {
-                    "name": "caller",
-                    "type": "Address"
-                },
-                {
-                    "name": "block",
-                    "type": "u64"
-                },
-                {
-                    "name": "epoch",
-                    "type": "u64"
-                },
-                {
                     "name": "timestamp",
                     "type": "u64"
+                },
+                {
+                    "name": "tokens",
+                    "type": "BigUint"
                 }
             ]
         },
-        "CheckpointTotalSupplyEvent": {
+        "ClaimedEvent": {
             "type": "struct",
             "fields": [
-                {
-                    "name": "caller",
-                    "type": "Address"
-                },
-                {
-                    "name": "block",
-                    "type": "u64"
-                },
-                {
-                    "name": "epoch",
-                    "type": "u64"
-                },
-                {
-                    "name": "timestamp",
-                    "type": "u64"
-                }
-            ]
-        },
-        "ClaimEvent": {
-            "type": "struct",
-            "fields": [
-                {
-                    "name": "caller",
-                    "type": "Address"
-                },
-                {
-                    "name": "block",
-                    "type": "u64"
-                },
-                {
-                    "name": "epoch",
-                    "type": "u64"
-                },
-                {
-                    "name": "timestamp",
-                    "type": "u64"
-                },
-                {
-                    "name": "user_epoch",
-                    "type": "u64"
-                },
-                {
-                    "name": "user_time_cursor",
-                    "type": "u64"
-                },
                 {
                     "name": "amount",
                     "type": "BigUint"
+                },
+                {
+                    "name": "claim_epoch",
+                    "type": "u64"
+                },
+                {
+                    "name": "max_epoch",
+                    "type": "u64"
                 }
             ]
         }

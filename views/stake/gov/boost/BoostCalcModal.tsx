@@ -260,7 +260,7 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
                                     className="bg-ash-dark-400 text-right h-10 px-2 sm:px-7 text-stake-gray-500 outline-none text-sm w-full"
                                     placeholder="0"
                                     value={lpValueStr}
-                                    decimals={pool.lpToken.decimals}
+                                    decimals={pool?.lpToken.decimals || 0}
                                     onChange={(e) => {
                                         setIsUserInput(true);
                                         setLpValueStr(e.target.value);

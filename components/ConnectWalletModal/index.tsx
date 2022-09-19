@@ -9,7 +9,7 @@ import downloadPlayStore from "assets/images/download-play-store.png";
 import maiarLogo from "assets/images/maiar-logo.png";
 import ICConnectApp from "assets/svg/connect-app.svg";
 import ICConnectExtension from "assets/svg/connect-extension.svg";
-import { accIsLoggedInState } from "atoms/dappState";
+import { accAddressState, accIsLoggedInState } from "atoms/dappState";
 import { walletIsOpenConnectModalState } from "atoms/walletState";
 import BaseModal from "components/BaseModal";
 import Image from "next/image";
@@ -28,6 +28,7 @@ const MAIAR_WALLET_LINK = {
 
 function ConnectWalletModal() {
     const loggedIn = useRecoilValue(accIsLoggedInState);
+    const accAddress = useRecoilValue(accAddressState);
     const [isOpenConnectWalletModal, setIsOpenConnectWalletModal] =
         useRecoilState(walletIsOpenConnectModalState);
 
@@ -50,7 +51,7 @@ function ConnectWalletModal() {
             setIsOpenDownloadApp(false);
             setIsOpenDownloadExtension(false);
         }
-    }, [loggedIn, setIsOpenConnectWalletModal]);
+    }, [loggedIn, accAddress, setIsOpenConnectWalletModal]);
     return (
         <>
             <BaseModal

@@ -2,9 +2,13 @@ import IconRight from "assets/svg/right-white.svg";
 import { addLPSessionIdAtom } from "atoms/addLiquidity";
 import {
     accIsInsufficientEGLDState,
-    accIsLoggedInState
+    accIsLoggedInState,
 } from "atoms/dappState";
-import { PoolsState } from "atoms/poolsState";
+import {
+    ashRawPoolByAddressQuery,
+    poolFeesQuery,
+    PoolsState,
+} from "atoms/poolsState";
 import { tokenMapState } from "atoms/tokensState";
 import BigNumber from "bignumber.js";
 import Avatar from "components/Avatar";
@@ -16,6 +20,7 @@ import TextAmt from "components/TextAmt";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
 import { toEGLDD, toWei } from "helper/balance";
 import { Fraction } from "helper/fraction/fraction";
+import { calculateEstimatedMintAmount } from "helper/stableswap/calculator/amounts";
 import { IESDTInfo } from "helper/token/token";
 import { TokenAmount } from "helper/token/tokenAmount";
 import { useOnboarding } from "hooks/useOnboarding";
@@ -24,8 +29,8 @@ import { useScreenSize } from "hooks/useScreenSize";
 import produce from "immer";
 import { Unarray } from "interface/utilities";
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useRecoilValue, useSetRecoilState } from "recoil";
+import { useEffect, useMemo, useState } from "react";
+import { useRecoilCallback, useRecoilValue, useSetRecoilState } from "recoil";
 import { theme } from "tailwind.config";
 
 interface Props {
@@ -144,31 +149,60 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
 
     const screenSize = useScreenSize();
 
-    const addLP = useCallback(async () => {
-        if (!loggedIn || adding) return;
-        setAdding(true);
-        try {
-            const { sessionId } = await addPoolLP(
-                pool,
-                pool.tokens.map((t, i) => toWei(t, inputValues[i] || "0"))
-            );
+    const addLP = useRecoilCallback(
+        ({ snapshot }) =>
+            async () => {
+                const poolData = await snapshot.getPromise(
+                    ashRawPoolByAddressQuery(pool.address)
+                );
+                const poolFee = await snapshot.getPromise(
+                    poolFeesQuery(pool.address)
+                );
+                if (!loggedIn || adding || !poolData) return;
+                const { ampFactor, reserves, totalSupply } = poolData;
+                if (!ampFactor || !reserves || !totalSupply) return;
+                setAdding(true);
 
-            setAddLPSessionId(sessionId || "");
-            if (sessionId) onClose?.();
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setAdding(false);
-        }
-    }, [
-        inputValues,
-        pool,
-        onClose,
-        adding,
-        loggedIn,
-        addPoolLP,
-        setAddLPSessionId,
-    ]);
+                try {
+                    const { mintAmount } = calculateEstimatedMintAmount(
+                        new BigNumber(ampFactor),
+                        pool.tokens.map(
+                            (t, i) => new TokenAmount(t, reserves[i])
+                        ),
+                        poolFee.swap,
+                        new TokenAmount(pool.lpToken, totalSupply),
+                        pool.tokens.map((t, i) =>
+                            toWei(t, inputValues[i] || "0")
+                        )
+                    );
+                    const { sessionId } = await addPoolLP(
+                        pool,
+                        pool.tokens.map((t, i) =>
+                            toWei(t, inputValues[i] || "0")
+                        ),
+                        mintAmount.raw
+                            .multipliedBy(0.99) // expected receive at least 99% of estimation LP
+                            .integerValue(BigNumber.ROUND_DOWN)
+                    );
+
+                    setAddLPSessionId(sessionId || "");
+                    if (sessionId) onClose?.();
+                } catch (error) {
+                    console.error(error);
+                } finally {
+                    setAdding(false);
+                }
+            },
+        [
+            inputValues,
+            pool,
+            onClose,
+            adding,
+            loggedIn,
+            addPoolLP,
+            setAddLPSessionId,
+        ]
+    );
 
     const tokenInputProps = useMemo(() => {
         return pool.tokens.map((t, i) => {
