@@ -5,11 +5,11 @@ import { MAIAR_POOLS } from "./maiarPools";
 import { TOKENS_MAP } from "./tokens";
 
 type PoolConfig = {
-    dev: IPool[];
-    test: IPool[];
+    beta: IPool[];
+    alpha: IPool[];
 };
 const devnet: PoolConfig = {
-    dev: [
+    beta: [
         {
             address:
                 "erd1qqqqqqqqqqqqqpgqest94j9tqlk2e0jjm93evdagye6eazfhrmcqp6j9mh",
@@ -47,7 +47,7 @@ const devnet: PoolConfig = {
             tokens: [TOKENS_MAP["RENBTC-0b6973"], TOKENS_MAP["WBTC-9bdb9b"]],
         },
     ],
-    test: [
+    alpha: [
         {
             address:
                 "erd1qqqqqqqqqqqqqpgq5wzf04ydtvdjg2cety9ve4jal4ja6jp6rmcq9tqf4h",

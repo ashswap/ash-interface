@@ -2,11 +2,11 @@ import { IFarm } from "interface/farm";
 import { ENVIRONMENT } from "./env";
 
 type FarmConfig = {
-    dev: IFarm[];
-    test: IFarm[];
+    alpha: IFarm[];
+    beta: IFarm[];
 };
 const devnet: FarmConfig = {
-    dev: [
+    beta: [
         {
             farm_address:
                 "erd1qqqqqqqqqqqqqpgq6cte98kfd6g7xnwp3je9q89q96l5mxcyrmcqd0n7u3",
@@ -41,7 +41,7 @@ const devnet: FarmConfig = {
             active: true,
         },
     ],
-    test: [
+    alpha: [
         {
             farm_address:
                 "erd1qqqqqqqqqqqqqpgq87sx2a9z2536sy5jfe7mh0a62t2lal47rmcq89jaam",
