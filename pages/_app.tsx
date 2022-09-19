@@ -24,7 +24,7 @@ import {
     ReactNode,
     useEffect,
     useMemo,
-    useState
+    useState,
 } from "react";
 import { RecoilRoot } from "recoil";
 import * as gtag from "../helper/gtag";
@@ -60,7 +60,8 @@ const TestnetGuard = ({ children }: any) => {
         localStorage.setItem("testnet_pass", pass);
     }, [pass]);
     if (
-        ENVIRONMENT.NETWORK === "testnet" &&
+        (ENVIRONMENT.NETWORK === "testnet" ||
+            (ENVIRONMENT.NETWORK === "devnet" && ENVIRONMENT.ENV === "test")) &&
         process.env.NODE_ENV === "production" &&
         !authorized
     )

@@ -10,7 +10,7 @@
         "contractCrate": {
             "name": "pool",
             "version": "0.0.0",
-            "git_version": "2ad619e-modified"
+            "git_version": "45566c6"
         },
         "framework": {
             "name": "elrond-wasm",
@@ -52,48 +52,27 @@
         {
             "name": "addLiquidity",
             "mutability": "mutable",
-            "payableInTokens": [
-                "*"
-            ],
+            "payableInTokens": ["*"],
             "inputs": [
+                {
+                    "name": "mint_amount_min",
+                    "type": "BigUint"
+                },
                 {
                     "name": "lp_token_receiver",
                     "type": "Address"
-                },
-                {
-                    "name": "token_amount_min",
-                    "type": "variadic<BigUint>",
-                    "multi_arg": true
                 }
             ],
             "outputs": [
                 {
                     "type": "List<EsdtTokenPayment>"
-                }
-            ]
-        },
-        {
-            "name": "estimateAddLiquidity",
-            "mutability": "readonly",
-            "inputs": [
-                {
-                    "name": "token_amount_added",
-                    "type": "variadic<BigUint>",
-                    "multi_arg": true
-                }
-            ],
-            "outputs": [
-                {
-                    "type": "List<AddLiquidityAttributes>"
                 }
             ]
         },
         {
             "name": "removeLiquidity",
             "mutability": "mutable",
-            "payableInTokens": [
-                "*"
-            ],
+            "payableInTokens": ["*"],
             "inputs": [
                 {
                     "name": "token_amount_min",
@@ -104,71 +83,26 @@
             "outputs": [
                 {
                     "type": "List<EsdtTokenPayment>"
-                }
-            ]
-        },
-        {
-            "name": "estimateRemoveLiquidity",
-            "mutability": "readonly",
-            "inputs": [
-                {
-                    "name": "liquidity",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "token_amount_min",
-                    "type": "variadic<BigUint>",
-                    "multi_arg": true
-                }
-            ],
-            "outputs": [
-                {
-                    "type": "List<RemoveLiquidityAttributes>"
                 }
             ]
         },
         {
             "name": "exchange",
             "mutability": "mutable",
-            "payableInTokens": [
-                "*"
-            ],
+            "payableInTokens": ["*"],
             "inputs": [
                 {
                     "name": "token_out",
                     "type": "TokenIdentifier"
                 },
                 {
-                    "name": "amount_out",
+                    "name": "amount_out_min",
                     "type": "BigUint"
                 }
             ],
             "outputs": [
                 {
                     "type": "List<EsdtTokenPayment>"
-                }
-            ]
-        },
-        {
-            "name": "estimateAmountOut",
-            "mutability": "readonly",
-            "inputs": [
-                {
-                    "name": "token_in",
-                    "type": "TokenIdentifier"
-                },
-                {
-                    "name": "token_out",
-                    "type": "TokenIdentifier"
-                },
-                {
-                    "name": "amount_in",
-                    "type": "BigUint"
-                }
-            ],
-            "outputs": [
-                {
-                    "type": "ExchangeAttributes"
                 }
             ]
         },
@@ -374,32 +308,55 @@
             ]
         },
         {
-            "name": "getGeneratedTokenAmount",
+            "name": "estimateAddLiquidity",
             "mutability": "readonly",
             "inputs": [
                 {
-                    "name": "token_id",
-                    "type": "TokenIdentifier"
+                    "name": "token_amount_added",
+                    "type": "List<BigUint>"
                 }
             ],
             "outputs": [
                 {
-                    "type": "BigUint"
+                    "type": "AddLiquidityResultType"
                 }
             ]
         },
         {
-            "name": "getBurnedTokenAmount",
+            "name": "estimateRemoveLiquidity",
             "mutability": "readonly",
             "inputs": [
                 {
-                    "name": "token_id",
-                    "type": "TokenIdentifier"
+                    "name": "burn_amount",
+                    "type": "BigUint"
                 }
             ],
             "outputs": [
                 {
+                    "type": "RemoveLiquidityResultType"
+                }
+            ]
+        },
+        {
+            "name": "estimateAmountOut",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "token_in",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "token_out",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "amount_in",
                     "type": "BigUint"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "ExchangeResultType"
                 }
             ]
         },
@@ -414,7 +371,65 @@
             ]
         }
     ],
-    "events": [],
+    "events": [
+        {
+            "identifier": "add_liquidity",
+            "inputs": [
+                {
+                    "name": "timestamp",
+                    "type": "u64",
+                    "indexed": true
+                },
+                {
+                    "name": "caller",
+                    "type": "Address",
+                    "indexed": true
+                },
+                {
+                    "name": "add_liquidity_event",
+                    "type": "AddLiquidityEvent"
+                }
+            ]
+        },
+        {
+            "identifier": "remove_liquidity",
+            "inputs": [
+                {
+                    "name": "timestamp",
+                    "type": "u64",
+                    "indexed": true
+                },
+                {
+                    "name": "caller",
+                    "type": "Address",
+                    "indexed": true
+                },
+                {
+                    "name": "remove_liquidity_event",
+                    "type": "RemoveLiquidityEvent"
+                }
+            ]
+        },
+        {
+            "identifier": "exchange",
+            "inputs": [
+                {
+                    "name": "timestamp",
+                    "type": "u64",
+                    "indexed": true
+                },
+                {
+                    "name": "caller",
+                    "type": "Address",
+                    "indexed": true
+                },
+                {
+                    "name": "exchange_event",
+                    "type": "ExchangeEvent"
+                }
+            ]
+        }
+    ],
     "hasCallback": false,
     "types": {
         "TokenAttributes": {
@@ -459,27 +474,24 @@
             "type": "struct",
             "fields": [
                 {
-                    "name": "epoch",
-                    "type": "u64"
-                },
-                {
-                    "name": "timestamp",
-                    "type": "u64"
-                },
-                {
-                    "name": "caller",
-                    "type": "Address"
-                },
-                {
-                    "name": "lp_token_id",
-                    "type": "TokenIdentifier"
-                },
-                {
                     "name": "lp_token_amount",
                     "type": "BigUint"
                 },
                 {
                     "name": "lp_token_supply",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "tokens",
+                    "type": "List<AddLiquidityAttributes>"
+                }
+            ]
+        },
+        "AddLiquidityResultType": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "mint_amount",
                     "type": "BigUint"
                 },
                 {
@@ -509,41 +521,16 @@
             "type": "struct",
             "fields": [
                 {
-                    "name": "token_in_index",
-                    "type": "u32"
-                },
-                {
-                    "name": "token_out_index",
-                    "type": "u32"
-                },
-                {
-                    "name": "final_in_amount",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "final_out_amount",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "total_fee",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "admin_fee",
-                    "type": "BigUint"
-                }
-            ]
-        },
-        "PoolTokenAttributes": {
-            "type": "struct",
-            "fields": [
-                {
                     "name": "token",
                     "type": "TokenIdentifier"
                 },
                 {
                     "name": "attribute",
                     "type": "TokenAttributes"
+                },
+                {
+                    "name": "final_amount",
+                    "type": "BigUint"
                 }
             ]
         },
@@ -551,24 +538,41 @@
             "type": "struct",
             "fields": [
                 {
-                    "name": "epoch",
-                    "type": "u64"
+                    "name": "total_fee",
+                    "type": "BigUint"
                 },
                 {
-                    "name": "timestamp",
-                    "type": "u64"
+                    "name": "admin_fee",
+                    "type": "BigUint"
                 },
                 {
-                    "name": "caller",
-                    "type": "Address"
-                },
-                {
-                    "name": "attributes",
+                    "name": "token_in",
                     "type": "ExchangeAttributes"
                 },
                 {
-                    "name": "tokens",
-                    "type": "List<PoolTokenAttributes>"
+                    "name": "token_out",
+                    "type": "ExchangeAttributes"
+                }
+            ]
+        },
+        "ExchangeResultType": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "total_fee",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "admin_fee",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "token_in",
+                    "type": "ExchangeAttributes"
+                },
+                {
+                    "name": "token_out",
+                    "type": "ExchangeAttributes"
                 }
             ]
         },
@@ -597,10 +601,6 @@
                     "type": "TokenAttributes"
                 },
                 {
-                    "name": "amount_min",
-                    "type": "BigUint"
-                },
-                {
                     "name": "amount_removed",
                     "type": "BigUint"
                 }
@@ -610,27 +610,24 @@
             "type": "struct",
             "fields": [
                 {
-                    "name": "epoch",
-                    "type": "u64"
-                },
-                {
-                    "name": "timestamp",
-                    "type": "u64"
-                },
-                {
-                    "name": "caller",
-                    "type": "Address"
-                },
-                {
-                    "name": "lp_token_id",
-                    "type": "TokenIdentifier"
-                },
-                {
                     "name": "lp_token_amount",
                     "type": "BigUint"
                 },
                 {
                     "name": "lp_token_supply",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "tokens",
+                    "type": "List<RemoveLiquidityAttributes>"
+                }
+            ]
+        },
+        "RemoveLiquidityResultType": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "burn_amount",
                     "type": "BigUint"
                 },
                 {

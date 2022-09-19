@@ -95,8 +95,6 @@ export const calculateEstimatedSwapOutputAmount = (
     };
 };
 
-const N_COINS = new BigNumber(2);
-
 export interface IWithdrawOneResult {
     withdrawAmount: TokenAmount;
     withdrawAmountBeforeFees: TokenAmount;
@@ -223,7 +221,7 @@ export const calculateEstimatedMintAmount = (
             : difference.multiply(-1);
         const fee = normalizedTradeFee(
             swapFee,
-            N_COINS,
+            new BigNumber(reserves.length),
             new BigNumber(diffAbs.toFixed(0))
         );
         return newBalance.minus(new BigNumber(fee.toFixed(0)));

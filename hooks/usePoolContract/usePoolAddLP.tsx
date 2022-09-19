@@ -9,35 +9,44 @@ import { useRecoilCallback } from "recoil";
 
 const usePoolAddLP = () => {
     const func = useRecoilCallback(
-        () => async (pool: IPool, tokensWei: BigNumber[]) => {
-            const poolContract = new PoolContract(pool.address);
-            const payments = pool.tokens
-                .map((t, i) =>
-                    TokenPayment.fungibleFromBigInteger(
-                        t.identifier,
-                        tokensWei[i],
-                        t.decimals
+        () =>
+            async (
+                pool: IPool,
+                tokensWei: BigNumber[],
+                mintAmtMin: BigNumber
+            ) => {
+                const poolContract = new PoolContract(pool.address);
+                const payments = pool.tokens
+                    .map((t, i) =>
+                        TokenPayment.fungibleFromBigInteger(
+                            t.identifier,
+                            tokensWei[i],
+                            t.decimals
+                        )
                     )
-                )
-                .filter((p) => p.amountAsBigInteger.gt(0));
-            const tx = await poolContract.addLiquidity(payments, tokensWei);
-            const receipt = pool.tokens
-                .map(
-                    (t, i) =>
-                        `${formatAmount(
-                            toEGLDD(t.decimals, tokensWei[i]).toNumber(),
-                            { notation: "standard" }
-                        )} ${t.symbol}`
-                )
-                .join(", ")
-                .replace(/\,$/, "");
-            return await sendTransactions({
-                transactions: tx,
-                transactionsDisplayInfo: {
-                    successMessage: `Add liquidity Success ${receipt}`,
-                },
-            });
-        }
+                    .filter((p) => p.amountAsBigInteger.gt(0));
+
+                const tx = await poolContract.addLiquidity(
+                    payments,
+                    mintAmtMin
+                );
+                const receipt = pool.tokens
+                    .map(
+                        (t, i) =>
+                            `${formatAmount(
+                                toEGLDD(t.decimals, tokensWei[i]).toNumber(),
+                                { notation: "standard" }
+                            )} ${t.symbol}`
+                    )
+                    .join(", ")
+                    .replace(/\,$/, "");
+                return await sendTransactions({
+                    transactions: tx,
+                    transactionsDisplayInfo: {
+                        successMessage: `Add liquidity Success ${receipt}`,
+                    },
+                });
+            }
     );
     return func;
 };

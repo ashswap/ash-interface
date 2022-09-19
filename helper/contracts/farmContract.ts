@@ -47,7 +47,7 @@ class FarmContract extends Contract {
             tokenPayments,
             new Address(sender)
         );
-        interaction.withGasLimit(13_000_000 + tokenPayments.length * 2_000_000);
+        interaction.withGasLimit(13_000_000 + tokenPayments.length * 2_500_000);
         return this.interceptInteraction(interaction)
             .check()
             .buildTransaction();

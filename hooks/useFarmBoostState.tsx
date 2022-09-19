@@ -171,7 +171,7 @@ export const useFarmBoostOwnerState = (farmData: FarmRecord) => {
                     (total, t) => total.plus(t.balance),
                     new BigNumber(0)
                 );
-                const boostInfo = await calcBoost(
+                const _boostInfo = await calcBoost(
                     slopeRefill,
                     lpAmt,
                     slopeUsed,
@@ -182,6 +182,13 @@ export const useFarmBoostOwnerState = (farmData: FarmRecord) => {
                     farmData.farmTokenSupply,
                     farmBalance
                 );
+                const boostInfo = {
+                    ..._boostInfo,
+                    boost: +new BigNumber(_boostInfo.boost).toFixed(
+                        2,
+                        BigNumber.ROUND_DOWN
+                    ),
+                };
                 setAvailableVe(
                     lockedAshAmt
                         .div(4 * 365 * 24 * 3600)
@@ -193,16 +200,19 @@ export const useFarmBoostOwnerState = (farmData: FarmRecord) => {
                 const veForMaxBoost = lpAmt
                     .multipliedBy(veSupply)
                     .div(farmData.lpLockedAmt);
-
+                const maxBoostRaw = calcYieldBoost(
+                    lpAmt,
+                    farmData.lpLockedAmt,
+                    veForMaxBoost,
+                    veSupply,
+                    farmData.farmTokenSupply,
+                    farmBalance
+                );
                 setMaxFarmBoost({
                     veForBoost: veForMaxBoost,
-                    boost: calcYieldBoost(
-                        lpAmt,
-                        farmData.lpLockedAmt,
-                        veForMaxBoost,
-                        veSupply,
-                        farmData.farmTokenSupply,
-                        farmBalance
+                    boost: +new BigNumber(maxBoostRaw).toFixed(
+                        2,
+                        BigNumber.ROUND_DOWN
                     ),
                 });
             },
@@ -235,12 +245,16 @@ export const useFarmBoostOwnerState = (farmData: FarmRecord) => {
                     new BigNumber(0)
                 );
                 const ve = slope.multipliedBy(unlockTs.minus(moment().unix()));
+                const currentBoostRaw = calcYieldBoostFromFarmToken(
+                    farmData.farmTokenSupply,
+                    farmBalance,
+                    totalLP,
+                    farmData.farm
+                );
                 setCurrentFarmBoost({
-                    boost: calcYieldBoostFromFarmToken(
-                        farmData.farmTokenSupply,
-                        farmBalance,
-                        totalLP,
-                        farmData.farm
+                    boost: +new BigNumber(currentBoostRaw).toFixed(
+                        2,
+                        BigNumber.ROUND_DOWN
                     ),
                     veForBoost: BigNumber.max(ve, 0),
                 });

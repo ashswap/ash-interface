@@ -3,17 +3,17 @@ import { accAddressState } from "atoms/dappState";
 import {
     lpTokenMapState,
     tokenMapState,
-    tokensRefresherAtom,
+    tokensRefresherAtom
 } from "atoms/tokensState";
 import { DAPP_CONFIG } from "const/dappConfig";
-import { ASH_TOKEN, TOKENS } from "const/tokens";
+import pools from "const/pool";
+import { TOKENS } from "const/tokens";
+import { toEGLDD } from "helper/balance";
 import { fetcher } from "helper/common";
+import produce from "immer";
 import { useEffect, useMemo } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import useSWR, { SWRConfiguration } from "swr";
-import produce from "immer";
-import { toEGLDD } from "helper/balance";
-import pools from "const/pool";
 
 const useGetTokens = (config?: SWRConfiguration) => {
     const accAddress = useRecoilValue(accAddressState);
@@ -39,49 +39,44 @@ const useGetTokens = (config?: SWRConfiguration) => {
     useEffect(() => {
         setTokenMap((state) => {
             return produce(state, (draft) => {
-                tokens.map(
-                    (t) => draft[t.id] && (draft[t.id].price = t.price || 0)
+                const tokenMap = Object.fromEntries(
+                    tokens.map((t) => [t.id, t])
                 );
-                data?.map(
-                    (t) =>
-                        draft[t.identifier] &&
-                        (draft[t.identifier].balance = t.balance || "0")
+                const dataMap = Object.fromEntries(
+                    data?.map((t) => [t.identifier, t]) || []
                 );
-                TOKENS.map(
-                    (t) =>
-                        (draft[t.identifier].valueUsd = toEGLDD(
-                            t.decimals,
-                            draft[t.identifier].balance
-                        )
-                            .multipliedBy(draft[t.identifier].price)
-                            .toNumber())
-                );
+                Object.keys(draft).map((id) => {
+                    draft[id].price = tokenMap[id]?.price || 0;
+                    draft[id].balance = dataMap[id]?.balance || "0";
+                    draft[id].valueUsd = toEGLDD(
+                        draft[id].decimals,
+                        draft[id].balance
+                    )
+                        .multipliedBy(draft[id].price)
+                        .toNumber();
+                });
             });
         });
     }, [data, tokens, setTokenMap]);
     useEffect(() => {
         setLPTokenMap((state) => {
             return produce(state, (draft) => {
-                rawPools.map(
-                    (p) =>
-                        draft[p.lpToken.id] &&
-                        (draft[p.lpToken.id].price = p.lpToken.price || 0)
+                const rawPoolMap = Object.fromEntries(
+                    rawPools.map((p) => [p.lpToken.id, p])
                 );
-                data?.map(
-                    (t) =>
-                        draft[t.identifier] &&
-                        (draft[t.identifier].balance = t.balance || "0")
+                const dataMap = Object.fromEntries(
+                    data?.map((t) => [t.identifier, t]) || []
                 );
-                pools.map(
-                    ({ lpToken: t }) =>
-                        draft[t.identifier] &&
-                        (draft[t.identifier].valueUsd = toEGLDD(
-                            t.decimals,
-                            draft[t.identifier].balance
-                        )
-                            .multipliedBy(draft[t.identifier].price)
-                            .toNumber())
-                );
+                Object.keys(draft).map((id) => {
+                    draft[id].balance = dataMap[id]?.balance || "0";
+                    draft[id].price = rawPoolMap[id]?.lpToken?.price || 0;
+                    draft[id].valueUsd = toEGLDD(
+                        draft[id].decimals,
+                        draft[id].balance
+                    )
+                        .multipliedBy(draft[id].price)
+                        .toNumber();
+                });
             });
         });
     }, [data, rawPools, setLPTokenMap]);
