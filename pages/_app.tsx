@@ -61,7 +61,7 @@ const TestnetGuard = ({ children }: any) => {
     }, [pass]);
     if (
         (ENVIRONMENT.NETWORK === "testnet" ||
-            (ENVIRONMENT.NETWORK === "devnet" && ENVIRONMENT.ENV === "test")) &&
+            (ENVIRONMENT.NETWORK === "devnet" && ENVIRONMENT.ENV === "alpha")) &&
         process.env.NODE_ENV === "production" &&
         !authorized
     )

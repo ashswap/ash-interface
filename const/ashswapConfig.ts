@@ -4,17 +4,17 @@ type DappContracts = {
     feeDistributor: string;
 };
 type DappContractConfig = {
-    dev: DappContracts;
-    test: DappContracts;
+    alpha: DappContracts;
+    beta: DappContracts;
 };
 const dappContractDevnet: DappContractConfig = {
-    dev: {
+    alpha: {
         voteEscrowedContract:
             "erd1qqqqqqqqqqqqqpgqy48fl8ck4z5nwjlhnkkqm85ufqrttncprmcqwzldec",
         feeDistributor:
             "erd1qqqqqqqqqqqqqpgq47yvf3lx98f837jcmm4cylnv29re8uryrmcql73mn2",
     },
-    test: {
+    beta: {
         voteEscrowedContract:
             "erd1qqqqqqqqqqqqqpgqjha3wpatzxhxl7auezw0q8wxrzfu72q8rmcqrk27vs",
         feeDistributor:
