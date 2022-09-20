@@ -60,65 +60,19 @@ const DEVNET_TOKENS: IESDTInfo[] = [
     },
 ];
 
-const TESTNET_TOKENS: IESDTInfo[] = [
-    {
-        identifier: "ASH-f01858",
-        chainId: ChainId.Testnet,
-        symbol: "ASH",
-        name: "Ashswap Token",
-        decimals: 18,
-        logoURI: ImgAshIcon.src,
-    },
-    {
-        identifier: "USDT-8d1668",
-        chainId: ChainId.Testnet,
-        symbol: "USDT",
-        name: "Tether",
-        decimals: 6,
-        logoURI: IconUSDT.src,
-    },
-    {
-        identifier: "USDC-cbf0b9",
-        chainId: ChainId.Testnet,
-        symbol: "USDC",
-        name: "USD Coin",
-        decimals: 6,
-        logoURI: IconUSDC.src,
-    },
-    {
-        identifier: "WUSDC-365a33",
-        chainId: ChainId.Testnet,
-        symbol: "wUSDC",
-        name: "Wrapped USDC",
-        decimals: 6,
-        logoURI: IconWUSDC.src,
-    },
-    {
-        identifier: "RENBTC-36935a",
-        chainId: ChainId.Testnet,
-        symbol: "renBTC",
-        name: "Ren BTC",
-        decimals: 8,
-        logoURI: IconBTC.src,
-    },
-    {
-        identifier: "WBTC-ebec12",
-        chainId: ChainId.Testnet,
-        symbol: "wBTC",
-        name: "Wrapped BTC",
-        decimals: 8,
-        logoURI: IconWBTC.src,
-    },
-];
+const MAINNET_TOKENS: IESDTInfo[] = [];
 
 export const TOKENS =
-    ENVIRONMENT.NETWORK === "devnet" ? DEVNET_TOKENS : TESTNET_TOKENS;
+    ENVIRONMENT.NETWORK === "devnet" ? DEVNET_TOKENS : MAINNET_TOKENS;
 /**@deprecate */
 export const TOKENS_MAP = Object.fromEntries(
     TOKENS.map((t) => [t.identifier, t])
 );
 /**@deprecate */
 export const ASH_TOKEN: IESDTInfo =
-    TOKENS_MAP[ENVIRONMENT.NETWORK == "devnet" ? "ASH-4ce444" : "ASH-f01858"];
-export const ESDT_MAP = Object.fromEntries(TOKENS.map((t) => [t.identifier, new ESDT(t)]));
-export const ASH_ESDT = ESDT_MAP[ENVIRONMENT.NETWORK == "devnet" ? "ASH-4ce444" : "ASH-f01858"];
+    TOKENS_MAP[ENVIRONMENT.NETWORK == "devnet" ? "ASH-4ce444" : ""];
+export const ESDT_MAP = Object.fromEntries(
+    TOKENS.map((t) => [t.identifier, new ESDT(t)])
+);
+export const ASH_ESDT =
+    ESDT_MAP[ENVIRONMENT.NETWORK == "devnet" ? "ASH-4ce444" : ""];

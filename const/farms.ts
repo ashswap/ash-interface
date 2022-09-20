@@ -78,44 +78,10 @@ const devnet: FarmConfig = {
     ],
 };
 
-const testnet: IFarm[] = [
-    {
-        farm_address:
-            "erd1qqqqqqqqqqqqqpgqprth95wg7zlzuuaghq35xa50vdtrwch4j9tsehcmef",
-        reward_token_id: "ASH-f01858",
-        reward_token_decimal: 18,
-        farming_token_id: "LPT-9cf3ed",
-        farming_token_decimal: 18,
-        farm_token_id: "FUU-d0a632",
-        farm_token_decimal: 18,
-        active: true,
-    },
-    {
-        farm_address:
-            "erd1qqqqqqqqqqqqqpgqfyyvh9jy5wq90hgvyszr3clewy9uvjrgj9tskfjhpj",
-        reward_token_id: "ASH-f01858",
-        reward_token_decimal: 18,
-        farming_token_id: "LPT-d1e2b6",
-        farming_token_decimal: 18,
-        farm_token_id: "FUU-b0a310",
-        farm_token_decimal: 18,
-        active: true,
-    },
-    {
-        farm_address:
-            "erd1qqqqqqqqqqqqqpgqfj4m5yfr3hnq285ucrk6hc2pwhf6gfcvj9tsqh6a8q",
-        reward_token_id: "ASH-f01858",
-        reward_token_decimal: 18,
-        farming_token_id: "LPT-643463",
-        farming_token_decimal: 18,
-        farm_token_id: "FUU-b0138e",
-        farm_token_decimal: 18,
-        active: true,
-    },
-];
+const mainnet: IFarm[] = [];
 
 export const FARMS =
-    (ENVIRONMENT.NETWORK == "devnet" ? devnet[ENVIRONMENT.ENV] : testnet) || [];
+    (ENVIRONMENT.NETWORK == "devnet" ? devnet[ENVIRONMENT.ENV] : mainnet) || [];
 export const ACTIVE_FARMS = FARMS.filter((f) => f.active);
 export const FARMS_MAP = Object.fromEntries(
     FARMS.map((f) => [f.farm_address, f])
