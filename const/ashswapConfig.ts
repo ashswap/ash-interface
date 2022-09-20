@@ -22,17 +22,17 @@ const dappContractDevnet: DappContractConfig = {
     },
 };
 
-const dappContractTestnet: DappContracts = {
+const dappContractMainnet: DappContracts = {
     voteEscrowedContract:
-        "erd1qqqqqqqqqqqqqpgq5k6v7gnfg4had300gskm99xdr2ks0lk7j9tsxqs4mx",
+        "",
     feeDistributor:
-        "erd1qqqqqqqqqqqqqpgq8l06u6vxt29c4dq77dq3633rx4qn43urj9tsh36lns",
+        "",
 };
 
 const dappContract =
     ENVIRONMENT.NETWORK == "devnet"
         ? dappContractDevnet[ENVIRONMENT.ENV]
-        : dappContractTestnet;
+        : dappContractMainnet;
 
 export const ASHSWAP_CONFIG = {
     ashApiBaseUrl: ENVIRONMENT.ASH_API,

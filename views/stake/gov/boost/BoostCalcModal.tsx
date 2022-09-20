@@ -19,7 +19,7 @@ import { formatAmount } from "helper/number";
 import { estimateVeASH } from "helper/voteEscrow";
 import useInputNumberString from "hooks/useInputNumberString";
 import { useScreenSize } from "hooks/useScreenSize";
-import Image from "next/image";
+import Image from "components/Image";
 import { useEffect, useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
 
@@ -177,8 +177,16 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
                     <div className="flex items-center mb-4">
                         {token1 && token2 ? (
                             <>
-                                <Avatar src={token1?.logoURI} alt={token1.name} className="w-9 h-9"/>
-                                <Avatar src={token2?.logoURI} alt={token2.name} className="w-9 h-9 -ml-1"/>
+                                <Avatar
+                                    src={token1?.logoURI}
+                                    alt={token1.name}
+                                    className="w-9 h-9"
+                                />
+                                <Avatar
+                                    src={token2?.logoURI}
+                                    alt={token2.name}
+                                    className="w-9 h-9 -ml-1"
+                                />
                             </>
                         ) : (
                             <>

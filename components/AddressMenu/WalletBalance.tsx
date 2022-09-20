@@ -76,14 +76,10 @@ function WalletBalance() {
             chainId:
                 ENVIRONMENT.NETWORK === "devnet"
                     ? CHAIN_ID.DEVNET
-                    : ENVIRONMENT.NETWORK === "testnet"
-                    ? CHAIN_ID.TESTNET
                     : CHAIN_ID.MAINNET,
             symbol:
                 ENVIRONMENT.NETWORK === "devnet"
                     ? "dEGLD"
-                    : ENVIRONMENT.NETWORK === "testnet"
-                    ? "xEGLD"
                     : "EGLD",
             name: "Elrond eGold",
             balance: new BigNumber(egldBalance),

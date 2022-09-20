@@ -2,7 +2,7 @@ import React from "react";
 import MetalCard from "./MetalCard";
 import ImgVoteGem from "assets/images/vote-gem.png";
 import ImgVoteStakeRisk from "assets/images/vote-stake-risk.png";
-import Image from "next/image";
+import Image from "components/Image";
 
 function VoteStakeCard() {
     return (

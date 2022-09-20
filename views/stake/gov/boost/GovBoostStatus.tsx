@@ -33,7 +33,7 @@ import {
 } from "hooks/useFarmBoostState";
 import useRouteModal from "hooks/useRouteModal";
 import { FarmBoostInfo } from "interface/farm";
-import Image from "next/image";
+import Image from "components/Image";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRecoilCallback, useRecoilValue } from "recoil";
@@ -129,7 +129,9 @@ const FarmRecord = ({
                 {token1.symbol}-{token2.symbol}
             </div>
             <div className="hidden md:block space-y-2">
-                <div className="text-stake-gray-500 text-xs font-bold">veASH</div>
+                <div className="text-stake-gray-500 text-xs font-bold">
+                    veASH
+                </div>
                 <div className="relative">
                     <ICArrowBarRight
                         className="w-full h-[2.625rem] text-stake-dark-500"

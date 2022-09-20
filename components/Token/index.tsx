@@ -1,5 +1,5 @@
 import { IESDTInfo } from "helper/token/token";
-import Image from "next/image";
+import Image from "components/Image";
 import styles from "./Token.module.css";
 
 interface Props {

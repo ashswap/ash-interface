@@ -9,7 +9,7 @@ import ICSetting from "assets/svg/setting.svg";
 import IconWallet from "assets/svg/wallet.svg";
 import {
     accIsInsufficientEGLDState,
-    accIsLoggedInState
+    accIsLoggedInState,
 } from "atoms/dappState";
 import { ashRawPoolByAddressQuery, poolFeesQuery } from "atoms/poolsState";
 import BigNumber from "bignumber.js";
@@ -40,7 +40,7 @@ import { useOnboarding } from "hooks/useOnboarding";
 import usePoolSwap from "hooks/usePoolContract/usePoolSwap";
 import { useScreenSize } from "hooks/useScreenSize";
 import IPool from "interface/pool";
-import Image from "next/image";
+import Image from "components/Image";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRecoilCallback, useRecoilValue } from "recoil";
 import SwapAmount from "./components/SwapAmount";
@@ -167,7 +167,8 @@ const Swap = () => {
             tokenFrom,
             new BigNumber(10)
                 .exponentiatedBy(tokenFrom.decimals)
-                .multipliedBy(valueFrom).integerValue(BigNumber.ROUND_DOWN)
+                .multipliedBy(valueFrom)
+                .integerValue(BigNumber.ROUND_DOWN)
         );
     }, [valueFrom, tokenFrom]);
 
@@ -203,7 +204,9 @@ const Swap = () => {
                     ashRawPoolByAddressQuery(pool.address)
                 );
                 if (!rawPool) return;
-                const reserves = pool.tokens.map((t, i) => new TokenAmount(t, rawPool.reserves[i]));
+                const reserves = pool.tokens.map(
+                    (t, i) => new TokenAmount(t, rawPool.reserves[i])
+                );
                 const price = calculateSwapPrice(
                     new BigNumber(rawPool?.ampFactor || 0),
                     reserves,
@@ -227,7 +230,12 @@ const Swap = () => {
         if (!tokenAmountTo) {
             return new Fraction(0);
         }
-        return new TokenAmount(tokenAmountTo.token, new Percent(100, 100).subtract(slippage).multiply(tokenAmountTo.raw).quotient)
+        return new TokenAmount(
+            tokenAmountTo.token,
+            new Percent(100, 100)
+                .subtract(slippage)
+                .multiply(tokenAmountTo.raw).quotient
+        );
     }, [tokenAmountTo, slippage]);
 
     useEffect(() => {
@@ -264,7 +272,9 @@ const Swap = () => {
                     ashRawPoolByAddressQuery(pool.address || "")
                 );
                 if (!rawPool) return;
-                const reserves = pool.tokens.map((t, i) => new TokenAmount(t, rawPool.reserves[i]));
+                const reserves = pool.tokens.map(
+                    (t, i) => new TokenAmount(t, rawPool.reserves[i])
+                );
                 const estimated = calculateEstimatedSwapOutputAmount(
                     new BigNumber(rawPool?.ampFactor || 0),
                     reserves.find(
@@ -308,7 +318,9 @@ const Swap = () => {
         }
 
         if (!tokenAmountFrom) return;
-        const minWeiOut = TokenAmount.isTokenAmount(minimumReceive) ? minimumReceive.raw : minimumReceive.numerator;
+        const minWeiOut = TokenAmount.isTokenAmount(minimumReceive)
+            ? minimumReceive.raw
+            : minimumReceive.numerator;
         if (minWeiOut.eq(0) || minWeiOut.isNaN()) return;
         try {
             await swap(

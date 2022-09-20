@@ -14,7 +14,7 @@ import { formatAmount } from "helper/number";
 import { IESDTInfo } from "helper/token/token";
 import { PoolStatsRecord } from "interface/poolStats";
 import { TxStatsRecord } from "interface/txStats";
-import { GetServerSideProps, NextPage } from "next";
+import { GetStaticPaths, GetStaticProps, NextPage } from "next";
 import Link from "next/link";
 import { ReactElement } from "react";
 import { useRecoilValue } from "recoil";
@@ -255,9 +255,17 @@ const TokenDetailPage: Page<props> = ({ token }: props) => {
 TokenDetailPage.getLayout = function getLayout(page: ReactElement) {
     return <InfoLayout>{page}</InfoLayout>;
 };
-export const getServerSideProps: GetServerSideProps = async ({ params }) => {
+
+export const getStaticPaths: GetStaticPaths = async () => {
+    return {
+        paths: IN_POOL_TOKENS.map((t) => ({ params: { id: t.identifier } })),
+        fallback: false,
+    };
+};
+export const getStaticProps: GetStaticProps = async ({ params }) => {
     const { id: tokenId } = params || {};
     const token = IN_POOL_TOKENS.find((t) => t.identifier === tokenId);
+    console.log(token);
     if (token) {
         return {
             props: { token },

@@ -5,7 +5,7 @@ import AddressMenu from "components/AddressMenu";
 import Avatar from "components/Avatar";
 import Nav from "components/Nav";
 import { useScreenSize } from "hooks/useScreenSize";
-import Image from "next/image";
+import Image from "components/Image";
 import Link from "next/link";
 
 const AppBar = () => {
