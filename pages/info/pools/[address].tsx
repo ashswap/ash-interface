@@ -14,7 +14,7 @@ import { fetcher } from "helper/common";
 import { formatAmount } from "helper/number";
 import IPool from "interface/pool";
 import { TxStatsRecord } from "interface/txStats";
-import { GetServerSideProps } from "next";
+import { GetStaticPaths, GetStaticProps } from "next";
 import Link from "next/link";
 import { ReactElement, useMemo } from "react";
 import { useRecoilValue } from "recoil";
@@ -266,7 +266,13 @@ function PoolDetailPage({ pool }: Props) {
 PoolDetailPage.getLayout = function getLayout(page: ReactElement) {
     return <InfoLayout>{page}</InfoLayout>;
 };
-export const getServerSideProps: GetServerSideProps = async ({ params }) => {
+export const getStaticPaths: GetStaticPaths = async () => {
+    return {
+        paths: pools.map((p) => ({ params: { address: p.address } })),
+        fallback: false,
+    };
+};
+export const getStaticProps: GetStaticProps = async ({ params }) => {
     const { address } = params || {};
     const pool = pools.find((t) => t.address === address);
     if (pool) {

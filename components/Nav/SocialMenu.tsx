@@ -2,7 +2,7 @@ import { Menu, Transition } from "@headlessui/react";
 import BaseModal from "components/BaseModal";
 import { TAILWIND_BREAKPOINT } from "const/mediaQueries";
 import useMediaQuery from "hooks/useMediaQuery";
-import Image from "next/image";
+import Image from "components/Image";
 import Link from "next/link";
 import React, { Fragment, useState } from "react";
 import discordImage from "../../assets/images/discord.png";

@@ -1,7 +1,7 @@
 import ImgAshSleep from "assets/images/ash-sleep.png";
 import { poolStakedOnlyState, poolToDisplayState } from "atoms/poolsState";
 import IPool from "interface/pool";
-import Image from "next/image";
+import Image from "components/Image";
 import Link from "next/link";
 import { useMemo } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";

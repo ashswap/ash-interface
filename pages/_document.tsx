@@ -3,7 +3,7 @@ import Document, {
     Html,
     Head,
     Main,
-    NextScript
+    NextScript,
 } from "next/document";
 
 class MyDocument extends Document {
@@ -15,7 +15,7 @@ class MyDocument extends Document {
 
     render() {
         return (
-            <Html className="dark">
+            <Html className="dark" lang="en">
                 <Head />
                 <body className="bg-white dark:bg-bg">
                     <Main />

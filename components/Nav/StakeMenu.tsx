@@ -12,7 +12,7 @@ import BaseTooltip from "components/BaseTooltip";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
 import { useOnboarding } from "hooks/useOnboarding";
 import { useScreenSize } from "hooks/useScreenSize";
-import Image from "next/image";
+import Image from "components/Image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";

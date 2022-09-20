@@ -12,7 +12,7 @@ import ICConnectExtension from "assets/svg/connect-extension.svg";
 import { accAddressState, accIsLoggedInState } from "atoms/dappState";
 import { walletIsOpenConnectModalState } from "atoms/walletState";
 import BaseModal from "components/BaseModal";
-import Image from "next/image";
+import Image from "components/Image";
 import platform from "platform";
 import QRCode from "qrcode";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
