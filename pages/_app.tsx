@@ -60,8 +60,8 @@ const TestnetGuard = ({ children }: any) => {
         localStorage.setItem("testnet_pass", pass);
     }, [pass]);
     if (
-        (ENVIRONMENT.NETWORK === "testnet" ||
-            (ENVIRONMENT.NETWORK === "devnet" && ENVIRONMENT.ENV === "alpha")) &&
+        ENVIRONMENT.NETWORK === "devnet" &&
+        ENVIRONMENT.ENV === "alpha" &&
         process.env.NODE_ENV === "production" &&
         !authorized
     )

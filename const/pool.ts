@@ -87,7 +87,7 @@ const devnet: PoolConfig = {
     ],
 };
 
-const testnet: IPool[] = [
+const mainnet: IPool[] = [
     {
         address:
             "erd1qqqqqqqqqqqqqpgqxkhgsfrejldzmnnjglx0pc2y5ssr4k92j9ts9ryaqe",
@@ -127,9 +127,7 @@ const testnet: IPool[] = [
 ];
 
 const pools =
-    ENVIRONMENT.NETWORK == "devnet"
-        ? devnet[ENVIRONMENT.ENV]
-        : [...testnet, ...MAIAR_POOLS];
+    ENVIRONMENT.NETWORK == "devnet" ? devnet[ENVIRONMENT.ENV] : mainnet;
 export const POOLS_MAP_ADDRESS = Object.fromEntries(
     pools.map((p) => [p.address, p])
 );
