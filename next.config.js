@@ -18,8 +18,9 @@ const moduleExports = withReactSvg(
         //     defaultLocale: "en",
         // },
         images: {
-            loader: "custom"
+            loader: "custom",
         },
+        trailingSlash: true,
         async redirects() {
             return [
                 { source: "/stake", destination: "/", permanent: false },
