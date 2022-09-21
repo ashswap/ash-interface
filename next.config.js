@@ -49,7 +49,7 @@ const sentryWebpackPluginOptions = {
 
 // Make sure adding Sentry options is the last code to run before exporting, to
 // ensure that your source maps include changes from all other Webpack plugins
-module.exports = withSentryConfig(moduleWithTM, sentryWebpackPluginOptions);
+module.exports = process.env.NEXT_PUBLIC_ENABLE_SENTRY === "true" ? withSentryConfig(moduleWithTM, sentryWebpackPluginOptions) : moduleWithTM;
 
 // https://github.com/facebookexperimental/Recoil/issues/733
 // safely ignore recoil warning messages in dev (triggered by HMR)

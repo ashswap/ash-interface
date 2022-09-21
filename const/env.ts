@@ -9,6 +9,7 @@ interface Environment {
     ASH_GRAPHQL: string;
     ASH_SOCKET: string;
     ENV: Env;
+    ENABLE_SENTRY: boolean;
 }
 
 export const ENVIRONMENT: Environment = {
@@ -19,4 +20,5 @@ export const ENVIRONMENT: Environment = {
     ASH_GRAPHQL: process.env.NEXT_PUBLIC_ASH_GRAPHQL!,
     ASH_SOCKET: process.env.NEXT_PUBLIC_ASH_SOCKET!,
     ENV: (process.env.NEXT_PUBLIC_ASH_ENV as Env) || "beta",
+    ENABLE_SENTRY: process.env.NEXT_PUBLIC_ENABLE_SENTRY === "true"
 };
