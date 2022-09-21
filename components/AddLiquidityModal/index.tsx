@@ -432,7 +432,8 @@ const AddLiquidityModal = (props: Props) => {
                 <BaseModal.CloseBtn />
             </div>
             <div className="grow overflow-auto">
-                <AddLiquidityContent {...props} />
+                {/* <AddLiquidityContent {...props} /> */}
+                dummy content
             </div>
         </BaseModal>
     );
