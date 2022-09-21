@@ -21,12 +21,12 @@ const moduleExports = withReactSvg(
             loader: "custom",
         },
         trailingSlash: true,
-        async redirects() {
-            return [
-                { source: "/stake", destination: "/", permanent: false },
-                { source: "/stake/mint", destination: "/", permanent: false },
-            ];
-        },
+        // async redirects() {
+        //     return [
+        //         { source: "/stake", destination: "/", permanent: false },
+        //         { source: "/stake/mint", destination: "/", permanent: false },
+        //     ];
+        // },
         sentry: {
             hideSourceMaps: true,
         },
