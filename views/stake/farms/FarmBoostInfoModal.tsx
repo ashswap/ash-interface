@@ -33,7 +33,7 @@ import { useOnboarding } from "hooks/useOnboarding";
 import useRouteModal from "hooks/useRouteModal";
 import { useScreenSize } from "hooks/useScreenSize";
 import { FarmBoostInfo } from "interface/farm";
-import Image from "next/image";
+import Image from "components/Image";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
@@ -403,7 +403,9 @@ const FarmBoostInfo = ({ farmData, onClose }: FarmBoostInfoType) => {
                                             {veConsume.gt(0) ? (
                                                 <div className="text-ash-pink-500 text-base md:text-lg font-bold">
                                                     x
-                                                    {formatAmount(expectedFarmBoost.boost)}
+                                                    {formatAmount(
+                                                        expectedFarmBoost.boost
+                                                    )}
                                                 </div>
                                             ) : (
                                                 <div className="text-ash-purple-500 text-base md:text-lg font-bold">

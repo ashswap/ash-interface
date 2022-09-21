@@ -12,7 +12,7 @@ import ICHomeTrendUp from "assets/svg/home-trend-up.svg";
 import AddressMenu from "components/AddressMenu";
 import Input from "components/Input";
 import { useScreenSize } from "hooks/useScreenSize";
-import Image from "next/image";
+import Image from "components/Image";
 import Link, { LinkProps } from "next/link";
 import { useRouter } from "next/router";
 import ImgLogo from "public/images/m-logo.png";

@@ -2,7 +2,7 @@ import React from "react";
 import MetalCard from "./MetalCard";
 import ImgLPGem from "assets/images/lp-gem.png";
 import ImgLPStakeRisk from "assets/images/lp-stake-risk.png";
-import Image from "next/image";
+import Image from "components/Image";
 
 function LPStakeCard() {
     return (
