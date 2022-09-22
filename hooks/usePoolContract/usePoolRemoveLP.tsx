@@ -16,7 +16,7 @@ const usePoolRemoveLP = (trackStatus = false) => {
             async (
                 pool: IPool,
                 liquidity: BigNumber,
-                estimatedAmtOut: BigNumber.Value[],
+                estimatedWeiOut: BigNumber.Value[],
                 slippage: Percent
             ) => {
                 const tokenPayment = TokenPayment.fungibleFromBigInteger(
@@ -24,8 +24,9 @@ const usePoolRemoveLP = (trackStatus = false) => {
                     liquidity,
                     pool.lpToken.decimals
                 );
-                const tokensAmtMin = estimatedAmtOut.map((v, i) =>
-                    toWei(pool.tokens[i], v.toString())
+
+                const tokensAmtMin = estimatedWeiOut.map((v, i) =>
+                    new BigNumber(v)
                         .multipliedBy(
                             Percent.fromBigNumber(1)
                                 .subtract(slippage)
@@ -44,7 +45,7 @@ const usePoolRemoveLP = (trackStatus = false) => {
                             `${formatAmount(
                                 toEGLDD(
                                     t.decimals,
-                                    estimatedAmtOut[i]
+                                    estimatedWeiOut[i]
                                 ).toNumber(),
                                 {
                                     notation: "standard",

@@ -7,6 +7,7 @@ export const toWei = (token: IESDTInfo, valueStr: string) => {
     }
 
     let amount = new BigNumber(valueStr);
+    if(amount.isNaN()) return new BigNumber(0);
     amount = new BigNumber(
         amount
             .multipliedBy(new BigNumber(10).exponentiatedBy(token.decimals))
