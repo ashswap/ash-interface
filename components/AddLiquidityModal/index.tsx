@@ -29,6 +29,7 @@ import { useScreenSize } from "hooks/useScreenSize";
 import produce from "immer";
 import { Unarray } from "interface/utilities";
 import Link from "next/link";
+import { useCallback } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { useRecoilCallback, useRecoilValue, useSetRecoilState } from "recoil";
 import { theme } from "tailwind.config";
@@ -42,7 +43,7 @@ interface TokenInputProps {
     token: IESDTInfo;
     value: string;
     isInsufficentFund: boolean;
-    onChangeValue: (val: string) => void;
+    onChangeValue: (val: string, number: number) => void;
     balance: string;
     tokenInPool: BigNumber;
 }
@@ -50,10 +51,17 @@ const TokenInput = ({
     token,
     value,
     isInsufficentFund,
-    onChangeValue,
+    onChangeValue: _onChangeValue,
     balance,
     tokenInPool,
 }: TokenInputProps) => {
+    const onChangeValue = useCallback(
+        (val: string) => {
+            const num = +val;
+            _onChangeValue(val, Number.isNaN(num) ? 0 : num);
+        },
+        [_onChangeValue]
+    );
     return (
         <>
             <div className="bg-ash-dark-700 sm:bg-transparent flex space-x-1 items-center sm:items-stretch">
@@ -128,8 +136,11 @@ const TokenInput = ({
 };
 const AddLiquidityContent = ({ onClose, poolData }: Props) => {
     const [isAgree, setAgree] = useState<boolean>(false);
-    const [inputValues, setInputValues] = useState(
+    const [inputRawValues, setInputRawValues] = useState(
         poolData.pool.tokens.map(() => "")
+    );
+    const [inputValues, setInputValues] = useState(
+        poolData.pool.tokens.map(() => 0)
     );
     const [isProMode, setIsProMode] = useState(false);
     const [adding, setAdding] = useState(false);
@@ -172,13 +183,13 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
                         poolFee.swap,
                         new TokenAmount(pool.lpToken, totalSupply),
                         pool.tokens.map((t, i) =>
-                            toWei(t, inputValues[i] || "0")
+                            toWei(t, inputValues[i].toString() || "0")
                         )
                     );
                     const { sessionId } = await addPoolLP(
                         pool,
                         pool.tokens.map((t, i) =>
-                            toWei(t, inputValues[i] || "0")
+                            toWei(t, inputValues[i].toString() || "0")
                         ),
                         mintAmount.raw
                             .multipliedBy(0.99) // expected receive at least 99% of estimation LP
@@ -212,7 +223,7 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
                 tokenMap[t.identifier]?.balance || 0
             );
             const isInsufficientFund =
-                inputValues[i] === "" || tokenAmt.equalTo(0)
+                inputValues[i] === 0 || tokenAmt.equalTo(0)
                     ? false
                     : userInput.greaterThan(tokenAmt);
             return {
@@ -308,18 +319,23 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
                                                 liquidityData?.lpReserves[i] ||
                                                     0
                                             )}
-                                            value={inputValues[i]}
-                                            onChangeValue={(val) =>
-                                                setInputValues((state) =>
+                                            value={inputRawValues[i]}
+                                            onChangeValue={(val, num) => {
+                                                setInputRawValues((state) =>
                                                     produce(state, (draft) => {
                                                         draft[i] = val;
                                                     })
-                                                )
-                                            }
+                                                );
+                                                setInputValues((state) =>
+                                                    produce(state, (draft) => {
+                                                        draft[i] = num;
+                                                    })
+                                                );
+                                            }}
                                             isInsufficentFund={
                                                 p.isInsufficientFund
                                             }
-                                            balance={p.tokenAmt.toFixed(8)}
+                                            balance={p.tokenAmt.egld.toString(10)}
                                         />
                                     </div>
                                 );
