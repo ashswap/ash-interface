@@ -8,13 +8,13 @@ type DappContractConfig = {
     beta: DappContracts;
 };
 const dappContractDevnet: DappContractConfig = {
-    alpha: {
+    beta: {
         voteEscrowedContract:
             "erd1qqqqqqqqqqqqqpgqy48fl8ck4z5nwjlhnkkqm85ufqrttncprmcqwzldec",
         feeDistributor:
             "erd1qqqqqqqqqqqqqpgq47yvf3lx98f837jcmm4cylnv29re8uryrmcql73mn2",
     },
-    beta: {
+    alpha: {
         voteEscrowedContract:
             "erd1qqqqqqqqqqqqqpgqjha3wpatzxhxl7auezw0q8wxrzfu72q8rmcqrk27vs",
         feeDistributor:
