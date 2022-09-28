@@ -31,9 +31,9 @@ function StakedPoolCardItem({
 
     if (!liquidityData) return null;
     const {
-        total_value_locked,
-        apr_day: tradingAPR,
-        usd_volume: volume24h,
+        tvl,
+        apr: tradingAPR,
+        volume_usd: volume24h,
     } = poolStats || {};
     const { capacityPercent, lpValueUsd, ownLiquidity, lpReserves } =
         liquidityData;
@@ -181,7 +181,7 @@ function StakedPoolCardItem({
                             <div className="text-sm">
                                 $
                                 <TextAmt
-                                    number={total_value_locked || 0}
+                                    number={tvl || 0}
                                     options={{ notation: "standard" }}
                                 />
                             </div>
