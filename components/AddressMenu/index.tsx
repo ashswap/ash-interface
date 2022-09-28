@@ -133,7 +133,7 @@ function AddressMenu({ infoLayout, dropdownBtn, connectBtn }: AddressMenuProp) {
                                             <IconCopy className="w-5 h-5 text-ash-gray-600 mr-3.5" />
                                             <span>Copy address</span>
                                         </button>
-                                        <button
+                                        {/* <button
                                             className={`w-full py-2 px-4 flex items-center overflow-hidden text-white hover:text-white transition-all font-bold text-xs hover:bg-ash-dark-500`}
                                             onClick={() => {
                                                 setIsOpenConnectWalletModal(
@@ -144,7 +144,7 @@ function AddressMenu({ infoLayout, dropdownBtn, connectBtn }: AddressMenuProp) {
                                         >
                                             <IconChange className="w-5 h-5 text-ash-gray-600 mr-3.5" />
                                             <span>Change wallet</span>
-                                        </button>
+                                        </button> */}
                                         <button
                                             className={`w-full py-2 px-4 flex items-center overflow-hidden text-white hover:text-white transition-all font-bold text-xs hover:bg-ash-dark-500`}
                                             onClick={() => {
@@ -188,12 +188,12 @@ function AddressMenu({ infoLayout, dropdownBtn, connectBtn }: AddressMenuProp) {
                                 </i>
                                 <span>Copy address</span>
                             </button>
-                            <button className="bg-bg rounded-lg px-6 h-12 flex items-center w-full mt-4 text-xs">
+                            {/* <button className="bg-bg rounded-lg px-6 h-12 flex items-center w-full mt-4 text-xs">
                                 <i className="mr-4">
                                     <IconChange className="h-5 w-5 text-ash-gray-500" />
                                 </i>
                                 <span>Change wallet</span>
-                            </button>
+                            </button> */}
                             <button
                                 className="bg-bg rounded-lg px-6 h-12 flex items-center w-full mt-4 text-xs"
                                 onClick={() => {
