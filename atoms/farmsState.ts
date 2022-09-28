@@ -119,8 +119,8 @@ export const farmToDisplayState = selector<FarmRecord[]>({
             case "volume":
                 result = result.sort(
                     (x, y) =>
-                        (y.poolStats?.usd_volume || 0) -
-                        (x.poolStats?.usd_volume || 0)
+                        (y.poolStats?.volume_usd || 0) -
+                        (x.poolStats?.volume_usd || 0)
                 );
                 break;
             default:

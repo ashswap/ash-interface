@@ -1,22 +1,35 @@
 export type TxStatsRecord = {
-    transaction_hash: string;
-    name: "swap" | "add_liquidity" | "remove_liquidity";
-    /** aka account/wallet */
+    action: "exchange" | "addLiquidity" | "removeLiquidity";
+    admin_fee_1: null;
+    admin_fee_1_usd: number;
+    admin_fee_2: string;
+    admin_fee_2_usd: number;
+    admin_fee_3: null;
+    admin_fee_3_usd: number;
+    amount_1: string;
+    amount_1_usd: number;
+    amount_2: string;
+    amount_2_usd: number;
+    amount_3: null;
+    amount_3_usd: number;
     caller: string;
-    total_value: number;
-    // add/remove liquidity data
-    first_token_id: string;
-    /** in wei format */
-    first_token_amount: string;
-    second_token_id: string;
-    /** in wei format */
-    second_token_amount: string;
-    // swap data
-    token_in: string;
-    token_out: string;
-    token_amount_in: string;
-    token_amount_out: string;
-
+    lp_token_amount: null;
+    lp_token_supply: null;
+    receiver: string;
+    reserve_1: string;
+    reserve_2: string;
+    reserve_3: null;
     timestamp: number;
-    
-}
+    token_id_1: string;
+    token_id_2: string;
+    token_id_3: null;
+    total_fee_1: null;
+    total_fee_1_usd: number;
+    total_fee_2: string;
+    total_fee_2_usd: number;
+    total_fee_3: null;
+    total_fee_3_usd: number;
+    transaction_hash: string;
+    // add from client
+    txValue?: number;
+};

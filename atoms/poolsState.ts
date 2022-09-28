@@ -75,22 +75,22 @@ export const poolToDisplayState = selector<PoolRecord[]>({
             case "apr":
                 result = result.sort(
                     (x, y) =>
-                        (y.poolStats?.apr_day || 0) -
-                        (x.poolStats?.apr_day || 0)
+                        (y.poolStats?.apr || 0) -
+                        (x.poolStats?.apr || 0)
                 );
                 break;
             case "liquidity":
                 result = result.sort(
                     (x, y) =>
-                        (y.poolStats?.total_value_locked || 0) -
-                        (x.poolStats?.total_value_locked || 0)
+                        (y.poolStats?.tvl || 0) -
+                        (x.poolStats?.tvl || 0)
                 );
                 break;
             case "volume":
                 result = result.sort(
                     (x, y) =>
-                        (y.poolStats?.usd_volume || 0) -
-                        (x.poolStats?.usd_volume || 0)
+                        (y.poolStats?.volume_usd || 0) -
+                        (x.poolStats?.volume_usd || 0)
                 );
                 break;
             default:

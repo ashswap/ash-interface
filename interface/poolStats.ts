@@ -1,20 +1,21 @@
 export type PoolStatsRecord = {
-    /** trading apr base on 24h period*/ 
-    apr_day: number;
-    /** trading apr base on 30days period*/
-    apr_month: number;
-    /** trading apr base on 7days period*/
-    apr_week: number;
-    /** APR base on value of reward token on 24h period - note: -1 ~ infinity */
-    emission_apr: number;
-    pool_address: string;
-    ratio: number;
-    timestamp: number;
+    address: string;
+    apr: number;
+    timestamp: number | null;
+    token_1_admin_fee_usd: number | null;
     token_1_amount: number;
-    token_1_value_locked: number;
+    token_1_amount_usd: number;
+    token_1_total_fee_usd: number | null;
+    token_2_admin_fee_usd: number | null;
     token_2_amount: number;
-    token_2_value_locked: number;
-    total_value_locked: number;
-    usd_volume: number;
-    volume: number;
-};
+    token_2_amount_usd: number;
+    token_2_total_fee_usd: number | null;
+    token_3_admin_fee_usd: number | null;
+    token_3_amount: number;
+    token_3_amount_usd: number;
+    token_3_total_fee_usd: number | null;
+    transaction_count: number | null;
+    tvl: number;
+    unique_traders: number | null;
+    volume_usd: number;
+}

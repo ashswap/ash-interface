@@ -1,5 +1,6 @@
 import ICArrowLeft from "assets/svg/arrow-left.svg";
 import ICArrowRight from "assets/svg/arrow-right.svg";
+import Avatar from "components/Avatar";
 import { IN_POOL_TOKENS } from "const/pool";
 import { formatAmount } from "helper/number";
 import { useScreenSize } from "hooks/useScreenSize";
@@ -55,18 +56,17 @@ const TokenRecord = ({
                     <div className="w-5">{order}</div>
                     <div className="w-20 md:w-28 lg:w-44 flex items-center justify-between overflow-hidden">
                         <div className="flex items-center mr-2">
-                            {/* <Image
-                        src={tokenData?.token?.icon || ""}
+                            <Avatar
+                        src={tokenData?.token?.logoURI || ""}
                         alt="token"
-                        width={24}
-                        height={24}
-                    /> */}
+                        className="w-6 h-6"
+                    />
                             <div className="ml-2.5 font-bold text-sm">
                                 {tokenData?.token?.symbol}
                             </div>
                         </div>
                         <div className="hidden lg:block text-2xs text-ash-gray-500 truncate">
-                            {tokenData?.token?.symbol} Coin
+                            {tokenData?.token?.name}
                         </div>
                     </div>
                     <div className="flex-1 overflow-hidden text-right">

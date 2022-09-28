@@ -13,6 +13,7 @@ import pools from "const/pool";
 import { fetcher } from "helper/common";
 import { formatAmount } from "helper/number";
 import IPool from "interface/pool";
+import { PoolStatsRecord } from "interface/poolStats";
 import { TxStatsRecord } from "interface/txStats";
 import { GetStaticPaths, GetStaticProps } from "next";
 import Link from "next/link";
@@ -21,31 +22,26 @@ import { useRecoilValue } from "recoil";
 import useSWR from "swr";
 import TxsTable from "views/info/components/TxsTable";
 import PoolChart from "views/info/Pools/[address]/PoolChart";
-type PoolStats = {
-    apr_day: number;
-    apr_month: number;
-    apr_week: number;
-    emission_apr: number;
-    first_admin_fee_usd: number;
-    first_total_fee_usd: number;
-    pool_address: string;
-    ratio: number;
-    second_admin_fee_usd: number;
-    second_total_fee_usd: number;
-    timestamp: number;
-    token_1_amount: number;
-    token_1_value_locked: number;
-    token_2_amount: number;
-    token_2_value_locked: number;
-    total_value_locked: number;
-    transaction_count: number;
-    unique_traders: number;
-    usd_volume: number;
-    volume: number;
+const getTotalFees = (
+    stats: PoolStatsRecord,
+    keyTemplate: (index: number) => string
+) => {
+    let index = 1;
+    let sum = 0;
+    while (true) {
+        const key = keyTemplate(index);
+        if (key in stats) {
+            sum += (stats[key as keyof PoolStatsRecord] as number) || 0;
+            index++;
+        } else {
+            break;
+        }
+    }
+    return sum;
 };
 type Props = { pool: IPool };
 function PoolDetailPage({ pool }: Props) {
-    const { data: stats } = useSWR<PoolStats>(
+    const { data: stats } = useSWR<PoolStatsRecord>(
         pool.address
             ? `${ASHSWAP_CONFIG.ashApiBaseUrl}/pool/${pool.address}/statistic`
             : null,
@@ -62,6 +58,17 @@ function PoolDetailPage({ pool }: Props) {
     const [token1, token2] = useMemo(() => pool.tokens, [pool]);
     const network: AccountInfoSliceNetworkType =
         useRecoilValue(networkConfigState).network;
+    const adminFee = useMemo(() => {
+        if (!stats) return 0;
+        return getTotalFees(stats, (i) => `token_${i}_admin_fee_usd`);
+    }, [stats]);
+    const totalFee = useMemo(() => {
+        if (!stats) return 0;
+        return getTotalFees(stats, (i) => `token_${i}_total_fee_usd`);
+    }, [stats]);
+    const fees = useMemo(() => {
+        return totalFee - adminFee;
+    }, [totalFee, adminFee]);
     return (
         <div className="text-white py-7 max-w-6xl mx-auto px-6 sm:px-0">
             <ul className="flex space-x-1 text-xs mb-6">
@@ -216,9 +223,7 @@ function PoolDetailPage({ pool }: Props) {
                         </div>
                         <div className="text-sm sm:text-lg">
                             <span className="text-stake-gray-500">$ </span>
-                            <span>
-                                {formatAmount(stats?.total_value_locked)}
-                            </span>
+                            <span>{formatAmount(stats?.tvl)}</span>
                         </div>
                     </div>
                     <div className="px-4 md:px-[1.625rem] py-4 md:pt-5 md:pb-8 bg-ash-dark-600 flex flex-col justify-between">
@@ -227,7 +232,7 @@ function PoolDetailPage({ pool }: Props) {
                         </div>
                         <div className="text-sm sm:text-lg">
                             <span className="text-stake-gray-500">$ </span>
-                            <span>{formatAmount(stats?.usd_volume)}</span>
+                            <span>{formatAmount(stats?.volume_usd)}</span>
                         </div>
                     </div>
                     <div className="px-4 md:px-[1.625rem] py-4 md:pt-5 md:pb-8 bg-ash-dark-600 flex flex-col justify-between">
@@ -236,16 +241,7 @@ function PoolDetailPage({ pool }: Props) {
                         </div>
                         <div className="text-sm sm:text-lg">
                             <span className="text-stake-gray-500">$ </span>
-                            <span>
-                                {stats
-                                    ? formatAmount(
-                                          stats.first_total_fee_usd +
-                                              stats.second_total_fee_usd -
-                                              stats.first_admin_fee_usd -
-                                              stats.second_admin_fee_usd
-                                      )
-                                    : "0.00"}
-                            </span>
+                            <span>{stats ? formatAmount(fees) : "0.00"}</span>
                         </div>
                     </div>
                 </div>

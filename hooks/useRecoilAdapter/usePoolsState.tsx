@@ -60,7 +60,7 @@ const usePoolsState = () => {
                 let record: PoolRecord = {
                     pool: p,
                     poolStats: poolStatsRecords?.find(
-                        (stats) => stats.pool_address === p.address
+                        (stats) => stats.address === p.address
                     ),
                     totalSupply: new BigNumber(rawPool?.totalSupply || 0),
                 };

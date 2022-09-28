@@ -14,21 +14,21 @@ import { useEffect, useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
 
 const actionLabelMap: Record<
-    TxStatsRecord["name"],
+    TxStatsRecord["action"],
     { action: string; separator: string }
 > = {
-    swap: { action: "Swap", separator: "to" },
-    add_liquidity: { action: "Add", separator: "and" },
-    remove_liquidity: { action: "Remove", separator: "and" },
+    exchange: { action: "swap", separator: "to" },
+    addLiquidity: { action: "deposit", separator: "and" },
+    removeLiquidity: { action: "withdraw", separator: "and" },
 };
 const TxRecord = ({ txStats }: { txStats: TxStatsRecord }) => {
-    const tokenId1 = txStats.first_token_id || txStats.token_in;
-    const tokenId2 = txStats.second_token_id || txStats.token_out;
-    const amt1 = txStats.first_token_amount || txStats.token_amount_in;
-    const amt2 = txStats.second_token_amount || txStats.token_amount_out;
+    const tokenId1 = txStats.token_id_1;
+    const tokenId2 = txStats.token_id_2;
+    const amt1 = txStats.amount_1;
+    const amt2 = txStats.amount_2;
     const token1 = TOKENS_MAP[tokenId1];
     const token2 = TOKENS_MAP[tokenId2];
-    const label = actionLabelMap[txStats.name];
+    const label = actionLabelMap[txStats.action];
     const [time, setTime] = useState("");
     const network: AccountInfoSliceNetworkType =
         useRecoilValue(networkConfigState).network;
@@ -50,6 +50,7 @@ const TxRecord = ({ txStats }: { txStats: TxStatsRecord }) => {
         }, 10000);
         return () => clearInterval(interval);
     }, [txStats]);
+
     return (
         <div className="px-4 lg:px-7 h-12 bg-ash-dark-600 hover:bg-ash-dark-700 text-xs grid items-center gap-x-4 grid-cols-[2fr,repeat(2,1fr)] md:grid-cols-[2fr,repeat(4,1fr)] xl:grid-cols-[2fr,0.8fr,repeat(4,1fr)]">
             <div>
@@ -66,9 +67,7 @@ const TxRecord = ({ txStats }: { txStats: TxStatsRecord }) => {
             </div>
             <div className="text-right">
                 <span className="text-ash-gray-600">$ </span>
-                <span className="text-white">
-                    {formatAmount(txStats.total_value)}
-                </span>
+                <span className="text-white">{formatAmount(txStats.txValue || 0)}</span>
             </div>
             <div className="text-right hidden md:block">
                 <span className="text-white">
@@ -113,10 +112,10 @@ enum EOrderBy {
     WALLET,
     TIME,
 }
-const filterMap: Record<TxStatsRecord["name"], EFilterType> = {
-    swap: EFilterType.SWAP,
-    add_liquidity: EFilterType.DEPOSIT,
-    remove_liquidity: EFilterType.WITHDRAW,
+const filterMap: Record<TxStatsRecord["action"], EFilterType> = {
+    exchange: EFilterType.SWAP,
+    addLiquidity: EFilterType.DEPOSIT,
+    removeLiquidity: EFilterType.WITHDRAW,
 };
 const filterOptions = [
     { label: "All", value: EFilterType.ALL },
@@ -139,40 +138,56 @@ function TxsTable({ data }: { data: TxStatsRecord[] }) {
         const filtered =
             filter === EFilterType.ALL
                 ? data
-                : data.filter((val) => filterMap[val.name] === filter);
-        const sorted = filtered.sort((x, y) => {
-            switch (orderBy) {
-                case EOrderBy.VALUE:
-                    return y.total_value - x.total_value;
-                case EOrderBy.TOKEN1:
-                    const xAmt1 = x.first_token_amount || x.token_amount_in;
-                    const yAmt1 = y.first_token_amount || y.token_amount_in;
-                    const tokenX1 = TOKENS_MAP[x.first_token_id || x.token_in];
-                    const tokenY1 = TOKENS_MAP[y.first_token_id || y.token_in];
-                    return toEGLDD(tokenY1.decimals, yAmt1)
-                        .minus(toEGLDD(tokenX1.decimals, xAmt1))
-                        .toNumber();
-                case EOrderBy.TOKEN2:
-                    const xAmt2 = x.second_token_amount || x.token_amount_out;
-                    const yAmt2 = y.second_token_amount || y.token_amount_out;
-                    const tokenX2 =
-                        TOKENS_MAP[x.second_token_id || x.token_out];
-                    const tokenY2 =
-                        TOKENS_MAP[y.second_token_id || y.token_out];
-                    return toEGLDD(tokenY2.decimals, yAmt2)
-                        .minus(toEGLDD(tokenX2.decimals, xAmt2))
-                        .toNumber();
-                case EOrderBy.WALLET:
-                    return y.caller > x.caller
-                        ? 1
-                        : y.caller === x.caller
-                        ? 0
-                        : -1;
-                case EOrderBy.TIME:
-                default:
-                    return y.timestamp - x.timestamp;
-            }
-        });
+                : data.filter((val) => filterMap[val.action] === filter);
+        const sorted = filtered
+            .map((tx) => {
+                switch (tx.action) {
+                    case "addLiquidity":
+                    case "removeLiquidity":
+                        tx.txValue =
+                            (tx.amount_1_usd || 0) +
+                            (tx.amount_2_usd || 0) +
+                            (tx.amount_3_usd || 0);
+                        break;
+                    case "exchange":
+                        tx.txValue = tx.amount_1_usd;
+                        break;
+                    default:
+                        tx.txValue = 0;
+                }
+                return tx;
+            })
+            .sort((x, y) => {
+                switch (orderBy) {
+                    case EOrderBy.VALUE:
+                        return y.txValue! - x.txValue!;
+                    case EOrderBy.TOKEN1:
+                        const xAmt1 = x.amount_1;
+                        const yAmt1 = y.amount_1;
+                        const tokenX1 = TOKENS_MAP[x.token_id_1];
+                        const tokenY1 = TOKENS_MAP[y.token_id_2];
+                        return toEGLDD(tokenY1.decimals, yAmt1)
+                            .minus(toEGLDD(tokenX1.decimals, xAmt1))
+                            .toNumber();
+                    case EOrderBy.TOKEN2:
+                        const xAmt2 = x.amount_2;
+                        const yAmt2 = y.amount_2;
+                        const tokenX2 = TOKENS_MAP[x.token_id_2];
+                        const tokenY2 = TOKENS_MAP[y.token_id_2];
+                        return toEGLDD(tokenY2.decimals, yAmt2)
+                            .minus(toEGLDD(tokenX2.decimals, xAmt2))
+                            .toNumber();
+                    case EOrderBy.WALLET:
+                        return y.caller > x.caller
+                            ? 1
+                            : y.caller === x.caller
+                            ? 0
+                            : -1;
+                    case EOrderBy.TIME:
+                    default:
+                        return y.timestamp - x.timestamp;
+                }
+            });
         const length = sorted.length;
         const nPage = Math.ceil(length / pageSize);
         const pagination: TxStatsRecord[][] = [];
