@@ -10,9 +10,9 @@
         "export": "next export"
     },
     "dependencies": {
-        "@elrondnetwork/dapp-core": "2.0.0-alpha.10",
-        "@elrondnetwork/erdjs": "10.2.5",
-        "@elrondnetwork/erdjs-extension-provider": "2.0.2",
+        "@elrondnetwork/dapp-core": "2.0.4",
+        "@elrondnetwork/erdjs": "11.0.0",
+        "@elrondnetwork/erdjs-extension-provider": "2.0.5",
         "@elrondnetwork/erdjs-network-providers": "0.1.6",
         "@elrondnetwork/erdjs-wallet-connect-provider": "2.0.3",
         "@floating-ui/react-dom-interactions": "^0.0.15",
@@ -59,6 +59,7 @@
         "@types/react-dom": "17.0.2",
         "@types/react-modal": "^3.13.1",
         "autoprefixer": "^10.4.7",
+        "better-sqlite3": "^7.6.2",
         "eslint": "7",
         "eslint-config-next": "12.0.1",
         "intercept-stdout": "^0.1.2",

@@ -1,6 +1,6 @@
-import TransactionsTracker from "@elrondnetwork/dapp-core/components/TransactionsTracker";
+import { TransactionsTracker } from "@elrondnetwork/dapp-core/components/TransactionsTracker";
 import { useGetPendingTransactions } from "@elrondnetwork/dapp-core/hooks";
-import checkBatch from "@elrondnetwork/dapp-core/hooks/transactions/useCheckTransactionStatus/checkBatch";
+import {checkBatch} from "@elrondnetwork/dapp-core/hooks/transactions/useCheckTransactionStatus/checkBatch";
 import { SignedTransactionsBodyType } from "@elrondnetwork/dapp-core/types";
 import {
     getIsTransactionPending

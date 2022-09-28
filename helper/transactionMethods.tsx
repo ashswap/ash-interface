@@ -24,6 +24,7 @@ const emptyTx = new Transaction({
     receiver: new Address(""),
     chainID: "",
     gasLimit: 0,
+    sender: new Address("")
 });
 // flow create TXS -> set nonce -> sign TXS -> send TXS -> update local nonce
 export const useCreateTransaction = () => {
@@ -45,6 +46,7 @@ export const useCreateTransaction = () => {
         tx = new Transaction({
             chainID: network.chainId,
             data: tx.getData(),
+            sender: new Address(address),
             receiver: scAddress,
             gasPrice: gasPrice,
             gasLimit: Math.min(

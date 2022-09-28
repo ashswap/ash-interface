@@ -1,4 +1,4 @@
-import { gasPrice } from "@elrondnetwork/dapp-core/constants";
+import { GAS_PRICE } from "@elrondnetwork/dapp-core/constants";
 import { AccountInfoSliceNetworkType } from "@elrondnetwork/dapp-core/types";
 import { getNetworkConfig } from "@elrondnetwork/dapp-core/utils";
 import { ResultsParser, Interaction, SmartContract, Address, AbiRegistry, SmartContractAbi } from "@elrondnetwork/erdjs/out";
@@ -25,7 +25,7 @@ export default class Contract {
         const network: AccountInfoSliceNetworkType = getNetworkConfig();
         return interaction
             .withChainID(network.chainId)
-            .withGasPrice(gasPrice)
+            .withGasPrice(GAS_PRICE)
             .withGasLimit(
                 Math.min(
                     Math.floor(
