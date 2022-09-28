@@ -28,9 +28,9 @@ function PoolCardItem({
     const network: AccountInfoSliceNetworkType =
         useRecoilValue(networkConfigState).network;
     const {
-        total_value_locked,
-        apr_day: tradingAPR,
-        usd_volume: volume24h,
+        tvl,
+        apr: tradingAPR,
+        volume_usd: volume24h,
     } = poolData.poolStats || {};
     const screenSize = useScreenSize();
     const [onboardingPoolDeposit, setOnboardedPoolDeposit] =
@@ -136,7 +136,7 @@ function PoolCardItem({
                     <div className="text-sm">
                         $
                         <TextAmt
-                            number={total_value_locked || 0}
+                            number={tvl || 0}
                             options={{ notation: "standard" }}
                         />
                     </div>
