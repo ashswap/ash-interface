@@ -33,13 +33,13 @@ const PoolRecord = ({
         [screenSize.xl]
     );
     const volume = useMemo(() => {
-        return format(poolData.usd_volume);
-    }, [format, poolData.usd_volume]);
+        return format(poolData.volume_usd);
+    }, [format, poolData.volume_usd]);
     const liquidity = useMemo(() => {
-        return format(poolData.total_value_locked);
-    }, [format, poolData.total_value_locked]);
+        return format(poolData.tvl);
+    }, [format, poolData.tvl]);
     return (
-        <Link href={`/info/pools/${poolData.pool_address}`}>
+        <Link href={`/info/pools/${poolData.address}`}>
             <a>
                 <div className="flex items-center bg-ash-dark-600 hover:bg-ash-dark-700 px-4 lg:px-[1.625rem] text-ash-gray-500 space-x-2 text-xs h-14 overflow-hidden">
                     {/* <div className="w-5">
@@ -78,7 +78,7 @@ const PoolRecord = ({
                         <span className="text-white">{liquidity}</span>
                     </div>
                     <div className="hidden md:block w-16 lg:w-24 xl:w-32 text-xs text-right text-white">
-                        {formatAmount(poolData.apr_day || 0, {
+                        {formatAmount(poolData.apr || 0, {
                             notation: "standard",
                         })}
                         %
@@ -97,15 +97,15 @@ function PoolsTable({
 }) {
     const [pageIndex, setPageIndex] = useState(0);
     const [pageSize, setPageSize] = useState(10);
-    const [sortBy, setSortBy] = useState<
-        "usd_volume" | "total_value_locked" | "apr_day"
-    >("usd_volume");
+    const [sortBy, setSortBy] = useState<"volume_usd" | "tvl" | "apr">(
+        "volume_usd"
+    );
     const poolRecords: PoolWithStatsRecords[] = useMemo(() => {
         if (!data?.length) return [];
         return data.map((record) => {
             return {
                 ...record,
-                pool: pools.find((p) => p.address === record.pool_address),
+                pool: pools.find((p) => p.address === record.address),
             };
         });
     }, [data]);
@@ -135,25 +135,25 @@ function PoolsTable({
                 <div className="flex-1 py-4 overflow-hidden">Token</div>
                 <div
                     className={`w-16 lg:w-24 xl:w-32 text-right py-4 cursor-pointer ${
-                        sortBy === "usd_volume" && "text-white"
+                        sortBy === "volume_usd" && "text-white"
                     }`}
-                    onClick={() => setSortBy("usd_volume")}
+                    onClick={() => setSortBy("volume_usd")}
                 >
                     Volume 24H
                 </div>
                 <div
                     className={`w-16 lg:w-24 xl:w-32 text-right py-4 cursor-pointer ${
-                        sortBy === "total_value_locked" && "text-white"
+                        sortBy === "tvl" && "text-white"
                     }`}
-                    onClick={() => setSortBy("total_value_locked")}
+                    onClick={() => setSortBy("tvl")}
                 >
                     Liquidity
                 </div>
                 <div
                     className={`hidden md:block w-16 lg:w-24 xl:w-32 text-right py-4 cursor-pointer ${
-                        sortBy === "apr_day" && "text-white"
+                        sortBy === "apr" && "text-white"
                     }`}
-                    onClick={() => setSortBy("apr_day")}
+                    onClick={() => setSortBy("apr")}
                 >
                     Trading APR
                 </div>
@@ -161,7 +161,7 @@ function PoolsTable({
             {displayPoolRecords[pageIndex]?.map((val, index) => {
                 return (
                     <PoolRecord
-                        key={val.pool_address}
+                        key={val.address}
                         order={pageIndex * pageSize + index + 1}
                         poolData={val}
                     />

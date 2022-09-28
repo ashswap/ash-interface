@@ -1,11 +1,10 @@
 import ICArrowRight from "assets/svg/arrow-right.svg";
 import InfoLayout from "components/Layout/Info";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
-import { ENVIRONMENT } from "const/env";
 import { fetcher } from "helper/common";
 import { PoolStatsRecord } from "interface/poolStats";
 import { TokenStatsRecord } from "interface/tokenStats";
-import React, { ReactElement, useMemo } from "react";
+import { ReactElement, useMemo } from "react";
 import useSWR from "swr";
 import PoolsTable from "views/info/components/PoolsTable";
 import TokenTable from "views/info/components/TokenTable";
@@ -28,7 +27,7 @@ function InfoPage() {
     );
     const topPools = useMemo(
         () =>
-            poolRecords?.sort((x, y) => y.volume - x.volume).slice(0, 5) || [],
+            poolRecords?.sort((x, y) => y.volume_usd - x.volume_usd).slice(0, 5) || [],
         [poolRecords]
     );
     return (
