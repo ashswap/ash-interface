@@ -23,15 +23,15 @@ export function useRecoilAdapter() {
     const setAshBaseState = useSetRecoilState(ashswapBaseState);
     // end recoil
 
-    const fetchBalances = useFetchBalances();
+    // const fetchBalances = useFetchBalances();
     const {data} = useAshBaseStateQuery({refreshInterval: 6000});
     useEffect(() => {data && setAshBaseState(data)}, [data, setAshBaseState]);
 
 
     // fetch tokens balance
 
-    useGetTokens({refreshInterval: 6000});
-    useGetFarmTokens({refreshInterval: 6000});
+    useGetTokens();
+    useGetFarmTokens();
     usePoolsState();
     useFarmsState();
     useVEState();
@@ -40,6 +40,5 @@ export function useRecoilAdapter() {
         setDappState(store as any);
     }, [setDappState, store]);
 
-    // fetch token balance every block
-    useInterval(fetchBalances, blockTimeMs);
+    
 }
