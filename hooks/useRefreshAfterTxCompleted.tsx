@@ -1,28 +1,17 @@
-import {
-    useGetFailedTransactions,
-    useGetSuccessfulTransactions
-} from "@elrondnetwork/dapp-core/hooks";
-import { useEffect, useState } from "react";
+import { lastCompletedTxHashAtom } from "atoms/transactions";
+import { useEffect } from "react";
+import { useRecoilValue } from "recoil";
+import { useDebounce } from "use-debounce";
 import { useFetchBalances } from "./useFetchBalances";
 
 export const useRefreshAfterTxCompleted = () => {
-    const { failedTransactionsArray } = useGetFailedTransactions();
-    const { successfulTransactionsArray } = useGetSuccessfulTransactions();
     const fetchBalances = useFetchBalances();
-    const [txsCount, setTxsCount] = useState(0);
-    const [prevTxsCount, setPrevTxsCount] = useState(0);
+    const lastCompletedTxHash = useRecoilValue(lastCompletedTxHashAtom);
+    const [deboundLastTxHash] = useDebounce(lastCompletedTxHash, 500);
+
     useEffect(() => {
-        setTxsCount((count) => {
-            setPrevTxsCount(count);
-            return (
-                failedTransactionsArray.length +
-                successfulTransactionsArray.length
-            );
-        });
-    }, [failedTransactionsArray.length, successfulTransactionsArray.length]);
-    useEffect(() => {
-        if (prevTxsCount > 0) {
-            fetchBalances();
+        if (deboundLastTxHash) {
+            fetchBalances()
         }
-    }, [prevTxsCount, fetchBalances]);
+    }, [deboundLastTxHash, fetchBalances]);
 };

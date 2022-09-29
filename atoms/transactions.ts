@@ -1,6 +1,6 @@
 import { atom } from "recoil";
 
-export const completedTxsAtom = atom<string[]>({
-    key: 'completed_txs_socket',
-    default: []
-})
+export const lastCompletedTxHashAtom = atom<string>({
+    key: "last_completed_tx_hash",
+    default: "",
+});

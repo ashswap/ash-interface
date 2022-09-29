@@ -1,20 +1,21 @@
 import { TransactionsTracker } from "@elrondnetwork/dapp-core/components/TransactionsTracker";
 import { useGetPendingTransactions } from "@elrondnetwork/dapp-core/hooks";
-import {checkBatch} from "@elrondnetwork/dapp-core/hooks/transactions/useCheckTransactionStatus/checkBatch";
+import { checkBatch } from "@elrondnetwork/dapp-core/hooks/transactions/useCheckTransactionStatus/checkBatch";
 import { SignedTransactionsBodyType } from "@elrondnetwork/dapp-core/types";
 import {
     getIsTransactionPending
 } from "@elrondnetwork/dapp-core/utils";
 import { CustomComponentsType } from "@elrondnetwork/dapp-core/wrappers/DappProvider/CustomComponents";
-import { completedTxsAtom } from "atoms/transactions";
+import { lastCompletedTxHashAtom } from "atoms/transactions";
 import { useEffect, useMemo, useRef } from "react";
-import { useRecoilState } from "recoil";
+import { useRecoilValue } from "recoil";
 
 const CustomTransactionsTracker: typeof TransactionsTracker = () => {
     const { pendingTransactionsArray } = useGetPendingTransactions();
-    const [completedTxs, setCompletedTxs] = useRecoilState(completedTxsAtom);
+    const lastCompletedTxHash = useRecoilValue(lastCompletedTxHashAtom);
     const intervalRef = useRef<Record<string, any>>({});
     const timeoutRef = useRef<Record<string, any>>({});
+    const pendingBatchTxsRef = useRef<[string, SignedTransactionsBodyType][]>([]);
 
     const pendingBatches = useMemo(() => {
         return pendingTransactionsArray.filter(
@@ -27,34 +28,29 @@ const CustomTransactionsTracker: typeof TransactionsTracker = () => {
         );
     }, [pendingTransactionsArray]);
 
-    const pendingLength = useMemo(
-        () => pendingBatches.length,
-        [pendingBatches]
-    );
+    useEffect(() => {
+        pendingBatchTxsRef.current = pendingBatches || [];
+    }, [pendingBatches])
 
     useEffect(() => {
-        if (pendingLength === 0) {
-            setCompletedTxs([]);
-        }
-    }, [pendingLength, setCompletedTxs]);
-
-    useEffect(() => {
-        completedTxs.map((hash) => {
-            pendingBatches.map(
-                ([sessionId, batch]: [string, SignedTransactionsBodyType]) => {
-                    const needCheck = batch.transactions?.some(
-                        (tx) => tx.hash === hash
-                    );
-                    if (needCheck) {
-                        checkBatch({
-                            sessionId,
-                            transactionBatch: batch,
-                        });
-                    }
+        if(!lastCompletedTxHash) return;
+        pendingBatchTxsRef.current.map(
+            ([sessionId, batch]: [string, SignedTransactionsBodyType]) => {
+                const matchedTx = batch.transactions?.find(
+                    (tx) => tx.hash === lastCompletedTxHash
+                );
+                if (matchedTx?.hash) {
+                    checkBatch({
+                        sessionId,
+                        transactionBatch: {
+                            transactions: [matchedTx],
+                            customTransactionInformation: batch.customTransactionInformation
+                        },
+                    });
                 }
-            );
-        });
-    }, [completedTxs, pendingBatches]);
+            }
+        );
+    }, [lastCompletedTxHash]);
 
     // fallback if socket fail to emit/receive transactionCompleted events in 60s
     useEffect(() => {
@@ -73,7 +69,7 @@ const CustomTransactionsTracker: typeof TransactionsTracker = () => {
                         } else {
                             intervalRef.current = { [sessionId]: interval };
                         }
-                    }, 60000);
+                    }, 2 * 60000);
                     timeoutRef.current[sessionId] = timeout;
                 }
             }

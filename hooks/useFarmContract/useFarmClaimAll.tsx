@@ -1,5 +1,5 @@
 import { Transaction, TokenPayment } from "@elrondnetwork/erdjs/out";
-import { farmRecordsState, farmSessionIdMapState } from "atoms/farmsState";
+import { farmLoadingMapState, farmRecordsState, farmSessionIdMapState } from "atoms/farmsState";
 import BigNumber from "bignumber.js";
 import { ASH_TOKEN } from "const/tokens";
 import { toEGLDD } from "helper/balance";
@@ -14,14 +14,14 @@ const useFarmClaimAll = (trackStatus = false) => {
         ({ snapshot, set }) =>
             async () => {
                 const farmRecords = await snapshot.getPromise(farmRecordsState);
-
+                const loadingMap = await snapshot.getPromise(farmLoadingMapState);
                 let txs: Transaction[] = [];
                 let totalASH = new BigNumber(0);
                 const farmsAddress: string[] = [];
 
                 for (let i = 0; i < farmRecords.length; i++) {
                     const val = farmRecords[i];
-                    if (val?.stakedData?.totalRewardAmt.gt(0)) {
+                    if (val?.stakedData?.totalRewardAmt.gt(0) && !loadingMap[val.farm.farm_address]) {
                         const tokenPayments = val.stakedData.farmTokens.map(
                             (t) =>
                                 TokenPayment.metaEsdtFromBigInteger(

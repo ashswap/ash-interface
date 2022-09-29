@@ -515,13 +515,11 @@ const FarmBoostInfo = ({ farmData, onClose }: FarmBoostInfoType) => {
                                     </div>
                                     <div>
                                         Go{" "}
-                                        <Link href="/stake/gov">
-                                            <a onClick={onClose}>
-                                                <span className="underline text-ash-cyan-500">
-                                                    stake LP-Tokens
-                                                </span>
-                                            </a>
-                                        </Link>{" "}
+                                        <a onClick={onClose}>
+                                            <span className="underline text-ash-cyan-500">
+                                                stake LP-Tokens
+                                            </span>
+                                        </a>{" "}
                                         now
                                     </div>
                                 </div>

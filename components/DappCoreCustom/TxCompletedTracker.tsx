@@ -1,4 +1,4 @@
-import { completedTxsAtom } from "atoms/transactions";
+import { lastCompletedTxHashAtom } from "atoms/transactions";
 import { useSocket } from "context/socket";
 import { useEffect } from "react";
 import { useSetRecoilState } from "recoil";
@@ -6,14 +6,14 @@ import { useSetRecoilState } from "recoil";
 
 export const TxCompletedTracker = () => {
     const socket = useSocket();
-    const setCompletedTxs = useSetRecoilState(completedTxsAtom);
+    const setLastCompletedTxHash = useSetRecoilState(lastCompletedTxHashAtom);
     useEffect(() => {
         if(!socket) return;
         const onTxCompleted = (hash: string) => {
-            setCompletedTxs(txs => [...txs, hash]);
+            setLastCompletedTxHash(hash);
         }
         socket.on('transactionCompleted', onTxCompleted)
         return () => {socket.off('transactionCompleted', onTxCompleted)}
-    }, [socket, setCompletedTxs]);
+    }, [socket, setLastCompletedTxHash]);
     return null;
 }
