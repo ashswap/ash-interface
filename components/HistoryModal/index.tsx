@@ -1,12 +1,14 @@
 import { AccountInfoSliceNetworkType } from "@elrondnetwork/dapp-core/types";
+import { getNetworkConfig } from "@elrondnetwork/dapp-core/utils";
 import IconNewTab from "assets/svg/new-tab.svg";
 import {
     accAddressState,
     accIsLoggedInState,
-    networkConfigState
+    networkConfigState,
 } from "atoms/dappState";
 import BaseModal from "components/BaseModal";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
+import { ENVIRONMENT } from "const/env";
 import pools from "const/pool";
 import { toEGLD } from "helper/balance";
 import { fetcher } from "helper/common";
@@ -32,118 +34,79 @@ interface Props {
     onClose?: () => void;
 }
 interface TXRecord {
-    caller: string;
-    epoch: number;
-    first_token_amount?: string;
-    first_token_id?: string;
-    first_token_reserve?: string;
-    lp_supply?: string;
-    lp_token_amount?: string;
-    lp_token_id?: string;
-    name: string;
+    txHash: string;
+    gasLimit: number;
+    gasPrice: number;
+    gasUsed: number;
+    miniBlockHash: string;
+    nonce: number;
     receiver: string;
-    second_out_reserve?: string;
-    second_token_amount?: string;
-    second_token_id?: string;
-    second_token_reserve?: string;
+    receiverShard: number;
+    round: number;
+    sender: string;
+    senderShard: number;
+    signature: string;
+    status: string;
+    value: string;
+    fee: string;
     timestamp: number;
-    token_amount_in?: string;
-    token_amount_out?: string;
-    token_in?: string;
-    token_in_reserve?: string;
-    token_out?: string;
-    total_value?: string;
-    transaction_hash: string;
+    data: string;
+    function: string;
+    action: {
+        category: string;
+        name: string;
+        description: string;
+        arguments: {
+            transfers: {
+                type: string;
+                name: string;
+                ticker: string;
+                token: string;
+                decimals: number;
+                value: string;
+            }[];
+            receiver: string;
+            functionName: string;
+            functionArgs: string[];
+        };
+    }
 }
 
+const actions = ["exchange", "addLiquidity", "removeLiquidity"];
+const receiver = pools.map((p) => p.address);
+const actionMap = {
+    exchange: "Swap",
+    addLiquidity: "Add liquidity",
+    removeLiquidity: "Remove liquidity",
+};
 const HistoryModal = ({ open, onClose }: Props) => {
     const loggedIn = useRecoilValue(accIsLoggedInState);
     const address = useRecoilValue(accAddressState);
+    const network: AccountInfoSliceNetworkType =
+        useRecoilValue(networkConfigState).network;
     const { data: txHistory, mutate: refresh } = useSWR<TXRecord[]>(
         loggedIn
-            ? `${ASHSWAP_CONFIG.ashApiBaseUrl}/user/${address}/transaction?offset=0&limit=50`
+            ? `${network.apiAddress}/transactions?function=${actions.join(
+                  ","
+              )}&sender=${address}&receiver=${receiver.join(",")}&size=50`
             : null,
         fetcher
     );
     const screenSize = useScreenSize();
-    const network: AccountInfoSliceNetworkType =
-        useRecoilValue(networkConfigState).network;
 
     const displayTx = useMemo(() => {
         return (txHistory || [])
             .map((record) => {
-                const { name, transaction_hash } = record;
-                switch (name) {
-                    case "swap":
-                        const {
-                            token_amount_in,
-                            token_amount_out,
-                            token_in,
-                            token_out,
-                        } = record;
-                        const tokenIn = TOKENS.find(
-                            (t) => t.identifier === token_in
-                        );
-                        const tokenOut = TOKENS.find(
-                            (t) => t.identifier === token_out
-                        );
-
-                        if (
-                            !token_amount_in ||
-                            !token_amount_out ||
-                            !tokenIn ||
-                            !tokenOut
-                        ) {
-                            return null;
-                        }
-                        return {
-                            msg: `Swap Success ${toEGLD(
-                                tokenIn,
-                                token_amount_in
-                            ).decimalPlaces(7)} ${tokenIn.symbol} to ${toEGLD(
-                                tokenOut,
-                                token_amount_out
-                            ).decimalPlaces(7)} ${tokenOut.symbol}`,
-                            txHash: transaction_hash,
-                            status: "success",
-                        };
-                    case "add_liquidity":
-                    case "remove_liquidity":
-                        const {
-                            first_token_amount,
-                            first_token_id,
-                            second_token_amount,
-                            second_token_id,
-                        } = record;
-                        const token1 = TOKENS.find(
-                            (t) => t.identifier === first_token_id
-                        );
-                        const token2 = TOKENS.find(
-                            (t) => t.identifier === second_token_id
-                        );
-                        if (
-                            !first_token_amount ||
-                            !second_token_amount ||
-                            !token1 ||
-                            !token2
-                        )
-                            return null;
-                        return {
-                            msg: `${
-                                name === "add_liquidity" ? "Add" : "Remove"
-                            } Success ${toEGLD(
-                                token1,
-                                first_token_amount
-                            ).decimalPlaces(7)} ${token1?.symbol} and ${toEGLD(
-                                token2,
-                                second_token_amount
-                            ).decimalPlaces(7)} ${token2.symbol}`,
-                            txHash: transaction_hash,
-                            status: "success",
-                        };
-                    default:
-                        return null;
-                }
+                const { function: func, txHash, status } = record;
+                const pool = pools.find((p) => p.address === record.action.arguments.receiver);
+                if(!pool) return null;
+                return {
+                    msg: `${
+                        actionMap[func as keyof typeof actionMap]
+                    } on pool ${pool?.tokens.map((t) => t.symbol).join("-")}.`,
+                    txHash,
+                    status,
+                };
             })
             .filter((val) => val !== null);
     }, [txHistory]);
@@ -177,7 +140,6 @@ const HistoryModal = ({ open, onClose }: Props) => {
             <div className="px-4 font-bold text-2xl mb-5">History</div>
             <div className="grow overflow-auto">
                 <div className="px-4">
-                    
                     {displayTx.slice(0, 50).map((record) => {
                         if (!record) {
                             return null;
