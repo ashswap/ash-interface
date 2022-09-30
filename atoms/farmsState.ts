@@ -1,13 +1,12 @@
-import { SendTransactionReturnType } from "@elrondnetwork/dapp-core/types";
 import BigNumber from "bignumber.js";
-import { FARMS } from "const/farms";
-import pools from "const/pool";
 import { FarmTokenAttrs, IFarm } from "interface/farm";
 import IPool from "interface/pool";
 import { PoolStatsRecord } from "interface/poolStats";
-import { Dispatch, SetStateAction } from "react";
+import { IMetaESDT } from "interface/tokens";
 import { atom, selector, selectorFamily } from "recoil";
+import { KeyedMutator } from "swr";
 import { ViewType } from "views/stake/farms/FarmFilter";
+import { ashswapBaseState } from "./ashswap";
 import { accAddressState } from "./dappState";
 export type FarmToken = {
     tokenId: string;
@@ -40,37 +39,15 @@ export type FarmRecord = {
     totalLiquidityValue: BigNumber;
     emissionAPR: BigNumber;
 };
-export type FarmsState = {
-    farmRecords: FarmRecord[];
-    farmToDisplay: FarmRecord[];
-    sortOption: "apr" | "liquidity" | "volume";
-    keyword: string;
-    stakedOnly: boolean;
-    inactive: boolean;
-    loadingMap: Record<string, boolean>;
-    setSortOption: Dispatch<SetStateAction<"apr" | "liquidity" | "volume">>;
-    setKeyword: Dispatch<SetStateAction<string>>;
-    setStakedOnly: Dispatch<SetStateAction<boolean>>;
-    setInactive: Dispatch<SetStateAction<boolean>>;
-    enterFarm: (
-        amtWei: BigNumber,
-        farm: IFarm
-    ) => Promise<SendTransactionReturnType>;
-    claimReward: (farm: IFarm) => Promise<void>;
-    claimAllReward: () => Promise<void>;
-    exitFarm: (
-        lpAmt: BigNumber,
-        farm: IFarm
-    ) => Promise<SendTransactionReturnType>;
-    estimateRewardOnExit: (lpAmt: BigNumber, farm: IFarm) => Promise<BigNumber>;
-};
+
+export type FarmSortOption = "apr" | "liquidity" | "volume";
 
 export const farmRecordsState = atom<FarmRecord[]>({
     key: "farm_records",
     default: [],
 });
 
-export const farmSortOptionState = atom<FarmsState["sortOption"]>({
+export const farmSortOptionState = atom<FarmSortOption>({
     key: "farm_sort_option",
     default: "apr",
 });
@@ -95,12 +72,7 @@ export const farmViewTypeState = atom<ViewType>({
     default: ViewType.Card,
 });
 
-export const farmBlockRewardMapState = atom<Record<string, BigNumber>>({
-    key: "farm_block_reward_map",
-    default: {},
-});
-
-export const farmLoadingMapState = atom<FarmsState["loadingMap"]>({
+export const farmLoadingMapState = atom<Record<string, boolean>>({
     key: "farm_loading_map",
     default: {},
 });
@@ -147,8 +119,8 @@ export const farmToDisplayState = selector<FarmRecord[]>({
             case "volume":
                 result = result.sort(
                     (x, y) =>
-                        (y.poolStats?.usd_volume || 0) -
-                        (x.poolStats?.usd_volume || 0)
+                        (y.poolStats?.volume_usd || 0) -
+                        (x.poolStats?.volume_usd || 0)
                 );
                 break;
             default:
@@ -267,4 +239,33 @@ export const farmPoolQuery = selectorFamily({
             const farm = get(farmQuery(farmAddress));
             return farm?.pool;
         },
+});
+// refactor
+
+export const farmBlockRewardMapSelector = selector<Record<string, BigNumber>>({
+    key: "farm_block_reward_map_by_address_selector",
+    get: ({ get }) => {
+        const base = get(ashswapBaseState);
+        return Object.fromEntries(
+            base.farms.map((f) => [
+                f.address,
+                new BigNumber(f.perBlockReward || "0"),
+            ])
+        );
+    },
+});
+
+export const ashRawFarmQuery = selectorFamily({
+    key: "ash_base_state_raw_farm_query_by_address",
+    get:
+        (address: string) =>
+        ({ get }) => {
+            const base = get(ashswapBaseState);
+            return base.farms.find((f) => f.address === address);
+        },
+});
+
+export const farmTokensRefresherAtom = atom<KeyedMutator<IMetaESDT[]>>({
+    key: "refresh_farm_tokens_balance",
+    default: () => Promise.resolve(undefined),
 });

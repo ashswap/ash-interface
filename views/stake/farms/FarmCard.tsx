@@ -1,13 +1,17 @@
 import { Transition } from "@headlessui/react";
 import ImgMetalCardBg from "assets/images/metal-card-bg.png";
+import ICChevronDown from "assets/svg/chevron-down.svg";
+import ICChevronUp from "assets/svg/chevron-up.svg";
+import ICGovBoost from "assets/svg/gov-boost.svg";
 import ICMinus from "assets/svg/minus.svg";
 import ICPlus from "assets/svg/plus.svg";
-import { farmLoadingMapState, FarmsState } from "atoms/farmsState";
+import { farmLoadingMapState, FarmRecord } from "atoms/farmsState";
+import { tokenMapState } from "atoms/tokensState";
 import BigNumber from "bignumber.js";
 import Avatar from "components/Avatar";
 import BaseModal from "components/BaseModal";
-import GlowingButton from "components/GlowingButton";
 import BoostBar from "components/BoostBar";
+import GlowingButton from "components/GlowingButton";
 import StakeLPModal from "components/StakeLPModal";
 import TextAmt from "components/TextAmt";
 import CardTooltip from "components/Tooltip/CardTooltip";
@@ -18,19 +22,14 @@ import { toEGLDD } from "helper/balance";
 import { formatAmount } from "helper/number";
 import useFarmClaimReward from "hooks/useFarmContract/useFarmClaimReward";
 import { useScreenSize } from "hooks/useScreenSize";
-import { Unarray } from "interface/utilities";
 import { useEffect, useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
-import { ViewType } from "./FarmFilter";
-import ICGovBoost from "assets/svg/gov-boost.svg";
-import ICChevronDown from "assets/svg/chevron-down.svg";
-import ICChevronUp from "assets/svg/chevron-up.svg";
-import { walletTokenPriceState } from "atoms/walletState";
-import FarmListLayoutContainer from "./FarmListLayoutContainer";
 import FarmBoostInfoModal from "./FarmBoostInfoModal";
+import { ViewType } from "./FarmFilter";
+import FarmListLayoutContainer from "./FarmListLayoutContainer";
 
 type props = {
-    farmData: Unarray<FarmsState["farmRecords"]>;
+    farmData: FarmRecord;
     viewType: ViewType;
 };
 const Card = ({ children }: any) => {
@@ -84,7 +83,7 @@ function FarmCard({ farmData, viewType }: props) {
     const { claimReward } = useFarmClaimReward();
     const [token0, token1] = farmData.pool.tokens;
     const [isExpand, setIsExpand] = useState(false);
-    const tokenPrices = useRecoilValue(walletTokenPriceState);
+    const tokenMap = useRecoilValue(tokenMapState);
     const stakedLPAmt = useMemo(() => {
         if (!stakedData?.totalStakedLP || stakedData?.totalStakedLP.eq(0))
             return new BigNumber(0);
@@ -105,9 +104,9 @@ function FarmCard({ farmData, viewType }: props) {
 
     const rewardValue = useMemo(() => {
         return toEGLDD(ASH_TOKEN.decimals, totalRewardAmt).multipliedBy(
-            tokenPrices[ASH_TOKEN.id]
+            tokenMap[ASH_TOKEN.identifier].price || 0
         );
-    }, [totalRewardAmt, tokenPrices]);
+    }, [totalRewardAmt, tokenMap]);
 
     const stakedLPValue = useMemo(() => {
         return new BigNumber(farmData.stakedData?.totalStakedLP || 0)
@@ -142,12 +141,12 @@ function FarmCard({ farmData, viewType }: props) {
                         </div>
                         <div className="flex">
                             <Avatar
-                                src={token0.icon}
+                                src={token0.logoURI}
                                 alt={token0.symbol}
                                 className="w-[3.25rem] h-[3.25rem]"
                             />
                             <Avatar
-                                src={token1.icon}
+                                src={token1.logoURI}
                                 alt={token1.symbol}
                                 className="w-[3.25rem] h-[3.25rem] -ml-2"
                             />
@@ -447,12 +446,12 @@ function FarmCard({ farmData, viewType }: props) {
                             <div className="flex items-center space-x-2 md:space-x-6 overflow-hidden">
                                 <div className="flex">
                                     <Avatar
-                                        src={token0.icon}
+                                        src={token0.logoURI}
                                         alt={token0.symbol}
                                         className="w-4 h-4 md:w-6 md:h-6 lg:w-9 lg:h-9"
                                     />
                                     <Avatar
-                                        src={token1.icon}
+                                        src={token1.logoURI}
                                         alt={token1.symbol}
                                         className="w-4 h-4 -ml-1 md:w-6 md:h-6 lg:w-9 lg:h-9 md:-ml-3 lg:-ml-4.5 md:mt-3 lg:mt-4.5"
                                     />

@@ -1,15 +1,14 @@
 import BigNumber from "bignumber.js";
-import IPool from "interface/pool";
-import { atom } from "recoil";
+import pools from "const/pool";
+import { Fraction } from "helper/fraction/fraction";
+import { TokenAmount } from "helper/token/tokenAmount";
+import moment from "moment";
+import { atom, selector } from "recoil";
+import { ashswapBaseState } from "./ashswap";
 
-export const govLockedAmtState = atom<BigNumber>({
-    key: "gov_locked_amt",
-    default: new BigNumber(0),
-});
-
-export const govTotalLockedAmtState = atom<BigNumber>({
-    key: "gov_total_locked_amt",
-    default: new BigNumber(0),
+export const govTotalLockedPctState = atom<number>({
+    key: "gov_total_locked_pct",
+    default: 0,
 });
 
 export const govVeASHAmtState = atom<BigNumber>({
@@ -17,32 +16,72 @@ export const govVeASHAmtState = atom<BigNumber>({
     default: new BigNumber(0),
 });
 
-export const govUnlockTSState = atom<BigNumber>({
+export const govLockedAmtState = selector<BigNumber>({
+    key: "gov_locked_amt",
+    get: ({ get }) => {
+        const base = get(ashswapBaseState);
+        return new BigNumber(
+            base.votingEscrows[0]?.account?.locked?.amount || 0
+        );
+    },
+});
+
+export const govUnlockTSState = selector<BigNumber>({
     key: "gov_unlock_ts",
-    default: new BigNumber(0),
+    get: ({ get }) => {
+        const base = get(ashswapBaseState);
+        return new BigNumber(
+            base.votingEscrows[0]?.account?.locked?.end || moment().unix()
+        );
+    },
 });
 
-export const govTotalSupplyVeASH = atom<BigNumber>({
+export const govTotalSupplyVeASH = selector<BigNumber>({
     key: "gov_total_supply_veash",
-    default: new BigNumber(0),
+    get: ({ get }) => {
+        const base = get(ashswapBaseState);
+        return new BigNumber(base.votingEscrows[0]?.veSupply || 0);
+    },
 });
 
-export const govTotalLockedPctState = atom<number>({
-    key: "gov_total_locked_pct",
-    default: 0,
-});
-
-export const govRewardLPAmtState = atom<BigNumber>({
-    key: "gov_reward_lp_amt",
-    default: new BigNumber(0),
-});
-
-export const govRewardLPValueState = atom<BigNumber>({
-    key: "gov_reward_lp_value",
-    default: new BigNumber(0),
-});
-
-export const govRewardLPTokenState = atom<IPool>({
+export const govRewardLPTokenState = selector({
     key: "gov_reward_lp_token",
-    default: undefined
+    get: ({ get }) => {
+        const base = get(ashswapBaseState);
+        return pools.find(
+            (p) => p.lpToken.identifier === base.feeDistributor?.rewardToken.id
+        );
+    },
+});
+
+export const govRewardLPAmtState = selector<BigNumber>({
+    key: "gov_reward_lp_amt",
+    get: ({ get }) => {
+        const base = get(ashswapBaseState);
+        return new BigNumber(base.feeDistributor?.account?.reward || 0);
+    },
+});
+
+export const govRewardLPValueState = selector({
+    key: "gov_reward_lp_value",
+    get: ({ get }) => {
+        const base = get(ashswapBaseState);
+        const rewardToken = get(govRewardLPTokenState)?.lpToken;
+        if (!rewardToken) return new Fraction(0);
+        const tokenAmount = new TokenAmount(
+            rewardToken,
+            base.feeDistributor?.account?.reward || 0
+        ).multiply(
+            Fraction.fromBigNumber(base.feeDistributor?.rewardToken.price || 0)
+        );
+        return tokenAmount;
+    },
+});
+
+export const govTotalLockedAmtState = selector<BigNumber>({
+    key: "gov_total_locked_amt",
+    get: ({ get }) => {
+        const base = get(ashswapBaseState);
+        return new BigNumber(base.votingEscrows[0]?.totalLock || 0);
+    },
 });

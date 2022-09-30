@@ -2,7 +2,10 @@
 const withFonts = require("next-fonts");
 const withReactSvg = require("next-react-svg");
 const path = require("path");
-const withTM = require('next-transpile-modules')(['@elrondnetwork/dapp-core', 'react-redux']);
+const withTM = require("next-transpile-modules")([
+    "@elrondnetwork/dapp-core",
+    "react-redux",
+]);
 
 const { withSentryConfig } = require("@sentry/nextjs");
 
@@ -10,10 +13,14 @@ const moduleExports = withReactSvg(
     withFonts({
         include: path.resolve(__dirname, "assets/svg"),
         reactStrictMode: true,
-        i18n: {
-            locales: ["en"],
-            defaultLocale: "en",
+        // i18n: {
+        //     locales: ["en"],
+        //     defaultLocale: "en",
+        // },
+        images: {
+            loader: "custom",
         },
+        trailingSlash: true,
         async redirects() {
             return [
                 { source: "/stake", destination: "/", permanent: false },
@@ -22,7 +29,7 @@ const moduleExports = withReactSvg(
         },
         sentry: {
             hideSourceMaps: true,
-        }
+        },
     })
 );
 
@@ -47,12 +54,12 @@ module.exports = withSentryConfig(moduleWithTM, sentryWebpackPluginOptions);
 // https://github.com/facebookexperimental/Recoil/issues/733
 // safely ignore recoil warning messages in dev (triggered by HMR)
 function interceptStdout(text) {
-  if (text.includes("Duplicate atom key")) {
-    return ""
-  }
-  return text
+    if (text.includes("Duplicate atom key")) {
+        return "";
+    }
+    return text;
 }
 
 if (process.env.NODE_ENV === "development") {
-    require("intercept-stdout")(interceptStdout)
+    require("intercept-stdout")(interceptStdout);
 }

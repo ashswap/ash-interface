@@ -28,11 +28,7 @@ export const dappCoreState = atom<DappCoreState>({
     key: "dapp_core_state",
     default: {
         account: {
-            account: {
-                address: "",
-                balance: "",
-                nonce: 0,
-            },
+            accounts: {},
             accountLoadingError: null,
             address: "",
             isAccountLoading: false,
@@ -43,24 +39,30 @@ export const dappCoreState = atom<DappCoreState>({
         },
         dappModal: {},
         loginInfo: {
-            extensionLogin: null,
-            ledgerLogin: null,
-            loginMethod: "",
-            tokenLogin: null,
+            loginMethod: LoginMethodsEnum.none,
             walletConnectLogin: null,
+            ledgerLogin: null,
+            tokenLogin: null,
             walletLogin: null,
+            extensionLogin: null,
+            isLoginSessionInvalid: false,
         },
         modals: {},
         networkConfig: {
             chainID: "",
             network: {},
         },
-        toasts: { customToasts: [], transactionToasts: [] },
+        toasts: {
+            customToasts: [],
+            transactionToasts: [],
+            failTransactionToast: {},
+        },
         transactions: {
-            customTransactionInformationForSessionId: {},
             signedTransactions: {},
-            signTransactionsError: null,
             transactionsToSign: null,
+            signTransactionsError: null,
+            signTransactionsCancelMessage: null,
+            customTransactionInformationForSessionId: {},
         },
         transactionsInfo: {},
     },
@@ -100,7 +102,10 @@ export const accAddressState = selector<string>({
 export const accBalanceState = selector<BigNumber>({
     key: "dapp_acc_egld_balance",
     get: ({ get }) =>
-        new BigNumber(get(dappCoreState).account.account.balance || 0),
+        new BigNumber(
+            get(dappCoreState).account.accounts[get(accAddressState)]
+                ?.balance || 0
+        ),
 });
 
 export const accIsInsufficientEGLDState = selector<boolean>({

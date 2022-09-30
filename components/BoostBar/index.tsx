@@ -1,3 +1,4 @@
+import BigNumber from "bignumber.js";
 import CardTooltip from "components/Tooltip/CardTooltip";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
 import { ACTIVE_FARMS } from "const/farms";
@@ -128,17 +129,18 @@ function BoostBar(props: BoostBarProps) {
         return topDeltaX + 5;
     }, [height]);
     const validValue = useMemo(() => {
-        return Math.floor(Math.max(Math.min(max, value), min) * 100) / 100;
+        return +new BigNumber(Math.max(Math.min(max, value), min)).toFixed(
+            2,
+            BigNumber.ROUND_DOWN
+        );
     }, [min, max, value]);
     const validNewValue = useMemo(() => {
-        return (
-            Math.floor(
-                (newVal ? Math.max(Math.min(max, newVal), min) : 0) * 100
-            ) / 100
-        );
+        return +new BigNumber(
+            newVal ? Math.max(Math.min(max, newVal), min) : 0
+        ).toFixed(2, BigNumber.ROUND_DOWN);
     }, [min, max, newVal]);
     const valueWidth = useMemo(() => {
-        if(max === min) return "100%";
+        if (max === min) return "100%";
         return validValue === min
             ? minWidth + "px"
             : 10 + ((validValue - min) * 90) / (max - min) + "%";
@@ -212,7 +214,7 @@ function BoostBar(props: BoostBarProps) {
                                 <Polygon
                                     height={height}
                                     className={`${
-                                        disabled ? "" : "bg-[#FF00E5]"
+                                        disabled ? "" : "bg-ash-pink-500"
                                     }`}
                                 />
                             </div>
@@ -287,7 +289,7 @@ const VeLine = () => {
                 {!disabled && (
                     <div
                         className={`absolute inset-0 border border-ash-dark-400 ${
-                            disabled ? "bg-[#757391]" : "bg-[#FF00E5]"
+                            disabled ? "bg-[#757391]" : "bg-ash-pink-500"
                         }`}
                         style={{
                             width: `calc(${deltaWidth} - ${bottomDeltaX}px)`,
@@ -306,7 +308,11 @@ const VeLine = () => {
                             disabled ? "text-ash-gray-600" : "text-pink-600"
                         }`}
                     >
-                        {(validNewValue > validValue) ? <></> : <>{formatAmount(currentVe)} ve</>}
+                        {validNewValue > validValue ? (
+                            <></>
+                        ) : (
+                            <>{formatAmount(currentVe)} ve</>
+                        )}
                     </div>
                     <div className="text-ash-gray-600">
                         {formatAmount(maxVe)} ve
@@ -314,7 +320,7 @@ const VeLine = () => {
                 </div>
                 {validNewValue > validValue && !disabled && (
                     <div
-                        className="absolute inset-0 text-[#FF00E5]"
+                        className="absolute inset-0 text-ash-pink-500"
                         style={{
                             marginLeft: `min(max(${valueWidth} - ${bottomDeltaX}px, 4rem), 100% - ${bottomDeltaX}px - 8rem)`,
                         }}
@@ -340,7 +346,7 @@ const TopLabel = () => {
         maxVe,
     } = useContext(BoostBarContext);
     const tan33 = Math.tan((33 * Math.PI) / 180);
-    const {encode} = useRouteModal("calc_boost");
+    const { encode } = useRouteModal("calc_boost");
     return (
         <div
             className="relative mb-1"
@@ -375,7 +381,7 @@ const TopLabel = () => {
                 </CardTooltip>
                 <CardTooltip
                     autoPlacement
-                    content={({close}) => 
+                    content={({ close }) => (
                         <div className="text-stake-gray-500 text-xs font-bold">
                             <div className="mb-4">Max = Max boost possible</div>
                             <div className="text-white text-lg mb-8">
@@ -391,12 +397,23 @@ const TopLabel = () => {
                                 Max boost possible shows the maximum boost that
                                 you can reach. It&apos;s not always been 2.5
                                 times. Go to&nbsp;
-                                <Link href={{pathname: "/stake/gov/boost", query: {p: encode({farmAddress: ACTIVE_FARMS[0].farm_address})}}}>
-                                <a onClick={close}>
-                                <span className="text-stake-green-500">
-                                    calculator
-                                </span>
-                                </a>
+                                <Link
+                                    href={{
+                                        pathname: "/stake/gov/boost",
+                                        query: {
+                                            p: encode({
+                                                farmAddress:
+                                                    ACTIVE_FARMS[0]
+                                                        .farm_address,
+                                            }),
+                                        },
+                                    }}
+                                >
+                                    <a onClick={close}>
+                                        <span className="text-stake-green-500">
+                                            calculator
+                                        </span>
+                                    </a>
                                 </Link>{" "}
                                 or{" "}
                                 <span className="text-stake-green-500">
@@ -405,7 +422,7 @@ const TopLabel = () => {
                                 to learn more.
                             </div>
                         </div>
-                    }
+                    )}
                 >
                     <div>Max</div>
                 </CardTooltip>
@@ -417,7 +434,7 @@ const TopLabel = () => {
                         right: `min(max(${
                             ((max - validNewValue) * 100) / (max - min)
                         }%, 3rem), 100% - 7rem)`,
-                        left: "1rem",
+                        left: "0.8rem",
                     }}
                 >
                     <CardTooltip
@@ -427,13 +444,13 @@ const TopLabel = () => {
                                 <div className="mb-4">
                                     New boost after confirmed
                                 </div>
-                                <div className="text-[#FF00E5] text-lg mb-8">
+                                <div className="text-ash-pink-500 text-lg mb-8">
                                     x{validNewValue}
                                 </div>
                                 <div className="mb-4">
                                     veASH used for new boost
                                 </div>
-                                <div className="text-[#FF00E5] text-lg mb-8">
+                                <div className="text-ash-pink-500 text-lg mb-8">
                                     {formatAmount(expectedVe)} ve
                                 </div>
                                 <div className="bg-ash-dark-600 p-2 text-2xs font-bold text-stake-gray-500 inline-block">
@@ -447,7 +464,7 @@ const TopLabel = () => {
                             <span className="underline text-stake-gray-500">
                                 New boost:{" "}
                             </span>
-                            <span className="underline text-[#FF00E5]">
+                            <span className="underline text-ash-pink-500">
                                 x{formatAmount(validNewValue)}
                             </span>
                         </span>

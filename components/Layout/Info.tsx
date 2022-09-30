@@ -12,7 +12,7 @@ import ICHomeTrendUp from "assets/svg/home-trend-up.svg";
 import AddressMenu from "components/AddressMenu";
 import Input from "components/Input";
 import { useScreenSize } from "hooks/useScreenSize";
-import Image from "next/image";
+import Image from "components/Image";
 import Link, { LinkProps } from "next/link";
 import { useRouter } from "next/router";
 import ImgLogo from "public/images/m-logo.png";
@@ -182,18 +182,22 @@ function InfoLayout({ children }: any) {
                                 <ICChevronRight className="w-2 h-2" />
                             )}
                         </button>
-                        <div
-                            className={`relative shrink-0 mb-5 ${
-                                openSidebar ? "w-14 h-14" : "w-10 h-10"
-                            }`}
-                        >
-                            <Image
-                                src={ImgLogo}
-                                alt="ashswap logo"
-                                layout="fill"
-                                objectFit="contain"
-                            ></Image>
-                        </div>
+                        <Link href="/swap">
+                            <a>
+                                <div
+                                    className={`relative shrink-0 mb-5 ${
+                                        openSidebar ? "w-14 h-14" : "w-10 h-10"
+                                    }`}
+                                >
+                                    <Image
+                                        src={ImgLogo}
+                                        alt="ashswap logo"
+                                        layout="fill"
+                                        objectFit="contain"
+                                    ></Image>
+                                </div>
+                            </a>
+                        </Link>
                         <div className="grow overflow-auto">
                             <ul>
                                 <li>
@@ -355,12 +359,16 @@ function InfoLayout({ children }: any) {
         <div>
             <header className="sticky top-0 left-0 right-0 z-20 w-full h-[4.5rem] flex items-center justify-between px-6 text-white bg-ash-dark-400">
                 <div className="mr-5 shrink-0">
-                    <Image
-                        src={ImgLogo}
-                        alt="ash logo"
-                        width={28}
-                        height={42}
-                    />
+                    <Link href="/swap">
+                        <a>
+                            <Image
+                                src={ImgLogo}
+                                alt="ash logo"
+                                width={28}
+                                height={42}
+                            />
+                        </a>
+                    </Link>
                 </div>
                 <div className="grow flex items-center space-x-1 overflow-hidden">
                     <Input

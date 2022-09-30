@@ -9,21 +9,12 @@ import BasePopover from "components/BasePopover";
 import Input from "components/Input";
 import { useRecoilState } from "recoil";
 
-export enum ViewType {
-    Card,
-    List,
-}
-
-interface Props {
-    view?: ViewType;
-    onChangeView: (view: ViewType) => void;
-}
 const options: { value: PoolsState["sortOption"]; label: any }[] = [
     { value: "apr", label: "APR" },
     { value: "liquidity", label: "Liquidity" },
     { value: "volume", label: "24h Volume" },
 ];
-const PoolFilter = (props: Props) => {
+const PoolFilter = () => {
     const [keyword, setKeyword] = useRecoilState(poolKeywordState);
     const [sortOption, setSortOption] = useRecoilState(poolSortOptionState);
 

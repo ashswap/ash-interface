@@ -16,12 +16,13 @@ const useGovLockASH = (trackStatus = false) => {
             const veContract = new VotingEscrowContract(
                 ASHSWAP_CONFIG.dappContract.voteEscrowedContract
             );
+            const tokenPayment = TokenPayment.fungibleFromBigInteger(
+                ASH_TOKEN.identifier,
+                weiAmt,
+                ASH_TOKEN.decimals
+            )
             const tx = await veContract.createLock(
-                TokenPayment.fungibleFromBigInteger(
-                    ASH_TOKEN.id,
-                    weiAmt,
-                    ASH_TOKEN.decimals
-                ),
+                tokenPayment,
                 unlockTimestamp.toNumber()
             );
             return await sendTransactions({

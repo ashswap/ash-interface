@@ -10,7 +10,7 @@
         "contractCrate": {
             "name": "pool",
             "version": "0.0.0",
-            "git_version": "85a021a"
+            "git_version": "45566c6"
         },
         "framework": {
             "name": "elrond-wasm",
@@ -29,23 +29,7 @@
                 "type": "Address"
             },
             {
-                "name": "token_1",
-                "type": "TokenIdentifier"
-            },
-            {
-                "name": "token_2",
-                "type": "TokenIdentifier"
-            },
-            {
-                "name": "rate_1",
-                "type": "BigUint"
-            },
-            {
-                "name": "rate_2",
-                "type": "BigUint"
-            },
-            {
-                "name": "inital_amp_factor",
+                "name": "initial_amp_factor",
                 "type": "u64"
             },
             {
@@ -55,6 +39,11 @@
             {
                 "name": "admin_fee_percent",
                 "type": "u64"
+            },
+            {
+                "name": "tokens",
+                "type": "variadic<PoolInitAttributes>",
+                "multi_arg": true
             }
         ],
         "outputs": []
@@ -63,16 +52,10 @@
         {
             "name": "addLiquidity",
             "mutability": "mutable",
-            "payableInTokens": [
-                "*"
-            ],
+            "payableInTokens": ["*"],
             "inputs": [
                 {
-                    "name": "token_1_amount_min",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "token_2_amount_min",
+                    "name": "mint_amount_min",
                     "type": "BigUint"
                 },
                 {
@@ -82,154 +65,46 @@
             ],
             "outputs": [
                 {
-                    "type": "EsdtTokenPayment"
-                },
-                {
-                    "type": "EsdtTokenPayment"
-                },
-                {
-                    "type": "EsdtTokenPayment"
-                }
-            ]
-        },
-        {
-            "name": "estimateAddLiquidity",
-            "mutability": "readonly",
-            "inputs": [
-                {
-                    "name": "token_1_amount",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "token_2_amount",
-                    "type": "BigUint"
-                }
-            ],
-            "outputs": [
-                {
-                    "type": "AddLiquidityViewResultType"
+                    "type": "List<EsdtTokenPayment>"
                 }
             ]
         },
         {
             "name": "removeLiquidity",
             "mutability": "mutable",
-            "payableInTokens": [
-                "*"
-            ],
+            "payableInTokens": ["*"],
             "inputs": [
                 {
-                    "name": "token_1_amount_min",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "token_2_amount_min",
-                    "type": "BigUint"
+                    "name": "token_amount_min",
+                    "type": "variadic<BigUint>",
+                    "multi_arg": true
                 }
             ],
             "outputs": [
                 {
-                    "type": "EsdtTokenPayment"
-                },
-                {
-                    "type": "EsdtTokenPayment"
-                },
-                {
-                    "type": "EsdtTokenPayment"
-                }
-            ]
-        },
-        {
-            "name": "estimateRemoveLiquidity",
-            "mutability": "readonly",
-            "inputs": [
-                {
-                    "name": "liquidity",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "token_1_amount_min",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "token_2_amount_min",
-                    "type": "BigUint"
-                }
-            ],
-            "outputs": [
-                {
-                    "type": "RemoveLiquidityViewResultType"
+                    "type": "List<EsdtTokenPayment>"
                 }
             ]
         },
         {
             "name": "exchange",
             "mutability": "mutable",
-            "payableInTokens": [
-                "*"
-            ],
+            "payableInTokens": ["*"],
             "inputs": [
                 {
                     "name": "token_out",
                     "type": "TokenIdentifier"
                 },
                 {
-                    "name": "amount_out",
+                    "name": "amount_out_min",
                     "type": "BigUint"
                 }
             ],
             "outputs": [
                 {
-                    "type": "EsdtTokenPayment"
-                },
-                {
-                    "type": "EsdtTokenPayment"
+                    "type": "List<EsdtTokenPayment>"
                 }
             ]
-        },
-        {
-            "name": "estimateAmountOut",
-            "mutability": "readonly",
-            "inputs": [
-                {
-                    "name": "token_in",
-                    "type": "TokenIdentifier"
-                },
-                {
-                    "name": "token_out",
-                    "type": "TokenIdentifier"
-                },
-                {
-                    "name": "amount_in",
-                    "type": "BigUint"
-                }
-            ],
-            "outputs": [
-                {
-                    "type": "GetAmountOutViewResultType"
-                }
-            ]
-        },
-        {
-            "name": "getLpTokenIdentifier",
-            "mutability": "readonly",
-            "inputs": [],
-            "outputs": [
-                {
-                    "type": "TokenIdentifier"
-                }
-            ]
-        },
-        {
-            "name": "setLpTokenIdentifier",
-            "mutability": "mutable",
-            "inputs": [
-                {
-                    "name": "token_identifier",
-                    "type": "TokenIdentifier"
-                }
-            ],
-            "outputs": []
         },
         {
             "name": "rampAmpFactor",
@@ -259,51 +134,6 @@
             "outputs": [
                 {
                     "type": "u64"
-                }
-            ]
-        },
-        {
-            "name": "getTotalSupply",
-            "mutability": "readonly",
-            "inputs": [],
-            "outputs": [
-                {
-                    "type": "BigUint"
-                }
-            ]
-        },
-        {
-            "name": "getVirtualPrice",
-            "mutability": "readonly",
-            "inputs": [],
-            "outputs": [
-                {
-                    "type": "BigUint"
-                }
-            ]
-        },
-        {
-            "name": "rates",
-            "mutability": "readonly",
-            "inputs": [
-                {
-                    "name": "index",
-                    "type": "u32"
-                }
-            ],
-            "outputs": [
-                {
-                    "type": "BigUint"
-                }
-            ]
-        },
-        {
-            "name": "precision",
-            "mutability": "readonly",
-            "inputs": [],
-            "outputs": [
-                {
-                    "type": "BigUint"
                 }
             ]
         },
@@ -356,6 +186,47 @@
             ]
         },
         {
+            "name": "setLpTokenIdentifier",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "token_identifier",
+                    "type": "TokenIdentifier"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "getLpTokenIdentifier",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "TokenIdentifier"
+                }
+            ]
+        },
+        {
+            "name": "getTotalSupply",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getPrecision",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
             "name": "getTokens",
             "mutability": "readonly",
             "inputs": [],
@@ -366,26 +237,11 @@
             ]
         },
         {
-            "name": "balances",
+            "name": "getBalances",
             "mutability": "readonly",
             "inputs": [
                 {
-                    "name": "index",
-                    "type": "u32"
-                }
-            ],
-            "outputs": [
-                {
-                    "type": "BigUint"
-                }
-            ]
-        },
-        {
-            "name": "getGeneratedTokenAmount",
-            "mutability": "readonly",
-            "inputs": [
-                {
-                    "name": "token_id",
+                    "name": "token",
                     "type": "TokenIdentifier"
                 }
             ],
@@ -396,11 +252,11 @@
             ]
         },
         {
-            "name": "getBurnedTokenAmount",
+            "name": "getRates",
             "mutability": "readonly",
             "inputs": [
                 {
-                    "name": "token_id",
+                    "name": "token",
                     "type": "TokenIdentifier"
                 }
             ],
@@ -450,12 +306,188 @@
                     "type": "u64"
                 }
             ]
+        },
+        {
+            "name": "estimateAddLiquidity",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "token_amount_added",
+                    "type": "List<BigUint>"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "AddLiquidityResultType"
+                }
+            ]
+        },
+        {
+            "name": "estimateRemoveLiquidity",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "burn_amount",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "RemoveLiquidityResultType"
+                }
+            ]
+        },
+        {
+            "name": "estimateAmountOut",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "token_in",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "token_out",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "amount_in",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "ExchangeResultType"
+                }
+            ]
+        },
+        {
+            "name": "getVirtualPrice",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
         }
     ],
-    "events": [],
+    "events": [
+        {
+            "identifier": "add_liquidity",
+            "inputs": [
+                {
+                    "name": "timestamp",
+                    "type": "u64",
+                    "indexed": true
+                },
+                {
+                    "name": "caller",
+                    "type": "Address",
+                    "indexed": true
+                },
+                {
+                    "name": "add_liquidity_event",
+                    "type": "AddLiquidityEvent"
+                }
+            ]
+        },
+        {
+            "identifier": "remove_liquidity",
+            "inputs": [
+                {
+                    "name": "timestamp",
+                    "type": "u64",
+                    "indexed": true
+                },
+                {
+                    "name": "caller",
+                    "type": "Address",
+                    "indexed": true
+                },
+                {
+                    "name": "remove_liquidity_event",
+                    "type": "RemoveLiquidityEvent"
+                }
+            ]
+        },
+        {
+            "identifier": "exchange",
+            "inputs": [
+                {
+                    "name": "timestamp",
+                    "type": "u64",
+                    "indexed": true
+                },
+                {
+                    "name": "caller",
+                    "type": "Address",
+                    "indexed": true
+                },
+                {
+                    "name": "exchange_event",
+                    "type": "ExchangeEvent"
+                }
+            ]
+        }
+    ],
     "hasCallback": false,
     "types": {
-        "AddLiquidityViewResultType": {
+        "TokenAttributes": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "reserve",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "rate",
+                    "type": "BigUint"
+                }
+            ]
+        },
+        "AddLiquidityAttributes": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "token",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "attribute",
+                    "type": "TokenAttributes"
+                },
+                {
+                    "name": "amount_added",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "total_fee",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "admin_fee",
+                    "type": "BigUint"
+                }
+            ]
+        },
+        "AddLiquidityEvent": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "lp_token_amount",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "lp_token_supply",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "tokens",
+                    "type": "List<AddLiquidityAttributes>"
+                }
+            ]
+        },
+        "AddLiquidityResultType": {
             "type": "struct",
             "fields": [
                 {
@@ -463,28 +495,8 @@
                     "type": "BigUint"
                 },
                 {
-                    "name": "total_first_token_fee",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "total_second_token_fee",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "first_token_admin_fee",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "second_token_admin_fee",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "first_token_balance",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "second_token_balance",
-                    "type": "BigUint"
+                    "name": "tokens",
+                    "type": "List<AddLiquidityAttributes>"
                 }
             ]
         },
@@ -505,21 +517,26 @@
                 }
             ]
         },
-        "GetAmountOutViewResultType": {
+        "ExchangeAttributes": {
             "type": "struct",
             "fields": [
                 {
-                    "name": "amount_out",
-                    "type": "BigUint"
+                    "name": "token",
+                    "type": "TokenIdentifier"
                 },
                 {
-                    "name": "token_in_balance",
-                    "type": "BigUint"
+                    "name": "attribute",
+                    "type": "TokenAttributes"
                 },
                 {
-                    "name": "token_out_balance",
+                    "name": "final_amount",
                     "type": "BigUint"
-                },
+                }
+            ]
+        },
+        "ExchangeEvent": {
+            "type": "struct",
+            "fields": [
                 {
                     "name": "total_fee",
                     "type": "BigUint"
@@ -527,27 +544,95 @@
                 {
                     "name": "admin_fee",
                     "type": "BigUint"
+                },
+                {
+                    "name": "token_in",
+                    "type": "ExchangeAttributes"
+                },
+                {
+                    "name": "token_out",
+                    "type": "ExchangeAttributes"
                 }
             ]
         },
-        "RemoveLiquidityViewResultType": {
+        "ExchangeResultType": {
             "type": "struct",
             "fields": [
                 {
-                    "name": "first_token_amount",
+                    "name": "total_fee",
                     "type": "BigUint"
                 },
                 {
-                    "name": "second_token_amount",
+                    "name": "admin_fee",
                     "type": "BigUint"
                 },
                 {
-                    "name": "first_token_balance",
+                    "name": "token_in",
+                    "type": "ExchangeAttributes"
+                },
+                {
+                    "name": "token_out",
+                    "type": "ExchangeAttributes"
+                }
+            ]
+        },
+        "PoolInitAttributes": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "token",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "rate",
+                    "type": "BigUint"
+                }
+            ]
+        },
+        "RemoveLiquidityAttributes": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "token",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "attribute",
+                    "type": "TokenAttributes"
+                },
+                {
+                    "name": "amount_removed",
+                    "type": "BigUint"
+                }
+            ]
+        },
+        "RemoveLiquidityEvent": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "lp_token_amount",
                     "type": "BigUint"
                 },
                 {
-                    "name": "second_token_balance",
+                    "name": "lp_token_supply",
                     "type": "BigUint"
+                },
+                {
+                    "name": "tokens",
+                    "type": "List<RemoveLiquidityAttributes>"
+                }
+            ]
+        },
+        "RemoveLiquidityResultType": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "burn_amount",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "tokens",
+                    "type": "List<RemoveLiquidityAttributes>"
                 }
             ]
         },

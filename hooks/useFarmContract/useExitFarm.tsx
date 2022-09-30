@@ -1,4 +1,4 @@
-import { TokenPayment as TokenPaymen } from "@elrondnetwork/erdjs/out";
+import { TokenPayment } from "@elrondnetwork/erdjs/out";
 import { accIsLoggedInState } from "atoms/dappState";
 import {
     farmQuery,
@@ -50,7 +50,7 @@ const calcUnstakeEntries2 = (weiAmt: BigNumber, farmTokens: FarmToken[]) => {
                 .integerValue(BigNumber.ROUND_FLOOR);
             const amt = lpBalance.lte(remain) ? lpBalance : remain;
             sum = sum.plus(amt);
-            return TokenPaymen.metaEsdtFromBigInteger(
+            return TokenPayment.metaEsdtFromBigInteger(
                 ft.collection,
                 ft.nonce.toNumber(),
                 amt.eq(remain)
@@ -68,7 +68,7 @@ const calcUnstakeEntries2 = (weiAmt: BigNumber, farmTokens: FarmToken[]) => {
             //     farmToken: ft,
             // };
         })
-        .filter((tp) => typeof tp !== "undefined") as TokenPaymen[];
+        .filter((tp) => typeof tp !== "undefined") as TokenPayment[];
 };
 const useExitFarm = (trackStatus = false) => {
     const { sendTransactions, trackingData, sessionId } =
@@ -95,16 +95,16 @@ const useExitFarm = (trackStatus = false) => {
                 const farmTokens = stakedData.farmTokens || [];
                 const entries = unstakeMax
                     ? farmTokens.map((t) =>
-                          TokenPaymen.metaEsdtFromBigInteger(
+                          TokenPayment.metaEsdtFromBigInteger(
                               t.collection,
                               t.nonce.toNumber(),
                               t.balance
                           )
                       )
                     : calcUnstakeEntries2(lpAmt, farmTokens);
-                const tx = await farmContract.exitFarm(entries);
+                const txs = await farmContract.exitFarm(entries);
                 const payload: DappSendTransactionsPropsType = {
-                    transactions: tx,
+                    transactions: txs,
                     transactionsDisplayInfo: {
                         successMessage: `Unstake succeed ${toEGLDD(
                             farm.farming_token_decimal,

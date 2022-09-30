@@ -44,7 +44,9 @@ function FarmBoostTooltip({
 }) {
     const farm = farmData.farm;
     const pool = useMemo(() => {
-        return pools.find((p) => p.lpToken.id === farm.farming_token_id);
+        return pools.find(
+            (p) => p.lpToken.identifier === farm.farming_token_id
+        );
     }, [farm]);
     const accAddress = useRecoilValue(accAddressState);
     const networkConfig: AccountInfoSliceNetworkType =
@@ -105,7 +107,7 @@ function FarmBoostTooltip({
                             onClick={() => onSelfBoostTransferedToken?.()}
                         >
                             <span className="mr-4">
-                                I want to boost by my self
+                                I want to boost by myself
                             </span>
                             <ICChevronRight className="w-1.5 h-auto" />
                         </button>

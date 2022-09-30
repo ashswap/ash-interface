@@ -2,7 +2,7 @@ import React from "react";
 import MetalCard from "./MetalCard";
 import ImgMintGem from "assets/images/mint-gem.png";
 import ImgMintStakeRisk from "assets/images/mint-stake-risk.png";
-import Image from "next/image";
+import Image from "components/Image";
 import Link from "next/link";
 
 function MintStakeCard() {

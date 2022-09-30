@@ -28,9 +28,9 @@ function PoolCardItem({
     const network: AccountInfoSliceNetworkType =
         useRecoilValue(networkConfigState).network;
     const {
-        total_value_locked,
-        apr_day: tradingAPR,
-        usd_volume: volume24h,
+        tvl,
+        apr: tradingAPR,
+        volume_usd: volume24h,
     } = poolData.poolStats || {};
     const screenSize = useScreenSize();
     const [onboardingPoolDeposit, setOnboardedPoolDeposit] =
@@ -52,12 +52,12 @@ function PoolCardItem({
                 </div>
                 <div className="flex flex-row justify-between items-center">
                     <Avatar
-                        src={pool.tokens[0].icon}
+                        src={pool.tokens[0].logoURI}
                         alt={pool.tokens[0].symbol}
                         className="w-[3.25rem] h-[3.25rem]"
                     />
                     <Avatar
-                        src={pool.tokens[1].icon}
+                        src={pool.tokens[1].logoURI}
                         alt={pool.tokens[1].symbol}
                         className="w-[3.25rem] h-[3.25rem] -ml-2.5"
                     />
@@ -136,7 +136,7 @@ function PoolCardItem({
                     <div className="text-sm">
                         $
                         <TextAmt
-                            number={total_value_locked || 0}
+                            number={tvl || 0}
                             options={{ notation: "standard" }}
                         />
                     </div>
@@ -190,7 +190,7 @@ function PoolCardItem({
             {isExpand && (
                 <div className="text-center mb-8">
                     <a
-                        href={`${network.explorerAddress}/tokens/${pool.lpToken.id}`}
+                        href={`${network.explorerAddress}/tokens/${pool.lpToken.identifier}`}
                         target="_blank"
                         rel="noreferrer"
                         className="text-earn underline text-2xs font-bold hover:text-earn hover:underline"

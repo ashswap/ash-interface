@@ -63,6 +63,7 @@ const StatusIconMap: Record<
     pending: (
         <div className="w-4 h-4 rounded-full border-2 border-ash-purple-500 border-t-transparent animate-spin"></div>
     ),
+    "not executed": <></>,
     success: <ICCheck className="w-4 h-4 text-stake-green-500" />,
     fail: <IClose className="w-4 h-4 text-ash-purple-500" />,
     invalid: <IClose className="w-4 h-4 text-ash-purple-500" />,

@@ -10,7 +10,7 @@
         "contractCrate": {
             "name": "voting_escrow",
             "version": "0.0.0",
-            "git_version": "85a021a"
+            "git_version": "45566c6"
         },
         "framework": {
             "name": "elrond-wasm",
@@ -29,55 +29,6 @@
     },
     "endpoints": [
         {
-            "name": "getLastUserSlope",
-            "mutability": "readonly",
-            "inputs": [
-                {
-                    "name": "addr",
-                    "type": "Address"
-                }
-            ],
-            "outputs": [
-                {
-                    "type": "BigInt"
-                }
-            ]
-        },
-        {
-            "name": "lockedEnd",
-            "mutability": "readonly",
-            "inputs": [
-                {
-                    "name": "addr",
-                    "type": "Address"
-                }
-            ],
-            "outputs": [
-                {
-                    "type": "u64"
-                }
-            ]
-        },
-        {
-            "name": "userPointHistoryTs",
-            "mutability": "readonly",
-            "inputs": [
-                {
-                    "name": "addr",
-                    "type": "Address"
-                },
-                {
-                    "name": "idx",
-                    "type": "u64"
-                }
-            ],
-            "outputs": [
-                {
-                    "type": "u64"
-                }
-            ]
-        },
-        {
             "name": "checkpoint",
             "mutability": "mutable",
             "inputs": [],
@@ -86,9 +37,7 @@
         {
             "name": "deposit_for",
             "mutability": "mutable",
-            "payableInTokens": [
-                "*"
-            ],
+            "payableInTokens": ["*"],
             "inputs": [
                 {
                     "name": "addr",
@@ -100,9 +49,7 @@
         {
             "name": "create_lock",
             "mutability": "mutable",
-            "payableInTokens": [
-                "*"
-            ],
+            "payableInTokens": ["*"],
             "inputs": [
                 {
                     "name": "unlock_time",
@@ -114,9 +61,7 @@
         {
             "name": "increase_amount",
             "mutability": "mutable",
-            "payableInTokens": [
-                "*"
-            ],
+            "payableInTokens": ["*"],
             "inputs": [],
             "outputs": []
         },
@@ -138,7 +83,7 @@
             "outputs": []
         },
         {
-            "name": "balanceOfAtTs",
+            "name": "getUserBalanceAtTs",
             "mutability": "readonly",
             "inputs": [
                 {
@@ -152,12 +97,12 @@
             ],
             "outputs": [
                 {
-                    "type": "BigInt"
+                    "type": "BigUint"
                 }
             ]
         },
         {
-            "name": "balanceOfAtBlock",
+            "name": "getUserBalanceAtBlock",
             "mutability": "readonly",
             "inputs": [
                 {
@@ -171,12 +116,12 @@
             ],
             "outputs": [
                 {
-                    "type": "BigInt"
+                    "type": "BigUint"
                 }
             ]
         },
         {
-            "name": "totalSupplyAtTs",
+            "name": "getTotalSupplyAtTs",
             "mutability": "readonly",
             "inputs": [
                 {
@@ -186,12 +131,12 @@
             ],
             "outputs": [
                 {
-                    "type": "BigInt"
+                    "type": "BigUint"
                 }
             ]
         },
         {
-            "name": "totalSupplyAtBlock",
+            "name": "getTotalSupplyAtBlock",
             "mutability": "readonly",
             "inputs": [
                 {
@@ -201,22 +146,12 @@
             ],
             "outputs": [
                 {
-                    "type": "BigInt"
-                }
-            ]
-        },
-        {
-            "name": "supply",
-            "mutability": "readonly",
-            "inputs": [],
-            "outputs": [
-                {
                     "type": "BigUint"
                 }
             ]
         },
         {
-            "name": "lockedToken",
+            "name": "getLockedToken",
             "mutability": "readonly",
             "inputs": [],
             "outputs": [
@@ -226,7 +161,7 @@
             ]
         },
         {
-            "name": "getLocked",
+            "name": "getUserLocked",
             "mutability": "readonly",
             "inputs": [
                 {
@@ -300,7 +235,7 @@
             ]
         },
         {
-            "name": "totalLock",
+            "name": "getTotalLocked",
             "mutability": "readonly",
             "inputs": [],
             "outputs": [
@@ -310,7 +245,7 @@
             ]
         },
         {
-            "name": "slopeChanges",
+            "name": "getSlopeChanges",
             "mutability": "readonly",
             "inputs": [
                 {
@@ -325,9 +260,69 @@
             ]
         }
     ],
-    "events": [],
+    "events": [
+        {
+            "identifier": "deposit",
+            "inputs": [
+                {
+                    "name": "provider",
+                    "type": "Address",
+                    "indexed": true
+                },
+                {
+                    "name": "locktime",
+                    "type": "u64",
+                    "indexed": true
+                },
+                {
+                    "name": "deposit",
+                    "type": "DepositEvent"
+                }
+            ]
+        },
+        {
+            "identifier": "withdraw",
+            "inputs": [
+                {
+                    "name": "provider",
+                    "type": "Address",
+                    "indexed": true
+                },
+                {
+                    "name": "withdraw",
+                    "type": "WithdrawEvent"
+                }
+            ]
+        },
+        {
+            "identifier": "supply",
+            "inputs": [
+                {
+                    "name": "supply",
+                    "type": "SupplyEvent"
+                }
+            ]
+        }
+    ],
     "hasCallback": false,
     "types": {
+        "DepositEvent": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "value",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "timestamp",
+                    "type": "u64"
+                },
+                {
+                    "name": "value_locked",
+                    "type": "BigUint"
+                }
+            ]
+        },
         "LockedBalance": {
             "type": "struct",
             "fields": [
@@ -358,6 +353,32 @@
                 },
                 {
                     "name": "block",
+                    "type": "u64"
+                }
+            ]
+        },
+        "SupplyEvent": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "prev_supply",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "supply",
+                    "type": "BigUint"
+                }
+            ]
+        },
+        "WithdrawEvent": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "value",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "timestamp",
                     "type": "u64"
                 }
             ]

@@ -4,7 +4,7 @@ import ICMinus from "assets/svg/minus.svg";
 import ICPlus from "assets/svg/plus.svg";
 import Avatar from "components/Avatar";
 import MintAOCModal from "components/MintAOCModal";
-import Image from "next/image";
+import Image from "components/Image";
 import { useState } from "react";
 
 const LPStat = () => {

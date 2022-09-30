@@ -1,12 +1,13 @@
 import BigNumber from "bignumber.js";
-import { IToken } from "interface/token";
+import { IESDTInfo } from "./token/token";
 
-export const toWei = (token: IToken, valueStr: string) => {
+export const toWei = (token: IESDTInfo, valueStr: string) => {
     if (valueStr === "") {
         return new BigNumber(0);
     }
 
     let amount = new BigNumber(valueStr);
+    if(amount.isNaN()) return new BigNumber(0);
     amount = new BigNumber(
         amount
             .multipliedBy(new BigNumber(10).exponentiatedBy(token.decimals))
@@ -17,14 +18,14 @@ export const toWei = (token: IToken, valueStr: string) => {
         return new BigNumber(0);
     }
 
-    return amount;
+    return amount.integerValue(BigNumber.ROUND_DOWN);
 };
 
-export const toEGLD = (token: IToken, valueStr: string) => {
+export const toEGLD = (token: IESDTInfo, valueStr: string) => {
     return toEGLDD(token.decimals, valueStr);
 };
 
-export const toEGLDD = (decimals: number, num: string | number | BigNumber) => {
+export const toEGLDD = (decimals: number, num: BigNumber.Value) => {
     if (num === "") {
         return new BigNumber(0);
     }

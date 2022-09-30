@@ -1,20 +1,20 @@
-import { walletBalanceState, walletTokenPriceState } from "atoms/walletState";
+import { tokenMapState } from "atoms/tokensState";
 import BigNumber from "bignumber.js";
 import InputCurrency from "components/InputCurrency";
-import TokenSelect from "views/swap/components/TokenSelect";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
 import pools from "const/pool";
 import { useSwap } from "context/swap";
 import { toEGLDD } from "helper/balance";
-import { formatAmount } from "helper/number";
+import { formatAmount, formatToSignificant } from "helper/number";
+import { IESDTInfo } from "helper/token/token";
 import { useOnboarding } from "hooks/useOnboarding";
 import { useScreenSize } from "hooks/useScreenSize";
-import { IToken } from "interface/token";
 import { useEffect, useMemo, useRef } from "react";
 import { useRecoilValue } from "recoil";
 import { theme } from "tailwind.config";
-import styles from "./SwapAmount.module.css";
+import TokenSelect from "views/swap/components/TokenSelect";
 import QuickSelect from "../QuickSelect";
+import styles from "./SwapAmount.module.css";
 
 interface Props {
     topLeftCorner?: boolean;
@@ -28,7 +28,6 @@ interface Props {
 
 const SwapAmount = (props: Props) => {
     const inputRef = useRef<HTMLInputElement>(null);
-    const balances = useRecoilValue(walletBalanceState);
     const {
         isInsufficentFund,
         setInsufficentFund,
@@ -41,7 +40,7 @@ const SwapAmount = (props: Props) => {
         setValueFrom,
         setValueTo,
     } = useSwap();
-    const priceMap = useRecoilValue(walletTokenPriceState);
+    const tokenMap = useRecoilValue(tokenMapState);
     const screenSize = useScreenSize();
     const [onboardingQuickSelectToken, setOnboardedQuickSelectToken] =
         useOnboarding("swap_quick_select_token");
@@ -94,16 +93,19 @@ const SwapAmount = (props: Props) => {
         }
 
         return pools.filter(
-            (p) => p.tokens.findIndex((t) => t.id == poolWithToken?.id) !== -1
+            (p) =>
+                p.tokens.findIndex(
+                    (t) => t.identifier == poolWithToken?.identifier
+                ) !== -1
         );
     }, [poolWithToken]);
 
     let suggestedTokens = useMemo(() => {
-        let tokens: IToken[] = [];
+        let tokens: IESDTInfo[] = [];
 
         validPools?.map((p) => {
             p.tokens.forEach((t) => {
-                if (t.id !== poolWithToken?.id) {
+                if (t.identifier !== poolWithToken?.identifier) {
                     tokens.push(t);
                 }
             });
@@ -114,8 +116,11 @@ const SwapAmount = (props: Props) => {
 
     const balance = useMemo(() => {
         if (!token) return new BigNumber(0);
-        return toEGLDD(token.decimals, balances[token.id]?.balance || 0);
-    }, [token, balances]);
+        return toEGLDD(
+            token.decimals,
+            tokenMap[token.identifier]?.balance || 0
+        );
+    }, [token, tokenMap]);
 
     useEffect(() => {
         if (props.type === "from") {
@@ -187,16 +192,26 @@ const SwapAmount = (props: Props) => {
                         className={`${styles.input} overflow-hidden grow font-medium`}
                         disabled={props.disableInput}
                         placeholder="0.00"
-                        value={value}
+                        value={
+                            props.disableInput
+                                ? value
+                                    ? formatToSignificant(value, 6)
+                                    : ""
+                                : value
+                        }
                         style={{
                             color:
                                 props.type === "from" && isInsufficentFund
                                     ? theme.extend.colors["insufficent-fund"]
                                     : undefined,
                         }}
+                        decimals={token?.decimals}
                         onChange={(e) => {
-                            onChangeValue(e.target.value);
-                            setOnboardedInputAmt(true);
+                            if(!props.disableInput){
+
+                                onChangeValue(e.target.value);
+                                setOnboardedInputAmt(true);
+                            }
                         }}
                     />
                 </div>
@@ -243,7 +258,8 @@ const SwapAmount = (props: Props) => {
                         <span>Balance: </span>
                         <span
                             className={`text-earn ${
-                                balances[token.id] && props.type === "from"
+                                tokenMap[token.identifier] &&
+                                props.type === "from"
                                     ? "select-none cursor-pointer"
                                     : ""
                             }`}
@@ -264,7 +280,9 @@ const SwapAmount = (props: Props) => {
                                 <span className="text-ash-gray-600">$ </span>
                                 <span>
                                     {formatAmount(
-                                        +(value || 0) * priceMap[token.id],
+                                        +(value || 0) *
+                                            (tokenMap[token.identifier]
+                                                ?.price || 0),
                                         { notation: "standard" }
                                     )}
                                 </span>

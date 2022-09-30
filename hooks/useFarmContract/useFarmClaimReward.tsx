@@ -36,11 +36,11 @@ const useFarmClaimReward = (trackStatus = false) => {
                         farm.farm_token_decimal
                     )
                 );
-                const tx = await ContractManager.getFarmContract(
+                const txs = await ContractManager.getFarmContract(
                     farm.farm_address
                 ).claimRewards(tokenPayments, false);
                 const payload: DappSendTransactionsPropsType = {
-                    transactions: tx,
+                    transactions: txs,
                     transactionsDisplayInfo: {
                         successMessage: `Claim succeed ${toEGLDD(
                             ASH_TOKEN.decimals,

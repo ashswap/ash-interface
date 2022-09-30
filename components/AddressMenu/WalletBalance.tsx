@@ -1,6 +1,6 @@
 import ImgEgldIcon from "assets/images/egld-icon.png";
 import { accBalanceState } from "atoms/dappState";
-import { walletBalanceState } from "atoms/walletState";
+import { lpTokenMapState, tokenMapState } from "atoms/tokensState";
 import BigNumber from "bignumber.js";
 import Avatar from "components/Avatar";
 import TextAmt from "components/TextAmt";
@@ -9,19 +9,23 @@ import { ENVIRONMENT } from "const/env";
 import pools from "const/pool";
 import { TOKENS } from "const/tokens";
 import { toEGLDD } from "helper/balance";
-import { IToken } from "interface/token";
+import { IESDTInfo } from "helper/token/token";
 import { useMemo } from "react";
 import { useRecoilValue } from "recoil";
-type TokenWithBalance = IToken & {
+type TokenWithBalance = IESDTInfo & {
     balance: BigNumber;
 };
-const TokenBalance = ({ data }: { data: Omit<TokenWithBalance, "id"> }) => {
+const TokenBalance = ({
+    data,
+}: {
+    data: Omit<TokenWithBalance, "identifier">;
+}) => {
     return (
         <div className="flex justify-between px-6 py-2">
             <div className="flex items-center mr-2">
-                {data.icon ? (
+                {data.logoURI ? (
                     <Avatar
-                        src={data.icon}
+                        src={data.logoURI}
                         alt={data.symbol}
                         className="w-3.5 h-3.5"
                     />
@@ -42,13 +46,14 @@ const TokenBalance = ({ data }: { data: Omit<TokenWithBalance, "id"> }) => {
     );
 };
 function WalletBalance() {
-    const balances = useRecoilValue(walletBalanceState);
+    const tokenMap = useRecoilValue(tokenMapState);
+    const lpTokenMap = useRecoilValue(lpTokenMapState);
     const egldBalance = useRecoilValue(accBalanceState);
     const ashSupportedBalances = useMemo(() => {
         const supportedTokens: TokenWithBalance[] = TOKENS.map((t) => {
             return {
                 ...t,
-                balance: balances[t.id]?.balance || new BigNumber(0),
+                balance: new BigNumber(tokenMap[t.identifier]?.balance || 0),
             };
         });
 
@@ -57,26 +62,24 @@ function WalletBalance() {
                 const t = p.lpToken;
                 return {
                     ...t,
-                    balance: balances[t.id]?.balance || new BigNumber(0),
+                    balance: new BigNumber(
+                        lpTokenMap[t.identifier]?.balance || 0
+                    ),
                 };
             })
             .filter((t) => t.balance.gt(0));
 
         return [...supportedTokens, ...lpTokens];
-    }, [balances]);
-    const egld: Omit<TokenWithBalance, "id"> = useMemo(() => {
+    }, [tokenMap, lpTokenMap]);
+    const egld: Omit<TokenWithBalance, "identifier"> = useMemo(() => {
         return {
             chainId:
                 ENVIRONMENT.NETWORK === "devnet"
                     ? CHAIN_ID.DEVNET
-                    : ENVIRONMENT.NETWORK === "testnet"
-                    ? CHAIN_ID.TESTNET
                     : CHAIN_ID.MAINNET,
             symbol:
                 ENVIRONMENT.NETWORK === "devnet"
                     ? "dEGLD"
-                    : ENVIRONMENT.NETWORK === "testnet"
-                    ? "xEGLD"
                     : "EGLD",
             name: "Elrond eGold",
             balance: new BigNumber(egldBalance),
@@ -92,7 +95,7 @@ function WalletBalance() {
             <div className="overflow-auto flex flex-col h-40">
                 <TokenBalance data={egld} />
                 {ashSupportedBalances.map((t) => {
-                    return <TokenBalance key={t.id} data={t} />;
+                    return <TokenBalance key={t.identifier} data={t} />;
                 })}
             </div>
         </div>

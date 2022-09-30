@@ -1,30 +1,28 @@
-import { createContext, useContext, useState, useMemo, useEffect } from "react";
-import BigNumber from "bignumber.js";
 import pools from "const/pool";
-import { IToken } from "interface/token";
-import IPool from "interface/pool";
 import { emptyFunc } from "helper/common";
+import { Percent } from "helper/fraction/percent";
+import { IESDTInfo } from "helper/token/token";
+import IPool from "interface/pool";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 export interface State {
-    tokenFrom?: IToken;
-    tokenTo?: IToken;
+    tokenFrom?: IESDTInfo;
+    tokenTo?: IESDTInfo;
     valueFrom?: string;
     valueTo?: string;
     pool?: IPool;
-    rates?: BigNumber[];
     isInsufficentFund: boolean;
-    slippage: number;
-    setSlippage: (slippage: number) => void;
+    slippage: Percent;
+    setSlippage: (slippage: Percent) => void;
     setInsufficentFund: (v: boolean) => void;
     setValueFrom: (v: string) => void;
     setValueTo: (v: string) => void;
-    setTokenFrom: (t: IToken | undefined) => void;
-    setTokenTo: (t: IToken | undefined) => void;
-    setRates: (r: BigNumber[] | undefined) => void;
+    setTokenFrom: (t: IESDTInfo | undefined) => void;
+    setTokenTo: (t: IESDTInfo | undefined) => void;
 }
 
 export const initState: State = {
-    slippage: 0.001,
+    slippage: new Percent(100, 100_000), //0.1%
     isInsufficentFund: false,
     setSlippage: emptyFunc,
     setInsufficentFund: emptyFunc,
@@ -32,7 +30,6 @@ export const initState: State = {
     setValueTo: emptyFunc,
     setTokenFrom: emptyFunc,
     setTokenTo: emptyFunc,
-    setRates: emptyFunc,
 };
 
 export const SwapContext = createContext<State>(initState);
@@ -45,13 +42,12 @@ interface Props {
 }
 
 export function SwapProvider({ children }: Props) {
-    const [tokenFrom, setTokenFrom] = useState<IToken | undefined>(undefined);
+    const [tokenFrom, setTokenFrom] = useState<IESDTInfo | undefined>(undefined);
     const [valueFrom, setValueFrom] = useState<string>("");
-    const [slippage, setSlippage] = useState<number>(initState.slippage);
-    const [tokenTo, setTokenTo] = useState<IToken | undefined>(undefined);
+    const [slippage, setSlippage] = useState<Percent>(initState.slippage);
+    const [tokenTo, setTokenTo] = useState<IESDTInfo | undefined>(undefined);
     const [valueTo, setValueTo] = useState<string>("");
-    
-    const [rates, setRates] = useState<BigNumber[] | undefined>(undefined);
+
     const [isInsufficentFund, setInsufficentFund] = useState<boolean>(false);
 
     const pool = useMemo(() => {
@@ -59,18 +55,27 @@ export function SwapProvider({ children }: Props) {
             return;
         }
 
-        const pool = pools.find(p => {
+        const pool = pools.find((p) => {
             return (
-                p.tokens.findIndex(t => t.id === tokenFrom?.id) !== -1 &&
-                p.tokens.findIndex(t => t.id === tokenTo?.id) !== -1
+                p.tokens.findIndex(
+                    (t) => t.identifier === tokenFrom?.identifier
+                ) !== -1 &&
+                p.tokens.findIndex(
+                    (t) => t.identifier === tokenTo?.identifier
+                ) !== -1
             );
         });
 
-        return pool
+        return pool;
     }, [tokenFrom, tokenTo]);
 
     useEffect(() => {
-        if(!valueFrom){
+        setValueFrom("");
+        setValueTo("");
+    }, [pool]);
+
+    useEffect(() => {
+        if (!valueFrom) {
             setValueTo("");
         }
     }, [valueFrom]);
@@ -82,7 +87,6 @@ export function SwapProvider({ children }: Props) {
         valueFrom,
         valueTo,
         pool,
-        rates,
         isInsufficentFund,
         slippage,
         setSlippage,
@@ -90,7 +94,6 @@ export function SwapProvider({ children }: Props) {
         setValueTo,
         setTokenFrom,
         setTokenTo,
-        setRates,
         setInsufficentFund,
     };
 

@@ -1,7 +1,9 @@
-import Image, { ImageProps } from "next/image";
+import Image from "components/Image";
+import { ImageProps } from "next/image";
 import React, { useMemo } from "react";
 import { twMerge } from "tailwind-merge";
-type Props = JSX.IntrinsicElements["span"] & Pick<ImageProps, "src" | "alt">;
+type Props = JSX.IntrinsicElements["span"] &
+    Partial<Pick<ImageProps, "src" | "alt">>;
 function Avatar({ src, alt, ...props }: Props) {
     const className = useMemo(() => {
         return twMerge(
@@ -11,7 +13,9 @@ function Avatar({ src, alt, ...props }: Props) {
     }, [props.className]);
     return (
         <span {...props} className={className}>
-            {src && <Image src={src} alt={alt} layout="fill" objectFit="cover" />}
+            {src && (
+                <Image src={src} alt={alt} layout="fill" objectFit="cover" />
+            )}
         </span>
     );
 }

@@ -4,21 +4,20 @@ import ICList from "assets/svg/list.svg";
 import ICSearch from "assets/svg/search.svg";
 import {
     farmKeywordState,
+    FarmSortOption,
     farmSortOptionState,
-    FarmsState,
     farmStakedOnlyState,
     farmViewTypeState,
 } from "atoms/farmsState";
 import BasePopover from "components/BasePopover";
 import Input from "components/Input";
 import { useScreenSize } from "hooks/useScreenSize";
-import React from "react";
 import { useRecoilState } from "recoil";
 export enum ViewType {
     Card,
     List,
 }
-const options: { value: FarmsState["sortOption"]; label: any }[] = [
+const options: { value: FarmSortOption; label: any }[] = [
     { value: "apr", label: "APR" },
     { value: "liquidity", label: "Liquidity" },
     { value: "volume", label: "24h Volume" },

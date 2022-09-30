@@ -17,13 +17,16 @@ import {
     networkConfigState
 } from "atoms/dappState";
 import { gasLimitBuffer, gasPrice, maxGasLimit } from "const/dappConfig";
-import { DappSendTransactionsPropsType } from "interface/dappCore";
+import {
+    DappSendTransactionsPropsType
+} from "interface/dappCore";
 import { useRecoilValue } from "recoil";
 const emptyTx = new Transaction({
     nonce: 0,
     receiver: new Address(""),
     chainID: "",
     gasLimit: 0,
+    sender: new Address(""),
 });
 // flow create TXS -> set nonce -> sign TXS -> send TXS -> update local nonce
 export const useCreateTransaction = () => {
@@ -45,6 +48,7 @@ export const useCreateTransaction = () => {
         tx = new Transaction({
             chainID: network.chainId,
             data: tx.getData(),
+            sender: new Address(address),
             receiver: scAddress,
             gasPrice: gasPrice,
             gasLimit: Math.min(

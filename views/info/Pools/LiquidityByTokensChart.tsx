@@ -1,16 +1,15 @@
 import BigNumber from "bignumber.js";
 import Avatar from "components/Avatar";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
-import pools from "const/pool";
-import { IN_POOL_TOKENS } from "const/pool";
+import pools, { IN_POOL_TOKENS } from "const/pool";
 import { randomHexColor } from "helper/color";
 import { fetcher } from "helper/common";
-import { IToken } from "interface/token";
+import { IESDTInfo } from "helper/token/token";
 import { useCallback, useMemo, useState } from "react";
 import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
 import useSWR from "swr";
 import TokensSelectorForChart, {
-    TokenOptionChart,
+    TokenOptionChart
 } from "../components/TokensSelectorForChart";
 
 type RawChartRecord = {
@@ -21,7 +20,7 @@ type RawChartRecord = {
 type ChartRecord = {
     value: number;
     percent: number;
-    token: IToken;
+    token: IESDTInfo;
 };
 const COLORS = [
     "#EC223A",
@@ -41,7 +40,7 @@ const TokenLegend = ({
     percent,
 }: {
     color: string;
-    token: IToken;
+    token: IESDTInfo;
     percent: number;
 }) => {
     return (
@@ -57,7 +56,7 @@ const TokenLegend = ({
                 {percent}%
             </div>
             <Avatar
-                src={token.icon}
+                src={token.logoURI}
                 alt={token.symbol}
                 className="w-3 h-3 mr-1 shrink-0"
             />
@@ -90,8 +89,8 @@ function LiquidityByTokensChart() {
                 const record: ChartRecord = {
                     value: liquidity,
                     token: IN_POOL_TOKENS.find(
-                        (t) => t.id === tokenId
-                    ) as IToken,
+                        (t) => t.identifier === tokenId
+                    ) as IESDTInfo,
                     percent:
                         index === data.length - 1
                             ? new BigNumber(100).minus(spct).toNumber()

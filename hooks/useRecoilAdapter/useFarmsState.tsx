@@ -1,44 +1,32 @@
 import { useGetPendingTransactions } from "@elrondnetwork/dapp-core/hooks";
 import { SendTransactionReturnType } from "@elrondnetwork/dapp-core/types";
-import { Address, ContractFunction, Query } from "@elrondnetwork/erdjs/out";
+import { blockShardQuery } from "atoms/blockchain";
 import { accAddressState } from "atoms/dappState";
 import {
-    farmBlockRewardMapState,
+    ashRawFarmQuery,
     farmDeboundKeywordState,
     farmKeywordState,
     farmLoadingMapState,
     FarmRecord,
     farmRecordsState,
     farmSessionIdMapState,
-    FarmToken
+    FarmToken,
 } from "atoms/farmsState";
-import { walletTokenPriceState } from "atoms/walletState";
+import { LPBreakDownQuery, poolRecordQuery } from "atoms/poolsState";
+import { farmTokenMapState, tokenMapState } from "atoms/tokensState";
 import BigNumber from "bignumber.js";
-import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 import { blockTimeMs } from "const/dappConfig";
 import { FARMS } from "const/farms";
 import pools from "const/pool";
 import { ASH_TOKEN } from "const/tokens";
 import { toEGLDD } from "helper/balance";
-import { fetcher } from "helper/common";
-import { ContractManager } from "helper/contracts/contractManager";
 import { calcYieldBoostFromFarmToken } from "helper/farmBooster";
-import {
-    getApiNetworkProvider,
-    getElrondProxyProvider,
-    getProxyNetworkProvider
-} from "helper/proxy/util";
-import {
-    decodeNestedStringBase64
-} from "helper/serializer";
+import { decodeNestedStringBase64 } from "helper/serializer";
 import useInterval from "hooks/useInterval";
-import useLPValue from "hooks/usePoolContract/useLPValue";
-import { FarmTokenAttrsStruct, IFarm } from "interface/farm";
+import { FarmTokenAttrs, FarmTokenAttrsStruct, IFarm } from "interface/farm";
 import IPool from "interface/pool";
-import { PoolStatsRecord } from "interface/poolStats";
-import { Dispatch, SetStateAction, useCallback, useEffect } from "react";
+import { Dispatch, SetStateAction, useEffect } from "react";
 import { useRecoilCallback, useRecoilValue, useSetRecoilState } from "recoil";
-import useSWR from "swr";
 import { useDebounce } from "use-debounce";
 
 export type FarmsState = {
@@ -66,7 +54,7 @@ export type FarmsState = {
     estimateRewardOnExit: (lpAmt: BigNumber, farm: IFarm) => Promise<BigNumber>;
 };
 
-const FarmsState = () => {
+const useFarmsState = () => {
     const keyword = useRecoilValue(farmKeywordState);
     const sessionIdsMap = useRecoilValue(farmSessionIdMapState);
     const setDeboundKeyword = useSetRecoilState(farmDeboundKeywordState);
@@ -76,113 +64,96 @@ const FarmsState = () => {
 
     const pendingTransactionsFromStore =
         useGetPendingTransactions().pendingTransactions;
-    const getLPValue = useLPValue();
 
     useEffect(() => {
         setDeboundKeyword(deboundKeyword);
     }, [deboundKeyword, setDeboundKeyword]);
-    // fetch pool stats
-    const { data: poolStatsRecords } = useSWR<PoolStatsRecord[]>(
-        `${ASHSWAP_CONFIG.ashApiBaseUrl}/pool`,
-        fetcher
-    );
 
-    const getBlockReward = useRecoilCallback(
-        () => async (farmAddress: string) => {
-            const proxy = getProxyNetworkProvider();
-            return await proxy
-                .queryContract(
-                    new Query({
-                        address: new Address(farmAddress),
-                        func: new ContractFunction("getPerBlockRewardAmount"),
-                    })
+    const calculateRewardsForGivenPositionLocal = useRecoilCallback(
+        ({ snapshot, set }) =>
+            async (
+                wei: BigNumber,
+                attributes: FarmTokenAttrs,
+                farmAddress: string
+            ) => {
+                const farmRaw = await snapshot.getPromise(
+                    ashRawFarmQuery(farmAddress)
+                );
+                const {
+                    shard,
+                    farmTokenSupply,
+                    divisionSafetyConstant,
+                    perBlockReward,
+                    lastRewardBlockNone,
+                    rewardPerShare,
+                } = farmRaw || {};
+                if (
+                    !shard ||
+                    !farmTokenSupply ||
+                    !lastRewardBlockNone ||
+                    !divisionSafetyConstant ||
+                    wei.lte(0) ||
+                    wei.gt(farmTokenSupply)
                 )
-                .then(({ returnData }) => {
-                    return new BigNumber(
-                        Buffer.from(returnData[0], "base64").toString("hex"),
-                        16
-                    );
-                });
-        },
-        []
-    );
+                    return new BigNumber(0);
 
-    const getFarmBlockRewardMap = useRecoilCallback(
-        ({ set }) =>
-            async () => {
-                try {
-                    const rewards = await Promise.all(
-                        FARMS.map((f) => getBlockReward(f.farm_address))
+                const blockShard = await snapshot.getPromise(
+                    blockShardQuery(shard)
+                );
+
+                let currentBlockNonce = blockShard?.nonce;
+                if (!currentBlockNonce || farmTokenSupply === "0")
+                    return new BigNumber(0);
+                let reward_increase = new BigNumber(currentBlockNonce)
+                    .minus(lastRewardBlockNone)
+                    .multipliedBy(perBlockReward || 0);
+                let reward_per_share_increase = reward_increase
+                    .multipliedBy(divisionSafetyConstant)
+                    .div(farmTokenSupply);
+
+                let future_reward_per_share = new BigNumber(
+                    rewardPerShare || 0
+                ).plus(reward_per_share_increase);
+                if (future_reward_per_share.gt(attributes.reward_per_share)) {
+                    let reward_per_share_diff = future_reward_per_share.minus(
+                        attributes.reward_per_share
                     );
-                    const entries: [string, BigNumber][] = rewards.map(
-                        (reward, i) => [FARMS[i].farm_address, reward]
-                    );
-                    const map = Object.fromEntries(entries);
-                    set(farmBlockRewardMapState, map);
-                } catch (error) {
-                    console.error(error);
+                    return wei
+                        .multipliedBy(reward_per_share_diff)
+                        .div(divisionSafetyConstant);
                 }
+                return new BigNumber(0);
             },
-        [getBlockReward]
-    );
-
-    const getFarmTokenSupply = useRecoilCallback(
-        () => async (farmAddress: string) => {
-            const proxy = getProxyNetworkProvider();
-            return proxy
-                .queryContract(
-                    new Query({
-                        address: new Address(farmAddress),
-                        func: new ContractFunction("getFarmTokenSupply"),
-                    })
-                )
-                .then(({ returnData }) => {
-                    return returnData[0]
-                        ? new BigNumber(
-                              Buffer.from(returnData[0], "base64").toString(
-                                  "hex"
-                              ),
-                              16
-                          )
-                        : new BigNumber(0);
-                });
-        },
         []
     );
-
-    const getTotalLPLocked = useCallback(async (farm: IFarm) => {
-        const apiProvider = getApiNetworkProvider();
-        const { balance } = await apiProvider
-            .getFungibleTokenOfAccount(
-                new Address(farm.farm_address),
-                farm.farming_token_id
-            )
-            .catch((err) => {
-                return { balance: new BigNumber(0) };
-            });
-        return balance || new BigNumber(0);
-    }, []);
 
     const getFarmRecord = useRecoilCallback(
         ({ snapshot, set }) =>
             async (f: IFarm, p: IPool) => {
                 const accAddress = await snapshot.getPromise(accAddressState);
-                const blockRewardMap = await snapshot.getPromise(
-                    farmBlockRewardMapState
+                const tokenMap = await snapshot.getPromise(tokenMapState);
+                const rawFarm = await snapshot.getPromise(
+                    ashRawFarmQuery(f.farm_address)
                 );
-                const tokenPrices = await snapshot.getPromise(
-                    walletTokenPriceState
+                const poolState = await snapshot.getPromise(
+                    poolRecordQuery(p.address)
                 );
-                const lpLockedAmt = await getTotalLPLocked(f);
-                const farmTokenSupply = await getFarmTokenSupply(
-                    f.farm_address
+                const lpLockedAmt = new BigNumber(
+                    rawFarm?.farmingTokenBalance || 0
                 );
-                const { lpValueUsd: totalLiquidityValue } = await getLPValue(
-                    lpLockedAmt,
-                    p
+                const farmTokenSupply = new BigNumber(
+                    rawFarm?.farmTokenSupply || 0
                 );
-                const ashPerBlock =
-                    blockRewardMap[f.farm_address] || new BigNumber(0);
+
+                const { valueUsd: totalLiquidityValue } =
+                    await snapshot.getPromise(
+                        LPBreakDownQuery({
+                            poolAddress: p.address,
+                            wei: lpLockedAmt.toString(),
+                        })
+                    );
+
+                const ashPerBlock = new BigNumber(rawFarm?.perBlockReward || 0);
                 const totalASH = toEGLDD(
                     ASH_TOKEN.decimals,
                     ashPerBlock
@@ -190,16 +161,14 @@ const FarmsState = () => {
                         .div(blockTimeMs / 1000)
                 );
                 const emissionAPR = totalASH
-                    .multipliedBy(tokenPrices[ASH_TOKEN.id] || 0)
+                    .multipliedBy(tokenMap[ASH_TOKEN.identifier]?.price || 0)
                     .multipliedBy(100)
                     .div(totalLiquidityValue);
 
                 const record: FarmRecord = {
                     pool: p,
                     farm: f,
-                    poolStats: poolStatsRecords?.find(
-                        (stats) => stats.pool_address === p.address
-                    ),
+                    poolStats: poolState?.poolStats,
                     ashPerBlock,
                     farmTokenSupply,
                     lpLockedAmt,
@@ -207,12 +176,11 @@ const FarmsState = () => {
                     emissionAPR,
                 };
                 if (!accAddress) return record;
-                const collectionTokens =
-                    await getElrondProxyProvider().getNFTsOfAccount(
-                        accAddress,
-                        { collections: f.farm_token_id, type: "MetaESDT" }
-                    );
 
+                const farmTokenMap = await snapshot.getPromise(
+                    farmTokenMapState
+                );
+                const collectionTokens = farmTokenMap[f.farm_token_id];
                 const farmTokens: FarmToken[] = collectionTokens.map(
                     (token) => {
                         const attributes = decodeNestedStringBase64(
@@ -222,10 +190,17 @@ const FarmsState = () => {
                         const perLP = attributes.initial_farm_amount.div(
                             attributes.initial_farming_amount
                         );
-                        const balance = token.balance || new BigNumber(0);
+                        const balance = new BigNumber(token.balance || 0);
                         const lpAmt = balance
                             .div(perLP)
                             .integerValue(BigNumber.ROUND_FLOOR);
+                        const yieldBoostRaw = calcYieldBoostFromFarmToken(
+                            farmTokenSupply,
+                            balance,
+                            lpAmt,
+                            f
+                        );
+
                         return {
                             tokenId: token.identifier,
                             collection: token.collection,
@@ -234,11 +209,9 @@ const FarmsState = () => {
                             attributes,
                             attrsRaw: token.attributes,
                             weightBoost: perLP.div(0.4),
-                            yieldBoost: calcYieldBoostFromFarmToken(
-                                farmTokenSupply,
-                                balance,
-                                lpAmt,
-                                f
+                            yieldBoost: +new BigNumber(yieldBoostRaw).toFixed(
+                                2,
+                                BigNumber.ROUND_DOWN
                             ),
                             perLP,
                             lpAmt,
@@ -250,16 +223,15 @@ const FarmsState = () => {
                     balance.gt(0)
                 );
                 if (isFarmed) {
-                    const farmContract = ContractManager.getFarmContract(
-                        f.farm_address
-                    );
-                    const rewards = farmTokens.map((t) =>
-                        farmContract.calculateRewardsForGivenPosition(
-                            t.balance,
-                            t.attributes
+                    const totalRewards = await Promise.all(
+                        farmTokens.map((t) =>
+                            calculateRewardsForGivenPositionLocal(
+                                t.balance,
+                                t.attributes,
+                                f.farm_address
+                            )
                         )
                     );
-                    const totalRewards = await Promise.all(rewards);
                     const totalStakedLP = farmTokens.reduce(
                         (total, val) =>
                             total.plus(
@@ -273,6 +245,12 @@ const FarmsState = () => {
                         (total, f) => total.plus(f.balance),
                         new BigNumber(0)
                     );
+                    const yieldBoostRaw = calcYieldBoostFromFarmToken(
+                        farmTokenSupply,
+                        farmBalance,
+                        totalStakedLP,
+                        f
+                    );
                     record.stakedData = {
                         farmTokens,
                         totalStakedLP,
@@ -284,17 +262,15 @@ const FarmsState = () => {
                             .multipliedBy(totalLiquidityValue)
                             .div(lpLockedAmt),
                         weightBoost: farmBalance.div(totalStakedLP).div(0.4),
-                        yieldBoost: calcYieldBoostFromFarmToken(
-                            farmTokenSupply,
-                            farmBalance,
-                            totalStakedLP,
-                            f
+                        yieldBoost: +new BigNumber(yieldBoostRaw).toFixed(
+                            2,
+                            BigNumber.ROUND_DOWN
                         ),
                     };
                 }
                 return record;
             },
-        [getLPValue, poolStatsRecords, getFarmTokenSupply, getTotalLPLocked]
+        []
     );
 
     const getFarmRecords = useRecoilCallback(
@@ -305,7 +281,8 @@ const FarmsState = () => {
                     for (let i = 0; i < FARMS.length; i++) {
                         const f = FARMS[i];
                         const p = pools.find(
-                            (val) => val.lpToken.id === f.farming_token_id
+                            (val) =>
+                                val.lpToken.identifier === f.farming_token_id
                         );
                         if (p) {
                             recordPromises.push(getFarmRecord(f, p));
@@ -319,10 +296,6 @@ const FarmsState = () => {
             },
         [getFarmRecord]
     );
-
-    useEffect(() => {
-        getFarmBlockRewardMap();
-    }, [getFarmBlockRewardMap]);
 
     useInterval(getFarmRecords, blockTimeMs);
 
@@ -345,8 +318,6 @@ const FarmsState = () => {
             }
         }
     }, [sessionIdsMap, pendingTransactionsFromStore, setLoadingMap]);
-
-    return null;
 };
 
-export default FarmsState;
+export default useFarmsState;

@@ -1,11 +1,7 @@
-import {
-    TokenPayment
-} from "@elrondnetwork/erdjs";
 import { Slider } from "antd";
 import IconRight from "assets/svg/right-yellow.svg";
 import { accIsInsufficientEGLDState } from "atoms/dappState";
-import { PoolsState } from "atoms/poolsState";
-import { walletLPMapState } from "atoms/walletState";
+import { ashRawPoolByAddressQuery, LPBreakDownQuery, PoolsState } from "atoms/poolsState";
 import BigNumber from "bignumber.js";
 import Avatar from "components/Avatar";
 import BaseModal from "components/BaseModal";
@@ -15,21 +11,15 @@ import TextAmt from "components/TextAmt";
 import Token from "components/Token";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
 import { useSwap } from "context/swap";
-import { toEGLD, toEGLDD, toWei } from "helper/balance";
-import PoolContract from "helper/contracts/pool";
-import { formatAmount } from "helper/number";
-import { getProxyNetworkProvider } from "helper/proxy/util";
-import {
-    sendTransactions,
-    useCreateTransaction
-} from "helper/transactionMethods";
-import { useFetchBalances } from "hooks/useFetchBalances";
+import { toEGLDD } from "helper/balance";
+import { Fraction } from "helper/fraction/fraction";
+import { TokenAmount } from "helper/token/tokenAmount";
 import { useOnboarding } from "hooks/useOnboarding";
 import usePoolRemoveLP from "hooks/usePoolContract/usePoolRemoveLP";
 import { useScreenSize } from "hooks/useScreenSize";
 import { Unarray } from "interface/utilities";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useRecoilValue } from "recoil";
+import { useRecoilCallback, useRecoilValue } from "recoil";
 import { theme } from "tailwind.config";
 import { useDebounce } from "use-debounce";
 
@@ -39,60 +29,51 @@ interface Props {
     poolData: Unarray<PoolsState["poolToDisplay"]>;
 }
 const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
-    const { pool, poolStats, liquidityData } = poolData;
-    const { capacityPercent, ownLiquidity } = liquidityData!;
-    const { total_value_locked } = poolStats || {};
+    const { pool, liquidityData } = poolData;
+    const { ownLiquidity } = liquidityData!;
     const [liquidity, setLiquidity] = useState<BigNumber>(new BigNumber(0));
     const [totalUsd, setTotalUsd] = useState<BigNumber>(new BigNumber(0));
     const [liquidityPercent, setLiquidityPercent] = useState<number>(0);
-    const [value0, setValue0] = useState<string>("");
-    const [value1, setValue1] = useState<string>("");
+    const [outputValues, setOutputValues] = useState(
+        pool.tokens.map((t) => new TokenAmount(t, 0))
+    );
     const [liquidityDebounce] = useDebounce(liquidity, 500);
     const screenSize = useScreenSize();
-    const lpTokens = useRecoilValue(walletLPMapState);
     const insufficientEGLD = useRecoilValue(accIsInsufficientEGLDState);
-    const {removeLP, trackingData} = usePoolRemoveLP(true);
+    const { removeLP, trackingData } = usePoolRemoveLP(true);
     const { slippage } = useSwap();
     const [displayInputLiquidity, setDisplayInputLiquidity] =
         useState<string>("");
+    const rawPool = useRecoilValue(ashRawPoolByAddressQuery(poolData.pool.address));
 
     const [onboardingWithdrawInput, setOnboardedWithdrawInput] = useOnboarding(
         "pool_withdraw_input"
     );
 
-    const removing = useMemo(() => !!trackingData.isPending, [trackingData.isPending]);
+    const removing = useMemo(
+        () => !!trackingData.isPending,
+        [trackingData.isPending]
+    );
 
     const pricePerLP = useMemo(() => {
-        // warning: mocking - change to 0 after pool analytic API success
-        if (!total_value_locked) return new BigNumber(0);
-        const lpToken = lpTokens[pool.lpToken.id];
-        if (!total_value_locked || !lpToken?.totalSupply) {
-            return new BigNumber(0);
-        }
-        return new BigNumber(total_value_locked).div(
-            toEGLDD(
-                pool.lpToken.decimals,
-                lpTokens[pool.lpToken.id].totalSupply!
-            )
-        );
-    }, [total_value_locked, lpTokens, pool]);
+        return new BigNumber(rawPool?.lpToken.price || 0);
+    }, [rawPool]);
 
-    // real LP
-    const shortOwnLP = useMemo(() => {
-        return toEGLD(pool.lpToken, ownLiquidity.toString());
+    const lpAmount = useMemo(() => {
+        return new TokenAmount(pool.lpToken, ownLiquidity);
     }, [pool.lpToken, ownLiquidity]);
 
     // verify input $ and set the new valid $ value
     const computeValidTotalUsd = useCallback(
         (val: BigNumber) => {
-            if (val.div(pricePerLP).div(shortOwnLP).gte(0.998)) {
-                const validVal = shortOwnLP.multipliedBy(pricePerLP);
+            if (val.div(pricePerLP).div(lpAmount.toBigNumber()).gte(0.998)) {
+                const validVal = lpAmount.multiply(Fraction.fromBigNumber(pricePerLP)).toBigNumber();
                 setDisplayInputLiquidity(validVal.toString(10));
                 return validVal;
             }
             return val;
         },
-        [pricePerLP, shortOwnLP]
+        [pricePerLP, lpAmount]
     );
 
     // re-validate totalUSD on pricePerLP, ownLp changes
@@ -104,11 +85,11 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
     useEffect(() => {
         const pct = totalUsd
             .div(pricePerLP)
-            .div(shortOwnLP)
+            .div(lpAmount.toBigNumber())
             .multipliedBy(100)
             .toNumber();
         setLiquidityPercent(pct);
-    }, [pricePerLP, totalUsd, shortOwnLP]);
+    }, [pricePerLP, totalUsd, lpAmount]);
 
     // only set liquidty base on liquidity percent - source of truth: liquidityPercent
     useEffect(() => {
@@ -123,7 +104,7 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
     const onChangeLiquidityPercent = useCallback(
         (percent: number) => {
             const valid = computeValidTotalUsd(
-                shortOwnLP
+                lpAmount.toBigNumber()
                     .multipliedBy(percent)
                     .div(100)
                     .multipliedBy(pricePerLP)
@@ -131,50 +112,47 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
             setDisplayInputLiquidity(valid.toString(10));
             setTotalUsd(valid);
         },
-        [pricePerLP, shortOwnLP, computeValidTotalUsd]
+        [pricePerLP, lpAmount, computeValidTotalUsd]
     );
 
-    useEffect(() => {
-        const proxy = getProxyNetworkProvider();
-        if (!proxy || liquidityDebounce.eq(0) || liquidityDebounce.isNaN()) {
-            return;
-        }
-        const poolContract = new PoolContract(pool.address);
-        poolContract.getRemoveLiquidityTokens(liquidityDebounce).then(({first_token_amount, second_token_amount}) => {
-            setValue0(
-                toEGLD(
-                    pool.tokens[0],
-                    first_token_amount.toString()
-                ).toString()
-            );
-            setValue1(
-                toEGLD(
-                    pool.tokens[1],
-                    second_token_amount.toString()
-                ).toString()
-            );
-        }).catch(err => console.error(err));
-    }, [liquidityDebounce, pool]);
+    const estimateRemoveLP = useRecoilCallback(
+        ({ snapshot }) =>
+            async () => {
+                if (liquidityDebounce.eq(0) || liquidityDebounce.isNaN()) {
+                    return;
+                }
+                const { lpReserves } = await snapshot.getPromise(
+                    LPBreakDownQuery({
+                        poolAddress: pool.address,
+                        wei: liquidityDebounce.toString(10),
+                    })
+                );
+                setOutputValues(
+                    pool.tokens.map((t, i) => new TokenAmount(t, lpReserves[i]))
+                );
+            },
+        [pool.address, pool.tokens, liquidityDebounce]
+    );
 
     const removeLPHandle = useCallback(async () => {
         if (removing || liquidity.eq(0)) return;
         try {
-            const {sessionId} = await removeLP(pool, liquidity, [value0, value1], slippage);
+            const { sessionId } = await removeLP(
+                pool,
+                liquidity,
+                outputValues.map((amt) => amt.raw),
+                slippage
+            );
             if (sessionId) onClose?.();
         } catch (error) {
             // TODO: extension close without response
             console.error(error);
         }
-    }, [
-        value0,
-        value1,
-        slippage,
-        pool,
-        onClose,
-        liquidity,
-        removing,
-        removeLP
-    ]);
+    }, [outputValues, slippage, pool, onClose, liquidity, removing, removeLP]);
+
+    useEffect(() => {
+        estimateRemoveLP();
+    }, [estimateRemoveLP]);
 
     return (
         <div className="px-8 pt-6 pb-16 sm:pb-7">
@@ -186,12 +164,12 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
                 </div>
                 <div className="flex flex-row justify-between items-center">
                     <Avatar
-                        src={pool.tokens[0].icon}
+                        src={pool.tokens[0].logoURI}
                         alt={pool.tokens[0].symbol}
                         className="w-3.5 h-3.5"
                     />
                     <Avatar
-                        src={pool.tokens[1].icon}
+                        src={pool.tokens[1].logoURI}
                         alt={pool.tokens[1].symbol}
                         className="w-3.5 h-3.5 -ml-1"
                     />
@@ -291,62 +269,43 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
                         </div>
                     </div>
                     <div className="relative">
-                        <div className="my-1.5">
-                            <div className="flex items-center flex-row space-x-1 bg-ash-dark-700 sm:bg-transparent pl-4 sm:pl-0">
-                                <Token
-                                    token={pool.tokens[0]}
-                                    className="w-24 border-r border-r-ash-gray-500 sm:border-r-0"
-                                />
-                                <InputCurrency
-                                    className="flex-1 overflow-hidden bg-ash-dark-700 text-right text-lg h-12 px-5 outline-none"
-                                    placeholder="0"
-                                    value={value0}
-                                    disabled
-                                />
-                            </div>
-                            <div className="py-2 text-2xs sm:text-sm text-text-input-3 text-right">
-                                <span>Available: </span>
-                                <span className="text-earn">
-                                    <TextAmt
-                                        number={toEGLDD(
-                                            pool.tokens[0].decimals,
-                                            liquidityData?.value0 || 0
-                                        )}
-                                        options={{ notation: "standard" }}
-                                    />{" "}
-                                    {pool.tokens[0].symbol}
-                                </span>
-                            </div>
-                        </div>
-
-                        <div className="my-1.5">
-                            <div className="flex items-center flex-row space-x-1 bg-ash-dark-700 sm:bg-transparent pl-4 sm:pl-0">
-                                <Token
-                                    token={pool.tokens[1]}
-                                    className="w-24 border-r border-r-ash-gray-500 sm:border-r-0"
-                                />
-                                <InputCurrency
-                                    className="flex-1 overflow-hidden bg-ash-dark-700 text-right text-lg h-12 px-5 outline-none"
-                                    placeholder="0"
-                                    value={value1}
-                                    disabled
-                                />
-                            </div>
-                            <div className="py-2 text-2xs sm:text-sm text-text-input-3 text-right">
-                                <span>Available: </span>
-                                <span className="text-earn">
-                                    <TextAmt
-                                        number={toEGLDD(
-                                            pool.tokens[1].decimals,
-                                            liquidityData?.value1 || 0
-                                        )}
-                                        options={{ notation: "standard" }}
-                                    />{" "}
-                                    {pool.tokens[1].symbol}
-                                </span>
-                            </div>
-                        </div>
-
+                        {pool.tokens.map((t, i) => {
+                            return (
+                                <div key={t.identifier} className="my-1.5">
+                                    <div className="flex items-center flex-row space-x-1 bg-ash-dark-700 sm:bg-transparent pl-4 sm:pl-0">
+                                        <Token
+                                            token={t}
+                                            className="w-24 border-r border-r-ash-gray-500 sm:border-r-0"
+                                        />
+                                        <InputCurrency
+                                            className="flex-1 overflow-hidden bg-ash-dark-700 text-right text-lg h-12 px-5 outline-none"
+                                            placeholder="0"
+                                            value={outputValues[i]
+                                                .toBigNumber()
+                                                .toNumber()}
+                                            disabled
+                                        />
+                                    </div>
+                                    <div className="py-2 text-2xs sm:text-sm text-text-input-3 text-right">
+                                        <span>Available: </span>
+                                        <span className="text-earn">
+                                            <TextAmt
+                                                number={toEGLDD(
+                                                    pool.tokens[0].decimals,
+                                                    liquidityData?.lpReserves[
+                                                        i
+                                                    ] || 0
+                                                )}
+                                                options={{
+                                                    notation: "standard",
+                                                }}
+                                            />{" "}
+                                            {pool.tokens[i].symbol}
+                                        </span>
+                                    </div>
+                                </div>
+                            );
+                        })}
                         <div className="absolute left-4 sm:left-0 text-sm top-14 sm:top-[4rem]">
                             &
                         </div>

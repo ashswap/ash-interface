@@ -1,6 +1,4 @@
-import {
-    TokenPayment, Transaction
-} from "@elrondnetwork/erdjs/out";
+import { TokenPayment, Transaction } from "@elrondnetwork/erdjs/out";
 import { accIsLoggedInState } from "atoms/dappState";
 import { govUnlockTSState } from "atoms/govState";
 import BigNumber from "bignumber.js";
@@ -14,7 +12,8 @@ import moment from "moment";
 import { useRecoilCallback } from "recoil";
 
 const useGovLockMore = (trackStatus = false) => {
-    const {sendTransactions, trackingData, sessionId} = useSendTxsWithTrackStatus(trackStatus);
+    const { sendTransactions, trackingData, sessionId } =
+        useSendTxsWithTrackStatus(trackStatus);
     const lockMoreASH = useRecoilCallback(
         ({ snapshot, set }) =>
             async ({
@@ -26,14 +25,26 @@ const useGovLockMore = (trackStatus = false) => {
 
                 if (!loggedIn) return { sessionId: "" };
                 let txs: Transaction[] = [];
-                const veContract = new VotingEscrowContract(ASHSWAP_CONFIG.dappContract.voteEscrowedContract);
+                const veContract = new VotingEscrowContract(
+                    ASHSWAP_CONFIG.dappContract.voteEscrowedContract
+                );
 
                 if (weiAmt && weiAmt.gt(0)) {
-                    const increaseAmtTx = await veContract.increaseAmount(TokenPayment.fungibleFromBigInteger(ASH_TOKEN.id, weiAmt, ASH_TOKEN.decimals));
+                    const tokenPayment = TokenPayment.fungibleFromBigInteger(
+                        ASH_TOKEN.identifier,
+                        weiAmt,
+                        ASH_TOKEN.decimals
+                    );
+                    const increaseAmtTx = await veContract.increaseAmount(
+                        tokenPayment
+                    );
                     txs.push(increaseAmtTx);
                 }
                 if (unlockTimestamp && unlockTimestamp.gt(unlockTS)) {
-                    const increaseLockTSTx = await veContract.increaseUnlockTime(unlockTimestamp.toNumber())
+                    const increaseLockTSTx =
+                        await veContract.increaseUnlockTime(
+                            unlockTimestamp.toNumber()
+                        );
                     txs.push(increaseLockTSTx);
                 }
                 if (!txs.length) return { sessionId: "" };
@@ -56,7 +67,7 @@ const useGovLockMore = (trackStatus = false) => {
             },
         [sendTransactions]
     );
-    return {lockMoreASH, trackingData, sessionId};
+    return { lockMoreASH, trackingData, sessionId };
 };
 
 export default useGovLockMore;

@@ -1,4 +1,4 @@
-import { IToken } from "./token";
+import { IESDTInfo } from "helper/token/token";
 
 export type TokenStatsRecord = {
     change_percentage_day: number;
@@ -10,5 +10,5 @@ export type TokenStatsRecord = {
     transaction_count: number;
     volume: number;
     // added from client
-    token?: IToken;
+    token?: IESDTInfo;
 };

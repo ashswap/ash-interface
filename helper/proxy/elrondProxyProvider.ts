@@ -1,12 +1,10 @@
 import {
-    ApiNetworkProvider,
-    NonFungibleTokenOfAccountOnNetwork,
-    ProxyNetworkProvider,
+    ApiNetworkProvider, ProxyNetworkProvider
 } from "@elrondnetwork/erdjs-network-providers/out";
 import BigNumber from "bignumber.js";
 import {
     isMetaESDTResponse,
-    NFTOfAccountResponse,
+    NFTOfAccountResponse
 } from "interface/proxyResponse/nftOfAccount";
 import { IMetaESDT } from "interface/tokens";
 import { NFTType } from "interface/tokens/type";

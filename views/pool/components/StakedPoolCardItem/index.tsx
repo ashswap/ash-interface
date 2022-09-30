@@ -31,11 +31,11 @@ function StakedPoolCardItem({
 
     if (!liquidityData) return null;
     const {
-        total_value_locked,
-        apr_day: tradingAPR,
-        usd_volume: volume24h,
+        tvl,
+        apr: tradingAPR,
+        volume_usd: volume24h,
     } = poolStats || {};
-    const { capacityPercent, lpValueUsd, ownLiquidity, value0, value1 } =
+    const { capacityPercent, lpValueUsd, ownLiquidity, lpReserves } =
         liquidityData;
     return (
         <div
@@ -51,7 +51,7 @@ function StakedPoolCardItem({
                             <TextAmt
                                 number={toEGLDD(
                                     pool.tokens[0].decimals,
-                                    value0 || 0
+                                    lpReserves[0] || 0
                                 )}
                             />
                         </div>
@@ -64,35 +64,35 @@ function StakedPoolCardItem({
                             <TextAmt
                                 number={toEGLDD(
                                     pool.tokens[1].decimals,
-                                    value1 || 0
+                                    lpReserves[1] || 0
                                 )}
                             />
                         </div>
                     </div>
                     <div className="flex">
                         <button
-                            className="clip-corner-1 clip-corner-bl bg-ash-dark-400 hover:bg-ash-dark-300 active:bg-ash-dark-600 transition-all w-14 h-14 flex items-center justify-center text-pink-600 mr-0.5"
-                            onClick={() => setOpenAddLiquidity(true)}
-                        >
-                            <ICPlus />
-                        </button>
-                        <button
-                            className="clip-corner-1 clip-corner-br bg-ash-dark-400 hover:bg-ash-dark-300 active:bg-ash-dark-600 transition-all w-14 h-14 flex items-center justify-center text-yellow-600"
+                            className="clip-corner-1 clip-corner-br bg-ash-dark-400 hover:bg-ash-dark-300 active:bg-ash-dark-600 transition-all w-14 h-14 flex items-center justify-center text-yellow-600 mr-0.5"
                             onClick={() => setOpenRemoveLiquidity(true)}
                         >
                             <ICMinus />
+                        </button>
+                        <button
+                            className="clip-corner-1 clip-corner-bl bg-ash-dark-400 hover:bg-ash-dark-300 active:bg-ash-dark-600 transition-all w-14 h-14 flex items-center justify-center text-pink-600"
+                            onClick={() => setOpenAddLiquidity(true)}
+                        >
+                            <ICPlus />
                         </button>
                     </div>
                 </div>
                 <div className="flex flex-col justify-end relative">
                     <div className="absolute top-0 right-0 flex flex-row justify-between items-center">
                         <Avatar
-                            src={pool.tokens[0].icon}
+                            src={pool.tokens[0].logoURI}
                             alt={pool.tokens[0].symbol}
                             className="w-[3.25rem] h-[3.25rem]"
                         />
                         <Avatar
-                            src={pool.tokens[1].icon}
+                            src={pool.tokens[1].logoURI}
                             alt={pool.tokens[1].symbol}
                             className="w-[3.25rem] h-[3.25rem] -ml-2.5"
                         />
@@ -181,7 +181,7 @@ function StakedPoolCardItem({
                             <div className="text-sm">
                                 $
                                 <TextAmt
-                                    number={total_value_locked || 0}
+                                    number={tvl || 0}
                                     options={{ notation: "standard" }}
                                 />
                             </div>
@@ -233,7 +233,7 @@ function StakedPoolCardItem({
                     </div>
                     <div className="text-center mb-8">
                         <a
-                            href={`${network.explorerAddress}/tokens/${pool.lpToken.id}`}
+                            href={`${network.explorerAddress}/tokens/${pool.lpToken.identifier}`}
                             target="_blank"
                             rel="noreferrer"
                             className="text-earn underline text-2xs font-bold hover:text-earn hover:underline"

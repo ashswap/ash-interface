@@ -11,10 +11,10 @@ import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 import { IN_POOL_TOKENS } from "const/pool";
 import { fetcher } from "helper/common";
 import { formatAmount } from "helper/number";
+import { IESDTInfo } from "helper/token/token";
 import { PoolStatsRecord } from "interface/poolStats";
-import { IToken } from "interface/token";
 import { TxStatsRecord } from "interface/txStats";
-import { GetServerSideProps, NextPage } from "next";
+import { GetStaticPaths, GetStaticProps, NextPage } from "next";
 import Link from "next/link";
 import { ReactElement } from "react";
 import { useRecoilValue } from "recoil";
@@ -36,25 +36,25 @@ type TokenStats = {
 type Page<P = {}> = NextPage<P> & {
     getLayout?: (page: ReactElement) => ReactElement;
 };
-type props = { token: IToken };
+type props = { token: IESDTInfo };
 const TokenDetailPage: Page<props> = ({ token }: props) => {
     const { data: stats } = useSWR<TokenStats>(
-        token.id
-            ? `${ASHSWAP_CONFIG.ashApiBaseUrl}/token/${token.id}/statistic`
+        token.identifier
+            ? `${ASHSWAP_CONFIG.ashApiBaseUrl}/token/${token.identifier}/statistic`
             : null,
         fetcher,
         { refreshInterval: 5 * 60 * 1000 }
     );
     const { data: pools } = useSWR<PoolStatsRecord[]>(
-        token.id
-            ? `${ASHSWAP_CONFIG.ashApiBaseUrl}/token/${token.id}/pool`
+        token.identifier
+            ? `${ASHSWAP_CONFIG.ashApiBaseUrl}/token/${token.identifier}/pool`
             : null,
         fetcher,
         { refreshInterval: 5 * 60 * 1000 }
     );
     const { data: txs } = useSWR<TxStatsRecord[]>(
-        token.id
-            ? `${ASHSWAP_CONFIG.ashApiBaseUrl}/token/${token.id}/transaction?offset=0&limit=50`
+        token.identifier
+            ? `${ASHSWAP_CONFIG.ashApiBaseUrl}/token/${token.identifier}/transaction?offset=0&limit=50`
             : null,
         fetcher,
         { refreshInterval: 5 * 60 * 1000 }
@@ -93,7 +93,7 @@ const TokenDetailPage: Page<props> = ({ token }: props) => {
                             {token.symbol}
                         </h1>
                         <Avatar
-                            src={token.icon}
+                            src={token.logoURI}
                             alt={token.symbol}
                             className="w-6 h-6 lg:w-8 lg:h-8 mr-5"
                         />
@@ -104,7 +104,7 @@ const TokenDetailPage: Page<props> = ({ token }: props) => {
                                 {token.symbol} Coin
                             </div>
                             <div className="text-ash-gray-500 text-2xs md:text-xs">
-                                {token.id}
+                                {token.identifier}
                             </div>
                             <div className="mx-4">|</div>
                             <Tooltip trigger={["click"]} title="copied">
@@ -112,7 +112,7 @@ const TokenDetailPage: Page<props> = ({ token }: props) => {
                                     onClick={() => {
                                         if (typeof window !== "undefined") {
                                             window.navigator.clipboard.writeText(
-                                                token.id
+                                                token.identifier
                                             );
                                         }
                                     }}
@@ -149,7 +149,11 @@ const TokenDetailPage: Page<props> = ({ token }: props) => {
                         <span>Save</span>
                     </button> */}
                     <a
-                        href={network.explorerAddress + "/tokens/" + token.id}
+                        href={
+                            network.explorerAddress +
+                            "/tokens/" +
+                            token.identifier
+                        }
                         target="_blank"
                         rel="noreferrer"
                     >
@@ -251,9 +255,16 @@ const TokenDetailPage: Page<props> = ({ token }: props) => {
 TokenDetailPage.getLayout = function getLayout(page: ReactElement) {
     return <InfoLayout>{page}</InfoLayout>;
 };
-export const getServerSideProps: GetServerSideProps = async ({ params }) => {
+
+export const getStaticPaths: GetStaticPaths = async () => {
+    return {
+        paths: IN_POOL_TOKENS.map((t) => ({ params: { id: t.identifier } })),
+        fallback: false,
+    };
+};
+export const getStaticProps: GetStaticProps = async ({ params }) => {
     const { id: tokenId } = params || {};
-    const token = IN_POOL_TOKENS.find((t) => t.id === tokenId);
+    const token = IN_POOL_TOKENS.find((t) => t.identifier === tokenId);
     if (token) {
         return {
             props: { token },

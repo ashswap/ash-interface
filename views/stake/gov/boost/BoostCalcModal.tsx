@@ -4,6 +4,7 @@ import ICGovBoost from "assets/svg/gov-boost.svg";
 import { farmPoolQuery, farmQuery } from "atoms/farmsState";
 import { govTotalSupplyVeASH, govVeASHAmtState } from "atoms/govState";
 import BigNumber from "bignumber.js";
+import Avatar from "components/Avatar";
 import BaseModal, { BaseModalType } from "components/BaseModal";
 import BasePopover from "components/BasePopover";
 import BoostBar from "components/BoostBar";
@@ -11,17 +12,16 @@ import InputCurrency from "components/InputCurrency";
 import CardTooltip from "components/Tooltip/CardTooltip";
 import { FARMS } from "const/farms";
 import { POOLS_MAP_LP } from "const/pool";
-import { VE_ASH_DECIMALS } from "const/tokens";
+import { ASH_TOKEN, VE_ASH_DECIMALS } from "const/tokens";
 import { toEGLDD } from "helper/balance";
 import { calcYieldBoost } from "helper/farmBooster";
 import { formatAmount } from "helper/number";
 import { estimateVeASH } from "helper/voteEscrow";
 import useInputNumberString from "hooks/useInputNumberString";
 import { useScreenSize } from "hooks/useScreenSize";
-import Image from "next/image";
+import Image from "components/Image";
 import { useEffect, useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
-import FarmsState from "views/stake/farms/FarmsState";
 
 const LockOptions = [
     { value: 4 * 365 * 24 * 3600, label: "4 years" },
@@ -96,7 +96,7 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
     const maxYieldBoost = useMemo(() => {
         // if (veForMaxBoost.eq(0)) return 1;
         const totalLP = lpWei.plus(totalLPExcludeOwnLPWei);
-        return calcYieldBoost(
+        const boost = calcYieldBoost(
             lpWei,
             totalLP,
             veForMaxBoost.multipliedBy(10 ** VE_ASH_DECIMALS),
@@ -106,6 +106,7 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
             currentFarmSupplyWei,
             existFarmTokenBal
         );
+        return boost;
     }, [
         lpWei,
         veForMaxBoost,
@@ -176,20 +177,16 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
                     <div className="flex items-center mb-4">
                         {token1 && token2 ? (
                             <>
-                                <div className="w-9 h-9">
-                                    <Image
-                                        src={token1?.icon}
-                                        alt={token1?.name}
-                                        layout="responsive"
-                                    />
-                                </div>
-                                <div className="w-9 h-9 -ml-1">
-                                    <Image
-                                        src={token2?.icon}
-                                        alt={token2?.name}
-                                        layout="responsive"
-                                    />
-                                </div>
+                                <Avatar
+                                    src={token1?.logoURI}
+                                    alt={token1.name}
+                                    className="w-9 h-9"
+                                />
+                                <Avatar
+                                    src={token2?.logoURI}
+                                    alt={token2.name}
+                                    className="w-9 h-9 -ml-1"
+                                />
                             </>
                         ) : (
                             <>
@@ -271,6 +268,7 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
                                     className="bg-ash-dark-400 text-right h-10 px-2 sm:px-7 text-stake-gray-500 outline-none text-sm w-full"
                                     placeholder="0"
                                     value={lpValueStr}
+                                    decimals={pool?.lpToken.decimals || 0}
                                     onChange={(e) => {
                                         setIsUserInput(true);
                                         setLpValueStr(e.target.value);
@@ -320,6 +318,7 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
                                     className="bg-ash-dark-400 text-right h-10 px-2 sm:px-7 text-stake-gray-500 outline-none text-sm w-full"
                                     placeholder="0"
                                     value={totalCurrentVeStr}
+                                    decimals={VE_ASH_DECIMALS}
                                     onChange={(e) => {
                                         setIsUserInput(true);
                                         setTotalCurrentVeStr(e.target.value);
@@ -500,6 +499,7 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
                                         className="bg-transparent text-right h-10 px-2 sm:px-7 text-stake-gray-500 outline-none text-sm w-full"
                                         placeholder="0"
                                         value={ashInputStr}
+                                        decimals={ASH_TOKEN.decimals}
                                         onChange={(e) => {
                                             setIsUserInput(true);
                                             setAshInputStr(e.target.value);
@@ -551,8 +551,6 @@ function BoostCalcModal({
     const screenSize = useScreenSize();
     return (
         <>
-            {/* TODO: replace fetching farm state with whole new app state from service latter */}
-            {modalProps.isOpen && <FarmsState />}
             <BaseModal
                 {...modalProps}
                 type={screenSize.isMobile ? "drawer_btt" : "modal"}

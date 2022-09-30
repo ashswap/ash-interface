@@ -10,7 +10,7 @@
         "contractCrate": {
             "name": "fee_distributor",
             "version": "0.0.0",
-            "git_version": "85a021a"
+            "git_version": "45566c6"
         },
         "framework": {
             "name": "elrond-wasm",
@@ -98,16 +98,7 @@
             ]
         },
         {
-            "name": "accept_payments",
-            "mutability": "mutable",
-            "payableInTokens": [
-                "*"
-            ],
-            "inputs": [],
-            "outputs": []
-        },
-        {
-            "name": "startTime",
+            "name": "getStartTime",
             "mutability": "readonly",
             "inputs": [],
             "outputs": [
@@ -117,7 +108,7 @@
             ]
         },
         {
-            "name": "timeCursor",
+            "name": "getTimeCursor",
             "mutability": "readonly",
             "inputs": [],
             "outputs": [
@@ -127,7 +118,7 @@
             ]
         },
         {
-            "name": "timeCursorOf",
+            "name": "getUserTimeCursor",
             "mutability": "readonly",
             "inputs": [
                 {
@@ -142,7 +133,7 @@
             ]
         },
         {
-            "name": "userEpochOf",
+            "name": "getUserEpoch",
             "mutability": "readonly",
             "inputs": [
                 {
@@ -157,7 +148,7 @@
             ]
         },
         {
-            "name": "lastTokenTime",
+            "name": "getLastTokenTime",
             "mutability": "readonly",
             "inputs": [],
             "outputs": [
@@ -167,7 +158,7 @@
             ]
         },
         {
-            "name": "tokensPerWeek",
+            "name": "getTokensPerWeek",
             "mutability": "readonly",
             "inputs": [
                 {
@@ -183,6 +174,7 @@
         },
         {
             "name": "setToken",
+            "onlyOwner": true,
             "mutability": "mutable",
             "inputs": [
                 {
@@ -193,7 +185,7 @@
             "outputs": []
         },
         {
-            "name": "token",
+            "name": "getToken",
             "mutability": "readonly",
             "inputs": [],
             "outputs": [
@@ -203,7 +195,7 @@
             ]
         },
         {
-            "name": "totalReceived",
+            "name": "getTotalReceived",
             "mutability": "readonly",
             "inputs": [],
             "outputs": [
@@ -213,7 +205,7 @@
             ]
         },
         {
-            "name": "tokenLastBalance",
+            "name": "getTokenLastBalance",
             "mutability": "readonly",
             "inputs": [],
             "outputs": [
@@ -223,7 +215,7 @@
             ]
         },
         {
-            "name": "veSupply",
+            "name": "getVeSupply",
             "mutability": "readonly",
             "inputs": [
                 {
@@ -258,7 +250,7 @@
             ]
         },
         {
-            "name": "admin",
+            "name": "getAdmin",
             "mutability": "readonly",
             "inputs": [],
             "outputs": [
@@ -266,39 +258,64 @@
                     "type": "Address"
                 }
             ]
-        },
+        }
+    ],
+    "events": [
         {
-            "name": "getGeneratedTokenAmount",
-            "mutability": "readonly",
+            "identifier": "checkpointToken",
             "inputs": [
                 {
-                    "name": "token_id",
-                    "type": "TokenIdentifier"
-                }
-            ],
-            "outputs": [
-                {
-                    "type": "BigUint"
+                    "name": "checkpoint_token",
+                    "type": "CheckpointTokenEvent"
                 }
             ]
         },
         {
-            "name": "getBurnedTokenAmount",
-            "mutability": "readonly",
+            "identifier": "claimed",
             "inputs": [
                 {
-                    "name": "token_id",
-                    "type": "TokenIdentifier"
-                }
-            ],
-            "outputs": [
+                    "name": "recipient",
+                    "type": "Address",
+                    "indexed": true
+                },
                 {
-                    "type": "BigUint"
+                    "name": "claimed",
+                    "type": "ClaimedEvent"
                 }
             ]
         }
     ],
-    "events": [],
     "hasCallback": false,
-    "types": {}
+    "types": {
+        "CheckpointTokenEvent": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "timestamp",
+                    "type": "u64"
+                },
+                {
+                    "name": "tokens",
+                    "type": "BigUint"
+                }
+            ]
+        },
+        "ClaimedEvent": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "amount",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "claim_epoch",
+                    "type": "u64"
+                },
+                {
+                    "name": "max_epoch",
+                    "type": "u64"
+                }
+            ]
+        }
+    }
 }

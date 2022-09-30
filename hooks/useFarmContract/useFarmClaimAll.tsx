@@ -1,10 +1,15 @@
 import { Transaction, TokenPayment } from "@elrondnetwork/erdjs/out";
-import { farmRecordsState, farmSessionIdMapState } from "atoms/farmsState";
+import {
+    farmLoadingMapState,
+    farmRecordsState,
+    farmSessionIdMapState,
+} from "atoms/farmsState";
 import BigNumber from "bignumber.js";
 import { ASH_TOKEN } from "const/tokens";
 import { toEGLDD } from "helper/balance";
 import { ContractManager } from "helper/contracts/contractManager";
 import useSendTxsWithTrackStatus from "hooks/useSendTxsWithTrackStatus";
+import produce from "immer";
 import { useRecoilCallback } from "recoil";
 
 const useFarmClaimAll = (trackStatus = false) => {
@@ -14,14 +19,19 @@ const useFarmClaimAll = (trackStatus = false) => {
         ({ snapshot, set }) =>
             async () => {
                 const farmRecords = await snapshot.getPromise(farmRecordsState);
-
+                const loadingMap = await snapshot.getPromise(
+                    farmLoadingMapState
+                );
                 let txs: Transaction[] = [];
                 let totalASH = new BigNumber(0);
                 const farmsAddress: string[] = [];
 
                 for (let i = 0; i < farmRecords.length; i++) {
                     const val = farmRecords[i];
-                    if (val?.stakedData?.totalRewardAmt.gt(0)) {
+                    if (
+                        val?.stakedData?.totalRewardAmt.gt(0) &&
+                        !loadingMap[val.farm.farm_address]
+                    ) {
                         const tokenPayments = val.stakedData.farmTokens.map(
                             (t) =>
                                 TokenPayment.metaEsdtFromBigInteger(
@@ -34,7 +44,7 @@ const useFarmClaimAll = (trackStatus = false) => {
                         const temp = await ContractManager.getFarmContract(
                             val.farm.farm_address
                         ).claimRewards(tokenPayments, false);
-                        txs = [...txs, temp];
+                        txs = [...txs, ...temp];
                         totalASH = totalASH.plus(val.stakedData.totalRewardAmt);
                         farmsAddress.push(val.farm.farm_address);
                     }
@@ -48,19 +58,18 @@ const useFarmClaimAll = (trackStatus = false) => {
                         )} ${ASH_TOKEN.symbol}`,
                     },
                 });
+
                 if (result.sessionId)
-                    set(farmSessionIdMapState, (val) => ({
-                        ...val,
-                        ...Object.fromEntries(
-                            farmsAddress.map((farm_address) => [
-                                farm_address,
-                                [
-                                    ...(val[farm_address] || []),
-                                    result.sessionId!,
-                                ],
-                            ])
-                        ),
-                    }));
+                    set(farmSessionIdMapState, (state) => {
+                        return produce(state, (draft) => {
+                            farmsAddress.map((farm_address) => {
+                                draft[farm_address] = [
+                                    ...(draft[farm_address] || []),
+                                    result.sessionId,
+                                ];
+                            });
+                        });
+                    });
             },
         [sendTransactions]
     );

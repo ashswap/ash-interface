@@ -7,16 +7,12 @@ class FeeDistributorContract extends Contract {
         super(address, feeDistributorAbi);
     }
 
-    async checkpointTotalSupply() {
-        let interaction = this.contract.methods.checkpoint_total_supply([]);
-        interaction.withGasLimit(7_000_000);
-        return this.interceptInteraction(interaction).check().buildTransaction();
-    }
-
     async claim(address: Address) {
         let interaction = this.contract.methods.claim([address]);
         interaction.withGasLimit(500_000_000);
-        return this.interceptInteraction(interaction).check().buildTransaction();
+        return this.interceptInteraction(interaction)
+            .check()
+            .buildTransaction();
     }
 }
 
