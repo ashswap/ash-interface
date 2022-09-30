@@ -12,7 +12,7 @@ const useFarmBoost = () => {
             transactions: await ContractManager.getFarmContract(farm.farm_address).claimRewards(tokenPayments, selfBoost),
             transactionsDisplayInfo: {
                 successMessage: "Success to boost",
-            }
+            },
         });
     }, []);
 

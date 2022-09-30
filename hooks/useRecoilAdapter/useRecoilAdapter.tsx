@@ -1,12 +1,10 @@
+import { useGetPendingTransactions } from "@elrondnetwork/dapp-core/hooks";
 import { useSelector } from "@elrondnetwork/dapp-core/reduxStore/DappProviderContext";
 import { ashswapBaseState } from "atoms/ashswap";
 import { dappCoreState } from "atoms/dappState";
-import { blockTimeMs } from "const/dappConfig";
-import { useFetchBalances } from "hooks/useFetchBalances";
 import { useEffect } from "react";
 import { useSetRecoilState } from "recoil";
 import useAshBaseStateQuery from "../../graphql/useQueries/useAshBaseStateQuery";
-import useInterval from "../useInterval";
 import useFarmsState from "./useFarmsState";
 import useGetFarmTokens from "./useGetFarmTokens";
 import useGetTokens from "./useGetTokens";
@@ -23,6 +21,8 @@ export function useRecoilAdapter() {
     const setAshBaseState = useSetRecoilState(ashswapBaseState);
     // end recoil
 
+    const {hasPendingTransactions} = useGetPendingTransactions();
+
     // const fetchBalances = useFetchBalances();
     const {data} = useAshBaseStateQuery({refreshInterval: 6000});
     useEffect(() => {data && setAshBaseState(data)}, [data, setAshBaseState]);
@@ -30,7 +30,7 @@ export function useRecoilAdapter() {
 
     // fetch tokens balance
 
-    useGetTokens();
+    useGetTokens({refreshInterval: hasPendingTransactions ? 6000: undefined});
     useGetFarmTokens();
     usePoolsState();
     useFarmsState();

@@ -28,6 +28,7 @@
         "graphql-request": "^4.3.0",
         "immer": "^9.0.15",
         "lodash.chunk": "^4.2.0",
+        "mitt": "^3.0.0",
         "moment": "^2.29.1",
         "next": "12.0.1",
         "next-fonts": "^1.5.1",

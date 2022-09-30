@@ -10,6 +10,7 @@ import {
     farmOwnerTokensQuery,
     FarmRecord,
     farmRecordsState,
+    farmSessionIdMapState,
     FarmToken,
     farmTransferedTokensState,
 } from "atoms/farmsState";
@@ -42,6 +43,7 @@ import BoostCalcModal from "./BoostCalcModal";
 import ICArrowBarRight from "assets/svg/arrow-bar-right.svg";
 import ICChevronVRight from "assets/svg/chevron-v-right.svg";
 import ICCloseV from "assets/svg/close-v.svg";
+import produce from "immer";
 const FarmRecord = ({
     farmData,
     label,
@@ -293,10 +295,11 @@ function GovBoostStatus() {
     const farmRecords = useRecoilValue(farmRecordsState);
     const farmTransferedTokens = useRecoilValue(farmTransferedTokensState);
     const boostOwnerFarmTokens = useRecoilCallback(
-        ({ snapshot }) =>
+        ({ snapshot, set }) =>
             async () => {
                 const farmRecords = await snapshot.getPromise(farmRecordsState);
                 const accAddress = await snapshot.getPromise(accAddressState);
+                const farmsAddress: string[] = [];
                 const txsPromises = farmRecords
                     .filter(
                         (record) =>
@@ -311,19 +314,20 @@ function GovBoostStatus() {
                         return { ownerTokens, farm: record.farm };
                     })
                     .filter(({ ownerTokens }) => ownerTokens.length > 0)
-                    .map(({ ownerTokens, farm }) =>
-                        ContractManager.getFarmContract(
-                            farm.farm_address
-                        ).claimRewards(
-                            ownerTokens.map((t) =>
+                    .map(({ ownerTokens, farm }) => {
+                        const tokenPayments: TokenPayment[] = ownerTokens.map(
+                            (t) =>
                                 TokenPayment.metaEsdtFromBigInteger(
                                     t.collection,
                                     t.nonce.toNumber(),
                                     t.balance
                                 )
-                            )
-                        )
-                    );
+                        );
+                        farmsAddress.push(farm.farm_address);
+                        return ContractManager.getFarmContract(
+                            farm.farm_address
+                        ).claimRewards(tokenPayments);
+                    });
                 const { sessionId, error } = await sendTransactions({
                     transactions: (
                         await Promise.all(txsPromises)
@@ -331,6 +335,16 @@ function GovBoostStatus() {
                     transactionsDisplayInfo: {
                         successMessage: "All farm tokens are boosted.",
                     },
+                });
+                set(farmSessionIdMapState, (state) => {
+                    return produce(state, (draft) => {
+                        farmsAddress.map((farm_address) => {
+                            draft[farm_address] = [
+                                ...draft[farm_address],
+                                sessionId,
+                            ];
+                        });
+                    });
                 });
                 setBoostId(sessionId);
             },
