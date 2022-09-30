@@ -12,9 +12,9 @@ const devnet: PoolConfig = {
     beta: [
         {
             address:
-                "erd1qqqqqqqqqqqqqpgqest94j9tqlk2e0jjm93evdagye6eazfhrmcqp6j9mh",
+                "erd1qqqqqqqqqqqqqpgqazgqgzj4ze67c2vqydt0rxfmj6nsctmwrmcq4d5qwg",
             lpToken: {
-                identifier: "LPT-02bf1a",
+                identifier: "LPT-02eb87",
                 chainId: ChainId.Devnet,
                 symbol: "LPT-USDC-USDT",
                 name: "Ashswap LP",
@@ -24,9 +24,9 @@ const devnet: PoolConfig = {
         },
         {
             address:
-                "erd1qqqqqqqqqqqqqpgq09nwtj56q8vwwuq47me5yxsqjfrn45k9rmcqwxrcnw",
+                "erd1qqqqqqqqqqqqqpgq8a9qdaayr4fq2uana9t5uwn4ym5d76grrmcq9amee4",
             lpToken: {
-                identifier: "LPT-fb4d45",
+                identifier: "LPT-00e9fe",
                 chainId: ChainId.Devnet,
                 symbol: "LPT-USDC-wUSDC",
                 name: "Ashswap LP",
@@ -36,9 +36,9 @@ const devnet: PoolConfig = {
         },
         {
             address:
-                "erd1qqqqqqqqqqqqqpgqxgwuy752gr6zth9d8d7jhdnfhkp7nr6grmcq9fd3gj",
+                "erd1qqqqqqqqqqqqqpgqremkn4680g9plp63lgmxj6z2v9tpj664rmcqf70k9q",
             lpToken: {
-                identifier: "LPT-fd847c",
+                identifier: "LPT-1b22d4",
                 chainId: ChainId.Devnet,
                 symbol: "LPT-renBTC-wBTC",
                 name: "Ashswap LP",
