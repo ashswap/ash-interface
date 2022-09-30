@@ -30,12 +30,13 @@ const useGovLockMore = (trackStatus = false) => {
                 );
 
                 if (weiAmt && weiAmt.gt(0)) {
+                    const tokenPayment = TokenPayment.fungibleFromBigInteger(
+                        ASH_TOKEN.identifier,
+                        weiAmt,
+                        ASH_TOKEN.decimals
+                    );
                     const increaseAmtTx = await veContract.increaseAmount(
-                        TokenPayment.fungibleFromBigInteger(
-                            ASH_TOKEN.identifier,
-                            weiAmt,
-                            ASH_TOKEN.decimals
-                        )
+                        tokenPayment
                     );
                     txs.push(increaseAmtTx);
                 }

@@ -265,7 +265,6 @@ export const getStaticPaths: GetStaticPaths = async () => {
 export const getStaticProps: GetStaticProps = async ({ params }) => {
     const { id: tokenId } = params || {};
     const token = IN_POOL_TOKENS.find((t) => t.identifier === tokenId);
-    console.log(token);
     if (token) {
         return {
             props: { token },

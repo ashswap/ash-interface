@@ -311,19 +311,19 @@ function GovBoostStatus() {
                         return { ownerTokens, farm: record.farm };
                     })
                     .filter(({ ownerTokens }) => ownerTokens.length > 0)
-                    .map(({ ownerTokens, farm }) =>
-                        ContractManager.getFarmContract(
-                            farm.farm_address
-                        ).claimRewards(
-                            ownerTokens.map((t) =>
+                    .map(({ ownerTokens, farm }) => {
+                        const tokenPayments: TokenPayment[] = ownerTokens.map(
+                            (t) =>
                                 TokenPayment.metaEsdtFromBigInteger(
                                     t.collection,
                                     t.nonce.toNumber(),
                                     t.balance
                                 )
-                            )
-                        )
-                    );
+                        );
+                        return ContractManager.getFarmContract(
+                            farm.farm_address
+                        ).claimRewards(tokenPayments);
+                    });
                 const { sessionId, error } = await sendTransactions({
                     transactions: (
                         await Promise.all(txsPromises)
