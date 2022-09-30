@@ -1,20 +1,20 @@
 import { AccountInfoSliceNetworkType } from "@elrondnetwork/dapp-core/types";
-import { getNetworkConfig } from "@elrondnetwork/dapp-core/utils";
 import IconNewTab from "assets/svg/new-tab.svg";
 import {
     accAddressState,
     accIsLoggedInState,
-    networkConfigState,
+    networkConfigState
 } from "atoms/dappState";
 import BaseModal from "components/BaseModal";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
-import { ENVIRONMENT } from "const/env";
 import pools from "const/pool";
-import { toEGLD } from "helper/balance";
+import { toEGLD, toEGLDD } from "helper/balance";
 import { fetcher } from "helper/common";
+import { formatAmount } from "helper/number";
 import { IESDTInfo } from "helper/token/token";
 import { useScreenSize } from "hooks/useScreenSize";
 import IPool from "interface/pool";
+import { TxStatsRecord } from "interface/txStats";
 import { useCallback, useEffect, useMemo } from "react";
 import { useRecoilValue } from "recoil";
 import useSWR from "swr";
@@ -33,80 +33,71 @@ interface Props {
     open: boolean;
     onClose?: () => void;
 }
-interface TXRecord {
-    txHash: string;
-    gasLimit: number;
-    gasPrice: number;
-    gasUsed: number;
-    miniBlockHash: string;
-    nonce: number;
-    receiver: string;
-    receiverShard: number;
-    round: number;
-    sender: string;
-    senderShard: number;
-    signature: string;
-    status: string;
-    value: string;
-    fee: string;
-    timestamp: number;
-    data: string;
-    function: string;
-    action: {
-        category: string;
-        name: string;
-        description: string;
-        arguments: {
-            transfers: {
-                type: string;
-                name: string;
-                ticker: string;
-                token: string;
-                decimals: number;
-                value: string;
-            }[];
-            receiver: string;
-            functionName: string;
-            functionArgs: string[];
-        };
-    }
-}
 
-const actions = ["exchange", "addLiquidity", "removeLiquidity"];
-const receiver = pools.map((p) => p.address);
-const actionMap = {
-    exchange: "Swap",
-    addLiquidity: "Add liquidity",
-    removeLiquidity: "Remove liquidity",
-};
 const HistoryModal = ({ open, onClose }: Props) => {
     const loggedIn = useRecoilValue(accIsLoggedInState);
     const address = useRecoilValue(accAddressState);
-    const network: AccountInfoSliceNetworkType =
-        useRecoilValue(networkConfigState).network;
-    const { data: txHistory, mutate: refresh } = useSWR<TXRecord[]>(
+    const { data: txHistory, mutate: refresh } = useSWR<TxStatsRecord[]>(
         loggedIn
-            ? `${network.apiAddress}/transactions?function=${actions.join(
-                  ","
-              )}&sender=${address}&receiver=${receiver.join(",")}&size=50`
+            ? `${ASHSWAP_CONFIG.ashApiBaseUrl}/user/${address}/transaction?offset=0&limit=50`
             : null,
         fetcher
     );
     const screenSize = useScreenSize();
+    const network: AccountInfoSliceNetworkType =
+        useRecoilValue(networkConfigState).network;
 
     const displayTx = useMemo(() => {
         return (txHistory || [])
             .map((record) => {
-                const { function: func, txHash, status } = record;
-                const pool = pools.find((p) => p.address === record.action.arguments.receiver);
-                if(!pool) return null;
-                return {
-                    msg: `${
-                        actionMap[func as keyof typeof actionMap]
-                    } on pool ${pool?.tokens.map((t) => t.symbol).join("-")}.`,
-                    txHash,
-                    status,
-                };
+                const { action, transaction_hash } = record;
+                const token1 = TOKENS.find(
+                    (t) => t.identifier === record.token_id_1
+                );
+                const token2 = TOKENS.find(
+                    (t) => t.identifier === record.token_id_2
+                );
+                const token3 = TOKENS.find(
+                    (t) => t.identifier === record.token_id_3
+                );
+                switch (action) {
+                    case "exchange":
+                        if (
+                            !record.amount_1 ||
+                            !record.amount_2 ||
+                            !token1 ||
+                            !token2
+                        ) {
+                            return null;
+                        }
+                        return {
+                            msg: `Swap ${toEGLD(
+                                token1,
+                                record.amount_1
+                            ).decimalPlaces(7)} ${token1.symbol} to ${toEGLD(
+                                token2,
+                                record.amount_2
+                            ).decimalPlaces(7)} ${token2.symbol}`,
+                            txHash: transaction_hash,
+                            status: "success",
+                        };
+                    case "addLiquidity":
+                    case "removeLiquidity":
+                        const msg = ([[token1, record.amount_1], [token2, record.amount_2], [token3, record.amount_3]] as [IESDTInfo, string][]).map(([t, amt]) => {
+                            if(!t || !amt) return '';
+                            const egld = toEGLDD(t.decimals, amt);
+                            return `${formatAmount(egld.toNumber())} ${t.symbol}`;
+                        }).join(', ').replace(/, $/, '');
+                        return {
+                            msg: `${
+                                action === "addLiquidity" ? "Add" : "Remove"
+                            } ${msg}`,
+                            txHash: transaction_hash,
+                            status: "success",
+                        };
+                    default:
+                        return null;
+                }
             })
             .filter((val) => val !== null);
     }, [txHistory]);
@@ -140,6 +131,7 @@ const HistoryModal = ({ open, onClose }: Props) => {
             <div className="px-4 font-bold text-2xl mb-5">History</div>
             <div className="grow overflow-auto">
                 <div className="px-4">
+                    
                     {displayTx.slice(0, 50).map((record) => {
                         if (!record) {
                             return null;
