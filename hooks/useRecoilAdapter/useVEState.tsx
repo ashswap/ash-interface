@@ -4,26 +4,24 @@ import {
     govTotalLockedAmtState,
     govTotalLockedPctState,
     govUnlockTSState,
-    govVeASHAmtState,
+    govVeASHAmtState
 } from "atoms/govState";
 import BigNumber from "bignumber.js";
-import { blockTimeMs } from "const/dappConfig";
 import { ASH_TOKEN } from "const/tokens";
 import { estimateVeASH } from "helper/voteEscrow";
-import useInterval from "hooks/useInterval";
 import moment from "moment";
-import { useRecoilCallback } from "recoil";
+import { useEffect } from "react";
+import { useRecoilCallback, useRecoilValue } from "recoil";
 
 const useVEState = () => {
+    const ashBase = useRecoilValue(ashswapBaseState);
+    const totalLockedAmt = useRecoilValue(govTotalLockedAmtState);
+    const accLockedAmt = useRecoilValue(govLockedAmtState);
+    const accUnlockTS = useRecoilValue(govUnlockTSState);
     const getTotalLockedASHPct = useRecoilCallback(
-        ({ snapshot, set }) =>
+        ({ set }) =>
             async () => {
-                const totalLockedAmt = await snapshot.getPromise(
-                    govTotalLockedAmtState
-                );
-                const { ashSupply } = await snapshot.getPromise(
-                    ashswapBaseState
-                );
+                const { ashSupply } = ashBase;
                 const totalSupply = new BigNumber(ashSupply);
                 if (totalSupply.eq(0)) set(govTotalLockedPctState, 0);
                 return set(
@@ -39,27 +37,25 @@ const useVEState = () => {
                         .toNumber()
                 );
             },
-        []
+        [ashBase, totalLockedAmt]
     );
 
     const getAccVe = useRecoilCallback(
-        ({ snapshot, set }) =>
+        ({ set }) =>
             async () => {
-                const ashWei = await snapshot.getPromise(govLockedAmtState);
-                const unlockTS = await snapshot.getPromise(govUnlockTSState);
-                const lockSecs = unlockTS.minus(moment().unix()).toNumber();
+                const lockSecs = accUnlockTS.minus(moment().unix()).toNumber();
                 set(
                     govVeASHAmtState,
                     new BigNumber(
-                        lockSecs > 0 ? estimateVeASH(ashWei, lockSecs) : 0
+                        lockSecs > 0 ? estimateVeASH(accLockedAmt, lockSecs) : 0
                     )
                 );
             },
-        []
+        [accLockedAmt, accUnlockTS]
     );
 
-    useInterval(getTotalLockedASHPct, blockTimeMs);
-    useInterval(getAccVe, blockTimeMs);
+    useEffect(() => {getTotalLockedASHPct()}, [getTotalLockedASHPct]);
+    useEffect(() => {getAccVe()}, [getAccVe]);
 };
 
 export default useVEState;

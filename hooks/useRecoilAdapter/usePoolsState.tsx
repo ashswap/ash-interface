@@ -1,5 +1,5 @@
+import { ashswapBaseState } from "atoms/ashswap";
 import {
-    ashRawPoolByAddressQuery,
     ashRawPoolMapByIdSelector,
     LPBreakDownQuery,
     poolDeboundKeywordState,
@@ -10,19 +10,20 @@ import {
 import { lpTokenMapState } from "atoms/tokensState";
 import BigNumber from "bignumber.js";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
-import { blockTimeMs } from "const/dappConfig";
 import pools from "const/pool";
 import { fetcher } from "helper/common";
-import useInterval from "hooks/useInterval";
 import IPool from "interface/pool";
 import { PoolStatsRecord } from "interface/poolStats";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { useRecoilCallback, useRecoilValue, useSetRecoilState } from "recoil";
 import useSWR from "swr";
 import { useDebounce } from "use-debounce";
 
 const usePoolsState = () => {
     const keyword = useRecoilValue(poolKeywordState);
+    const ashBase = useRecoilValue(ashswapBaseState);
+    const poolMapById = useRecoilValue(ashRawPoolMapByIdSelector);
+    const lpTokenMap = useRecoilValue(lpTokenMapState);
     // const setPoolRecords = useSetRecoilState(poolRecordsState);
     const setDeboundKeyword = useSetRecoilState(poolDeboundKeywordState);
     const [deboundKeyword] = useDebounce(keyword, 500);
@@ -37,61 +38,62 @@ const usePoolsState = () => {
         fetcher
     );
 
-    const getPortion = useRecoilCallback(
-        ({ snapshot, set }) =>
-            async (lpTokenId: string, ownLiquidity: BigNumber) => {
-                const poolMapById = await snapshot.getPromise(
-                    ashRawPoolMapByIdSelector
+    const getPortion = useCallback(
+        async (lpTokenId: string, ownLiquidity: BigNumber) => {
+            const totalSupply = poolMapById[lpTokenId]?.totalSupply || "0";
+            if (totalSupply === "0") return new BigNumber(0);
+            return ownLiquidity.multipliedBy(100).div(totalSupply);
+        },
+        [poolMapById]
+    );
+
+    const lpBreak = useRecoilCallback(
+        ({ snapshot }) =>
+            async (poolAddress: string, wei: string) => {
+                return await snapshot.getPromise(
+                    LPBreakDownQuery({ poolAddress, wei })
                 );
-                const totalSupply = poolMapById[lpTokenId]?.totalSupply || "0";
-                if (totalSupply === "0") return new BigNumber(0);
-                return ownLiquidity.multipliedBy(100).div(totalSupply);
             },
         []
     );
 
-    const getPoolRecord = useRecoilCallback(
-        ({ snapshot, set }) =>
-            async (p: IPool) => {
-                const lpTokenMap = await snapshot.getPromise(lpTokenMapState);
-                const rawPool = await snapshot.getPromise(
-                    ashRawPoolByAddressQuery(p.address)
+    const getPoolRecord = useCallback(
+        async (p: IPool) => {
+            const rawPool = ashBase.pools.find(
+                (_p) => _p.address === p.address
+            );
+            let record: PoolRecord = {
+                pool: p,
+                poolStats: poolStatsRecords?.find(
+                    (stats) => stats.address === p.address
+                ),
+                totalSupply: new BigNumber(rawPool?.totalSupply || 0),
+            };
+            const ownLP = new BigNumber(
+                lpTokenMap[p.lpToken.identifier]?.balance || 0
+            );
+            if (ownLP.gt(0)) {
+                const { lpReserves, valueUsd: lpValueUsd } = await lpBreak(
+                    p.address,
+                    ownLP.toString()
                 );
-                let record: PoolRecord = {
-                    pool: p,
-                    poolStats: poolStatsRecords?.find(
-                        (stats) => stats.address === p.address
+                record.liquidityData = {
+                    ownLiquidity: ownLP,
+                    capacityPercent: await getPortion(
+                        p.lpToken.identifier,
+                        ownLP
                     ),
-                    totalSupply: new BigNumber(rawPool?.totalSupply || 0),
+                    lpReserves,
+                    lpValueUsd,
                 };
-                const ownLP = new BigNumber(
-                    lpTokenMap[p.lpToken.identifier]?.balance || 0
-                );
-                if (ownLP.gt(0)) {
-                    const { lpReserves, valueUsd: lpValueUsd } =
-                        await snapshot.getPromise(
-                            LPBreakDownQuery({
-                                poolAddress: p.address,
-                                wei: ownLP.toString(),
-                            })
-                        );
-                    record.liquidityData = {
-                        ownLiquidity: ownLP,
-                        capacityPercent: await getPortion(
-                            p.lpToken.identifier,
-                            ownLP
-                        ),
-                        lpReserves,
-                        lpValueUsd,
-                    };
-                }
-                return record;
-            },
-        [getPortion, poolStatsRecords]
+            }
+            return record;
+        },
+        [getPortion, poolStatsRecords, ashBase, lpBreak, lpTokenMap]
     );
 
     const getPoolRecords = useRecoilCallback(
-        ({ snapshot, set }) =>
+        ({ set }) =>
             async () => {
                 const recordPromises: Promise<PoolRecord>[] = [];
                 for (let i = 0; i < pools.length; i++) {
@@ -104,7 +106,11 @@ const usePoolsState = () => {
             },
         [getPoolRecord]
     );
-    useInterval(getPoolRecords, blockTimeMs);
+
+    const [deboundGetPoolRecords] = useDebounce(getPoolRecords, 500);
+    useEffect(() => {
+        deboundGetPoolRecords();
+    }, [deboundGetPoolRecords]);
 };
 
 export default usePoolsState;
