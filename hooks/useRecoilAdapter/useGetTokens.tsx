@@ -3,7 +3,7 @@ import { accAddressState } from "atoms/dappState";
 import {
     lpTokenMapState,
     tokenMapState,
-    tokensRefresherAtom
+    tokensRefresherAtom,
 } from "atoms/tokensState";
 import { DAPP_CONFIG } from "const/dappConfig";
 import pools from "const/pool";
@@ -38,7 +38,7 @@ const useGetTokens = (config?: SWRConfiguration) => {
 
     useEffect(() => {
         setTokenMap((state) => {
-            return produce(state, (draft) => {
+            const map = produce(state, (draft) => {
                 const tokenMap = Object.fromEntries(
                     tokens.map((t) => [t.id, t])
                 );
@@ -56,11 +56,12 @@ const useGetTokens = (config?: SWRConfiguration) => {
                         .toNumber();
                 });
             });
+            return { ...map };
         });
     }, [data, tokens, setTokenMap]);
     useEffect(() => {
         setLPTokenMap((state) => {
-            return produce(state, (draft) => {
+            const map = produce(state, (draft) => {
                 const rawPoolMap = Object.fromEntries(
                     rawPools.map((p) => [p.lpToken.id, p])
                 );
@@ -78,6 +79,7 @@ const useGetTokens = (config?: SWRConfiguration) => {
                         .toNumber();
                 });
             });
+            return { ...map };
         });
     }, [data, rawPools, setLPTokenMap]);
 
