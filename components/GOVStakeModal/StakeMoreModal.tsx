@@ -33,7 +33,18 @@ type props = {
     open: boolean;
     onClose: () => void;
 };
-const EXTEND_CONFIG = {
+const EXTEND_BOY = {
+    options: [
+        // test purpose
+        { value: 12 * 60 * 60, label: "+ 12 hours" },
+        { value: 24 * 60 * 60, label: "+ 1 day" },
+        { value: 3 * 24 * 60 * 60, label: "+ 3 days" },
+        { value: 1 * 7 * 24 * 60 * 60, label: "+ 1 week" },
+    ],
+    maxLock: 2 * 7 * 24 * 60 * 60,
+    minLock: 12 * 60 * 60,
+};
+const EXTEND_CONFIG_MAIN = {
     options: [
         // test purpose
         { value: 7 * 24 * 60 * 60, label: "+ 1 week" },
@@ -45,6 +56,7 @@ const EXTEND_CONFIG = {
     maxLock: 4 * 365 * 24 * 60 * 60,
     minLock: 7 * 24 * 60 * 60,
 };
+const EXTEND_CONFIG = EXTEND_BOY;
 const StakeMoreContent = ({ open, onClose }: props) => {
     const lockedAmt = useRecoilValue(govLockedAmtState);
     const unlockTS = useRecoilValue(govUnlockTSState);

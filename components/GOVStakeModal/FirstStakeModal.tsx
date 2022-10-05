@@ -28,7 +28,19 @@ type props = {
     open: boolean;
     onClose: () => void;
 };
-const LOCK_CONFIG = {
+const LOCK_CONFIG_BOY = {
+    predefinedLockPeriod: [
+        { value: 12 * 60 * 60, label: "12 hours" },
+        { value: 24 * 60 * 60, label: "1 day" },
+        { value: 3 * 24 * 60 * 60, label: "3 days" },
+        { value: 1 * 7 * 24 * 60 * 60, label: "1 week" },
+        { value: 2 * 7 * 24 * 60 * 60, label: "2 weeks" },
+    ],
+    maxLock: 2 * 7 * 24 * 60 * 60,
+    minLock: 12 * 60 * 60,
+    sliderStep: 12 * 60 * 60,
+};
+const LOCK_CONFIG_MAIN = {
     predefinedLockPeriod: [
         { value: 7 * 24 * 60 * 60, label: "1 week" },
         { value: 4 * 7 * 24 * 60 * 60, label: "4 weeks" },
@@ -41,6 +53,7 @@ const LOCK_CONFIG = {
     minLock: 7 * 24 * 60 * 60,
     sliderStep: 24 * 60 * 60,
 };
+const LOCK_CONFIG = LOCK_CONFIG_BOY; 
 const FirstStakeContent = ({ open, onClose }: props) => {
     const tokenMap = useRecoilValue(tokenMapState);
     const insufficientEGLD = useRecoilValue(accIsInsufficientEGLDState);

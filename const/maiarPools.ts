@@ -1,7 +1,42 @@
 import IPool from "interface/pool";
+import { CHAIN_ID } from "./dappConfig";
 import { ENVIRONMENT } from "./env";
+import { TOKENS_MAP } from "./tokens";
+type MaiarPoolConfig = {
+    alpha: IPool[];
+    beta: IPool[];
+};
+const devnet: MaiarPoolConfig = {
+    alpha: [
+        {
+            address:
+                "erd1qqqqqqqqqqqqqpgq9efzwnujjm6f75pccujr2jp4j5csym0vrmcqg9r3ff",
+            lpToken: {
+                identifier: "LPT-8d3117",
+                symbol: "LPT-8d3117",
+                decimals: 18,
+                chainId: CHAIN_ID.DEVNET,
+                name: "Maiar LP",
+            },
+            tokens: [TOKENS_MAP["ASH-4ce444"], TOKENS_MAP["USDT-a55fa7"]],
+            isMaiarPool: true,
+        },
+        {
+            address:
+                "erd1qqqqqqqqqqqqqpgqkec4u8tkq4tztu30vvk889dnnddex5k8rmcqqnw6a4",
+            lpToken: {
+                identifier: "LPT-a31851",
+                symbol: "LPT-a31851",
+                decimals: 18,
+                chainId: CHAIN_ID.DEVNET,
+                name: "Maiar LP",
+            },
+            tokens: [TOKENS_MAP["WBTC-9bdb9b"], TOKENS_MAP["USDC-d5181d"]],
+            isMaiarPool: true,
+        },
+    ],
+    beta: [],
+};
 
-export const devnet: IPool[] = [];
-
-
-export const MAIAR_POOLS = ENVIRONMENT.NETWORK == "devnet" ? devnet : [];
+export const MAIAR_POOLS =
+    ENVIRONMENT.NETWORK === "devnet" ? devnet[ENVIRONMENT.ENV] : [];

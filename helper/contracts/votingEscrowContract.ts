@@ -11,7 +11,7 @@ class VotingEscrowContract extends Contract {
         let interaction = this.contract.methods.create_lock([unlockTS]);
         interaction
             .withSingleESDTTransfer(tokenPayment)
-            .withGasLimit(7_000_000);
+            .withGasLimit(100_000_000);// 7m
         return this.interceptInteraction(interaction)
             .check()
             .buildTransaction();
@@ -21,7 +21,7 @@ class VotingEscrowContract extends Contract {
         let interaction = this.contract.methods.increase_amount([]);
         interaction
             .withSingleESDTTransfer(tokenPayment)
-            .withGasLimit(7_000_000);
+            .withGasLimit(100_000_000);//7m
         return this.interceptInteraction(interaction)
             .check()
             .buildTransaction();
@@ -31,7 +31,7 @@ class VotingEscrowContract extends Contract {
         let interaction = this.contract.methods.increase_unlock_time([
             unlockTS,
         ]);
-        interaction.withGasLimit(7_000_000);
+        interaction.withGasLimit(100_000_000);//7m
         return this.interceptInteraction(interaction)
             .check()
             .buildTransaction();
@@ -39,7 +39,7 @@ class VotingEscrowContract extends Contract {
 
     async withdraw() {
         let interaction = this.contract.methods.withdraw([]);
-        interaction.withGasLimit(7_000_000);
+        interaction.withGasLimit(100_000_000);//7m
         return this.interceptInteraction(interaction)
             .check()
             .buildTransaction();
