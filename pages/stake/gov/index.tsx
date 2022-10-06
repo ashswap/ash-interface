@@ -24,7 +24,7 @@ function GovPage() {
                 </div>
                 <div>
                     <h2 className="text-lg font-bold text-white mb-5 lg:mb-7">
-                        Weekly Summary
+                        Daily Summary
                     </h2>
                     <WeeklyFeeTable />
                 </div>
