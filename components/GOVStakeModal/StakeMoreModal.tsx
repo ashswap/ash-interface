@@ -18,6 +18,7 @@ import Switch from "components/Switch";
 import TextAmt from "components/TextAmt";
 import CardTooltip from "components/Tooltip/CardTooltip";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
+import { ENVIRONMENT } from "const/env";
 import { ASH_TOKEN, VE_ASH_DECIMALS } from "const/tokens";
 import { toEGLDD, toWei } from "helper/balance";
 import { estimateVeASH } from "helper/voteEscrow";
@@ -36,13 +37,15 @@ type props = {
 const EXTEND_BOY = {
     options: [
         // test purpose
-        { value: 12 * 60 * 60, label: "+ 12 hours" },
+        ENVIRONMENT.ENV === "alpha"
+            ? { value: 10 * 60, label: "+ 12 minutes" }
+            : { value: 12 * 60 * 60, label: "+ 12 hours" },
         { value: 24 * 60 * 60, label: "+ 1 day" },
         { value: 3 * 24 * 60 * 60, label: "+ 3 days" },
         { value: 1 * 7 * 24 * 60 * 60, label: "+ 1 week" },
     ],
     maxLock: 2 * 7 * 24 * 60 * 60,
-    minLock: 12 * 60 * 60,
+    minLock: ENVIRONMENT.ENV === "alpha" ? 10 * 60 : 12 * 60 * 60,
 };
 const EXTEND_CONFIG_MAIN = {
     options: [

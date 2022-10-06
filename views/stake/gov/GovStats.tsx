@@ -26,6 +26,7 @@ import TextAmt from "components/TextAmt";
 import CardTooltip from "components/Tooltip/CardTooltip";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 import { ASH_TOKEN, VE_ASH_DECIMALS } from "const/tokens";
+import { VE_LOCK_LABEL } from "const/ve";
 import { toEGLDD } from "helper/balance";
 import { fetcher } from "helper/common";
 import { formatAmount } from "helper/number";
@@ -456,52 +457,27 @@ function GovStats() {
                             transaction fee & have a power for voting!
                         </div>
                         <ul>
-                            <li className="text-sm font-bold">
-                                <span className="text-stake-green-500">1</span>{" "}
-                                ASH locked for{" "}
-                                <span className="text-stake-green-500">
-                                    4 years
-                                </span>{" "}
-                                ={" "}
-                                <span className="text-stake-green-500">1</span>{" "}
-                                veASH
-                            </li>
-                            <li className="text-sm font-bold">
-                                <span className="text-stake-green-500">1</span>{" "}
-                                ASH locked for{" "}
-                                <span className="text-stake-green-500">
-                                    3 years
-                                </span>{" "}
-                                ={" "}
-                                <span className="text-stake-green-500">
-                                    0.75
-                                </span>{" "}
-                                veASH
-                            </li>
-                            <li className="text-sm font-bold">
-                                <span className="text-stake-green-500">1</span>{" "}
-                                ASH locked for{" "}
-                                <span className="text-stake-green-500">
-                                    2 years
-                                </span>{" "}
-                                ={" "}
-                                <span className="text-stake-green-500">
-                                    0.5
-                                </span>{" "}
-                                veASH
-                            </li>
-                            <li className="text-sm font-bold">
-                                <span className="text-stake-green-500">1</span>{" "}
-                                ASH locked for{" "}
-                                <span className="text-stake-green-500">
-                                    1 year
-                                </span>{" "}
-                                ={" "}
-                                <span className="text-stake-green-500">
-                                    0.25
-                                </span>{" "}
-                                veASH
-                            </li>
+                            {VE_LOCK_LABEL.map((lock) => {
+                                return (
+                                    <li
+                                        key={lock.amt}
+                                        className="text-sm font-bold"
+                                    >
+                                        <span className="text-stake-green-500">
+                                            1
+                                        </span>{" "}
+                                        ASH locked for{" "}
+                                        <span className="text-stake-green-500">
+                                            {lock.label}
+                                        </span>{" "}
+                                        ={" "}
+                                        <span className="text-stake-green-500">
+                                            {lock.amt}
+                                        </span>{" "}
+                                        veASH
+                                    </li>
+                                );
+                            })}
                         </ul>
                     </div>
                     <div>
