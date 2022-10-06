@@ -23,12 +23,17 @@ import Image from "components/Image";
 import { useEffect, useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
 
-const LockOptions = [
+const LOCK_OPTS_BOY = [
+    { value: 2 * 7 * 24 * 3600, label: "2 weeks" },
+    { value: 7 * 24 * 3600, label: "1 week" },
+];
+const LOCK_OPTS_MAIN = [
     { value: 4 * 365 * 24 * 3600, label: "4 years" },
     { value: 3 * 365 * 24 * 3600, label: "3 years" },
     { value: 2 * 365 * 24 * 3600, label: "2 years" },
     { value: 365 * 24 * 3600, label: "1 year" },
 ];
+const LOCK_OPTS = LOCK_OPTS_BOY;
 
 type BoostCalcProps = { farmAddress?: string };
 const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
@@ -44,7 +49,7 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
     );
     const [ashInput, setAshInput] = useState(new BigNumber(0));
     const [isUserInput, setIsUserInput] = useState(false);
-    const [selectedLock, setSelectedLock] = useState(LockOptions[0]);
+    const [selectedLock, setSelectedLock] = useState(LOCK_OPTS[0]);
 
     const farmData = useRecoilValue(farmQuery(farmAddress || ""));
     const veASHSupplyRecoil = useRecoilValue(govTotalSupplyVeASH);
@@ -467,7 +472,7 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
                                         {({ close }) => {
                                             return (
                                                 <ul className="py-2">
-                                                    {LockOptions.map((opt) => {
+                                                    {LOCK_OPTS.map((opt) => {
                                                         return (
                                                             <li
                                                                 key={opt.value}
