@@ -16,17 +16,15 @@ const dappContractDevnet: DappContractConfig = {
     },
     alpha: {
         voteEscrowedContract:
-            "erd1qqqqqqqqqqqqqpgqjha3wpatzxhxl7auezw0q8wxrzfu72q8rmcqrk27vs",
+            "erd1qqqqqqqqqqqqqpgquy2s8dm5k66xu2wvxwvqlfccqy3ke9xermcqx5wqsn",
         feeDistributor:
-            "erd1qqqqqqqqqqqqqpgqjlq6fp98nnl68r9swez37juky3l33p8qrmcqh3863x",
+            "erd1qqqqqqqqqqqqqpgqcgnps9r7g7ywql70s0eusddfue8lgsaurmcqx5yd3w",
     },
 };
 
 const dappContractMainnet: DappContracts = {
-    voteEscrowedContract:
-        "",
-    feeDistributor:
-        "",
+    voteEscrowedContract: "",
+    feeDistributor: "",
 };
 
 const dappContract =

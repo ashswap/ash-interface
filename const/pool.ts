@@ -50,9 +50,9 @@ const devnet: PoolConfig = {
     alpha: [
         {
             address:
-                "erd1qqqqqqqqqqqqqpgq5wzf04ydtvdjg2cety9ve4jal4ja6jp6rmcq9tqf4h",
+                "erd1qqqqqqqqqqqqqpgqmce40wq2rgy6cc2r4u27k77dwz948jy6rmcqdszkrg",
             lpToken: {
-                identifier: "LPT-e94e61",
+                identifier: "LPT-2d928d",
                 chainId: ChainId.Devnet,
                 symbol: "LPT-USDC-USDT",
                 name: "Ashswap LP",
@@ -62,9 +62,9 @@ const devnet: PoolConfig = {
         },
         {
             address:
-                "erd1qqqqqqqqqqqqqpgqvy4vkfxcd57fprs3jzal8ex0yuk6c2xsrmcqa9k9h7",
+                "erd1qqqqqqqqqqqqqpgqq9vnqmylf54hp5y025e3ycedepdwv0rqrmcqw4690k",
             lpToken: {
-                identifier: "LPT-bd1ee9",
+                identifier: "LPT-748bad",
                 chainId: ChainId.Devnet,
                 symbol: "LPT-USDC-wUSDC",
                 name: "Ashswap LP",
@@ -74,9 +74,9 @@ const devnet: PoolConfig = {
         },
         {
             address:
-                "erd1qqqqqqqqqqqqqpgq66c48ferx7tm97wvx47hzgwx6wyg95xqrmcqkw983w",
+                "erd1qqqqqqqqqqqqqpgq3ddu0dp5cx2s5drf96wy2hadyz2n63q4rmcq0p509q",
             lpToken: {
-                identifier: "LPT-66c89c",
+                identifier: "LPT-bcdb19c",
                 chainId: ChainId.Devnet,
                 symbol: "LPT-renBTC-wBTC",
                 name: "Ashswap LP",
@@ -127,7 +127,9 @@ const mainnet: IPool[] = [
 ];
 
 const pools =
-    ENVIRONMENT.NETWORK == "devnet" ? [...devnet[ENVIRONMENT.ENV], ...MAIAR_POOLS] : mainnet;
+    ENVIRONMENT.NETWORK == "devnet"
+        ? [...devnet[ENVIRONMENT.ENV], ...MAIAR_POOLS]
+        : mainnet;
 export const POOLS_MAP_ADDRESS = Object.fromEntries(
     pools.map((p) => [p.address, p])
 );
