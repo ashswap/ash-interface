@@ -76,7 +76,7 @@ const devnet: PoolConfig = {
             address:
                 "erd1qqqqqqqqqqqqqpgq3ddu0dp5cx2s5drf96wy2hadyz2n63q4rmcq0p509q",
             lpToken: {
-                identifier: "LPT-bcdb19c",
+                identifier: "LPT-bcdb19",
                 chainId: ChainId.Devnet,
                 symbol: "LPT-renBTC-wBTC",
                 name: "Ashswap LP",
