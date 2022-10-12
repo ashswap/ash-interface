@@ -117,16 +117,15 @@ class PoolContract extends Contract {
             receiver,
         ]);
         if (tokenPayments.length === 1) {
-            interaction.withSingleESDTTransfer(tokenPayments[0]);
+            interaction
+                .withSingleESDTTransfer(tokenPayments[0])
+                .withGasLimit(10_000_000);
         } else {
-            interaction.withMultiESDTNFTTransfer(
-                tokenPayments,
-                new Address(sender)
-            );
+            interaction
+                .withMultiESDTNFTTransfer(tokenPayments, new Address(sender))
+                .withGasLimit(10_000_000 + tokenPayments.length * 2_000_000);
         }
-        interaction = this.interceptInteraction(
-            interaction.withGasLimit(12_000_000)
-        );
+        interaction = this.interceptInteraction(interaction);
         return interaction.check().buildTransaction();
     }
 

@@ -38,7 +38,7 @@ const EXTEND_BOY = {
     options: [
         // test purpose
         ENVIRONMENT.ENV === "alpha"
-            ? { value: 10 * 60, label: "+ 12 minutes" }
+            ? { value: 10 * 60, label: "+ 10 minutes" }
             : { value: 12 * 60 * 60, label: "+ 12 hours" },
         { value: 24 * 60 * 60, label: "+ 1 day" },
         { value: 3 * 24 * 60 * 60, label: "+ 3 days" },
