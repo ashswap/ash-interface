@@ -56,7 +56,6 @@ function useRouteModal<T extends keyof ModalType>(key: keyof ModalType) {
 
     const onCloseModal = useCallback(() => {
         const router = routerRef.current;
-        console.log(router.pathname, router);
         router.replace(
             {
                 pathname: router.pathname,

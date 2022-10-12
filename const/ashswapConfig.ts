@@ -32,6 +32,15 @@ const dappContract =
         ? dappContractDevnet[ENVIRONMENT.ENV]
         : dappContractMainnet;
 
+export const VE_CONFIG = {
+    // main config
+    // maxLock: 4 * 365 * 24 * 3600,
+    // minLock: 7 * 24 * 3600,
+    // for BoY
+    maxLock: 2 * 7 * 24 * 3600,
+    minLock: ENVIRONMENT.ENV === 'alpha' ? 10 * 60 : 12 * 60 * 60
+}
+
 export const ASHSWAP_CONFIG = {
     ashApiBaseUrl: ENVIRONMENT.ASH_API,
     dappContract,
