@@ -27,6 +27,7 @@ import {
     useState,
 } from "react";
 import { RecoilRoot } from "recoil";
+import GlobalModals from "views/components/GlobalModal";
 import * as gtag from "../helper/gtag";
 import "../styles/globals.css";
 
@@ -165,6 +166,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
                         <SocketProvider>
                             <TxCompletedTracker />
                         </SocketProvider>
+                        <GlobalModals />
                     </TestnetGuard>
                 </DappProvider>
             </RecoilRoot>

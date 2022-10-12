@@ -441,7 +441,6 @@ const FarmBoostInfo = ({ farmData, onClose }: FarmBoostInfoType) => {
                                 <div className="flex justify-end space-x-2">
                                     <Link
                                         href={{
-                                            pathname: "/stake/gov/boost",
                                             query: {
                                                 p: encode({
                                                     farmAddress:
@@ -449,6 +448,8 @@ const FarmBoostInfo = ({ farmData, onClose }: FarmBoostInfoType) => {
                                                 }),
                                             },
                                         }}
+                                        scroll={false}
+                                        replace
                                     >
                                         <a>
                                             <BaseButton className="h-12 w-12 sm:w-auto bg-ash-dark-400 px-1 sm:px-6 uppercase text-sm font-bold text-white">
@@ -511,7 +512,7 @@ const FarmBoostInfo = ({ farmData, onClose }: FarmBoostInfoType) => {
                                 </div>
                                 <div className="text-sm lg:text-lg font-bold text-stake-gray-500">
                                     <div>
-                                        You&apos;ve not enter any farm yet
+                                        You&apos;ve not entered this farm yet
                                     </div>
                                     <div>
                                         Go{" "}

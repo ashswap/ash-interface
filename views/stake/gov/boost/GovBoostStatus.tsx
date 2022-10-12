@@ -2,7 +2,10 @@ import { useTrackTransactionStatus } from "@elrondnetwork/dapp-core/hooks";
 import { TokenPayment } from "@elrondnetwork/erdjs/out";
 import { Transition } from "@headlessui/react";
 import ImgASHSleep from "assets/images/ash-sleep.png";
+import ICArrowBarRight from "assets/svg/arrow-bar-right.svg";
 import ICChevronRight from "assets/svg/chevron-right.svg";
+import ICChevronVRight from "assets/svg/chevron-v-right.svg";
+import ICCloseV from "assets/svg/close-v.svg";
 import ICEqualSquare from "assets/svg/equal-square.svg";
 import ICHexagonDuo from "assets/svg/hexagon-duo.svg";
 import { accAddressState } from "atoms/dappState";
@@ -19,6 +22,7 @@ import Avatar from "components/Avatar";
 import BaseButton from "components/BaseButton";
 import AdvanceBoostBar from "components/BoostBar/AdvanceBoostBar";
 import GlowingButton from "components/GlowingButton";
+import Image from "components/Image";
 import CardTooltip from "components/Tooltip/CardTooltip";
 import { ACTIVE_FARMS } from "const/farms";
 import pools from "const/pool";
@@ -33,17 +37,12 @@ import {
     useFarmBoostTransferState,
 } from "hooks/useFarmBoostState";
 import useRouteModal from "hooks/useRouteModal";
+import produce from "immer";
 import { FarmBoostInfo } from "interface/farm";
-import Image from "components/Image";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRecoilCallback, useRecoilValue } from "recoil";
 import FarmBoostTooltip from "views/stake/farms/FarmBoostTooltip";
-import BoostCalcModal from "./BoostCalcModal";
-import ICArrowBarRight from "assets/svg/arrow-bar-right.svg";
-import ICChevronVRight from "assets/svg/chevron-v-right.svg";
-import ICCloseV from "assets/svg/close-v.svg";
-import produce from "immer";
 const FarmRecord = ({
     farmData,
     label,
@@ -281,16 +280,13 @@ const FarmRecordTransfer = ({
     );
 };
 function GovBoostStatus() {
-    const { encode, modalParams, showModal, onCloseModal } =
-        useRouteModal("calc_boost");
-    const [openCalc, setOpenCalc] = useState(false);
+    const { encode } = useRouteModal("calc_boost");
     const [boostId, setBoostId] = useState<string | null>(null);
     const { isPending } = useTrackTransactionStatus({
         transactionId: boostId,
     });
     const [isSelfBoostTToken, setIsBoostTToken] = useState(false);
     const [canBoostMap, setCanBoostMap] = useState<Record<string, boolean>>({});
-    useEffect(() => setOpenCalc(showModal), [showModal]);
     const accAddress = useRecoilValue(accAddressState);
     const farmRecords = useRecoilValue(farmRecordsState);
     const farmTransferedTokens = useRecoilValue(farmTransferedTokensState);
@@ -400,7 +396,7 @@ function GovBoostStatus() {
                                 />
                             </div>
                             <div className="text-lg font-bold text-stake-gray-500">
-                                <div>You&apos;ve not enter any farm yet</div>
+                                <div>You&apos;ve not entered any farms yet</div>
                                 <div>
                                     Go{" "}
                                     <Link href="/stake/farms">
@@ -427,6 +423,7 @@ function GovBoostStatus() {
                                 },
                             }}
                             scroll={false}
+                            replace
                             passHref
                         >
                             <a>
@@ -508,11 +505,6 @@ function GovBoostStatus() {
                     </div>
                 </Transition>
             </div>
-            <BoostCalcModal
-                isOpen={showModal}
-                onRequestClose={() => onCloseModal()}
-                farmAddress={modalParams?.farmAddress}
-            />
         </>
     );
 }
