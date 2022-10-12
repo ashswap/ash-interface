@@ -1,4 +1,5 @@
 import BigNumber from "bignumber.js";
+import { VE_CONFIG } from "const/ashswapConfig";
 import { calcYieldBoost } from "helper/farmBooster";
 import { FarmBoostInfo } from "interface/farm";
 import moment from "moment";
@@ -29,7 +30,7 @@ const useCalcBoost = () => {
 
                 const slopeForBoost = BigNumber.max(
                     lockedAshAmt
-                        .div(4 * 365 * 24 * 3600)
+                        .div(VE_CONFIG.maxLock)
                         .minus(slopeUsed.minus(slopeRefill)),
                     slopeRefill
                 );

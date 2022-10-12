@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { useCallback, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 
 type ModalType = {
     calc_boost: { farmAddress?: string };
@@ -56,7 +56,7 @@ function useRouteModal<T extends keyof ModalType>(key: keyof ModalType) {
 
     const onCloseModal = useCallback(() => {
         const router = routerRef.current;
-        router.push(
+        router.replace(
             {
                 pathname: router.pathname,
                 query: (delete router.query.p, router.query),
@@ -65,6 +65,10 @@ function useRouteModal<T extends keyof ModalType>(key: keyof ModalType) {
             { shallow: true }
         );
     }, []);
+
+    useEffect(() => {
+        routerRef.current = router;
+    }, [router]);
 
     return {
         showModal,
