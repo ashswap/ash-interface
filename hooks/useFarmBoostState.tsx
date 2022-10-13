@@ -171,15 +171,6 @@ export const useFarmBoostOwnerState = (farmData: FarmRecord) => {
                     (total, t) => total.plus(t.balance),
                     new BigNumber(0)
                 );
-                console.log(                    slopeRefill.toNumber(),
-                    lpAmt.toString(),
-                    slopeUsed.toString(),
-                    veSupply.toString(),
-                    lockedAshAmt.toString(),
-                    unlockTs.toString(),
-                    farmData.lpLockedAmt.toString(),
-                    farmData.farmTokenSupply.toString(),
-                    farmBalance.toString())
                 const _boostInfo = await calcBoost(
                     slopeRefill,
                     lpAmt,

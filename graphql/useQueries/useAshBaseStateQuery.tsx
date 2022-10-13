@@ -1,11 +1,14 @@
+import { ashBaseStateRefresherAtom } from "atoms/ashswap";
 import { accAddressState } from "atoms/dappState";
 import { gql } from "graphql-request";
 import { graphqlFetcher } from "helper/common";
-import { useRecoilValue } from "recoil";
+import { useEffect } from "react";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import useSWR from "swr";
 import { SWRConfiguration } from "swr/dist/types";
 const useAshBaseStateQuery = (config?: SWRConfiguration) => {
     const accAddress = useRecoilValue(accAddressState);
+    const setAshBaseStateRefresher = useSetRecoilState(ashBaseStateRefresherAtom);
     const swr = useSWR(
         [
             gql`
@@ -93,6 +96,9 @@ const useAshBaseStateQuery = (config?: SWRConfiguration) => {
         graphqlFetcher,
         {refreshInterval: 6000, ...config}
     );
+    useEffect(() => {
+        setAshBaseStateRefresher(() => swr.mutate);
+    }, [setAshBaseStateRefresher, swr.mutate]);
     return swr;
 };
 
