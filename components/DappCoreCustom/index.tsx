@@ -1,14 +1,16 @@
 import { TransactionsTracker } from "@elrondnetwork/dapp-core/components/TransactionsTracker";
 import { useGetPendingTransactions } from "@elrondnetwork/dapp-core/hooks";
 import { checkBatch } from "@elrondnetwork/dapp-core/hooks/transactions/useCheckTransactionStatus/checkBatch";
-import { SignedTransactionsBodyType } from "@elrondnetwork/dapp-core/types";
+import { GetTransactionsByHashesReturnType, PendingTransactionsType, SignedTransactionsBodyType } from "@elrondnetwork/dapp-core/types";
 import {
     getIsTransactionPending
 } from "@elrondnetwork/dapp-core/utils";
 import { CustomComponentsType } from "@elrondnetwork/dapp-core/wrappers/DappProvider/CustomComponents";
 import { lastCompletedTxHashAtom } from "atoms/transactions";
-import { useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useRecoilValue } from "recoil";
+import {getTransactionsByHashes} from "@elrondnetwork/dapp-core/apiCalls/transactions/getTransactionsByHashes";
+import emitter from "helper/emitter";
 
 const CustomTransactionsTracker: typeof TransactionsTracker = () => {
     const { pendingTransactionsArray } = useGetPendingTransactions();
@@ -28,6 +30,13 @@ const CustomTransactionsTracker: typeof TransactionsTracker = () => {
         );
     }, [pendingTransactionsArray]);
 
+    const getTransactionByHashesIntercept = useCallback(async (pendingTxs: PendingTransactionsType) => {
+        const serverTransactions: GetTransactionsByHashesReturnType = await getTransactionsByHashes(pendingTxs);
+        const completedTxs = serverTransactions.filter(tx => tx.status !== 'pending');
+        emitter.emit('onCheckBatchResult', completedTxs);
+        return serverTransactions;
+    }, []);
+
     useEffect(() => {
         pendingBatchTxsRef.current = pendingBatches || [];
     }, [pendingBatches])
@@ -46,11 +55,12 @@ const CustomTransactionsTracker: typeof TransactionsTracker = () => {
                             transactions: [matchedTx],
                             customTransactionInformation: batch.customTransactionInformation
                         },
+                        getTransactionsByHash: getTransactionByHashesIntercept
                     });
                 }
             }
         );
-    }, [lastCompletedTxHash]);
+    }, [lastCompletedTxHash, getTransactionByHashesIntercept]);
 
     // fallback if socket fail to emit/receive transactionCompleted events in 60s
     useEffect(() => {
