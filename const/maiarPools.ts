@@ -10,28 +10,41 @@ const devnet: MaiarPoolConfig = {
     alpha: [
         {
             address:
-                "erd1qqqqqqqqqqqqqpgq9efzwnujjm6f75pccujr2jp4j5csym0vrmcqg9r3ff",
+                "erd1qqqqqqqqqqqqqpgqd69cn4nfel93s09jdxxwekafrv528ztzrmcqntvk0z",
             lpToken: {
-                identifier: "LPT-8d3117",
-                symbol: "LPT-8d3117",
+                identifier: "LPT-12718c",
+                symbol: "LPT-12718c",
                 decimals: 18,
                 chainId: CHAIN_ID.DEVNET,
                 name: "Maiar LP",
             },
-            tokens: [TOKENS_MAP["ASH-4ce444"], TOKENS_MAP["USDT-a55fa7"]],
+            tokens: [TOKENS_MAP["BUSD-104d95"], TOKENS_MAP["RENBTC-61ff58"]],
             isMaiarPool: true,
         },
         {
             address:
-                "erd1qqqqqqqqqqqqqpgqkec4u8tkq4tztu30vvk889dnnddex5k8rmcqqnw6a4",
+                "erd1qqqqqqqqqqqqqpgqdsp4a5pxy43452e6uaed4jr9m9xqhh0hrmcqw685su",
             lpToken: {
-                identifier: "LPT-a31851",
-                symbol: "LPT-a31851",
+                identifier: "LPT-c63e7e",
+                symbol: "LPT-c63e7e",
                 decimals: 18,
                 chainId: CHAIN_ID.DEVNET,
                 name: "Maiar LP",
             },
-            tokens: [TOKENS_MAP["WBTC-9bdb9b"], TOKENS_MAP["USDC-d5181d"]],
+            tokens: [TOKENS_MAP["USDC-89351f"], TOKENS_MAP["AEGLD-3e2d88"]],
+            isMaiarPool: true,
+        },
+        {
+            address:
+                "erd1qqqqqqqqqqqqqpgqteeux9x8p565tqltwz0tvfu7ayc3nk2jrmcqpukfw3",
+            lpToken: {
+                identifier: "LPT-e72954",
+                symbol: "LPT-e72954",
+                decimals: 18,
+                chainId: CHAIN_ID.DEVNET,
+                name: "Maiar LP",
+            },
+            tokens: [TOKENS_MAP["USDT-2c4852"], TOKENS_MAP["ASH-a0d8e5"]],
             isMaiarPool: true,
         },
     ],

@@ -14,7 +14,7 @@ export const VE_ASH_DECIMALS = 18;
 
 const DEVNET_TOKENS_ALPHA: IESDTInfo[] = [
     {
-        identifier: "ASH-4ce444",
+        identifier: "ASH-a0d8e5",
         chainId: ChainId.Devnet,
         symbol: "ASH",
         name: "Ashswap Token",
@@ -22,7 +22,7 @@ const DEVNET_TOKENS_ALPHA: IESDTInfo[] = [
         logoURI: ImgAshIcon.src,
     },
     {
-        identifier: "USDT-a55fa7",
+        identifier: "USDT-2c4852",
         chainId: ChainId.Devnet,
         symbol: "USDT",
         name: "Tether",
@@ -30,7 +30,7 @@ const DEVNET_TOKENS_ALPHA: IESDTInfo[] = [
         logoURI: IconUSDT.src,
     },
     {
-        identifier: "USDC-d5181d",
+        identifier: "USDC-89351f",
         chainId: ChainId.Devnet,
         symbol: "USDC",
         name: "USD Coin",
@@ -38,15 +38,15 @@ const DEVNET_TOKENS_ALPHA: IESDTInfo[] = [
         logoURI: IconUSDC.src,
     },
     {
-        identifier: "WUSDC-3124eb",
+        identifier: "BUSD-104d95",
         chainId: ChainId.Devnet,
-        symbol: "wUSDC",
-        name: "Wrapped USDC",
+        symbol: "BUSD",
+        name: "Binance USD",
         decimals: 6,
-        logoURI: IconWUSDC.src,
+        logoURI: IconBUSD.src,
     },
     {
-        identifier: "RENBTC-0b6973",
+        identifier: "RENBTC-61ff58",
         chainId: ChainId.Devnet,
         symbol: "renBTC",
         name: "Ren BTC",
@@ -54,12 +54,28 @@ const DEVNET_TOKENS_ALPHA: IESDTInfo[] = [
         logoURI: IconBTC.src,
     },
     {
-        identifier: "WBTC-9bdb9b",
+        identifier: "WBTC-3965ad",
         chainId: ChainId.Devnet,
         symbol: "wBTC",
         name: "Wrapped BTC",
         decimals: 8,
         logoURI: IconWBTC.src,
+    },
+    {
+        identifier: "WEGLD-d6dee7",
+        chainId: ChainId.Devnet,
+        symbol: "wEGLD",
+        name: "Wrapped EGLD",
+        decimals: 18,
+        logoURI: IconWEGLD.src,
+    },
+    {
+        identifier: "AEGLD-3e2d88",
+        chainId: ChainId.Devnet,
+        symbol: "aEGLD",
+        name: "A EGLD",
+        decimals: 18,
+        logoURI: IconAEGLD.src,
     },
 ];
 const DEVNET_TOKENS_BETA: IESDTInfo[] = [
@@ -146,7 +162,7 @@ export const ASH_TOKEN: IESDTInfo =
     TOKENS_MAP[
         ENVIRONMENT.NETWORK == "devnet"
             ? ENVIRONMENT.ENV === "alpha"
-                ? "ASH-4ce444"
+                ? "ASH-a0d8e5"
                 : "ASH-6969f1"
             : ""
     ];
@@ -157,7 +173,7 @@ export const ASH_ESDT =
     ESDT_MAP[
         ENVIRONMENT.NETWORK == "devnet"
             ? ENVIRONMENT.ENV === "alpha"
-                ? "ASH-4ce444"
+                ? "ASH-a0d8e5"
                 : "ASH-6969f1"
             : ""
     ];

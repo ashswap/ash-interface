@@ -16,9 +16,9 @@ const dappContractDevnet: DappContractConfig = {
     },
     alpha: {
         voteEscrowedContract:
-            "erd1qqqqqqqqqqqqqpgquy2s8dm5k66xu2wvxwvqlfccqy3ke9xermcqx5wqsn",
+            "erd1qqqqqqqqqqqqqpgqhcxzesh0q0cuvr4atp3jlmrvgguw2nvermcq3yu9rl",
         feeDistributor:
-            "erd1qqqqqqqqqqqqqpgqcgnps9r7g7ywql70s0eusddfue8lgsaurmcqx5yd3w",
+            "erd1qqqqqqqqqqqqqpgque0adu3plxy0r3gcamd4m2nl23hlud6srmcqzzyx6z",
     },
 };
 
@@ -38,7 +38,7 @@ export const VE_CONFIG = {
     // minLock: 7 * 24 * 3600,
     // for BoY
     maxLock: 2 * 7 * 24 * 3600,
-    minLock: ENVIRONMENT.ENV === "alpha" ? 10 * 60 : 12 * 60 * 60,
+    minLock: 12 * 60 * 60,
 };
 
 export const ASHSWAP_CONFIG = {
