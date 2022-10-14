@@ -10,15 +10,15 @@ type DappContractConfig = {
 const dappContractDevnet: DappContractConfig = {
     beta: {
         voteEscrowedContract:
-            "erd1qqqqqqqqqqqqqpgqemp4a6mud6kh4x5dflql53uyzs9jrz5ermcq8a5f5v",
+            "erd1qqqqqqqqqqqqqpgqkqjzf9t26rvkq46qgkwym0hvlwczrsy3rmcq6s6uss",
         feeDistributor:
-            "erd1qqqqqqqqqqqqqpgq4dkwq6fjvr9yuaxj3tpanuul9dy2kvl3rmcq7rseul",
+            "erd1qqqqqqqqqqqqqpgq0skjjx8wmvw83jyxeulntgl2nq6alsv8rmcqhypczn",
     },
     alpha: {
         voteEscrowedContract:
-            "erd1qqqqqqqqqqqqqpgquy2s8dm5k66xu2wvxwvqlfccqy3ke9xermcqx5wqsn",
+            "erd1qqqqqqqqqqqqqpgqhcxzesh0q0cuvr4atp3jlmrvgguw2nvermcq3yu9rl",
         feeDistributor:
-            "erd1qqqqqqqqqqqqqpgqcgnps9r7g7ywql70s0eusddfue8lgsaurmcqx5yd3w",
+            "erd1qqqqqqqqqqqqqpgque0adu3plxy0r3gcamd4m2nl23hlud6srmcqzzyx6z",
     },
 };
 
@@ -38,8 +38,8 @@ export const VE_CONFIG = {
     // minLock: 7 * 24 * 3600,
     // for BoY
     maxLock: 2 * 7 * 24 * 3600,
-    minLock: ENVIRONMENT.ENV === 'alpha' ? 10 * 60 : 12 * 60 * 60
-}
+    minLock: 12 * 60 * 60,
+};
 
 export const ASHSWAP_CONFIG = {
     ashApiBaseUrl: ENVIRONMENT.ASH_API,

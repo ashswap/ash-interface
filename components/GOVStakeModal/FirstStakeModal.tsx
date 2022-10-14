@@ -33,17 +33,16 @@ type props = {
 // for BoY
 const LOCK_CONFIG_BOY = {
     predefinedLockPeriod: [
-        ENVIRONMENT.ENV === "alpha"
-            ? { value: 10 * 60, label: "10 minutes" }
-            : { value: 12 * 60 * 60, label: "12 hours" },
+        // ENVIRONMENT.ENV === "alpha"
+        { value: 12 * 60 * 60, label: "12 hours" },
         { value: 24 * 60 * 60, label: "1 day" },
         { value: 3 * 24 * 60 * 60, label: "3 days" },
         { value: 1 * 7 * 24 * 60 * 60, label: "1 week" },
         { value: 2 * 7 * 24 * 60 * 60, label: "2 weeks" },
     ],
     maxLock: 2 * 7 * 24 * 60 * 60,
-    minLock: ENVIRONMENT.ENV === "alpha" ? 10 * 60 : 12 * 60 * 60,
-    sliderStep: ENVIRONMENT.ENV === "alpha" ? 10 * 60 : 12 * 60 * 60,
+    minLock: 12 * 60 * 60,
+    sliderStep: 12 * 60 * 60,
 };
 const LOCK_CONFIG_MAIN = {
     predefinedLockPeriod: [
