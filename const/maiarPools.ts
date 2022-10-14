@@ -35,7 +35,47 @@ const devnet: MaiarPoolConfig = {
             isMaiarPool: true,
         },
     ],
-    beta: [],
+    beta: [
+        {
+            address:
+                "erd1qqqqqqqqqqqqqpgqhkh5meslneg4a5jxelc3uxzyx2h8dhgzrmcqglju3p",
+            lpToken: {
+                identifier: "LPT-bb63c8",
+                symbol: "LPT-bb63c8",
+                decimals: 18,
+                chainId: CHAIN_ID.DEVNET,
+                name: "Maiar LP",
+            },
+            tokens: [TOKENS_MAP["BUSD-46fbb9"], TOKENS_MAP["RENBTC-fb2e83"]],
+            isMaiarPool: true,
+        },
+        {
+            address:
+                "erd1qqqqqqqqqqqqqpgqyp36j7apxajzclu72d7d4h5ghhth2a9rrmcqgcfrgs",
+            lpToken: {
+                identifier: "LPT-8c4633",
+                symbol: "LPT-8c4633",
+                decimals: 18,
+                chainId: CHAIN_ID.DEVNET,
+                name: "Maiar LP",
+            },
+            tokens: [TOKENS_MAP["USDC-3ae937"], TOKENS_MAP["AEGLD-f09e97"]],
+            isMaiarPool: true,
+        },
+        {
+            address:
+                "erd1qqqqqqqqqqqqqpgq2wupw4rr4lknm6rl75vcjzdxg48c5gvdrmcqgetg9e",
+            lpToken: {
+                identifier: "LPT-96c663",
+                symbol: "LPT-96c663",
+                decimals: 18,
+                chainId: CHAIN_ID.DEVNET,
+                name: "Maiar LP",
+            },
+            tokens: [TOKENS_MAP["USDT-186541"], TOKENS_MAP["ASH-6969f1"]],
+            isMaiarPool: true,
+        },
+    ],
 };
 
 export const MAIAR_POOLS =
