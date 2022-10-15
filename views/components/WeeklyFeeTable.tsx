@@ -27,8 +27,8 @@ const Row = ({ order, feeData }: { order: number; feeData: FeeRecord }) => {
                 <span> - </span>
                 <span className="text-white">{to.format("DD MMM, ")}</span>
                 <span>{to.format("yyyy")}</span> */}
-                <span className="text-white">{to.format("DD MMM, ")}</span>
-                <span>{to.format("yyyy")}</span>
+                <span className="text-white">{from.format("DD MMM, ")}</span>
+                <span>{from.format("YYYY")}</span>
             </div>
             <div className="text-right">
                 $
@@ -54,6 +54,7 @@ function WeeklyFeeTable() {
         (data || []).map((val) => {
             const key = moment
                 .unix(val.from_timestamp)
+                .utc()
                 // for BoY only
                 // .weekday(0)
                 .endOf("days")
