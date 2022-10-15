@@ -1,3 +1,4 @@
+import { ashBaseStateRefresherAtom } from "atoms/ashswap";
 import { farmTokensRefresherAtom } from "atoms/farmsState";
 import { tokensRefresherAtom } from "atoms/tokensState";
 import { useRecoilCallback } from "recoil";
@@ -9,8 +10,19 @@ export const useFetchBalances = () => {
                 const tokenRefresher = await snapshot.getPromise(
                     tokensRefresherAtom
                 );
-                const farmTokensRefresher = await snapshot.getPromise(farmTokensRefresherAtom);
-                Promise.all([tokenRefresher?.(), farmTokensRefresher?.()]);
+                const farmTokensRefresher = await snapshot.getPromise(
+                    farmTokensRefresherAtom
+                );
+                const ashBaseStateRefresher = await snapshot.getPromise(
+                    ashBaseStateRefresherAtom
+                );
+                setTimeout(() => {
+                    Promise.all([
+                        tokenRefresher?.(),
+                        farmTokensRefresher?.(),
+                        ashBaseStateRefresher?.(),
+                    ]);
+                }, 500);
             },
         []
     );

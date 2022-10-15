@@ -264,14 +264,16 @@ PoolDetailPage.getLayout = function getLayout(page: ReactElement) {
 };
 export const getStaticPaths: GetStaticPaths = async () => {
     return {
-        paths: pools.map((p) => ({ params: { address: p.address } })),
+        paths: pools
+            .filter((p) => !p.isMaiarPool)
+            .map((p) => ({ params: { address: p.address } })),
         fallback: false,
     };
 };
 export const getStaticProps: GetStaticProps = async ({ params }) => {
     const { address } = params || {};
     const pool = pools.find((t) => t.address === address);
-    if (pool) {
+    if (pool && !pool.isMaiarPool) {
         return {
             props: { pool },
         };

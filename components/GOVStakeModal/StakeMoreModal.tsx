@@ -18,6 +18,7 @@ import Switch from "components/Switch";
 import TextAmt from "components/TextAmt";
 import CardTooltip from "components/Tooltip/CardTooltip";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
+import { ENVIRONMENT } from "const/env";
 import { ASH_TOKEN, VE_ASH_DECIMALS } from "const/tokens";
 import { toEGLDD, toWei } from "helper/balance";
 import { estimateVeASH } from "helper/voteEscrow";
@@ -33,7 +34,19 @@ type props = {
     open: boolean;
     onClose: () => void;
 };
-const EXTEND_CONFIG = {
+// for BoY
+const EXTEND_BOY = {
+    options: [
+        // test purpose
+        { value: 12 * 60 * 60, label: "+ 12 hours" },
+        { value: 24 * 60 * 60, label: "+ 1 day" },
+        { value: 3 * 24 * 60 * 60, label: "+ 3 days" },
+        { value: 1 * 7 * 24 * 60 * 60, label: "+ 1 week" },
+    ],
+    maxLock: 2 * 7 * 24 * 60 * 60,
+    minLock: 12 * 60 * 60,
+};
+const EXTEND_CONFIG_MAIN = {
     options: [
         // test purpose
         { value: 7 * 24 * 60 * 60, label: "+ 1 week" },
@@ -45,6 +58,7 @@ const EXTEND_CONFIG = {
     maxLock: 4 * 365 * 24 * 60 * 60,
     minLock: 7 * 24 * 60 * 60,
 };
+const EXTEND_CONFIG = EXTEND_BOY;
 const StakeMoreContent = ({ open, onClose }: props) => {
     const lockedAmt = useRecoilValue(govLockedAmtState);
     const unlockTS = useRecoilValue(govUnlockTSState);

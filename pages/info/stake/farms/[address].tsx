@@ -59,17 +59,17 @@ function FarmDetailPage({ pool }: Props) {
     const [token1, token2] = useMemo(() => pool.tokens, [pool]);
     const network: AccountInfoSliceNetworkType =
         useRecoilValue(networkConfigState).network;
-        const adminFee = useMemo(() => {
-            if (!stats) return 0;
-            return getTotalFees(stats, (i) => `token_${i}_admin_fee_usd`);
-        }, [stats]);
-        const totalFee = useMemo(() => {
-            if (!stats) return 0;
-            return getTotalFees(stats, (i) => `token_${i}_total_fee_usd`);
-        }, [stats]);
-        const fees = useMemo(() => {
-            return totalFee - adminFee;
-        }, [totalFee, adminFee]);
+    const adminFee = useMemo(() => {
+        if (!stats) return 0;
+        return getTotalFees(stats, (i) => `token_${i}_admin_fee_usd`);
+    }, [stats]);
+    const totalFee = useMemo(() => {
+        if (!stats) return 0;
+        return getTotalFees(stats, (i) => `token_${i}_total_fee_usd`);
+    }, [stats]);
+    const fees = useMemo(() => {
+        return totalFee - adminFee;
+    }, [totalFee, adminFee]);
     return (
         <div className="text-white py-7 max-w-6xl mx-auto px-6 sm:px-0">
             <ul className="flex space-x-1 text-xs mb-6">
@@ -224,9 +224,7 @@ function FarmDetailPage({ pool }: Props) {
                         </div>
                         <div className="text-sm sm:text-lg">
                             <span className="text-stake-gray-500">$ </span>
-                            <span>
-                                {formatAmount(stats?.tvl)}
-                            </span>
+                            <span>{formatAmount(stats?.tvl)}</span>
                         </div>
                     </div>
                     <div className="px-4 md:px-[1.625rem] py-4 md:pt-5 md:pb-8 bg-ash-dark-600 flex flex-col justify-between">
@@ -244,11 +242,7 @@ function FarmDetailPage({ pool }: Props) {
                         </div>
                         <div className="text-sm sm:text-lg">
                             <span className="text-stake-gray-500">$ </span>
-                            <span>
-                                {stats
-                                    ? formatAmount(fees)
-                                    : "0.00"}
-                            </span>
+                            <span>{stats ? formatAmount(fees) : "0.00"}</span>
                         </div>
                     </div>
                 </div>

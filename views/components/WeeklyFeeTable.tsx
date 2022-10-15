@@ -22,9 +22,11 @@ const Row = ({ order, feeData }: { order: number; feeData: FeeRecord }) => {
         <div className="grid grid-cols-[2rem,1fr,1fr] gap-x-4 sm:gap-x-8 lg:gap-x-28 items-center h-12 bg-ash-dark-600 px-4.5 lg:px-6 text-stake-gray-500 text-xs">
             <div className="text-right">{order}</div>
             <div className="">
-                <span className="text-white">{from.format("DD MMM, ")}</span>
+                {/* <span className="text-white">{from.format("DD MMM, ")}</span>
                 <span>{from.format("yyyy")}</span>
                 <span> - </span>
+                <span className="text-white">{to.format("DD MMM, ")}</span>
+                <span>{to.format("yyyy")}</span> */}
                 <span className="text-white">{to.format("DD MMM, ")}</span>
                 <span>{to.format("yyyy")}</span>
             </div>
@@ -52,7 +54,8 @@ function WeeklyFeeTable() {
         (data || []).map((val) => {
             const key = moment
                 .unix(val.from_timestamp)
-                .weekday(0)
+                // for BoY only
+                // .weekday(0)
                 .endOf("days")
                 .unix();
             map[key] = [...(map[key] || []), val];

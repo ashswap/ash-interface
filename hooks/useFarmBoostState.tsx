@@ -13,7 +13,7 @@ import {
     govUnlockTSState,
 } from "atoms/govState";
 import BigNumber from "bignumber.js";
-import { ASHSWAP_CONFIG } from "const/ashswapConfig";
+import { ASHSWAP_CONFIG, VE_CONFIG } from "const/ashswapConfig";
 import { ContractManager } from "helper/contracts/contractManager";
 import {
     calcYieldBoost,
@@ -191,7 +191,7 @@ export const useFarmBoostOwnerState = (farmData: FarmRecord) => {
                 };
                 setAvailableVe(
                     lockedAshAmt
-                        .div(4 * 365 * 24 * 3600)
+                        .div(VE_CONFIG.maxLock)
                         .minus(slopeUsed)
                         .multipliedBy(unlockTs.minus(moment().unix()))
                 );

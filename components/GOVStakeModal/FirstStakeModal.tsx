@@ -12,7 +12,9 @@ import InputCurrency from "components/InputCurrency";
 import TextAmt from "components/TextAmt";
 import CardTooltip from "components/Tooltip/CardTooltip";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
+import { ENVIRONMENT } from "const/env";
 import { ASH_TOKEN, VE_ASH_DECIMALS } from "const/tokens";
+import { VE_LOCK_LABEL } from "const/ve";
 import { toEGLD, toEGLDD, toWei } from "helper/balance";
 import { estimateVeASH } from "helper/voteEscrow";
 import useGovLockASH from "hooks/useGovContract/useGovLockASH";
@@ -28,7 +30,21 @@ type props = {
     open: boolean;
     onClose: () => void;
 };
-const LOCK_CONFIG = {
+// for BoY
+const LOCK_CONFIG_BOY = {
+    predefinedLockPeriod: [
+        // ENVIRONMENT.ENV === "alpha"
+        { value: 12 * 60 * 60, label: "12 hours" },
+        { value: 24 * 60 * 60, label: "1 day" },
+        { value: 3 * 24 * 60 * 60, label: "3 days" },
+        { value: 1 * 7 * 24 * 60 * 60, label: "1 week" },
+        { value: 2 * 7 * 24 * 60 * 60, label: "2 weeks" },
+    ],
+    maxLock: 2 * 7 * 24 * 60 * 60,
+    minLock: 12 * 60 * 60,
+    sliderStep: 12 * 60 * 60,
+};
+const LOCK_CONFIG_MAIN = {
     predefinedLockPeriod: [
         { value: 7 * 24 * 60 * 60, label: "1 week" },
         { value: 4 * 7 * 24 * 60 * 60, label: "4 weeks" },
@@ -41,6 +57,7 @@ const LOCK_CONFIG = {
     minLock: 7 * 24 * 60 * 60,
     sliderStep: 24 * 60 * 60,
 };
+const LOCK_CONFIG = LOCK_CONFIG_BOY;
 const FirstStakeContent = ({ open, onClose }: props) => {
     const tokenMap = useRecoilValue(tokenMapState);
     const insufficientEGLD = useRecoilValue(accIsInsufficientEGLDState);
@@ -194,62 +211,27 @@ const FirstStakeContent = ({ open, onClose }: props) => {
                                                 until the lock duration ends.
                                             </div>
                                             <ul>
-                                                <li className="text-sm font-bold">
-                                                    <span className="text-stake-green-500">
-                                                        1
-                                                    </span>{" "}
-                                                    ASH locked for{" "}
-                                                    <span className="text-stake-green-500">
-                                                        4 years
-                                                    </span>{" "}
-                                                    ={" "}
-                                                    <span className="text-stake-green-500">
-                                                        1
-                                                    </span>{" "}
-                                                    veASH
-                                                </li>
-                                                <li className="text-sm font-bold">
-                                                    <span className="text-stake-green-500">
-                                                        1
-                                                    </span>{" "}
-                                                    ASH locked for{" "}
-                                                    <span className="text-stake-green-500">
-                                                        3 years
-                                                    </span>{" "}
-                                                    ={" "}
-                                                    <span className="text-stake-green-500">
-                                                        0.75
-                                                    </span>{" "}
-                                                    veASH
-                                                </li>
-                                                <li className="text-sm font-bold">
-                                                    <span className="text-stake-green-500">
-                                                        1
-                                                    </span>{" "}
-                                                    ASH locked for{" "}
-                                                    <span className="text-stake-green-500">
-                                                        2 years
-                                                    </span>{" "}
-                                                    ={" "}
-                                                    <span className="text-stake-green-500">
-                                                        0.5
-                                                    </span>{" "}
-                                                    veASH
-                                                </li>
-                                                <li className="text-sm font-bold">
-                                                    <span className="text-stake-green-500">
-                                                        1
-                                                    </span>{" "}
-                                                    ASH locked for{" "}
-                                                    <span className="text-stake-green-500">
-                                                        1 year
-                                                    </span>{" "}
-                                                    ={" "}
-                                                    <span className="text-stake-green-500">
-                                                        0.25
-                                                    </span>{" "}
-                                                    veASH
-                                                </li>
+                                                {VE_LOCK_LABEL.map((lock) => {
+                                                    return (
+                                                        <li
+                                                            key={lock.amt}
+                                                            className="text-sm font-bold"
+                                                        >
+                                                            <span className="text-stake-green-500">
+                                                                1
+                                                            </span>{" "}
+                                                            ASH locked for{" "}
+                                                            <span className="text-stake-green-500">
+                                                                {lock.label}
+                                                            </span>{" "}
+                                                            ={" "}
+                                                            <span className="text-stake-green-500">
+                                                                {lock.amt}
+                                                            </span>{" "}
+                                                            veASH
+                                                        </li>
+                                                    );
+                                                })}
                                             </ul>
                                         </div>
                                     </div>

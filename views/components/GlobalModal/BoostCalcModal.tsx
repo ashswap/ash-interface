@@ -22,13 +22,19 @@ import { useScreenSize } from "hooks/useScreenSize";
 import Image from "components/Image";
 import { useEffect, useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
+import { ENVIRONMENT } from "const/env";
 
-const LockOptions = [
+const LOCK_OPTS_BOY = [
+    { value: 2 * 7 * 24 * 3600, label: "2 weeks" },
+    { value: 7 * 24 * 3600, label: "1 week" },
+];
+const LOCK_OPTS_MAIN = [
     { value: 4 * 365 * 24 * 3600, label: "4 years" },
     { value: 3 * 365 * 24 * 3600, label: "3 years" },
     { value: 2 * 365 * 24 * 3600, label: "2 years" },
     { value: 365 * 24 * 3600, label: "1 year" },
 ];
+const LOCK_OPTS = LOCK_OPTS_BOY;
 
 type BoostCalcProps = { farmAddress?: string };
 const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
@@ -44,7 +50,7 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
     );
     const [ashInput, setAshInput] = useState(new BigNumber(0));
     const [isUserInput, setIsUserInput] = useState(false);
-    const [selectedLock, setSelectedLock] = useState(LockOptions[0]);
+    const [selectedLock, setSelectedLock] = useState(LOCK_OPTS[0]);
 
     const farmData = useRecoilValue(farmQuery(farmAddress || ""));
     const veASHSupplyRecoil = useRecoilValue(govTotalSupplyVeASH);
@@ -147,6 +153,25 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
         currentFarmSupplyWei,
         existFarmTokenBal,
     ]);
+
+    // const ashStakeMaxBoostArr = useMemo(() => {
+    //     return [
+    //         veForMaxBoost,
+    //         veForMaxBoost.div(0.75),
+    //         veForMaxBoost.div(0.5),
+    //         veForMaxBoost.div(0.25),
+    //     ].map((ash, i) => ({
+    //         amt: ash.toNumber(),
+    //         year: 4 - i,
+    //     }));
+    // }, [veForMaxBoost]);
+
+    const ashStakeMaxBoostArr = useMemo(() => {
+        return [veForMaxBoost, veForMaxBoost.div(0.5)].map((ash, i) => ({
+            amt: ash.toNumber(),
+            week: 2 - i,
+        }));
+    }, [veForMaxBoost]);
 
     useEffect(() => {
         if (farmAddress && !isUserInput) {
@@ -368,48 +393,38 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
                             <CardTooltip
                                 content={
                                     <div className="text-xs text-white space-y-2">
-                                        <div>
-                                            {formatAmount(
-                                                veForMaxBoost.toNumber()
-                                            )}{" "}
-                                            ASH locked for 4{" "}
-                                            <span className="text-stake-green-500">
-                                                years
-                                            </span>
-                                        </div>
-                                        <div>
-                                            {formatAmount(
-                                                veForMaxBoost
-                                                    .div(0.75)
-                                                    .toNumber()
-                                            )}{" "}
-                                            ASH locked for 3{" "}
-                                            <span className="text-stake-green-500">
-                                                years
-                                            </span>
-                                        </div>
-                                        <div>
-                                            {formatAmount(
-                                                veForMaxBoost
-                                                    .div(0.5)
-                                                    .toNumber()
-                                            )}{" "}
-                                            ASH locked for 2{" "}
-                                            <span className="text-stake-green-500">
-                                                years
-                                            </span>
-                                        </div>
-                                        <div>
-                                            {formatAmount(
-                                                veForMaxBoost
-                                                    .div(0.25)
-                                                    .toNumber()
-                                            )}{" "}
-                                            ASH locked for 1{" "}
-                                            <span className="text-stake-green-500">
-                                                year
-                                            </span>
-                                        </div>
+                                        {/* {ashStakeMaxBoostArr.map(
+                                            ({ amt, year }) => {
+                                                return (
+                                                    <div key={year}>
+                                                        {formatAmount(amt)} ASH
+                                                        locked for {year}{" "}
+                                                        <span className="text-stake-green-500">
+                                                            year
+                                                            {year > 1
+                                                                ? "s"
+                                                                : ""}
+                                                        </span>
+                                                    </div>
+                                                );
+                                            }
+                                        )} */}
+                                        {ashStakeMaxBoostArr.map(
+                                            ({ amt, week }) => {
+                                                return (
+                                                    <div key={week}>
+                                                        {formatAmount(amt)} ASH
+                                                        locked for {week}{" "}
+                                                        <span className="text-stake-green-500">
+                                                            week
+                                                            {week > 1
+                                                                ? "s"
+                                                                : ""}
+                                                        </span>
+                                                    </div>
+                                                );
+                                            }
+                                        )}
                                     </div>
                                 }
                             >
@@ -467,7 +482,7 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
                                         {({ close }) => {
                                             return (
                                                 <ul className="py-2">
-                                                    {LockOptions.map((opt) => {
+                                                    {LOCK_OPTS.map((opt) => {
                                                         return (
                                                             <li
                                                                 key={opt.value}
