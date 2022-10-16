@@ -29,11 +29,6 @@ const useVEState = () => {
                     totalLockedAmt
                         .multipliedBy(100)
                         .div(totalSupply)
-                        .div(
-                            new BigNumber(10).exponentiatedBy(
-                                ASH_TOKEN.decimals
-                            )
-                        )
                         .toNumber()
                 );
             },
