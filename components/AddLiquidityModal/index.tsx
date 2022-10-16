@@ -43,7 +43,7 @@ interface TokenInputProps {
     token: IESDTInfo;
     value: string;
     isInsufficentFund: boolean;
-    onChangeValue: (val: string, number: number) => void;
+    onChangeValue: (val: string, number: BigNumber) => void;
     balance: string;
     tokenInPool: BigNumber;
 }
@@ -58,7 +58,7 @@ const TokenInput = ({
     const onChangeValue = useCallback(
         (val: string) => {
             const num = +val;
-            _onChangeValue(val, Number.isNaN(num) ? 0 : num);
+            _onChangeValue(val, new BigNumber(Number.isNaN(num) ? 0 : val));
         },
         [_onChangeValue]
     );
@@ -140,7 +140,7 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
         poolData.pool.tokens.map(() => "")
     );
     const [inputValues, setInputValues] = useState(
-        poolData.pool.tokens.map(() => 0)
+        poolData.pool.tokens.map(() => new BigNumber(0))
     );
     const [isProMode, setIsProMode] = useState(false);
     const [adding, setAdding] = useState(false);
@@ -223,7 +223,7 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
                 tokenMap[t.identifier]?.balance || 0
             );
             const isInsufficientFund =
-                inputValues[i] === 0 || tokenAmt.equalTo(0)
+                inputValues[i].eq(0) || tokenAmt.equalTo(0)
                     ? false
                     : userInput.greaterThan(tokenAmt);
             return {
@@ -335,7 +335,9 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
                                             isInsufficentFund={
                                                 p.isInsufficientFund
                                             }
-                                            balance={p.tokenAmt.egld.toString(10)}
+                                            balance={p.tokenAmt.egld.toString(
+                                                10
+                                            )}
                                         />
                                     </div>
                                 );
