@@ -167,6 +167,16 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
                             <TxCompletedTracker />
                         </SocketProvider>
                         <GlobalModals />
+                        <a
+                            href="https://forms.gle/VfEEfzTG3LnJPPxC9"
+                            rel="noreferrer"
+                            target="_blank"
+                            className="fixed bottom-20 left-6 bg-pink-600 backdrop-blur-[25px] px-4 py-3"
+                        >
+                            <span className="text-xs font-bold text-white">
+                                Bug Report
+                            </span>
+                        </a>
                     </TestnetGuard>
                 </DappProvider>
             </RecoilRoot>
