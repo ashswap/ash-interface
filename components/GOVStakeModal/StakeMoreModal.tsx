@@ -116,31 +116,33 @@ const StakeMoreContent = ({ open, onClose }: props) => {
         return lockAmt.gt(ASHBalance);
     }, [ASHBalance, lockAmt]);
 
+    const canExtendLockPeriod = useMemo(() => {
+        return (
+            isExtend &&
+            extendLockPeriod >= EXTEND_CONFIG.minLock &&
+            extendLockPeriod + currentLockSeconds <= EXTEND_CONFIG.maxLock
+        );
+    }, [currentLockSeconds, extendLockPeriod, isExtend]);
+
     const canStake = useMemo(() => {
         return (
             !insufficientEGLD &&
             !insufficientASH &&
             isAgree &&
-            (lockAmt.gt(0) ||
-                (isExtend &&
-                    extendLockPeriod >= EXTEND_CONFIG.minLock &&
-                    extendLockPeriod + currentLockSeconds <=
-                        EXTEND_CONFIG.maxLock))
+            (lockAmt.gt(0) || canExtendLockPeriod)
         );
     }, [
         insufficientEGLD,
-        extendLockPeriod,
-        isAgree,
-        currentLockSeconds,
-        lockAmt,
-        isExtend,
         insufficientASH,
+        isAgree,
+        lockAmt,
+        canExtendLockPeriod,
     ]);
 
     const lockMore = useCallback(async () => {
         const { sessionId } = await lockMoreASH({
             weiAmt: lockAmt,
-            unlockTimestamp: isExtend
+            unlockTimestamp: canExtendLockPeriod
                 ? new BigNumber(
                       moment
                           .unix(unlockTS.toNumber())
@@ -150,7 +152,14 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                 : undefined,
         });
         if (sessionId) onClose?.();
-    }, [lockMoreASH, isExtend, extendLockPeriod, unlockTS, lockAmt, onClose]);
+    }, [
+        lockMoreASH,
+        lockAmt,
+        canExtendLockPeriod,
+        unlockTS,
+        extendLockPeriod,
+        onClose,
+    ]);
 
     const estimatedVeASH = useMemo(() => {
         if (isExtend) {
