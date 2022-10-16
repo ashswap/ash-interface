@@ -213,6 +213,11 @@ function StakeMenu() {
                             <div>
                                 <button
                                     className={`${styles.btn} outline-none`}
+                                    onMouseEnter={() =>
+                                        onboaringFarmFromAddedLp &&
+                                        isSuccessful &&
+                                        setOnboardedFarmFromAddedLp(true)
+                                    }
                                 >
                                     <ICStake className="inline-block w-4 h-4 md:mr-2 transition-none" />
                                     <div className="flex items-center">
