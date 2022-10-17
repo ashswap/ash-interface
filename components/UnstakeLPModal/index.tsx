@@ -59,7 +59,7 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
         const totalAshPerDay = ashPerBlock
             .multipliedBy(24 * 60 * 60)
             .div(blockTimeMs / 1000);
-        const shareOfFarm = stakedData.totalStakedLP.div(farmTokenSupply);
+        const shareOfFarm = stakedData.totalStakedLP.multipliedBy(0.4).div(farmTokenSupply);
         return totalAshPerDay.multipliedBy(shareOfFarm);
     }, [stakedData, farmTokenSupply, ashPerBlock]);
 
@@ -68,15 +68,13 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
         const totalAshPerDay = ashPerBlock
             .multipliedBy(24 * 60 * 60)
             .div(blockTimeMs / 1000);
-        const newStaked = stakedData.totalStakedLP.minus(unStakeAmt);
+        const baseFarmToken = unStakeAmt.multipliedBy(0.4);
+        const newStaked = stakedData.totalStakedLP.multipliedBy(0.4).minus(baseFarmToken);
         if (newStaked.lte(0)) return new BigNumber(0);
-        const shareOfFarm = newStaked.div(farmTokenSupply.minus(unStakeAmt));
+        const shareOfFarm = newStaked.div(farmTokenSupply.minus(baseFarmToken));
         return totalAshPerDay.multipliedBy(shareOfFarm);
     }, [stakedData, farmTokenSupply, ashPerBlock, unStakeAmt]);
 
-    const lpName = useMemo(() => {
-        return `LP-${token0.symbol}${token1.symbol}`;
-    }, [token0.symbol, token1.symbol]);
     const insufficientFarmToken = useMemo(() => {
         if (!stakedData?.totalStakedLP) return true;
         return unStakeAmt.gt(stakedData?.totalStakedLP);
@@ -134,7 +132,7 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
     return (
         <div className="px-6 lg:px-20 pb-12 overflow-auto">
             <div className="text-2xl font-bold text-yellow-600 mb-9 lg:mb-14">
-                Unstake {lpName}
+                Unstake {pool?.lpToken?.symbol}
             </div>
             <div className="sm:flex sm:space-x-8 lg:space-x-24 mb-18">
                 <div className="flex flex-col grow mb-16 sm:mb-0">
@@ -157,7 +155,7 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
                                     />
                                 </div>
                                 <div className="text-ash-gray-500 text-sm lg:text-lg font-bold">
-                                    {lpName}
+                                    {pool?.lpToken?.symbol}
                                 </div>
                             </div>
                         </div>
@@ -195,7 +193,7 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
                                         )}
                                         options={{ notation: "standard" }}
                                     />{" "}
-                                    {lpName}
+                                    {pool?.lpToken?.symbol}
                                 </span>
                             </div>
                         </div>
