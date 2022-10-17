@@ -41,15 +41,13 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
         setRawStakeAmt(toEGLDD(pool.lpToken.decimals, LPBalance).toString(10));
     }, [LPBalance, pool]);
     const ashPerDay = useMemo(() => {
+        const baseFarmToken = stakeAmt.multipliedBy(0.4);
         const totalAshPerDay = ashPerBlock
             .multipliedBy(24 * 60 * 60)
             .div(blockTimeMs / 1000);
-        const shareOfFarm = stakeAmt.div(farmTokenSupply.plus(stakeAmt));
+        const shareOfFarm = baseFarmToken.div(farmTokenSupply.plus(baseFarmToken));
         return totalAshPerDay.multipliedBy(shareOfFarm);
     }, [stakeAmt, farmTokenSupply, ashPerBlock]);
-    const lpName = useMemo(() => {
-        return `LP-${token0.symbol}${token1.symbol}`;
-    }, [token0.symbol, token1.symbol]);
     const insufficientLP = useMemo(() => {
         return !LPBalance || LPBalance.eq(0) || stakeAmt.gt(LPBalance);
     }, [LPBalance, stakeAmt]);
@@ -67,7 +65,7 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
     return (
         <div className="px-6 lg:px-20 pb-12 overflow-auto">
             <div className="text-2xl font-bold text-ash-cyan-500 mb-9 lg:mb-14">
-                Stake {lpName}
+                Stake {pool?.lpToken?.symbol}
             </div>
             <div className="sm:flex sm:space-x-8 lg:space-x-24 mb-18">
                 <div className="flex flex-col grow mb-16 lg:mb-0">
@@ -90,7 +88,7 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
                                     />
                                 </div>
                                 <div className="text-ash-gray-500 text-sm lg:text-lg font-bold">
-                                    {lpName}
+                                    {pool?.lpToken?.symbol}
                                 </div>
                             </div>
                         </div>
@@ -131,7 +129,7 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
                                                 : 0
                                         }
                                     />{" "}
-                                    {lpName}
+                                    {pool?.lpToken?.symbol}
                                 </span>
                             </div>
                         </div>
