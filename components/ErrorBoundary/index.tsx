@@ -4,7 +4,7 @@ function ErrorBoundary({ children }: any) {
     return (
         <Sentry.ErrorBoundary
             beforeCapture={(scope) => {
-                scope.setLevel(Sentry.Severity.Fatal);
+                scope.setLevel("fatal");
             }}
             fallback={() => {
                 return (
