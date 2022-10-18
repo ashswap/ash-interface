@@ -27,6 +27,7 @@ import {
     useState,
 } from "react";
 import { RecoilRoot } from "recoil";
+import { theme } from "tailwind.config";
 import GlobalModals from "views/components/GlobalModal";
 import * as gtag from "../helper/gtag";
 import "../styles/globals.css";
@@ -135,6 +136,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
                     name="viewport"
                     content="width=device-width, initial-scale=1.0"
                 />
+                <meta name="theme-color" content={theme.extend.colors.bg} />
             </Head>
             <NextSeo
                 title="AshSwap Interface"

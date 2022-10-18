@@ -254,8 +254,7 @@ const TokenSelect = ({
                                                 : "Search or try usdt-usdc"
                                         }
                                         suffix={<Search />}
-                                        outline
-                                        autoFocus
+                                        outline                                      
                                         value={keyword}
                                         onChange={(e) => {
                                             setKeyword(e.target.value);
