@@ -336,7 +336,7 @@ function GovBoostStatus() {
                     return produce(state, (draft) => {
                         farmsAddress.map((farm_address) => {
                             draft[farm_address] = [
-                                ...draft[farm_address],
+                                ...(draft[farm_address] || []),
                                 sessionId,
                             ];
                         });
