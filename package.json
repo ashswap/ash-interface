@@ -18,7 +18,7 @@
         "@floating-ui/react-dom-interactions": "^0.0.15",
         "@headlessui/react": "^1.4.3",
         "@popperjs/core": "^2.11.2",
-        "@sentry/nextjs": "^7.15.0",
+        "@sentry/nextjs": "^7.16.0",
         "@tailwindcss/line-clamp": "^0.4.0",
         "@tippyjs/react": "^4.2.6",
         "@types/numeral": "^2.0.2",
