@@ -57,8 +57,8 @@ const TokenInput = ({
 }: TokenInputProps) => {
     const onChangeValue = useCallback(
         (val: string) => {
-            const num = +val;
-            _onChangeValue(val, new BigNumber(Number.isNaN(num) ? 0 : val));
+            const num = new BigNumber(val);
+            _onChangeValue(val, num.isNaN() ? new BigNumber(0) : num);
         },
         [_onChangeValue]
     );
@@ -222,10 +222,7 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
                 t,
                 tokenMap[t.identifier]?.balance || 0
             );
-            const isInsufficientFund =
-                inputValues[i].eq(0) || tokenAmt.equalTo(0)
-                    ? false
-                    : userInput.greaterThan(tokenAmt);
+            const isInsufficientFund = userInput.greaterThan(tokenAmt);
             return {
                 tokenAmt,
                 isInsufficientFund,
