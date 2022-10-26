@@ -52,6 +52,21 @@ export type FarmsState = {
     estimateRewardOnExit: (lpAmt: BigNumber, farm: IFarm) => Promise<BigNumber>;
 };
 
+const calculatePerBlockRewards = (
+    currentBlock: BigNumber,
+    lastBlock: BigNumber,
+    perBlockReward: BigNumber,
+    produceRewardEnable: boolean
+) => {
+    if (currentBlock.lte(lastBlock) || !produceRewardEnable) {
+        return new BigNumber(0);
+    }
+
+    return new BigNumber(currentBlock)
+        .minus(lastBlock)
+        .multipliedBy(perBlockReward || 0);
+};
+
 const useFarmsState = () => {
     const keyword = useRecoilValue(farmKeywordState);
     const sessionIdsMap = useRecoilValue(farmSessionIdMapState);
@@ -90,6 +105,7 @@ const useFarmsState = () => {
                 lastRewardBlockNone,
                 rewardPerShare,
             } = farmRaw || {};
+            const produceRewardEnable = false;
             if (
                 !shard ||
                 !farmTokenSupply ||
@@ -107,9 +123,13 @@ const useFarmsState = () => {
             let currentBlockNonce = blockShard?.nonce;
             if (!currentBlockNonce || farmTokenSupply === "0")
                 return new BigNumber(0);
-            let reward_increase = new BigNumber(currentBlockNonce)
-                .minus(lastRewardBlockNone)
-                .multipliedBy(perBlockReward || 0);
+            let reward_increase = calculatePerBlockRewards(
+                new BigNumber(currentBlockNonce),
+                new BigNumber(lastRewardBlockNone),
+                new BigNumber(perBlockReward || 0),
+                produceRewardEnable
+            );
+
             let reward_per_share_increase = reward_increase
                 .multipliedBy(divisionSafetyConstant)
                 .div(farmTokenSupply);
