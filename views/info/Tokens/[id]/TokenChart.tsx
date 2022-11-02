@@ -10,7 +10,7 @@ import TokenVolumeChart from "./TokenVolumeChart";
 const CHART_TYPES = {
     LIQUIDITY: "Liquidity",
     VOLUME: "Volume",
-    PRICE: "Price",
+    // PRICE: "Price",
 } as const;
 const ChartTypeArr = Object.values(CHART_TYPES);
 type ChartType = ValueOf<typeof CHART_TYPES>;
@@ -42,9 +42,9 @@ function TokenChart({ token }: { token: IESDTInfo }) {
                     <TokenVolumeChart token={token} timeUnit={timeUnit} />
                 )}
                 {/* {chartType === "Price" && <TokenPriceChart token={token} timeUnit={timeUnit} />} */}
-                {chartType === "Price" && (
+                {/* {chartType === "Price" && (
                     <TokenPriceAreaChart token={token} timeUnit={timeUnit} />
-                )}
+                )} */}
             </div>
             <div className="text-ash-gray-500 flex space-x-2 shrink-0">
                 {CHART_INTERVAL.map((unit) => {
