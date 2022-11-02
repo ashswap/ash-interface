@@ -244,7 +244,7 @@ function FarmCard({ farmData, viewType }: props) {
                                 </div>
                             </CardTooltip>
                             <div
-                                className={`text-lg font-bold line-through ${
+                                className={`text-lg font-bold ${
                                     stakedData?.totalRewardAmt.gt(0)
                                         ? "text-white"
                                         : "text-stake-gray-500"
