@@ -9,8 +9,8 @@ import PoolVolumeChart from "./PoolVolumeChart";
 const CHART_TYPES = {
     LIQUIDITY: "Liquidity",
     VOLUME: "Volume",
-    RATIO12: "ratio12",
-    RATIO21: "ratio21",
+    // RATIO12: "ratio12",
+    // RATIO21: "ratio21",
 } as const;
 const ChartTypeArr = Object.values(CHART_TYPES);
 type ChartType = ValueOf<typeof CHART_TYPES>;
@@ -31,11 +31,12 @@ function PoolChart({ pool }: Props) {
                             }`}
                             onClick={() => setChartType(type)}
                         >
-                            {type.startsWith("ratio")
+                            {/* {type.startsWith("ratio")
                                 ? type === "ratio12"
                                     ? `${token1.symbol}/${token2.symbol}`
                                     : `${token2.symbol}/${token1.symbol}`
-                                : type}
+                                : type} */}
+                            {type}
                         </button>
                     );
                 })}
@@ -47,13 +48,13 @@ function PoolChart({ pool }: Props) {
                 {chartType === "Volume" && (
                     <PoolVolumeChart pool={pool} timeUnit={timeUnit} />
                 )}
-                {(chartType === "ratio12" || chartType === "ratio21") && (
+                {/* {(chartType === "ratio12" || chartType === "ratio21") && (
                     <PoolPriceRatioAreaChart
                         pool={pool}
                         timeUnit={timeUnit}
                         type={chartType}
                     />
-                )}
+                )} */}
                 {/* {chartType === "Price" && <TokenPriceAreaChart token={token} timeUnit={timeUnit} />} */}
             </div>
             <div className="text-ash-gray-500 flex space-x-2 shrink-0">
