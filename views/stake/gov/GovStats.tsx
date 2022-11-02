@@ -110,7 +110,6 @@ function GovStats() {
         return rewardLPAmt && rewardLPAmt.gt(0);
     }, [rewardLPAmt]);
     const canUnlockASH = useMemo(() => {
-        return true;
         return (
             lockedAmt.gt(0) &&
             unlockTS &&
@@ -195,7 +194,7 @@ function GovStats() {
                             <GlowingButton
                                 theme="cyan"
                                 className={`text-sm font-bold w-full h-[3.375rem]`}
-                                disabled={true || !canClaim}
+                                disabled={!canClaim}
                                 onClick={() =>
                                     canClaim &&
                                     claimReward().then(
@@ -242,7 +241,7 @@ function GovStats() {
                                     </div>
                                 </div>
                             </div>
-                            {canUnlockASH && false ? (
+                            {canUnlockASH ? (
                                 <GlowingButton
                                     theme="yellow"
                                     className="text-sm font-bold w-full h-[3.375rem]"
@@ -356,7 +355,7 @@ function GovStats() {
                     </div>
                     {mounted &&
                         (loggedIn ? (
-                            <ExpiredLockTooltip disabled={true || !canUnlockASH}>
+                            <ExpiredLockTooltip disabled={!canUnlockASH}>
                                 <span>
                                     <GlowingButton
                                         theme="pink"
