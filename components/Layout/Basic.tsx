@@ -16,7 +16,20 @@ const BasicLayout = ({ children }: { children: any }) => {
             <div className="h-8 flex justify-center items-center bg-ash-dark-600 text-2xs text-center text-stake-gray-500">
                 <span>
                     Scam/Phishing verification:{" "}
-                    <span className="text-pink-600">https://</span>{ENVIRONMENT.ASH_DOMAIN}
+                    <span className="text-pink-600">https://</span>
+                    {ENVIRONMENT.ASH_DOMAIN}
+                    {ENVIRONMENT.ENV === "beta" && (
+                        <span>
+                            &nbsp;- Claim devnet tokens{" "}
+                            <a
+                                href="https://faucet-devnet.ashswap.io/"
+                                target="_blank"
+                                rel="noreferrer"
+                            >
+                                <span className="text-ash-cyan-500 underline">Here</span>
+                            </a>
+                        </span>
+                    )}
                 </span>
             </div>
             <AppBar />
