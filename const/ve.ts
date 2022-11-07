@@ -10,4 +10,4 @@ const VE_LOCK_LABEL_MAIN = [
     { label: "2 years", amt: 0.5 },
     { label: "1 year", amt: 0.25 },
 ];
-export const VE_LOCK_LABEL = VE_LOCK_LABEL_BOY;
+export const VE_LOCK_LABEL = VE_LOCK_LABEL_MAIN;

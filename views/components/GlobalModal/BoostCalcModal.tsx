@@ -34,7 +34,7 @@ const LOCK_OPTS_MAIN = [
     { value: 2 * 365 * 24 * 3600, label: "2 years" },
     { value: 365 * 24 * 3600, label: "1 year" },
 ];
-const LOCK_OPTS = LOCK_OPTS_BOY;
+const LOCK_OPTS = LOCK_OPTS_MAIN;
 
 type BoostCalcProps = { farmAddress?: string };
 const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {

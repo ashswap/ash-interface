@@ -1,7 +1,6 @@
 import { ChainId, IESDTInfo } from "helper/token/token";
 import IPool from "interface/pool";
 import { ENVIRONMENT } from "./env";
-import { MAIAR_POOLS } from "./maiarPools";
 import { TOKENS_MAP } from "./tokens";
 
 type PoolConfig = {
@@ -62,51 +61,39 @@ const devnet: PoolConfig = {
     beta: [
         {
             address:
-                "erd1qqqqqqqqqqqqqpgqd7yxyjpyj5px59sn48kf5sk6ppvzcxnlrmcq5gxdhw",
+                "erd1qqqqqqqqqqqqqpgqa9lmuq52nv9n735q9gpm4v5847xqwhl2rmcq263q8v",
             lpToken: {
-                identifier: "LPT-1cb0dd",
+                identifier: "LPT-93bf25",
                 chainId: ChainId.Devnet,
-                symbol: "LPT-USDT-USDC",
+                symbol: "LPT-USDC-USDT",
                 name: "Ashswap LP",
                 decimals: 18,
             },
-            tokens: [TOKENS_MAP["USDT-186541"], TOKENS_MAP["USDC-3ae937"]],
+            tokens: [TOKENS_MAP["USDC-6c5d88"], TOKENS_MAP["USDT-324eda"]],
         },
         {
             address:
-                "erd1qqqqqqqqqqqqqpgqr279layxqhkzpamlkg72wt2kckfq586lrmcq52vlap",
+                "erd1qqqqqqqqqqqqqpgqfa7c92aezxmry0va47l27mvydhh2rl08rmcqr32cjg",
             lpToken: {
-                identifier: "LPT-554644",
+                identifier: "LPT-d6b19f",
                 chainId: ChainId.Devnet,
-                symbol: "LPT-USDC-BUSD",
+                symbol: "LPT-USDC-WUSDC",
                 name: "Ashswap LP",
                 decimals: 18,
             },
-            tokens: [TOKENS_MAP["USDC-3ae937"], TOKENS_MAP["BUSD-46fbb9"]],
+            tokens: [TOKENS_MAP["USDC-6c5d88"], TOKENS_MAP["WUSDC-232e24"]],
         },
         {
             address:
-                "erd1qqqqqqqqqqqqqpgq3qh3s7ns3t02xhg0hu46d646vtnz9ypcrmcqfd2nfd",
+                "erd1qqqqqqqqqqqqqpgqrl56gfxdkr2e9xs2ee992jtswl38x372rmcqksswu9",
             lpToken: {
-                identifier: "LPT-840b08",
+                identifier: "LPT-820467",
                 chainId: ChainId.Devnet,
-                symbol: "LPT-wEGLD-aEGLD",
+                symbol: "LPT-renBTC-wBTC",
                 name: "Ashswap LP",
                 decimals: 18,
             },
-            tokens: [TOKENS_MAP["WEGLD-030586"], TOKENS_MAP["AEGLD-f09e97"]],
-        },
-        {
-            address:
-                "erd1qqqqqqqqqqqqqpgqu887uzj2k3e4006h3lnp9k7gdnkg84djrmcqd5rqwv",
-            lpToken: {
-                identifier: "LPT-340989",
-                chainId: ChainId.Devnet,
-                symbol: "LPT-wBTC-renBTC",
-                name: "Ashswap LP",
-                decimals: 18,
-            },
-            tokens: [TOKENS_MAP["WBTC-678a4f"], TOKENS_MAP["RENBTC-fb2e83"]],
+            tokens: [TOKENS_MAP["RENBTC-a74396"], TOKENS_MAP["WBTC-1297c1"]],
         },
     ],
 };
@@ -151,9 +138,7 @@ const mainnet: IPool[] = [
 ];
 
 const pools =
-    ENVIRONMENT.NETWORK == "devnet"
-        ? [...devnet[ENVIRONMENT.ENV], ...MAIAR_POOLS]
-        : mainnet;
+    ENVIRONMENT.NETWORK == "devnet" ? [...devnet[ENVIRONMENT.ENV]] : mainnet;
 export const POOLS_MAP_ADDRESS = Object.fromEntries(
     pools.map((p) => [p.address, p])
 );
