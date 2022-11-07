@@ -59,7 +59,7 @@ const devnet: MaiarPoolConfig = {
                 chainId: CHAIN_ID.DEVNET,
                 name: "Maiar LP",
             },
-            tokens: [TOKENS_MAP["BUSD-46fbb9"], TOKENS_MAP["RENBTC-fb2e83"]],
+            tokens: [TOKENS_MAP["WUSDC-232e24"], TOKENS_MAP["RENBTC-a74396"]],
             isMaiarPool: true,
         },
         {
@@ -72,7 +72,7 @@ const devnet: MaiarPoolConfig = {
                 chainId: CHAIN_ID.DEVNET,
                 name: "Maiar LP",
             },
-            tokens: [TOKENS_MAP["USDC-3ae937"], TOKENS_MAP["AEGLD-f09e97"]],
+            tokens: [TOKENS_MAP["USDC-6c5d88"], TOKENS_MAP["AEGLD-f09e97"]],
             isMaiarPool: true,
         },
         {
@@ -85,7 +85,7 @@ const devnet: MaiarPoolConfig = {
                 chainId: CHAIN_ID.DEVNET,
                 name: "Maiar LP",
             },
-            tokens: [TOKENS_MAP["USDT-186541"], TOKENS_MAP["ASH-6969f1"]],
+            tokens: [TOKENS_MAP["USDT-324eda"], TOKENS_MAP["ASH-77a5df"]],
             isMaiarPool: true,
         },
     ],

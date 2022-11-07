@@ -58,7 +58,7 @@ const EXTEND_CONFIG_MAIN = {
     maxLock: 4 * 365 * 24 * 60 * 60,
     minLock: 7 * 24 * 60 * 60,
 };
-const EXTEND_CONFIG = EXTEND_BOY;
+const EXTEND_CONFIG = EXTEND_CONFIG_MAIN;
 const StakeMoreContent = ({ open, onClose }: props) => {
     const lockedAmt = useRecoilValue(govLockedAmtState);
     const unlockTS = useRecoilValue(govUnlockTSState);

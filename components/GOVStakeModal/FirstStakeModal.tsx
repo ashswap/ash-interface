@@ -57,7 +57,7 @@ const LOCK_CONFIG_MAIN = {
     minLock: 7 * 24 * 60 * 60,
     sliderStep: 24 * 60 * 60,
 };
-const LOCK_CONFIG = LOCK_CONFIG_BOY;
+const LOCK_CONFIG = LOCK_CONFIG_MAIN;
 const FirstStakeContent = ({ open, onClose }: props) => {
     const tokenMap = useRecoilValue(tokenMapState);
     const insufficientEGLD = useRecoilValue(accIsInsufficientEGLDState);

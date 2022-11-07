@@ -10,9 +10,9 @@ type DappContractConfig = {
 const dappContractDevnet: DappContractConfig = {
     beta: {
         voteEscrowedContract:
-            "erd1qqqqqqqqqqqqqpgqkqjzf9t26rvkq46qgkwym0hvlwczrsy3rmcq6s6uss",
+            "erd1qqqqqqqqqqqqqpgqmvv8hpzg2d6fc5z9tcm8p2aes7qve26krmcqpw84n5",
         feeDistributor:
-            "erd1qqqqqqqqqqqqqpgq0skjjx8wmvw83jyxeulntgl2nq6alsv8rmcqhypczn",
+            "erd1qqqqqqqqqqqqqpgqylsfrzwl65ez8d34lqzu8zxks6vnua3trmcq6cr5v4",
     },
     alpha: {
         voteEscrowedContract:
@@ -34,11 +34,11 @@ const dappContract =
 
 export const VE_CONFIG = {
     // main config
-    // maxLock: 4 * 365 * 24 * 3600,
-    // minLock: 7 * 24 * 3600,
+    maxLock: 4 * 365 * 24 * 3600,
+    minLock: 7 * 24 * 3600,
     // for BoY
-    maxLock: 2 * 7 * 24 * 3600,
-    minLock: 12 * 60 * 60,
+    // maxLock: 2 * 7 * 24 * 3600,
+    // minLock: 12 * 60 * 60,
 };
 
 export const ASHSWAP_CONFIG = {
