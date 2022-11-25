@@ -23,6 +23,7 @@
         "@tailwindcss/line-clamp": "^0.4.0",
         "@tippyjs/react": "^4.2.6",
         "@types/numeral": "^2.0.2",
+        "@types/uuid": "^8.3.4",
         "antd": "^4.16.13",
         "axios": "^1.2.0",
         "bignumber.js": "9.0.1",
@@ -51,7 +52,8 @@
         "swr": "^1.0.1",
         "tailwind-merge": "^1.3.0",
         "tailwind-scrollbar-hide": "^1.1.7",
-        "use-debounce": "^7.0.1"
+        "use-debounce": "^7.0.1",
+        "uuid": "^9.0.0"
     },
     "devDependencies": {
         "@types/lodash.chunk": "^4.2.7",

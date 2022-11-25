@@ -449,7 +449,7 @@ function FirstStakeModal({ open, onClose }: props) {
                 isOpen={open}
                 onRequestClose={() => onClose()}
                 type={`${isMobile ? "drawer_btt" : "modal"}`}
-                className="bg-stake-dark-400 p-4 sm:ash-container flex flex-col max-h-full"
+                className="bg-stake-dark-400 p-4 w-screen max-w-[70rem] sm:mx-auto flex flex-col max-h-full"
             >
                 <div className="flex justify-end mb-4">
                     <BaseModal.CloseBtn />
