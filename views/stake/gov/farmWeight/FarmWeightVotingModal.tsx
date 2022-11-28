@@ -49,7 +49,7 @@ const FarmWeightVotingContent = ({ open, onClose }: Props) => {
                                     options={{
                                         placement: "bottom-start",
                                         modifiers: [
-                                            { options: { offset: [0, 8] } },
+                                            { name: "offset", options: { offset: [0, 8] } },
                                         ],
                                     }}
                                     button={() => (
