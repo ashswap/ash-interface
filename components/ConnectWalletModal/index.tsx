@@ -26,7 +26,7 @@ const MAIAR_WALLET_LINK = {
         "https://chrome.google.com/webstore/detail/maiar-defi-wallet/dngmlblcodfobpdpecaadgfbcggfjfnm",
 };
 
-let isFirstRender = true        //baileyng - add
+let isFirstRender = true        
 
 function ConnectWalletModal() {
     const loggedIn = useRecoilValue(accIsLoggedInState);
@@ -41,7 +41,7 @@ function ConnectWalletModal() {
     const [extensionLogin] = useExtensionLogin({
         callbackRoute: "",
     });
-    const dappCore = useRecoilValue(dappCoreState);         //baileyng - add
+    const dappCore = useRecoilValue(dappCoreState);         
     useEffect(() => {
         if (!isOpenConnectWalletModal) {
             setIsOpenQR(false);
@@ -55,7 +55,6 @@ function ConnectWalletModal() {
             setIsOpenDownloadExtension(false);
         }
     }, [loggedIn, accAddress, setIsOpenConnectWalletModal]);
-    //baileyng - start
     useEffect(() => {
         if (window && !loggedIn && isOpenConnectWalletModal) {
             let dataLayer = (window as any).dataLayer || [];
@@ -66,11 +65,7 @@ function ConnectWalletModal() {
         }
     }, [isOpenConnectWalletModal]);
     useEffect(() => {
-        // console.log("loggedIn", loggedIn);
-        // console.log("address", address);
-        // console.log("isMobile", isMobile);
-        console.log("dappCore", dappCore);           //Use this
-        // console.log("accInfo", accInfo);
+        console.log("dappCore", dappCore);           
         if (window && loggedIn) {
             let dataLayer = (window as any).dataLayer || [];
             console.log("dataLayer",dataLayer);
@@ -99,7 +94,6 @@ function ConnectWalletModal() {
             })
         }
     }, [loggedIn]);
-    //baileyng - end
     return (
         <>
             <BaseModal

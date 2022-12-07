@@ -44,7 +44,7 @@ const SwapAmount = (props: Props) => {
     } = useSwap();
     const tokenMap = useRecoilValue(tokenMapState);
     const screenSize = useScreenSize();
-    const [debounceValueFrom] = useDebounce(valueFrom, 500);        //baileyng - add
+    const [debounceValueFrom] = useDebounce(valueFrom, 500);        
     const [onboardingQuickSelectToken, setOnboardedQuickSelectToken] =
         useOnboarding("swap_quick_select_token");
     const [onboardingInputAmt, setOnboardedInputAmt] =
@@ -56,7 +56,6 @@ const SwapAmount = (props: Props) => {
 
         return valueTo;
     }, [valueTo, valueFrom, props.type]);
-    //baileyng - start
     useEffect(() => {
         if (window && props.type === "from" && valueFrom && tokenTo) {
             let dataLayer = (window as any).dataLayer || [];
@@ -67,7 +66,6 @@ const SwapAmount = (props: Props) => {
             console.log("dataLayer", dataLayer);
         }
     }, [debounceValueFrom]);
-    //baileyng - end
     const onChangeValue = useMemo(() => {
         if (props.type === "from") {
             return setValueFrom;

@@ -135,7 +135,7 @@ const Swap = () => {
         isInsufficentFund,
         slippage,
     } = useSwap();
-    const debounceSlippage = useDebounce(slippage, 500);            //baileyng - add
+    const debounceSlippage = useDebounce(slippage, 500);            
     const fees = useRecoilValue(poolFeesQuery(pool?.address || ""));
     const [showSetting, setShowSetting] = useState<boolean>(false);
     const [isOpenHistoryModal, openHistoryModal] = useState<boolean>(false);
@@ -239,8 +239,6 @@ const Swap = () => {
                 .multiply(tokenAmountTo.raw).quotient
         );
     }, [tokenAmountTo, slippage]);
-
-    // baileyng - start
     useEffect(() => {
         if (window && slippage && !slippage.equalTo(new Percent(100, 100_000))) {
             console.log(slippage);
@@ -252,8 +250,6 @@ const Swap = () => {
             console.log("dataLayer", dataLayer);
         }
     }, [debounceSlippage]);
-    // baileyng - end
-
     useEffect(() => {
         if (!tokenFrom) {
             setValueFrom("");

@@ -131,24 +131,6 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
                 `,
                 }}
             />
-            {/* baileyng - start */}
-            {/* <Script
-                strategy='afterInteractive'
-                src={'https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS}'}
-            />
-      
-            <Script
-                strategy='afterInteractive'>
-                    {
-                    `
-                    window.dataLayer = window.dataLayer || [];
-                    function gtag(){dataLayer.push(arguments);}
-                    gtag('js', new Date());
-                    
-                    gtag('config', '${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS}');
-                    `
-                    }
-            </Script> */}
             <Head>
                 <meta
                     name="viewport"
@@ -165,7 +147,6 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
                     })(window,document,'script','dataLayer','${process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER}');
                 `}
             </Script>
-            {/* baileyng - end */}
             <NextSeo
                 title="AshSwap Interface"
                 description="Swap or provide liquidity on the AshSwap Protocol."

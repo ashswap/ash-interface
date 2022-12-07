@@ -75,9 +75,8 @@ const TokenSelect = ({
 
     const onSelectToken = (t: IESDTInfo) => {
         setOpen(false);
-        //baileyng - start  
         if (window && onChange) {
-            onChange(t);        //original
+            onChange(t);       
             let dataLayer = (window as any).dataLayer || [];
             console.log("dataLayer",dataLayer);
             dataLayer.push({
@@ -87,7 +86,6 @@ const TokenSelect = ({
                 'token_symbol': t.symbol,
                 'token_identifier': t.identifier
             });
-        //baileyng - end
         }
     };
 
