@@ -44,7 +44,7 @@ const SwapAmount = (props: Props) => {
     } = useSwap();
     const tokenMap = useRecoilValue(tokenMapState);
     const screenSize = useScreenSize();
-    const [debounceValueFrom] = useDebounce(valueFrom, 500);
+    const [debounceValueFrom] = useDebounce(valueFrom, 500);        
     const [onboardingQuickSelectToken, setOnboardedQuickSelectToken] =
         useOnboarding("swap_quick_select_token");
     const [onboardingInputAmt, setOnboardedInputAmt] =

@@ -63,7 +63,8 @@ function ConnectWalletModal() {
             })
         }
     }, [isOpenConnectWalletModal, loggedIn]);
-    useEffect(() => {          
+    useEffect(() => {
+        console.log("dappCore", dappCore);           
         if (window && loggedIn) {
             let dataLayer = (window as any).dataLayer || [];
             window.localStorage.setItem('address', dappCore.account.address);
