@@ -28,7 +28,7 @@ import { toEGLDD } from "helper/balance";
 import { queryPoolContract } from "helper/contracts/pool";
 import { Fraction } from "helper/fraction/fraction";
 import { Percent } from "helper/fraction/percent";
-import { formatAmount } from "helper/number";
+import { formatAmount, getFirstThreeNonZeroDecimals } from "helper/number";
 import { calculateEstimatedSwapOutputAmount } from "helper/stableswap/calculator/amounts";
 import { calculateSwapPrice } from "helper/stableswap/calculator/price";
 import { Price } from "helper/token/price";
@@ -45,6 +45,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRecoilCallback, useRecoilValue } from "recoil";
 import SwapAmount from "./components/SwapAmount";
 import styles from "./Swap.module.css";
+import { useDebounce } from "@elrondnetwork/dapp-core/hooks";
 const MaiarPoolTooltip = ({
     children,
     pool,
@@ -134,6 +135,7 @@ const Swap = () => {
         isInsufficentFund,
         slippage,
     } = useSwap();
+    const debounceSlippage = useDebounce(slippage, 500);            //baileyng - add
     const fees = useRecoilValue(poolFeesQuery(pool?.address || ""));
     const [showSetting, setShowSetting] = useState<boolean>(false);
     const [isOpenHistoryModal, openHistoryModal] = useState<boolean>(false);
@@ -237,6 +239,20 @@ const Swap = () => {
                 .multiply(tokenAmountTo.raw).quotient
         );
     }, [tokenAmountTo, slippage]);
+
+    // baileyng - start
+    useEffect(() => {
+        if (window && slippage && !slippage.equalTo(new Percent(100, 100_000))) {
+            console.log(slippage);
+            let dataLayer = (window as any).dataLayer || [];
+            dataLayer.push({
+                'event': 'set_slippage',
+                'amount': slippage.toString()
+            });
+            console.log("dataLayer", dataLayer);
+        }
+    }, [debounceSlippage]);
+    // baileyng - end
 
     useEffect(() => {
         if (!tokenFrom) {

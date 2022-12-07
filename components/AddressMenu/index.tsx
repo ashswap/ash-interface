@@ -4,7 +4,7 @@ import IconChange from "assets/svg/change.svg";
 import ICChevronUp from "assets/svg/chevron-up.svg";
 import IconCopy from "assets/svg/copy.svg";
 import IconDisconnect from "assets/svg/disconnect.svg";
-import { accAddressState, accIsLoggedInState } from "atoms/dappState";
+import { accAddressState, accInfoState, accIsLoggedInState, dappCoreState } from "atoms/dappState";
 import { walletIsOpenConnectModalState } from "atoms/walletState";
 import Avatar from "components/Avatar";
 import BaseModal from "components/BaseModal";

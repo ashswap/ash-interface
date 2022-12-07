@@ -5,6 +5,7 @@ import OnboardTooltip from "components/Tooltip/OnboardTooltip";
 import pools from "const/pool";
 import { useSwap } from "context/swap";
 import { toEGLDD } from "helper/balance";
+import { Percent } from "helper/fraction/percent";
 import { formatAmount, formatToSignificant } from "helper/number";
 import { IESDTInfo } from "helper/token/token";
 import { useOnboarding } from "hooks/useOnboarding";
@@ -12,6 +13,7 @@ import { useScreenSize } from "hooks/useScreenSize";
 import { useEffect, useMemo, useRef } from "react";
 import { useRecoilValue } from "recoil";
 import { theme } from "tailwind.config";
+import { useDebounce } from "use-debounce";
 import TokenSelect from "views/swap/components/TokenSelect";
 import QuickSelect from "../QuickSelect";
 import styles from "./SwapAmount.module.css";
@@ -42,11 +44,11 @@ const SwapAmount = (props: Props) => {
     } = useSwap();
     const tokenMap = useRecoilValue(tokenMapState);
     const screenSize = useScreenSize();
+    const [debounceValueFrom] = useDebounce(valueFrom, 500);        //baileyng - add
     const [onboardingQuickSelectToken, setOnboardedQuickSelectToken] =
         useOnboarding("swap_quick_select_token");
     const [onboardingInputAmt, setOnboardedInputAmt] =
         useOnboarding("swap_input_amt");
-
     const value = useMemo(() => {
         if (props.type === "from") {
             return valueFrom;
@@ -54,7 +56,18 @@ const SwapAmount = (props: Props) => {
 
         return valueTo;
     }, [valueTo, valueFrom, props.type]);
-
+    //baileyng - start
+    useEffect(() => {
+        if (window && props.type === "from" && valueFrom && tokenTo) {
+            let dataLayer = (window as any).dataLayer || [];
+            dataLayer.push({
+                'event': 'input_value_from',
+                'amount': valueFrom
+            })
+            console.log("dataLayer", dataLayer);
+        }
+    }, [debounceValueFrom]);
+    //baileyng - end
     const onChangeValue = useMemo(() => {
         if (props.type === "from") {
             return setValueFrom;
@@ -67,7 +80,6 @@ const SwapAmount = (props: Props) => {
         if (props.type === "from") {
             return tokenFrom;
         }
-
         return tokenTo;
     }, [tokenFrom, tokenTo, props.type]);
 
@@ -83,7 +95,6 @@ const SwapAmount = (props: Props) => {
         if (props.type === "from") {
             return setTokenFrom;
         }
-
         return setTokenTo;
     }, [setTokenFrom, setTokenTo, props.type]);
 
