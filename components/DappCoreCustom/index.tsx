@@ -1,7 +1,7 @@
 import { TransactionsTracker } from "@elrondnetwork/dapp-core/components/TransactionsTracker";
 import { useGetPendingTransactions } from "@elrondnetwork/dapp-core/hooks";
 import { checkBatch } from "@elrondnetwork/dapp-core/hooks/transactions/useCheckTransactionStatus/checkBatch";
-import { GetTransactionsByHashesReturnType, PendingTransactionsType, SignedTransactionsBodyType } from "@elrondnetwork/dapp-core/types";
+import { PendingTransactionsType, SignedTransactionsBodyType } from "@elrondnetwork/dapp-core/types";
 import {
     getIsTransactionPending
 } from "@elrondnetwork/dapp-core/utils";
@@ -9,8 +9,8 @@ import { CustomComponentsType } from "@elrondnetwork/dapp-core/wrappers/DappProv
 import { lastCompletedTxHashAtom } from "atoms/transactions";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useRecoilValue } from "recoil";
-import {getTransactionsByHashes} from "@elrondnetwork/dapp-core/apiCalls/transactions/getTransactionsByHashes";
 import emitter from "helper/emitter";
+import { getTransactionsByHashes } from "./getTransactionsByHashes";
 
 const CustomTransactionsTracker: typeof TransactionsTracker = () => {
     const { pendingTransactionsArray } = useGetPendingTransactions();
@@ -31,7 +31,7 @@ const CustomTransactionsTracker: typeof TransactionsTracker = () => {
     }, [pendingTransactionsArray]);
 
     const getTransactionByHashesIntercept = useCallback(async (pendingTxs: PendingTransactionsType) => {
-        const serverTransactions: GetTransactionsByHashesReturnType = await getTransactionsByHashes(pendingTxs);
+        const serverTransactions = await getTransactionsByHashes(pendingTxs);
         const completedTxs = serverTransactions.filter(tx => tx.status !== 'pending');
         emitter.emit('onCheckBatchResult', completedTxs);
         return serverTransactions;

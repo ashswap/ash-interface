@@ -17,9 +17,7 @@ import {
     networkConfigState
 } from "atoms/dappState";
 import { gasLimitBuffer, gasPrice, maxGasLimit } from "const/dappConfig";
-import {
-    DappSendTransactionsPropsType
-} from "interface/dappCore";
+import { DappSendTransactionsPropsType } from "interface/dappCore";
 import { useRecoilValue } from "recoil";
 const emptyTx = new Transaction({
     nonce: 0,
