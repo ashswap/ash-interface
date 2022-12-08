@@ -136,7 +136,7 @@ const QuestOverview = () => {
         }
     }, [router]);
 
-    if (firstLoad && !userStats) return null;
+    if (firstLoad && !userStats && userAddress) return null;
 
     return (
         <>
