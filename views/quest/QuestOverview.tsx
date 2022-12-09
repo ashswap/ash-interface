@@ -50,7 +50,7 @@ const QuestOverview = () => {
 
     const isRegistered = useMemo(() => {
         return (
-            userStats?.wallet.discord_id &&
+            userStats?.wallet?.twitter_metadata?.user?.id &&
             userStats.wallet.wallet_address === userAddress
         );
     }, [userStats, userAddress]);
@@ -69,7 +69,7 @@ const QuestOverview = () => {
                 .post(
                     "/api/v1/wallet",
                     {
-                        discord: {
+                        twitter: {
                             code,
                         },
                     },
@@ -93,10 +93,10 @@ const QuestOverview = () => {
         [code, getUserStats]
     );
 
-    const unlinkDiscord = useCallback(() => {
+    const unlinkTwitter = useCallback(() => {
         logApi
             .post("/api/v1/wallet/unlink", {
-                platform: "discord",
+                platform: "twitter",
             })
             .finally(() => getUserStats());
     }, [getUserStats]);
@@ -184,20 +184,20 @@ const QuestOverview = () => {
                                 {"// "}
                             </span>
                             <span className="font-bold text-white">
-                                Discord
+                                Twitter
                             </span>
                         </div>
                         <div className="flex justify-between text-xs">
                             <div className="font-semibold text-stake-gray-500">
                                 {isRegistered
-                                    ? userStats?.wallet.discord_metadata?.user
+                                    ? userStats?.wallet.twitter_metadata?.user
                                           .username
                                     : "_"}
                             </div>
                             {isRegistered && (
                                 <button
                                     className="font-bold text-ash-purple-500 underline"
-                                    onClick={() => unlinkDiscord()}
+                                    onClick={() => unlinkTwitter()}
                                 >
                                     Disconnect
                                 </button>
@@ -316,12 +316,12 @@ const QuestOverview = () => {
                                 <div className="font-bold text-4xl text-white">
                                     2
                                 </div>
-                                <a href={ENVIRONMENT.LOGIN_DISCORD_LINK}>
+                                <a href={ENVIRONMENT.LOGIN_TWITTER_LINK}>
                                     <GlowingButton
                                         theme="cyan"
                                         className="w-40 h-14 ml-6 clip-corner-1 clip-corner-br font-bold text-sm "
                                     >
-                                        Link your Discord
+                                        Link your Twitter
                                     </GlowingButton>
                                 </a>
                             </div>

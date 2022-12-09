@@ -41,7 +41,9 @@ export type QuestWallet = {
     rank: number;
     referral_address: string;
     twitter_created_at: number;
-    twitter_metadata: string;
+    twitter_metadata: {
+        user: TwitterMetadata
+    }
     twitter_username: string;
     wallet_address: string;
 }
@@ -51,6 +53,13 @@ export type DiscordMetadata = {
     email: string;
     username: string;
     discriminator: string;
+}
+
+export type TwitterMetadata = {
+    id: string;
+    name: string;
+    username: string;
+    created_at: string;
 }
 
 export type QuestUserStatsModel = {
