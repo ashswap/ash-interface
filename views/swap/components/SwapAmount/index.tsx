@@ -44,7 +44,7 @@ const SwapAmount = (props: Props) => {
     } = useSwap();
     const tokenMap = useRecoilValue(tokenMapState);
     const screenSize = useScreenSize();
-    const [debounceValueFrom] = useDebounce(valueFrom, 500);        
+    const [debounceValueFrom] = useDebounce(valueFrom, 500);
     const [onboardingQuickSelectToken, setOnboardedQuickSelectToken] =
         useOnboarding("swap_quick_select_token");
     const [onboardingInputAmt, setOnboardedInputAmt] =
@@ -60,12 +60,11 @@ const SwapAmount = (props: Props) => {
         if (window && props.type === "from" && valueFrom && tokenTo) {
             let dataLayer = (window as any).dataLayer || [];
             dataLayer.push({
-                'event': 'input_value_from',
-                'amount': valueFrom
-            })
-            console.log("dataLayer", dataLayer);
+                event: "input_value_from",
+                amount: valueFrom,
+            });
         }
-    }, [debounceValueFrom]);
+    }, [debounceValueFrom, props.type, tokenTo, valueFrom]);
     const onChangeValue = useMemo(() => {
         if (props.type === "from") {
             return setValueFrom;
@@ -216,8 +215,7 @@ const SwapAmount = (props: Props) => {
                         }}
                         decimals={token?.decimals}
                         onChange={(e) => {
-                            if(!props.disableInput){
-
+                            if (!props.disableInput) {
                                 onChangeValue(e.target.value);
                                 setOnboardedInputAmt(true);
                             }

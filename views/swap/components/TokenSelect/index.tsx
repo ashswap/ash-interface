@@ -78,7 +78,6 @@ const TokenSelect = ({
         if (window && onChange) {
             onChange(t);       
             let dataLayer = (window as any).dataLayer || [];
-            console.log("dataLayer",dataLayer);
             dataLayer.push({
                 'event': 'select_token',
                 'type': type,

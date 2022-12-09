@@ -45,7 +45,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRecoilCallback, useRecoilValue } from "recoil";
 import SwapAmount from "./components/SwapAmount";
 import styles from "./Swap.module.css";
-import { useDebounce } from "@elrondnetwork/dapp-core/hooks";
+import { useDebounce } from "use-debounce";
+
 const MaiarPoolTooltip = ({
     children,
     pool,
@@ -135,7 +136,7 @@ const Swap = () => {
         isInsufficentFund,
         slippage,
     } = useSwap();
-    const debounceSlippage = useDebounce(slippage, 500);            
+    const [debounceSlippage] = useDebounce(slippage, 500);
     const fees = useRecoilValue(poolFeesQuery(pool?.address || ""));
     const [showSetting, setShowSetting] = useState<boolean>(false);
     const [isOpenHistoryModal, openHistoryModal] = useState<boolean>(false);
@@ -240,14 +241,16 @@ const Swap = () => {
         );
     }, [tokenAmountTo, slippage]);
     useEffect(() => {
-        if (window && slippage && !slippage.equalTo(new Percent(100, 100_000))) {
-            console.log(slippage);
+        if (
+            window &&
+            debounceSlippage &&
+            !debounceSlippage.equalTo(new Percent(100, 100_000))
+        ) {
             let dataLayer = (window as any).dataLayer || [];
             dataLayer.push({
-                'event': 'set_slippage',
-                'amount': slippage.toString()
+                event: "set_slippage",
+                amount: debounceSlippage.toString(),
             });
-            console.log("dataLayer", dataLayer);
         }
     }, [debounceSlippage]);
     useEffect(() => {
