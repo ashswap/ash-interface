@@ -1,12 +1,14 @@
 import type { NextPage } from 'next'
-import Head from 'next/head'
-import styles from 'styles/Home.module.css'
 import BasicLayout from "components/Layout/Basic";
+import Swap from 'views/swap/Swap'
+import { SwapProvider } from 'context/swap';
 
 const Home: NextPage = () => {
     return (
         <BasicLayout>
-            
+            <SwapProvider>
+                <Swap />
+            </SwapProvider>
         </BasicLayout>
     )
 }

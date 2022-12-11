@@ -1,0 +1,9 @@
+.container{
+    @apply flex flex-col items-center justify-center cursor-pointer select-none text-sm;
+    width: 72px;
+    height: 48px;
+}
+
+.container.active{
+    @apply bg-ash-dark-700 text-pink-600;
+}

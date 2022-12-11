@@ -1,0 +1,41 @@
+.container {
+    @apply cursor-pointer select-none text-white flex items-center justify-center;
+
+    width: 40px;
+    height: 40px;
+    padding: 8px;
+}
+
+.container:hover {
+    background-color: #292540;
+}
+
+.container:active {
+    @apply bg-bg;
+}
+
+.container.iconSmall svg {
+    width: 10px;
+    height: 10px;
+}
+
+.container.iconBig svg {
+    width: 24px;
+    height: 24px;
+}
+
+.container.active {
+    background-color: transparent;
+    position: relative;
+}
+
+.container.active::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: theme("colors.pink.600");
+    opacity: 0.1;
+}

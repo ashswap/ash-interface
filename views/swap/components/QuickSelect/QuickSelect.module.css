@@ -1,0 +1,4 @@
+.container{
+    @apply bg-bg pb-2;
+    padding: 0 10px 8px;
+}

@@ -1,0 +1,57 @@
+.corner {
+    @apply relative;
+
+    border-right: theme("colors.ash-dark.600") 16px solid;
+    padding-left: 16px;
+    background: linear-gradient(
+                to right,
+                theme("colors.ash-dark.600") 18px,
+                transparent 18px
+            )
+            0 100%,
+        linear-gradient(
+                to bottom,
+                theme("colors.ash-dark.600") 18px,
+                transparent 18px
+            )
+            100% 0;
+
+    background-repeat: no-repeat;
+    background-size: calc(100% - 16px) calc(100% - 16px);
+
+    display: flex;
+    flex-direction: row;
+}
+
+.container {
+    @apply relative bg-ash-dark-600 text-white py-11 pl-8 pr-12;
+    width: 460px;
+}
+
+.fire {
+    @apply absolute z-10;
+
+    left: -70px;
+    top: -70px;
+}
+
+.revert {
+    @apply absolute w-7 h-7 rounded-lg bg-ash-dark-600 flex items-center justify-center cursor-pointer select-none z-10;
+    left: 50%;
+    top: 50%;
+    transform: translateX(-50%) translateY(-50%);
+}
+
+.revert:hover {
+    background-color: #292540;
+}
+
+.swapResultLabel {
+    @apply text-text-input-3 underline;
+    font-size: 10px;
+}
+
+.swapResultValue {
+    color: #ffffff;
+    font-size: 14px;
+}

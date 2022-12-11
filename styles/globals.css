@@ -1,38 +1,163 @@
+/* @import "~antd/lib/style/index.css";
+@import "~antd/lib/slider/style/index.css";
+@import "~antd/lib/dropdown/style/index.css";
+@import "~antd/lib/menu/style/index.css";
+@import "~antd/lib/notification/style/index.css";
+@import "~antd/lib/popover/style/index.css";
+@import "~antd/lib/date-picker/style/index.css"; */
+/* @import "~antd/dist/antd.css"; */
+@import "~antd/dist/antd.dark.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @font-face {
-    font-family: 'SamsungSharpSans';
+    font-family: "SamsungSharpSans";
     font-weight: 700;
-    src: url('../assets/fonts/samsungsharpsans-bold.otf');
+    src: url("../assets/fonts/samsungsharpsans-bold.otf");
 }
 
 @font-face {
-    font-family: 'SamsungSharpSans';
+    font-family: "SamsungSharpSans";
     font-weight: 500;
-    src: url('../assets/fonts/samsungsharpsans-medium.otf');
+    src: url("../assets/fonts/samsungsharpsans-medium.otf");
 }
 
 @font-face {
-    font-family: 'SamsungSharpSans';
+    font-family: "SamsungSharpSans";
     font-weight: 400;
-    src: url('../assets/fonts/samsungsharpsans.otf');
+    src: url("../assets/fonts/samsungsharpsans.otf");
 }
 
 html,
 body {
-  padding: 0;
-  margin: 0;
-  font-family: SamsungSharpSans, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+    padding: 0;
+    margin: 0;
+    font-family: SamsungSharpSans, -apple-system, BlinkMacSystemFont, Segoe UI,
+        Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue,
+        sans-serif;
 }
 
 a {
-  color: inherit;
-  text-decoration: none;
+    color: inherit;
+    text-decoration: none;
 }
 
 * {
-  box-sizing: border-box;
+    box-sizing: border-box;
+    /* transition: all 0.3s ease; */
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Firefox */
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+.ash-slider {
+    --ash-slider-theme: theme("colors.slider.track");
+}
+.ash-slider-green {
+    --ash-slider-theme: theme("colors.stake-green.500");
+}
+.ash-slider-pink {
+    --ash-slider-theme: theme("colors.pink.600");
+}
+.ash-slider .ant-slider-rail {
+    @apply bg-slider-rail;
+    height: 2px;
+}
+
+.ash-slider .ant-slider-handle {
+    @apply bg-bg;
+    border-color: var(--ash-slider-theme);
+    border-radius: 0;
+    height: 7px;
+    width: 7px;
+    transform: translateX(-50%) rotate(45deg) !important;
+    margin-top: -2px;
+}
+
+.ash-slider .ant-slider-track,
+.ash-slider:hover .ant-slider-track {
+    background-color: var(--ash-slider-theme);
+    height: 2px;
+}
+
+.ash-slider .ant-slider-dot,
+.ash-slider .ant-slider-dot-active {
+    @apply bg-bg;
+    border-color: var(--ash-slider-theme);
+    border-radius: 0;
+    width: 7px;
+    height: 7px;
+    transform: rotate(45deg);
+    border-width: 2px;
+    border-style: solid;
+}
+
+.ant-dropdown {
+    transform: translateY(-10px);
+}
+
+.ant-notification-notice {
+    @apply bg-ash-dark-600;
+}
+
+.ant-notification-notice-message {
+    color: #00ff75;
+}
+
+.ant-notification-notice-with-icon .ant-notification-notice-message {
+    margin-left: 0;
+    margin-right: 30px;
+}
+
+.ant-notification-notice-icon {
+    right: 22px;
+}
+
+.ant-notification-notice:after {
+    @apply bg-pink-600;
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 100%;
+    height: 2px;
+    animation: notificationTimer 10s 1;
+}
+
+.ant-notification-notice-close {
+    display: none;
+}
+
+@keyframes notificationTimer {
+    from {
+        right: 0;
+    }
+    to {
+        right: 100%;
+    }
+}
+
+@layer components {
+    .ash-container {
+        @apply w-full max-w-[72.375rem] px-6 mx-auto;
+    }
+}
+
+@media (pointer: fine) and (hover: hover) {
+    ::-webkit-scrollbar {
+        @apply w-1.5 h-1.5 bg-transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+        @apply bg-ash-gray-500/80 rounded-full hover:bg-ash-gray-500/50 border border-solid border-transparent bg-clip-padding;
+    }
 }

@@ -1,5 +1,5 @@
-.container{
-    background-color: theme('colors.pink.600');
+.container {
+    background-color: theme("colors.pink.600");
     height: 206px;
     opacity: 0.2;
     filter: blur(146px);
@@ -9,8 +9,8 @@
     top: 250px;
 }
 
-.dot1{
-    background-color: theme('colors.pink.600');
+.dot1 {
+    background-color: theme("colors.pink.600");
     width: 24px;
     height: 24px;
     position: absolute;
@@ -18,8 +18,8 @@
     left: 41px;
 }
 
-.dot2{
-    background-color: theme('colors.pink.700');
+.dot2 {
+    background-color: theme("colors.pink.700");
     opacity: 0.7;
     width: 43px;
     height: 15px;
@@ -28,8 +28,8 @@
     left: 170px;
 }
 
-.dot3{
-    background-color: theme('colors.pink.600');
+.dot3 {
+    background-color: theme("colors.pink.600");
     filter: blur(6px);
     width: 16px;
     height: 16px;
@@ -38,8 +38,8 @@
     left: calc(50% - 220px);
 }
 
-.dot4{
-    background-color: theme('colors.pink.600');
+.dot4 {
+    background-color: theme("colors.pink.600");
     filter: blur(4px);
     transform: rotate(45deg);
     width: 10.47px;
@@ -49,21 +49,31 @@
     left: calc(50% + 315px);
 }
 
-.dot5{
-    background-color: theme('colors.pink.700');
+.dot5 {
+    background-color: theme("colors.pink.700");
     opacity: 0.3;
     width: 49px;
     height: 8px;
     position: absolute;
     top: calc(50% + 9px);
-    left: calc(50% + 426px);
+    right: 10px;
 }
 
-.dot6{
-    background-color: theme('colors.pink.600');
+.dot6 {
+    background-color: theme("colors.pink.600");
     width: 14px;
     height: 14px;
     position: absolute;
     top: calc(50% - 133px);
-    left: calc(50% + 542px);
+    right: 20px;
+}
+
+@media (min-width: 852px) {
+    .dot5 {
+        right: calc(50% - 426px);
+    }
+
+    .dot6 {
+        right: calc(50% - 542px);
+    }
 }

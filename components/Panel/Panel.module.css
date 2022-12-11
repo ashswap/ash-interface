@@ -1,0 +1,154 @@
+.topLeftCorner {
+    @apply relative;
+
+    padding-left: 16px;
+    padding-top: 16px;
+
+    background-repeat: no-repeat;
+    background-size: calc(100% - 16px) calc(100% - 16px);
+
+    display: flex;
+    flex-direction: row;
+}
+
+.topRightCorner {
+    @apply relative;
+
+    padding-right: 16px;
+
+    background-repeat: no-repeat;
+    background-size: calc(100% - 16px) calc(100% - 16px);
+    background-position: bottom right;
+
+    display: flex;
+    flex-direction: row;
+}
+
+.content {
+    @apply relative text-white py-7;
+    /* width: 460px;
+    padding: 30px; */
+    transition: 0s;
+}
+
+.dark700 .topLeftCorner {
+    background: linear-gradient(
+                to right,
+                theme("colors.ash-dark.600") 16px,
+                transparent 16px
+            )
+            0 100%,
+        linear-gradient(
+                to bottom,
+                theme("colors.ash-dark.600") 16px,
+                transparent 16px
+            )
+            100% 0;
+    border-right: 16px solid theme("colors.ash-dark.600");
+    border-bottom: 16px solid theme("colors.ash-dark.600");
+    background-repeat: no-repeat;
+    background-size: calc(100% - 16px) calc(100% - 16px);
+}
+
+.dark700 .topRightCorner {
+    border-left: theme("colors.ash-dark.600") 16px solid;
+    border-bottom: theme("colors.ash-dark.600") 16px solid;
+    background: linear-gradient(
+            to left,
+            theme("colors.ash-dark.600") 16px,
+            transparent 16px
+        )
+        100% 0;
+    background-repeat: no-repeat;
+    background-size: calc(100% - 16px) calc(100% - 16px);
+}
+
+.dark700 .content {
+    @apply bg-ash-dark-600;
+}
+
+.dark600 .topLeftCorner {
+    border-right: theme("colors.ash-dark.600") 16px solid;
+    border-bottom: theme("colors.ash-dark.600") 16px solid;
+    background: linear-gradient(
+                to right,
+                theme("colors.ash-dark.600") 16px,
+                transparent 16px
+            )
+            0 100%,
+        linear-gradient(
+                to bottom,
+                theme("colors.ash-dark.600") 16px,
+                transparent 16px
+            )
+            100% 0;
+    background-repeat: no-repeat;
+    background-size: calc(100% - 16px) calc(100% - 16px);
+}
+
+.dark600 .topRightCorner {
+    border-left: theme("colors.ash-dark.600") 16px solid;
+    border-bottom: theme("colors.ash-dark.600") 16px solid;
+    background: linear-gradient(
+            to left,
+            theme("colors.ash-dark.600") 16px,
+            transparent 16px
+        )
+        100% 0;
+}
+
+.dark600 .content {
+    @apply bg-ash-dark-600;
+}
+
+.dark650 .topLeftCorner {
+    border-right: theme("colors.bg") 16px solid;
+    border-bottom: theme("colors.bg") 16px solid;
+    background: linear-gradient(
+                to right,
+                theme("colors.bg") 16px,
+                transparent 16px
+            )
+            0 100%,
+        linear-gradient(to bottom, theme("colors.bg") 16px, transparent 16px)
+            100% 0;
+    background-repeat: no-repeat;
+    background-size: calc(100% - 16px) calc(100% - 16px);
+}
+
+.dark650 .topRightCorner {
+    border-left: theme("colors.bg") 16px solid;
+    border-bottom: theme("colors.bg") 16px solid;
+    background: linear-gradient(
+            to left,
+            theme("colors.bg") 16px,
+            transparent 16px
+        )
+        100% 0;
+    background-repeat: no-repeat;
+    background-size: calc(100% - 16px) calc(100% - 16px);
+}
+
+.dark650 .content {
+    @apply bg-bg;
+}
+
+.frameTopLeft {
+    padding: 1em 0 0 1em;
+    border-right: 1em solid currentColor;
+    border-bottom: 1em solid currentColor;
+    background: linear-gradient(to right, currentColor 1em, transparent 1em) bottom left,
+        linear-gradient(to bottom, currentColor 1em, transparent 1em) top right;
+    background-repeat: no-repeat;
+    background-size: calc(100% - 1em) calc(100% - 1em);
+}
+
+.frameTopRight {
+    padding: 1em 1em 0 0;
+    border-left: 1em solid currentColor;
+    border-bottom: 1em solid currentColor;
+    background: linear-gradient(to left, currentColor 1em, transparent 1em) bottom right
+        , linear-gradient(to bottom, currentColor 1em, transparent 1em) top left;
+    background-repeat: no-repeat;
+    background-size: calc(100% - 1em) calc(100% - 1em);
+}

@@ -1,0 +1,387 @@
+{
+    "buildInfo": {
+        "rustc": {
+            "version": "1.62.0-nightly",
+            "commitHash": "082e4ca49770ebc9cb0ee616f3726a67471be8cb",
+            "commitDate": "2022-04-26",
+            "channel": "Nightly",
+            "short": "rustc 1.62.0-nightly (082e4ca49 2022-04-26)"
+        },
+        "contractCrate": {
+            "name": "voting_escrow",
+            "version": "0.0.0",
+            "git_version": "45566c6"
+        },
+        "framework": {
+            "name": "elrond-wasm",
+            "version": "0.33.1"
+        }
+    },
+    "name": "VotingEscrow",
+    "constructor": {
+        "inputs": [
+            {
+                "name": "locked_token",
+                "type": "TokenIdentifier"
+            }
+        ],
+        "outputs": []
+    },
+    "endpoints": [
+        {
+            "name": "checkpoint",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "deposit_for",
+            "mutability": "mutable",
+            "payableInTokens": ["*"],
+            "inputs": [
+                {
+                    "name": "addr",
+                    "type": "Address"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "create_lock",
+            "mutability": "mutable",
+            "payableInTokens": ["*"],
+            "inputs": [
+                {
+                    "name": "unlock_time",
+                    "type": "u64"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "increase_amount",
+            "mutability": "mutable",
+            "payableInTokens": ["*"],
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "increase_unlock_time",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "unlock_time",
+                    "type": "u64"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "withdraw",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "getUserBalanceAtTs",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "addr",
+                    "type": "Address"
+                },
+                {
+                    "name": "t",
+                    "type": "u64"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getUserBalanceAtBlock",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "addr",
+                    "type": "Address"
+                },
+                {
+                    "name": "block",
+                    "type": "u64"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getTotalSupplyAtTs",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "t",
+                    "type": "u64"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getTotalSupplyAtBlock",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "_block",
+                    "type": "u64"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getLockedToken",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "TokenIdentifier"
+                }
+            ]
+        },
+        {
+            "name": "getUserLocked",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "address",
+                    "type": "Address"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "LockedBalance"
+                }
+            ]
+        },
+        {
+            "name": "getEpoch",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "getPointHistory",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "epoch",
+                    "type": "u64"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "Point"
+                }
+            ]
+        },
+        {
+            "name": "getUserPointHistory",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "address",
+                    "type": "Address"
+                },
+                {
+                    "name": "epoch",
+                    "type": "u64"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "Point"
+                }
+            ]
+        },
+        {
+            "name": "getUserPointEpoch",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "address",
+                    "type": "Address"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "getTotalLocked",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getSlopeChanges",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "time",
+                    "type": "u64"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigInt"
+                }
+            ]
+        }
+    ],
+    "events": [
+        {
+            "identifier": "deposit",
+            "inputs": [
+                {
+                    "name": "provider",
+                    "type": "Address",
+                    "indexed": true
+                },
+                {
+                    "name": "locktime",
+                    "type": "u64",
+                    "indexed": true
+                },
+                {
+                    "name": "deposit",
+                    "type": "DepositEvent"
+                }
+            ]
+        },
+        {
+            "identifier": "withdraw",
+            "inputs": [
+                {
+                    "name": "provider",
+                    "type": "Address",
+                    "indexed": true
+                },
+                {
+                    "name": "withdraw",
+                    "type": "WithdrawEvent"
+                }
+            ]
+        },
+        {
+            "identifier": "supply",
+            "inputs": [
+                {
+                    "name": "supply",
+                    "type": "SupplyEvent"
+                }
+            ]
+        }
+    ],
+    "hasCallback": false,
+    "types": {
+        "DepositEvent": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "value",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "timestamp",
+                    "type": "u64"
+                },
+                {
+                    "name": "value_locked",
+                    "type": "BigUint"
+                }
+            ]
+        },
+        "LockedBalance": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "amount",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "end",
+                    "type": "u64"
+                }
+            ]
+        },
+        "Point": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "bias",
+                    "type": "BigInt"
+                },
+                {
+                    "name": "slope",
+                    "type": "BigInt"
+                },
+                {
+                    "name": "ts",
+                    "type": "u64"
+                },
+                {
+                    "name": "block",
+                    "type": "u64"
+                }
+            ]
+        },
+        "SupplyEvent": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "prev_supply",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "supply",
+                    "type": "BigUint"
+                }
+            ]
+        },
+        "WithdrawEvent": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "value",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "timestamp",
+                    "type": "u64"
+                }
+            ]
+        }
+    }
+}
