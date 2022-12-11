@@ -129,7 +129,72 @@ const DEVNET_TOKENS_BETA: IESDTInfo[] = [
     },
 ];
 
-const MAINNET_TOKENS: IESDTInfo[] = [];
+const MAINNET_TOKENS: IESDTInfo[] = [
+    {
+        identifier: "ASH-a85626",
+        chainId: ChainId.Devnet,
+        symbol: "ASH",
+        name: "Ashswap Token",
+        decimals: 18,
+        logoURI: ImgAshIcon.src,
+    },
+    {
+        identifier: "USDT-821a84",
+        chainId: ChainId.Devnet,
+        symbol: "USDT",
+        name: "Tether",
+        decimals: 6,
+        logoURI: IconUSDT.src,
+    },
+    {
+        identifier: "USDC-bb1e62",
+        chainId: ChainId.Devnet,
+        symbol: "USDC",
+        name: "USD Coin",
+        decimals: 6,
+        logoURI: IconUSDC.src,
+    },
+    {
+        identifier: "BUSD-7f6b0f",
+        chainId: ChainId.Devnet,
+        symbol: "BUSD",
+        name: "Binance USD",
+        decimals: 6,
+        logoURI: IconBUSD.src,
+    },
+    {
+        identifier: "RENBTC-9179c8",
+        chainId: ChainId.Devnet,
+        symbol: "renBTC",
+        name: "Ren BTC",
+        decimals: 8,
+        logoURI: IconBTC.src,
+    },
+    {
+        identifier: "WBTC-2d9033",
+        chainId: ChainId.Devnet,
+        symbol: "wBTC",
+        name: "Wrapped BTC",
+        decimals: 8,
+        logoURI: IconWBTC.src,
+    },
+    {
+        identifier: "WEGLD-795247",
+        chainId: ChainId.Devnet,
+        symbol: "wEGLD",
+        name: "Wrapped EGLD",
+        decimals: 18,
+        logoURI: IconWEGLD.src,
+    },
+    {
+        identifier: "AEGLD-a1f5d4",
+        chainId: ChainId.Devnet,
+        symbol: "aEGLD",
+        name: "AEGLD",
+        decimals: 18,
+        logoURI: IconAEGLD.src,
+    },
+];
 
 export const TOKENS =
     ENVIRONMENT.NETWORK === "devnet"
@@ -148,7 +213,7 @@ export const ASH_TOKEN: IESDTInfo =
             ? ENVIRONMENT.ENV === "alpha"
                 ? "ASH-a0d8e5"
                 : "ASH-77a5df"
-            : ""
+            : "ASH-a85626"
     ];
 export const ESDT_MAP = Object.fromEntries(
     TOKENS.map((t) => [t.identifier, new ESDT(t)])
@@ -159,5 +224,5 @@ export const ASH_ESDT =
             ? ENVIRONMENT.ENV === "alpha"
                 ? "ASH-a0d8e5"
                 : "ASH-77a5df"
-            : ""
+            : "ASH-a85626"
     ];

@@ -23,8 +23,8 @@ const dappContractDevnet: DappContractConfig = {
 };
 
 const dappContractMainnet: DappContracts = {
-    voteEscrowedContract: "",
-    feeDistributor: "",
+    voteEscrowedContract: "erd1qqqqqqqqqqqqqpgq0679eygvlua6wxaqvvdgy3k6kjahk7a4tk2qpwlv8z",
+    feeDistributor: "erd1qqqqqqqqqqqqqpgqg6c8dasj4nnyqn7m97vd4a234rd4ypd4tk2qxxw9qw",
 };
 
 const dappContract =
