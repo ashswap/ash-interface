@@ -18,7 +18,7 @@ const BasicLayout = ({ children }: { children: any }) => {
                     Scam/Phishing verification:{" "}
                     <span className="text-pink-600">https://</span>
                     {ENVIRONMENT.ASH_DOMAIN}
-                    {ENVIRONMENT.ENV === "beta" && (
+                    {ENVIRONMENT.NETWORK === "devnet" && ENVIRONMENT.ENV === "beta" && (
                         <span>
                             &nbsp;- Claim devnet tokens{" "}
                             <a

@@ -101,39 +101,51 @@ const devnet: PoolConfig = {
 const mainnet: IPool[] = [
     {
         address:
-            "erd1qqqqqqqqqqqqqpgqxkhgsfrejldzmnnjglx0pc2y5ssr4k92j9ts9ryaqe",
+            "erd1qqqqqqqqqqqqqpgq23rr93etp8l3ejkn99wx0uacmmyylte7tk2qsgndsh",
         lpToken: {
-            identifier: "LPT-9cf3ed",
+            identifier: "ALP-4df369",
             chainId: ChainId.Testnet,
             symbol: "LPT-USDC-USDT",
             name: "Ashswap LP",
             decimals: 18,
         },
-        tokens: [TOKENS_MAP["USDC-cbf0b9"], TOKENS_MAP["USDT-8d1668"]],
+        tokens: [TOKENS_MAP["USDC-bb1e62"], TOKENS_MAP["USDT-821a84"]],
     },
     {
         address:
-            "erd1qqqqqqqqqqqqqpgqwfqh8gu8kgc0gp0gcye9jkqg278ly340j9tsr29hp4",
+            "erd1qqqqqqqqqqqqqpgqhjnxk0y3lnaplx77fahf6l39t7zkke74tk2qk3awv2",
         lpToken: {
-            identifier: "LPT-d1e2b6",
+            identifier: "ALP-35a95f",
             chainId: ChainId.Testnet,
-            symbol: "LPT-USDC-wUSDC",
+            symbol: "LPT-USDC-BUSD",
             name: "Ashswap LP",
             decimals: 18,
         },
-        tokens: [TOKENS_MAP["USDC-cbf0b9"], TOKENS_MAP["WUSDC-365a33"]],
+        tokens: [TOKENS_MAP["USDC-bb1e62"], TOKENS_MAP["BUSD-7f6b0f"]],
     },
     {
         address:
-            "erd1qqqqqqqqqqqqqpgqgk44n93n2pjsyynz0dzndr6yej7c7u5mj9ts3n4cfn",
+            "erd1qqqqqqqqqqqqqpgqpggw86hkkv3yyrc5fzvg0xe68esq4rfjtk2qtpgcsm",
         lpToken: {
-            identifier: "LPT-643463",
+            identifier: "ALP-d6fa8e",
+            chainId: ChainId.Devnet,
+            symbol: "LPT-wEGLD-aEGLD",
+            name: "Ashswap LP",
+            decimals: 18,
+        },
+        tokens: [TOKENS_MAP["WEGLD-795247"], TOKENS_MAP["AEGLD-a1f5d4"]],
+    },
+    {
+        address:
+            "erd1qqqqqqqqqqqqqpgqj6ntxz9zqvcvdumec6dua2xl4kyykmantk2qgq0yu8",
+        lpToken: {
+            identifier: "ALP-3e1426",
             chainId: ChainId.Testnet,
             symbol: "LPT-renBTC-wBTC",
             name: "Ashswap LP",
             decimals: 18,
         },
-        tokens: [TOKENS_MAP["RENBTC-36935a"], TOKENS_MAP["WBTC-ebec12"]],
+        tokens: [TOKENS_MAP["RENBTC-9179c8"], TOKENS_MAP["WBTC-2d9033"]],
     },
 ];
 
