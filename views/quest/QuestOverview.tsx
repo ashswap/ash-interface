@@ -41,6 +41,8 @@ const QuestOverview = () => {
     const router = useRouter();
     const [code, setCode] = useState<string>();
     const [errMsg, setErrMsg] = useState("");
+    const [isRegistering, setIsRegistering] = useState(false);
+    const [isError, setIsError] = useState(false);
     const [userStats, setUserStats] = useRecoilState(atomQuestUserStats);
     const connectWallet = useConnectWallet();
     const userAddress = useRecoilValue(accAddressState);
@@ -65,6 +67,7 @@ const QuestOverview = () => {
 
     const register = useCallback(
         (captcha: string) => {
+            setIsRegistering(true);
             logApi
                 .post(
                     "/api/v1/wallet",
@@ -85,9 +88,11 @@ const QuestOverview = () => {
                         msg = "Something went wrong!!, please try again later";
                     }
                     setErrMsg(msg);
+                    setIsError(true);
                 })
                 .finally(() => {
                     getUserStats();
+                    setIsRegistering(false);
                 });
         },
         [code, getUserStats]
@@ -97,7 +102,8 @@ const QuestOverview = () => {
         logApi
             .post("/api/v1/wallet/unlink", {
                 platform: "twitter",
-            }).then(() => setCode(undefined))
+            })
+            .then(() => setCode(undefined))
             .finally(() => getUserStats());
     }, [getUserStats]);
 
@@ -110,8 +116,8 @@ const QuestOverview = () => {
     }, [userAddress, setUserStats, getUserStats]);
 
     useEffect(() => {
-        console.log('log', code, userAddress);
-        if(code && userAddress) {
+        console.log("captcha", code, userAddress);
+        if (code && userAddress) {
             initGeetest4({ product: "bind", riskType: "slide" }, (obj) => {
                 captchaObjRef.current?.destroy();
                 captchaObjRef.current = obj
@@ -129,7 +135,7 @@ const QuestOverview = () => {
         return () => {
             captchaObjRef.current?.destroy();
             captchaObjRef.current = undefined;
-        }
+        };
     }, [code, userAddress, register]);
 
     useEffect(() => {
@@ -324,27 +330,43 @@ const QuestOverview = () => {
                                 <div className="font-bold text-4xl text-white">
                                     2
                                 </div>
-                                <a href={ENVIRONMENT.LOGIN_TWITTER_LINK.replace("http://localhost:3000", "https://8b32-27-79-164-223.ngrok.io")}>
+                                <a href={ENVIRONMENT.LOGIN_TWITTER_LINK}>
                                     <GlowingButton
                                         theme="cyan"
                                         className="w-40 h-14 ml-6 clip-corner-1 clip-corner-br font-bold text-sm disabled:bg-ash-dark-300"
                                         disabled={!!code}
                                     >
-                                        {code ? 'Linked Twitter' : 'Link your Twitter'}
+                                        {code
+                                            ? "Linked Twitter"
+                                            : "Link your Twitter"}
                                     </GlowingButton>
                                 </a>
                             </div>
                             <div className="mt-20">
-                                <GlowingButton
-                                    theme="pink"
-                                    className="w-full h-16 font-bold text-lg disabled:bg-ash-dark-300"
-                                    disabled={!code || !userAddress}
-                                    onClick={() =>
-                                        captchaObjRef.current?.showBox()
-                                    }
-                                >
-                                    Register
-                                </GlowingButton>
+                                {isError ? (
+                                    <GlowingButton
+                                        theme="pink"
+                                        className="w-full h-16 font-bold text-lg disabled:bg-ash-dark-300"
+                                        onClick={() => {
+                                            setErrMsg("");
+                                            setIsError(false);
+                                            setCode(undefined);
+                                        }}
+                                    >
+                                        Try another Twitter account.
+                                    </GlowingButton>
+                                ) : (
+                                    <GlowingButton
+                                        theme="pink"
+                                        className="w-full h-16 font-bold text-lg disabled:bg-ash-dark-300"
+                                        disabled={!code || !userAddress || isRegistering}
+                                        onClick={() =>
+                                            captchaObjRef.current?.showBox()
+                                        }
+                                    >
+                                        Register
+                                    </GlowingButton>
+                                )}
                             </div>
                         </div>
                         {errMsg && (
