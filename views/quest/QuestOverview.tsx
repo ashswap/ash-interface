@@ -9,6 +9,7 @@ import logApi from "helper/logHelper";
 import { formatAmount } from "helper/number";
 import { shortenString } from "helper/string";
 import { useConnectWallet } from "hooks/useConnectWallet";
+import usePrevState from "hooks/usePrevState";
 import { GeetestCaptchaObj } from "interface/geetest";
 import { QuestActionType, QuestUserStatsModel } from "interface/quest";
 import moment from "moment";
@@ -41,16 +42,19 @@ const QuestOverview = () => {
     const router = useRouter();
     const [code, setCode] = useState<string>();
     const [errMsg, setErrMsg] = useState("");
+    const [isRegistering, setIsRegistering] = useState(false);
+    const [isError, setIsError] = useState(false);
     const [userStats, setUserStats] = useRecoilState(atomQuestUserStats);
     const connectWallet = useConnectWallet();
     const userAddress = useRecoilValue(accAddressState);
+    const prevAddr = usePrevState(userAddress);
     const captchaElRef = useRef(null);
     const captchaObjRef = useRef<GeetestCaptchaObj>();
     const [firstLoad, setFirstLoad] = useState(true);
 
     const isRegistered = useMemo(() => {
         return (
-            userStats?.wallet?.twitter_metadata?.user?.id &&
+            userStats?.wallet?.discord_metadata?.user?.id &&
             userStats.wallet.wallet_address === userAddress
         );
     }, [userStats, userAddress]);
@@ -64,12 +68,13 @@ const QuestOverview = () => {
     }, [setUserStats]);
 
     const register = useCallback(
-        (captcha: string) => {
+        (captcha: string, platform: "twitter" | "discord") => {
+            setIsRegistering(true);
             logApi
                 .post(
                     "/api/v1/wallet",
                     {
-                        twitter: {
+                        [platform]: {
                             code,
                         },
                     },
@@ -85,21 +90,27 @@ const QuestOverview = () => {
                         msg = "Something went wrong!!, please try again later";
                     }
                     setErrMsg(msg);
+                    setIsError(true);
                 })
                 .finally(() => {
                     getUserStats();
+                    setIsRegistering(false);
                 });
         },
         [code, getUserStats]
     );
 
-    const unlinkTwitter = useCallback(() => {
-        logApi
-            .post("/api/v1/wallet/unlink", {
-                platform: "twitter",
-            })
-            .finally(() => getUserStats());
-    }, [getUserStats]);
+    const unlinkSocial = useCallback(
+        (platform: "twitter" | "discord") => {
+            logApi
+                .post("/api/v1/wallet/unlink", {
+                    platform,
+                })
+                .then(() => setCode(undefined))
+                .finally(() => getUserStats());
+        },
+        [getUserStats]
+    );
 
     useEffect(() => {
         if (userAddress) {
@@ -110,19 +121,26 @@ const QuestOverview = () => {
     }, [userAddress, setUserStats, getUserStats]);
 
     useEffect(() => {
-        initGeetest4({ product: "bind", riskType: "slide" }, (obj) => {
+        if (code && userAddress) {
+            initGeetest4({ product: "bind", riskType: "slide" }, (obj) => {
+                captchaObjRef.current?.destroy();
+                captchaObjRef.current = obj
+                    .appendTo(captchaElRef.current as any)
+                    .onSuccess(() => {
+                        const validate = obj.getValidate();
+                        const captcha = Buffer.from(
+                            JSON.stringify(validate)
+                        ).toString("base64");
+                        register(captcha, "discord");
+                    });
+                captchaObjRef.current.showBox();
+            });
+        }
+        return () => {
             captchaObjRef.current?.destroy();
-            captchaObjRef.current = obj
-                .appendTo(captchaElRef.current as any)
-                .onSuccess(() => {
-                    const validate = obj.getValidate();
-                    const captcha = Buffer.from(
-                        JSON.stringify(validate)
-                    ).toString("base64");
-                    register(captcha);
-                });
-        });
-    }, [register]);
+            captchaObjRef.current = undefined;
+        };
+    }, [code, userAddress, register]);
 
     useEffect(() => {
         const query = router.query;
@@ -135,6 +153,14 @@ const QuestOverview = () => {
             });
         }
     }, [router]);
+
+    useEffect(() => {
+        if(!userAddress && prevAddr){
+            setIsError(false);
+            setErrMsg("");
+            setCode("");
+        }
+    }, [userAddress, prevAddr]);
 
     if (firstLoad && !userStats && userAddress) return null;
 
@@ -184,20 +210,20 @@ const QuestOverview = () => {
                                 {"// "}
                             </span>
                             <span className="font-bold text-white">
-                                Twitter
+                                Discord
                             </span>
                         </div>
                         <div className="flex justify-between text-xs">
                             <div className="font-semibold text-stake-gray-500">
                                 {isRegistered
-                                    ? userStats?.wallet.twitter_metadata?.user
+                                    ? userStats?.wallet.discord_metadata?.user
                                           .username
                                     : "_"}
                             </div>
                             {isRegistered && (
                                 <button
                                     className="font-bold text-ash-purple-500 underline"
-                                    onClick={() => unlinkTwitter()}
+                                    onClick={() => unlinkSocial("discord")}
                                 >
                                     Disconnect
                                 </button>
@@ -316,26 +342,68 @@ const QuestOverview = () => {
                                 <div className="font-bold text-4xl text-white">
                                     2
                                 </div>
-                                <a href={ENVIRONMENT.LOGIN_TWITTER_LINK}>
+                                {/* <a
+                                    href={ENVIRONMENT.LOGIN_TWITTER_LINK.replace(
+                                        "state=state",
+                                        "state=" + userAddress
+                                    ).replace("code_challenge=challenge", "code_challenge=" + userAddress)}
+                                >
                                     <GlowingButton
                                         theme="cyan"
-                                        className="w-40 h-14 ml-6 clip-corner-1 clip-corner-br font-bold text-sm "
+                                        className="w-40 h-14 ml-6 clip-corner-1 clip-corner-br font-bold text-sm disabled:bg-ash-dark-300"
+                                        disabled={!!code || !userAddress}
                                     >
-                                        Link your Twitter
+                                        {code
+                                            ? "Linked Twitter"
+                                            : "Link your Twitter"}
+                                    </GlowingButton>
+                                </a> */}
+                                <a
+                                    href={ENVIRONMENT.LOGIN_DISCORD_LINK.replace(
+                                        "http://localhost:3000/ashpoint",
+                                        "https://378c-27-79-164-223.ngrok.io/ashpoint"
+                                    )}
+                                >
+                                    <GlowingButton
+                                        theme="cyan"
+                                        className="w-40 h-14 ml-6 clip-corner-1 clip-corner-br font-bold text-sm disabled:bg-ash-dark-300"
+                                        disabled={!!code || !userAddress}
+                                    >
+                                        {code
+                                            ? "Linked Discord"
+                                            : "Link your Discord"}
                                     </GlowingButton>
                                 </a>
                             </div>
                             <div className="mt-20">
-                                <GlowingButton
-                                    theme="pink"
-                                    className="w-full h-16 font-bold text-lg disabled:bg-ash-dark-300"
-                                    disabled={!code || !userAddress}
-                                    onClick={() =>
-                                        captchaObjRef.current?.showBox()
-                                    }
-                                >
-                                    Register
-                                </GlowingButton>
+                                {isError ? (
+                                    <GlowingButton
+                                        theme="pink"
+                                        className="w-full h-16 font-bold text-lg disabled:bg-ash-dark-300"
+                                        onClick={() => {
+                                            setErrMsg("");
+                                            setIsError(false);
+                                            setCode(undefined);
+                                        }}
+                                    >
+                                        Try another Discord account.
+                                    </GlowingButton>
+                                ) : (
+                                    <GlowingButton
+                                        theme="pink"
+                                        className="w-full h-16 font-bold text-lg disabled:bg-ash-dark-300"
+                                        disabled={
+                                            !code ||
+                                            !userAddress ||
+                                            isRegistering
+                                        }
+                                        onClick={() =>
+                                            captchaObjRef.current?.showBox()
+                                        }
+                                    >
+                                        Register
+                                    </GlowingButton>
+                                )}
                             </div>
                         </div>
                         {errMsg && (

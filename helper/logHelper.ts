@@ -25,6 +25,7 @@ logApi.interceptors.request.use(async (config) => {
         ...config.headers,
         "X-ASH-authen": ashAuth,
         "X-ASH-verify": verify,
+        // "ngrok-skip-browser-warning": "FU_NGROK"
     };
     config.baseURL = process.env.NEXT_PUBLIC_ASH_LOG_API;
     return config;
