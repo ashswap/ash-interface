@@ -324,7 +324,7 @@ const QuestOverview = () => {
                                 <div className="font-bold text-4xl text-white">
                                     2
                                 </div>
-                                <a href={ENVIRONMENT.LOGIN_TWITTER_LINK.replace("http://localhost:3000", "https://8b32-27-79-164-223.ngrok.io")}>
+                                <a href={ENVIRONMENT.LOGIN_TWITTER_LINK}>
                                     <GlowingButton
                                         theme="cyan"
                                         className="w-40 h-14 ml-6 clip-corner-1 clip-corner-br font-bold text-sm disabled:bg-ash-dark-300"
