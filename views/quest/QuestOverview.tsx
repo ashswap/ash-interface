@@ -110,19 +110,26 @@ const QuestOverview = () => {
     }, [userAddress, setUserStats, getUserStats]);
 
     useEffect(() => {
-        initGeetest4({ product: "bind", riskType: "slide" }, (obj) => {
+        if(code && userAddress) {
+            initGeetest4({ product: "bind", riskType: "slide" }, (obj) => {
+                captchaObjRef.current?.destroy();
+                captchaObjRef.current = obj
+                    .appendTo(captchaElRef.current as any)
+                    .onSuccess(() => {
+                        const validate = obj.getValidate();
+                        const captcha = Buffer.from(
+                            JSON.stringify(validate)
+                        ).toString("base64");
+                        register(captcha);
+                    });
+                captchaObjRef.current.showBox();
+            });
+        }
+        return () => {
             captchaObjRef.current?.destroy();
-            captchaObjRef.current = obj
-                .appendTo(captchaElRef.current as any)
-                .onSuccess(() => {
-                    const validate = obj.getValidate();
-                    const captcha = Buffer.from(
-                        JSON.stringify(validate)
-                    ).toString("base64");
-                    register(captcha);
-                });
-        });
-    }, [register]);
+            captchaObjRef.current = undefined;
+        }
+    }, [code, userAddress, register]);
 
     useEffect(() => {
         const query = router.query;
@@ -319,9 +326,10 @@ const QuestOverview = () => {
                                 <a href={ENVIRONMENT.LOGIN_TWITTER_LINK}>
                                     <GlowingButton
                                         theme="cyan"
-                                        className="w-40 h-14 ml-6 clip-corner-1 clip-corner-br font-bold text-sm "
+                                        className="w-40 h-14 ml-6 clip-corner-1 clip-corner-br font-bold text-sm disabled:bg-ash-dark-300"
+                                        disabled={!!code}
                                     >
-                                        Link your Twitter
+                                        {code ? 'Linked Twitter' : 'Link your Twitter'}
                                     </GlowingButton>
                                 </a>
                             </div>
