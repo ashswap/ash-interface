@@ -1,5 +1,6 @@
 import {
     useExtensionLogin,
+    useUpdateEffect,
     useWalletConnectLogin,
 } from "@elrondnetwork/dapp-core/hooks";
 import connectWalletBg from "assets/images/connect-wallet-bg.png";
@@ -25,9 +26,7 @@ const MAIAR_WALLET_LINK = {
     CHROME_EXT:
         "https://chrome.google.com/webstore/detail/maiar-defi-wallet/dngmlblcodfobpdpecaadgfbcggfjfnm",
 };
-
-let isFirstRender = true        
-
+let notFirstRender = false;  
 function ConnectWalletModal() {
     const loggedIn = useRecoilValue(accIsLoggedInState);
     const accAddress = useRecoilValue(accAddressState);
@@ -63,32 +62,29 @@ function ConnectWalletModal() {
             })
         }
     }, [isOpenConnectWalletModal, loggedIn]);
-    useEffect(() => {
-        console.log("dappCore", dappCore);           
-        if (window && loggedIn) {
+    useEffect(() => {          
+        if (window && loggedIn && isOpenConnectWalletModal) {
             let dataLayer = (window as any).dataLayer || [];
             window.localStorage.setItem('address', dappCore.account.address);
             window.localStorage.setItem('method', dappCore.loginInfo.loginMethod);
             dataLayer.push({
                 'event': 'success_connect_wallet',
                 'address': dappCore.account.address,
-                'method': dappCore.loginInfo.loginMethod
+                'method': dappCore.loginInfo.loginMethod,
             })
         }
     }, [loggedIn, dappCore.account.address, dappCore.loginInfo.loginMethod]);
     useEffect(() => {
-        if (isFirstRender) {
-            isFirstRender = false
-            return
-        }
-        if (window && !loggedIn && !isFirstRender) {
+        if (window && !loggedIn && notFirstRender) {
             let dataLayer = (window as any).dataLayer || [];
+            console.log("dataLayer",dataLayer);
             dataLayer.push({
                 'event': 'disconnect_wallet',
                 'address': window.localStorage.getItem('address'),
                 'method': window.localStorage.getItem('method')
             })
         }
+        if (window && !loggedIn) {notFirstRender = true}
     }, [loggedIn]);
     return (
         <>

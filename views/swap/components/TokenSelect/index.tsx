@@ -75,16 +75,8 @@ const TokenSelect = ({
 
     const onSelectToken = (t: IESDTInfo) => {
         setOpen(false);
-        if (window && onChange) {
-            onChange(t);       
-            let dataLayer = (window as any).dataLayer || [];
-            dataLayer.push({
-                'event': 'select_token',
-                'type': type,
-                'token_name': t.name,
-                'token_symbol': t.symbol,
-                'token_identifier': t.identifier
-            });
+        if (onChange) {
+            onChange(t);
         }
     };
 
@@ -108,6 +100,17 @@ const TokenSelect = ({
 
     useEffect(() => {
         if (value) setOnboardedSearchToken(true);
+        if (value && window) {
+            let dataLayer = (window as any).dataLayer || [];
+            console.log("dataLayer",dataLayer);
+            dataLayer.push({
+                'event': 'select_token',
+                'type': type,
+                'token_name': value.name,
+                'token_symbol': value.symbol,
+                'token_identifier': value.identifier
+            });
+        }
     }, [value, setOnboardedSearchToken]);
 
     const renderPivotToken = () => {

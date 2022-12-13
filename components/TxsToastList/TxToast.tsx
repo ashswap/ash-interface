@@ -16,6 +16,7 @@ import {
     AccountInfoSliceNetworkType,
     SignedTransactionType,
     TransactionBatchStatusesEnum,
+    TransactionsDisplayInfoType,
     TransactionServerStatusesEnum,
 } from "@elrondnetwork/dapp-core/types";
 import {
@@ -78,6 +79,28 @@ const TxRecord = ({
     collapse?: boolean;
 }) => {
     const { hash, status } = tx;
+    useEffect(() => {
+        if(window && status != "pending" && window.location.href.includes("pool")) {
+            let dataLayer = (window as any).dataLayer || [];
+            console.log("dataLayer", dataLayer);
+            dataLayer.push({
+                'event': 'add_liquidity',
+                'hash': hash,
+                'status': status
+            });
+        };
+    }, [status]);
+    useEffect(() => {
+        if(window && status != "pending" && window.location.href.includes("swap")) {
+            let dataLayer = (window as any).dataLayer || [];
+            console.log("dataLayer", dataLayer);
+            dataLayer.push({
+                'event': 'swap',
+                'hash': hash,
+                'status': status
+            });
+        };
+    }, [status]);
     const network: AccountInfoSliceNetworkType =
         useRecoilValue(networkConfigState).network;
     const iconEl = useMemo(() => {
