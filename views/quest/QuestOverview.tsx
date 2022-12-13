@@ -1,15 +1,21 @@
 import { logout } from "@elrondnetwork/dapp-core/utils";
+import ImgDiscord from "assets/images/discord.png";
+import ImgTwitter from "assets/images/twitter.png";
 import ICCaretRight from "assets/svg/caret-right.svg";
 import { atomQuestUserStats } from "atoms/ashpoint";
 import { accAddressState } from "atoms/dappState";
+import BaseModal from "components/BaseModal";
 import GlowingButton from "components/GlowingButton";
+import Image from "components/Image";
 import { ENVIRONMENT } from "const/env";
+import buildUrlParams from "helper/buildUrlParams";
 import { initGeetest4 } from "helper/geetest";
 import logApi from "helper/logHelper";
 import { formatAmount } from "helper/number";
 import { shortenString } from "helper/string";
 import { useConnectWallet } from "hooks/useConnectWallet";
 import usePrevState from "hooks/usePrevState";
+import { useScreenSize } from "hooks/useScreenSize";
 import { GeetestCaptchaObj } from "interface/geetest";
 import { QuestActionType, QuestUserStatsModel } from "interface/quest";
 import moment from "moment";
@@ -18,6 +24,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
 import QuestItem from "./QuestItem";
 
+type PlatformType = "twitter" | "discord";
 const Star = ({ active = false }: { active?: boolean }) => {
     return (
         <div
@@ -51,10 +58,35 @@ const QuestOverview = () => {
     const captchaElRef = useRef(null);
     const captchaObjRef = useRef<GeetestCaptchaObj>();
     const [firstLoad, setFirstLoad] = useState(true);
+    const [isOpenPlatformModal, setIsOpenPlatformModal] = useState(false);
+    const screenSize = useScreenSize();
+
+    const [platform, setPlatform] = useState<PlatformType>();
+
+    const twitterLink = useMemo(() => {
+        const [path, search] = ENVIRONMENT.LOGIN_TWITTER_LINK.split("?");
+        const { nextUrlParams } = buildUrlParams(search, {
+            state: `twitter:${userAddress}`,
+            code_challenge: userAddress,
+            code_challenge_method: "plain",
+            redirect_uri: location?.href.split("?")[0].replace(/\/$/, ""),
+        });
+        return `${path}?${nextUrlParams}`;
+    }, [userAddress]);
+
+    const discordLink = useMemo(() => {
+        const [path, search] = ENVIRONMENT.LOGIN_DISCORD_LINK.split("?");
+        const { nextUrlParams } = buildUrlParams(search, {
+            state: `discord:${userAddress}`,
+            redirect_uri: location?.href.split("?")[0].replace(/\/$/, ""),
+        });
+        return `${path}?${nextUrlParams}`;
+    }, [userAddress]);
 
     const isRegistered = useMemo(() => {
         return (
-            userStats?.wallet?.twitter_metadata?.user?.id &&
+            (userStats?.wallet?.twitter_username ||
+                userStats?.wallet?.discord_id) &&
             userStats.wallet.wallet_address === userAddress
         );
     }, [userStats, userAddress]);
@@ -68,7 +100,7 @@ const QuestOverview = () => {
     }, [setUserStats]);
 
     const register = useCallback(
-        (captcha: string, platform: "twitter" | "discord") => {
+        (captcha: string, platform: PlatformType) => {
             setIsRegistering(true);
             logApi
                 .post(
@@ -101,7 +133,7 @@ const QuestOverview = () => {
     );
 
     const unlinkSocial = useCallback(
-        (platform: "twitter" | "discord") => {
+        (platform: PlatformType) => {
             logApi
                 .post("/api/v1/wallet/unlink", {
                     platform,
@@ -121,7 +153,7 @@ const QuestOverview = () => {
     }, [userAddress, setUserStats, getUserStats]);
 
     useEffect(() => {
-        if (code && userAddress) {
+        if (code && userAddress && platform) {
             initGeetest4({ product: "bind", riskType: "slide" }, (obj) => {
                 captchaObjRef.current?.destroy();
                 captchaObjRef.current = obj
@@ -131,7 +163,7 @@ const QuestOverview = () => {
                         const captcha = Buffer.from(
                             JSON.stringify(validate)
                         ).toString("base64");
-                        register(captcha, "twitter");
+                        register(captcha, platform);
                     });
                 captchaObjRef.current.showBox();
             });
@@ -140,13 +172,17 @@ const QuestOverview = () => {
             captchaObjRef.current?.destroy();
             captchaObjRef.current = undefined;
         };
-    }, [code, userAddress, register]);
+    }, [code, userAddress, platform, register]);
 
     useEffect(() => {
         const query = router.query;
         const code = query.code;
         if (code) {
             setCode(code as string);
+            setPlatform(
+                (router.query.state as string).split(":")[0] as PlatformType
+            );
+            delete query.state;
             delete query.code;
             router.replace({
                 query,
@@ -155,12 +191,21 @@ const QuestOverview = () => {
     }, [router]);
 
     useEffect(() => {
-        if(!userAddress && prevAddr){
+        if (!userAddress && prevAddr) {
             setIsError(false);
             setErrMsg("");
             setCode("");
         }
     }, [userAddress, prevAddr]);
+
+    useEffect(() => {
+        if (
+            userStats?.wallet.discord_id ||
+            userStats?.wallet.twitter_username
+        ) {
+            setPlatform(userStats?.wallet?.discord_id ? "discord" : "twitter");
+        }
+    }, [userStats]);
 
     if (firstLoad && !userStats && userAddress) return null;
 
@@ -209,21 +254,23 @@ const QuestOverview = () => {
                             <span className="font-semibold text-stake-gray-500">
                                 {"// "}
                             </span>
-                            <span className="font-bold text-white">
-                                Twitter
+                            <span className="font-bold text-white capitalize">
+                                {platform || "Account"}
                             </span>
                         </div>
                         <div className="flex justify-between text-xs">
                             <div className="font-semibold text-stake-gray-500">
                                 {isRegistered
                                     ? userStats?.wallet.twitter_metadata?.user
+                                          .username ||
+                                      userStats?.wallet.discord_metadata.user
                                           .username
                                     : "_"}
                             </div>
-                            {isRegistered && (
+                            {isRegistered && platform && (
                                 <button
                                     className="font-bold text-ash-purple-500 underline"
-                                    onClick={() => unlinkSocial("twitter")}
+                                    onClick={() => unlinkSocial(platform)}
                                 >
                                     Disconnect
                                 </button>
@@ -342,22 +389,18 @@ const QuestOverview = () => {
                                 <div className="font-bold text-4xl text-white">
                                     2
                                 </div>
-                                <a
-                                    href={ENVIRONMENT.LOGIN_TWITTER_LINK.replace(
-                                        "state=state",
-                                        "state=" + userAddress
-                                    ).replace("code_challenge=challenge", "code_challenge=" + userAddress)}
+
+                                <GlowingButton
+                                    theme="cyan"
+                                    className="w-40 h-14 ml-6 clip-corner-1 clip-corner-br font-bold text-sm capitalize disabled:bg-ash-dark-300"
+                                    disabled={!!code || !userAddress}
+                                    onClick={() => setIsOpenPlatformModal(true)}
                                 >
-                                    <GlowingButton
-                                        theme="cyan"
-                                        className="w-40 h-14 ml-6 clip-corner-1 clip-corner-br font-bold text-sm disabled:bg-ash-dark-300"
-                                        disabled={!!code || !userAddress}
-                                    >
-                                        {code
-                                            ? "Linked Twitter"
-                                            : "Link your Twitter"}
-                                    </GlowingButton>
-                                </a>
+                                    {code
+                                        ? "Linked " + platform
+                                        : "Link your account"}
+                                </GlowingButton>
+
                                 {/* <a
                                     href={ENVIRONMENT.LOGIN_DISCORD_LINK.replace(
                                         "http://localhost:3000/ashpoint",
@@ -384,9 +427,10 @@ const QuestOverview = () => {
                                             setErrMsg("");
                                             setIsError(false);
                                             setCode(undefined);
+                                            setPlatform(undefined);
                                         }}
                                     >
-                                        Try another Discord account.
+                                        Try another account.
                                     </GlowingButton>
                                 ) : (
                                     <GlowingButton
@@ -426,6 +470,54 @@ const QuestOverview = () => {
                     </div>
                 )}
             </div>
+
+            <BaseModal
+                isOpen={!!isOpenPlatformModal}
+                onRequestClose={() => setIsOpenPlatformModal(false)}
+                type={screenSize.msm ? "drawer_btt" : "modal"}
+                className={`clip-corner-4 clip-corner-tl bg-ash-dark-600 text-white p-4 flex flex-col max-h-full sm:min-w-[30rem] max-w-4xl mx-auto`}
+            >
+                <div className="flex justify-end mb-6">
+                    <BaseModal.CloseBtn />
+                </div>
+                <div className="grow overflow-auto px-8 pb-16 sm:pb-7">
+                    <div className="font-bold text-lg sm:text-2xl mb-14">
+                        Choose your platform
+                    </div>
+                    <div className="flex justify-around">
+                        <div className="flex flex-col items-center">
+                            <a href={twitterLink} className="">
+                                <div className="w-14 h-auto hover:colored-drop-shadow-sm hover:colored-drop-shadow-cyan-500 duration-300">
+                                    <Image
+                                        src={ImgTwitter}
+                                        alt="twitter"
+                                        objectFit="contain"
+                                        layout="responsive"
+                                    />
+                                </div>
+                            </a>
+                            <div className="font-bold text-sm sm:text-base mt-4">
+                                Twitter
+                            </div>
+                        </div>
+                        <div className="flex flex-col items-center">
+                            <a href={discordLink}>
+                                <div className="w-14 h-auto hover:colored-drop-shadow-sm hover:colored-drop-shadow-ash-purple-500 duration-300">
+                                    <Image
+                                        src={ImgDiscord}
+                                        alt="discord"
+                                        objectFit="contain"
+                                        layout="responsive"
+                                    />
+                                </div>
+                            </a>
+                            <div className="font-bold text-sm sm:text-base mt-4">
+                                Discord
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </BaseModal>
         </>
     );
 };

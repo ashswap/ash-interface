@@ -5,7 +5,11 @@ import { atomQuestUserStats } from "atoms/ashpoint";
 import GlowingButton from "components/GlowingButton";
 import logApi from "helper/logHelper";
 import { formatAmount } from "helper/number";
-import { QuestAction, QuestActionType, QuestUserStatsModel } from "interface/quest";
+import {
+    QuestAction,
+    QuestActionType,
+    QuestUserStatsModel
+} from "interface/quest";
 import Link from "next/link";
 import { useCallback, useMemo, useState } from "react";
 import { useRecoilCallback } from "recoil";
@@ -49,18 +53,23 @@ function QuestItem({
             case "removeLiquidity":
                 return `Remove liquidity ${questData.require} times`;
             case "prize":
-                return `Be active in ${questData.require} days`
+                return `Be active in ${questData.require} days`;
             default:
                 return "";
         }
     }, [questData, type]);
 
-    const getUserStats = useRecoilCallback(({set}) => async () => {
-        const stats = await logApi
-            .get<QuestUserStatsModel>("/api/v1/wallet")
-            .then((res) => res.data).catch(() => undefined);
-        set(atomQuestUserStats, stats);
-    }, []);
+    const getUserStats = useRecoilCallback(
+        ({ set }) =>
+            async () => {
+                const stats = await logApi
+                    .get<QuestUserStatsModel>("/api/v1/wallet")
+                    .then((res) => res.data)
+                    .catch(() => undefined);
+                set(atomQuestUserStats, stats);
+            },
+        []
+    );
 
     const claimASHPoint = useCallback(async () => {
         const claimType = type === "prize" ? "prize" : "action";
@@ -74,8 +83,6 @@ function QuestItem({
         await getUserStats();
     }, [questData, type, getUserStats]);
 
-
-
     return (
         <div className="relative px-5 lg:px-12 py-5 flex justify-between bg-ash-dark-600 border border-black">
             <div className="absolute top-2 left-1">
@@ -83,7 +90,7 @@ function QuestItem({
                     className={`w-3 lg:w-4.5 h-auto colored-drop-shadow-xs ${prac1Classes[status]}`}
                 />
             </div>
-            <div className="w-32 sm:w-36 shrink-0 mr-4 lg:mr-20 flex flex-col items-end">
+            <div className="w-1/5 sm:w-36 shrink-0 mr-4 lg:mr-20 flex flex-col items-end">
                 <div
                     className={`font-bold text-xs mb-auto ${colorClasses[status]}`}
                 >
@@ -114,7 +121,7 @@ function QuestItem({
             </div>
             <div className="grow flex">
                 <div className="grow flex flex-col justify-between">
-                    <div className="mb-7 text-xs sm:text-sm leading-tight">
+                    <div className="mb-7 text-2xs sm:text-sm leading-tight">
                         <span className="font-semibold text-ash-gray-600">
                             {"//"}
                         </span>
@@ -129,17 +136,20 @@ function QuestItem({
                         </span>
                     </div>
                     <div
-                        className={`relative max-w-[9rem] px-4 py-2 bg-ash-gray-600/10 ${colorClasses[status]}`}
+                        className={`relative max-w-[9rem] px-2 py-1 sm:px-4 sm:py-2 bg-ash-gray-600/10 ${colorClasses[status]}`}
                     >
                         <ICQuestPrac2 className="absolute top-0 left-0" />
-                        <span className="font-bold text-xs">
-                            {formatAmount(questData.point)} ASH points
+                        <span className="font-bold text-2xs sm:text-xs truncate">
+                            {formatAmount(questData.point, { isInteger: true })}{" "}
+                            ASH points
                         </span>
                     </div>
                 </div>
                 <div className="shrink-0 relative ml-4 lg:ml-10 flex items-center">
-                    <ICBambooShoot className="w-auto absolute -inset-y-5 -left-2 sm:-left-4 text-ash-gray-600/10" />
-                    <div className="w-24 border-notch-x border-notch-white/50">
+                    <div className="absolute -inset-y-5 -left-2 sm:-left-4 overflow-hidden">
+                        <ICBambooShoot className="w-14 h-auto text-ash-gray-600/10" />
+                    </div>
+                    <div className="shrink w-20 sm:w-24 border-notch-x border-notch-white/50">
                         {status === 0 ? (
                             <Link href={questData.redirect || "/"}>
                                 <a>
