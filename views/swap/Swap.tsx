@@ -136,7 +136,7 @@ const Swap = () => {
         isInsufficentFund,
         slippage,
     } = useSwap();
-    const deboundSlippage = useDebounce(slippage, 500);            
+    const [deboundSlippage] = useDebounce(slippage, 500);            
     const fees = useRecoilValue(poolFeesQuery(pool?.address || ""));
     const [showSetting, setShowSetting] = useState<boolean>(false);
     const [isOpenHistoryModal, openHistoryModal] = useState<boolean>(false);

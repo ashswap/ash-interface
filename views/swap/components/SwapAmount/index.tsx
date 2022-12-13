@@ -64,7 +64,7 @@ const SwapAmount = (props: Props) => {
                 amount: valueFrom,
             });
         }
-    }, [deboundValueFrom, props.type, tokenTo, valueFrom]);
+    }, [deboundValueFrom, props.type, tokenTo]);
     const onChangeValue = useMemo(() => {
         if (props.type === "from") {
             return setValueFrom;
