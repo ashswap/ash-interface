@@ -35,7 +35,6 @@ function StakedPoolCardItem({
             dataLayer.push({
                 'event': 'click_remove_liquidity'
             });
-            console.log("dataLayer", dataLayer);
         }
     }, [openRemoveLiquidity]);
     useEffect(() => {
@@ -44,7 +43,6 @@ function StakedPoolCardItem({
             dataLayer.push({
                 'event': 'click_deposit'
             });
-            console.log("dataLayer", dataLayer);
         }
     }, [openAddLiquidity]);
     if (!liquidityData) return null;

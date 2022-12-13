@@ -36,7 +36,6 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
     useEffect(() => {
         if(window && loggedIn && deboundRawStakeAmt){
             let dataLayer = (window as any).dataLayer || [];
-            console.log("dataLayer", dataLayer);
             dataLayer.push({
                 'event': 'input_stake_value',
                 'amount': deboundRawStakeAmt,

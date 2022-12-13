@@ -72,7 +72,6 @@ const TokenInput = ({
                 'amount': value,
                 'token': token.identifier
             })
-            console.log("dataLayer", dataLayer);
         }
     }, [deboundValue, token])
     return (

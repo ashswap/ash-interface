@@ -58,7 +58,6 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
     useEffect(() => {
         if(window && loggedIn && !deboundedUnstakeAmt.eq(0)){
             let dataLayer = (window as any).dataLayer || [];
-            console.log("dataLayer", dataLayer);
             dataLayer.push({
                 'event': 'input_unstake_value',
                 'amount': deboundedUnstakeAmt.toNumber()/(10**18),

@@ -32,7 +32,6 @@ function PoolCardItem({
             dataLayer.push({
                 'event': 'click_deposit'
             });
-            console.log("dataLayer", dataLayer);
         }
     }, [openAddLiquidity]);
     const network: AccountInfoSliceNetworkType =

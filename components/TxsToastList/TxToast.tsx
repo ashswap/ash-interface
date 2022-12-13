@@ -95,7 +95,6 @@ const TxRecord = ({
             && !isClickedCollapse
         ) {
             let dataLayer = (window as any).dataLayer || [];
-            console.log("dataLayer", dataLayer);
             dataLayer.push({
                 'event': 'add_liquidity',
                 'hash': hash,
@@ -112,7 +111,6 @@ const TxRecord = ({
             && !isClickedCollapse
         ) {
             let dataLayer = (window as any).dataLayer || [];
-            console.log("dataLayer", dataLayer);
             dataLayer.push({
                 'event': 'swap',
                 'hash': hash,
@@ -130,7 +128,6 @@ const TxRecord = ({
             && isClickedStakeButton
         ) {
             let dataLayer = (window as any).dataLayer || [];
-            console.log("dataLayer", dataLayer);
             dataLayer.push({
                 'event': 'liquidity_stake',
                 'hash': hash,
@@ -149,7 +146,6 @@ const TxRecord = ({
             && isClickedHarvestButton
         ) {
             let dataLayer = (window as any).dataLayer || [];
-            console.log("dataLayer", dataLayer);
             dataLayer.push({
                 'event': 'harvest_liquidity_stake',
                 'hash': hash,
@@ -168,7 +164,6 @@ const TxRecord = ({
             && isClickedUnstake
         ) {
             let dataLayer = (window as any).dataLayer || [];
-            console.log("dataLayer", dataLayer);
             dataLayer.push({
                 'event': 'liquidity_unstake',
                 'hash': hash,
