@@ -54,7 +54,7 @@ const QuestOverview = () => {
 
     const isRegistered = useMemo(() => {
         return (
-            userStats?.wallet?.discord_metadata?.user?.id &&
+            userStats?.wallet?.twitter_metadata?.user?.id &&
             userStats.wallet.wallet_address === userAddress
         );
     }, [userStats, userAddress]);
@@ -131,7 +131,7 @@ const QuestOverview = () => {
                         const captcha = Buffer.from(
                             JSON.stringify(validate)
                         ).toString("base64");
-                        register(captcha, "discord");
+                        register(captcha, "twitter");
                     });
                 captchaObjRef.current.showBox();
             });
@@ -210,20 +210,20 @@ const QuestOverview = () => {
                                 {"// "}
                             </span>
                             <span className="font-bold text-white">
-                                Discord
+                                Twitter
                             </span>
                         </div>
                         <div className="flex justify-between text-xs">
                             <div className="font-semibold text-stake-gray-500">
                                 {isRegistered
-                                    ? userStats?.wallet.discord_metadata?.user
+                                    ? userStats?.wallet.twitter_metadata?.user
                                           .username
                                     : "_"}
                             </div>
                             {isRegistered && (
                                 <button
                                     className="font-bold text-ash-purple-500 underline"
-                                    onClick={() => unlinkSocial("discord")}
+                                    onClick={() => unlinkSocial("twitter")}
                                 >
                                     Disconnect
                                 </button>
@@ -342,7 +342,7 @@ const QuestOverview = () => {
                                 <div className="font-bold text-4xl text-white">
                                     2
                                 </div>
-                                {/* <a
+                                <a
                                     href={ENVIRONMENT.LOGIN_TWITTER_LINK.replace(
                                         "state=state",
                                         "state=" + userAddress
@@ -357,8 +357,8 @@ const QuestOverview = () => {
                                             ? "Linked Twitter"
                                             : "Link your Twitter"}
                                     </GlowingButton>
-                                </a> */}
-                                <a
+                                </a>
+                                {/* <a
                                     href={ENVIRONMENT.LOGIN_DISCORD_LINK.replace(
                                         "http://localhost:3000/ashpoint",
                                         "https://378c-27-79-164-223.ngrok.io/ashpoint"
@@ -373,7 +373,7 @@ const QuestOverview = () => {
                                             ? "Linked Discord"
                                             : "Link your Discord"}
                                     </GlowingButton>
-                                </a>
+                                </a> */}
                             </div>
                             <div className="mt-20">
                                 {isError ? (
