@@ -45,15 +45,16 @@ function QuestItem({
             : 0;
     }, [questData]);
     const name = useMemo(() => {
+        const requireMsg = `${questData.require} ${questData.require > 1 ? "times" : "time"}`;
         switch (type) {
             case "addLiquidity":
-                return `Add liquidity ${questData.require} times`;
+                return `Add liquidity ${requireMsg}`;
             case "exchange":
-                return `Swap ${questData.require} times`;
+                return `Swap ${requireMsg}`;
             case "removeLiquidity":
-                return `Remove liquidity ${questData.require} times`;
+                return `Remove liquidity ${requireMsg}`;
             case "prize":
-                return `Be active in ${questData.require} days`;
+                return `Be active in ${requireMsg}`;
             default:
                 return "";
         }

@@ -477,12 +477,16 @@ const QuestOverview = () => {
                 type={screenSize.msm ? "drawer_btt" : "modal"}
                 className={`clip-corner-4 clip-corner-tl bg-ash-dark-600 text-white p-4 flex flex-col max-h-full sm:min-w-[30rem] max-w-4xl mx-auto`}
             >
-                <div className="flex justify-end mb-6">
+                <div className="flex justify-end mb-2">
                     <BaseModal.CloseBtn />
                 </div>
-                <div className="grow overflow-auto px-8 pb-16 sm:pb-7">
-                    <div className="font-bold text-lg sm:text-2xl mb-14">
+                <div className="grow overflow-auto px-8 pb-20 sm:pb-12">
+                    <div className="font-bold text-lg sm:text-2xl mb-2">
                         Choose your platform
+                    </div>
+                    <div className="font-bold text-xs text-white mb-14">
+                        Your account must have been created for at least 30
+                        days.
                     </div>
                     <div className="flex justify-around">
                         <div className="flex flex-col items-center">
