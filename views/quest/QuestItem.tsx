@@ -8,7 +8,7 @@ import { formatAmount } from "helper/number";
 import {
     QuestAction,
     QuestActionType,
-    QuestUserStatsModel
+    QuestUserStatsModel,
 } from "interface/quest";
 import Link from "next/link";
 import { useCallback, useMemo, useState } from "react";
@@ -29,6 +29,20 @@ const bgColorClasses = [
     "bg-ash-gray-600",
 ];
 const statusLabels = ["To do", "Claimable", "Done"];
+const actionLabelMap: { [key in QuestActionType]: string } = {
+    addLiquidity: "Add liquidity",
+    exchange: "Swap",
+    removeLiquidity: "Remove liquidity",
+    prize: "Checkin",
+    enterFarm: "Enter farm",
+    exitFarm: "Exit farm",
+    claimRewards: "Claim farm rewards",
+    claim: "Claim governance rewards",
+    create_lock: "Lock ASH in governance pool",
+    increase_amount: "Increase amount of ASH in governance pool",
+    increase_unlock_time: "Extend lock period in governance pool",
+    withdraw: "Withdraw ASH from governance pool",
+};
 function QuestItem({
     questData,
     type,
@@ -45,18 +59,15 @@ function QuestItem({
             : 0;
     }, [questData]);
     const name = useMemo(() => {
-        switch (type) {
-            case "addLiquidity":
-                return `Add liquidity ${questData.require} times`;
-            case "exchange":
-                return `Swap ${questData.require} times`;
-            case "removeLiquidity":
-                return `Remove liquidity ${questData.require} times`;
-            case "prize":
-                return `Be active in ${questData.require} days`;
-            default:
-                return "";
+        const requireMsg = `${questData.require} ${
+            questData.require > 1 ? "times" : "time"
+        }`;
+        if (type === "prize") {
+            return `Complete at least 1 quest a day, repeat ${
+                questData.require
+            } ${questData.require > 1 ? "days" : "day"}`;
         }
+        return `${actionLabelMap[type]} ${requireMsg}`;
     }, [questData, type]);
 
     const getUserStats = useRecoilCallback(
@@ -156,6 +167,7 @@ function QuestItem({
                                     <GlowingButton
                                         theme="purple"
                                         className="w-full h-8 clip-corner-1 clip-corner-tl font-bold text-xs"
+                                        disabled={type === "prize"}
                                     >
                                         <div className="flex items-center space-x-2.5">
                                             Go!

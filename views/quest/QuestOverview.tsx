@@ -5,6 +5,7 @@ import ICCaretRight from "assets/svg/caret-right.svg";
 import { atomQuestUserStats } from "atoms/ashpoint";
 import { accAddressState } from "atoms/dappState";
 import BaseModal from "components/BaseModal";
+import CopyBtn from "components/CopyBtn";
 import GlowingButton from "components/GlowingButton";
 import Image from "components/Image";
 import { ENVIRONMENT } from "const/env";
@@ -12,6 +13,7 @@ import buildUrlParams from "helper/buildUrlParams";
 import { initGeetest4 } from "helper/geetest";
 import logApi from "helper/logHelper";
 import { formatAmount } from "helper/number";
+import storage from "helper/storage";
 import { shortenString } from "helper/string";
 import { useConnectWallet } from "hooks/useConnectWallet";
 import usePrevState from "hooks/usePrevState";
@@ -83,6 +85,23 @@ const QuestOverview = () => {
         return `${path}?${nextUrlParams}`;
     }, [userAddress]);
 
+    const inviteLink = useMemo(() => {
+        const search = new URLSearchParams({
+            invitationCode: userStats?.wallet.invitation_code || storage.local.getItem("invitationCode") || "",
+        });
+        return `${location?.href
+            .split("?")[0]
+            .replace(/\/$/, "")}?${search.toString()}`;
+    }, [userStats]);
+
+    const sharableLink = useMemo(() => {
+        const text = new URLSearchParams({
+            text: `I just swapped the stablecoins with low slippage, small fees, and fast transaction confirmed on the @ash_swap devnet. Use my referral link, and we'll both earn 500 ASH Points when you join: ${inviteLink}\n#ashswap #MVX #Elrond #stableswap`
+
+        })
+        return `https://twitter.com/intent/tweet?${text.toString()}`;
+    }, [inviteLink]);
+
     const isRegistered = useMemo(() => {
         return (
             (userStats?.wallet?.twitter_username ||
@@ -109,6 +128,7 @@ const QuestOverview = () => {
                         [platform]: {
                             code,
                         },
+                        referral: storage.local.getItem("invitationCode") || undefined
                     },
                     {
                         headers: {
@@ -207,6 +227,15 @@ const QuestOverview = () => {
         }
     }, [userStats]);
 
+    useEffect(() => {
+        if (router.query.invitationCode) {
+            storage.local.setItem({
+                key: "invitationCode",
+                data: router.query.invitationCode as string,
+            });
+        }
+    }, [router]);
+
     if (firstLoad && !userStats && userAddress) return null;
 
     return (
@@ -258,7 +287,7 @@ const QuestOverview = () => {
                                 {platform || "Account"}
                             </span>
                         </div>
-                        <div className="flex justify-between text-xs">
+                        <div className="flex justify-between text-xs mb-4">
                             <div className="font-semibold text-stake-gray-500">
                                 {isRegistered
                                     ? userStats?.wallet.twitter_metadata?.user
@@ -276,6 +305,40 @@ const QuestOverview = () => {
                                 </button>
                             )}
                         </div>
+                        {isRegistered && (
+                            <>
+                                <div className="text-lg mb-4">
+                                    <span className="font-semibold text-stake-gray-500">
+                                        {"// "}
+                                    </span>
+                                    <span className="font-bold text-white capitalize">
+                                        Invite
+                                    </span>
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <CopyBtn text={inviteLink}>
+                                        <GlowingButton
+                                            theme="pink"
+                                            className="w-full py-3 font-bold text-sm truncate"
+                                        >
+                                            Copy link
+                                        </GlowingButton>
+                                    </CopyBtn>
+                                    <a
+                                        href={sharableLink}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                    >
+                                        <GlowingButton
+                                            theme="cyan"
+                                            className="w-full py-3 font-bold text-sm truncate"
+                                        >
+                                            Share
+                                        </GlowingButton>
+                                    </a>
+                                </div>
+                            </>
+                        )}
                     </div>
                     <div className="p-4 bg-ash-dark-600 space-y-9">
                         <div>
@@ -318,7 +381,7 @@ const QuestOverview = () => {
                                     {"// "}
                                 </span>
                                 <span className="font-bold text-ash-gray-500">
-                                    Your ranked
+                                    Your rank
                                 </span>
                             </div>
                         </div>
@@ -477,12 +540,16 @@ const QuestOverview = () => {
                 type={screenSize.msm ? "drawer_btt" : "modal"}
                 className={`clip-corner-4 clip-corner-tl bg-ash-dark-600 text-white p-4 flex flex-col max-h-full sm:min-w-[30rem] max-w-4xl mx-auto`}
             >
-                <div className="flex justify-end mb-6">
+                <div className="flex justify-end mb-2">
                     <BaseModal.CloseBtn />
                 </div>
-                <div className="grow overflow-auto px-8 pb-16 sm:pb-7">
-                    <div className="font-bold text-lg sm:text-2xl mb-14">
+                <div className="grow overflow-auto px-8 pb-20 sm:pb-12">
+                    <div className="font-bold text-lg sm:text-2xl mb-2">
                         Choose your platform
+                    </div>
+                    <div className="font-bold text-xs text-white mb-14">
+                        Your account must have been created for at least 30
+                        days.
                     </div>
                     <div className="flex justify-around">
                         <div className="flex flex-col items-center">
