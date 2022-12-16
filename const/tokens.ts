@@ -132,7 +132,7 @@ const DEVNET_TOKENS_BETA: IESDTInfo[] = [
 const MAINNET_TOKENS: IESDTInfo[] = [
     {
         identifier: "ASH-a85626",
-        chainId: ChainId.Devnet,
+        chainId: ChainId.Mainnet,
         symbol: "ASH",
         name: "Ashswap Token",
         decimals: 18,
@@ -140,7 +140,7 @@ const MAINNET_TOKENS: IESDTInfo[] = [
     },
     {
         identifier: "USDT-821a84",
-        chainId: ChainId.Devnet,
+        chainId: ChainId.Mainnet,
         symbol: "USDT",
         name: "Tether",
         decimals: 6,
@@ -148,7 +148,7 @@ const MAINNET_TOKENS: IESDTInfo[] = [
     },
     {
         identifier: "USDC-bb1e62",
-        chainId: ChainId.Devnet,
+        chainId: ChainId.Mainnet,
         symbol: "USDC",
         name: "USD Coin",
         decimals: 6,
@@ -156,7 +156,7 @@ const MAINNET_TOKENS: IESDTInfo[] = [
     },
     {
         identifier: "BUSD-7f6b0f",
-        chainId: ChainId.Devnet,
+        chainId: ChainId.Mainnet,
         symbol: "BUSD",
         name: "Binance USD",
         decimals: 6,
@@ -164,7 +164,7 @@ const MAINNET_TOKENS: IESDTInfo[] = [
     },
     {
         identifier: "RENBTC-9179c8",
-        chainId: ChainId.Devnet,
+        chainId: ChainId.Mainnet,
         symbol: "renBTC",
         name: "Ren BTC",
         decimals: 8,
@@ -172,7 +172,7 @@ const MAINNET_TOKENS: IESDTInfo[] = [
     },
     {
         identifier: "WBTC-2d9033",
-        chainId: ChainId.Devnet,
+        chainId: ChainId.Mainnet,
         symbol: "wBTC",
         name: "Wrapped BTC",
         decimals: 8,
@@ -180,7 +180,7 @@ const MAINNET_TOKENS: IESDTInfo[] = [
     },
     {
         identifier: "WEGLD-795247",
-        chainId: ChainId.Devnet,
+        chainId: ChainId.Mainnet,
         symbol: "wEGLD",
         name: "Wrapped EGLD",
         decimals: 18,
@@ -188,7 +188,7 @@ const MAINNET_TOKENS: IESDTInfo[] = [
     },
     {
         identifier: "AEGLD-a1f5d4",
-        chainId: ChainId.Devnet,
+        chainId: ChainId.Mainnet,
         symbol: "aEGLD",
         name: "AEGLD",
         decimals: 18,

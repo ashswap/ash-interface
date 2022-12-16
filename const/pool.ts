@@ -1,6 +1,7 @@
 import { ChainId, IESDTInfo } from "helper/token/token";
 import IPool from "interface/pool";
 import { ENVIRONMENT } from "./env";
+import { MAIAR_POOLS } from "./maiarPools";
 import { TOKENS_MAP } from "./tokens";
 
 type PoolConfig = {
@@ -104,7 +105,7 @@ const mainnet: IPool[] = [
             "erd1qqqqqqqqqqqqqpgq23rr93etp8l3ejkn99wx0uacmmyylte7tk2qsgndsh",
         lpToken: {
             identifier: "ALP-4df369",
-            chainId: ChainId.Testnet,
+            chainId: ChainId.Mainnet,
             symbol: "LPT-USDC-USDT",
             name: "Ashswap LP",
             decimals: 18,
@@ -116,7 +117,7 @@ const mainnet: IPool[] = [
             "erd1qqqqqqqqqqqqqpgqhjnxk0y3lnaplx77fahf6l39t7zkke74tk2qk3awv2",
         lpToken: {
             identifier: "ALP-35a95f",
-            chainId: ChainId.Testnet,
+            chainId: ChainId.Mainnet,
             symbol: "LPT-USDC-BUSD",
             name: "Ashswap LP",
             decimals: 18,
@@ -128,7 +129,7 @@ const mainnet: IPool[] = [
             "erd1qqqqqqqqqqqqqpgqpggw86hkkv3yyrc5fzvg0xe68esq4rfjtk2qtpgcsm",
         lpToken: {
             identifier: "ALP-d6fa8e",
-            chainId: ChainId.Devnet,
+            chainId: ChainId.Mainnet,
             symbol: "LPT-wEGLD-aEGLD",
             name: "Ashswap LP",
             decimals: 18,
@@ -140,7 +141,7 @@ const mainnet: IPool[] = [
             "erd1qqqqqqqqqqqqqpgqj6ntxz9zqvcvdumec6dua2xl4kyykmantk2qgq0yu8",
         lpToken: {
             identifier: "ALP-3e1426",
-            chainId: ChainId.Testnet,
+            chainId: ChainId.Mainnet,
             symbol: "LPT-renBTC-wBTC",
             name: "Ashswap LP",
             decimals: 18,
@@ -150,7 +151,7 @@ const mainnet: IPool[] = [
 ];
 
 const pools =
-    ENVIRONMENT.NETWORK == "devnet" ? [...devnet[ENVIRONMENT.ENV]] : mainnet;
+    ENVIRONMENT.NETWORK == "devnet" ? [...devnet[ENVIRONMENT.ENV], ...MAIAR_POOLS] : [...mainnet, ...MAIAR_POOLS];
 export const POOLS_MAP_ADDRESS = Object.fromEntries(
     pools.map((p) => [p.address, p])
 );
