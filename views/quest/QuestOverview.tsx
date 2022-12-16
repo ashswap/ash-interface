@@ -71,7 +71,7 @@ const QuestOverview = () => {
             state: `twitter:${userAddress}`,
             code_challenge: userAddress,
             code_challenge_method: "plain",
-            redirect_uri: location?.href.split("?")[0].replace(/\/$/, ""),
+            redirect_uri: location?.href.split("?")[0].replace(/\/$/, "")+"/",
         });
         return `${path}?${nextUrlParams}`;
     }, [userAddress]);
@@ -80,7 +80,7 @@ const QuestOverview = () => {
         const [path, search] = ENVIRONMENT.LOGIN_DISCORD_LINK.split("?");
         const { nextUrlParams } = buildUrlParams(search, {
             state: `discord:${userAddress}`,
-            redirect_uri: location?.href.split("?")[0].replace(/\/$/, ""),
+            redirect_uri: location?.href.split("?")[0].replace(/\/$/, "")+"/",
         });
         return `${path}?${nextUrlParams}`;
     }, [userAddress]);
