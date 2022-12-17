@@ -1,7 +1,8 @@
 import { Slider } from "antd";
 import ICChevronRight from "assets/svg/chevron-right.svg";
-import { accIsInsufficientEGLDState } from "atoms/dappState";
+import { accIsInsufficientEGLDState, accIsLoggedInState } from "atoms/dappState";
 import { FarmRecord } from "atoms/farmsState";
+import { clickedUnstakeModalState } from "atoms/unstakeState";
 import BigNumber from "bignumber.js";
 import Avatar from "components/Avatar";
 import BaseModal from "components/BaseModal";
@@ -17,7 +18,7 @@ import { formatAmount } from "helper/number";
 import useExitFarm from "hooks/useFarmContract/useExitFarm";
 import { useScreenSize } from "hooks/useScreenSize";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { theme } from "tailwind.config";
 import { useDebounce } from "use-debounce";
 type props = {
@@ -34,6 +35,8 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
         farmTokenSupply,
         emissionAPR,
     } = farmData;
+    const loggedIn = useRecoilValue(accIsLoggedInState);
+    const [isClickedUnstake, setIsClickedUnstake] = useRecoilState(clickedUnstakeModalState);
     const [token0, token1] = pool.tokens;
     const [isAgree, setIsAgree] = useState(false);
     const [unStakeAmt, setUnStakeAmt] = useState<BigNumber>(new BigNumber(0));
@@ -43,7 +46,6 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
     const [rewardOnExit, setRewardOnExit] = useState(new BigNumber(0));
     const insufficientEGLD = useRecoilValue(accIsInsufficientEGLDState);
     const { exitFarm, estimateRewardOnExit } = useExitFarm();
-
     const setMaxStakeAmt = useCallback(() => {
         if (!stakedData?.totalStakedLP) return;
         setUnStakeAmt(stakedData.totalStakedLP);
@@ -53,7 +55,17 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
             )
         );
     }, [stakedData, farm]);
-
+    useEffect(() => {
+        if(window && loggedIn && !deboundedUnstakeAmt.eq(0)){
+            let dataLayer = (window as any).dataLayer || [];
+            console.log("dataLayer", dataLayer);
+            dataLayer.push({
+                'event': 'input_unstake_value',
+                'amount': deboundedUnstakeAmt.toNumber()/(10**18),
+                'lp_token': pool?.lpToken?.symbol
+            })
+        }
+    }, [deboundedUnstakeAmt]);
     const ashPerDay = useMemo(() => {
         if (!stakedData) return new BigNumber(0);
         const totalAshPerDay = ashPerBlock
@@ -176,6 +188,7 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
                                     const amt = toWei(pool.lpToken, raw);
                                     setRawStakeAmt(raw);
                                     setUnStakeAmt(amt);
+                                    setIsClickedUnstake(true);
                                 }}
                             />
                             <div className="text-right text-2xs lg:text-xs mt-2">

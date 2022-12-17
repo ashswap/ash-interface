@@ -1,5 +1,6 @@
+import { useDebounce } from "use-debounce";
 import ICChevronRight from "assets/svg/chevron-right.svg";
-import { accIsInsufficientEGLDState } from "atoms/dappState";
+import { accIsInsufficientEGLDState, accIsLoggedInState } from "atoms/dappState";
 import { FarmRecord } from "atoms/farmsState";
 import { lpTokenMapState } from "atoms/tokensState";
 import BigNumber from "bignumber.js";
@@ -15,7 +16,7 @@ import { toEGLDD, toWei } from "helper/balance";
 import { formatAmount } from "helper/number";
 import useEnterFarm from "hooks/useFarmContract/useEnterFarm";
 import { useScreenSize } from "hooks/useScreenSize";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
 type props = {
     open: boolean;
@@ -23,6 +24,7 @@ type props = {
     farmData: FarmRecord;
 };
 const StakeLPContent = ({ open, onClose, farmData }: props) => {
+    const loggedIn = useRecoilValue(accIsLoggedInState);
     const { pool, farm, farmTokenSupply, ashPerBlock, emissionAPR } = farmData;
     const [token0, token1] = pool.tokens;
     const [isAgree, setIsAgree] = useState(false);
@@ -30,6 +32,18 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
     const insufficientEGLD = useRecoilValue(accIsInsufficientEGLDState);
     const [stakeAmt, setStakeAmt] = useState<BigNumber>(new BigNumber(0));
     const [rawStakeAmt, setRawStakeAmt] = useState("");
+    const [deboundRawStakeAmt] = useDebounce(rawStakeAmt, 500);
+    useEffect(() => {
+        if(window && loggedIn && deboundRawStakeAmt){
+            let dataLayer = (window as any).dataLayer || [];
+            console.log("dataLayer", dataLayer);
+            dataLayer.push({
+                'event': 'input_stake_value',
+                'amount': deboundRawStakeAmt,
+                'lp_token': pool?.lpToken?.symbol
+            })
+        }
+    }, [deboundRawStakeAmt]);
     const { enterFarm } = useEnterFarm();
     const LPBalance = useMemo(
         () => new BigNumber(lpTokenMap[pool.lpToken.identifier]?.balance || 0),

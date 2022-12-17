@@ -1,4 +1,6 @@
-import { farmRecordsState, farmStakedOnlyState } from "atoms/farmsState";
+import { accIsLoggedInState } from "atoms/dappState";
+import { FarmRecord, farmRecordsState, farmStakedOnlyState } from "atoms/farmsState";
+import { clickedHarvestModalState } from "atoms/harvestState";
 import BigNumber from "bignumber.js";
 import Avatar from "components/Avatar";
 import GlowingButton from "components/GlowingButton";
@@ -7,9 +9,8 @@ import CardTooltip from "components/Tooltip/CardTooltip";
 import { ASH_TOKEN } from "const/tokens";
 import { toEGLDD } from "helper/balance";
 import useFarmClaimAll from "hooks/useFarmContract/useFarmClaimAll";
-import { useCallback, useMemo, useState } from "react";
-import { useRecoilValue, useSetRecoilState } from "recoil";
-
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 function FarmStats({ onClickAll }: { onClickAll?: () => void }) {
     const [harvesting, setHarvesting] = useState(false);
     const farmRecords = useRecoilValue(farmRecordsState);
@@ -27,7 +28,6 @@ function FarmStats({ onClickAll }: { onClickAll?: () => void }) {
             new BigNumber(0)
         );
     }, [farmRecords]);
-
     const harvestAll = useCallback(async () => {
         if (harvesting || totalReward.eq(0)) return;
         setHarvesting(true);
@@ -38,6 +38,17 @@ function FarmStats({ onClickAll }: { onClickAll?: () => void }) {
             setHarvesting(false);
         }
     }, [harvesting, totalReward, claimAllReward]);
+    const [isClickedHarvestButton, setIsClickedHarvestButton] = useRecoilState(clickedHarvestModalState);
+    const loggedIn = useRecoilValue(accIsLoggedInState);
+    useEffect(() => {
+        if(window && isClickedHarvestButton && loggedIn){
+            let dataLayer = (window as any).dataLayer || [];
+            console.log("dataLayer",dataLayer);
+            dataLayer.push({
+                'event': 'click_harvest_liquidity_stake',
+            })
+        }
+    }, [isClickedHarvestButton]);
     return (
         <div className="flex flex-col md:flex-row">
             <div className="md:w-[21.875rem] shrink-0 flex flex-col px-7 lg:px-9 pb-9 pt-7 lg:pt-14 bg-stake-dark-400 mb-4 md:mb-0 md:mr-[1.875rem]">
@@ -91,7 +102,10 @@ function FarmStats({ onClickAll }: { onClickAll?: () => void }) {
                         theme="cyan"
                         className={`w-full h-[3.375rem] text-sm font-bold`}
                         disabled={harvesting || totalReward.eq(0)}
-                        onClick={() => harvestAll()}
+                        onClick={() => {
+                            harvestAll()
+                            setIsClickedHarvestButton(true)}  
+                        }
                     >
                         Harvest
                     </GlowingButton>

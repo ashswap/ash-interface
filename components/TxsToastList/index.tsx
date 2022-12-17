@@ -6,12 +6,14 @@ import {
     SignedTransactionsBodyType,
     SignedTransactionsType
 } from "@elrondnetwork/dapp-core/types";
+import { collapseModalState } from "atoms/collapseState";
 import {
     getToastsIdsFromStorage,
     setToastsIdsToStorage
 } from "helper/storage/session";
 
 import { useCallback, useEffect, useState } from "react";
+import { useRecoilState } from "recoil";
 import TxToast from "./TxToast";
 
 export interface Props {
@@ -33,6 +35,7 @@ function TxsToastList({
 }: Props) {
     const [toastsIds, setToastsIds] = useState<string[]>([]);
     const [collapsed, setCollapsed] = useState(false);
+    const [isClickedCollapse, setIsClickedCollapse] = useRecoilState(collapseModalState);
 
     const pendingTransactionsFromStore =
         useGetPendingTransactions().pendingTransactions;
@@ -70,7 +73,11 @@ function TxsToastList({
                     setToastsIds((val) => val.filter((x) => x !== id))
                 }
                 collapsed={collapsed}
-                onCollapsedChange={(val) => setCollapsed(val)}
+                onCollapsedChange={(val) => {
+                    setCollapsed(val)
+                    setIsClickedCollapse(true)
+                    }
+                }
             />
         );
     });

@@ -68,7 +68,7 @@ const TokenInput = ({
         if(window && value) {
             let dataLayer = (window as any).dataLayer || [];
             dataLayer.push({
-                'event': 'add_liquidity_value',
+                'event': 'input_liquidity_value',
                 'amount': value,
                 'token': token.identifier
             })
