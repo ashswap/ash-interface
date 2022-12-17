@@ -5,6 +5,7 @@ import ICCaretRight from "assets/svg/caret-right.svg";
 import { atomQuestUserStats } from "atoms/ashpoint";
 import { accAddressState } from "atoms/dappState";
 import BaseModal from "components/BaseModal";
+import CopyBtn from "components/CopyBtn";
 import GlowingButton from "components/GlowingButton";
 import Image from "components/Image";
 import { ENVIRONMENT } from "const/env";
@@ -12,6 +13,7 @@ import buildUrlParams from "helper/buildUrlParams";
 import { initGeetest4 } from "helper/geetest";
 import logApi from "helper/logHelper";
 import { formatAmount } from "helper/number";
+import storage from "helper/storage";
 import { shortenString } from "helper/string";
 import { useConnectWallet } from "hooks/useConnectWallet";
 import usePrevState from "hooks/usePrevState";
@@ -69,7 +71,7 @@ const QuestOverview = () => {
             state: `twitter:${userAddress}`,
             code_challenge: userAddress,
             code_challenge_method: "plain",
-            redirect_uri: location?.href.split("?")[0].replace(/\/$/, ""),
+            redirect_uri: location?.href.split("?")[0].replace(/\/$/, "")+"/",
         });
         return `${path}?${nextUrlParams}`;
     }, [userAddress]);
@@ -78,10 +80,27 @@ const QuestOverview = () => {
         const [path, search] = ENVIRONMENT.LOGIN_DISCORD_LINK.split("?");
         const { nextUrlParams } = buildUrlParams(search, {
             state: `discord:${userAddress}`,
-            redirect_uri: location?.href.split("?")[0].replace(/\/$/, ""),
+            redirect_uri: location?.href.split("?")[0].replace(/\/$/, "")+"/",
         });
         return `${path}?${nextUrlParams}`;
     }, [userAddress]);
+
+    const inviteLink = useMemo(() => {
+        const search = new URLSearchParams({
+            invitationCode: userStats?.wallet.invitation_code || storage.local.getItem("invitationCode") || "",
+        });
+        return `${location?.href
+            .split("?")[0]
+            .replace(/\/$/, "")}?${search.toString()}`;
+    }, [userStats]);
+
+    const sharableLink = useMemo(() => {
+        const text = new URLSearchParams({
+            text: `I just swapped the stablecoins with low slippage, small fees, and fast transaction confirmed on the @ash_swap devnet. Use my referral link, and we'll both earn 500 ASH Points when you join: ${inviteLink}\n#ashswap #MVX #Elrond #stableswap`
+
+        })
+        return `https://twitter.com/intent/tweet?${text.toString()}`;
+    }, [inviteLink]);
 
     const isRegistered = useMemo(() => {
         return (
@@ -109,6 +128,7 @@ const QuestOverview = () => {
                         [platform]: {
                             code,
                         },
+                        referral: storage.local.getItem("invitationCode") || undefined
                     },
                     {
                         headers: {
@@ -207,6 +227,15 @@ const QuestOverview = () => {
         }
     }, [userStats]);
 
+    useEffect(() => {
+        if (router.query.invitationCode) {
+            storage.local.setItem({
+                key: "invitationCode",
+                data: router.query.invitationCode as string,
+            });
+        }
+    }, [router]);
+
     if (firstLoad && !userStats && userAddress) return null;
 
     return (
@@ -258,7 +287,7 @@ const QuestOverview = () => {
                                 {platform || "Account"}
                             </span>
                         </div>
-                        <div className="flex justify-between text-xs">
+                        <div className="flex justify-between text-xs mb-4">
                             <div className="font-semibold text-stake-gray-500">
                                 {isRegistered
                                     ? userStats?.wallet.twitter_metadata?.user
@@ -276,6 +305,40 @@ const QuestOverview = () => {
                                 </button>
                             )}
                         </div>
+                        {isRegistered && (
+                            <>
+                                <div className="text-lg mb-4">
+                                    <span className="font-semibold text-stake-gray-500">
+                                        {"// "}
+                                    </span>
+                                    <span className="font-bold text-white capitalize">
+                                        Invite
+                                    </span>
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <CopyBtn text={inviteLink}>
+                                        <GlowingButton
+                                            theme="pink"
+                                            className="w-full py-3 font-bold text-sm truncate"
+                                        >
+                                            Copy link
+                                        </GlowingButton>
+                                    </CopyBtn>
+                                    <a
+                                        href={sharableLink}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                    >
+                                        <GlowingButton
+                                            theme="cyan"
+                                            className="w-full py-3 font-bold text-sm truncate"
+                                        >
+                                            Share
+                                        </GlowingButton>
+                                    </a>
+                                </div>
+                            </>
+                        )}
                     </div>
                     <div className="p-4 bg-ash-dark-600 space-y-9">
                         <div>
@@ -318,7 +381,7 @@ const QuestOverview = () => {
                                     {"// "}
                                 </span>
                                 <span className="font-bold text-ash-gray-500">
-                                    Your ranked
+                                    Your rank
                                 </span>
                             </div>
                         </div>
