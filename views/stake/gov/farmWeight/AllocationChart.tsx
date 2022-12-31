@@ -1,10 +1,9 @@
-
 import TextAmt from "components/TextAmt";
 import { randomUUID } from "crypto";
 import { formatAmount } from "helper/number";
 import { FarmWeightChartRecord } from "interface/chart";
 import { Unarray } from "interface/utilities";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 import React, { useCallback, useMemo, useState } from "react";
 import {
     Cell,
@@ -14,6 +13,7 @@ import {
     Sector,
     SectorProps,
 } from "recharts";
+import { Percent } from "helper/fraction/percent";
 const data = [
     { name: "Group A", value: 400 },
     { name: "Group B", value: 300 },
@@ -53,7 +53,7 @@ const renderActiveShape = (props: PieSectorDataItem) => {
     const ey = my;
     const textAnchor = cos >= 0 ? "start" : "end";
     const uuid = uuidv4();
-    
+
     return (
         <g>
             {/* <text x={cx} y={cy} dy={8} textAnchor="middle" fill={fill}>
@@ -108,10 +108,10 @@ const renderActiveShape = (props: PieSectorDataItem) => {
     );
 };
 type AllocationChartProps = {
-    data: FarmWeightChartRecord[],
-    radius: number
-}
-function AllocationChart({data, radius}: AllocationChartProps) {
+    data: FarmWeightChartRecord[];
+    radius: number;
+};
+function AllocationChart({ data, radius }: AllocationChartProps) {
     const [activeIndex, setActiveIndex] = useState(0);
     const onPieEnter = useCallback((_: any, index: number) => {
         setActiveIndex(index);
@@ -136,25 +136,41 @@ function AllocationChart({data, radius}: AllocationChartProps) {
                         onMouseEnter={onPieEnter}
                         stroke="transparent"
                     >
-                        {data.map(d => {
-                            return <Cell key={d.farmAddress} fill={d.color} />
+                        {data.map((d) => {
+                            return <Cell key={d.farmAddress} fill={d.color} />;
                         })}
-                        
                     </Pie>
                 </PieChart>
             </ResponsiveContainer>
-            <div className="absolute left-1/2 top-1/2 flex flex-col justify-center items-center" style={{width: radius * 1.5, height: radius * 1.5, transform: `translate(-50%, -50%) scale(${Math.min(radius / 200, 1)})`}}>
-                <div className="flex items-center mb-4">
-                    <div className="w-4 h-4 mr-2.5" style={{backgroundColor: activeRecord.color}}></div>
-                    <div className="font-bold text-2xl text-white">
-                        {activeRecord.name}
+            {activeRecord && (
+                <div
+                    className="absolute left-1/2 top-1/2 flex flex-col justify-center items-center"
+                    style={{
+                        width: radius * 1.5,
+                        height: radius * 1.5,
+                        transform: `translate(-50%, -50%) scale(${Math.min(
+                            radius / 200,
+                            1
+                        )})`,
+                    }}
+                >
+                    <div className="flex items-center mb-4">
+                        <div
+                            className="w-4 h-4 mr-2.5"
+                            style={{ backgroundColor: activeRecord.color }}
+                        ></div>
+                        <div className="font-bold text-2xl text-white">
+                            {activeRecord.name}
+                        </div>
+                    </div>
+                    <div className="font-semibold text-xs text-stake-gray-500 mb-3">
+                        Weight
+                    </div>
+                    <div className="font-bold text-5xl text-white">
+                        {formatAmount(activeRecord.value * 100 / 10_000)}%
                     </div>
                 </div>
-                <div className="font-semibold text-xs text-stake-gray-500 mb-3">
-                    Weight
-                </div>
-                <div className="font-bold text-5xl text-white">{formatAmount(activeRecord.value)}%</div>
-            </div>
+            )}
         </div>
     );
 }

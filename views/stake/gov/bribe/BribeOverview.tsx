@@ -1,14 +1,34 @@
-import Input from "components/Input";
-import React, { useState } from "react";
+import { Transition } from "@headlessui/react";
 import ICSearch from "assets/svg/search.svg";
+import { ashswapBaseState } from "atoms/ashswap";
 import GlowingButton from "components/GlowingButton";
+import Input from "components/Input";
+import { TRANSITIONS } from "const/transitions";
+import { useMemo, useState } from "react";
+import { useRecoilValue } from "recoil";
+import { useDebounce } from "use-debounce";
 import BribeCard from "./BribeCard";
-import { FARMS } from "const/farms";
 import FarmBribeModal from "./FarmBribeModal";
 
 function BribeOverview() {
     const [keyword, setKeyword] = useState("");
+    const [debounceKeyword] = useDebounce(keyword, 500);
     const [isOpenBribe, setIsOpenBribe] = useState(false);
+    const { farmBribe } = useRecoilValue(ashswapBaseState);
+
+    const displayFarms = useMemo(() => {
+        const lowercase = debounceKeyword.toLowerCase();
+        return (
+            (lowercase
+                ? farmBribe?.farms.filter((f) =>
+                      f.rewards.some((r) =>
+                          r.tokenId.toLowerCase().includes(lowercase)
+                      )
+                  )
+                : farmBribe?.farms) || []
+        );
+    }, [farmBribe, debounceKeyword]);
+
     return (
         <>
             <div className="mt-20 lg:flex lg:space-x-7.5">
@@ -41,14 +61,19 @@ function BribeOverview() {
                         Create Bribe
                     </GlowingButton>
                 </div>
-                <div className="mt-20 lg:mt-0 lg:w-2/3 grid md:grid-cols-2 gap-x-7.5 gap-y-14">
-                    {FARMS.map((f) => (
-                        <BribeCard
-                            key={f.farm_address}
-                            farmAddress={f.farm_address}
-                        />
+                <Transition
+                    show
+                    className="mt-20 lg:mt-0 lg:w-2/3 grid md:grid-cols-2 gap-x-7.5 gap-y-14"
+                >
+                    {displayFarms.map((f) => (
+                        <Transition.Child
+                            key={f.address}
+                            {...TRANSITIONS.fadeZoomIn}
+                        >
+                            <BribeCard fbFarm={f} />
+                        </Transition.Child>
                     ))}
-                </div>
+                </Transition>
             </div>
             <FarmBribeModal
                 isOpen={isOpenBribe}

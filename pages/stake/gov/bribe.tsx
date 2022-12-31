@@ -1,9 +1,13 @@
 import ICArrowRight from "assets/svg/arrow-right.svg";
 import GovLayout from 'components/Layout/Gov';
+import { GraphOptions } from "graphql/type";
+import useGraphQLQueryOptions from "graphql/useQueries/useGraphQLQueryOptions";
 import { ReactElement } from 'react';
 import BribeOverview from 'views/stake/gov/bribe/BribeOverview';
 import GovMenu from 'views/stake/gov/components/GovMenu';
+const queryOptions: GraphOptions = {withFB: true, withFC: true}
 function BribePage() {
+    useGraphQLQueryOptions(queryOptions);
     return (
         <>
             <div className="ash-container text-white pt-[1.875rem]">

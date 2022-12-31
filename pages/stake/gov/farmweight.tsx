@@ -1,9 +1,14 @@
-import GovLayout from 'components/Layout/Gov';
-import React, { ReactElement } from 'react'
 import ICArrowRight from "assets/svg/arrow-right.svg";
-import GovMenu from 'views/stake/gov/components/GovMenu';
-import FarmWeightOverview from 'views/stake/gov/farmWeight/FarmWeightOverview';
+import GovLayout from "components/Layout/Gov";
+import { GraphOptions } from "graphql/type";
+import useGraphQLQueryOptions from "graphql/useQueries/useGraphQLQueryOptions";
+import { ReactElement } from "react";
+import GovMenu from "views/stake/gov/components/GovMenu";
+import FarmWeightOverview from "views/stake/gov/farmWeight/FarmWeightOverview";
+const queryOptions: GraphOptions = {withFC: true, withFB: true};
 function FarmWeightPage() {
+    useGraphQLQueryOptions(queryOptions);
+    
     return (
         <>
             <div className="ash-container text-white pt-[1.875rem]">
@@ -24,7 +29,7 @@ function FarmWeightPage() {
                     </h1>
                     <GovMenu />
                 </div>
-                <FarmWeightOverview/>
+                <FarmWeightOverview />
             </div>
         </>
     );

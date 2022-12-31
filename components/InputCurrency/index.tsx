@@ -58,6 +58,12 @@ function InputCurrency(
         onNumberChange?.(num);
     }, [num, onNumberChange]);
 
+    useEffect(() => {
+        if(typeof rest.value !== "string") return;
+        const raw = rest.value.replace(/,/g, ".") || "";
+        setPreviousVal(raw);
+    }, [rest.value]);
+
     return (
         <input
             {...rest}

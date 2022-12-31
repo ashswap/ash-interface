@@ -1,6 +1,6 @@
-import BaseModal from "components/BaseModal";
+import BaseModal, { BaseModalType } from "components/BaseModal";
 import { useScreenSize } from "hooks/useScreenSize";
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import ICBribe from "assets/svg/bribe.svg";
 import ICChevronDown from "assets/svg/chevron-down.svg";
 import ICChevronRight from "assets/svg/chevron-right.svg";
@@ -16,21 +16,102 @@ import OnboardTooltip from "components/Tooltip/OnboardTooltip";
 import { useOnboarding } from "hooks/useOnboarding";
 import CardTooltip from "components/Tooltip/CardTooltip";
 import TextAmt from "components/TextAmt";
+import useGraphQLQueryOptions from "graphql/useQueries/useGraphQLQueryOptions";
+import { GraphOptions } from "graphql/type";
+import { useRecoilValue } from "recoil";
+import { ashswapBaseState } from "atoms/ashswap";
+import BigNumber from "bignumber.js";
+import {
+    fcAccountFarmSelector,
+    fcFarmSelector,
+    fcTypeSelector,
+} from "atoms/farmControllerState";
+import { formatAmount } from "helper/number";
+import { ContractManager } from "helper/contracts/contractManager";
+import useVoteForFarm from "hooks/useFarmControllerContract/useVoteForFarm";
+import moment from "moment";
+import { WEEK } from "const/ve";
+import { govPointSelector, govUnlockTSState } from "atoms/govState";
+import { fbFarmSelector, fbTotalRewardsUSD } from "atoms/farmBribeState";
 
-interface Props {
-    open?: boolean;
-    onClose?: () => void;
-}
-const FarmWeightVotingContent = ({ open, onClose }: Props) => {
-    const [selectedFarm, setSelectedFarm] = useState(FARMS[0].farm_address);
-    const [weight, setWeight] = useState(0);
+type Props = BaseModalType & {
+    farmAddress?: string;
+};
+const queryOptions: GraphOptions = { withFC: true, withFB: true };
+const FarmWeightVotingContent = ({ farmAddress: farmAddressProp }: Props) => {
+    useGraphQLQueryOptions(queryOptions);
+    const [farmAddress, setFarmAddress] = useState(farmAddressProp);
+    const {
+        voteFarmWeight,
+        trackingData: { isPending },
+    } = useVoteForFarm(true);
     const [onboardingDAOFarmBribe, setOnboardedDAOFarmBribe] = useOnboarding(
         "dao_farm_weight_bribe"
     );
+    const ashBase = useRecoilValue(ashswapBaseState);
+    const vePoint = useRecoilValue(govPointSelector);
+    const fbFarm = useRecoilValue(fbFarmSelector(farmAddress || ''));
+    const totalRewardsUSD = useRecoilValue(fbTotalRewardsUSD(farmAddress || ''));
+    const hasBribe = useMemo(() => {
+        return fbFarm?.rewards.some(r => new BigNumber(r.rewardPerVote).gt(0));
+    }, [fbFarm]);
+    const nextTime = useMemo(() => {
+        return moment.unix(Math.floor(moment().unix() / WEEK) * WEEK + WEEK).format("Do MMM, YYYY");
+    }, []);
+    const powerUsed = useMemo(() => {
+        if (ashBase.farmController?.account) {
+            return new BigNumber(
+                ashBase.farmController.account.voteUserPower
+            ).toNumber();
+        }
+        return 0;
+    }, [ashBase.farmController]);
+
+    const farmInController = useRecoilValue(fcFarmSelector(farmAddress));
+    const farmTypeData = useRecoilValue(
+        fcTypeSelector(farmInController?.farmType)
+    );
+    const accountFarm = useRecoilValue(fcAccountFarmSelector(farmAddress));
+    const powerUsedForCurrentFarm = useMemo(() => {
+        if (!accountFarm?.voteUserSlope?.power) return 0;
+        return +accountFarm.voteUserSlope.power;
+    }, [accountFarm]);
+    useEffect(() => {
+        console.log("abc", powerUsedForCurrentFarm);
+    }, [powerUsedForCurrentFarm]);
+    const [weight, setWeight] = useState(0);
+
+    const farmWeight = useMemo(() => {
+        if (!farmInController || !farmTypeData) return new BigNumber(0);
+        return new BigNumber(farmInController.nextVotedPoint.bias).multipliedBy(
+            farmTypeData.nextWeight
+        );
+    }, [farmInController, farmTypeData]);
+
+    const estimatedNextFarmWeight = useMemo(() => {
+        if (!accountFarm?.voteUserSlope) return new BigNumber(0);
+        const olddt =
+            accountFarm.voteUserSlope.end -
+            Math.floor(moment().unix() / WEEK) * WEEK;
+        const oldBias = new BigNumber(
+            accountFarm.voteUserSlope.slope
+        ).multipliedBy(olddt);
+        return farmWeight.minus(oldBias).plus(vePoint.bias.multipliedBy(weight).div(10000));
+    }, [vePoint, accountFarm, farmWeight, weight]);
+
     const pool = useMemo(() => {
-        const lp = FARMS_MAP[selectedFarm].farming_token_id;
+        if (!farmAddress) return undefined;
+        const lp = FARMS_MAP[farmAddress].farming_token_id;
         return POOLS_MAP_LP[lp];
-    }, [selectedFarm]);
+    }, [farmAddress]);
+
+    const canVote = useMemo(() => {
+        return farmAddress && weight >= 0 && !isPending;
+    }, [farmAddress, weight, isPending]);
+
+    useEffect(() => {
+        setWeight(powerUsedForCurrentFarm);
+    }, [powerUsedForCurrentFarm]);
     return (
         <div className="px-6 lg:px-20 pb-12 overflow-auto relative">
             <div className="sm:flex sm:space-x-8 lg:space-x-24 mb-7">
@@ -49,12 +130,15 @@ const FarmWeightVotingContent = ({ open, onClose }: Props) => {
                                     options={{
                                         placement: "bottom-start",
                                         modifiers: [
-                                            { name: "offset", options: { offset: [0, 8] } },
+                                            {
+                                                name: "offset",
+                                                options: { offset: [0, 8] },
+                                            },
                                         ],
                                     }}
                                     button={() => (
                                         <div className="w-full h-18 px-7 flex items-center justify-between text-xs sm:text-lg font-bold text-stake-gray-500 bg-ash-dark-400 cursor-pointer">
-                                            {selectedFarm ? (
+                                            {pool ? (
                                                 <>
                                                     <div className="flex items-center">
                                                         <div className="flex mr-2">
@@ -97,35 +181,50 @@ const FarmWeightVotingContent = ({ open, onClose }: Props) => {
                                     {({ close }) => {
                                         return (
                                             <ul className="py-6 max-h-52">
-                                                {FARMS.map((f) => {
-                                                    const [t1, t2] =
-                                                        POOLS_MAP_LP[
-                                                            f.farming_token_id
-                                                        ].tokens;
-                                                    return (
-                                                        <li
-                                                            key={f.farm_address}
-                                                            className="relative"
-                                                        >
-                                                            <button
-                                                                className="w-full py-3 text-left px-6 text-xs font-bold"
-                                                                onClick={() => {
-                                                                    setSelectedFarm(
-                                                                        f.farm_address
-                                                                    );
-                                                                    close();
-                                                                }}
+                                                {ashBase.farmController?.farms?.map(
+                                                    (f) => {
+                                                        const farm =
+                                                            FARMS_MAP[
+                                                                f.address
+                                                            ];
+                                                        const tokens =
+                                                            POOLS_MAP_LP[
+                                                                farm
+                                                                    .farming_token_id
+                                                            ].tokens;
+                                                        return (
+                                                            <li
+                                                                key={f.address}
+                                                                className="relative"
                                                             >
-                                                                {t1.symbol}-
-                                                                {t2.symbol}
-                                                            </button>
-                                                            {f.farm_address ===
-                                                                selectedFarm && (
-                                                                <span className="absolute w-[3px] h-5 bg-ash-cyan-500 top-1/2 -translate-y-1/2 left-0"></span>
-                                                            )}
-                                                        </li>
-                                                    );
-                                                })}
+                                                                <button
+                                                                    className="w-full py-3 text-left px-6 text-xs font-bold"
+                                                                    onClick={() => {
+                                                                        setFarmAddress(
+                                                                            f.address
+                                                                        );
+                                                                        close();
+                                                                    }}
+                                                                >
+                                                                    {tokens
+                                                                        .map(
+                                                                            (
+                                                                                t
+                                                                            ) =>
+                                                                                t.symbol
+                                                                        )
+                                                                        .join(
+                                                                            "-"
+                                                                        )}
+                                                                </button>
+                                                                {f.address ===
+                                                                    farmAddress && (
+                                                                    <span className="absolute w-[3px] h-5 bg-ash-cyan-500 top-1/2 -translate-y-1/2 left-0"></span>
+                                                                )}
+                                                            </li>
+                                                        );
+                                                    }
+                                                )}
                                             </ul>
                                         );
                                     }}
@@ -156,25 +255,43 @@ const FarmWeightVotingContent = ({ open, onClose }: Props) => {
                                 >
                                     <CardTooltip
                                         autoPlacement
-                                        content={<div className="w-52 p-4">
-                                            <div className="font-bold text-lg leading-tight text-stake-gray-500 mb-5"><span className="text-pink-600">Vote</span> to earn rewards</div>
-                                            <div className="mb-4">
-                                                <div className="font-bold text-xs text-stake-gray-500 mb-2">Total treasure</div>
-                                                <div className="text-white">
-                                                    <span>$</span><TextAmt number={123.123} className="font-bold"/>
+                                        disabled={!hasBribe}
+                                        content={
+                                            <div className="w-52 p-4">
+                                                <div className="font-bold text-lg leading-tight text-stake-gray-500 mb-5">
+                                                    <span className="text-pink-600">
+                                                        Vote
+                                                    </span>{" "}
+                                                    to earn rewards
+                                                </div>
+                                                <div className="mb-4">
+                                                    <div className="font-bold text-xs text-stake-gray-500 mb-2">
+                                                        Total treasure
+                                                    </div>
+                                                    <div className="text-white">
+                                                        <span>$</span>
+                                                        <TextAmt
+                                                            number={totalRewardsUSD}
+                                                            className="font-bold"
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="px-3 py-2 bg-ash-dark-400">
+                                                    <div className="flex items-center font-bold text-2xs mb-2">
+                                                        <ICLock className="w-3 h-3 mr-1" />
+                                                        <div className="underline">
+                                                            Lock reward
+                                                        </div>
+                                                    </div>
+                                                    <div className="font-bold text-xs text-white">
+                                                        {nextTime}
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div className="px-3 py-2 bg-ash-dark-400">
-                                                <div className="flex items-center font-bold text-2xs mb-2">
-                                                    <ICLock className="w-3 h-3 mr-1"/>
-                                                    <div className="underline">Lock reward</div>
-                                                </div>
-                                                <div className="font-bold text-xs text-white">03th Oct, 2022</div>
-                                            </div>
-                                        </div>}
+                                        }
                                     >
                                         <div>
-                                            <ICBribe className="w-16 h-16 text-pink-600/80" />
+                                            <ICBribe className={`w-16 h-16 ${hasBribe ? "text-pink-600/80" : "text-ash-dark-400/60 stroke-ash-dark-400"} `} />
                                         </div>
                                     </CardTooltip>
                                 </OnboardTooltip>
@@ -213,7 +330,9 @@ const FarmWeightVotingContent = ({ open, onClose }: Props) => {
                                 max={10000}
                                 value={weight}
                                 tooltipVisible={false}
-                                onChange={(e) => setWeight(e)}
+                                onChange={(e) => {
+                                    setWeight(Math.min(10000 - powerUsed, e));
+                                }}
                             />
                             <div className="flex justify-between mt-1">
                                 <div className="text-xs lg:text-sm font-bold text-stake-gray-500">
@@ -235,10 +354,10 @@ const FarmWeightVotingContent = ({ open, onClose }: Props) => {
                             Total vote on this Farm
                         </div>
                         <div className="font-bold text-lg text-stake-gray-500 mb-2 line-through">
-                            158
+                            {formatAmount(farmWeight.toNumber())}
                         </div>
                         <div className="font-bold text-lg text-white mb-2">
-                            158
+                            {formatAmount(estimatedNextFarmWeight.toNumber())}
                         </div>
                     </div>
                     <div>
@@ -259,6 +378,8 @@ const FarmWeightVotingContent = ({ open, onClose }: Props) => {
                     <GlowingButton
                         theme="pink"
                         className="w-full h-12 flex items-center"
+                        disabled={!canVote}
+                        onClick={() => voteFarmWeight(farmAddress!, weight)}
                     >
                         <span className="font-bold text-sm uppercase mr-2">
                             Vote
@@ -271,12 +392,11 @@ const FarmWeightVotingContent = ({ open, onClose }: Props) => {
     );
 };
 
-function FarmWeightVotingModal({ open, onClose }: Props) {
+function FarmWeightVotingModal({ farmAddress, ...modalProps }: Props) {
     const screenSize = useScreenSize();
     return (
         <BaseModal
-            isOpen={!!open}
-            onRequestClose={() => onClose?.()}
+            {...modalProps}
             type={screenSize.isMobile ? "drawer_btt" : "modal"}
             className="clip-corner-4 clip-corner-tl bg-stake-dark-400 p-4 sm:w-screen sm:ash-container flex flex-col max-h-full"
         >
@@ -284,7 +404,10 @@ function FarmWeightVotingModal({ open, onClose }: Props) {
                 <BaseModal.CloseBtn />
             </div>
             <div className="grow overflow-auto">
-                <FarmWeightVotingContent open={open} onClose={onClose} />
+                <FarmWeightVotingContent
+                    {...modalProps}
+                    farmAddress={farmAddress}
+                />
             </div>
         </BaseModal>
     );

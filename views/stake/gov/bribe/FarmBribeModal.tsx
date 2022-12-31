@@ -1,26 +1,79 @@
 import BaseModal, { BaseModalType } from "components/BaseModal";
 import { useScreenSize } from "hooks/useScreenSize";
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import ICChevronDown from "assets/svg/chevron-down.svg";
 import ICChevronRight from "assets/svg/chevron-right.svg";
 import BasePopover from "components/BasePopover";
 import { FARMS, FARMS_MAP } from "const/farms";
 import { POOLS_MAP_LP } from "const/pool";
 import Avatar from "components/Avatar";
-import { TOKENS } from "const/tokens";
+import { TOKENS, TOKENS_MAP } from "const/tokens";
 import { IESDTInfo } from "helper/token/token";
 import InputCurrency from "components/InputCurrency";
 import GlowingButton from "components/GlowingButton";
+import { useRecoilValue } from "recoil";
+import { ashswapBaseState } from "atoms/ashswap";
+import { tokenBalanceSelector, tokenMapState } from "atoms/tokensState";
+import { formatAmount } from "helper/number";
+import { TokenAmount } from "helper/token/tokenAmount";
+import useAddRewardAmount from "hooks/useFarmBribeContract/useAddRewardAmount";
+import useInputNumberString from "hooks/useInputNumberString";
+import BigNumber from "bignumber.js";
+import { Address, TokenPayment } from "@elrondnetwork/erdjs/out";
 
-const WHITELIST_TOKENS = TOKENS;
 type FarmBribeModalProps = {};
 const FarmBribeContent = ({}: FarmBribeModalProps) => {
-    const [selectedFarm, setSelectedFarm] = useState("");
-    const [selectedToken, setSelectedToken] = useState<IESDTInfo | undefined>();
+    const ashBase = useRecoilValue(ashswapBaseState);
+    const [selectedFarmAddress, setSelectedFarm] = useState("");
+    const [selectedTokenId, setSelectedTokenId] = useState("");
+    const selectedTokenBalance = useRecoilValue(
+        tokenBalanceSelector(selectedTokenId)
+    );
+    const [inputValue, setInputValue] = useState(new BigNumber(""));
+    const [inputStr, setInputStr] = useInputNumberString(
+        inputValue,
+        TOKENS_MAP[selectedTokenId]?.decimals
+    );
+    const { addRewardAmount } = useAddRewardAmount();
+    const tokenMap = useRecoilValue(tokenMapState);
     const pool = useMemo(() => {
-        const lp = FARMS_MAP[selectedFarm]?.farming_token_id;
+        const lp = FARMS_MAP[selectedFarmAddress]?.farming_token_id;
         return POOLS_MAP_LP[lp];
-    }, [selectedFarm]);
+    }, [selectedFarmAddress]);
+    const searchFarms = useMemo(() => {
+        return ashBase.farmController?.farms?.map((f) => f.address).join(",");
+    }, [ashBase.farmController]);
+    const farms = useMemo(() => {
+        if (!searchFarms) return [];
+        return FARMS.filter((f) => searchFarms.includes(f.farm_address));
+    }, [searchFarms]);
+    const isInsufficient = useMemo(() => {
+        return selectedTokenBalance && inputValue.gt(selectedTokenBalance.egld);
+    }, [selectedTokenBalance, inputValue]);
+    const canCreateBribe = useMemo(() => {
+        return (
+            !!selectedTokenId &&
+            !!selectedFarmAddress &&
+            inputValue.gt(0) &&
+            !isInsufficient
+        );
+    }, [selectedTokenId, selectedFarmAddress, inputValue, isInsufficient]);
+    const createBribe = useCallback(async () => {
+        if (!canCreateBribe) return;
+        const tokenPayment = TokenPayment.fungibleFromAmount(
+            selectedTokenId,
+            inputValue,
+            TOKENS_MAP[selectedTokenId].decimals
+        );
+        await addRewardAmount(new Address(selectedFarmAddress), [tokenPayment]);
+    }, [
+        canCreateBribe,
+        selectedTokenId,
+        selectedFarmAddress,
+        inputValue,
+        addRewardAmount,
+    ]);
+
     return (
         <div className="px-6 lg:px-12 pb-12 overflow-auto relative">
             <div className="font-bold text-2xl text-white mb-12">
@@ -40,7 +93,7 @@ const FarmBribeContent = ({}: FarmBribeModalProps) => {
                     }}
                     button={() => (
                         <div className="w-full h-18 px-7 flex items-center justify-between text-xs sm:text-lg font-bold text-stake-gray-500 bg-ash-dark-400 cursor-pointer">
-                            {selectedFarm ? (
+                            {selectedFarmAddress ? (
                                 <>
                                     <div className="flex items-center">
                                         <div className="flex mr-2">
@@ -71,9 +124,7 @@ const FarmBribeContent = ({}: FarmBribeModalProps) => {
                     {({ close }) => {
                         return (
                             <ul className="py-6 max-h-52">
-                                {FARMS.map((f) => {
-                                    const [t1, t2] =
-                                        POOLS_MAP_LP[f.farming_token_id].tokens;
+                                {farms.map((f) => {
                                     return (
                                         <li
                                             key={f.farm_address}
@@ -88,10 +139,14 @@ const FarmBribeContent = ({}: FarmBribeModalProps) => {
                                                     close();
                                                 }}
                                             >
-                                                {t1.symbol}-{t2.symbol}
+                                                {POOLS_MAP_LP[
+                                                    f.farming_token_id
+                                                ].tokens
+                                                    .map((t) => t.symbol)
+                                                    .join("-")}
                                             </button>
                                             {f.farm_address ===
-                                                selectedFarm && (
+                                                selectedFarmAddress && (
                                                 <span className="absolute w-[3px] h-5 bg-ash-cyan-500 top-1/2 -translate-y-1/2 left-0"></span>
                                             )}
                                         </li>
@@ -119,18 +174,24 @@ const FarmBribeContent = ({}: FarmBribeModalProps) => {
                             }}
                             button={() => (
                                 <div className="w-full h-18 px-7 flex items-center justify-between text-xs sm:text-lg font-bold text-stake-gray-500 bg-ash-dark-400 cursor-pointer">
-                                    {selectedToken ? (
+                                    {selectedTokenId ? (
                                         <>
                                             <div className="flex items-center">
                                                 <Avatar
-                                                    key={
-                                                        selectedToken.identifier
+                                                    key={selectedTokenId}
+                                                    src={
+                                                        TOKENS_MAP[
+                                                            selectedTokenId
+                                                        ].logoURI
                                                     }
-                                                    src={selectedToken.logoURI}
                                                     className={`w-4 h-4 mr-2`}
                                                 />
                                                 <div>
-                                                    {selectedToken.symbol}
+                                                    {
+                                                        TOKENS_MAP[
+                                                            selectedTokenId
+                                                        ].symbol
+                                                    }
                                                 </div>
                                             </div>
                                         </>
@@ -144,28 +205,41 @@ const FarmBribeContent = ({}: FarmBribeModalProps) => {
                             {({ close }) => {
                                 return (
                                     <ul className="py-6 max-h-52">
-                                        {WHITELIST_TOKENS.map((t) => {
-                                            return (
-                                                <li
-                                                    key={t.identifier}
-                                                    className="relative"
-                                                >
-                                                    <button
-                                                        className="w-full py-3 text-left px-6 text-xs font-bold"
-                                                        onClick={() => {
-                                                            setSelectedToken(t);
-                                                            close();
-                                                        }}
+                                        {ashBase.farmBribe?.whitelistTokens.map(
+                                            (t) => {
+                                                if (!t.id) return;
+                                                return (
+                                                    <li
+                                                        key={t.id}
+                                                        className="relative"
                                                     >
-                                                        {t.symbol}
-                                                    </button>
-                                                    {t.identifier ===
-                                                        selectedToken?.identifier && (
-                                                        <span className="absolute w-[3px] h-5 bg-ash-cyan-500 top-1/2 -translate-y-1/2 left-0"></span>
-                                                    )}
-                                                </li>
-                                            );
-                                        })}
+                                                        <button
+                                                            className="w-full py-3 text-left px-6 text-xs font-bold"
+                                                            onClick={() => {
+                                                                setSelectedTokenId(
+                                                                    t.id as string
+                                                                );
+                                                                setInputValue(
+                                                                    new BigNumber(
+                                                                        ""
+                                                                    )
+                                                                );
+                                                                close();
+                                                            }}
+                                                        >
+                                                            {
+                                                                TOKENS_MAP[t.id]
+                                                                    .symbol
+                                                            }
+                                                        </button>
+                                                        {t.id ===
+                                                            selectedTokenId && (
+                                                            <span className="absolute w-[3px] h-5 bg-ash-cyan-500 top-1/2 -translate-y-1/2 left-0"></span>
+                                                        )}
+                                                    </li>
+                                                );
+                                            }
+                                        )}
                                     </ul>
                                 );
                             }}
@@ -176,15 +250,34 @@ const FarmBribeContent = ({}: FarmBribeModalProps) => {
                             Input Amount
                         </div>
                         <InputCurrency
-                            placeholder="0"
+                            placeholder="0.00"
                             className="w-full h-18 px-7 outline-none bg-ash-dark-400 font-semibold text-lg text-white text-right placeholder:text-ash-gray-600"
+                            decimals={TOKENS_MAP[selectedTokenId]?.decimals}
+                            disabled={!selectedTokenId}
+                            value={inputStr}
+                            onChange={(e) => {
+                                setInputStr(e.target.value);
+                                setInputValue(new BigNumber(e.target.value));
+                            }}
                         />
-                        <div className="mt-2 font-semibold text-xs text-right">
-                            <span className="text-ash-gray-600">Balance: </span>
-                            <span className="text-cyan-500 cursor-pointer">
-                                123.123 USDT
-                            </span>
-                        </div>
+                        {selectedTokenId && selectedTokenBalance && (
+                            <div className="mt-2 font-semibold text-xs text-right">
+                                <span className="text-ash-gray-600">
+                                    Balance:{" "}
+                                </span>
+                                <span
+                                    className="text-cyan-500 cursor-pointer"
+                                    onClick={() =>
+                                        setInputValue(selectedTokenBalance.egld)
+                                    }
+                                >
+                                    {formatAmount(
+                                        selectedTokenBalance.egld.toNumber()
+                                    )}{" "}
+                                    {TOKENS_MAP[selectedTokenId].symbol}
+                                </span>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
@@ -192,6 +285,8 @@ const FarmBribeContent = ({}: FarmBribeModalProps) => {
                 <GlowingButton
                     theme="pink"
                     className="w-full sm:w-72 h-12 font-bold text-sm text-white uppercase"
+                    disabled={!canCreateBribe}
+                    onClick={() => createBribe()}
                 >
                     <span className="mr-2">Create bribe</span>
                     <ICChevronRight className="w-3 h-3" />
