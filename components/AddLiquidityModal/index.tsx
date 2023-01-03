@@ -122,7 +122,7 @@ const TokenInput = ({
                             Insufficient fund -{" "}
                             <Link href="/swap" passHref>
                                 <span className="text-insufficent-fund select-none cursor-pointer">
-                                    Go trade!
+                                    Swap for more tokens!
                                 </span>
                             </Link>
                         </span>

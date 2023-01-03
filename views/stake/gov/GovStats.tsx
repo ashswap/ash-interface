@@ -516,7 +516,7 @@ function GovStats() {
                                     <div className="mb-4">
                                         Of course not, when your veASH decreases
                                         to 0. It also means that the lock period
-                                        of your ASH is done. You can withdraw
+                                        of your ASH is over. You can withdraw
                                         your staked ASH right away.
                                     </div>
                                     <div>

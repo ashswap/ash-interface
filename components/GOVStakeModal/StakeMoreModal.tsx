@@ -485,7 +485,7 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                     </div>
                     <div className="w-full sm:w-1/3 lg:w-[17.8125rem] shrink-0 bg-stake-dark-500 py-[2.375rem] px-10 sm:px-4 lg:px-10">
                         <div className="text-white text-lg font-bold mb-16">
-                            Estimate Staking
+                            Estimated Staking
                         </div>
                         <div className="flex flex-col space-y-11">
                             <div>
