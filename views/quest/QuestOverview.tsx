@@ -91,7 +91,7 @@ const QuestOverview = () => {
         });
         return `${location?.href
             .split("?")[0]
-            .replace(/\/$/, "")}?${search.toString()}`;
+            .replace(/\/$/, "")}/?${search.toString()}`;
     }, [userStats]);
 
     const sharableLink = useMemo(() => {
