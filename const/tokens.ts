@@ -135,6 +135,22 @@ const DEVNET_TOKENS_BETA: IESDTInfo[] = [
         decimals: 8,
         logoURI: IconWBTC.src,
     },
+    {
+        identifier: "WEGLD-795247",
+        chainId: ChainId.Devnet,
+        symbol: "wEGLD",
+        name: "Wrapped EGLD",
+        decimals: 18,
+        logoURI: IconWEGLD.src,
+    },
+    {
+        identifier: "AEGLD-f09e97",
+        chainId: ChainId.Devnet,
+        symbol: "aEGLD",
+        name: "A EGLD",
+        decimals: 18,
+        logoURI: IconAEGLD.src,
+    },
 ];
 
 const MAINNET_TOKENS: IESDTInfo[] = [
