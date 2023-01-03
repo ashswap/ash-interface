@@ -187,10 +187,10 @@ const useFarmsState = () => {
                     .multipliedBy(365 * 24 * 60 * 60)
                     .div(blockTimeMs / 1000)
             );
-            const emissionAPR = totalASH
+            const emissionAPR = totalLiquidityValue.gt(0) ? totalASH
                 .multipliedBy(tokenMap[ASH_TOKEN.identifier]?.price || 0)
                 .multipliedBy(100)
-                .div(totalLiquidityValue);
+                .div(totalLiquidityValue) : new BigNumber(0);
 
             const record: FarmRecord = {
                 pool: p,
