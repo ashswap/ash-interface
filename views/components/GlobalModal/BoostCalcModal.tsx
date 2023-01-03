@@ -154,24 +154,24 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
         existFarmTokenBal,
     ]);
 
-    // const ashStakeMaxBoostArr = useMemo(() => {
-    //     return [
-    //         veForMaxBoost,
-    //         veForMaxBoost.div(0.75),
-    //         veForMaxBoost.div(0.5),
-    //         veForMaxBoost.div(0.25),
-    //     ].map((ash, i) => ({
-    //         amt: ash.toNumber(),
-    //         year: 4 - i,
-    //     }));
-    // }, [veForMaxBoost]);
-
     const ashStakeMaxBoostArr = useMemo(() => {
-        return [veForMaxBoost, veForMaxBoost.div(0.5)].map((ash, i) => ({
+        return [
+            veForMaxBoost,
+            veForMaxBoost.div(0.75),
+            veForMaxBoost.div(0.5),
+            veForMaxBoost.div(0.25),
+        ].map((ash, i) => ({
             amt: ash.toNumber(),
-            week: 2 - i,
+            year: 4 - i,
         }));
     }, [veForMaxBoost]);
+
+    // const ashStakeMaxBoostArr = useMemo(() => {
+    //     return [veForMaxBoost, veForMaxBoost.div(0.5)].map((ash, i) => ({
+    //         amt: ash.toNumber(),
+    //         week: 2 - i,
+    //     }));
+    // }, [veForMaxBoost]);
 
     useEffect(() => {
         if (farmAddress && !isUserInput) {
@@ -393,7 +393,7 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
                             <CardTooltip
                                 content={
                                     <div className="text-xs text-white space-y-2">
-                                        {/* {ashStakeMaxBoostArr.map(
+                                        {ashStakeMaxBoostArr.map(
                                             ({ amt, year }) => {
                                                 return (
                                                     <div key={year}>
@@ -408,8 +408,8 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
                                                     </div>
                                                 );
                                             }
-                                        )} */}
-                                        {ashStakeMaxBoostArr.map(
+                                        )}
+                                        {/* {ashStakeMaxBoostArr.map(
                                             ({ amt, week }) => {
                                                 return (
                                                     <div key={week}>
@@ -424,7 +424,7 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
                                                     </div>
                                                 );
                                             }
-                                        )}
+                                        )} */}
                                     </div>
                                 }
                             >
