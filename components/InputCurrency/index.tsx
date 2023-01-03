@@ -25,7 +25,8 @@ function InputCurrency(
 
     const _onChange: React.ChangeEventHandler<HTMLInputElement> = useCallback(
         (e) => {
-            const raw = e.target.value.replace(/,/g, ".");
+            const raw = e.target.value.replace(/,/g, ".").replace(/^0+/, "0");
+
             if (raw === "" || inputRegex.test(escapeRegExp(raw))) {
                 const numDecimals = raw.split(".")[1]?.length || 0;
                 if (
@@ -57,6 +58,12 @@ function InputCurrency(
     useEffect(() => {
         onNumberChange?.(num);
     }, [num, onNumberChange]);
+
+    useEffect(() => {
+        if(typeof rest.value !== "string") return;
+        const raw = rest.value.replace(/,/g, ".") || "";
+        setPreviousVal(raw);
+    }, [rest.value]);
 
     return (
         <input
