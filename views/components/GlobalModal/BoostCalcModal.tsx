@@ -23,6 +23,7 @@ import Image from "components/Image";
 import { useEffect, useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { ENVIRONMENT } from "const/env";
+import { poolStatsRefresherAtom } from "atoms/poolsState";
 
 const LOCK_OPTS_BOY = [
     { value: 2 * 7 * 24 * 3600, label: "2 weeks" },
@@ -564,6 +565,12 @@ function BoostCalcModal({
     ...modalProps
 }: BaseModalType & BoostCalcProps) {
     const screenSize = useScreenSize();
+    const poolStatsRefresher = useRecoilValue(poolStatsRefresherAtom);
+    useEffect(() => {
+        if(modalProps.isOpen){
+            poolStatsRefresher?.()
+        }
+    }, [modalProps.isOpen, poolStatsRefresher]);
     return (
         <>
             <BaseModal
