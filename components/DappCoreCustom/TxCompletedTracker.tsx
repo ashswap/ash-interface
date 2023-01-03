@@ -1,9 +1,10 @@
-import { GetTransactionsByHashesReturnType } from "@elrondnetwork/dapp-core/types";
 import { lastCompletedTxHashAtom } from "atoms/transactions";
 import { useSocket } from "context/socket";
 import emitter from "helper/emitter";
+import logApi from "helper/logHelper";
 import { useEffect } from "react";
 import { useSetRecoilState } from "recoil";
+import { GetTransactionsByHashesReturnType } from "./getTransactionsByHashes";
 
 export const TxCompletedTracker = () => {
     const { socket, socketExtra } = useSocket();
@@ -23,12 +24,17 @@ export const TxCompletedTracker = () => {
         if (!socketExtra) return;
         const onCheckBatchResult = (txs: GetTransactionsByHashesReturnType) => {
             txs.map((tx) => {
-                const { hash, receiver } = tx;
+                const { hash, receiver, raw } = tx;
                 socketExtra.emit(
                     "transactionCompletedClient",
                     receiver,
                     hash
                 );
+                logApi.post("/api/v1/tracking/ash-point", {
+                    action_time: Date.now(),
+                    action_name: raw?.function,
+                    action_metadata: raw,
+                })
             });
         };
         emitter.on("onCheckBatchResult", onCheckBatchResult);

@@ -131,6 +131,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
                 `,
                 }}
             />
+            <Script src="https://static.geetest.com/v4/gt4.js"/>  
             <Head>
                 <meta
                     name="viewport"

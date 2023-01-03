@@ -7,7 +7,8 @@ type LocalStorageKey =
     | "loginMethod"
     | "address"
     | "ledgerLogin"
-    | "userOnboarding";
+    | "userOnboarding"
+    | "invitationCode";
 export const setItem = ({
     key,
     data,

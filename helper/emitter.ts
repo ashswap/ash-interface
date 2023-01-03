@@ -1,5 +1,6 @@
-import { GetTransactionsByHashesReturnType } from "@elrondnetwork/dapp-core/types";
-import { TokenPayment, Transaction } from "@elrondnetwork/erdjs/out";
+
+import { TokenPayment } from "@elrondnetwork/erdjs/out";
+import { GetTransactionsByHashesReturnType } from "components/DappCoreCustom/getTransactionsByHashes";
 import mitt from "mitt";
 
 type Events = {

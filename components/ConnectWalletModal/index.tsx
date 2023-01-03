@@ -58,17 +58,14 @@ function ConnectWalletModal() {
     useEffect(() => {
         if (window && !loggedIn && isOpenConnectWalletModal) {
             let dataLayer = (window as any).dataLayer || [];
-            console.log("dataLayer",dataLayer);
             dataLayer.push({
                 'event': 'click_connect_wallet'
             })
         }
-    }, [isOpenConnectWalletModal]);
-    useEffect(() => {
-        console.log("dappCore", dappCore);           
+    }, [isOpenConnectWalletModal, loggedIn]);
+    useEffect(() => {          
         if (window && loggedIn) {
             let dataLayer = (window as any).dataLayer || [];
-            console.log("dataLayer",dataLayer);
             window.localStorage.setItem('address', dappCore.account.address);
             window.localStorage.setItem('method', dappCore.loginInfo.loginMethod);
             dataLayer.push({
@@ -85,8 +82,6 @@ function ConnectWalletModal() {
         }
         if (window && !loggedIn && !isFirstRender) {
             let dataLayer = (window as any).dataLayer || [];
-            console.log("Disconnected");
-            console.log("dataLayer",dataLayer);
             dataLayer.push({
                 'event': 'disconnect_wallet',
                 'address': window.localStorage.getItem('address'),
