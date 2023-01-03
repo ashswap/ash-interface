@@ -435,7 +435,7 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
                             <div className="flex items-center text-pink-600">
                                 <ICChevronDown className="w-2 h-auto mr-2" />
                                 <span className="text-lg font-bold">
-                                    {formatAmount(veForMaxBoost.toNumber())}
+                                    {veForMaxBoost.isNaN() ? "invalid" : formatAmount(veForMaxBoost.toNumber())}
                                 </span>
                             </div>
                         </div>
