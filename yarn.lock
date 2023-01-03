@@ -285,7 +285,7 @@
     flow-copy-source "^2.0.9"
     flow-typed "^3.2.1"
 
-"@elrondnetwork/transaction-decoder@1.0.0":
+"@elrondnetwork/transaction-decoder@1.0.0", "@elrondnetwork/transaction-decoder@^1.0.0":
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@elrondnetwork/transaction-decoder/-/transaction-decoder-1.0.0.tgz#b1cdababcd9ac04be42ea384c693fa20b9e9b043"
   integrity sha512-FFUDXffwDNwo4V6Co+S9ur3OPYyAEzwgen7gh7LtQrG7SNPELFHjl+YssABXI8v1+SWmqcrSxervMggAiDDXkg==
