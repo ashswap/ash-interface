@@ -20,7 +20,7 @@ export const calcYieldBoost = (
               .plus(totalLP.multipliedBy(0.6).multipliedBy(ve).div(totalVe));
     const boosted = BigNumber.min(_boosted, lpAmt);
     const farmBoost = farmSupply.plus(boosted).minus(existFarmTokenBal);
-    return (
+    const yieldBoost = (
         Math.max(
             +boosted
                 .multipliedBy(10 ** 20)
@@ -29,6 +29,7 @@ export const calcYieldBoost = (
             1
         ) || 1
     );
+    return yieldBoost === Number.POSITIVE_INFINITY ? 1: yieldBoost; 
 };
 
 export const calcYieldBoostFromFarmToken = (
@@ -38,7 +39,7 @@ export const calcYieldBoostFromFarmToken = (
     farm: IFarm
 ) => {
     const base = toEGLDD(farm.farming_token_decimal, lpAmt).multipliedBy(0.4);
-    return (
+    const yieldBoost = (
         Math.max(
             +farmBalance
                 .div(farmTokenSupply)
@@ -54,4 +55,5 @@ export const calcYieldBoostFromFarmToken = (
             1
         ) || 1
     );
+    return yieldBoost === Number.POSITIVE_INFINITY ? 1: yieldBoost;
 };

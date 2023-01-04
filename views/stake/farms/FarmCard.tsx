@@ -191,8 +191,7 @@ function FarmCard({ farmData, viewType }: props) {
                                     }
                                 >
                                     <span
-                                        className={`underline text-xs font-bold text-stake-gray-500 cursor-pointer`}
-                                        onClick={() => setOpenBoostInfo(true)}
+                                        className={`underline text-xs font-bold text-stake-gray-500`}
                                     >
                                         Farm Boost
                                     </span>
