@@ -102,13 +102,13 @@ const TokenSelect = ({
         if (value) setOnboardedSearchToken(true);
         if (value && window) {
             let dataLayer = (window as any).dataLayer || [];
-            console.log("dataLayer",dataLayer);
+            console.log("dataLayer", dataLayer);
             dataLayer.push({
-                'event': 'select_token',
-                'type': type,
-                'token_name': value.name,
-                'token_symbol': value.symbol,
-                'token_identifier': value.identifier
+                event: "select_token",
+                type: type,
+                token_name: value.name,
+                token_symbol: value.symbol,
+                token_identifier: value.identifier,
             });
         }
     }, [value, setOnboardedSearchToken]);
@@ -264,7 +264,7 @@ const TokenSelect = ({
                                                 : "Search or try usdt-usdc"
                                         }
                                         suffix={<Search />}
-                                        outline                                      
+                                        outline
                                         value={keyword}
                                         onChange={(e) => {
                                             setKeyword(e.target.value);

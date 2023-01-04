@@ -136,7 +136,7 @@ const Swap = () => {
         isInsufficentFund,
         slippage,
     } = useSwap();
-    const [deboundSlippage] = useDebounce(slippage, 500);            
+    const [deboundSlippage] = useDebounce(slippage, 500);
     const fees = useRecoilValue(poolFeesQuery(pool?.address || ""));
     const [showSetting, setShowSetting] = useState<boolean>(false);
     const [isOpenHistoryModal, openHistoryModal] = useState<boolean>(false);
@@ -249,8 +249,10 @@ const Swap = () => {
             let dataLayer = (window as any).dataLayer || [];
             console.log("dataLayer", dataLayer);
             dataLayer.push({
-                'event': 'set_slippage',
-                'amount': slippage.numerator.toNumber()/slippage.denominator.toNumber()
+                event: "set_slippage",
+                amount:
+                    slippage.numerator.toNumber() /
+                    slippage.denominator.toNumber(),
             });
         }
     }, [deboundSlippage]);

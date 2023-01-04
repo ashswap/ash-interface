@@ -97,8 +97,12 @@ function FarmCard({ farmData, viewType }: props) {
         return stakedData?.totalRewardAmt || new BigNumber(0);
     }, [stakedData]);
     const loggedIn = useRecoilValue(accIsLoggedInState);
-    const [isClickedHarvestButton, setIsClickedHarvestButton] = useRecoilState(clickedHarvestModalState);
-    const [isClickedStakeButton, setIsClickedStakeButton] = useRecoilState(clickedStakeModalState);
+    const [isClickedHarvestButton, setIsClickedHarvestButton] = useRecoilState(
+        clickedHarvestModalState
+    );
+    const [isClickedStakeButton, setIsClickedStakeButton] = useRecoilState(
+        clickedStakeModalState
+    );
 
     useEffect(() => {
         if (!screenSize.isMobile) {
@@ -109,21 +113,21 @@ function FarmCard({ farmData, viewType }: props) {
     }, [screenSize.isMobile]);
 
     useEffect(() => {
-        if(window && openStakeLP && loggedIn){
+        if (window && openStakeLP && loggedIn) {
             let dataLayer = (window as any).dataLayer || [];
-            console.log("dataLayer",dataLayer);
+            console.log("dataLayer", dataLayer);
             dataLayer.push({
-                'event': 'click_stake_lp'
-            })
+                event: "click_stake_lp",
+            });
         }
     }, [openStakeLP]);
-    useEffect(() => {        
-        if(window && openUnstakeLP && loggedIn){
+    useEffect(() => {
+        if (window && openUnstakeLP && loggedIn) {
             let dataLayer = (window as any).dataLayer || [];
-            console.log("dataLayer",dataLayer);
+            console.log("dataLayer", dataLayer);
             dataLayer.push({
-                'event': 'click_unstake_lp'
-            })
+                event: "click_unstake_lp",
+            });
         }
     }, [openUnstakeLP]);
     const rewardValue = useMemo(() => {
@@ -298,12 +302,11 @@ function FarmCard({ farmData, viewType }: props) {
                             disabled={!stakedData?.totalRewardAmt.gt(0)}
                             onClick={() => {
                                 stakedData?.totalRewardAmt.gt(0) &&
-                                claimReward(farm).then(() =>
-                                    setMOpenFarm(false),
-                                )
-                                setIsClickedHarvestButton(true)
-                                }     
-                            }
+                                    claimReward(farm).then(() =>
+                                        setMOpenFarm(false)
+                                    );
+                                setIsClickedHarvestButton(true);
+                            }}
                         >
                             Harvest
                         </GlowingButton>
@@ -355,10 +358,9 @@ function FarmCard({ farmData, viewType }: props) {
                                     <button
                                         className="w-[3.375rem] h-[3.375rem] clip-corner-1 clip-corner-bl bg-ash-dark-400 hover:bg-ash-dark-300 active:bg-ash-dark-600 transition-all flex items-center justify-center"
                                         onClick={() => {
-                                            setOpenStakeLP(true)
-                                            setIsClickedStakeButton(true)
-                                            }
-                                        }
+                                            setOpenStakeLP(true);
+                                            setIsClickedStakeButton(true);
+                                        }}
                                     >
                                         <ICPlus className="w-3 h-auto text-ash-cyan-500" />
                                     </button>
@@ -368,10 +370,9 @@ function FarmCard({ farmData, viewType }: props) {
                                     theme="cyan"
                                     className={`clip-corner-1 clip-corner-br w-[7.25rem] h-14 text-sm font-bold underline`}
                                     onClick={() => {
-                                        setOpenStakeLP(true)
-                                        setIsClickedStakeButton(true)
-                                        }
-                                    }
+                                        setOpenStakeLP(true);
+                                        setIsClickedStakeButton(true);
+                                    }}
                                 >
                                     Stake LP
                                 </GlowingButton>
@@ -436,10 +437,9 @@ function FarmCard({ farmData, viewType }: props) {
             <button
                 className="w-10 lg:w-12 h-10 lg:h-12 clip-corner-1 clip-corner-bl bg-ash-dark-400 hover:bg-ash-dark-300 active:bg-ash-dark-600 transition-all flex items-center justify-center"
                 onClick={() => {
-                    setOpenStakeLP(true)
-                    setIsClickedStakeButton(true)
-                    }
-                }
+                    setOpenStakeLP(true);
+                    setIsClickedStakeButton(true);
+                }}
             >
                 <ICPlus className="w-3 h-auto text-ash-cyan-500" />
             </button>
@@ -449,10 +449,9 @@ function FarmCard({ farmData, viewType }: props) {
             theme="cyan"
             className={`clip-corner-1 clip-corner-br h-10 lg:h-12 w-full font-bold underline text-xs`}
             onClick={() => {
-                setOpenStakeLP(true)
-                setIsClickedStakeButton(true)
-                }
-            }
+                setOpenStakeLP(true);
+                setIsClickedStakeButton(true);
+            }}
         >
             Stake LP
         </GlowingButton>

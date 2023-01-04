@@ -86,12 +86,12 @@ function GovStats() {
         onSuccess: () => setOpenHarvestResult(true),
     });
     useEffect(() => {
-        if(window && openStakeGov && loggedIn){
+        if (window && openStakeGov && loggedIn) {
             let dataLayer = (window as any).dataLayer || [];
-            console.log("dataLayer",dataLayer);
+            console.log("dataLayer", dataLayer);
             dataLayer.push({
-                'event': 'click_stake_gov'
-            })
+                event: "click_stake_gov",
+            });
         }
     }, [openStakeGov]);
     const { claimReward } = useGovClaimReward();

@@ -83,113 +83,115 @@ const TxRecord = ({
     collapse?: boolean;
 }) => {
     const { hash, status } = tx;
-    const [isClickedHarvestButton, setIsClickedHarvestButton] = useRecoilState(clickedHarvestModalState);
-    const [isClickedCollapse, setIsClickedCollapse] = useRecoilState(collapseModalState);
-    const [isClickedUnstake, setIsClickedUnstake] = useRecoilState(clickedUnstakeModalState);
-    const [isClickedStakeButton, setIsClickedStakeButton] = useRecoilState(clickedStakeModalState);
-    const [isClickedGovStakeButton, setIsClickedGovStakeButton] = useRecoilState(clickedGovStakeModalState);
+    const [isClickedHarvestButton, setIsClickedHarvestButton] = useRecoilState(
+        clickedHarvestModalState
+    );
+    const [isClickedCollapse, setIsClickedCollapse] =
+        useRecoilState(collapseModalState);
+    const [isClickedUnstake, setIsClickedUnstake] = useRecoilState(
+        clickedUnstakeModalState
+    );
+    const [isClickedStakeButton, setIsClickedStakeButton] = useRecoilState(
+        clickedStakeModalState
+    );
+    const [isClickedGovStakeButton, setIsClickedGovStakeButton] =
+        useRecoilState(clickedGovStakeModalState);
     useEffect(() => {
-        if(
-            window 
-            && status 
-            != "pending" 
-            && window.location.href.includes("pool")
-            && !isClickedCollapse
+        if (
+            window &&
+            status != "pending" &&
+            window.location.href.includes("pool") &&
+            !isClickedCollapse
         ) {
             let dataLayer = (window as any).dataLayer || [];
             dataLayer.push({
-                'event': 'add_liquidity',
-                'hash': hash,
-                'status': status
+                event: "add_liquidity",
+                hash: hash,
+                status: status,
             });
-        };
+        }
     }, [status]);
     useEffect(() => {
-        if(
-            window 
-            && status 
-            != "pending" 
-            && window.location.href.includes("swap") 
-            && !isClickedCollapse
+        if (
+            window &&
+            status != "pending" &&
+            window.location.href.includes("swap") &&
+            !isClickedCollapse
         ) {
             let dataLayer = (window as any).dataLayer || [];
             dataLayer.push({
-                'event': 'swap',
-                'hash': hash,
-                'status': status
+                event: "swap",
+                hash: hash,
+                status: status,
             });
-        };
+        }
     }, [status]);
     useEffect(() => {
-        if(
-            window 
-            && status 
-            != "pending" 
-            && window.location.href.includes("farms")
-            && !isClickedCollapse
-            && isClickedStakeButton
+        if (
+            window &&
+            status != "pending" &&
+            window.location.href.includes("farms") &&
+            !isClickedCollapse &&
+            isClickedStakeButton
         ) {
             let dataLayer = (window as any).dataLayer || [];
             dataLayer.push({
-                'event': 'liquidity_stake',
-                'hash': hash,
-                'status': status
-            })
+                event: "liquidity_stake",
+                hash: hash,
+                status: status,
+            });
             setIsClickedStakeButton(false);
         }
     }, [status, isClickedStakeButton]);
     useEffect(() => {
-        if(
-            window 
-            && status 
-            != "pending" 
-            && window.location.href.includes("farms")
-            && !isClickedCollapse
-            && isClickedHarvestButton
+        if (
+            window &&
+            status != "pending" &&
+            window.location.href.includes("farms") &&
+            !isClickedCollapse &&
+            isClickedHarvestButton
         ) {
             let dataLayer = (window as any).dataLayer || [];
             dataLayer.push({
-                'event': 'harvest_liquidity_stake',
-                'hash': hash,
-                'status': status
-            })
+                event: "harvest_liquidity_stake",
+                hash: hash,
+                status: status,
+            });
             setIsClickedHarvestButton(false);
         }
     }, [status, isClickedHarvestButton]);
     useEffect(() => {
-        if(
-            window 
-            && status 
-            != "pending" 
-            && window.location.href.includes("farms")
-            && !isClickedCollapse
-            && isClickedUnstake
+        if (
+            window &&
+            status != "pending" &&
+            window.location.href.includes("farms") &&
+            !isClickedCollapse &&
+            isClickedUnstake
         ) {
             let dataLayer = (window as any).dataLayer || [];
             dataLayer.push({
-                'event': 'liquidity_unstake',
-                'hash': hash,
-                'status': status
-            })
+                event: "liquidity_unstake",
+                hash: hash,
+                status: status,
+            });
             setIsClickedUnstake(false);
         }
     }, [status, isClickedUnstake]);
     useEffect(() => {
-        if(
-            window 
-            && status 
-            != "pending" 
-            && window.location.href.includes("gov")
-            && !isClickedCollapse
-            && isClickedGovStakeButton
+        if (
+            window &&
+            status != "pending" &&
+            window.location.href.includes("gov") &&
+            !isClickedCollapse &&
+            isClickedGovStakeButton
         ) {
             let dataLayer = (window as any).dataLayer || [];
             console.log("dataLayer", dataLayer);
             dataLayer.push({
-                'event': 'gov_stake',
-                'hash': hash,
-                'status': status
-            })
+                event: "gov_stake",
+                hash: hash,
+                status: status,
+            });
             setIsClickedGovStakeButton(false);
         }
     }, [status, isClickedGovStakeButton]);

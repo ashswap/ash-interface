@@ -1,6 +1,9 @@
 import { useDebounce } from "use-debounce";
 import ICChevronRight from "assets/svg/chevron-right.svg";
-import { accIsInsufficientEGLDState, accIsLoggedInState } from "atoms/dappState";
+import {
+    accIsInsufficientEGLDState,
+    accIsLoggedInState,
+} from "atoms/dappState";
 import { FarmRecord } from "atoms/farmsState";
 import { lpTokenMapState } from "atoms/tokensState";
 import BigNumber from "bignumber.js";
@@ -34,13 +37,13 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
     const [rawStakeAmt, setRawStakeAmt] = useState("");
     const [deboundRawStakeAmt] = useDebounce(rawStakeAmt, 500);
     useEffect(() => {
-        if(window && loggedIn && deboundRawStakeAmt){
+        if (window && loggedIn && deboundRawStakeAmt) {
             let dataLayer = (window as any).dataLayer || [];
             dataLayer.push({
-                'event': 'input_stake_value',
-                'amount': deboundRawStakeAmt,
-                'lp_token': pool?.lpToken?.symbol
-            })
+                event: "input_stake_value",
+                amount: deboundRawStakeAmt,
+                lp_token: pool?.lpToken?.symbol,
+            });
         }
     }, [deboundRawStakeAmt]);
     const { enterFarm } = useEnterFarm();
@@ -58,7 +61,9 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
         const totalAshPerDay = ashPerBlock
             .multipliedBy(24 * 60 * 60)
             .div(blockTimeMs / 1000);
-        const shareOfFarm = baseFarmToken.div(farmTokenSupply.plus(baseFarmToken));
+        const shareOfFarm = baseFarmToken.div(
+            farmTokenSupply.plus(baseFarmToken)
+        );
         return totalAshPerDay.multipliedBy(shareOfFarm);
     }, [stakeAmt, farmTokenSupply, ashPerBlock]);
     const insufficientLP = useMemo(() => {

@@ -1,5 +1,9 @@
 import { accIsLoggedInState } from "atoms/dappState";
-import { FarmRecord, farmRecordsState, farmStakedOnlyState } from "atoms/farmsState";
+import {
+    FarmRecord,
+    farmRecordsState,
+    farmStakedOnlyState,
+} from "atoms/farmsState";
 import { clickedHarvestModalState } from "atoms/harvestState";
 import BigNumber from "bignumber.js";
 import Avatar from "components/Avatar";
@@ -38,15 +42,17 @@ function FarmStats({ onClickAll }: { onClickAll?: () => void }) {
             setHarvesting(false);
         }
     }, [harvesting, totalReward, claimAllReward]);
-    const [isClickedHarvestButton, setIsClickedHarvestButton] = useRecoilState(clickedHarvestModalState);
+    const [isClickedHarvestButton, setIsClickedHarvestButton] = useRecoilState(
+        clickedHarvestModalState
+    );
     const loggedIn = useRecoilValue(accIsLoggedInState);
     useEffect(() => {
-        if(window && isClickedHarvestButton && loggedIn){
+        if (window && isClickedHarvestButton && loggedIn) {
             let dataLayer = (window as any).dataLayer || [];
-            console.log("dataLayer",dataLayer);
+            console.log("dataLayer", dataLayer);
             dataLayer.push({
-                'event': 'click_harvest_liquidity_stake',
-            })
+                event: "click_harvest_liquidity_stake",
+            });
         }
     }, [isClickedHarvestButton]);
     return (
@@ -103,9 +109,9 @@ function FarmStats({ onClickAll }: { onClickAll?: () => void }) {
                         className={`w-full h-[3.375rem] text-sm font-bold`}
                         disabled={harvesting || totalReward.eq(0)}
                         onClick={() => {
-                            harvestAll()
-                            setIsClickedHarvestButton(true)}  
-                        }
+                            harvestAll();
+                            setIsClickedHarvestButton(true);
+                        }}
                     >
                         Harvest
                     </GlowingButton>

@@ -27,10 +27,10 @@ function PoolCardItem({
     const [openAddLiquidity, setOpenAddLiquidity] = useState<boolean>(false);
     const loggedIn = useRecoilValue(accIsLoggedInState);
     useEffect(() => {
-        if(window && openAddLiquidity && loggedIn) {
+        if (window && openAddLiquidity && loggedIn) {
             let dataLayer = (window as any).dataLayer || [];
             dataLayer.push({
-                'event': 'click_deposit'
+                event: "click_deposit",
             });
         }
     }, [openAddLiquidity]);

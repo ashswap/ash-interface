@@ -65,15 +65,15 @@ const TokenInput = ({
     );
     const [deboundValue] = useDebounce(value, 500);
     useEffect(() => {
-        if(window && value) {
+        if (window && value) {
             let dataLayer = (window as any).dataLayer || [];
             dataLayer.push({
-                'event': 'input_liquidity_value',
-                'amount': value,
-                'token': token.identifier
-            })
+                event: "input_liquidity_value",
+                amount: value,
+                token: token.identifier,
+            });
         }
-    }, [deboundValue, token])
+    }, [deboundValue, token]);
     return (
         <>
             <div className="bg-ash-dark-700 sm:bg-transparent flex space-x-1 items-center sm:items-stretch">

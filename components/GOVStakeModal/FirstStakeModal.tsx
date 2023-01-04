@@ -1,6 +1,9 @@
 import { Slider } from "antd";
 import ICChevronRight from "assets/svg/chevron-right.svg";
-import { accIsInsufficientEGLDState, accIsLoggedInState } from "atoms/dappState";
+import {
+    accIsInsufficientEGLDState,
+    accIsLoggedInState,
+} from "atoms/dappState";
 import { clickedGovStakeModalState } from "atoms/govstakeStake";
 import { govTotalSupplyVeASH } from "atoms/govState";
 import { tokenMapState } from "atoms/tokensState";
@@ -76,19 +79,20 @@ const FirstStakeContent = ({ open, onClose }: props) => {
     const [deboundRawLockAmt] = useDebounce(rawLockAmt, 500);
     const loggedIn = useRecoilValue(accIsLoggedInState);
     useEffect(() => {
-        if(window && loggedIn && deboundRawLockAmt){
+        if (window && loggedIn && deboundRawLockAmt) {
             let dataLayer = (window as any).dataLayer || [];
             console.log("dataLayer", dataLayer);
             dataLayer.push({
-                'event': 'input_lock_value',
-                'amount': deboundRawLockAmt,
-            })
+                event: "input_lock_value",
+                amount: deboundRawLockAmt,
+            });
         }
     }, [deboundRawLockAmt]);
     const [onboardingStakeGov, setOnboardedStakeGov] =
         useOnboarding("stake_gov_1st");
     const [openOnboardStakeTooltip, setOpenOnboardTooltip] = useState(false);
-    const [isClickedGovStakeButton, setIsClickedGovStakeButton] = useRecoilState(clickedGovStakeModalState);
+    const [isClickedGovStakeButton, setIsClickedGovStakeButton] =
+        useRecoilState(clickedGovStakeModalState);
     const isTouchScreen = useMediaQuery("(hover: none)");
     const screenSize = useScreenSize();
 
@@ -436,11 +440,12 @@ const FirstStakeContent = ({ open, onClose }: props) => {
                                 theme="pink"
                                 className={`clip-corner-1 clip-corner-tl transition w-full h-12 flex items-center justify-center text-sm font-bold text-white`}
                                 disabled={!canStake}
-                                onClick={() => {if(canStake) {
-                                    lock() 
-                                    setIsClickedGovStakeButton(true)
-                                    }}
-                                }
+                                onClick={() => {
+                                    if (canStake) {
+                                        lock();
+                                        setIsClickedGovStakeButton(true);
+                                    }
+                                }}
                             >
                                 {insufficientEGLD ? (
                                     "INSUFFICIENT EGLD BALANCE"

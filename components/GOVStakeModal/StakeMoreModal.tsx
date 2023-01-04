@@ -1,6 +1,9 @@
 import ICArrowTopRight from "assets/svg/arrow-top-right.svg";
 import ICChevronRight from "assets/svg/chevron-right.svg";
-import { accIsInsufficientEGLDState, accIsLoggedInState } from "atoms/dappState";
+import {
+    accIsInsufficientEGLDState,
+    accIsLoggedInState,
+} from "atoms/dappState";
 import { clickedGovStakeModalState } from "atoms/govstakeStake";
 import {
     govLockedAmtState,
@@ -79,13 +82,13 @@ const StakeMoreContent = ({ open, onClose }: props) => {
     const [deboundRawLockAmt] = useDebounce(rawLockAmt, 500);
     const loggedIn = useRecoilValue(accIsLoggedInState);
     useEffect(() => {
-        if(window && loggedIn && deboundRawLockAmt){
+        if (window && loggedIn && deboundRawLockAmt) {
             let dataLayer = (window as any).dataLayer || [];
             console.log("dataLayer", dataLayer);
             dataLayer.push({
-                'event': 'input_lock_value',
-                'amount': deboundRawLockAmt,
-            })
+                event: "input_lock_value",
+                amount: deboundRawLockAmt,
+            });
         }
     }, [deboundRawLockAmt]);
     const [currentLockSeconds, setCurrentLockSeconds] = useState(0);
@@ -101,7 +104,8 @@ const StakeMoreContent = ({ open, onClose }: props) => {
     );
     const [openOnboardingExtendTooltip, setOpenOnboardingExtendTooltip] =
         useState(false);
-    const [isClickedGovStakeButton, setIsClickedGovStakeButton] = useRecoilState(clickedGovStakeModalState);
+    const [isClickedGovStakeButton, setIsClickedGovStakeButton] =
+        useRecoilState(clickedGovStakeModalState);
     const remaining = useMemo(() => {
         return lockPeriodFormater(currentLockSeconds * 1000);
     }, [currentLockSeconds]);
@@ -219,10 +223,9 @@ const StakeMoreContent = ({ open, onClose }: props) => {
     }, [unlockTS]);
     const aClass = "";
     const lockSubmit = useCallback(() => {
-        if(canStake) {
-            lockMore(), 
-            setIsClickedGovStakeButton(true)
-            }
+        if (canStake) {
+            lockMore(), setIsClickedGovStakeButton(true);
+        }
     }, [canStake]);
     return (
         <>

@@ -30,27 +30,23 @@ function StakedPoolCardItem({
         useRecoilValue(networkConfigState).network;
     const loggedIn = useRecoilValue(accIsLoggedInState);
     useEffect(() => {
-        if(window && openRemoveLiquidity && loggedIn) {
+        if (window && openRemoveLiquidity && loggedIn) {
             let dataLayer = (window as any).dataLayer || [];
             dataLayer.push({
-                'event': 'click_remove_liquidity'
+                event: "click_remove_liquidity",
             });
         }
     }, [openRemoveLiquidity]);
     useEffect(() => {
-        if(window && openAddLiquidity && loggedIn) {
+        if (window && openAddLiquidity && loggedIn) {
             let dataLayer = (window as any).dataLayer || [];
             dataLayer.push({
-                'event': 'click_deposit'
+                event: "click_deposit",
             });
         }
     }, [openAddLiquidity]);
     if (!liquidityData) return null;
-    const {
-        tvl,
-        apr: tradingAPR,
-        volume_usd: volume24h,
-    } = poolStats || {};
+    const { tvl, apr: tradingAPR, volume_usd: volume24h } = poolStats || {};
     const { capacityPercent, lpValueUsd, ownLiquidity, lpReserves } =
         liquidityData;
     return (

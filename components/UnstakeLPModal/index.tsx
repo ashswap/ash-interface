@@ -1,6 +1,9 @@
 import { Slider } from "antd";
 import ICChevronRight from "assets/svg/chevron-right.svg";
-import { accIsInsufficientEGLDState, accIsLoggedInState } from "atoms/dappState";
+import {
+    accIsInsufficientEGLDState,
+    accIsLoggedInState,
+} from "atoms/dappState";
 import { FarmRecord } from "atoms/farmsState";
 import { clickedUnstakeModalState } from "atoms/unstakeState";
 import BigNumber from "bignumber.js";
@@ -36,7 +39,9 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
         emissionAPR,
     } = farmData;
     const loggedIn = useRecoilValue(accIsLoggedInState);
-    const [isClickedUnstake, setIsClickedUnstake] = useRecoilState(clickedUnstakeModalState);
+    const [isClickedUnstake, setIsClickedUnstake] = useRecoilState(
+        clickedUnstakeModalState
+    );
     const [token0, token1] = pool.tokens;
     const [isAgree, setIsAgree] = useState(false);
     const [unStakeAmt, setUnStakeAmt] = useState<BigNumber>(new BigNumber(0));
@@ -56,13 +61,13 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
         );
     }, [stakedData, farm]);
     useEffect(() => {
-        if(window && loggedIn && !deboundedUnstakeAmt.eq(0)){
+        if (window && loggedIn && !deboundedUnstakeAmt.eq(0)) {
             let dataLayer = (window as any).dataLayer || [];
             dataLayer.push({
-                'event': 'input_unstake_value',
-                'amount': deboundedUnstakeAmt.toNumber()/(10**18),
-                'lp_token': pool?.lpToken?.symbol
-            })
+                event: "input_unstake_value",
+                amount: deboundedUnstakeAmt.toNumber() / 10 ** 18,
+                lp_token: pool?.lpToken?.symbol,
+            });
         }
     }, [deboundedUnstakeAmt]);
     const ashPerDay = useMemo(() => {
@@ -70,7 +75,9 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
         const totalAshPerDay = ashPerBlock
             .multipliedBy(24 * 60 * 60)
             .div(blockTimeMs / 1000);
-        const shareOfFarm = stakedData.totalStakedLP.multipliedBy(0.4).div(farmTokenSupply);
+        const shareOfFarm = stakedData.totalStakedLP
+            .multipliedBy(0.4)
+            .div(farmTokenSupply);
         return totalAshPerDay.multipliedBy(shareOfFarm);
     }, [stakedData, farmTokenSupply, ashPerBlock]);
 
@@ -80,7 +87,9 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
             .multipliedBy(24 * 60 * 60)
             .div(blockTimeMs / 1000);
         const baseFarmToken = unStakeAmt.multipliedBy(0.4);
-        const newStaked = stakedData.totalStakedLP.multipliedBy(0.4).minus(baseFarmToken);
+        const newStaked = stakedData.totalStakedLP
+            .multipliedBy(0.4)
+            .minus(baseFarmToken);
         if (newStaked.lte(0)) return new BigNumber(0);
         const shareOfFarm = newStaked.div(farmTokenSupply.minus(baseFarmToken));
         return totalAshPerDay.multipliedBy(shareOfFarm);
