@@ -40,6 +40,7 @@ import { clickedHarvestModalState } from "atoms/harvestState";
 import { collapseModalState } from "atoms/collapseState";
 import { clickedUnstakeModalState } from "atoms/unstakeState";
 import { clickedStakeModalState } from "atoms/stakeState";
+import { clickedGovStakeModalState } from "atoms/govstakeStake";
 const averageTxDurationMs = 6000;
 const crossShardRounds = 5;
 interface TransactionToastPropsType {
@@ -85,7 +86,8 @@ const TxRecord = ({
     const [isClickedHarvestButton, setIsClickedHarvestButton] = useRecoilState(clickedHarvestModalState);
     const [isClickedCollapse, setIsClickedCollapse] = useRecoilState(collapseModalState);
     const [isClickedUnstake, setIsClickedUnstake] = useRecoilState(clickedUnstakeModalState);
-    const [isClickedStakeButton, setIsClickedStakeButton] = useRecoilState(clickedStakeModalState)
+    const [isClickedStakeButton, setIsClickedStakeButton] = useRecoilState(clickedStakeModalState);
+    const [isClickedGovStakeButton, setIsClickedGovStakeButton] = useRecoilState(clickedGovStakeModalState);
     useEffect(() => {
         if(
             window 
@@ -172,6 +174,25 @@ const TxRecord = ({
             setIsClickedUnstake(false);
         }
     }, [status, isClickedUnstake]);
+    useEffect(() => {
+        if(
+            window 
+            && status 
+            != "pending" 
+            && window.location.href.includes("gov")
+            && !isClickedCollapse
+            && isClickedGovStakeButton
+        ) {
+            let dataLayer = (window as any).dataLayer || [];
+            console.log("dataLayer", dataLayer);
+            dataLayer.push({
+                'event': 'gov_stake',
+                'hash': hash,
+                'status': status
+            })
+            setIsClickedGovStakeButton(false);
+        }
+    }, [status, isClickedGovStakeButton]);
     const network: AccountInfoSliceNetworkType =
         useRecoilValue(networkConfigState).network;
     const iconEl = useMemo(() => {

@@ -37,7 +37,7 @@ import useMounted from "hooks/useMounted";
 import { useScreenSize } from "hooks/useScreenSize";
 import moment from "moment";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
 import useSWR from "swr";
 import GovMenu from "./components/GovMenu";
@@ -85,7 +85,15 @@ function GovStats() {
         transactionId: harvestId,
         onSuccess: () => setOpenHarvestResult(true),
     });
-
+    useEffect(() => {
+        if(window && openStakeGov && loggedIn){
+            let dataLayer = (window as any).dataLayer || [];
+            console.log("dataLayer",dataLayer);
+            dataLayer.push({
+                'event': 'click_stake_gov'
+            })
+        }
+    }, [openStakeGov]);
     const { claimReward } = useGovClaimReward();
     const { unlockASH } = useGovUnlockASH();
     const loggedIn = useRecoilValue(accIsLoggedInState);

@@ -1,6 +1,7 @@
 import { Slider } from "antd";
 import ICChevronRight from "assets/svg/chevron-right.svg";
-import { accIsInsufficientEGLDState } from "atoms/dappState";
+import { accIsInsufficientEGLDState, accIsLoggedInState } from "atoms/dappState";
+import { clickedGovStakeModalState } from "atoms/govstakeStake";
 import { govTotalSupplyVeASH } from "atoms/govState";
 import { tokenMapState } from "atoms/tokensState";
 import BigNumber from "bignumber.js";
@@ -23,8 +24,9 @@ import { useOnboarding } from "hooks/useOnboarding";
 import { useScreenSize } from "hooks/useScreenSize";
 import moment from "moment";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { theme } from "tailwind.config";
+import { useDebounce } from "use-debounce";
 import LockPeriod, { lockPeriodFormater } from "./LockPeriod";
 type props = {
     open: boolean;
@@ -71,9 +73,22 @@ const FirstStakeContent = ({ open, onClose }: props) => {
     );
     const [lockAmt, setLockAmt] = useState<BigNumber>(new BigNumber(0));
     const [rawLockAmt, setRawLockAmt] = useState("");
+    const [deboundRawLockAmt] = useDebounce(rawLockAmt, 500);
+    const loggedIn = useRecoilValue(accIsLoggedInState);
+    useEffect(() => {
+        if(window && loggedIn && deboundRawLockAmt){
+            let dataLayer = (window as any).dataLayer || [];
+            console.log("dataLayer", dataLayer);
+            dataLayer.push({
+                'event': 'input_lock_value',
+                'amount': deboundRawLockAmt,
+            })
+        }
+    }, [deboundRawLockAmt]);
     const [onboardingStakeGov, setOnboardedStakeGov] =
         useOnboarding("stake_gov_1st");
     const [openOnboardStakeTooltip, setOpenOnboardTooltip] = useState(false);
+    const [isClickedGovStakeButton, setIsClickedGovStakeButton] = useRecoilState(clickedGovStakeModalState);
     const isTouchScreen = useMediaQuery("(hover: none)");
     const screenSize = useScreenSize();
 
@@ -421,7 +436,11 @@ const FirstStakeContent = ({ open, onClose }: props) => {
                                 theme="pink"
                                 className={`clip-corner-1 clip-corner-tl transition w-full h-12 flex items-center justify-center text-sm font-bold text-white`}
                                 disabled={!canStake}
-                                onClick={() => canStake && lock()}
+                                onClick={() => {if(canStake) {
+                                    lock() 
+                                    setIsClickedGovStakeButton(true)
+                                    }}
+                                }
                             >
                                 {insufficientEGLD ? (
                                     "INSUFFICIENT EGLD BALANCE"
