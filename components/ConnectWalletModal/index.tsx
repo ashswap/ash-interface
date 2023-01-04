@@ -1,5 +1,6 @@
 import {
     useExtensionLogin,
+    useUpdateEffect,
     useWalletConnectLogin,
 } from "@elrondnetwork/dapp-core/hooks";
 import connectWalletBg from "assets/images/connect-wallet-bg.png";
@@ -9,7 +10,12 @@ import downloadPlayStore from "assets/images/download-play-store.png";
 import maiarLogo from "assets/images/maiar-logo.png";
 import ICConnectApp from "assets/svg/connect-app.svg";
 import ICConnectExtension from "assets/svg/connect-extension.svg";
-import { accAddressState, accIsLoggedInState, dappCoreState } from "atoms/dappState";
+import {
+    accAddressState,
+    accIsLoggedInState,
+    dappCoreState,
+} from "atoms/dappState";
+import { notFirstRenderConnectWallet } from "atoms/firstRenderConnectWalletState";
 import { walletIsOpenConnectModalState } from "atoms/walletState";
 import BaseModal from "components/BaseModal";
 import Image from "components/Image";
@@ -25,9 +31,6 @@ const MAIAR_WALLET_LINK = {
     CHROME_EXT:
         "https://chrome.google.com/webstore/detail/maiar-defi-wallet/dngmlblcodfobpdpecaadgfbcggfjfnm",
 };
-
-let isFirstRender = true        
-
 function ConnectWalletModal() {
     const loggedIn = useRecoilValue(accIsLoggedInState);
     const accAddress = useRecoilValue(accAddressState);
@@ -41,7 +44,10 @@ function ConnectWalletModal() {
     const [extensionLogin] = useExtensionLogin({
         callbackRoute: "",
     });
-    const dappCore = useRecoilValue(dappCoreState);         
+    const dappCore = useRecoilValue(dappCoreState);
+    const [notFirstRender, setNotFirstRender] = useRecoilState(
+        notFirstRenderConnectWallet
+    );
     useEffect(() => {
         if (!isOpenConnectWalletModal) {
             setIsOpenQR(false);
@@ -59,34 +65,37 @@ function ConnectWalletModal() {
         if (window && !loggedIn && isOpenConnectWalletModal) {
             let dataLayer = (window as any).dataLayer || [];
             dataLayer.push({
-                'event': 'click_connect_wallet'
-            })
+                event: "click_connect_wallet",
+            });
         }
     }, [isOpenConnectWalletModal, loggedIn]);
-    useEffect(() => {          
-        if (window && loggedIn) {
+    useEffect(() => {
+        if (window && loggedIn && isOpenConnectWalletModal) {
             let dataLayer = (window as any).dataLayer || [];
-            window.localStorage.setItem('address', dappCore.account.address);
-            window.localStorage.setItem('method', dappCore.loginInfo.loginMethod);
+            window.localStorage.setItem("address", dappCore.account.address);
+            window.localStorage.setItem(
+                "method",
+                dappCore.loginInfo.loginMethod
+            );
             dataLayer.push({
-                'event': 'success_connect_wallet',
-                'address': dappCore.account.address,
-                'method': dappCore.loginInfo.loginMethod
-            })
+                event: "success_connect_wallet",
+                address: dappCore.account.address,
+                method: dappCore.loginInfo.loginMethod,
+            });
         }
     }, [loggedIn, dappCore.account.address, dappCore.loginInfo.loginMethod]);
     useEffect(() => {
-        if (isFirstRender) {
-            isFirstRender = false
-            return
-        }
-        if (window && !loggedIn && !isFirstRender) {
+        if (window && !loggedIn && notFirstRender) {
             let dataLayer = (window as any).dataLayer || [];
+            console.log("dataLayer", dataLayer);
             dataLayer.push({
-                'event': 'disconnect_wallet',
-                'address': window.localStorage.getItem('address'),
-                'method': window.localStorage.getItem('method')
-            })
+                event: "disconnect_wallet",
+                address: window.localStorage.getItem("address"),
+                method: window.localStorage.getItem("method"),
+            });
+        }
+        if (window && !loggedIn) {
+            setNotFirstRender(true);
         }
     }, [loggedIn]);
     return (
