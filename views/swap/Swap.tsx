@@ -1,3 +1,4 @@
+import { useDebounce } from "@elrondnetwork/dapp-core/hooks";
 import Fire from "assets/images/fire.png";
 import ICArrowDownRounded from "assets/svg/arrow-down-rounded.svg";
 import ICChevronDown from "assets/svg/chevron-down.svg";
@@ -9,7 +10,7 @@ import ICSetting from "assets/svg/setting.svg";
 import IconWallet from "assets/svg/wallet.svg";
 import {
     accIsInsufficientEGLDState,
-    accIsLoggedInState,
+    accIsLoggedInState
 } from "atoms/dappState";
 import { ashRawPoolByAddressQuery, poolFeesQuery } from "atoms/poolsState";
 import BigNumber from "bignumber.js";
@@ -19,6 +20,7 @@ import BaseModal from "components/BaseModal";
 import GlowingButton from "components/GlowingButton";
 import HistoryModal from "components/HistoryModal";
 import IconButton from "components/IconButton";
+import Image from "components/Image";
 import Setting from "components/Setting";
 import TextAmt from "components/TextAmt";
 import CardTooltip from "components/Tooltip/CardTooltip";
@@ -28,8 +30,10 @@ import { toEGLDD } from "helper/balance";
 import { queryPoolContract } from "helper/contracts/pool";
 import { Fraction } from "helper/fraction/fraction";
 import { Percent } from "helper/fraction/percent";
-import { formatAmount, getFirstThreeNonZeroDecimals } from "helper/number";
-import { calculateEstimatedSwapOutputAmount } from "helper/stableswap/calculator/amounts";
+import { formatAmount } from "helper/number";
+import {
+    calculateEstimatedSwapOutputAmount2
+} from "helper/stableswap/calculator/amounts";
 import { calculateSwapPrice } from "helper/stableswap/calculator/price";
 import { Price } from "helper/token/price";
 import { IESDTInfo } from "helper/token/token";
@@ -40,12 +44,10 @@ import { useOnboarding } from "hooks/useOnboarding";
 import usePoolSwap from "hooks/usePoolContract/usePoolSwap";
 import { useScreenSize } from "hooks/useScreenSize";
 import IPool from "interface/pool";
-import Image from "components/Image";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRecoilCallback, useRecoilValue } from "recoil";
 import SwapAmount from "./components/SwapAmount";
 import styles from "./Swap.module.css";
-import { useDebounce } from "@elrondnetwork/dapp-core/hooks";
 const MaiarPoolTooltip = ({
     children,
     pool,
@@ -135,7 +137,7 @@ const Swap = () => {
         isInsufficentFund,
         slippage,
     } = useSwap();
-    const debounceSlippage = useDebounce(slippage, 500);            
+    const debounceSlippage = useDebounce(slippage, 500);
     const fees = useRecoilValue(poolFeesQuery(pool?.address || ""));
     const [showSetting, setShowSetting] = useState<boolean>(false);
     const [isOpenHistoryModal, openHistoryModal] = useState<boolean>(false);
@@ -240,12 +242,16 @@ const Swap = () => {
         );
     }, [tokenAmountTo, slippage]);
     useEffect(() => {
-        if (window && slippage && !slippage.equalTo(new Percent(100, 100_000))) {
+        if (
+            window &&
+            slippage &&
+            !slippage.equalTo(new Percent(100, 100_000))
+        ) {
             console.log(slippage);
             let dataLayer = (window as any).dataLayer || [];
             dataLayer.push({
-                'event': 'set_slippage',
-                'amount': slippage.toString()
+                event: "set_slippage",
+                amount: slippage.toString(),
             });
             console.log("dataLayer", dataLayer);
         }
@@ -287,13 +293,11 @@ const Swap = () => {
                 const reserves = pool.tokens.map(
                     (t, i) => new TokenAmount(t, rawPool.reserves[i])
                 );
-                const estimated = calculateEstimatedSwapOutputAmount(
+                const estimated = calculateEstimatedSwapOutputAmount2(
                     new BigNumber(rawPool?.ampFactor || 0),
-                    reserves.find(
-                        (r) => r.token.identifier === tokenTo.identifier
-                    )!,
                     reserves,
                     tokenAmountFrom,
+                    tokenTo,
                     fees
                 );
                 return estimated;

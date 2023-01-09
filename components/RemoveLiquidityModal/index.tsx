@@ -1,7 +1,11 @@
 import { Slider } from "antd";
 import IconRight from "assets/svg/right-yellow.svg";
 import { accIsInsufficientEGLDState } from "atoms/dappState";
-import { ashRawPoolByAddressQuery, LPBreakDownQuery, PoolsState } from "atoms/poolsState";
+import {
+    ashRawPoolByAddressQuery,
+    LPBreakDownQuery,
+    PoolsState,
+} from "atoms/poolsState";
 import BigNumber from "bignumber.js";
 import Avatar from "components/Avatar";
 import BaseModal from "components/BaseModal";
@@ -44,7 +48,9 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
     const { slippage } = useSwap();
     const [displayInputLiquidity, setDisplayInputLiquidity] =
         useState<string>("");
-    const rawPool = useRecoilValue(ashRawPoolByAddressQuery(poolData.pool.address));
+    const rawPool = useRecoilValue(
+        ashRawPoolByAddressQuery(poolData.pool.address)
+    );
 
     const [onboardingWithdrawInput, setOnboardedWithdrawInput] = useOnboarding(
         "pool_withdraw_input"
@@ -67,7 +73,9 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
     const computeValidTotalUsd = useCallback(
         (val: BigNumber) => {
             if (val.div(pricePerLP).div(lpAmount.toBigNumber()).gte(0.998)) {
-                const validVal = lpAmount.multiply(Fraction.fromBigNumber(pricePerLP)).toBigNumber();
+                const validVal = lpAmount
+                    .multiply(Fraction.fromBigNumber(pricePerLP))
+                    .toBigNumber();
                 setDisplayInputLiquidity(validVal.toString(10));
                 return validVal;
             }
@@ -83,7 +91,7 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
 
     // calculate % LP tokens - source of truth: totalUsd
     useEffect(() => {
-        const pct = totalUsd
+        const pct = pricePerLP.eq(0) || lpAmount.equalTo(0) ? 0 : totalUsd
             .div(pricePerLP)
             .div(lpAmount.toBigNumber())
             .multipliedBy(100)
@@ -104,7 +112,8 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
     const onChangeLiquidityPercent = useCallback(
         (percent: number) => {
             const valid = computeValidTotalUsd(
-                lpAmount.toBigNumber()
+                lpAmount
+                    .toBigNumber()
                     .multipliedBy(percent)
                     .div(100)
                     .multipliedBy(pricePerLP)
@@ -159,20 +168,18 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
             <div className="flex flex-row items-center mb-3">
                 <div className="mr-3">
                     <div className="text-text-input-3 text-xs">
-                        {pool.tokens[0].symbol} & {pool.tokens[1].symbol}
+                        {pool.tokens.map((t) => t.symbol).join(" & ")}
                     </div>
                 </div>
                 <div className="flex flex-row justify-between items-center">
-                    <Avatar
-                        src={pool.tokens[0].logoURI}
-                        alt={pool.tokens[0].symbol}
-                        className="w-3.5 h-3.5"
-                    />
-                    <Avatar
-                        src={pool.tokens[1].logoURI}
-                        alt={pool.tokens[1].symbol}
-                        className="w-3.5 h-3.5 -ml-1"
-                    />
+                    {pool.tokens.map((t) => (
+                        <Avatar
+                            key={t.identifier}
+                            src={t.logoURI}
+                            alt={t.symbol}
+                            className="w-3.5 h-3.5 first:-ml-0 -ml-1"
+                        />
+                    ))}
                 </div>
             </div>
             <div className="flex items-baseline text-2xl font-bold text-yellow-700">
@@ -209,7 +216,7 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
                                 </div>
                                 <div className="flex-1 flex items-center overflow-hidden bg-ash-dark-700 text-right text-lg h-[4.5rem] px-5 ">
                                     <InputCurrency
-                                        className="bg-transparent text-right grow outline-none"
+                                        className="bg-transparent text-right grow outline-none min-w-0"
                                         placeholder="0"
                                         value={displayInputLiquidity}
                                         onChange={(e) => {
@@ -227,7 +234,7 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
                                             setOnboardedWithdrawInput(true);
                                         }}
                                     />
-                                    <div className="text-ash-gray-500 ml-2">
+                                    <div className="shrink-0 text-ash-gray-500 ml-2">
                                         $
                                     </div>
                                 </div>
@@ -237,7 +244,7 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
                         <div className="flex flex-row items-center">
                             <div className="sm:w-24"></div>
                             <div className="flex flex-row items-center flex-1 gap-4">
-                                <div>0%</div>
+                                <div className="w-9 shrink-0 font-bold text-sm text-yellow-500">{liquidityPercent}%</div>
                                 <Slider
                                     className="ash-slider pt-4 w-full"
                                     step={1}
@@ -286,7 +293,7 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
                                             disabled
                                         />
                                     </div>
-                                    <div className="py-2 text-2xs sm:text-sm text-text-input-3 text-right">
+                                    <div className="pt-2 text-2xs sm:text-sm text-text-input-3 text-right">
                                         <span>Available: </span>
                                         <span className="text-earn">
                                             <TextAmt
@@ -303,12 +310,12 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
                                             {pool.tokens[i].symbol}
                                         </span>
                                     </div>
+                                    {i !== pool.tokens.length - 1 && (
+                                        <div className="text-sm">&</div>
+                                    )}
                                 </div>
                             );
                         })}
-                        <div className="absolute left-4 sm:left-0 text-sm top-14 sm:top-[4rem]">
-                            &
-                        </div>
                     </div>
                 </div>
             </div>

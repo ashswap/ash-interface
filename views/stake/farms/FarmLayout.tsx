@@ -30,7 +30,7 @@ const FarmItems = () => {
                             <div className="text-2xs sm:text-xs font-bold underline text-white">
                                 {screenSize.md ? "Emission APR" : "E-APR"}
                             </div>
-                            <div className="text-2xs sm:text-xs underline text-right pr-2.5 sm:pr-3.5">
+                            <div className="hidden xs:block text-2xs sm:text-xs underline text-right pr-2.5 sm:pr-3.5">
                                 {screenSize.md ? "Farm Boost" : "Boost"}
                             </div>
                             <div className="hidden md:block text-2xs sm:text-xs underline text-right">
