@@ -105,7 +105,7 @@ const useFarmsState = () => {
                 lastRewardBlockNone,
                 rewardPerShare,
             } = farmRaw || {};
-            const produceRewardEnable = true;
+            const produceRewardEnable = !!farmRaw?.produceRewardEnabled;
             if (
                 !shard ||
                 !farmTokenSupply ||
