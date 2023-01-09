@@ -13,7 +13,7 @@ import CardTooltip from "components/Tooltip/CardTooltip";
 import { toEGLDD } from "helper/balance";
 import { formatAmount } from "helper/number";
 import { Unarray } from "interface/utilities";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
 
 function StakedPoolCardItem({
@@ -28,13 +28,13 @@ function StakedPoolCardItem({
         useState<boolean>(false);
     const network: AccountInfoSliceNetworkType =
         useRecoilValue(networkConfigState).network;
+    const is2Pool = useMemo(
+        () => pool.tokens.length === 2,
+        [pool.tokens.length]
+    );
 
     if (!liquidityData) return null;
-    const {
-        tvl,
-        apr: tradingAPR,
-        volume_usd: volume24h,
-    } = poolStats || {};
+    const { tvl, apr: tradingAPR, volume_usd: volume24h } = poolStats || {};
     const { capacityPercent, lpValueUsd, ownLiquidity, lpReserves } =
         liquidityData;
     return (
@@ -43,31 +43,39 @@ function StakedPoolCardItem({
         >
             <div className="flex justify-between pb-9 border-b border-dashed border-ash-gray-500">
                 <div className="mr-5">
-                    <div className="mt-5 mb-8">
-                        <div className="text-2xl font-bold text-white">
-                            {pool.tokens[0].symbol}
-                        </div>
-                        <div className="text-earn font-bold text-lg leading-tight">
-                            <TextAmt
-                                number={toEGLDD(
-                                    pool.tokens[0].decimals,
-                                    lpReserves[0] || 0
-                                )}
-                            />
-                        </div>
-                    </div>
-                    <div className="mb-8">
-                        <div className="text-2xl font-bold text-white">
-                            {pool.tokens[1].symbol}
-                        </div>
-                        <div className="text-earn font-bold text-lg leading-tight">
-                            <TextAmt
-                                number={toEGLDD(
-                                    pool.tokens[1].decimals,
-                                    lpReserves[1] || 0
-                                )}
-                            />
-                        </div>
+                    <div
+                        className={`mt-5 flex flex-col justify-between ${
+                            is2Pool ? "" : "mb-3"
+                        }`}
+                    >
+                        {pool.tokens.map((t, i) => {
+                            return (
+                                <div
+                                    key={t.identifier}
+                                    className={is2Pool ? "mb-8" : "mb-2"}
+                                >
+                                    <div
+                                        className={`font-bold text-white ${
+                                            is2Pool ? "text-2xl" : "text-lg"
+                                        }`}
+                                    >
+                                        {t.symbol}
+                                    </div>
+                                    <div
+                                        className={`text-earn font-bold leading-tight ${
+                                            is2Pool ? "text-lg" : "text-base"
+                                        }`}
+                                    >
+                                        <TextAmt
+                                            number={toEGLDD(
+                                                t.decimals,
+                                                lpReserves[i] || 0
+                                            )}
+                                        />
+                                    </div>
+                                </div>
+                            );
+                        })}
                     </div>
                     <div className="flex">
                         <button
@@ -85,17 +93,33 @@ function StakedPoolCardItem({
                     </div>
                 </div>
                 <div className="flex flex-col justify-end relative">
-                    <div className="absolute top-0 right-0 flex flex-row justify-between items-center">
-                        <Avatar
-                            src={pool.tokens[0].logoURI}
-                            alt={pool.tokens[0].symbol}
-                            className="w-[3.25rem] h-[3.25rem]"
-                        />
-                        <Avatar
-                            src={pool.tokens[1].logoURI}
-                            alt={pool.tokens[1].symbol}
-                            className="w-[3.25rem] h-[3.25rem] -ml-2.5"
-                        />
+                    <div
+                        className={`absolute top-0 right-0 sm:-right-4 flex flex-wrap justify-center ${
+                            is2Pool ? "-mx-2.5" : "max-w-[4.5rem]"
+                        }`}
+                    >
+                        {pool.tokens.map((t, i) => {
+                            return (
+                                <Avatar
+                                    key={t.identifier}
+                                    src={t.logoURI}
+                                    alt={t.symbol}
+                                    className={`${
+                                        is2Pool
+                                            ? "w-[3.25rem] h-[3.25rem]"
+                                            : "w-9 h-9"
+                                    } ${
+                                        i === 1
+                                            ? is2Pool
+                                                ? "-ml-2.5"
+                                                : "-ml-1.5"
+                                            : ""
+                                    } ${i === 2 ? "-mt-2.5" : ""} ${
+                                        i > 2 && "hidden"
+                                    }`}
+                                />
+                            );
+                        })}
                     </div>
                     <div className="min-w-[8rem]">
                         <div className="mb-8">
