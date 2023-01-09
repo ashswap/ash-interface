@@ -19,6 +19,7 @@ import BaseModal from "components/BaseModal";
 import GlowingButton from "components/GlowingButton";
 import HistoryModal from "components/HistoryModal";
 import IconButton from "components/IconButton";
+import Image from "components/Image";
 import Setting from "components/Setting";
 import TextAmt from "components/TextAmt";
 import CardTooltip from "components/Tooltip/CardTooltip";
@@ -28,8 +29,8 @@ import { toEGLDD } from "helper/balance";
 import { queryPoolContract } from "helper/contracts/pool";
 import { Fraction } from "helper/fraction/fraction";
 import { Percent } from "helper/fraction/percent";
-import { formatAmount, getFirstThreeNonZeroDecimals } from "helper/number";
-import { calculateEstimatedSwapOutputAmount } from "helper/stableswap/calculator/amounts";
+import { formatAmount } from "helper/number";
+import { calculateEstimatedSwapOutputAmount2 } from "helper/stableswap/calculator/amounts";
 import { calculateSwapPrice } from "helper/stableswap/calculator/price";
 import { Price } from "helper/token/price";
 import { IESDTInfo } from "helper/token/token";
@@ -40,7 +41,6 @@ import { useOnboarding } from "hooks/useOnboarding";
 import usePoolSwap from "hooks/usePoolContract/usePoolSwap";
 import { useScreenSize } from "hooks/useScreenSize";
 import IPool from "interface/pool";
-import Image from "components/Image";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRecoilCallback, useRecoilValue } from "recoil";
 import SwapAmount from "./components/SwapAmount";
@@ -293,13 +293,11 @@ const Swap = () => {
                 const reserves = pool.tokens.map(
                     (t, i) => new TokenAmount(t, rawPool.reserves[i])
                 );
-                const estimated = calculateEstimatedSwapOutputAmount(
+                const estimated = calculateEstimatedSwapOutputAmount2(
                     new BigNumber(rawPool?.ampFactor || 0),
-                    reserves.find(
-                        (r) => r.token.identifier === tokenTo.identifier
-                    )!,
                     reserves,
                     tokenAmountFrom,
+                    tokenTo,
                     fees
                 );
                 return estimated;

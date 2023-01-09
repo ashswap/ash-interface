@@ -1,4 +1,4 @@
-import IconRight from "assets/svg/right-white.svg";
+import ICChevronRight from "assets/svg/chevron-right.svg";
 import { addLPSessionIdAtom } from "atoms/addLiquidity";
 import {
     accIsInsufficientEGLDState,
@@ -29,8 +29,7 @@ import { useScreenSize } from "hooks/useScreenSize";
 import produce from "immer";
 import { Unarray } from "interface/utilities";
 import Link from "next/link";
-import { useCallback } from "react";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRecoilCallback, useRecoilValue, useSetRecoilState } from "recoil";
 import { theme } from "tailwind.config";
 import { useDebounce } from "use-debounce";
@@ -277,23 +276,34 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
             <div className="inline-flex justify-between items-center">
                 <div className="mr-2">
                     {/* <div className="text-text-input-3 text-xs">Deposit</div> */}
-                    <div className="flex flex-row items-baseline text-lg sm:text-2xl font-bold">
-                        <span>{pool.tokens[0].symbol}</span>
-                        <span className="text-sm px-3">&</span>
-                        <span>{pool.tokens[1].symbol}</span>
+                    <div className="text-lg sm:text-2xl font-bold">
+                        {pool.tokens.map((t, i) => {
+                            return (
+                                <span key={t.identifier}>
+                                    <span>{t.symbol}</span>
+                                    {i !== pool.tokens.length - 1 && (
+                                        <span className="text-sm">
+                                            &nbsp;&&nbsp;
+                                        </span>
+                                    )}
+                                </span>
+                            );
+                        })}
                     </div>
                 </div>
                 <div className="flex flex-row justify-between items-center">
-                    <Avatar
-                        src={pool.tokens[0].logoURI}
-                        alt={pool.tokens[0].symbol}
-                        className="w-6 h-6 sm:w-9 sm:h-9"
-                    />
-                    <Avatar
-                        src={pool.tokens[1].logoURI}
-                        alt={pool.tokens[1].symbol}
-                        className="w-6 h-6 sm:w-9 sm:h-9 -ml-1 sm:ml-[-0.375rem]"
-                    />
+                    {pool.tokens.map((t, i) => {
+                        return (
+                            <Avatar
+                                key={t.identifier}
+                                src={t.logoURI}
+                                alt={t.symbol}
+                                className={`w-6 h-6 sm:w-9 sm:h-9 ${
+                                    i > 0 && "-ml-2"
+                                }`}
+                            />
+                        );
+                    })}
                 </div>
             </div>
             <div className="my-10">
@@ -313,7 +323,7 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
                             </OnboardTooltip.Panel>
                         )}
                     >
-                        <div>
+                        <div className="mb-8">
                             {tokenInputProps.map((p, i) => {
                                 return (
                                     <div
@@ -347,6 +357,9 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
                                                 10
                                             )}
                                         />
+                                        {i !== tokenInputProps.length - 1 && (
+                                            <div>&</div>
+                                        )}
                                     </div>
                                 );
                             })}
@@ -355,7 +368,7 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
 
                     <div className="flex items-center space-x-1 bg-ash-dark-700 sm:bg-transparent mb-11 sm:mb-0">
                         <div className="flex items-center font-bold w-24 sm:w-1/3 px-4 sm:px-0 border-r border-r-ash-gray-500 sm:border-r-0">
-                            <IconRight className="mr-4" />
+                            <ICChevronRight className="mr-4 text-pink-600" />
                             <span>TOTAL</span>
                         </div>
                         <div className="flex-1 overflow-hidden bg-ash-dark-700 text-right text-lg h-[4.5rem] px-5 outline-none flex items-center justify-end">
@@ -368,10 +381,6 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
                                 />
                             </span>
                         </div>
-                    </div>
-
-                    <div className="absolute left-0 ml-2" style={{ top: 62 }}>
-                        &
                     </div>
                 </div>
             </div>

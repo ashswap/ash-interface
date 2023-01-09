@@ -29,7 +29,6 @@ type props = {
 const StakeLPContent = ({ open, onClose, farmData }: props) => {
     const loggedIn = useRecoilValue(accIsLoggedInState);
     const { pool, farm, farmTokenSupply, ashPerBlock, emissionAPR } = farmData;
-    const [token0, token1] = pool.tokens;
     const [isAgree, setIsAgree] = useState(false);
     const lpTokenMap = useRecoilValue(lpTokenMapState);
     const insufficientEGLD = useRecoilValue(accIsInsufficientEGLDState);
@@ -94,16 +93,11 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
                             </div>
                             <div className="bg-ash-dark-400/30 h-14 lg:h-18 px-6 flex items-center">
                                 <div className="flex mr-2">
-                                    <Avatar
-                                        src={token0.logoURI}
-                                        alt={token0.symbol}
-                                        className="w-4 h-4"
-                                    />
-                                    <Avatar
-                                        src={token1.logoURI}
-                                        alt={token1.symbol}
-                                        className="w-4 h-4 -ml-1"
-                                    />
+                                    {farmData.pool.tokens.map(t => <Avatar key={t.identifier}
+                                        src={t.logoURI}
+                                        alt={t.symbol}
+                                        className="w-4 h-4 first:ml-0 -ml-1"
+                                    />)}
                                 </div>
                                 <div className="text-ash-gray-500 text-sm lg:text-lg font-bold">
                                     {pool?.lpToken?.symbol}
