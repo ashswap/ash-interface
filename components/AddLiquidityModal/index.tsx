@@ -33,6 +33,7 @@ import { useCallback } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { useRecoilCallback, useRecoilValue, useSetRecoilState } from "recoil";
 import { theme } from "tailwind.config";
+import { useDebounce } from "use-debounce";
 
 interface Props {
     open?: boolean;
@@ -62,6 +63,17 @@ const TokenInput = ({
         },
         [_onChangeValue]
     );
+    const [deboundValue] = useDebounce(value, 500);
+    useEffect(() => {
+        if (window && value) {
+            let dataLayer = (window as any).dataLayer || [];
+            dataLayer.push({
+                event: "input_liquidity_value",
+                amount: value,
+                token: token.identifier,
+            });
+        }
+    }, [deboundValue, token]);
     return (
         <>
             <div className="bg-ash-dark-700 sm:bg-transparent flex space-x-1 items-center sm:items-stretch">
@@ -214,7 +226,6 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
             setAddLPSessionId,
         ]
     );
-
     const tokenInputProps = useMemo(() => {
         return pool.tokens.map((t, i) => {
             const userInput = Fraction.fromBigNumber(inputValues[i] || 0);

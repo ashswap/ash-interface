@@ -1,6 +1,6 @@
 import { AccountInfoSliceNetworkType } from "@elrondnetwork/dapp-core/types";
 import Down from "assets/svg/down-white.svg";
-import { networkConfigState } from "atoms/dappState";
+import { accIsLoggedInState, networkConfigState } from "atoms/dappState";
 import { PoolsState } from "atoms/poolsState";
 import AddLiquidityModal from "components/AddLiquidityModal";
 import Avatar from "components/Avatar";
@@ -12,7 +12,7 @@ import { formatAmount } from "helper/number";
 import { useOnboarding } from "hooks/useOnboarding";
 import { useScreenSize } from "hooks/useScreenSize";
 import { Unarray } from "interface/utilities";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRecoilValue } from "recoil";
 
 function PoolCardItem({
@@ -25,6 +25,15 @@ function PoolCardItem({
     const { pool } = poolData;
     const [isExpand, setIsExpand] = useState<boolean>(false);
     const [openAddLiquidity, setOpenAddLiquidity] = useState<boolean>(false);
+    const loggedIn = useRecoilValue(accIsLoggedInState);
+    useEffect(() => {
+        if (window && openAddLiquidity && loggedIn) {
+            let dataLayer = (window as any).dataLayer || [];
+            dataLayer.push({
+                event: "click_deposit",
+            });
+        }
+    }, [openAddLiquidity]);
     const network: AccountInfoSliceNetworkType =
         useRecoilValue(networkConfigState).network;
     const {

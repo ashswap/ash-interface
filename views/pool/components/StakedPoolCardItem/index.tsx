@@ -3,7 +3,7 @@ import ICChevronDown from "assets/svg/chevron-down.svg";
 import ICChevronUp from "assets/svg/chevron-up.svg";
 import ICMinus from "assets/svg/minus.svg";
 import ICPlus from "assets/svg/plus.svg";
-import { networkConfigState } from "atoms/dappState";
+import { accIsLoggedInState, networkConfigState } from "atoms/dappState";
 import { PoolsState } from "atoms/poolsState";
 import AddLiquidityModal from "components/AddLiquidityModal";
 import Avatar from "components/Avatar";
@@ -13,7 +13,7 @@ import CardTooltip from "components/Tooltip/CardTooltip";
 import { toEGLDD } from "helper/balance";
 import { formatAmount } from "helper/number";
 import { Unarray } from "interface/utilities";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 
 function StakedPoolCardItem({
@@ -28,13 +28,25 @@ function StakedPoolCardItem({
         useState<boolean>(false);
     const network: AccountInfoSliceNetworkType =
         useRecoilValue(networkConfigState).network;
-
+    const loggedIn = useRecoilValue(accIsLoggedInState);
+    useEffect(() => {
+        if (window && openRemoveLiquidity && loggedIn) {
+            let dataLayer = (window as any).dataLayer || [];
+            dataLayer.push({
+                event: "click_remove_liquidity",
+            });
+        }
+    }, [openRemoveLiquidity]);
+    useEffect(() => {
+        if (window && openAddLiquidity && loggedIn) {
+            let dataLayer = (window as any).dataLayer || [];
+            dataLayer.push({
+                event: "click_deposit",
+            });
+        }
+    }, [openAddLiquidity]);
     if (!liquidityData) return null;
-    const {
-        tvl,
-        apr: tradingAPR,
-        volume_usd: volume24h,
-    } = poolStats || {};
+    const { tvl, apr: tradingAPR, volume_usd: volume24h } = poolStats || {};
     const { capacityPercent, lpValueUsd, ownLiquidity, lpReserves } =
         liquidityData;
     return (
