@@ -16,12 +16,14 @@ function SignTxsModal() {
     //     return null;
     // }
     const loginMethodName = useMemo(() => {
+        console.log(loginMethod);
         switch (loginMethod) {
             case LoginMethodsEnum.extension:
                 return "Maiar Wallet Extension";
             case LoginMethodsEnum.walletconnect:
+                return "Maiar App"
             case LoginMethodsEnum.wallet:
-                return "Maiar App";
+                return "Web Wallet";
             default:
                 return "Wallet";
         }
