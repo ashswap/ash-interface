@@ -73,6 +73,18 @@ const devnet: PoolConfig = {
         },
         {
             address:
+                "erd1qqqqqqqqqqqqqpgq538lw0v2r50drzvuk6r679wh5nancavermcqg040vs",
+            lpToken: {
+                identifier: "ALP-fc47a2",
+                chainId: ChainId.Devnet,
+                symbol: "LPT-USDC-USDT",
+                name: "Ashswap LP",
+                decimals: 18,
+            },
+            tokens: [TOKENS_MAP["USDC-8d4068"], TOKENS_MAP["USDT-324eda"]],
+        },
+        {
+            address:
                 "erd1qqqqqqqqqqqqqpgqfa7c92aezxmry0va47l27mvydhh2rl08rmcqr32cjg",
             lpToken: {
                 identifier: "LPT-d6b19f",
