@@ -2,6 +2,7 @@ import {
     useExtensionLogin,
     useUpdateEffect,
     useWalletConnectLogin,
+    useWebWalletLogin,
 } from "@elrondnetwork/dapp-core/hooks";
 import connectWalletBg from "assets/images/connect-wallet-bg.png";
 import downloadAppGallery from "assets/images/download-app-gallery.png";
@@ -48,6 +49,9 @@ function ConnectWalletModal() {
     const [notFirstRender, setNotFirstRender] = useRecoilState(
         notFirstRenderConnectWallet
     );
+    const [webWalletLogin] = useWebWalletLogin({
+        callbackRoute: "",
+    });        
     useEffect(() => {
         if (!isOpenConnectWalletModal) {
             setIsOpenQR(false);
@@ -150,6 +154,22 @@ function ConnectWalletModal() {
                                         <span>Maiar </span>
                                         <span className="text-ash-blue-500">
                                             web extension
+                                        </span>
+                                    </div>
+                                </div>
+                                <div
+                                    className="max-w-full w-[21.875rem] h-24 bg-ash-dark-600 cursor-pointer flex items-center px-6 mb-4"
+                                    onClick={webWalletLogin}
+                                >
+                                    <div className="mr-[1.625rem]">
+                                        <ICConnectExtension
+                                            className={`colored-drop-shadow-xs colored-drop-shadow-ash-blue-500 w-16 inline text-ash-blue-500`}
+                                        />
+                                    </div>
+                                    <div className="text-sm font-bold uppercase">
+                                        <span>Maiar </span>
+                                        <span className="text-ash-blue-500">
+                                            web wallet
                                         </span>
                                     </div>
                                 </div>
