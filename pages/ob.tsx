@@ -1,17 +1,17 @@
 import { useGetAccountProvider } from "@elrondnetwork/dapp-core/hooks";
 import {
-    Address,
-    BigUIntValue,
-    SignableMessage,
+    Address, SignableMessage
 } from "@elrondnetwork/erdjs/out";
-import BasicLayout from "components/Layout/Basic";
-import { useCallback, useMemo, useState } from "react";
-import createKeccakHash from "keccak";
-import moment from "moment";
-import BigNumber from "bignumber.js";
-import { useRecoilValue } from "recoil";
 import { accAddressState } from "atoms/dappState";
 import axios from "axios";
+import BigNumber from "bignumber.js";
+import BasicLayout from "components/Layout/Basic";
+import ExchangeContract, { Order } from "helper/contracts/exchange";
+import { sendTransactions } from "helper/transactionMethods";
+import createKeccakHash from "keccak";
+import moment from "moment";
+import { useCallback, useState } from "react";
+import { useRecoilValue } from "recoil";
 
 function bitLength(number: number) {
     return Math.floor(Math.log2(number)) + 1;
@@ -85,6 +85,25 @@ function TestOB() {
         const data = await accProvider?.provider?.signMessage(new SignableMessage({message: Buffer.from(hash_mess)}), {});
         // const data = await accProvider.provider.signMessage(new SignableMessage({message: Buffer.from("hello")}), {});
         console.log("sign", data);
+        const order: Order = {
+            id: hash_mess,
+            salt: new BigNumber(salt),
+            kind: +kind, //EnumValue.fromDiscriminant(OrderKindEnum, +kind),// +kind === 0 ?  "Market" : "Limit",
+            created_at: createAt,
+            expire_time: expireAt,
+            owner_address: new Address(userAddress),
+            owner_signature: data.signature.hex(),
+            buy_token: buyToken,
+            buy_amount: new BigNumber(buyAmount),
+            sell_token: sellToken,
+            sell_amount: new BigNumber(sellAmount),
+        }
+        console.log(order);
+        const tx = await new ExchangeContract("erd1qqqqqqqqqqqqqpgqgg5wshagx8e539rk485ym06790f3hhakrmcqjw9zxm").executeExchange(order, [order, order]);
+        console.log("transaction", tx);
+        await sendTransactions({
+            transactions: [tx],
+        })
         axios.post(`${process.env.NEXT_PUBLIC_OB_API}/api/v1/order/create`, {
             id: hash_mess,
             salt: ''+salt,

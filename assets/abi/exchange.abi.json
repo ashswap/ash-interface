@@ -1,0 +1,221 @@
+{
+    "buildInfo": {
+        "rustc": {
+            "version": "1.68.0-nightly",
+            "commitHash": "3020239de947ec52677e9b4e853a6a9fc073d1f9",
+            "commitDate": "2023-01-09",
+            "channel": "Nightly",
+            "short": "rustc 1.68.0-nightly (3020239de 2023-01-09)"
+        },
+        "contractCrate": {
+            "name": "exchange",
+            "version": "0.0.0",
+            "git_version": "cf1b397"
+        },
+        "framework": {
+            "name": "elrond-wasm",
+            "version": "0.36.1"
+        }
+    },
+    "name": "Exchange",
+    "constructor": {
+        "inputs": [
+            {
+                "name": "vault_address",
+                "type": "Address"
+            }
+        ],
+        "outputs": []
+    },
+    "endpoints": [
+        {
+            "name": "getFeeSettlement",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "order_kind",
+                    "type": "OrderKind"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "setFeeSettlement",
+            "onlyOwner": true,
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "order_kind",
+                    "type": "OrderKind"
+                },
+                {
+                    "name": "fee_percent",
+                    "type": "u64"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "getVaultAddress",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "Address"
+                }
+            ]
+        },
+        {
+            "name": "getPrefixMessage",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "bytes"
+                }
+            ]
+        },
+        {
+            "name": "setPrefixMessage",
+            "onlyOwner": true,
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "prefix",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "getPostfixMessage",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "bytes"
+                }
+            ]
+        },
+        {
+            "name": "setPostfixMessage",
+            "onlyOwner": true,
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "postfix",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "setCancelByOrderId",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "order",
+                    "type": "Order"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "cancelByTimestamp",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "timestamp",
+                    "type": "u64"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "executeExchange",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "taker_order",
+                    "type": "Order"
+                },
+                {
+                    "name": "maker_orders",
+                    "type": "variadic<Order>",
+                    "multi_arg": true
+                }
+            ],
+            "outputs": []
+        }
+    ],
+    "events": [],
+    "hasCallback": false,
+    "types": {
+        "OrderKind": {
+            "type": "enum",
+            "variants": [
+                {
+                    "name": "Market",
+                    "discriminant": 0
+                },
+                {
+                    "name": "Limit",
+                    "discriminant": 1
+                }
+            ]
+        },
+        "Order": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "bytes"
+                },
+                {
+                    "name": "salt",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "kind",
+                    "type": "u8"
+                },
+                {
+                    "name": "created_at",
+                    "type": "u64"
+                },
+                {
+                    "name": "expire_time",
+                    "type": "u64"
+                },
+                {
+                    "name": "owner_address",
+                    "type": "Address"
+                },
+                {
+                    "name": "owner_signature",
+                    "type": "bytes"
+                },
+                {
+                    "name": "buy_token",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "buy_amount",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "sell_token",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "sell_amount",
+                    "type": "BigUint"
+                }
+            ]
+        }
+    }
+}
