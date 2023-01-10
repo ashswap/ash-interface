@@ -104,6 +104,14 @@ const DEVNET_TOKENS_BETA: IESDTInfo[] = [
         logoURI: IconUSDC.src,
     },
     {
+        identifier: "USDC-8d4068",
+        chainId: ChainId.Devnet,
+        symbol: "xUSDC",
+        name: "xUSD Coin",
+        decimals: 6,
+        logoURI: IconUSDC.src,
+    },
+    {
         identifier: "WUSDC-232e24",
         chainId: ChainId.Devnet,
         symbol: "wUSDC",
