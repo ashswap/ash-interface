@@ -196,6 +196,18 @@ const mainnet: IPool[] = [
         },
         tokens: [TOKENS_MAP["USDC-bb1e62"], TOKENS_MAP["USDT-821a84"], TOKENS_MAP["BUSD-7f6b0f"]],
     },
+    {
+        address:
+            "erd1qqqqqqqqqqqqqpgqu4qzl6qdm4467dqpavce39y3usrwjwagtk2qvjcy7g",
+        lpToken: {
+            identifier: "ALP-c011fd",
+            chainId: ChainId.Mainnet,
+            symbol: "LPT-3pool",
+            name: "Ashswap LP",
+            decimals: 18,
+        },
+        tokens: [TOKENS_MAP["USDC-c76f1f"], TOKENS_MAP["USDT-f8c08c"], TOKENS_MAP["BUSD-40b57e"]],
+    },
 ];
 
 const pools =
