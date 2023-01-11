@@ -11,7 +11,7 @@ export const gasPerDataByte = 1500;
 export const shardId = 1;
 export const blockTimeMs = 6000;
 
-let defaultDevnet: CustomNetworkType = fallbackNetworkConfigurations.devnet;
+let defaultDevnet: CustomNetworkType = {...fallbackNetworkConfigurations.devnet, walletAddress: "https://devnet-wallet.multiversx.com"};
 // defaultDevnet.apiAddress = "https://api-elrond-devnet.ashswap.io";
 defaultDevnet.apiTimeout = "10000";
 
