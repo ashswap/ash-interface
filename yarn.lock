@@ -171,10 +171,9 @@
   resolved "https://registry.yarnpkg.com/@ctrl/tinycolor/-/tinycolor-3.4.0.tgz#c3c5ae543c897caa9c2a68630bed355be5f9990f"
   integrity sha512-JZButFdZ1+/xAfpguQHoabIXkcqRRKpMrWKBkpEZZyxfY9C1DpADFB8PEqGSTeFr135SaTRfKqGKx5xSCLI7ZQ==
 
-"@elrondnetwork/dapp-core@npm:@ashswap/dapp-core":
+"@elrondnetwork/dapp-core@https://github.com/ashswap/dapp-core#25e4a5987dd72c817ad80e9f0aca0048866ec45d":
   version "2.0.4"
-  resolved "https://npm.pkg.github.com/download/@ashswap/dapp-core/2.0.4/e65c3a20975c39afa3f1a4d8dd7d04f93bb675a9#e65c3a20975c39afa3f1a4d8dd7d04f93bb675a9"
-  integrity sha512-UujVqUVag1W9Nki2KDudu+Kw2hLKToRUrqUSdr+/tAX13UOVN0O3B1u4cuMFyfzBa8nlJEbJ92CQxqkT8NYz4Q==
+  resolved "https://github.com/ashswap/dapp-core#25e4a5987dd72c817ad80e9f0aca0048866ec45d"
   dependencies:
     "@elrondnetwork/erdjs" "11.0.0"
     "@elrondnetwork/erdjs-extension-provider" "2.0.5"
