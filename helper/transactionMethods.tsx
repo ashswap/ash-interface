@@ -67,6 +67,6 @@ export const sendTransactions = async (
     if (accProviderType === LoginMethodsEnum.extension) {
         await ExtensionProvider.getInstance()?.cancelAction?.();
     }
-
+    
     return await _sendTxs(payload);
 };
