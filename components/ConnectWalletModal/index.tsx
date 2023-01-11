@@ -1,7 +1,6 @@
 import {
-    useExtensionLogin,
-    useWalletConnectLogin,
-    useWebWalletLogin,
+    useExtensionLogin, useWalletConnectLogin,
+    useWebWalletLogin
 } from "@elrondnetwork/dapp-core/hooks";
 import connectWalletBg from "assets/images/connect-wallet-bg.png";
 import downloadAppGallery from "assets/images/download-app-gallery.png";
@@ -10,15 +9,21 @@ import downloadPlayStore from "assets/images/download-play-store.png";
 import maiarLogo from "assets/images/maiar-logo.png";
 import ICConnectApp from "assets/svg/connect-app.svg";
 import ICConnectExtension from "assets/svg/connect-extension.svg";
-import { accAddressState, accIsLoggedInState, dappCoreState } from "atoms/dappState";
+import ICConnectLedger from "assets/svg/connect-ledger.svg";
+import ICConnectWebWallet from "assets/svg/connect-web-wallet.svg";
+import {
+    accAddressState,
+    accIsLoggedInState,
+    dappCoreState
+} from "atoms/dappState";
 import { walletIsOpenConnectModalState } from "atoms/walletState";
 import BaseModal from "components/BaseModal";
 import Image from "components/Image";
+import { useRouter } from "next/router";
 import platform from "platform";
 import QRCode from "qrcode";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
-
 const MAIAR_WALLET_LINK = {
     PLAY_STORE: "https://maiar.onelink.me/HLcx/52dcde54",
     APP_STORE: "https://maiar.onelink.me/HLcx/f0b7455c",
@@ -27,7 +32,7 @@ const MAIAR_WALLET_LINK = {
         "https://chrome.google.com/webstore/detail/maiar-defi-wallet/dngmlblcodfobpdpecaadgfbcggfjfnm",
 };
 
-let isFirstRender = true        
+let isFirstRender = true;
 
 function ConnectWalletModal() {
     const loggedIn = useRecoilValue(accIsLoggedInState);
@@ -45,7 +50,8 @@ function ConnectWalletModal() {
     const [webWalletLogin] = useWebWalletLogin({
         callbackRoute: "",
     });
-    const dappCore = useRecoilValue(dappCoreState);         
+    const dappCore = useRecoilValue(dappCoreState);
+    const router = useRouter();
     useEffect(() => {
         if (!isOpenConnectWalletModal) {
             setIsOpenQR(false);
@@ -62,40 +68,43 @@ function ConnectWalletModal() {
     useEffect(() => {
         if (window && !loggedIn && isOpenConnectWalletModal) {
             let dataLayer = (window as any).dataLayer || [];
-            console.log("dataLayer",dataLayer);
+            console.log("dataLayer", dataLayer);
             dataLayer.push({
-                'event': 'click_connect_wallet'
-            })
+                event: "click_connect_wallet",
+            });
         }
     }, [isOpenConnectWalletModal]);
     useEffect(() => {
-        console.log("dappCore", dappCore);           
+        console.log("dappCore", dappCore);
         if (window && loggedIn) {
             let dataLayer = (window as any).dataLayer || [];
-            console.log("dataLayer",dataLayer);
-            window.localStorage.setItem('address', dappCore.account.address);
-            window.localStorage.setItem('method', dappCore.loginInfo.loginMethod);
+            console.log("dataLayer", dataLayer);
+            window.localStorage.setItem("address", dappCore.account.address);
+            window.localStorage.setItem(
+                "method",
+                dappCore.loginInfo.loginMethod
+            );
             dataLayer.push({
-                'event': 'success_connect_wallet',
-                'address': dappCore.account.address,
-                'method': dappCore.loginInfo.loginMethod
-            })
+                event: "success_connect_wallet",
+                address: dappCore.account.address,
+                method: dappCore.loginInfo.loginMethod,
+            });
         }
     }, [loggedIn, dappCore.account.address, dappCore.loginInfo.loginMethod]);
     useEffect(() => {
         if (isFirstRender) {
-            isFirstRender = false
-            return
+            isFirstRender = false;
+            return;
         }
         if (window && !loggedIn && !isFirstRender) {
             let dataLayer = (window as any).dataLayer || [];
             console.log("Disconnected");
-            console.log("dataLayer",dataLayer);
+            console.log("dataLayer", dataLayer);
             dataLayer.push({
-                'event': 'disconnect_wallet',
-                'address': window.localStorage.getItem('address'),
-                'method': window.localStorage.getItem('method')
-            })
+                event: "disconnect_wallet",
+                address: window.localStorage.getItem("address"),
+                method: window.localStorage.getItem("method"),
+            });
         }
     }, [loggedIn]);
     return (
@@ -155,22 +164,6 @@ function ConnectWalletModal() {
                                 </div>
                                 <div
                                     className="max-w-full w-[21.875rem] h-24 bg-ash-dark-600 cursor-pointer flex items-center px-6 mb-4"
-                                    onClick={webWalletLogin}
-                                >
-                                    <div className="mr-[1.625rem]">
-                                        <ICConnectExtension
-                                            className={`colored-drop-shadow-xs colored-drop-shadow-ash-blue-500 w-16 inline text-ash-blue-500`}
-                                        />
-                                    </div>
-                                    <div className="text-sm font-bold uppercase">
-                                        <span>Maiar </span>
-                                        <span className="text-ash-blue-500">
-                                            web wallet
-                                        </span>
-                                    </div>
-                                </div>
-                                <div
-                                    className="max-w-full w-[21.875rem] h-24 bg-ash-dark-600 cursor-pointer flex items-center px-6"
                                     onClick={() => setIsOpenQR(true)}
                                 >
                                     <div className="mr-[1.625rem] w-16 text-center">
@@ -182,6 +175,46 @@ function ConnectWalletModal() {
                                         <span>Maiar </span>
                                         <span className="text-ash-blue-500">
                                             mobile app
+                                        </span>
+                                    </div>
+                                </div>
+                                <div
+                                    className="max-w-full w-[21.875rem] h-24 bg-ash-dark-600 cursor-pointer flex items-center px-6 mb-4"
+                                    onClick={() => {
+                                        router.push({
+                                            pathname: "/ledger",
+                                            query: {
+                                                callbackUrl: router.pathname,
+                                            },
+                                        });
+                                        setIsOpenConnectWalletModal(false);
+                                    }}
+                                >
+                                    <div className="mr-[1.625rem]">
+                                        <ICConnectLedger
+                                            className={`colored-drop-shadow-xs colored-drop-shadow-ash-blue-500 w-16 inline text-ash-blue-500`}
+                                        />
+                                    </div>
+                                    <div className="text-sm font-bold uppercase">
+                                        <span>Ledger </span>
+                                        <span className="text-ash-blue-500">
+                                            wallet
+                                        </span>
+                                    </div>
+                                </div>
+                                <div
+                                    className="max-w-full w-[21.875rem] h-24 bg-ash-dark-600 cursor-pointer flex items-center px-6 mb-4"
+                                    onClick={webWalletLogin}
+                                >
+                                    <div className="mr-[1.625rem]">
+                                        <ICConnectWebWallet
+                                            className={`colored-drop-shadow-xs colored-drop-shadow-ash-blue-500 w-16 inline text-ash-blue-500`}
+                                        />
+                                    </div>
+                                    <div className="text-sm font-bold uppercase">
+                                        <span>Web </span>
+                                        <span className="text-ash-blue-500">
+                                            wallet
                                         </span>
                                     </div>
                                 </div>

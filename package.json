@@ -10,7 +10,7 @@
         "export": "next export"
     },
     "dependencies": {
-        "@elrondnetwork/dapp-core": "2.0.4",
+        "@elrondnetwork/dapp-core": "npm:@ashswap/dapp-core",
         "@elrondnetwork/erdjs": "11.0.0",
         "@elrondnetwork/erdjs-extension-provider": "2.0.5",
         "@elrondnetwork/erdjs-network-providers": "0.1.6",
