@@ -155,7 +155,7 @@ const mainnet: IFarm[] = [
         farm_address: "erd1qqqqqqqqqqqqqpgqryurefhn2aajq58jn0l9d3de802sv4q8tk2q3gjpdq",
         reward_token_id: "ASH-a85626",
         reward_token_decimal: 18,
-        farming_token_id: "ALP-8efbbe",
+        farming_token_id: "ALP-c011fd",
         farming_token_decimal: 18,
         farm_token_id: "FARM-86f286",
         farm_token_decimal: 18,
