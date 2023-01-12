@@ -298,7 +298,7 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
                                         <span className="text-earn">
                                             <TextAmt
                                                 number={toEGLDD(
-                                                    pool.tokens[0].decimals,
+                                                    pool.tokens[i].decimals,
                                                     liquidityData?.lpReserves[
                                                         i
                                                     ] || 0
