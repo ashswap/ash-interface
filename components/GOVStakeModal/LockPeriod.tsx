@@ -120,7 +120,7 @@ function LockPeriod({
                             <span className="font-bold text-xs lg:text-sm mr-2">
                                 {open ? "LOCK PERIOD" : fSelectedDate}
                             </span>
-                            <ICChevronDown className="w-2 h-auto" />
+                            <ICChevronDown className="shrink-0 w-2 h-auto" />
                         </button>
                     )}
                 >

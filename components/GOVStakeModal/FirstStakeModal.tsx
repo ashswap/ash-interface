@@ -46,8 +46,8 @@ const LOCK_CONFIG_BOY = {
 };
 const LOCK_CONFIG_MAIN = {
     predefinedLockPeriod: [
-        { value: 7 * 24 * 60 * 60, label: "1 week" },
-        { value: 4 * 7 * 24 * 60 * 60, label: "4 weeks" },
+        // { value: 7 * 24 * 60 * 60, label: "1 week" },
+        // { value: 4 * 7 * 24 * 60 * 60, label: "4 weeks" },
         { value: 1 * 365 * 24 * 60 * 60, label: "1 year" },
         { value: 2 * 365 * 24 * 60 * 60, label: "2 years" },
         { value: 3 * 365 * 24 * 60 * 60, label: "3 years" },
@@ -63,7 +63,7 @@ const FirstStakeContent = ({ open, onClose }: props) => {
     const insufficientEGLD = useRecoilValue(accIsInsufficientEGLDState);
     const totalSupplyVeASH = useRecoilValue(govTotalSupplyVeASH);
     const { createLock: lockASH } = useGovLockASH();
-    const [lockPeriod, setLockPeriod] = useState(LOCK_CONFIG.minLock); // in seconds
+    const [lockPeriod, setLockPeriod] = useState(LOCK_CONFIG.predefinedLockPeriod[0].value); // in seconds
     const [isAgree, setIsAgree] = useState(false);
     const ASHBalance = useMemo(
         () => new BigNumber(tokenMap[ASH_TOKEN.identifier]?.balance || 0),

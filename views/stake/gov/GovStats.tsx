@@ -494,7 +494,7 @@ function GovStats() {
                                 onClick={() => setIsQAExpand((val) => !val)}
                             >
                                 <div className="line-clamp-2 text-xs lg:text-sm font-bold grow text-left mr-4">
-                                    OMG? Does it mean user will lose money
+                                    Does it mean user will lose money
                                     everyday?
                                 </div>
                                 {isQAExpand ? (
@@ -513,10 +513,7 @@ function GovStats() {
                                     </div>
                                     <div>
                                         However, If you want to keep your veASH
-                                        stays on the maximum, just{" "}
-                                        <span className="text-pink-600 underline font-bold">
-                                            extend
-                                        </span>{" "}
+                                        stays on the maximum, just extend
                                         your lock period.
                                     </div>
                                 </div>
