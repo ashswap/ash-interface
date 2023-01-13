@@ -49,8 +49,8 @@ const EXTEND_BOY = {
 const EXTEND_CONFIG_MAIN = {
     options: [
         // test purpose
-        { value: 7 * 24 * 60 * 60, label: "+ 1 week" },
-        { value: 4 * 7 * 24 * 60 * 60, label: "+ 4 weeks" },
+        // { value: 7 * 24 * 60 * 60, label: "+ 1 week" },
+        // { value: 4 * 7 * 24 * 60 * 60, label: "+ 4 weeks" },
         { value: 1 * 365 * 24 * 60 * 60, label: "+ 1 year" },
         { value: 2 * 365 * 24 * 60 * 60, label: "+ 2 years" },
         { value: 3 * 365 * 24 * 60 * 60, label: "+ 3 years" },
@@ -75,9 +75,7 @@ const StakeMoreContent = ({ open, onClose }: props) => {
     const [lockAmt, setLockAmt] = useState<BigNumber>(new BigNumber(0));
     const [rawLockAmt, setRawLockAmt] = useState("");
     const [currentLockSeconds, setCurrentLockSeconds] = useState(0);
-    const [extendLockPeriod, setExtendLockPeriod] = useState(
-        EXTEND_CONFIG.minLock
-    ); // in seconds
+
     const [isAgree, setIsAgree] = useState(false);
     const [isExtend, setIsExtend] = useState(false);
     const { isMobile } = useScreenSize();
@@ -100,6 +98,9 @@ const StakeMoreContent = ({ open, onClose }: props) => {
             },
         ];
     }, [currentLockSeconds]);
+    const [extendLockPeriod, setExtendLockPeriod] = useState(
+        extendOpts[0].value
+    ); // in seconds
     useEffect(() => {
         if (currentLockSeconds === 0) {
             setIsExtend(true);
