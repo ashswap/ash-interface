@@ -13,7 +13,6 @@ import { tokenMapState } from "atoms/tokensState";
 import BigNumber from "bignumber.js";
 import Avatar from "components/Avatar";
 import BaseModal from "components/BaseModal";
-import Checkbox from "components/Checkbox";
 import GlowingButton from "components/GlowingButton";
 import InputCurrency from "components/InputCurrency";
 import TextAmt from "components/TextAmt";
@@ -134,7 +133,6 @@ const TokenInput = ({
     );
 };
 const AddLiquidityContent = ({ onClose, poolData }: Props) => {
-    const [isAgree, setAgree] = useState<boolean>(false);
     const [inputRawValues, setInputRawValues] = useState(
         poolData.pool.tokens.map(() => "")
     );
@@ -153,9 +151,6 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
     const { pool, liquidityData } = poolData;
     const [onboardingDepositInput, setOnboardedDepositInput] =
         useOnboarding("pool_deposit_input");
-    const [onboardingPoolCheck, setOnboardedPoolCheck] = useOnboarding(
-        "pool_deposit_checkbox"
-    );
 
     const screenSize = useScreenSize();
 
@@ -244,7 +239,6 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
 
     const canAddLP = useMemo(() => {
         return (
-            isAgree &&
             !isInsufficientEGLD &&
             tokenInputProps.every((t) => !t.isInsufficientFund) &&
             !adding &&
@@ -252,7 +246,7 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
                 .reduce((total, val) => total.plus(val || 0), new BigNumber(0))
                 .eq(0)
         );
-    }, [isAgree, isInsufficientEGLD, adding, inputValues, tokenInputProps]);
+    }, [isInsufficientEGLD, adding, inputValues, tokenInputProps]);
 
     useEffect(() => {
         if (liquidityValue.gt(0)) {
@@ -375,54 +369,22 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
             </div>
 
             <div className="sm:flex gap-8">
-                <OnboardTooltip
-                    open={
-                        onboardingPoolCheck &&
-                        !onboardingDepositInput &&
-                        screenSize.md
-                    }
-                    placement="bottom-start"
-                    onArrowClick={() => setOnboardedPoolCheck(true)}
-                    arrowStyle={() => ({ left: 0 })}
-                    content={({ size }) => (
-                        <OnboardTooltip.Panel size={size} className="w-36">
-                            <div className="p-3 text-xs font-bold">
-                                <span className="text-stake-green-500">
-                                    Click check box{" "}
-                                </span>
-                                <span>to verify your actions</span>
-                            </div>
-                        </OnboardTooltip.Panel>
-                    )}
-                >
-                    <div>
-                        <Checkbox
-                            className="w-full mb-12 sm:mb-0 sm:w-2/3"
-                            checked={isAgree}
-                            onChange={(val) => {
-                                setAgree(val);
-                                setOnboardedPoolCheck(true);
-                            }}
-                            text={
-                                <span>
-                                    I verify that I have read the{" "}
-                                    <a
-                                        href="https://docs.ashswap.io/guides/add-remove-liquidity"
-                                        target="_blank"
-                                        rel="noreferrer"
-                                    >
-                                        <b className="text-white">
-                                            <u>AshSwap Pools Guide</u>
-                                        </b>
-                                    </a>{" "}
-                                    and understand the risks of providing
-                                    liquidity, including impermanent loss.
-                                </span>
-                            }
-                        />
-                    </div>
-                </OnboardTooltip>
-
+                <div className="w-full mb-12 sm:mb-0 sm:w-2/3">
+                    <span className="text-xs text-ash-gray-500">
+                        I verify that I have read the{" "}
+                        <a
+                            href="https://docs.ashswap.io/guides/add-remove-liquidity"
+                            target="_blank"
+                            rel="noreferrer"
+                        >
+                            <b className="text-white">
+                                <u>AshSwap Pools Guide</u>
+                            </b>
+                        </a>{" "}
+                        and understand the risks of providing liquidity,
+                        including impermanent loss.
+                    </span>
+                </div>
                 <div className="w-full sm:w-1/3">
                     <div className="border-notch-x border-notch-white/50">
                         <GlowingButton

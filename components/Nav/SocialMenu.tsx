@@ -1,67 +1,15 @@
-import discordImage from "assets/images/discord.png";
-import gmailImage from "assets/images/gmail.png";
-import mediumImage from "assets/images/medium.png";
-import redditImage from "assets/images/reddit.png";
-import telegramImage from "assets/images/telegram.png";
-import twitterImage from "assets/images/twitter.png";
 import ICChevronDown from "assets/svg/chevron-down.svg";
-import ICNewTabRound from "assets/svg/new-tab-round.svg";
 import ICSocial from "assets/svg/social.svg";
 import BaseModal from "components/BaseModal";
 import BaseTooltip from "components/BaseTooltip";
 import Image from "components/Image";
+import { LEGAL_LINKS, SOCIALS } from "const/link";
 import { useScreenSize } from "hooks/useScreenSize";
 import Link from "next/link";
 import React, { useState } from "react";
+import LegalLinkItem from "./LegalLinkItem";
 import styles from "./Nav.module.css";
-const SOCIALS = [
-    {
-        name: "Discord",
-        url: "https://discord.gg/apmhYCPDbW",
-        image: discordImage,
-    },
-    { name: "Telegram", url: "https://t.me/ash_swap", image: telegramImage },
-    {
-        name: "Twitter",
-        url: "https://twitter.com/@ash_swap",
-        image: twitterImage,
-    },
-    { name: "Medium", url: "https://medium.com/@ashswap", image: mediumImage },
-    {
-        name: "Reddit",
-        url: "https://www.reddit.com/r/AshSwap",
-        image: redditImage,
-    },
-    {
-        name: "Gmail",
-        url:
-            typeof window === "undefined"
-                ? "mailto:helloATashswapDOTio?subject=AshSwap Contact&cc=helloATbicarusDOTio"
-                : "mailto:hello@ashswap.io?subject=AshSwap Contact&cc=hello@bicarus.io",
-        image: gmailImage,
-    },
-];
-const LEGAL_LINKS = [
-    {
-        name: "Terms of use",
-        url: "https://ashswap.io/terms",
-        iconClassName:
-            "text-pink-600 colored-drop-shadow-xs colored-drop-shadow-pink-600",
-    },
-    {
-        name: "Privacy Policy",
-        url: "https://ashswap.io/privacy/policy",
-        iconClassName:
-            "text-ash-cyan-500 colored-drop-shadow-xs colored-drop-shadow-ash-cyan-500",
-    },
-    {
-        name: "Disclaimer",
-        url: "https://ashswap.io/disclaimer",
-        iconClassName:
-            "text-ash-purple-500 colored-drop-shadow-xs colored-drop-shadow-ash-purple-500",
-    },
-];
-const iconClassName = "text";
+
 function HeadlessLink(
     props: React.DetailedHTMLProps<
         React.AnchorHTMLAttributes<HTMLAnchorElement>,
@@ -84,37 +32,9 @@ const MenuContent = () => {
                 Legal Documents
             </div>
             <div className="space-y-2 mb-12">
-                {LEGAL_LINKS.map(({ url, name, iconClassName }) => {
+                {LEGAL_LINKS.map((linkProps) => {
                     return (
-                        <a
-                            key={name}
-                            href={url}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="block"
-                        >
-                            <div className="py-2.5 px-3 bg-ash-dark-400 hover:bg-stake-dark-400 flex items-center justify-between space-x-1 text-ash-gray-500 transition-all duration-300">
-                                <div className="flex items-center space-x-4">
-                                    <svg
-                                        width="18"
-                                        height="9"
-                                        viewBox="0 0 18 9"
-                                        fill="none"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        className={iconClassName}
-                                    >
-                                        <path
-                                            d="M17.5 5.88233L12.0369 0.000385219L6.57376 0.000385154L1.01366e-07 2.26795e-05L7.39617 8.5L17.5 8.50037L17.5 5.88233Z"
-                                            fill="currentColor"
-                                        />
-                                    </svg>
-                                    <div className="font-medium text-sm truncate">
-                                        {name}
-                                    </div>
-                                </div>
-                                <ICNewTabRound className="w-3.5 h-auto" />
-                            </div>
-                        </a>
+                        <LegalLinkItem key={linkProps.name} {...linkProps} />
                     );
                 })}
             </div>
