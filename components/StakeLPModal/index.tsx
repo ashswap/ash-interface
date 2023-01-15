@@ -24,7 +24,6 @@ type props = {
 };
 const StakeLPContent = ({ open, onClose, farmData }: props) => {
     const { pool, farm, farmTokenSupply, ashPerBlock, emissionAPR } = farmData;
-    const [isAgree, setIsAgree] = useState(false);
     const lpTokenMap = useRecoilValue(lpTokenMapState);
     const insufficientEGLD = useRecoilValue(accIsInsufficientEGLDState);
     const [stakeAmt, setStakeAmt] = useState<BigNumber>(new BigNumber(0));
@@ -44,17 +43,17 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
         const totalAshPerDay = ashPerBlock
             .multipliedBy(24 * 60 * 60)
             .div(blockTimeMs / 1000);
-        const shareOfFarm = baseFarmToken.div(farmTokenSupply.plus(baseFarmToken));
+        const shareOfFarm = baseFarmToken.div(
+            farmTokenSupply.plus(baseFarmToken)
+        );
         return totalAshPerDay.multipliedBy(shareOfFarm);
     }, [stakeAmt, farmTokenSupply, ashPerBlock]);
     const insufficientLP = useMemo(() => {
         return !LPBalance || LPBalance.eq(0) || stakeAmt.gt(LPBalance);
     }, [LPBalance, stakeAmt]);
     const canStake = useMemo(() => {
-        return (
-            isAgree && stakeAmt.gt(0) && !insufficientLP && !insufficientEGLD
-        );
-    }, [isAgree, stakeAmt, insufficientLP, insufficientEGLD]);
+        return stakeAmt.gt(0) && !insufficientLP && !insufficientEGLD;
+    }, [stakeAmt, insufficientLP, insufficientEGLD]);
     const stake = useCallback(async () => {
         const { sessionId } = await enterFarm(stakeAmt, farm);
         if (sessionId && onClose) {
@@ -75,11 +74,14 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
                             </div>
                             <div className="bg-ash-dark-400/30 h-14 lg:h-18 px-6 flex items-center">
                                 <div className="flex mr-2">
-                                    {farmData.pool.tokens.map(t => <Avatar key={t.identifier}
-                                        src={t.logoURI}
-                                        alt={t.symbol}
-                                        className="w-4 h-4 first:ml-0 -ml-1"
-                                    />)}
+                                    {farmData.pool.tokens.map((t) => (
+                                        <Avatar
+                                            key={t.identifier}
+                                            src={t.logoURI}
+                                            alt={t.symbol}
+                                            className="w-4 h-4 first:ml-0 -ml-1"
+                                        />
+                                    ))}
                                 </div>
                                 <div className="text-ash-gray-500 text-sm lg:text-lg font-bold">
                                     {pool?.lpToken?.symbol}
@@ -164,26 +166,20 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
             </div>
             <div className="sm:flex sm:space-x-8 lg:space-x-24">
                 <div className="w-full mb-12 sm:mb-0 sm:grow">
-                    <Checkbox
-                        checked={isAgree}
-                        onChange={setIsAgree}
-                        text={
-                            <span className="text-ash-gray-500">
-                                I verify that I have read the{" "}
-                                <a
-                                    href="https://docs.ashswap.io/testnet-guides/liquidity-staking"
-                                    target="_blank"
-                                    rel="noreferrer"
-                                >
-                                    <b className="text-white">
-                                        <u>AshSwap Liquidity Staking Guide</u>
-                                    </b>
-                                </a>{" "}
-                                and understand the risks of providing liquidity,
-                                including impermanent loss.
-                            </span>
-                        }
-                    />
+                    <span className="text-xs text-ash-gray-500">
+                        I verify that I have read the{" "}
+                        <a
+                            href="https://docs.ashswap.io/testnet-guides/liquidity-staking"
+                            target="_blank"
+                            rel="noreferrer"
+                        >
+                            <b className="text-white">
+                                <u>AshSwap Liquidity Staking Guide</u>
+                            </b>
+                        </a>{" "}
+                        and understand the risks of providing liquidity,
+                        including impermanent loss.
+                    </span>
                 </div>
                 <div className="w-full sm:w-1/3 lg:w-[17.8125rem] shrink-0">
                     <div className="border-notch-x border-notch-white/50">
