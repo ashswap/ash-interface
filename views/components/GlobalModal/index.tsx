@@ -7,7 +7,7 @@ import React, { Suspense, useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 const BoostCalcModal = React.lazy(() => import("./BoostCalcModal"));
 const LegalModalLazy = dynamic(
-    import("./LegalModal").then((m) => m.LegalModal),
+    () => import("./LegalModal"),
     { ssr: false }
 );
 const GlobalModals = () => {
