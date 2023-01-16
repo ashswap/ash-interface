@@ -57,7 +57,7 @@ const LegalContent = ({onRequestClose}: Pick<BaseModalType, "onRequestClose">) =
         </div>
     );
 };
-export const LegalModal = (props: BaseModalType) => {
+const LegalModal = (props: BaseModalType) => {
     const screenSize = useScreenSize();
     return (
         <>
@@ -76,3 +76,4 @@ export const LegalModal = (props: BaseModalType) => {
         </>
     );
 };
+export default LegalModal;
