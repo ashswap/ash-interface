@@ -1,3 +1,4 @@
+import { TransactionDecoder } from "@elrondnetwork/transaction-decoder";
 import { lastCompletedTxHashAtom } from "atoms/transactions";
 import { useSocket } from "context/socket";
 import emitter from "helper/emitter";
@@ -22,19 +23,23 @@ export const TxCompletedTracker = () => {
 
     useEffect(() => {
         if (!socketExtra) return;
+        const decoder = new TransactionDecoder();
         const onCheckBatchResult = (txs: GetTransactionsByHashesReturnType) => {
             txs.map((tx) => {
-                const { hash, receiver, raw } = tx;
-                socketExtra.emit(
-                    "transactionCompletedClient",
-                    receiver,
-                    hash
-                );
+                const { hash, raw } = tx;
+                const { receiver } = decoder.getTransactionMetadata({
+                    data: tx.data,
+                    receiver: tx.receiver,
+                    sender: tx.sender,
+                    value: "0",
+                    type: "",
+                });
+                socketExtra.emit("transactionCompletedClient", receiver, hash);
                 logApi.post("/api/v1/tracking/ash-point", {
                     action_time: Date.now(),
                     action_name: raw?.function,
                     action_metadata: raw,
-                })
+                });
             });
         };
         emitter.on("onCheckBatchResult", onCheckBatchResult);
