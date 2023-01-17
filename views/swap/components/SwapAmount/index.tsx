@@ -264,10 +264,10 @@ const SwapAmount = (props: Props) => {
                     <div>
                         <span>Balance: </span>
                         <span
-                            className={`text-earn ${
+                            className={`${
                                 tokenMap[token.identifier] &&
                                 props.type === "from"
-                                    ? "select-none cursor-pointer"
+                                    ? "select-none cursor-pointer text-earn"
                                     : ""
                             }`}
                             onClick={() => {

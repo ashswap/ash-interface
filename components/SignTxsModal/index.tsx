@@ -1,14 +1,14 @@
 import {
     useGetLoginInfo,
-    useSignTransactions,
+    useSignTransactions
 } from "@elrondnetwork/dapp-core/hooks";
 import { LoginMethodsEnum } from "@elrondnetwork/dapp-core/types";
 import { Transition } from "@headlessui/react";
-import React, { Fragment, useMemo } from "react";
+import { Fragment, useMemo } from "react";
 // listen for the txs to be signed in queue, if the queue is not empty prompt the modal for user
 function SignTxsModal() {
     // ! useSignTransactions auto invoke provider for signing hence just use the hook only in once place globlally
-    const { hasTransactions } = useSignTransactions();
+    const { hasTransactions, transactions, error, canceledTransactionsMessage } = useSignTransactions();
     // const { hasTransactions } = useSignTxs();
     const { loginMethod } = useGetLoginInfo();
 
@@ -20,8 +20,11 @@ function SignTxsModal() {
             case LoginMethodsEnum.extension:
                 return "Maiar Wallet Extension";
             case LoginMethodsEnum.walletconnect:
+                return "Maiar App"
             case LoginMethodsEnum.wallet:
-                return "Maiar App";
+                return "Web Wallet";
+            case LoginMethodsEnum.ledger:
+                return "Ledger";
             default:
                 return "Wallet";
         }

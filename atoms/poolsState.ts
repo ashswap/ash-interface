@@ -4,6 +4,7 @@ import { Percent } from "helper/fraction/percent";
 import IPool from "interface/pool";
 import { PoolStatsRecord } from "interface/poolStats";
 import { atom, selector, selectorFamily } from "recoil";
+import { KeyedMutator } from "swr";
 import { ashswapBaseState } from "./ashswap";
 export type PoolRecord = {
     pool: IPool;
@@ -160,3 +161,8 @@ export const poolFeesQuery = selectorFamily({
         return fees;
     }
 })
+
+export const poolStatsRefresherAtom = atom<KeyedMutator<PoolStatsRecord[]>>({
+    key: "pool_stats_record_refresher_atom",
+    default: () => Promise.resolve(undefined),
+});

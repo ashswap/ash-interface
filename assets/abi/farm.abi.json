@@ -1,16 +1,16 @@
 {
     "buildInfo": {
         "rustc": {
-            "version": "1.62.0-nightly",
-            "commitHash": "082e4ca49770ebc9cb0ee616f3726a67471be8cb",
-            "commitDate": "2022-04-26",
+            "version": "1.66.0-nightly",
+            "commitHash": "7fcf850d7942804990a1d2e3fe036622a0fe4c74",
+            "commitDate": "2022-10-23",
             "channel": "Nightly",
-            "short": "rustc 1.62.0-nightly (082e4ca49 2022-04-26)"
+            "short": "rustc 1.66.0-nightly (7fcf850d7 2022-10-23)"
         },
         "contractCrate": {
             "name": "farm",
             "version": "0.0.0",
-            "git_version": "45566c6"
+            "git_version": "a2dab03"
         },
         "framework": {
             "name": "elrond-wasm",
@@ -33,6 +33,10 @@
                 "type": "BigUint"
             },
             {
+                "name": "rewarder_address",
+                "type": "Address"
+            },
+            {
                 "name": "voting_escrow_address",
                 "type": "Address"
             }
@@ -43,33 +47,51 @@
         {
             "name": "enterFarm",
             "mutability": "mutable",
-            "payableInTokens": ["*"],
+            "payableInTokens": [
+                "*"
+            ],
             "inputs": [
                 {
                     "name": "self_boost",
                     "type": "bool"
                 }
             ],
-            "outputs": []
+            "outputs": [
+                {
+                    "type": "List<EsdtTokenPayment>"
+                }
+            ]
         },
         {
             "name": "exitFarm",
             "mutability": "mutable",
-            "payableInTokens": ["*"],
+            "payableInTokens": [
+                "*"
+            ],
             "inputs": [],
-            "outputs": []
+            "outputs": [
+                {
+                    "type": "List<EsdtTokenPayment>"
+                }
+            ]
         },
         {
             "name": "claimRewards",
             "mutability": "mutable",
-            "payableInTokens": ["*"],
+            "payableInTokens": [
+                "*"
+            ],
             "inputs": [
                 {
                     "name": "self_boost",
                     "type": "bool"
                 }
             ],
-            "outputs": []
+            "outputs": [
+                {
+                    "type": "List<EsdtTokenPayment>"
+                }
+            ]
         },
         {
             "name": "calculateRewardsForGivenPosition",
@@ -113,7 +135,9 @@
             "name": "registerFarmToken",
             "onlyOwner": true,
             "mutability": "mutable",
-            "payableInTokens": ["EGLD"],
+            "payableInTokens": [
+                "EGLD"
+            ],
             "inputs": [
                 {
                     "name": "token_display_name",
@@ -244,6 +268,16 @@
             ]
         },
         {
+            "name": "getProduceRewardEnabled",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "bool"
+                }
+            ]
+        },
+        {
             "name": "getLastRewardBlockNonce",
             "mutability": "readonly",
             "inputs": [],
@@ -279,7 +313,17 @@
             ]
         },
         {
-            "name": "VotingEscrowAddress",
+            "name": "getRewarderAddress",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "Address"
+                }
+            ]
+        },
+        {
+            "name": "getVotingEscrowAddress",
             "mutability": "readonly",
             "inputs": [],
             "outputs": [
@@ -320,7 +364,7 @@
             ]
         }
     ],
-    "hasCallback": false,
+    "hasCallback": true,
     "types": {
         "KeyValue": {
             "type": "struct",
@@ -331,6 +375,23 @@
                 },
                 {
                     "name": "value",
+                    "type": "BigUint"
+                }
+            ]
+        },
+        "EsdtTokenPayment": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "token_identifier",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "token_nonce",
+                    "type": "u64"
+                },
+                {
+                    "name": "amount",
                     "type": "BigUint"
                 }
             ]
