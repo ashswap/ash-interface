@@ -10,7 +10,7 @@
         "export": "next export"
     },
     "dependencies": {
-        "@elrondnetwork/dapp-core": "https://github.com/ashswap/dapp-core#25e4a5987dd72c817ad80e9f0aca0048866ec45d",
+        "@elrondnetwork/dapp-core": "2.0.4",
         "@elrondnetwork/erdjs": "11.0.0",
         "@elrondnetwork/erdjs-extension-provider": "2.0.5",
         "@elrondnetwork/erdjs-network-providers": "0.1.6",

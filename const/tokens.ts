@@ -135,28 +135,12 @@ const DEVNET_TOKENS_BETA: IESDTInfo[] = [
         decimals: 8,
         logoURI: IconWBTC.src,
     },
-    {
-        identifier: "WEGLD-795247",
-        chainId: ChainId.Devnet,
-        symbol: "wEGLD",
-        name: "Wrapped EGLD",
-        decimals: 18,
-        logoURI: IconWEGLD.src,
-    },
-    {
-        identifier: "AEGLD-f09e97",
-        chainId: ChainId.Devnet,
-        symbol: "aEGLD",
-        name: "A EGLD",
-        decimals: 18,
-        logoURI: IconAEGLD.src,
-    },
 ];
 
 const MAINNET_TOKENS: IESDTInfo[] = [
     {
         identifier: "ASH-a85626",
-        chainId: ChainId.Mainnet,
+        chainId: ChainId.Devnet,
         symbol: "ASH",
         name: "Ashswap Token",
         decimals: 18,
@@ -164,7 +148,7 @@ const MAINNET_TOKENS: IESDTInfo[] = [
     },
     {
         identifier: "USDT-821a84",
-        chainId: ChainId.Mainnet,
+        chainId: ChainId.Devnet,
         symbol: "USDT",
         name: "Tether",
         decimals: 6,
@@ -172,7 +156,7 @@ const MAINNET_TOKENS: IESDTInfo[] = [
     },
     {
         identifier: "USDC-bb1e62",
-        chainId: ChainId.Mainnet,
+        chainId: ChainId.Devnet,
         symbol: "USDC",
         name: "USD Coin",
         decimals: 6,
@@ -180,39 +164,15 @@ const MAINNET_TOKENS: IESDTInfo[] = [
     },
     {
         identifier: "BUSD-7f6b0f",
-        chainId: ChainId.Mainnet,
+        chainId: ChainId.Devnet,
         symbol: "BUSD",
         name: "Binance USD",
         decimals: 6,
         logoURI: IconBUSD.src,
     },
     {
-        identifier: "USDT-f8c08c",
-        chainId: ChainId.Mainnet,
-        symbol: "rUSDT",
-        name: "Tether",
-        decimals: 6,
-        logoURI: IconUSDT.src,
-    },
-    {
-        identifier: "USDC-c76f1f",
-        chainId: ChainId.Mainnet,
-        symbol: "rUSDC",
-        name: "USD Coin",
-        decimals: 6,
-        logoURI: IconUSDC.src,
-    },
-    {
-        identifier: "BUSD-40b57e",
-        chainId: ChainId.Mainnet,
-        symbol: "rBUSD",
-        name: "Binance USD",
-        decimals: 18,
-        logoURI: IconBUSD.src,
-    },
-    {
         identifier: "RENBTC-9179c8",
-        chainId: ChainId.Mainnet,
+        chainId: ChainId.Devnet,
         symbol: "renBTC",
         name: "Ren BTC",
         decimals: 8,
@@ -220,7 +180,7 @@ const MAINNET_TOKENS: IESDTInfo[] = [
     },
     {
         identifier: "WBTC-2d9033",
-        chainId: ChainId.Mainnet,
+        chainId: ChainId.Devnet,
         symbol: "wBTC",
         name: "Wrapped BTC",
         decimals: 8,
@@ -228,7 +188,7 @@ const MAINNET_TOKENS: IESDTInfo[] = [
     },
     {
         identifier: "WEGLD-795247",
-        chainId: ChainId.Mainnet,
+        chainId: ChainId.Devnet,
         symbol: "wEGLD",
         name: "Wrapped EGLD",
         decimals: 18,
@@ -236,7 +196,7 @@ const MAINNET_TOKENS: IESDTInfo[] = [
     },
     {
         identifier: "AEGLD-a1f5d4",
-        chainId: ChainId.Mainnet,
+        chainId: ChainId.Devnet,
         symbol: "aEGLD",
         name: "AEGLD",
         decimals: 18,

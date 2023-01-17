@@ -168,7 +168,7 @@ function FarmStats({ onClickAll }: { onClickAll?: () => void }) {
                             to earn ASH.
                         </div>
                         <div className="text-sm">
-                            Simply lie back and watch it grow.
+                            Just lie on the bed & watch it growing!
                         </div>
                     </div>
                 </div>

@@ -9,18 +9,20 @@ import {
     govLockedAmtState,
     govTotalSupplyVeASH,
     govUnlockTSState,
-    govVeASHAmtState
+    govVeASHAmtState,
 } from "atoms/govState";
 import { tokenMapState } from "atoms/tokensState";
 import BigNumber from "bignumber.js";
 import Avatar from "components/Avatar";
 import BaseModal from "components/BaseModal";
+import Checkbox from "components/Checkbox";
 import GlowingButton from "components/GlowingButton";
 import InputCurrency from "components/InputCurrency";
 import Switch from "components/Switch";
 import TextAmt from "components/TextAmt";
 import CardTooltip from "components/Tooltip/CardTooltip";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
+import { ENVIRONMENT } from "const/env";
 import { ASH_TOKEN, VE_ASH_DECIMALS } from "const/tokens";
 import { toEGLDD, toWei } from "helper/balance";
 import { estimateVeASH } from "helper/voteEscrow";
@@ -52,8 +54,8 @@ const EXTEND_BOY = {
 const EXTEND_CONFIG_MAIN = {
     options: [
         // test purpose
-        // { value: 7 * 24 * 60 * 60, label: "+ 1 week" },
-        // { value: 4 * 7 * 24 * 60 * 60, label: "+ 4 weeks" },
+        { value: 7 * 24 * 60 * 60, label: "+ 1 week" },
+        { value: 4 * 7 * 24 * 60 * 60, label: "+ 4 weeks" },
         { value: 1 * 365 * 24 * 60 * 60, label: "+ 1 year" },
         { value: 2 * 365 * 24 * 60 * 60, label: "+ 2 years" },
         { value: 3 * 365 * 24 * 60 * 60, label: "+ 3 years" },
@@ -90,7 +92,10 @@ const StakeMoreContent = ({ open, onClose }: props) => {
         }
     }, [deboundRawLockAmt]);
     const [currentLockSeconds, setCurrentLockSeconds] = useState(0);
-
+    const [extendLockPeriod, setExtendLockPeriod] = useState(
+        EXTEND_CONFIG.minLock
+    ); // in seconds
+    const [isAgree, setIsAgree] = useState(false);
     const [isExtend, setIsExtend] = useState(false);
     const { isMobile } = useScreenSize();
     const isTouchScreen = useMediaQuery("(hover: none)");
@@ -114,9 +119,6 @@ const StakeMoreContent = ({ open, onClose }: props) => {
             },
         ];
     }, [currentLockSeconds]);
-    const [extendLockPeriod, setExtendLockPeriod] = useState(
-        extendOpts[0].value
-    ); // in seconds
     useEffect(() => {
         if (currentLockSeconds === 0) {
             setIsExtend(true);
@@ -145,11 +147,13 @@ const StakeMoreContent = ({ open, onClose }: props) => {
         return (
             !insufficientEGLD &&
             !insufficientASH &&
+            isAgree &&
             (lockAmt.gt(0) || canExtendLockPeriod)
         );
     }, [
         insufficientEGLD,
         insufficientASH,
+        isAgree,
         lockAmt,
         canExtendLockPeriod,
     ]);
@@ -481,7 +485,7 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                     </div>
                     <div className="w-full sm:w-1/3 lg:w-[17.8125rem] shrink-0 bg-stake-dark-500 py-[2.375rem] px-10 sm:px-4 lg:px-10">
                         <div className="text-white text-lg font-bold mb-16">
-                            Estimated Staking
+                            Estimate Staking
                         </div>
                         <div className="flex flex-col space-y-11">
                             <div>
@@ -617,20 +621,26 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                 </div>
                 <div className="sm:flex sm:space-x-8 lg:space-x-24">
                     <div className="w-full mb-12 sm:mb-0 sm:grow">
-                        <span className="text-xs text-ash-gray-500">
-                            I verify that I have read the{" "}
-                            <a
-                                href="https://docs.ashswap.io/testnet-guides/governance-staking"
-                                target="_blank"
-                                rel="noreferrer"
-                            >
-                                <b className="text-white">
-                                    <u>AshSwap Stake Guide</u>
-                                </b>
-                            </a>{" "}
-                            and understand the risks of providing liquidity,
-                            including impermanent loss.
-                        </span>
+                        <Checkbox
+                            checked={isAgree}
+                            onChange={setIsAgree}
+                            text={
+                                <span className="text-ash-gray-500">
+                                    I verify that I have read the{" "}
+                                    <a
+                                        href="https://docs.ashswap.io/testnet-guides/governance-staking"
+                                        target="_blank"
+                                        rel="noreferrer"
+                                    >
+                                        <b className="text-white">
+                                            <u>AshSwap Stake Guide</u>
+                                        </b>
+                                    </a>{" "}
+                                    and understand the risks of providing
+                                    liquidity, including impermanent loss.
+                                </span>
+                            }
+                        />
                     </div>
                     <div className="w-full sm:w-1/3 lg:w-[17.8125rem] shrink-0">
                         <div className="border-notch-x border-notch-white/50">

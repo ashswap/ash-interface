@@ -337,8 +337,14 @@ const TokenSelect = ({
                                     }
                                     pivotToken={pivotToken!}
                                     isPivotFirst={type === "to"}
-                                    onSelect={(p, t) => {
-                                        onSelectToken(t);
+                                    onSelect={(p) => {
+                                        onSelectToken(
+                                            p.tokens.filter(
+                                                (t) =>
+                                                    t.identifier !==
+                                                    pivotToken?.identifier
+                                            )[0]
+                                        );
                                         setOnboardedAvailablePair(true);
                                     }}
                                 />

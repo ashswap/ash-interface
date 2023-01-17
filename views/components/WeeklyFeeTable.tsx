@@ -54,7 +54,7 @@ function WeeklyFeeTable() {
                 .unix(val.from_timestamp)
                 .utc()
                 .weekday(0)
-                // .endOf("days")
+                .endOf("days")
                 .unix();
             map[key] = [...(map[key] || []), val];
         });

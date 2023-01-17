@@ -105,7 +105,7 @@ const useFarmsState = () => {
                 lastRewardBlockNone,
                 rewardPerShare,
             } = farmRaw || {};
-            const produceRewardEnable = !!farmRaw?.produceRewardEnabled;
+            const produceRewardEnable = true;
             if (
                 !shard ||
                 !farmTokenSupply ||
@@ -187,10 +187,10 @@ const useFarmsState = () => {
                     .multipliedBy(365 * 24 * 60 * 60)
                     .div(blockTimeMs / 1000)
             );
-            const emissionAPR = totalLiquidityValue.gt(0) ? totalASH
+            const emissionAPR = totalASH
                 .multipliedBy(tokenMap[ASH_TOKEN.identifier]?.price || 0)
                 .multipliedBy(100)
-                .div(totalLiquidityValue) : new BigNumber(0);
+                .div(totalLiquidityValue);
 
             const record: FarmRecord = {
                 pool: p,

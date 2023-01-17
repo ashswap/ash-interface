@@ -177,7 +177,7 @@ function StakeMenu() {
                                         </div>
                                     </div>
                                     <div className="text-stake-gray-500 bg-ash-dark-400/30 p-6 text-sm font-bold">
-                                        Coming soon...
+                                        On developing...
                                     </div>
                                 </div>
                             </div>

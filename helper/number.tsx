@@ -79,5 +79,5 @@ export const formatToSignificant = (
     if (int.toString(10).length >= significant) {
         return _value.toFixed(0);
     }
-    return _value.toPrecision(significant).replace(/0+$/, "").replace(/\.$/, ".0");
+    return _value.toPrecision(significant).replace(/0+$/, "");
 };

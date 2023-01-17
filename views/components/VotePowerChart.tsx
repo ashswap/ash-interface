@@ -66,7 +66,7 @@ function VotePowerChart() {
     }, [chartData]);
     const defaultIndex = useMemo(() => {
         return displayChartData.findIndex(
-            (val) => moment.unix(val.timestamp).isSame(moment(), "years")
+            (val) => moment.unix(val.timestamp).isSame(moment(), "date") //for BoY years
         );
     }, [displayChartData]);
     const [activeIndex, setActiveIndex] = useState(defaultIndex);
@@ -76,7 +76,7 @@ function VotePowerChart() {
     // Xaxis formatter
     const tickFormatter = useCallback((val, index: number) => {
         const time = moment.unix(val);
-        return time.format("MMM, YYYY");
+        return time.format("DD, MMM");
     }, []);
     const activePayload = useMemo(() => {
         return displayChartData[activeIndex];
