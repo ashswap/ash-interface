@@ -6,7 +6,6 @@ import {
     poolKeywordState,
     PoolRecord,
     poolRecordsState,
-    poolStatsRefresherAtom,
 } from "atoms/poolsState";
 import { lpTokenMapState } from "atoms/tokensState";
 import BigNumber from "bignumber.js";
@@ -26,7 +25,6 @@ const usePoolsState = () => {
     const poolMapById = useRecoilValue(ashRawPoolMapByIdSelector);
     const lpTokenMap = useRecoilValue(lpTokenMapState);
     // const setPoolRecords = useSetRecoilState(poolRecordsState);
-    const setPoolRecordsRefresher = useSetRecoilState(poolStatsRefresherAtom);
     const setDeboundKeyword = useSetRecoilState(poolDeboundKeywordState);
     const [deboundKeyword] = useDebounce(keyword, 500);
 
@@ -35,7 +33,7 @@ const usePoolsState = () => {
     }, [deboundKeyword, setDeboundKeyword]);
 
     // fetch pool stats
-    const { data: poolStatsRecords, mutate: poolStatsRefresher } = useSWR<PoolStatsRecord[]>(
+    const { data: poolStatsRecords } = useSWR<PoolStatsRecord[]>(
         `${ASHSWAP_CONFIG.ashApiBaseUrl}/pool`,
         fetcher
     );
@@ -113,10 +111,6 @@ const usePoolsState = () => {
     useEffect(() => {
         deboundGetPoolRecords();
     }, [deboundGetPoolRecords]);
-
-    useEffect(() => {
-        setPoolRecordsRefresher(() => poolStatsRefresher);
-    }, [setPoolRecordsRefresher, poolStatsRefresher])
 };
 
 export default usePoolsState;

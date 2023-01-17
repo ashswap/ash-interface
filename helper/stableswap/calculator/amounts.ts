@@ -1,13 +1,8 @@
 import BigNumber from "bignumber.js";
 import { Fraction } from "helper/fraction/fraction";
-import { IESDTInfo } from "helper/token/token";
 import { TokenAmount } from "helper/token/tokenAmount";
-import { computeD, computeY, computeY2 } from "./curve";
+import { computeD, computeY } from "./curve";
 
-const PRECISION = new BigNumber(1e18);
-const getTokenRate = (token: IESDTInfo) => {
-    return new BigNumber(10).pow(18 * 2 - token.decimals);
-}
 /**
  * Calculates the current virtual price of the exchange.
  */
@@ -100,82 +95,6 @@ export const calculateEstimatedSwapOutputAmount = (
     };
 };
 
-export const calculateEstimatedSwapOutputAmount2 = (
-    amp: BigNumber,
-    reserves: TokenAmount[],
-    fromAmount: TokenAmount,
-    toToken: IESDTInfo,
-    fees: {
-        swap: Fraction;
-        admin: Fraction;
-    }
-): {
-    [K in
-        | "outputAmountBeforeFees"
-        | "outputAmount"
-        | "fee"
-        | "lpFee"
-        | "adminFee"]: TokenAmount;
-} => {
-    const fromReserve = reserves.find(
-        (r) => r.token.identifier === fromAmount.token.identifier
-    );
-    const toReserve = reserves.find(
-        (r) => r.token.identifier === toToken.identifier
-    );
-    const fromRate = getTokenRate(fromAmount.token);
-    const toRate = getTokenRate(toToken);
-
-    if (fromAmount.equalTo(0) || !fromReserve || !toReserve) {
-        const zero = new TokenAmount(toToken, 0);
-        return {
-            outputAmountBeforeFees: zero,
-            outputAmount: zero,
-            fee: zero,
-            lpFee: zero,
-            adminFee: zero,
-        };
-    }
-
-    const oldReserves = reserves.map(r => new TokenAmount(r.token, r.raw.multipliedBy(getTokenRate(r.token)).idiv(PRECISION)));
-    const fromAmountNormalized = new TokenAmount(fromAmount.token, fromAmount.raw.multipliedBy(fromRate).idiv(PRECISION));
-    const toReserveNormalized = new TokenAmount(toReserve.token, toReserve.raw.multipliedBy(toRate).idiv(PRECISION));
-
-    const toNormalized = computeY2(amp, oldReserves, fromAmountNormalized, toToken.identifier);
-    const dy = toReserveNormalized.raw.minus(toNormalized);
-
-    const amountBeforeFees = dy.multipliedBy(PRECISION).idiv(toRate);
-
-    const outputAmountBeforeFees = new TokenAmount(
-        toReserve.token,
-        amountBeforeFees
-    );
-
-    const fee = new TokenAmount(
-        toReserve.token,
-        fees.swap.multiply(dy).multiply(PRECISION).toBigNumber().idiv(toRate)
-    );
-
-    const adminFee = new TokenAmount(
-        toReserve.token,
-        fees.admin.multiply(fee.raw).toFixed(0)
-    );
-    const lpFee = fee.subtract(adminFee);
-
-    const outputAmount = new TokenAmount(
-        toReserve.token,
-        amountBeforeFees.minus(fee.raw)
-    );
-
-    return {
-        outputAmountBeforeFees,
-        outputAmount,
-        fee: fee,
-        lpFee,
-        adminFee,
-    };
-};
-
 export interface IWithdrawOneResult {
     withdrawAmount: TokenAmount;
     withdrawAmountBeforeFees: TokenAmount;
@@ -249,13 +168,11 @@ export const normalizedTradeFee = (
     n_coins: BigNumber,
     amount: BigNumber
 ): Fraction => {
-    // const adjustedTradeFee = new Fraction(
-    //     n_coins,
-    //     n_coins.minus(1).multipliedBy(4)
-    // );
-    // return new Fraction(amount, 1).multiply(swapFee).multiply(adjustedTradeFee);
-    const feePercent = swapFee.numerator.multipliedBy(n_coins).idiv(n_coins.minus(1).multipliedBy(4));
-    return new Fraction(feePercent.multipliedBy(amount).idiv(swapFee.denominator), 1);
+    const adjustedTradeFee = new Fraction(
+        n_coins,
+        n_coins.minus(1).multipliedBy(4)
+    );
+    return new Fraction(amount, 1).multiply(swapFee).multiply(adjustedTradeFee);
 };
 
 /**
@@ -276,7 +193,7 @@ export const calculateEstimatedMintAmount = (
     mintAmount: TokenAmount;
     fees: TokenAmount;
 } => {
-    if (depositAmounts.every((amt) => amt.eq(0)) || lpTotalSupply.equalTo(0)) {
+    if (depositAmounts.every((amt) => amt.eq(0))) {
         const zero = new TokenAmount(lpTotalSupply.token, 0);
         return {
             mintAmountBeforeFees: zero,
@@ -288,9 +205,9 @@ export const calculateEstimatedMintAmount = (
     const newBalances = reserves.map((r, i) =>
         r.raw.plus(depositAmounts[i] || 0)
     );
-    const d0 = computeD(amp, oldBalances.map((bal, i) => bal.multipliedBy(getTokenRate(reserves[i].token)).idiv(PRECISION)));
+    const d0 = computeD(amp, oldBalances);
 
-    const d1 = computeD(amp, newBalances.map((bal, i) => bal.multipliedBy(getTokenRate(reserves[i].token)).idiv(PRECISION)));
+    const d1 = computeD(amp, newBalances);
     if (d1.lt(d0)) {
         throw new Error("New D cannot be less than previous D");
     }
@@ -309,7 +226,7 @@ export const calculateEstimatedMintAmount = (
         );
         return newBalance.minus(new BigNumber(fee.toFixed(0)));
     });
-    const d2 = computeD(amp, adjustedBalances.map((bal, i) => bal.multipliedBy(getTokenRate(reserves[i].token)).idiv(PRECISION)));
+    const d2 = computeD(amp, adjustedBalances);
 
     const lpSupply = lpTotalSupply;
     const mintAmountRaw = lpSupply.raw.multipliedBy(d2.minus(d0)).idiv(d0);

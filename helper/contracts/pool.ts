@@ -158,13 +158,6 @@ class PoolContract extends Contract {
             .check()
             .buildTransaction();
     }
-
-    async estimateAddLiquidity(tokenAmounts: BigNumber[]) {
-        let interaction = this.contract.methods.estimateAddLiquidity([tokenAmounts]);
-        const res = await this.getProxy().queryContract(interaction.check().buildQuery());
-        const {firstValue} = this.resultParser.parseQueryResponse(res, interaction.getEndpoint());
-        return firstValue?.valueOf();
-    }
 }
 
 export default PoolContract;

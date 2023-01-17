@@ -84,6 +84,7 @@ function FarmCard({ farmData, viewType }: props) {
     const screenSize = useScreenSize();
     const loadingMap = useRecoilValue(farmLoadingMapState);
     const { claimReward } = useFarmClaimReward();
+    const [token0, token1] = farmData.pool.tokens;
     const [isExpand, setIsExpand] = useState(false);
     const tokenMap = useRecoilValue(tokenMapState);
     const stakedLPAmt = useMemo(() => {
@@ -101,10 +102,6 @@ function FarmCard({ farmData, viewType }: props) {
     );
     const [isClickedStakeButton, setIsClickedStakeButton] = useRecoilState(
         clickedStakeModalState
-    );
-    const is2Pool = useMemo(
-        () => farmData.pool.tokens.length === 2,
-        [farmData.pool.tokens.length]
     );
 
     useEffect(() => {
@@ -164,43 +161,23 @@ function FarmCard({ farmData, viewType }: props) {
                             <div className="text-stake-gray-500 text-xs mb-2.5">
                                 Stake LP
                             </div>
-                            <div
-                                className={`font-bold text-white truncate ${
-                                    is2Pool ? "text-2xl" : "text-lg"
-                                }`}
-                            >
-                                {farmData.pool.tokens
-                                    .map((t) => t.symbol)
-                                    .join(is2Pool ? " & " : "/")}
+                            <div className="font-bold text-2xl text-white truncate">
+                                {token0.symbol}
+                                <span className="text-sm"> & </span>
+                                {token1.symbol}
                             </div>
                         </div>
-                        <div
-                            className={`shrink-0 flex flex-wrap justify-center ${
-                                is2Pool ? "" : "-mr-2 max-w-[4.5rem]"
-                            }`}
-                        >
-                            {farmData.pool.tokens.map((t, i) => {
-                                return (
-                                    <Avatar
-                                        key={t.identifier}
-                                        src={t.logoURI}
-                                        alt={t.symbol}
-                                        className={`${
-                                            is2Pool
-                                                ? "w-[3.25rem] h-[3.25rem]"
-                                                : "w-9 h-9"
-                                        } ${
-                                            i === 1
-                                                ? is2Pool
-                                                    ? "-ml-2.5"
-                                                    : "-ml-1.5"
-                                                : ""
-                                        } ${i === 2 ? "-mt-2.5" : ""} ${
-                                            i > 2 && "hidden"
-                                        }`}
-                                    />
-                                );
-                            })}
+                        <div className="flex">
+                            <Avatar
+                                src={token0.logoURI}
+                                alt={token0.symbol}
+                                className="w-[3.25rem] h-[3.25rem]"
+                            />
+                            <Avatar
+                                src={token1.logoURI}
+                                alt={token1.symbol}
+                                className="w-[3.25rem] h-[3.25rem] -ml-2"
+                            />
                         </div>
                     </div>
                     <div className="mb-12 flex justify-between">
@@ -242,7 +219,8 @@ function FarmCard({ farmData, viewType }: props) {
                                     }
                                 >
                                     <span
-                                        className={`underline text-xs font-bold text-stake-gray-500`}
+                                        className={`underline text-xs font-bold text-stake-gray-500 cursor-pointer`}
+                                        onClick={() => setOpenBoostInfo(true)}
                                     >
                                         Farm Boost
                                     </span>
@@ -506,33 +484,22 @@ function FarmCard({ farmData, viewType }: props) {
                         }
                     >
                         <FarmListLayoutContainer>
-                            <div className="flex items-center space-x-2 lg:space-x-6 overflow-hidden">
-                                <div
-                                    className={`shrink-0 flex flex-wrap justify-center w-8 md:w-12 lg:w-18`}
-                                >
-                                    {farmData.pool.tokens.map((t, i) => {
-                                        return (
-                                            <Avatar
-                                                key={t.identifier}
-                                                src={t.logoURI}
-                                                alt={t.symbol}
-                                                className={`w-4 h-4 md:w-6 md:h-6 lg:w-9 lg:h-9 ${
-                                                    i === 1
-                                                        ? is2Pool
-                                                            ? "-ml-2.5"
-                                                            : "-ml-1.5"
-                                                        : ""
-                                                } ${i === 2 ? "-mt-2.5" : ""} ${
-                                                    i > 2 && "hidden"
-                                                }`}
-                                            />
-                                        );
-                                    })}
+                            <div className="flex items-center space-x-2 md:space-x-6 overflow-hidden">
+                                <div className="flex">
+                                    <Avatar
+                                        src={token0.logoURI}
+                                        alt={token0.symbol}
+                                        className="w-4 h-4 md:w-6 md:h-6 lg:w-9 lg:h-9"
+                                    />
+                                    <Avatar
+                                        src={token1.logoURI}
+                                        alt={token1.symbol}
+                                        className="w-4 h-4 -ml-1 md:w-6 md:h-6 lg:w-9 lg:h-9 md:-ml-3 lg:-ml-4.5 md:mt-3 lg:mt-4.5"
+                                    />
                                 </div>
                                 <div className="flex flex-col text-xs lg:text-lg font-bold md:space-y-2 leading-tight">
-                                    {farmData.pool.tokens.map((t) => (
-                                        <div key={t.identifier}>{t.symbol}</div>
-                                    ))}
+                                    <div>{token0.symbol}</div>
+                                    <div>{token1.symbol}</div>
                                 </div>
                             </div>
                             {/* emission APR */}
@@ -542,13 +509,10 @@ function FarmCard({ farmData, viewType }: props) {
                                 })}
                                 %
                             </div>
-                            <div className="hidden xs:block pr-2.5 sm:pr-3.5 text-right text-white text-xs lg:text-lg font-bold">
+                            <div className="pr-2.5 sm:pr-3.5 text-right text-white text-xs lg:text-lg font-bold">
                                 <div
                                     className="cursor-pointer"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        setOpenBoostInfo(true);
-                                    }}
+                                    onClick={() => setOpenBoostInfo(true)}
                                 >
                                     <BoostBar
                                         height={screenSize?.isMobile ? 24 : 32}
@@ -647,7 +611,7 @@ function FarmCard({ farmData, viewType }: props) {
                             <FarmListLayoutContainer>
                                 <div></div>
                                 <div></div>
-                                <div className="hidden xs:block pr-3.5">
+                                <div className="pr-3.5">
                                     {isExpand && (
                                         <div className="flex flex-col items-end text-2xs md:text-xs font-bold text-stake-gray-500 leading-tight mt-2">
                                             <div>Current / Max</div>

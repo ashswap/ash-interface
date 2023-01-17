@@ -502,7 +502,7 @@ function GovStats() {
                                 onClick={() => setIsQAExpand((val) => !val)}
                             >
                                 <div className="line-clamp-2 text-xs lg:text-sm font-bold grow text-left mr-4">
-                                    Does it mean user will lose money
+                                    OMG? Does it mean user will lose money
                                     everyday?
                                 </div>
                                 {isQAExpand ? (
@@ -516,12 +516,15 @@ function GovStats() {
                                     <div className="mb-4">
                                         Of course not, when your veASH decreases
                                         to 0. It also means that the lock period
-                                        of your ASH is over. You can withdraw
+                                        of your ASH is done. You can withdraw
                                         your staked ASH right away.
                                     </div>
                                     <div>
                                         However, If you want to keep your veASH
-                                        stays on the maximum, just extend
+                                        stays on the maximum, just{" "}
+                                        <span className="text-pink-600 underline font-bold">
+                                            extend
+                                        </span>{" "}
                                         your lock period.
                                     </div>
                                 </div>

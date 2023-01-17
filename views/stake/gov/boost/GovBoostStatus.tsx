@@ -85,6 +85,7 @@ const FarmRecord = ({
         );
     }, [expectedBoost, currentBoost]);
     if (!pool) return null;
+    const [token1, token2] = pool.tokens;
 
     return (
         <div className="grid grid-cols-[minmax(0,auto)_1fr] sm:grid-cols-[minmax(0,auto)_1fr_2fr] md:grid-cols-[minmax(0,auto)_7.5rem_minmax(9.75rem,1fr)_0.8fr_2fr] lg:grid-cols-[minmax(0,auto)_10.5rem_minmax(9.75rem,1fr)_1fr_2fr] items-center">
@@ -113,15 +114,20 @@ const FarmRecord = ({
                     </div>
                 </FarmBoostTooltip>
                 <div className="absolute flex bottom-0 translate-y-1/2 left-1/2 -translate-x-1/2">
-                    {pool.tokens.map(t => <Avatar key={t.identifier}
-                        src={t.logoURI}
-                        alt={t.name}
-                        className="w-4 h-4 first:ml-0 -ml-1"
-                    />)}
+                    <Avatar
+                        src={token1.logoURI}
+                        alt={token1.name}
+                        className="w-4 h-4"
+                    />
+                    <Avatar
+                        src={token2.logoURI}
+                        alt={token2.name}
+                        className="w-4 h-4 -ml-0.5"
+                    />
                 </div>
             </div>
             <div className="hidden sm:block text-sm text-stake-gray-500 font-bold mr-2 truncate">
-                {pool.tokens.map(t => t.symbol).join("-")}
+                {token1.symbol}-{token2.symbol}
             </div>
             <div className="hidden md:block space-y-2">
                 <div className="text-stake-gray-500 text-xs font-bold">

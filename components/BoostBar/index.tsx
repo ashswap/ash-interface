@@ -433,7 +433,7 @@ const TopLabel = () => {
                     style={{
                         right: `min(max(${
                             ((max - validNewValue) * 100) / (max - min)
-                        }%, 3rem), 100% - 7.5rem)`,
+                        }%, 3rem), 100% - 7rem)`,
                         left: "0.8rem",
                     }}
                 >
