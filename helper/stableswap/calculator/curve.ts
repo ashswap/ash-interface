@@ -1,4 +1,5 @@
 import BigNumber from "bignumber.js";
+import { TokenAmount } from "helper/token/tokenAmount";
 
 // maximum iterations of newton's method approximation
 const MAX_ITERS = 20;
@@ -68,3 +69,40 @@ export const computeY = (ampFactor: BigNumber, x: BigNumber, d: BigNumber, nCoin
 
   return y;
 };
+
+export const computeY2 = (ampFactor: BigNumber, reserves: TokenAmount[], fromAmount: TokenAmount, tokenOut: string) => {
+    const nCoins = new BigNumber(reserves.length);
+
+    const d = computeD(ampFactor, reserves.map(r => r.raw));
+    const Ann = ampFactor.multipliedBy(nCoins); // A*n^n
+
+    let c = d;
+    let s = new BigNumber(0);
+
+    for (const r of reserves) {
+        let amt = r;
+        if (r.token.identifier === fromAmount.token.identifier) {
+            amt = r.add(fromAmount);
+        } else if (r.token.identifier === tokenOut){
+            continue;
+        }
+        s = s.plus(amt.raw);
+        c = c.multipliedBy(d).idiv(amt.raw.multipliedBy(nCoins));
+    }
+
+    c = c.multipliedBy(d).idiv(Ann.multipliedBy(nCoins));
+
+    const b = s.plus(d.idiv(Ann)).minus(d);
+    let yPrev = new BigNumber(0);
+    let y = d;
+    for (
+      let i = 0;
+      i < MAX_ITERS && y.minus(yPrev).abs().gt(1);
+      i++
+    ) {
+      yPrev = y;
+      y = y.pow(2).plus(c).idiv(y.plus(y).plus(b));
+    }
+  
+    return y;
+}

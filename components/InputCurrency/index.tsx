@@ -14,7 +14,7 @@ type InputCurrencyProps = Omit<
     onNumberChange?: (val: number) => void;
 };
 function InputCurrency(
-    { onChange, decimals, onNumberChange, ...rest }: InputCurrencyProps,
+    { onChange, decimals: _d, onNumberChange, ...rest }: InputCurrencyProps,
     ref: ForwardedRef<HTMLInputElement>
 ) {
     const _ref = useRef<HTMLInputElement>(null);
@@ -22,10 +22,16 @@ function InputCurrency(
 
     const [previousVal, setPreviousVal] = useState("");
     const [val, setVal] = useState("");
+    const decimals = useMemo(() => {
+        if (typeof _d === "number") {
+            return Math.min(_d, 8);
+        }
+    }, [_d]);
 
     const _onChange: React.ChangeEventHandler<HTMLInputElement> = useCallback(
         (e) => {
-            const raw = e.target.value.replace(/,/g, ".");
+            const raw = e.target.value.replace(/,/g, ".").replace(/^0+/, "0");
+
             if (raw === "" || inputRegex.test(escapeRegExp(raw))) {
                 const numDecimals = raw.split(".")[1]?.length || 0;
                 if (
@@ -57,6 +63,12 @@ function InputCurrency(
     useEffect(() => {
         onNumberChange?.(num);
     }, [num, onNumberChange]);
+
+    useEffect(() => {
+        if(typeof rest.value !== "string") return;
+        const raw = rest.value.replace(/,/g, ".") || "";
+        setPreviousVal(raw);
+    }, [rest.value]);
 
     return (
         <input
