@@ -8,7 +8,8 @@ type LocalStorageKey =
     | "address"
     | "ledgerLogin"
     | "userOnboarding"
-    | "invitationCode";
+    | "invitationCode"
+    | "acceptedLegal";
 export const setItem = ({
     key,
     data,
