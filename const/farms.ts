@@ -55,34 +55,12 @@ const devnet: FarmConfig = {
     beta: [
         {
             farm_address:
-                "erd1qqqqqqqqqqqqqpgq6euk6n5av376vqg768z48zrv4fjxyw63rmcq8cgglq",
-            reward_token_id: "ASH-77a5df",
-            reward_token_decimal: 18,
-            farming_token_id: "LPT-93bf25",
-            farming_token_decimal: 18,
-            farm_token_id: "FUU-ab98ef",
-            farm_token_decimal: 18,
-            active: true,
-        },
-        {
-            farm_address:
                 "erd1qqqqqqqqqqqqqpgq0w3ceg72srdy5xacnlgy7v2083gm3vrqrmcqtmp497",
             reward_token_id: "ASH-77a5df",
             reward_token_decimal: 18,
             farming_token_id: "ALP-fc47a2",
             farming_token_decimal: 18,
             farm_token_id: "FARM-00609b",
-            farm_token_decimal: 18,
-            active: true,
-        },
-        {
-            farm_address:
-                "erd1qqqqqqqqqqqqqpgqpr26ag4qah8393ektrgemhtgfyxlfll4rmcqp5y5c4",
-            reward_token_id: "ASH-77a5df",
-            reward_token_decimal: 18,
-            farming_token_id: "LPT-d6b19f",
-            farming_token_decimal: 18,
-            farm_token_id: "FUU-78ab31",
             farm_token_decimal: 18,
             active: true,
         },
