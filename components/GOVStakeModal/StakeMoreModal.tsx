@@ -222,7 +222,7 @@ const StakeMoreContent = ({ open, onClose }: props) => {
         if (canStake) {
             lockMore(), setIsClickedGovStakeButton(true);
         }
-    }, [canStake]);
+    }, [canStake, lockMore]);
     return (
         <>
             <div className="px-6 lg:px-20 pb-12 overflow-auto relative">
