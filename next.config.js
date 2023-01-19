@@ -8,32 +8,52 @@ const withTM = require("next-transpile-modules")([
 ]);
 
 const { withSentryConfig } = require("@sentry/nextjs");
-
-const moduleExports = withReactSvg(
-    withFonts({
-        include: path.resolve(__dirname, "assets/svg"),
-        reactStrictMode: true,
-        // i18n: {
-        //     locales: ["en"],
-        //     defaultLocale: "en",
-        // },
-        images: {
-            loader: "custom",
-        },
-        trailingSlash: true,
-        async redirects() {
-            return [
-                { source: "/stake", destination: "/", permanent: false },
-                { source: "/stake/mint", destination: "/", permanent: false },
-            ];
-        },
-        sentry: {
-            hideSourceMaps: true,
-            disableServerWebpackPlugin: process.env.BUILD_ENV !== "prod",
-            disableClientWebpackPlugin: process.env.BUILD_ENV !== "prod",
-        },
-    })
-);
+/** @type {import('next').NextConfig} */
+const config = {
+    include: path.resolve(__dirname, "assets/svg"),
+    reactStrictMode: true,
+    // i18n: {
+    //     locales: ["en"],
+    //     defaultLocale: "en",
+    // },
+    images: {
+        loader: "custom",
+    },
+    trailingSlash: true,
+    async redirects() {
+        return [
+            { source: "/stake", destination: "/", permanent: false },
+            { source: "/stake/mint", destination: "/", permanent: false },
+        ];
+    },
+    sentry: {
+        hideSourceMaps: true,
+        disableServerWebpackPlugin: process.env.BUILD_ENV !== "prod",
+        disableClientWebpackPlugin: process.env.BUILD_ENV !== "prod",
+    },
+    exportPathMap: async function (
+        defaultPathMap,
+        { dev, dir, outDir, distDir, buildId }
+    ) {
+        const whitelistPath = ["/", "/reward-pool"];
+        const entries = Object.entries(defaultPathMap).map(
+            ([path, pageObj]) => {
+                return [
+                    path,
+                    {
+                        ...pageObj,
+                        page: whitelistPath.includes(pageObj.page)
+                            ? pageObj.page
+                            : "/404",
+                    },
+                ];
+            }
+        );
+        const pathMap = Object.fromEntries(entries);
+        return pathMap;
+    },
+};
+const moduleExports = withReactSvg(withFonts(config));
 
 const moduleWithTM = withTM(moduleExports);
 

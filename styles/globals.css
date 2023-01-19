@@ -30,6 +30,12 @@
     src: url("../assets/fonts/samsungsharpsans.otf");
 }
 
+@font-face {
+    font-family: "AmazObitaemOstrovItalic";
+    font-weight: 400;
+    src: url("../assets/fonts/Amazobitaemostrovitalic-A4P7.ttf");
+}
+
 html,
 body {
     padding: 0;

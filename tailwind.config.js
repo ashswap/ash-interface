@@ -21,6 +21,9 @@ module.exports = {
             fontSize: {
                 "2xs": "0.625rem",
             },
+            fontFamily: {
+                amaz: "AmazObitaemOstrovItalic",
+            },
             colors: {
                 "bg": "#191629",
                 "bg-hover": "#211D36",
