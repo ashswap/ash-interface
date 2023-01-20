@@ -21,3 +21,8 @@ export const ashBaseStateRefresherAtom = atom<
     key: "refresh_ash_base_state",
     default: () => Promise.resolve(undefined),
 });
+
+export const openLegalModalAtom = atom({
+    key: "is_open_legal_modal",
+    default: false,
+})
