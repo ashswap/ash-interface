@@ -40,6 +40,17 @@ class RewardDistributorContract extends Contract {
         );
         return firstValue?.valueOf() as boolean;
     }
+
+    async getStartClaimableTs() {
+        let interaction = this.contract.methods.getStartClaimableTs([]);
+        const query = interaction.check().buildQuery();
+        const res = await this.getProxy().queryContract(query);
+        const { firstValue } = this.resultParser.parseQueryResponse(
+            res,
+            interaction.getEndpoint()
+        );
+        return firstValue?.valueOf() as BigNumber;
+    }
 }
 
 export default RewardDistributorContract;
