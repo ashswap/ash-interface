@@ -174,7 +174,7 @@ function ConnectWalletModal() {
                                     <div className="text-sm font-bold">
                                         <span>xPortal </span>
                                         <span className="text-ash-blue-500">
-                                        DeFi Wallet
+                                        Wallet
                                         </span>
                                     </div>
                                 </div>

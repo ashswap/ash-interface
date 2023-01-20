@@ -5,7 +5,7 @@ import {
     govLockedAmtState,
     govTotalSupplyVeASH,
     govUnlockTSState,
-    govVeASHAmtState
+    govVeASHAmtState,
 } from "atoms/govState";
 import { tokenMapState } from "atoms/tokensState";
 import BigNumber from "bignumber.js";
@@ -70,7 +70,10 @@ const EXTEND_CONFIG_PRE_MAIN = {
     maxLock: VE_CONFIG.maxLock,
     minLock: VE_CONFIG.minLock,
 };
-const EXTEND_CONFIG = ENVIRONMENT.NETWORK === "mainnet" ? EXTEND_CONFIG_MAIN : EXTEND_CONFIG_PRE_MAIN;
+const EXTEND_CONFIG =
+    ENVIRONMENT.NETWORK === "mainnet"
+        ? EXTEND_CONFIG_MAIN
+        : EXTEND_CONFIG_PRE_MAIN;
 const StakeMoreContent = ({ open, onClose }: props) => {
     const lockedAmt = useRecoilValue(govLockedAmtState);
     const unlockTS = useRecoilValue(govUnlockTSState);
@@ -142,12 +145,7 @@ const StakeMoreContent = ({ open, onClose }: props) => {
             !insufficientASH &&
             (lockAmt.gt(0) || canExtendLockPeriod)
         );
-    }, [
-        insufficientEGLD,
-        insufficientASH,
-        lockAmt,
-        canExtendLockPeriod,
-    ]);
+    }, [insufficientEGLD, insufficientASH, lockAmt, canExtendLockPeriod]);
 
     const lockMore = useCallback(async () => {
         const { sessionId } = await lockMoreASH({
@@ -212,7 +210,12 @@ const StakeMoreContent = ({ open, onClose }: props) => {
         const interval = setInterval(func, 60 * 1000);
         return () => clearInterval(interval);
     }, [unlockTS]);
-    const aClass = "";
+
+    useEffect(() => {
+        if (extendOpts.length === 1) {
+            setExtendLockPeriod(extendOpts[0].value);
+        }
+    }, [extendOpts]);
     return (
         <>
             <div className="px-6 lg:px-20 pb-12 overflow-auto relative">
@@ -431,8 +434,10 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                                     <div className="mt-8">
                                         <LockPeriod
                                             lockSeconds={
-                                                extendLockPeriod +
-                                                currentLockSeconds
+                                                extendOpts.length === 1
+                                                    ? EXTEND_CONFIG.maxLock
+                                                    : extendLockPeriod +
+                                                      currentLockSeconds
                                             }
                                             min={
                                                 currentLockSeconds +
