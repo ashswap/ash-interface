@@ -167,7 +167,7 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
             <div className="sm:flex sm:space-x-8 lg:space-x-24">
                 <div className="w-full mb-12 sm:mb-0 sm:grow">
                     <span className="text-xs text-ash-gray-500">
-                        I verify that I have read the{" "}
+                        Make sure you have read the{" "}
                         <a
                             href="https://docs.ashswap.io/testnet-guides/liquidity-staking"
                             target="_blank"
@@ -177,8 +177,7 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
                                 <u>AshSwap Liquidity Staking Guide</u>
                             </b>
                         </a>{" "}
-                        and understand the risks of providing liquidity,
-                        including impermanent loss.
+                        and understand the associated risks.
                     </span>
                 </div>
                 <div className="w-full sm:w-1/3 lg:w-[17.8125rem] shrink-0">
