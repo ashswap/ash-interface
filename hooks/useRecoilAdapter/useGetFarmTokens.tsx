@@ -15,7 +15,7 @@ const useGetFarmTokens = (config?: SWRConfiguration) => {
     const setFarmTokensRefresher = useSetRecoilState(farmTokensRefresherAtom);
     const collections = useMemo(() => FARMS.map((f) => f.farm_token_id), []);
     const { data, error, mutate } = useSWR<IMetaESDT[]>(
-        accAddress
+        accAddress && collections.length > 0
             ? `${DAPP_CONFIG.apiAddress}/accounts/${accAddress}/nfts?collections=${collections}&type=MetaESDT`
             : null,
         fetcher,

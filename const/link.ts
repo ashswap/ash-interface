@@ -42,12 +42,12 @@ export const LEGAL_LINKS = [
         name: "Privacy Policy",
         url: "https://ashswap.io/privacy/policy",
         iconClassName:
-            "text-ash-cyan-500 colored-drop-shadow-xs colored-drop-shadow-ash-cyan-500",
+            "text-ash-cyan-500 colored-drop-shadow-xs colored-drop-shadow-current",
     },
     {
         name: "Disclaimer",
         url: "https://ashswap.io/disclaimer",
         iconClassName:
-            "text-ash-purple-500 colored-drop-shadow-xs colored-drop-shadow-ash-purple-500",
+            "text-ash-purple-500 colored-drop-shadow-xs colored-drop-shadow-current",
     },
 ];

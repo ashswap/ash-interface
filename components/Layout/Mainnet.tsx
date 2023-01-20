@@ -4,7 +4,7 @@ function MainnetLayout({ children }: PropsWithChildren<{}>) {
     return (
         <div className="relative min-h-screen">
             <div
-                className="absolute inset-0  bg-cover bg-top bg-no-repeat mt-52"
+                className="max-h-[83rem] absolute inset-0 bg-cover bg-top bg-no-repeat mt-52"
                 style={{
                     backgroundImage: `url(${ImgBgMainnet.src})`,
                 }}

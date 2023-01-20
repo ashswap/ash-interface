@@ -14,69 +14,69 @@ export const VE_ASH_DECIMALS = 18;
 
 const DEVNET_TOKENS_ALPHA: IESDTInfo[] = [
     {
-        identifier: "ASH-a0d8e5",
+        identifier: "ASH-4ce444",
         chainId: ChainId.Devnet,
         symbol: "ASH",
         name: "Ashswap Token",
         decimals: 18,
         logoURI: ImgAshIcon.src,
     },
-    {
-        identifier: "USDT-2c4852",
-        chainId: ChainId.Devnet,
-        symbol: "USDT",
-        name: "Tether",
-        decimals: 6,
-        logoURI: IconUSDT.src,
-    },
-    {
-        identifier: "USDC-89351f",
-        chainId: ChainId.Devnet,
-        symbol: "USDC",
-        name: "USD Coin",
-        decimals: 6,
-        logoURI: IconUSDC.src,
-    },
-    {
-        identifier: "BUSD-104d95",
-        chainId: ChainId.Devnet,
-        symbol: "BUSD",
-        name: "Binance USD",
-        decimals: 6,
-        logoURI: IconBUSD.src,
-    },
-    {
-        identifier: "RENBTC-61ff58",
-        chainId: ChainId.Devnet,
-        symbol: "renBTC",
-        name: "Ren BTC",
-        decimals: 8,
-        logoURI: IconBTC.src,
-    },
-    {
-        identifier: "WBTC-3965ad",
-        chainId: ChainId.Devnet,
-        symbol: "wBTC",
-        name: "Wrapped BTC",
-        decimals: 8,
-        logoURI: IconWBTC.src,
-    },
-    {
-        identifier: "WEGLD-d6dee7",
-        chainId: ChainId.Devnet,
-        symbol: "wEGLD",
-        name: "Wrapped EGLD",
-        decimals: 18,
-        logoURI: IconWEGLD.src,
-    },
-    {
-        identifier: "AEGLD-3e2d88",
-        chainId: ChainId.Devnet,
-        symbol: "aEGLD",
-        name: "A EGLD",
-        decimals: 18,
-        logoURI: IconAEGLD.src,
-    },
+    // {
+    //     identifier: "USDT-2c4852",
+    //     chainId: ChainId.Devnet,
+    //     symbol: "USDT",
+    //     name: "Tether",
+    //     decimals: 6,
+    //     logoURI: IconUSDT.src,
+    // },
+    // {
+    //     identifier: "USDC-89351f",
+    //     chainId: ChainId.Devnet,
+    //     symbol: "USDC",
+    //     name: "USD Coin",
+    //     decimals: 6,
+    //     logoURI: IconUSDC.src,
+    // },
+    // {
+    //     identifier: "BUSD-104d95",
+    //     chainId: ChainId.Devnet,
+    //     symbol: "BUSD",
+    //     name: "Binance USD",
+    //     decimals: 6,
+    //     logoURI: IconBUSD.src,
+    // },
+    // {
+    //     identifier: "RENBTC-61ff58",
+    //     chainId: ChainId.Devnet,
+    //     symbol: "renBTC",
+    //     name: "Ren BTC",
+    //     decimals: 8,
+    //     logoURI: IconBTC.src,
+    // },
+    // {
+    //     identifier: "WBTC-3965ad",
+    //     chainId: ChainId.Devnet,
+    //     symbol: "wBTC",
+    //     name: "Wrapped BTC",
+    //     decimals: 8,
+    //     logoURI: IconWBTC.src,
+    // },
+    // {
+    //     identifier: "WEGLD-d6dee7",
+    //     chainId: ChainId.Devnet,
+    //     symbol: "wEGLD",
+    //     name: "Wrapped EGLD",
+    //     decimals: 18,
+    //     logoURI: IconWEGLD.src,
+    // },
+    // {
+    //     identifier: "AEGLD-3e2d88",
+    //     chainId: ChainId.Devnet,
+    //     symbol: "aEGLD",
+    //     name: "A EGLD",
+    //     decimals: 18,
+    //     logoURI: IconAEGLD.src,
+    // },
 ];
 const DEVNET_TOKENS_BETA: IESDTInfo[] = [
     {
@@ -251,7 +251,7 @@ export const ASH_TOKEN: IESDTInfo =
     TOKENS_MAP[
         ENVIRONMENT.NETWORK == "devnet"
             ? ENVIRONMENT.ENV === "alpha"
-                ? "ASH-a0d8e5"
+                ? "ASH-4ce444"
                 : "ASH-77a5df"
             : "ASH-a85626"
     ];
@@ -262,7 +262,7 @@ export const ASH_ESDT =
     ESDT_MAP[
         ENVIRONMENT.NETWORK == "devnet"
             ? ENVIRONMENT.ENV === "alpha"
-                ? "ASH-a0d8e5"
+                ? "ASH-4ce444"
                 : "ASH-77a5df"
             : "ASH-a85626"
     ];

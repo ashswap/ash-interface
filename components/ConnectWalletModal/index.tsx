@@ -140,10 +140,10 @@ function ConnectWalletModal() {
                             </div>
                         ) : (
                             <div className="flex flex-col pb-16 overflow-hidden">
-                                <div className="font-bold text-2xl mb-20 text-center">
+                                <div className="max-w-full w-[21.875rem] font-bold text-2xl mb-20 text-center">
                                     <span>Connect to </span>
                                     <span className="text-ash-blue-500">
-                                        Maiar Wallet
+                                    MultiversX
                                     </span>
                                 </div>
                                 <div
@@ -155,10 +155,10 @@ function ConnectWalletModal() {
                                             className={`colored-drop-shadow-xs colored-drop-shadow-ash-blue-500 w-16 inline text-ash-blue-500`}
                                         />
                                     </div>
-                                    <div className="text-sm font-bold uppercase">
-                                        <span>Maiar </span>
+                                    <div className="text-sm font-bold">
+                                        <span>MultiversX </span>
                                         <span className="text-ash-blue-500">
-                                            web extension
+                                        DeFi Wallet
                                         </span>
                                     </div>
                                 </div>
@@ -171,10 +171,10 @@ function ConnectWalletModal() {
                                             className={`colored-drop-shadow-xs colored-drop-shadow-ash-blue-500 h-16 inline text-ash-blue-500`}
                                         />
                                     </div>
-                                    <div className="text-sm font-bold uppercase">
-                                        <span>Maiar </span>
+                                    <div className="text-sm font-bold">
+                                        <span>xPortal </span>
                                         <span className="text-ash-blue-500">
-                                            mobile app
+                                        DeFi Wallet
                                         </span>
                                     </div>
                                 </div>
@@ -195,10 +195,10 @@ function ConnectWalletModal() {
                                             className={`colored-drop-shadow-xs colored-drop-shadow-ash-blue-500 w-16 inline text-ash-blue-500`}
                                         />
                                     </div>
-                                    <div className="text-sm font-bold uppercase">
+                                    <div className="text-sm font-bold">
                                         <span>Ledger </span>
                                         <span className="text-ash-blue-500">
-                                            wallet
+                                            Wallet
                                         </span>
                                     </div>
                                 </div>
@@ -211,10 +211,10 @@ function ConnectWalletModal() {
                                             className={`colored-drop-shadow-xs colored-drop-shadow-ash-blue-500 w-16 inline text-ash-blue-500`}
                                         />
                                     </div>
-                                    <div className="text-sm font-bold uppercase">
-                                        <span>Web </span>
+                                    <div className="text-sm font-bold">
+                                        <span>MultiversX </span>
                                         <span className="text-ash-blue-500">
-                                            wallet
+                                            Web Wallet
                                         </span>
                                     </div>
                                 </div>

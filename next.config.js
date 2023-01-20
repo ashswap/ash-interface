@@ -35,7 +35,7 @@ const config = {
         defaultPathMap,
         { dev, dir, outDir, distDir, buildId }
     ) {
-        const whitelistPath = ["/", "/reward-pool"];
+        const whitelistPath = ["/", "/reward-pool", "/ledger"];
         const entries = Object.entries(defaultPathMap).map(
             ([path, pageObj]) => {
                 return [

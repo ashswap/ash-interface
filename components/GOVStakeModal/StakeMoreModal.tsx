@@ -17,6 +17,8 @@ import Switch from "components/Switch";
 import TextAmt from "components/TextAmt";
 import CardTooltip from "components/Tooltip/CardTooltip";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
+import { VE_CONFIG } from "const/ashswapConfig";
+import { ENVIRONMENT } from "const/env";
 import { ASH_TOKEN, VE_ASH_DECIMALS } from "const/tokens";
 import { toEGLDD, toWei } from "helper/balance";
 import { estimateVeASH } from "helper/voteEscrow";
@@ -56,7 +58,19 @@ const EXTEND_CONFIG_MAIN = {
     maxLock: 4 * 365 * 24 * 60 * 60,
     minLock: 7 * 24 * 60 * 60,
 };
-const EXTEND_CONFIG = EXTEND_CONFIG_MAIN;
+const EXTEND_CONFIG_PRE_MAIN = {
+    options: [
+        // test purpose
+        // { value: 7 * 24 * 60 * 60, label: "+ 1 week" },
+        // { value: 4 * 7 * 24 * 60 * 60, label: "+ 4 weeks" },
+        { value: 1 * 365 * 24 * 60 * 60, label: "+ 1 year" },
+        { value: 2 * 365 * 24 * 60 * 60, label: "+ 2 years" },
+        { value: 3 * 365 * 24 * 60 * 60, label: "+ 3 years" },
+    ],
+    maxLock: VE_CONFIG.maxLock,
+    minLock: VE_CONFIG.minLock,
+};
+const EXTEND_CONFIG = ENVIRONMENT.NETWORK === "mainnet" ? EXTEND_CONFIG_MAIN : EXTEND_CONFIG_PRE_MAIN;
 const StakeMoreContent = ({ open, onClose }: props) => {
     const lockedAmt = useRecoilValue(govLockedAmtState);
     const unlockTS = useRecoilValue(govUnlockTSState);

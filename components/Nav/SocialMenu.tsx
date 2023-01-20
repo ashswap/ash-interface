@@ -9,6 +9,7 @@ import Link from "next/link";
 import React, { useState } from "react";
 import LegalLinkItem from "./LegalLinkItem";
 import styles from "./Nav.module.css";
+import ICNewTabRound from "assets/svg/new-tab-round.svg";
 
 function HeadlessLink(
     props: React.DetailedHTMLProps<
@@ -61,6 +62,12 @@ const MenuContent = () => {
                     );
                 })}
             </div>
+            <a href="https://blog.ashswap.io" target="_blank" rel="noreferrer">
+            <button className="mt-4 inline-flex items-center font-bold text-xs text-white">
+                <span className="mr-2">Ashswap Blog</span>
+                <ICNewTabRound className="w-3.5 h-3.5 text-white"/>
+            </button>
+            </a>
         </>
     );
 };

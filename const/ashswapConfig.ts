@@ -16,7 +16,7 @@ const dappContractDevnet: DappContractConfig = {
     },
     alpha: {
         voteEscrowedContract:
-            "erd1qqqqqqqqqqqqqpgqhcxzesh0q0cuvr4atp3jlmrvgguw2nvermcq3yu9rl",
+            "erd1qqqqqqqqqqqqqpgqz8szldx6ek0uzdnp0hrdrwhnwrs4uj5trmcqsz3t7t",
         feeDistributor:
             "erd1qqqqqqqqqqqqqpgque0adu3plxy0r3gcamd4m2nl23hlud6srmcqzzyx6z",
     },
@@ -35,7 +35,7 @@ const dappContract =
 export const VE_CONFIG = {
     // main config
     maxLock: 4 * 365 * 24 * 3600,
-    minLock: 7 * 24 * 3600,
+    minLock: ENVIRONMENT.NETWORK === "mainnet" ? 7 * 24 * 3600 : 10 * 60,
     // for BoY
     // maxLock: 2 * 7 * 24 * 3600,
     // minLock: 12 * 60 * 60,
