@@ -18,3 +18,4 @@ export const UNLOCK_TS = 1674214200;// 1674432000;
 export const REWARD_POOL_MIN_VE = new BigNumber(200).multipliedBy(
     10 ** VE_ASH_DECIMALS
 );
+export const LINK_PLAY_RULE = "https://medium.com/@ashswap/ash-staking-reward-pool-23bc3b45cee0";

@@ -6,9 +6,9 @@ import BigNumber from "bignumber.js";
 import Avatar from "components/Avatar";
 import GlowingButton from "components/GlowingButton";
 import GOVStakeModal from "components/GOVStakeModal";
-import UnlockASHModal from "components/UnlockASHModal";
 import { DAPP_CONFIG } from "const/dappConfig";
 import {
+    LINK_PLAY_RULE,
     LKASH_CONTRACT,
     LK_ASH_COLLECTION,
     REWARD_DISTRIBUTOR_CONTRACT,
@@ -30,6 +30,7 @@ import { useRecoilValue } from "recoil";
 import useSWR from "swr";
 import Heading from "./Heading";
 import Image from "components/Image";
+import UnlockASHModal from "components/UnlockASHModal";
 
 function PrizePool() {
     const [isOpenStake, setIsOpenStake] = useState(false);
@@ -43,7 +44,6 @@ function PrizePool() {
     const veSupply = useRecoilValue(govTotalSupplyVeASH);
     const currentVe = useRecoilValue(govVeASHAmtState);
     const pendingTxKey = usePendingTxKey();
-    const { unlockAllLKASH, disabled: disabledUnlockLKASH } = useUnlockBtn();
 
     const {
         claim,
@@ -81,18 +81,16 @@ function PrizePool() {
             REWARD_DISTRIBUTOR_CONTRACT
         )
             .estimateReward(new Address(userAddress))
-            .then(
-                (val) => {
-                    console.log(val.toString());
-                    setSharePct(val.multipliedBy(100).div(1e11).toNumber());
-                    setRewardAmount(
-                        new TokenAmount(
-                            ASH_ESDT,
-                            TOTAL_REWARD_POOL.raw.multipliedBy(val).idiv(1e11)
-                        )
+            .then((val) => {
+                console.log(val.toString());
+                setSharePct(val.multipliedBy(100).div(1e11).toNumber());
+                setRewardAmount(
+                    new TokenAmount(
+                        ASH_ESDT,
+                        TOTAL_REWARD_POOL.raw.multipliedBy(val).idiv(1e11)
                     )
-                }
-            );
+                );
+            });
     }, [userAddress, pendingTxKey]);
 
     return (
@@ -141,12 +139,13 @@ function PrizePool() {
                                     </div>
                                 </div>
                                 <div className="mb-6 font-bold text-xs text-stake-gray-500">
-                                    will be distributed to every veASH Holder who join this Staking event!
+                                    will be distributed to every veASH Holder
+                                    who join this Staking event!
                                 </div>
                             </div>
                             <div className="p-6 bg-stake-dark-500 border border-black">
                                 <div className="mb-4 font-bold text-sm text-stake-gray-500">
-                                Total veASH staked during this event
+                                    Total veASH staked during this event
                                 </div>
                                 <div className="flex items-center">
                                     <Avatar className="w-6 h-6 mr-2 bg-ash-purple-500" />
@@ -188,7 +187,13 @@ function PrizePool() {
                                 <div className="mt-5 font-bold text-sm text-ash-purple-500">
                                     <div className="mb-2">
                                         To be eligible for the reward pool, you
-                                        must stake at least {formatAmount(REWARD_POOL_MIN_VE.div(10**VE_ASH_DECIMALS).toNumber())} veASH. 
+                                        must stake at least{" "}
+                                        {formatAmount(
+                                            REWARD_POOL_MIN_VE.div(
+                                                10 ** VE_ASH_DECIMALS
+                                            ).toNumber()
+                                        )}{" "}
+                                        veASH. 
                                     </div>
                                     <div>
                                         You need to stake{" "}
@@ -303,7 +308,8 @@ function PrizePool() {
                                                             : "text-white"
                                                     }`}
                                                 >
-                                                    minimum staking to receive reward
+                                                    minimum staking to receive
+                                                    reward
                                                 </div>
                                             </div>
                                         </div>
@@ -378,20 +384,24 @@ function PrizePool() {
                         <div className="flex justify-center space-x-4">
                             <GlowingButton
                                 className="px-4 md:w-72 shrink-0 h-14 md:h-[5.5rem] font-bold text-sm md:text-lg bg-ash-dark-600"
-                                disabled={disabledUnlockLKASH}
                                 onClick={() => {
                                     setIsUnlockOpen(true);
-                                    unlockAllLKASH();
                                 }}
                             >
                                 Unlock LKASH to get ASH
                             </GlowingButton>
-                            <GlowingButton
-                                theme="cyan"
-                                className="px-4 md:w-72 shrink-0 h-14 md:h-[5.5rem] font-bold text-sm md:text-lg"
+                            <a
+                                href={LINK_PLAY_RULE}
+                                target="_blank"
+                                rel="noreferrer"
                             >
-                                View Play Rules & FAQ
-                            </GlowingButton>
+                                <GlowingButton
+                                    theme="cyan"
+                                    className="px-4 md:w-72 shrink-0 h-14 md:h-[5.5rem] font-bold text-sm md:text-lg"
+                                >
+                                    View Play Rules & FAQ
+                                </GlowingButton>
+                            </a>
                         </div>
                     </div>
                 </div>

@@ -1,5 +1,6 @@
 import { useGetPendingTransactions } from "@elrondnetwork/dapp-core/hooks";
 import { useMemo } from "react";
+import { useDebounce } from "use-debounce";
 
 const usePendingTxKey = () => {
     const pendingTransactionsFromStore =
@@ -7,7 +8,8 @@ const usePendingTxKey = () => {
     const pendingTxKey = useMemo(() => {
         return Object.keys(pendingTransactionsFromStore).join("-");
     }, [pendingTransactionsFromStore]);
-    return pendingTxKey;
+    const [debounceKey] = useDebounce(pendingTxKey, 500);
+    return debounceKey;
 }
 
 export default usePendingTxKey;

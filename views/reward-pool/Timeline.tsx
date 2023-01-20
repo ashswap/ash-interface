@@ -20,7 +20,7 @@ function Timeline() {
                     <div className="relative ml-20 sm:ml-40 md:ml-72 px-10 sm:px-24 lg:px-40 py-10 bg-yellow-600">
                         <div className="mb-4 lg:mb-10">
                             <div className="mb-0 lg:mb-4 font-bold text-base sm:text-lg lg:text-2xl text-ash-dark-600">
-                                Stake Start__
+                                Stake Starts__
                             </div>
                             <div className="flex items-start text-ash-dark-600">
                                 <div className="font-bold text-sm sm:text-lg lg:text-2xl mr-1 sm:mr-3">

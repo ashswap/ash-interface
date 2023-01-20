@@ -177,7 +177,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
                             <TxCompletedTracker />
                         </SocketProvider>
                         <GlobalModals />
-                        <a
+                        {/* <a
                             href="https://forms.gle/VfEEfzTG3LnJPPxC9"
                             rel="noreferrer"
                             target="_blank"
@@ -186,7 +186,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
                             <span className="text-xs font-bold text-white">
                                 Bug Report
                             </span>
-                        </a>
+                        </a> */}
                     </TestnetGuard>
                 </DappProvider>
             </RecoilRoot>
