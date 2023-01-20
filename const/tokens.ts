@@ -155,6 +155,14 @@ const MAINNET_TOKENS: IESDTInfo[] = [
         logoURI: ImgAshIcon.src,
     },
     {
+        identifier: "ASH-a642d1",
+        chainId: ChainId.Mainnet,
+        symbol: "ASH",
+        name: "Ashswap Token",
+        decimals: 18,
+        logoURI: ImgAshIcon.src,
+    },
+    {
         identifier: "USDT-821a84",
         chainId: ChainId.Mainnet,
         symbol: "USDT",
@@ -253,7 +261,7 @@ export const ASH_TOKEN: IESDTInfo =
             ? ENVIRONMENT.ENV === "alpha"
                 ? "ASH-4ce444"
                 : "ASH-77a5df"
-            : "ASH-a85626"
+            : "ASH-a642d1"
     ];
 export const ESDT_MAP = Object.fromEntries(
     TOKENS.map((t) => [t.identifier, new ESDT(t)])
@@ -264,5 +272,5 @@ export const ASH_ESDT =
             ? ENVIRONMENT.ENV === "alpha"
                 ? "ASH-4ce444"
                 : "ASH-77a5df"
-            : "ASH-a85626"
+            : "ASH-a642d1"
     ];

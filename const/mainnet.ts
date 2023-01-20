@@ -1,11 +1,12 @@
 import BigNumber from "bignumber.js";
 import { TokenAmount } from "helper/token/tokenAmount";
+import { ENVIRONMENT } from "./env";
 import { ASH_ESDT, VE_ASH_DECIMALS } from "./tokens";
 
 export const REWARD_DISTRIBUTOR_CONTRACT =
     "erd1qqqqqqqqqqqqqpgqjfnu9jt6p4679nyw0xfwrqahfw6lje4xrmcqge6evj";
-export const LKASH_CONTRACT = "erd1qqqqqqqqqqqqqpgqxsyrdj38fclflak2mwtqdknqzqhuxy4s0n4sc3e0jy";
-export const LK_ASH_COLLECTION = "LKASH-261982";
+export const LKASH_CONTRACT = ENVIRONMENT.NETWORK == "devnet" ? "erd1qqqqqqqqqqqqqpgqxsyrdj38fclflak2mwtqdknqzqhuxy4s0n4sc3e0jy" : "erd1qqqqqqqqqqqqqpgqawujux7w60sjhm8xdx3n0ed8v9h7kpqu2jpsecw6ek";
+export const LK_ASH_COLLECTION = ENVIRONMENT.NETWORK == "devnet" ? "LKASH-261982" : "LKASH-10bd00";
 export const TOTAL_REWARD_POOL = new TokenAmount(
     ASH_ESDT,
     new BigNumber(2_000_000).multipliedBy(10 ** ASH_ESDT.decimals)
