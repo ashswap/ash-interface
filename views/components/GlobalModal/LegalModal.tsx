@@ -32,14 +32,24 @@ const LegalContent = ({onRequestClose}: Pick<BaseModalType, "onRequestClose">) =
                 }}
                 text={
                     <span className="text-ash-gray-500">
-                        I verify that I have read & accepted to all of{" "}
+                        I verify that I have read & accepted to{" "}
                         <a
-                            href="https://ashswap.io/legal"
+                            href="https://ashswap.io/terms"
                             target="_blank"
                             rel="noreferrer"
                         >
                             <span className="underline font-bold text-white">
-                                AshSwap legal documents.
+                                Terms
+                            </span>
+                        </a>
+                        {" and "}
+                        <a
+                            href="https://ashswap.io/privacy/policy"
+                            target="_blank"
+                            rel="noreferrer"
+                        >
+                            <span className="underline font-bold text-white">
+                                Privacy Policy
                             </span>
                         </a>
                     </span>
