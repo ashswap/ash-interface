@@ -13,7 +13,7 @@ export const TOTAL_REWARD_POOL = new TokenAmount(
 export const LAUNCH_TS = 1676592000;
 export const START_REWARD_POOL = 1674313200;
 export const END_REWWARD_POOL = 1676649600;
-export const UNLOCK_TS = 1674432000;
+export const UNLOCK_TS = 1674190205;// 1674432000;
 export const REWARD_POOL_MIN_VE = new BigNumber(200).multipliedBy(
     10 ** VE_ASH_DECIMALS
 );
