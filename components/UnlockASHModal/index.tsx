@@ -7,7 +7,7 @@ import Image from "components/Image";
 import Avatar from "components/Avatar";
 import { formatAmount } from "helper/number";
 import useUnlockBtn from "hooks/useUnlockBtn";
-import UnlockASHInfoModal from "./unlockASHInfoModal";
+import UnlockASHInfoModal from "./UnlockASHInfoModal";
 import { ASH_ESDT } from "const/tokens";
 import BigNumber from "bignumber.js";
 import GlowingButton from "components/GlowingButton";
