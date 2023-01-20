@@ -38,6 +38,7 @@ function PrizePool() {
     const [rewardAmount, setRewardAmount] = useState(
         new TokenAmount(ASH_ESDT, 0)
     );
+    const [sharePct, setSharePct] = useState(0);
     const userAddress = useRecoilValue(accAddressState);
     const veSupply = useRecoilValue(govTotalSupplyVeASH);
     const currentVe = useRecoilValue(govVeASHAmtState);
@@ -81,15 +82,16 @@ function PrizePool() {
         )
             .estimateReward(new Address(userAddress))
             .then(
-                (val) => (
-                    console.log(val.toString()),
+                (val) => {
+                    console.log(val.toString());
+                    setSharePct(val.multipliedBy(100).div(1e11).toNumber());
                     setRewardAmount(
                         new TokenAmount(
                             ASH_ESDT,
                             TOTAL_REWARD_POOL.raw.multipliedBy(val).idiv(1e11)
                         )
                     )
-                )
+                }
             );
     }, [userAddress, pendingTxKey]);
 
@@ -346,7 +348,7 @@ function PrizePool() {
                                         Your rewards share
                                     </div>
                                     <div className="font-bold text-2xl text-white">
-                                        -%
+                                        {formatAmount(sharePct)}%
                                     </div>
                                 </div>
                             </div>
