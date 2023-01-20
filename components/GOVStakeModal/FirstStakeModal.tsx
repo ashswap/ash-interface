@@ -412,7 +412,7 @@ const FirstStakeContent = ({ open, onClose }: props) => {
                 <div className="sm:flex sm:space-x-8 lg:space-x-24">
                     <div className="w-full mb-12 sm:mb-0 sm:grow">
                         <span className="text-xs text-ash-gray-500">
-                            I verify that I have read the{" "}
+                            Make sure you have read the{" "}
                             <a
                                 href="https://docs.ashswap.io/testnet-guides/governance-staking"
                                 target="_blank"
@@ -422,8 +422,7 @@ const FirstStakeContent = ({ open, onClose }: props) => {
                                     <u>AshSwap Stake Guide</u>
                                 </b>
                             </a>{" "}
-                            and understand the risks of providing liquidity,
-                            including impermanent loss.
+                            and understand the associated risks.
                         </span>
                     </div>
                     <div className="w-full sm:w-[17.8125rem] shrink-0">
