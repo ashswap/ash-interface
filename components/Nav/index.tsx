@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import styles from "./Nav.module.css";
 import SocialMenu from "./SocialMenu";
 import ICPool from "assets/svg/pool.svg";
@@ -10,6 +10,9 @@ import ICNewTab from "assets/svg/new-tab.svg";
 import ICStake from "assets/svg/stake.svg";
 import ICM from "assets/svg/m.svg";
 import StakeMenu from "./StakeMenu";
+import { ENVIRONMENT } from "const/env";
+import moment from "moment";
+import { START_REWARD_POOL } from "const/mainnet";
 
 const Nav = () => {
     const router = useRouter();
@@ -22,6 +25,13 @@ const Nav = () => {
         },
         [router]
     );
+    const disableLinkRewardPool = useMemo(() => {
+        const canAccess =
+            ENVIRONMENT.NETWORK === "devnet" ||
+            (ENVIRONMENT.NETWORK === "mainnet" &&
+                moment().unix() > START_REWARD_POOL);
+        return !canAccess;
+    }, []);
 
     return (
         <div
@@ -73,16 +83,19 @@ const Nav = () => {
                     </div>
                 </a>
             </Link> */}
-            <Link href="/reward-pool" passHref>
-                <div
-                    className={`transition ${styles.btn} ${
-                        isActive("/reward-pool", false) ? styles.active : ""
-                    }`}
-                >
-                    <ICM className="inline-block w-4 h-4 md:mr-2 mt-1.5 transition-none" />
-                    <span className="inline-block">Reward Pool</span>
-                </div>
-            </Link>
+            {!disableLinkRewardPool && (
+                <Link href="/reward-pool" passHref>
+                    <div
+                        className={`transition ${styles.btn} ${
+                            isActive("/reward-pool", false) ? styles.active : ""
+                        }`}
+                    >
+                        <ICM className="inline-block w-4 h-4 md:mr-2 mt-1.5 transition-none" />
+                        <span className="inline-block">Reward Pool</span>
+                    </div>
+                </Link>
+            )}
+
             <SocialMenu />
         </div>
     );

@@ -1,6 +1,7 @@
 import { TokenPayment } from "@elrondnetwork/erdjs/out";
 import { accAddressState } from "atoms/dappState";
 import { DAPP_CONFIG } from "const/dappConfig";
+import { ENVIRONMENT } from "const/env";
 import { LKASH_CONTRACT, LK_ASH_COLLECTION, START_REWARD_POOL, UNLOCK_TS } from "const/mainnet";
 import { fetcher } from "helper/common";
 import { ContractManager } from "helper/contracts/contractManager";
@@ -36,7 +37,7 @@ const useUnlockBtn = () => {
                     TokenPayment.metaEsdtFromBigInteger(
                         t.collection,
                         t.nonce,
-                        1e18,
+                        ENVIRONMENT.NETWORK === "mainnet" ? t.balance : 1e18,
                         t.decimals
                     )
                 );

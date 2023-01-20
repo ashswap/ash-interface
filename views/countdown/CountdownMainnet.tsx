@@ -7,12 +7,18 @@ import Countdown from "components/Coundown";
 import GlowingButton from "components/GlowingButton";
 import Image from "components/Image";
 import UnlockASHModal from "components/UnlockASHModal";
-import { LAUNCH_TS, TOTAL_REWARD_POOL } from "const/mainnet";
+import { ENVIRONMENT } from "const/env";
+import { LAUNCH_TS, START_REWARD_POOL, TOTAL_REWARD_POOL } from "const/mainnet";
 import { formatAmount } from "helper/number";
+import moment from "moment";
 import Link from "next/link";
-import { memo, useState } from "react";
+import { memo, useMemo, useState } from "react";
 function CountdownMainnet() {
     const [isOpenUnlockModal, setIsOpenUnlockModal] = useState(false);
+    const disableLinkRewardPool = useMemo(() => {
+        const canAccess = ENVIRONMENT.NETWORK === "devnet" || (ENVIRONMENT.NETWORK === "mainnet" && moment().unix() > START_REWARD_POOL);
+        return !canAccess;
+    }, []);
     return (
         <>
             <div className="overflow-hidden min-h-screen">
@@ -60,6 +66,7 @@ function CountdownMainnet() {
                                         <GlowingButton
                                             theme="pink"
                                             className="w-full h-16 md:h-[5.5rem] font-bold text-lg"
+                                            disabled={disableLinkRewardPool}
                                         >
                                             Join Event now!
                                         </GlowingButton>
