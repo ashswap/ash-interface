@@ -31,6 +31,7 @@ import useSWR from "swr";
 import Heading from "./Heading";
 import Image from "components/Image";
 import UnlockASHModal from "components/UnlockASHModal";
+import moment from "moment";
 
 function PrizePool() {
     const [isOpenStake, setIsOpenStake] = useState(false);
@@ -39,6 +40,7 @@ function PrizePool() {
     const [rewardAmount, setRewardAmount] = useState(
         new TokenAmount(ASH_ESDT, 0)
     );
+    const [startClaimTs, setStartClaimTs] = useState(0);
     const [sharePct, setSharePct] = useState(0);
     const userAddress = useRecoilValue(accAddressState);
     const veSupply = useRecoilValue(govTotalSupplyVeASH);
@@ -72,26 +74,46 @@ function PrizePool() {
             setRewardAmount(new TokenAmount(ASH_ESDT, 0));
             return;
         }
-        ContractManager.getRewardDistributorContract(
+        const rdContract = ContractManager.getRewardDistributorContract(
             REWARD_DISTRIBUTOR_CONTRACT
-        )
+        );
+        rdContract
             .isClaimable()
             .then((val) => (console.log(val), setIsClaimable(val)));
-        ContractManager.getRewardDistributorContract(
-            REWARD_DISTRIBUTOR_CONTRACT
-        )
-            .estimateReward(new Address(userAddress))
-            .then((val) => {
-                console.log(val.toString());
-                setSharePct(val.multipliedBy(100).div(1e11).toNumber());
-                setRewardAmount(
-                    new TokenAmount(
-                        ASH_ESDT,
-                        TOTAL_REWARD_POOL.raw.multipliedBy(val).idiv(1e11)
-                    )
-                );
-            });
     }, [userAddress, pendingTxKey]);
+
+    useEffect(() => {
+        const rdContract = ContractManager.getRewardDistributorContract(
+            REWARD_DISTRIBUTOR_CONTRACT
+        );
+        const func = () =>
+            rdContract
+                .estimateReward(
+                    new Address(userAddress),
+                    startClaimTs || moment().unix()
+                )
+                .then((val) => {
+                    console.log('%', val.toString());
+                    setSharePct(val.multipliedBy(100).div(1e11).toNumber());
+                    setRewardAmount(
+                        new TokenAmount(
+                            ASH_ESDT,
+                            TOTAL_REWARD_POOL.raw.multipliedBy(val).idiv(1e11)
+                        )
+                    );
+                });
+        const timeout = setTimeout(func, 500);
+        return () => clearTimeout(timeout);
+    }, [userAddress, startClaimTs, pendingTxKey]);
+
+    useEffect(() => {
+        const rdContract = ContractManager.getRewardDistributorContract(
+            REWARD_DISTRIBUTOR_CONTRACT
+        );
+        rdContract.getStartClaimableTs().then((val) => {
+            setStartClaimTs(val.toNumber());
+        });
+    }, [pendingTxKey]);
 
     return (
         <>

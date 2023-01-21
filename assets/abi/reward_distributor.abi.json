@@ -1,16 +1,16 @@
 {
     "buildInfo": {
         "rustc": {
-            "version": "1.68.0-nightly",
-            "commitHash": "ee0412d1ef81efcfabe7f66cd21476ca85d618b1",
-            "commitDate": "2023-01-07",
+            "version": "1.66.0-nightly",
+            "commitHash": "7fcf850d7942804990a1d2e3fe036622a0fe4c74",
+            "commitDate": "2022-10-23",
             "channel": "Nightly",
-            "short": "rustc 1.68.0-nightly (ee0412d1e 2023-01-07)"
+            "short": "rustc 1.66.0-nightly (7fcf850d7 2022-10-23)"
         },
         "contractCrate": {
             "name": "reward_distributor",
             "version": "0.0.0",
-            "git_version": "2ba1dfb-modified"
+            "git_version": "fc6560d"
         },
         "framework": {
             "name": "elrond-wasm",
@@ -68,6 +68,33 @@
                 },
                 {
                     "name": "timestamp",
+                    "type": "u64"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "calculate",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "addr",
+                    "type": "Address"
+                },
+                {
+                    "name": "timestamp",
+                    "type": "u64"
+                },
+                {
+                    "name": "amount",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "unlock_time",
                     "type": "u64"
                 }
             ],

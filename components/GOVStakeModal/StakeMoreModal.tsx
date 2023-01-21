@@ -1,11 +1,12 @@
 import ICArrowTopRight from "assets/svg/arrow-top-right.svg";
 import ICChevronRight from "assets/svg/chevron-right.svg";
+import ICWarning from "assets/svg/warning.svg";
 import { accIsInsufficientEGLDState } from "atoms/dappState";
 import {
     govLockedAmtState,
     govTotalSupplyVeASH,
     govUnlockTSState,
-    govVeASHAmtState
+    govVeASHAmtState,
 } from "atoms/govState";
 import { tokenMapState } from "atoms/tokensState";
 import BigNumber from "bignumber.js";
@@ -19,8 +20,10 @@ import CardTooltip from "components/Tooltip/CardTooltip";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
 import { VE_CONFIG } from "const/ashswapConfig";
 import { ENVIRONMENT } from "const/env";
+import { REWARD_DISTRIBUTOR_CONTRACT, TOTAL_REWARD_POOL } from "const/mainnet";
 import { ASH_TOKEN, VE_ASH_DECIMALS } from "const/tokens";
 import { toEGLDD, toWei } from "helper/balance";
+import { ContractManager } from "helper/contracts/contractManager";
 import { estimateVeASH } from "helper/voteEscrow";
 import useGovLockMore from "hooks/useGovContract/useGovLockMore";
 import useMediaQuery from "hooks/useMediaQuery";
@@ -29,6 +32,7 @@ import { useScreenSize } from "hooks/useScreenSize";
 import moment from "moment";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
+import { useDebouncedCallback } from "use-debounce";
 import LockPeriod, { lockPeriodFormater } from "./LockPeriod";
 type props = {
     open: boolean;
@@ -70,7 +74,10 @@ const EXTEND_CONFIG_PRE_MAIN = {
     maxLock: VE_CONFIG.maxLock,
     minLock: VE_CONFIG.minLock,
 };
-const EXTEND_CONFIG = ENVIRONMENT.NETWORK === "mainnet" ? EXTEND_CONFIG_MAIN : EXTEND_CONFIG_PRE_MAIN;
+const EXTEND_CONFIG =
+    ENVIRONMENT.NETWORK === "mainnet"
+        ? EXTEND_CONFIG_MAIN
+        : EXTEND_CONFIG_PRE_MAIN;
 const StakeMoreContent = ({ open, onClose }: props) => {
     const lockedAmt = useRecoilValue(govLockedAmtState);
     const unlockTS = useRecoilValue(govUnlockTSState);
@@ -96,6 +103,7 @@ const StakeMoreContent = ({ open, onClose }: props) => {
     );
     const [openOnboardingExtendTooltip, setOpenOnboardingExtendTooltip] =
         useState(false);
+    const [estimatedReward, setEstimatedReward] = useState(0);
     const remaining = useMemo(() => {
         return lockPeriodFormater(currentLockSeconds * 1000);
     }, [currentLockSeconds]);
@@ -142,12 +150,7 @@ const StakeMoreContent = ({ open, onClose }: props) => {
             !insufficientASH &&
             (lockAmt.gt(0) || canExtendLockPeriod)
         );
-    }, [
-        insufficientEGLD,
-        insufficientASH,
-        lockAmt,
-        canExtendLockPeriod,
-    ]);
+    }, [insufficientEGLD, insufficientASH, lockAmt, canExtendLockPeriod]);
 
     const lockMore = useCallback(async () => {
         const { sessionId } = await lockMoreASH({
@@ -195,6 +198,24 @@ const StakeMoreContent = ({ open, onClose }: props) => {
         const e = estimatedCapacity.startsWith("<") ? 0 : +estimatedCapacity;
         return new BigNumber(e).minus(c).toNumber();
     }, [currentCapacity, estimatedCapacity]);
+    const calculateReward = useDebouncedCallback(
+        (ashAmt: BigNumber, unlockTs: number) => {
+            ContractManager.getRewardDistributorContract(
+                REWARD_DISTRIBUTOR_CONTRACT
+            )
+                .calculate(ashAmt, unlockTs, moment().unix())
+                .then((val) => (console.log(val.toString()), val))
+                .then((val) =>
+                    setEstimatedReward(
+                        val
+                            .multipliedBy(TOTAL_REWARD_POOL.egld)
+                            .div(1e11)
+                            .toNumber()
+                    )
+                );
+        },
+        500
+    );
 
     useEffect(() => {
         if (isTouchScreen) {
@@ -212,7 +233,19 @@ const StakeMoreContent = ({ open, onClose }: props) => {
         const interval = setInterval(func, 60 * 1000);
         return () => clearInterval(interval);
     }, [unlockTS]);
-    const aClass = "";
+
+    useEffect(() => {
+        if (extendOpts.length === 1) {
+            setExtendLockPeriod(extendOpts[0].value);
+        }
+    }, [extendOpts]);
+
+    useEffect(() => {
+        console.log(estimatedVeASH.toString(), veASH.toString());
+        const virtualAmt = BigNumber.max(estimatedVeASH.minus(veASH), 0);
+        console.log(virtualAmt.toString());
+        calculateReward(virtualAmt, VE_CONFIG.maxLock + moment().unix());
+    }, [calculateReward, estimatedVeASH, veASH]);
     return (
         <>
             <div className="px-6 lg:px-20 pb-12 overflow-auto relative">
@@ -431,8 +464,10 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                                     <div className="mt-8">
                                         <LockPeriod
                                             lockSeconds={
-                                                extendLockPeriod +
-                                                currentLockSeconds
+                                                extendOpts.length === 1
+                                                    ? EXTEND_CONFIG.maxLock
+                                                    : extendLockPeriod +
+                                                      currentLockSeconds
                                             }
                                             min={
                                                 currentLockSeconds +
@@ -474,6 +509,46 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                             Estimated Staking
                         </div>
                         <div className="flex flex-col space-y-11">
+                            <div>
+                                <CardTooltip
+                                    content={
+                                        <div>
+                                            <ICWarning className="w-6 h-6 -mt-1 inline-block mr-2"/>
+                                            Your reward will change depending on
+                                            the number of veASH of other
+                                            participants
+                                        </div>
+                                    }
+                                >
+                                    <div className="inline-block text-stake-gray-500 text-xs underline mb-2">
+                                        Estimated Reward
+                                    </div>
+                                </CardTooltip>
+                                <div className="flex items-center">
+                                    <Avatar
+                                        src={TOTAL_REWARD_POOL.token.logoURI}
+                                        className="w-5 h-5 mr-2"
+                                    />
+                                    <div className="text-white text-lg font-bold">
+                                        <TextAmt
+                                            number={estimatedReward}
+                                            decimalClassName="text-stake-gray-500"
+                                        />
+                                    </div>
+                                </div>
+                                {/* <div className="flex items-center">
+                                    <Avatar
+                                        src={TOTAL_REWARD_POOL.token.logoURI}
+                                        className="w-5 h-5 mr-2"
+                                    />
+                                    <div className="text-white text-lg font-bold">
+                                        <TextAmt
+                                            number={estimatedReward}
+                                            decimalClassName="text-stake-gray-500"
+                                        />
+                                    </div>
+                                </div> */}
+                            </div>
                             <div>
                                 <CardTooltip
                                     content={

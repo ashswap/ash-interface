@@ -13,5 +13,5 @@ export const estimateVeASH = (weiAmt: BigNumber, lockSeconds: number) => {
                 .multiply(lockSeconds)
                 .multiply(10 ** VE_ASH_DECIMALS)
         )
-        .toBigNumber();
+        .quotient;
 };

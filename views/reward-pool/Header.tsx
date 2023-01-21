@@ -21,8 +21,8 @@ function Header() {
                 <div className="mt-10 mb-5 font-bold text-base sm:text-lg text-yellow-600">
                     {timeline}
                 </div>
-                <div className="font-bold text-lg sm:text-3xl text-white text-left">
-                Stake ASH - as many <br /> as you can - to win <br /> the cake!
+                <div className="font-bold text-base sm:text-3xl text-white text-left">
+                 Stake ASH to win the cake! <br /> More ASH, more Reward
                 </div>
             </div>
         </div>
