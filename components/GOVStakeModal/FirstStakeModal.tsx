@@ -1,5 +1,6 @@
 import { Slider } from "antd";
 import ICChevronRight from "assets/svg/chevron-right.svg";
+import ICWarning from "assets/svg/warning.svg";
 import { accIsInsufficientEGLDState } from "atoms/dappState";
 import { govTotalSupplyVeASH } from "atoms/govState";
 import { tokenMapState } from "atoms/tokensState";
@@ -367,6 +368,7 @@ const FirstStakeContent = ({ open, onClose }: props) => {
                                 <CardTooltip
                                     content={
                                         <div>
+                                            <ICWarning className="w-6 h-6 -mt-1 inline-block mr-2"/>
                                             Your reward will change depending on the number of veASH of other participants
                                         </div>
                                     }

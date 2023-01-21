@@ -1,5 +1,6 @@
 import ICArrowTopRight from "assets/svg/arrow-top-right.svg";
 import ICChevronRight from "assets/svg/chevron-right.svg";
+import ICWarning from "assets/svg/warning.svg";
 import { accIsInsufficientEGLDState } from "atoms/dappState";
 import {
     govLockedAmtState,
@@ -512,6 +513,7 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                                 <CardTooltip
                                     content={
                                         <div>
+                                            <ICWarning className="w-6 h-6 -mt-1 inline-block mr-2"/>
                                             Your reward will change depending on
                                             the number of veASH of other
                                             participants
