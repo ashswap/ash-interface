@@ -120,11 +120,11 @@ const StakeMoreContent = ({ open, onClose }: props) => {
     const [extendLockPeriod, setExtendLockPeriod] = useState(
         extendOpts[0].value
     ); // in seconds
-    useEffect(() => {
-        if (currentLockSeconds === 0) {
-            setIsExtend(true);
-        }
-    }, [currentLockSeconds]);
+    // useEffect(() => {
+    //     if (currentLockSeconds === 0) {
+    //         setIsExtend(true);
+    //     }
+    // }, [currentLockSeconds]);
     const setMaxLockAmt = useCallback(() => {
         if (!ASHBalance) return;
         setLockAmt(ASHBalance);
