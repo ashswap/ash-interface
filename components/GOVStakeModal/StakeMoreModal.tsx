@@ -19,8 +19,10 @@ import CardTooltip from "components/Tooltip/CardTooltip";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
 import { VE_CONFIG } from "const/ashswapConfig";
 import { ENVIRONMENT } from "const/env";
+import { REWARD_DISTRIBUTOR_CONTRACT, TOTAL_REWARD_POOL } from "const/mainnet";
 import { ASH_TOKEN, VE_ASH_DECIMALS } from "const/tokens";
 import { toEGLDD, toWei } from "helper/balance";
+import { ContractManager } from "helper/contracts/contractManager";
 import { estimateVeASH } from "helper/voteEscrow";
 import useGovLockMore from "hooks/useGovContract/useGovLockMore";
 import useMediaQuery from "hooks/useMediaQuery";
@@ -29,6 +31,7 @@ import { useScreenSize } from "hooks/useScreenSize";
 import moment from "moment";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
+import { useDebouncedCallback } from "use-debounce";
 import LockPeriod, { lockPeriodFormater } from "./LockPeriod";
 type props = {
     open: boolean;
@@ -99,6 +102,7 @@ const StakeMoreContent = ({ open, onClose }: props) => {
     );
     const [openOnboardingExtendTooltip, setOpenOnboardingExtendTooltip] =
         useState(false);
+    const [estimatedReward, setEstimatedReward] = useState(0);
     const remaining = useMemo(() => {
         return lockPeriodFormater(currentLockSeconds * 1000);
     }, [currentLockSeconds]);
@@ -193,6 +197,23 @@ const StakeMoreContent = ({ open, onClose }: props) => {
         const e = estimatedCapacity.startsWith("<") ? 0 : +estimatedCapacity;
         return new BigNumber(e).minus(c).toNumber();
     }, [currentCapacity, estimatedCapacity]);
+    const calculateReward = useDebouncedCallback(
+        (ashAmt: BigNumber, unlockTs: number) => {
+            ContractManager.getRewardDistributorContract(
+                REWARD_DISTRIBUTOR_CONTRACT
+            )
+                .calculate(ashAmt, unlockTs, moment().unix())
+                .then((val) =>
+                    setEstimatedReward(
+                        val
+                            .multipliedBy(TOTAL_REWARD_POOL.egld)
+                            .div(1e11)
+                            .toNumber()
+                    )
+                );
+        },
+        500
+    );
 
     useEffect(() => {
         if (isTouchScreen) {
@@ -216,6 +237,10 @@ const StakeMoreContent = ({ open, onClose }: props) => {
             setExtendLockPeriod(extendOpts[0].value);
         }
     }, [extendOpts]);
+
+    useEffect(() => {
+        calculateReward(lockAmt.plus(lockedAmt), extendLockPeriod + currentLockSeconds + moment().unix());
+    }, [lockAmt, lockedAmt, calculateReward, extendLockPeriod, currentLockSeconds]);
     return (
         <>
             <div className="px-6 lg:px-20 pb-12 overflow-auto relative">
@@ -479,6 +504,43 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                             Estimated Staking
                         </div>
                         <div className="flex flex-col space-y-11">
+                        <div>
+                                <CardTooltip
+                                    content={
+                                        <div>
+                                            By joining reward pool.
+                                        </div>
+                                    }
+                                >
+                                    <div className="inline-block text-stake-gray-500 text-xs underline mb-2">
+                                        Your rewards
+                                    </div>
+                                </CardTooltip>
+                                <div className="flex items-center">
+                                    <Avatar
+                                        src={TOTAL_REWARD_POOL.token.logoURI}
+                                        className="w-5 h-5 mr-2"
+                                    />
+                                    <div className="text-white text-lg font-bold">
+                                        <TextAmt
+                                            number={estimatedReward}
+                                            decimalClassName="text-stake-gray-500"
+                                        />
+                                    </div>
+                                </div>
+                                {/* <div className="flex items-center">
+                                    <Avatar
+                                        src={TOTAL_REWARD_POOL.token.logoURI}
+                                        className="w-5 h-5 mr-2"
+                                    />
+                                    <div className="text-white text-lg font-bold">
+                                        <TextAmt
+                                            number={estimatedReward}
+                                            decimalClassName="text-stake-gray-500"
+                                        />
+                                    </div>
+                                </div> */}
+                            </div>
                             <div>
                                 <CardTooltip
                                     content={
