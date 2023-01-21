@@ -381,7 +381,7 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
                                 <u>AshSwap Pools Guide</u>
                             </b>
                         </a>{" "}
-                        and understand the associated risks.
+                        and understood the associated risks.
                     </span>
                 </div>
                 <div className="w-full sm:w-1/3">
