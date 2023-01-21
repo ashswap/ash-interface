@@ -367,12 +367,12 @@ const FirstStakeContent = ({ open, onClose }: props) => {
                                 <CardTooltip
                                     content={
                                         <div>
-                                            By joining reward pool.
+                                            Your reward will change depending on the number of veASH of other participants
                                         </div>
                                     }
                                 >
                                     <div className="inline-block text-stake-gray-500 text-xs underline mb-2">
-                                        Your rewards
+                                    Estimated Reward
                                     </div>
                                 </CardTooltip>
                                 <div className="flex items-center">

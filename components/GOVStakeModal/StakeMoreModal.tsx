@@ -203,6 +203,7 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                 REWARD_DISTRIBUTOR_CONTRACT
             )
                 .calculate(ashAmt, unlockTs, moment().unix())
+                .then((val) => (console.log(val.toString()), val))
                 .then((val) =>
                     setEstimatedReward(
                         val
@@ -239,8 +240,11 @@ const StakeMoreContent = ({ open, onClose }: props) => {
     }, [extendOpts]);
 
     useEffect(() => {
-        calculateReward(lockAmt.plus(lockedAmt), extendLockPeriod + currentLockSeconds + moment().unix());
-    }, [lockAmt, lockedAmt, calculateReward, extendLockPeriod, currentLockSeconds]);
+        console.log(estimatedVeASH.toString(), veASH.toString());
+        const virtualAmt = BigNumber.max(estimatedVeASH.minus(veASH), 0);
+        console.log(virtualAmt.toString());
+        calculateReward(virtualAmt, VE_CONFIG.maxLock + moment().unix());
+    }, [calculateReward, estimatedVeASH, veASH]);
     return (
         <>
             <div className="px-6 lg:px-20 pb-12 overflow-auto relative">
@@ -504,16 +508,18 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                             Estimated Staking
                         </div>
                         <div className="flex flex-col space-y-11">
-                        <div>
+                            <div>
                                 <CardTooltip
                                     content={
                                         <div>
-                                            By joining reward pool.
+                                            Your reward will change depending on
+                                            the number of veASH of other
+                                            participants
                                         </div>
                                     }
                                 >
                                     <div className="inline-block text-stake-gray-500 text-xs underline mb-2">
-                                        Your rewards
+                                        Estimated Reward
                                     </div>
                                 </CardTooltip>
                                 <div className="flex items-center">
