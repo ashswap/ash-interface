@@ -506,7 +506,7 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                     </div>
                     <div className="w-full sm:w-1/3 lg:w-[17.8125rem] shrink-0 bg-stake-dark-500 py-[2.375rem] px-10 sm:px-4 lg:px-10">
                         <div className="text-white text-lg font-bold mb-16">
-                            Estimated Staking
+                            Staking Estimate
                         </div>
                         <div className="flex flex-col space-y-11">
                             <div>
@@ -616,7 +616,7 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                                     }
                                 >
                                     <div className="text-ash-gray-500 text-xs underline mb-2">
-                                        Your capacity
+                                        Your share
                                     </div>
                                 </CardTooltip>
                                 <div
@@ -683,7 +683,7 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                 <div className="sm:flex sm:space-x-8 lg:space-x-24">
                     <div className="w-full mb-12 sm:mb-0 sm:grow">
                         <span className="text-xs text-ash-gray-500">
-                            I verify that I have read the{" "}
+                            Make sure you have read the{" "}
                             <a
                                 href="https://docs.ashswap.io/testnet-guides/governance-staking"
                                 target="_blank"
@@ -693,8 +693,7 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                                     <u>AshSwap Stake Guide</u>
                                 </b>
                             </a>{" "}
-                            and understand the risks of providing liquidity,
-                            including impermanent loss.
+                            and understood the associated risks.
                         </span>
                     </div>
                     <div className="w-full sm:w-1/3 lg:w-[17.8125rem] shrink-0">
