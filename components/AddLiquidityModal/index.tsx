@@ -371,7 +371,7 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
             <div className="sm:flex gap-8">
                 <div className="w-full mb-12 sm:mb-0 sm:w-2/3">
                     <span className="text-xs text-ash-gray-500">
-                        I verify that I have read the{" "}
+                        Make sure you  have read the{" "}
                         <a
                             href="https://docs.ashswap.io/guides/add-remove-liquidity"
                             target="_blank"
@@ -381,8 +381,7 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
                                 <u>AshSwap Pools Guide</u>
                             </b>
                         </a>{" "}
-                        and understand the risks of providing liquidity,
-                        including impermanent loss.
+                        and understood the associated risks.
                     </span>
                 </div>
                 <div className="w-full sm:w-1/3">

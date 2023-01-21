@@ -330,7 +330,7 @@ function PrizePool() {
                                                             : "text-white"
                                                     }`}
                                                 >
-                                                    minimum staking to receive
+                                                    minimum stake to receive
                                                     reward
                                                 </div>
                                             </div>
@@ -347,7 +347,7 @@ function PrizePool() {
                                     }`}
                                 >
                                     <div className="mb-2.5 font-bold text-sm text-stake-gray-500">
-                                        Your rewards // Estimating...
+                                        Your reward // Estimating...
                                     </div>
                                     <div className="flex items-center">
                                         <Avatar
@@ -373,7 +373,7 @@ function PrizePool() {
                                     }`}
                                 >
                                     <div className="mb-2.5 font-bold text-sm text-stake-gray-500">
-                                        Your rewards share
+                                        Your reward share
                                     </div>
                                     <div className="font-bold text-2xl text-white">
                                         {formatAmount(sharePct)}%
