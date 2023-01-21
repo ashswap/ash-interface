@@ -16,7 +16,7 @@ const dappContractDevnet: DappContractConfig = {
     },
     alpha: {
         voteEscrowedContract:
-            "erd1qqqqqqqqqqqqqpgqg7f39yekqtjr9hucuvsg2qe3twp6kt0drmcqplg7su",
+            "erd1qqqqqqqqqqqqqpgqjn9yuunngs2a0tuqgldw3d0rrns57y04rmcq5ke5kz",
         feeDistributor:
             "erd1qqqqqqqqqqqqqpgque0adu3plxy0r3gcamd4m2nl23hlud6srmcqzzyx6z",
     },

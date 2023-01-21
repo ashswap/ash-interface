@@ -4,7 +4,7 @@ import { ENVIRONMENT } from "./env";
 import { ASH_ESDT, VE_ASH_DECIMALS } from "./tokens";
 
 export const REWARD_DISTRIBUTOR_CONTRACT =
-    "erd1qqqqqqqqqqqqqpgqf7lftcyvzsk3az02xrq2kzh2fr9qwaf7rmcq5ksg5k";
+    "erd1qqqqqqqqqqqqqpgq447xgljqnz0wuk8u05ejccae8w0zg6s7rmcqy3f0hu";
 export const LKASH_CONTRACT = ENVIRONMENT.NETWORK == "devnet" ? "erd1qqqqqqqqqqqqqpgqxsyrdj38fclflak2mwtqdknqzqhuxy4s0n4sc3e0jy" : "erd1qqqqqqqqqqqqqpgqawujux7w60sjhm8xdx3n0ed8v9h7kpqu2jpsecw6ek";
 export const LK_ASH_COLLECTION = ENVIRONMENT.NETWORK == "devnet" ? "LKASH-261982" : "LKASH-10bd00";
 export const TOTAL_REWARD_POOL = new TokenAmount(
