@@ -37,7 +37,7 @@ const LegalContent = ({onRequestClose}: Pick<BaseModalType, "onRequestClose">) =
                 }}
                 text={
                     <span className="text-ash-gray-500">
-                        I verify that I have read & accepted{" "}
+                        Make sure you  have read & accepted{" "}
                         <a
                             href="https://ashswap.io/terms"
                             target="_blank"

@@ -339,7 +339,7 @@ const FirstStakeContent = ({ open, onClose }: props) => {
                     </div>
                     <div className="w-full sm:w-1/3 lg:w-[17.8125rem] shrink-0 bg-stake-dark-500 py-[2.375rem] px-10">
                         <div className="text-white text-lg font-bold mb-16">
-                            Estimated Staking
+                            Staking Estimate
                         </div>
                         <div className="flex flex-col space-y-11">
                             <div>
@@ -352,7 +352,7 @@ const FirstStakeContent = ({ open, onClose }: props) => {
                                     }
                                 >
                                     <div className="inline-block text-stake-gray-500 text-xs underline mb-2">
-                                        VeASH Receive
+                                        veASH Received
                                     </div>
                                 </CardTooltip>
 
@@ -378,7 +378,7 @@ const FirstStakeContent = ({ open, onClose }: props) => {
                                     }
                                 >
                                     <div className="inline-block text-stake-gray-500 text-xs underline mb-2">
-                                        Your capacity
+                                        Your share
                                     </div>
                                 </CardTooltip>
 
@@ -422,7 +422,7 @@ const FirstStakeContent = ({ open, onClose }: props) => {
                                     <u>AshSwap Stake Guide</u>
                                 </b>
                             </a>{" "}
-                            and understand the associated risks.
+                            and understood the associated risks.
                         </span>
                     </div>
                     <div className="w-full sm:w-[17.8125rem] shrink-0">

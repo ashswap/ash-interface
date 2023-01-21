@@ -193,7 +193,7 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
                                 <u>AshSwap Liquidity Staking Guide</u>
                             </b>
                         </a>{" "}
-                        and understand the associated risks.
+                        and understood the associated risks.
                     </span>
                 </div>
                 <div className="w-full sm:w-1/3 lg:w-[17.8125rem] shrink-0">
