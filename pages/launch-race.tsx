@@ -18,6 +18,7 @@ import useSWR from "swr";
 import logApi from "helper/logHelper";
 import { QuestUserStatsModel } from "interface/quest";
 import { formatAmount } from "helper/number";
+import CardTooltip from "components/Tooltip/CardTooltip";
 const swrLogApi = (url: string) => logApi.get(url).then((res) => res.data);
 const _RacePointTable = () => {
     const isLoggedIn = useRecoilValue(accIsLoggedInState);
@@ -85,9 +86,19 @@ const _RacePointTable = () => {
                         </div>
                     </div>
                     <div>
-                        <div className="mb-5 font-bold text-xs text-white">
-                            Friends stake
-                        </div>
+                        <CardTooltip
+                            content={
+                                <>
+                                    When the person you refer stakes governance
+                                    and owns at least 200 veASH, you will
+                                    receive an additional 100 Race Point bonus.
+                                </>
+                            }
+                        >
+                            <div className="mb-5 font-bold text-xs text-white underline">
+                                Friends stake
+                            </div>
+                        </CardTooltip>
                         <div className="font-bold text-2xl text-white">
                             {isLoggedIn
                                 ? formatAmount(data?.wallet.user_staked || 0, {
@@ -119,7 +130,7 @@ function LaunchRacePage() {
             <LaunchRaceLayout>
                 <div className="overflow-hidden max-w-full md:overflow-visible mt-[-6.25rem] pt-[6.25rem]">
                     <div className="ash-container px-6 lg:px-0 pt-14 relative">
-                        <div className="absolute -z-10 -top-[6.25rem] bottom-0 -left-32 md:left-0 -right-44 md:-right-[calc(50vw-50%-2px)] mix-blend-lighten">
+                        <div className="absolute -z-10 -top-[6.25rem] bottom-0 -left-32 md:left-0 -right-44 md:-right-[calc(50vw-50%-4px)] mix-blend-lighten">
                             <Image
                                 src={ImgBgRace}
                                 alt=""
@@ -144,12 +155,16 @@ function LaunchRacePage() {
                                     More friends, more prize
                                 </div>
                                 <div className="flex flex-col max-w-[18rem] space-y-4">
-                                    <a href="https://medium.com/@ashswap/ashswap-launch-race-4463e9b1f47" target="_blank" rel="noreferrer">
-                                    <GlowingButton className="w-full h-16 xl:h-[5.5rem] bg-ash-purple-500 hover:colored-drop-shadow-xs hover:colored-drop-shadow-ash-purple-500/30 font-bold text-lg text-white">
-                                        How to join?
-                                    </GlowingButton>
+                                    <a
+                                        href="https://medium.com/@ashswap/ashswap-launch-race-4463e9b1f47"
+                                        target="_blank"
+                                        rel="noreferrer"
+                                    >
+                                        <GlowingButton className="w-full h-16 xl:h-[5.5rem] bg-ash-purple-500 hover:colored-drop-shadow-xs hover:colored-drop-shadow-ash-purple-500/30 font-bold text-lg text-white">
+                                            How to join?
+                                        </GlowingButton>
                                     </a>
-                                    <a href="https://devnet.ashswap.io ">
+                                    <a href="https://devnet.ashswap.io/ashpoint">
                                         <GlowingButton className="w-full h-16 xl:h-[5.5rem] bg-ash-dark-600 font-bold text-lg text-white">
                                             Open Ashswap
                                         </GlowingButton>
