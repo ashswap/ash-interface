@@ -59,6 +59,10 @@ export type QuestWallet = {
     twitter_username: string;
     wallet_address: string;
     invitation_code: string;
+    // launch race
+    race_point: number;
+    user_invited: number;
+    user_staked: number;
 };
 
 export type DiscordMetadata = {
