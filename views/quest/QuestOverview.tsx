@@ -100,7 +100,8 @@ const QuestOverview = () => {
 
     const sharableLink = useMemo(() => {
         const text = new URLSearchParams({
-            text: `I just swapped the stablecoins with low slippage, small fees, and fast transaction confirmed on the @ash_swap devnet. Use my referral link, and we'll both earn 500 ASH Points when you join: ${inviteLink}\n#ashswap #MVX #Elrond #stableswap`,
+            // text: `I just swapped the stablecoins with low slippage, small fees, and fast transaction confirmed on the @ash_swap devnet. Use my referral link, and we'll both earn 500 ASH Points when you join: ${inviteLink}\n#ashswap #MVX #Elrond #stableswap`,
+            text: `@ash_swap - the very first #DEX following the stable-swap model on the @MultiversX blockchain - will launch its Mainnet this Feb 17 at https://app.ashswap.io/ \n\nUse my referral link, and we'll both earn 500 ASH Points & I will have 1 RACE Point when you join:\n${inviteLink}`,
         });
         return `https://twitter.com/intent/tweet?${text.toString()}`;
     }, [inviteLink]);
