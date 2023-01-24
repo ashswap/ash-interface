@@ -1,3 +1,4 @@
+import { Slider } from "antd";
 import ICArrowTopRight from "assets/svg/arrow-top-right.svg";
 import ICChevronRight from "assets/svg/chevron-right.svg";
 import ICWarning from "assets/svg/warning.svg";
@@ -32,6 +33,7 @@ import { useScreenSize } from "hooks/useScreenSize";
 import moment from "moment";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
+import { theme } from "tailwind.config";
 import { useDebouncedCallback } from "use-debounce";
 import LockPeriod, { lockPeriodFormater } from "./LockPeriod";
 type props = {
@@ -61,6 +63,7 @@ const EXTEND_CONFIG_MAIN = {
     ],
     maxLock: 4 * 365 * 24 * 60 * 60,
     minLock: 7 * 24 * 60 * 60,
+    sliderStep: 24 * 60 * 60,
 };
 const EXTEND_CONFIG_PRE_MAIN = {
     options: [
@@ -73,6 +76,7 @@ const EXTEND_CONFIG_PRE_MAIN = {
     ],
     maxLock: VE_CONFIG.maxLock,
     minLock: VE_CONFIG.minLock,
+    sliderStep: 4 * 60 * 60,
 };
 const EXTEND_CONFIG =
     ENVIRONMENT.NETWORK === "mainnet"
@@ -499,7 +503,61 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                                                     );
                                                 })}
                                             </div> */}
+                                                                            <div className="overflow-hidden mt-8">
+                                    <Slider
+                                        className="ash-slider ash-slider-pink my-0"
+                                        step={EXTEND_CONFIG.sliderStep}
+                                        marks={{
+                                            [EXTEND_CONFIG.minLock]: "",
+                                            [(EXTEND_CONFIG.maxLock -
+                                                EXTEND_CONFIG.minLock) /
+                                                4 +
+                                                EXTEND_CONFIG.minLock]: "",
+                                            [(EXTEND_CONFIG.maxLock -
+                                                EXTEND_CONFIG.minLock) /
+                                                2 +
+                                                EXTEND_CONFIG.minLock]: "",
+                                            [((EXTEND_CONFIG.maxLock -
+                                                EXTEND_CONFIG.minLock) *
+                                                3) /
+                                                4 +
+                                                EXTEND_CONFIG.minLock]: "",
+                                            [EXTEND_CONFIG.maxLock]: "",
+                                        }}
+                                        handleStyle={{
+                                            backgroundColor:
+                                                theme.extend.colors.pink[600],
+                                            borderRadius: 0,
+                                            border:
+                                                "2px solid " +
+                                                theme.extend.colors.pink[600],
+                                            width: 7,
+                                            height: 7,
+                                        }}
+                                        min={EXTEND_CONFIG.minLock}
+                                        max={EXTEND_CONFIG.maxLock}
+                                        value={currentLockSeconds + extendLockPeriod}
+                                        tipFormatter={(val) =>
+                                            val &&
+                                            lockPeriodFormater(val * 1000)
+                                        }
+                                        onChange={(e) => e > currentLockSeconds && setExtendLockPeriod(e - currentLockSeconds)}
+                                    />
+                                    <div className="flex justify-between mt-1">
+                                        <div className="text-xs lg:text-sm font-bold text-white">
+                                            {lockPeriodFormater(
+                                                EXTEND_CONFIG.minLock * 1000
+                                            )}
+                                        </div>
+                                        <div className="text-xs lg:text-sm font-bold text-pink-600">
+                                            {lockPeriodFormater(
+                                                EXTEND_CONFIG.maxLock * 1000
+                                            )}
+                                        </div>
                                     </div>
+                                </div>
+                                    </div>
+
                                 </OnboardTooltip>
                             )}
                         </div>
