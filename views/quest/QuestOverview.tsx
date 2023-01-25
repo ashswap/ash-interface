@@ -246,8 +246,16 @@ const QuestOverview = () => {
     return (
         <>
             <div ref={captchaElRef}></div>
-            <a href="https://app.ashswap.io/reward-pool" target="_blank" rel="noreferrer">
-            <Image src={ImgRewardPoolBanner} alt="reward pool banner" layout="responsive"/>
+            <a
+                href="https://app.ashswap.io/reward-pool"
+                target="_blank"
+                rel="noreferrer"
+            >
+                <Image
+                    src={ImgRewardPoolBanner}
+                    alt="reward pool banner"
+                    layout="responsive"
+                />
             </a>
             <h1 className="mt-10 text-2xl md:text-5xl font-bold text-white mb-7 md:mb-11">
                 Quest
@@ -429,7 +437,8 @@ const QuestOverview = () => {
                                     <span className="font-bold text-2xl text-white">
                                         {userAddress
                                             ? formatAmount(
-                                                  userStats?.wallet.race_point || 0,
+                                                  userStats?.wallet
+                                                      .race_point || 0,
                                                   {
                                                       isInteger: true,
                                                       notation: "standard",
@@ -498,6 +507,15 @@ const QuestOverview = () => {
                                     </span>
                                 </div>
                             </div>
+                            <a
+                                href="https://medium.com/@ashswap/ashswap-launch-race-4463e9b1f47"
+                                target="_blank"
+                                rel="noreferrer"
+                            >
+                                <GlowingButton theme="purple" className="mt-10 h-11 md:h-[5.5rem] w-full font-bold text-sm md:text-lg">
+                                    How to join Launch Race?
+                                </GlowingButton>
+                            </a>
                         </div>
                     </div>
                 </div>
