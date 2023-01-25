@@ -1,6 +1,7 @@
 import { logout } from "@elrondnetwork/dapp-core/utils";
 import ImgDiscord from "assets/images/discord.png";
 import ImgTwitter from "assets/images/twitter.png";
+import ImgRewardPoolBanner from "assets/images/reward-pool-banner.jpeg";
 import ICCaretRight from "assets/svg/caret-right.svg";
 import { atomQuestUserStats } from "atoms/ashpoint";
 import { accAddressState } from "atoms/dappState";
@@ -99,7 +100,8 @@ const QuestOverview = () => {
 
     const sharableLink = useMemo(() => {
         const text = new URLSearchParams({
-            text: `I just swapped the stablecoins with low slippage, small fees, and fast transaction confirmed on the @ash_swap devnet. Use my referral link, and we'll both earn 500 ASH Points when you join: ${inviteLink}\n#ashswap #MVX #Elrond #stableswap`,
+            // text: `I just swapped the stablecoins with low slippage, small fees, and fast transaction confirmed on the @ash_swap devnet. Use my referral link, and we'll both earn 500 ASH Points when you join: ${inviteLink}\n#ashswap #MVX #Elrond #stableswap`,
+            text: `@ash_swap - the very first #DEX following the stable-swap model on the @MultiversX blockchain - will launch its Mainnet this Feb 17 at https://app.ashswap.io/ \n\nUse my referral link, and we'll both earn 500 ASH Points & I will have 1 RACE Point when you join:\n${inviteLink}`,
         });
         return `https://twitter.com/intent/tweet?${text.toString()}`;
     }, [inviteLink]);
@@ -244,7 +246,10 @@ const QuestOverview = () => {
     return (
         <>
             <div ref={captchaElRef}></div>
-            <h1 className="text-2xl md:text-5xl font-bold text-white mb-7 md:mb-11">
+            <a href="https://app.ashswap.io/reward-pool" target="_blank" rel="noreferrer">
+            <Image src={ImgRewardPoolBanner} alt="reward pool banner" layout="responsive"/>
+            </a>
+            <h1 className="mt-10 text-2xl md:text-5xl font-bold text-white mb-7 md:mb-11">
                 Quest
             </h1>
             <div className="lg:flex lg:space-x-2">
@@ -418,12 +423,88 @@ const QuestOverview = () => {
                                 </div>
                             </div>
                         </div>
+                        <div className="sm:col-span-2 lg:col-span-1 p-4 bg-ash-dark-600 space-y-9">
+                            <div>
+                                <div className="mb-2">
+                                    <span className="font-bold text-2xl text-white">
+                                        {userAddress
+                                            ? formatAmount(
+                                                  userStats?.wallet.race_point || 0,
+                                                  {
+                                                      isInteger: true,
+                                                      notation: "standard",
+                                                  }
+                                              )
+                                            : "_"}
+                                        &nbsp;
+                                    </span>
+                                    <span className="font-semibold text-xs text-stake-gray-500">
+                                        pts
+                                    </span>
+                                </div>
+                                <div className="text-xs">
+                                    <span className="font-semibold text-ash-gray-500">
+                                        {"// "}
+                                    </span>
+                                    <span className="font-bold text-ash-gray-500">
+                                        Race Points
+                                    </span>
+                                </div>
+                            </div>
+                            <div>
+                                <div className="mb-2">
+                                    <span className="font-bold text-2xl text-white">
+                                        {userAddress
+                                            ? formatAmount(
+                                                  userStats?.wallet
+                                                      .user_invited,
+                                                  {
+                                                      notation: "standard",
+                                                      isInteger: true,
+                                                  }
+                                              )
+                                            : "_"}
+                                    </span>
+                                </div>
+                                <div className="text-xs">
+                                    <span className="font-semibold text-ash-gray-500">
+                                        {"// "}
+                                    </span>
+                                    <span className="font-bold text-ash-gray-500">
+                                        Friends Invited
+                                    </span>
+                                </div>
+                            </div>
+                            <div>
+                                <div className="mb-2">
+                                    <span className="font-bold text-2xl text-white">
+                                        {userAddress
+                                            ? formatAmount(
+                                                  userStats?.wallet.user_staked,
+                                                  {
+                                                      notation: "standard",
+                                                      isInteger: true,
+                                                  }
+                                              )
+                                            : "_"}
+                                    </span>
+                                </div>
+                                <div className="text-xs">
+                                    <span className="font-semibold text-ash-gray-500">
+                                        {"// "}
+                                    </span>
+                                    <span className="font-bold text-ash-gray-500">
+                                        Friends Stake
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 {!isRegistered ? (
                     <div className="grow flex flex-col items-center px-12 mt-10 lg:mt-0">
-                        <div className="font-bold text-3xl lg:text-5xl text-stake-gray-500 leading-tight mb-16">
+                        <div className="font-bold text-3xl lg:text-5xl text-stake-gray-500 text-center leading-tight mb-16">
                             2 small steps to start!
                         </div>
 

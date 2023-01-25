@@ -1,16 +1,21 @@
+import ICChevronRight from "assets/svg/chevron-right.svg";
+import { accIsLoggedInState } from "atoms/dappState";
+import { walletIsOpenConnectModalState } from "atoms/walletState";
 import BaseModal, { BaseModalType } from "components/BaseModal";
 import Checkbox from "components/Checkbox";
 import GlowingButton from "components/GlowingButton";
 import LegalLinkItem from "components/Nav/LegalLinkItem";
 import { LEGAL_LINKS } from "const/link";
-import { useScreenSize } from "hooks/useScreenSize";
-import { useCallback, useState } from "react";
-import ICChevronRight from "assets/svg/chevron-right.svg";
 import storage from "helper/storage";
+import { useScreenSize } from "hooks/useScreenSize";
+import { useState } from "react";
+import { useRecoilCallback } from "recoil";
 const LegalContent = ({onRequestClose}: Pick<BaseModalType, "onRequestClose">) => {
     const [accepted, setAccepted] = useState(false);
-    const accept = useCallback(() => {
+    const accept = useRecoilCallback(({snapshot, set}) => async () => {
+        const loggedIn = await snapshot.getPromise(accIsLoggedInState);
         storage.local.setItem({ key: "acceptedLegal", data: true });
+        set(walletIsOpenConnectModalState, !loggedIn);
     }, []);
     return (
         <div>
@@ -32,14 +37,24 @@ const LegalContent = ({onRequestClose}: Pick<BaseModalType, "onRequestClose">) =
                 }}
                 text={
                     <span className="text-ash-gray-500">
-                        I verify that I have read & accepted to all of{" "}
+                        Make sure you  have read & accepted{" "}
                         <a
-                            href="https://ashswap.io/legal"
+                            href="https://ashswap.io/terms"
                             target="_blank"
                             rel="noreferrer"
                         >
                             <span className="underline font-bold text-white">
-                                AshSwap legal documents.
+                                Terms
+                            </span>
+                        </a>
+                        {" and "}
+                        <a
+                            href="https://ashswap.io/privacy/policy"
+                            target="_blank"
+                            rel="noreferrer"
+                        >
+                            <span className="underline font-bold text-white">
+                                Privacy Policy
                             </span>
                         </a>
                     </span>
@@ -64,7 +79,7 @@ const LegalModal = (props: BaseModalType) => {
             <BaseModal
                 {...props}
                 type={screenSize.isMobile ? "drawer_btt" : "modal"}
-                className={`bg-ash-dark-600 text-white p-4 flex flex-col overflow-hidden max-h-full w-screen max-w-sm mx-auto`}
+                className={`bg-ash-dark-600 text-white p-4 flex flex-col overflow-hidden max-h-full w-screen sm:max-w-sm mx-auto`}
             >
                 <div className="flex justify-end mb-3.5">
                     <BaseModal.CloseBtn />
