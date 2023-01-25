@@ -95,7 +95,16 @@ const Nav = () => {
                     </div>
                 </Link>
             )}
-
+                <Link href="/launch-race" passHref>
+                    <div
+                        className={`transition ${styles.btn} ${
+                            isActive("/launch-race", false) ? styles.active : ""
+                        }`}
+                    >
+                        <ICM className="inline-block w-4 h-4 md:mr-2 mt-1.5 transition-none -rotate-90" />
+                        <span className="inline-block">Launch Race</span>
+                    </div>
+                </Link>
             <SocialMenu />
         </div>
     );
