@@ -80,7 +80,7 @@ const DEVNET_TOKENS_ALPHA: IESDTInfo[] = [
 ];
 const DEVNET_TOKENS_BETA: IESDTInfo[] = [
     {
-        identifier: "ASH-77a5df",
+        identifier: "ASH-4ce444",
         chainId: ChainId.Devnet,
         symbol: "ASH",
         name: "Ashswap Token",
@@ -110,6 +110,14 @@ const DEVNET_TOKENS_BETA: IESDTInfo[] = [
         name: "xUSD Coin",
         decimals: 6,
         logoURI: IconUSDC.src,
+    },
+    {
+        identifier: "BUSD-85dac0",
+        chainId: ChainId.Devnet,
+        symbol: "BUSD",
+        name: "BUSD",
+        decimals: 18,
+        logoURI: IconBUSD.src,
     },
     {
         identifier: "WUSDC-232e24",
@@ -260,7 +268,7 @@ export const ASH_TOKEN: IESDTInfo =
         ENVIRONMENT.NETWORK == "devnet"
             ? ENVIRONMENT.ENV === "alpha"
                 ? "ASH-a0d8e5"
-                : "ASH-77a5df"
+                : "ASH-4ce444"
             : "ASH-a85626"
     ];
 export const ESDT_MAP = Object.fromEntries(
@@ -271,6 +279,6 @@ export const ASH_ESDT =
         ENVIRONMENT.NETWORK == "devnet"
             ? ENVIRONMENT.ENV === "alpha"
                 ? "ASH-a0d8e5"
-                : "ASH-77a5df"
+                : "ASH-4ce444"
             : "ASH-a85626"
     ];
