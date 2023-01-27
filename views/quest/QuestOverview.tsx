@@ -1,6 +1,7 @@
 import { logout } from "@elrondnetwork/dapp-core/utils";
 import ImgDiscord from "assets/images/discord.png";
 import ImgTwitter from "assets/images/twitter.png";
+import ImgRewardPoolBanner from "assets/images/reward-pool-banner.jpeg";
 import ICCaretRight from "assets/svg/caret-right.svg";
 import { atomQuestUserStats } from "atoms/ashpoint";
 import { accAddressState } from "atoms/dappState";
@@ -71,7 +72,7 @@ const QuestOverview = () => {
             state: `twitter:${userAddress}`,
             code_challenge: userAddress,
             code_challenge_method: "plain",
-            redirect_uri: location?.href.split("?")[0].replace(/\/$/, "")+"/",
+            redirect_uri: location?.href.split("?")[0].replace(/\/$/, "") + "/",
         });
         return `${path}?${nextUrlParams}`;
     }, [userAddress]);
@@ -80,25 +81,28 @@ const QuestOverview = () => {
         const [path, search] = ENVIRONMENT.LOGIN_DISCORD_LINK.split("?");
         const { nextUrlParams } = buildUrlParams(search, {
             state: `discord:${userAddress}`,
-            redirect_uri: location?.href.split("?")[0].replace(/\/$/, "")+"/",
+            redirect_uri: location?.href.split("?")[0].replace(/\/$/, "") + "/",
         });
         return `${path}?${nextUrlParams}`;
     }, [userAddress]);
 
     const inviteLink = useMemo(() => {
         const search = new URLSearchParams({
-            invitationCode: userStats?.wallet.invitation_code || storage.local.getItem("invitationCode") || "",
+            invitationCode:
+                userStats?.wallet.invitation_code ||
+                storage.local.getItem("invitationCode") ||
+                "",
         });
         return `${location?.href
             .split("?")[0]
-            .replace(/\/$/, "")}?${search.toString()}`;
+            .replace(/\/$/, "")}/?${search.toString()}`;
     }, [userStats]);
 
     const sharableLink = useMemo(() => {
         const text = new URLSearchParams({
-            text: `I just swapped the stablecoins with low slippage, small fees, and fast transaction confirmed on the @ash_swap devnet. Use my referral link, and we'll both earn 500 ASH Points when you join: ${inviteLink}\n#ashswap #MVX #Elrond #stableswap`
-
-        })
+            // text: `I just swapped the stablecoins with low slippage, small fees, and fast transaction confirmed on the @ash_swap devnet. Use my referral link, and we'll both earn 500 ASH Points when you join: ${inviteLink}\n#ashswap #MVX #Elrond #stableswap`,
+            text: `@ash_swap - the very first #DEX following the stable-swap model on the @MultiversX blockchain - will launch its Mainnet this Feb 17 at https://app.ashswap.io/\n\nUse my referral link, and we'll both earn 500 ASH Points & I will have 1 RACE Point:\n${inviteLink}`,
+        });
         return `https://twitter.com/intent/tweet?${text.toString()}`;
     }, [inviteLink]);
 
@@ -128,7 +132,9 @@ const QuestOverview = () => {
                         [platform]: {
                             code,
                         },
-                        referral: storage.local.getItem("invitationCode") || undefined
+                        referral:
+                            storage.local.getItem("invitationCode") ||
+                            undefined,
                     },
                     {
                         headers: {
@@ -137,10 +143,9 @@ const QuestOverview = () => {
                     }
                 )
                 .catch((err) => {
-                    let msg = err?.response?.data?.error || "";
-                    if (err?.response?.status === 403) {
-                        msg = "Something went wrong!!, please try again later";
-                    }
+                    const msg =
+                        err?.response?.data?.error ||
+                        "Something went wrong!!, please try again later";
                     setErrMsg(msg);
                     setIsError(true);
                 })
@@ -241,178 +246,283 @@ const QuestOverview = () => {
     return (
         <>
             <div ref={captchaElRef}></div>
-            <h1 className="text-2xl md:text-5xl font-bold text-white mb-7 md:mb-11">
+            <a
+                href="https://app.ashswap.io/reward-pool"
+                target="_blank"
+                rel="noreferrer"
+            >
+                <Image
+                    src={ImgRewardPoolBanner}
+                    alt="reward pool banner"
+                    layout="responsive"
+                />
+            </a>
+            <h1 className="mt-10 text-2xl md:text-5xl font-bold text-white mb-7 md:mb-11">
                 Quest
             </h1>
             <div className="lg:flex lg:space-x-2">
-                <div className="grid sm:grid-cols-2 lg:grid-cols-1 gap-x-4 gap-y-2 shrink-0 min-w-[20rem]">
-                    <div className="p-4 bg-ash-dark-600">
-                        <div className="text-lg mb-4">
-                            <span className="font-semibold text-stake-gray-500">
-                                {"// "}
-                            </span>
-                            <span className="font-bold text-white">Wallet</span>
-                        </div>
-                        <div className="flex justify-between text-xs mb-4">
-                            {userAddress ? (
-                                <>
-                                    <div className="font-semibold text-stake-gray-500">
-                                        {shortenString(userAddress)}
-                                    </div>
+                <div className="shrink-0 min-w-[20rem]">
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-1 gap-x-4 gap-y-2">
+                        <div className="p-4 bg-ash-dark-600">
+                            <div className="text-lg mb-4">
+                                <span className="font-semibold text-stake-gray-500">
+                                    {"// "}
+                                </span>
+                                <span className="font-bold text-white">
+                                    Wallet
+                                </span>
+                            </div>
+                            <div className="flex justify-between text-xs mb-4">
+                                {userAddress ? (
+                                    <>
+                                        <div className="font-semibold text-stake-gray-500">
+                                            {shortenString(userAddress)}
+                                        </div>
+                                        <button
+                                            className="font-bold text-ash-purple-500 underline"
+                                            onClick={() => logout()}
+                                        >
+                                            Disconnect
+                                        </button>
+                                    </>
+                                ) : (
+                                    <>
+                                        <div className="text-xs">
+                                            <span className="font-bold text-white underline">
+                                                Connect&nbsp;
+                                            </span>
+                                            <span className="text-stake-gray-500">
+                                                your wallet
+                                            </span>
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+                            <div className="text-lg mb-4">
+                                <span className="font-semibold text-stake-gray-500">
+                                    {"// "}
+                                </span>
+                                <span className="font-bold text-white capitalize">
+                                    {platform || "Account"}
+                                </span>
+                            </div>
+                            <div className="flex justify-between text-xs mb-4">
+                                <div className="font-semibold text-stake-gray-500">
+                                    {isRegistered
+                                        ? userStats?.wallet.twitter_metadata
+                                              ?.user.username ||
+                                          userStats?.wallet.discord_metadata
+                                              .user.username
+                                        : "_"}
+                                </div>
+                                {isRegistered && platform && (
                                     <button
                                         className="font-bold text-ash-purple-500 underline"
-                                        onClick={() => logout()}
+                                        onClick={() => unlinkSocial(platform)}
                                     >
                                         Disconnect
                                     </button>
-                                </>
-                            ) : (
+                                )}
+                            </div>
+                            {isRegistered && (
                                 <>
-                                    <div className="text-xs">
-                                        <span className="font-bold text-white underline">
-                                            Connect&nbsp;
+                                    <div className="text-lg mb-4">
+                                        <span className="font-semibold text-stake-gray-500">
+                                            {"// "}
                                         </span>
-                                        <span className="text-stake-gray-500">
-                                            your wallet
+                                        <span className="font-bold text-white capitalize">
+                                            Invite
                                         </span>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <CopyBtn text={inviteLink}>
+                                            <GlowingButton
+                                                theme="pink"
+                                                className="w-full py-3 font-bold text-sm truncate"
+                                            >
+                                                Copy link
+                                            </GlowingButton>
+                                        </CopyBtn>
+                                        <a
+                                            href={sharableLink}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                        >
+                                            <GlowingButton
+                                                theme="cyan"
+                                                className="w-full py-3 font-bold text-sm truncate"
+                                            >
+                                                Share
+                                            </GlowingButton>
+                                        </a>
                                     </div>
                                 </>
                             )}
                         </div>
-                        <div className="text-lg mb-4">
-                            <span className="font-semibold text-stake-gray-500">
-                                {"// "}
-                            </span>
-                            <span className="font-bold text-white capitalize">
-                                {platform || "Account"}
-                            </span>
-                        </div>
-                        <div className="flex justify-between text-xs mb-4">
-                            <div className="font-semibold text-stake-gray-500">
-                                {isRegistered
-                                    ? userStats?.wallet.twitter_metadata?.user
-                                          .username ||
-                                      userStats?.wallet.discord_metadata.user
-                                          .username
-                                    : "_"}
-                            </div>
-                            {isRegistered && platform && (
-                                <button
-                                    className="font-bold text-ash-purple-500 underline"
-                                    onClick={() => unlinkSocial(platform)}
-                                >
-                                    Disconnect
-                                </button>
-                            )}
-                        </div>
-                        {isRegistered && (
-                            <>
-                                <div className="text-lg mb-4">
-                                    <span className="font-semibold text-stake-gray-500">
+                        <div className="p-4 bg-ash-dark-600 space-y-9">
+                            <div>
+                                <div className="mb-2">
+                                    <span className="font-bold text-2xl text-white">
+                                        {userStats?.wallet.ash_point_total
+                                            ? formatAmount(
+                                                  userStats?.wallet
+                                                      .ash_point_total,
+                                                  { isInteger: true }
+                                              )
+                                            : "_"}
+                                        &nbsp;
+                                    </span>
+                                    <span className="font-semibold text-xs text-stake-gray-500">
+                                        pts
+                                    </span>
+                                </div>
+                                <div className="text-xs">
+                                    <span className="font-semibold text-ash-gray-500">
                                         {"// "}
                                     </span>
-                                    <span className="font-bold text-white capitalize">
-                                        Invite
+                                    <span className="font-bold text-ash-gray-500">
+                                        ASH Points
                                     </span>
                                 </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <CopyBtn text={inviteLink}>
-                                        <GlowingButton
-                                            theme="pink"
-                                            className="w-full py-3 font-bold text-sm truncate"
-                                        >
-                                            Copy link
-                                        </GlowingButton>
-                                    </CopyBtn>
-                                    <a
-                                        href={sharableLink}
-                                        target="_blank"
-                                        rel="noreferrer"
-                                    >
-                                        <GlowingButton
-                                            theme="cyan"
-                                            className="w-full py-3 font-bold text-sm truncate"
-                                        >
-                                            Share
-                                        </GlowingButton>
-                                    </a>
-                                </div>
-                            </>
-                        )}
-                    </div>
-                    <div className="p-4 bg-ash-dark-600 space-y-9">
-                        <div>
-                            <div className="mb-2">
-                                <span className="font-bold text-2xl text-white">
-                                    {userStats?.wallet.ash_point_total
-                                        ? formatAmount(
-                                              userStats?.wallet.ash_point_total,
-                                              { isInteger: true }
-                                          )
-                                        : "_"}
-                                    &nbsp;
-                                </span>
-                                <span className="font-semibold text-xs text-stake-gray-500">
-                                    pts
-                                </span>
                             </div>
-                            <div className="text-xs">
-                                <span className="font-semibold text-ash-gray-500">
-                                    {"// "}
-                                </span>
-                                <span className="font-bold text-ash-gray-500">
-                                    ASH Points
-                                </span>
-                            </div>
-                        </div>
-                        <div>
-                            <div className="mb-2">
-                                <span className="font-bold text-2xl text-white">
-                                    #
-                                    {userStats?.wallet.rank
-                                        ? formatAmount(userStats?.wallet.rank, {
-                                              isInteger: true,
-                                          })
-                                        : "_"}
-                                </span>
-                            </div>
-                            <div className="text-xs">
-                                <span className="font-semibold text-ash-gray-500">
-                                    {"// "}
-                                </span>
-                                <span className="font-bold text-ash-gray-500">
-                                    Your rank
-                                </span>
-                            </div>
-                        </div>
-                        <div>
-                            <div className="mb-2">
-                                <span className="font-bold text-2xl text-white">
-                                    {userStats?.wallet.created_at
-                                        ? moment
-                                              .unix(
-                                                  userStats.wallet.created_at /
-                                                      1000
+                            <div>
+                                <div className="mb-2">
+                                    <span className="font-bold text-2xl text-white">
+                                        #
+                                        {userStats?.wallet.rank
+                                            ? formatAmount(
+                                                  userStats?.wallet.rank,
+                                                  {
+                                                      isInteger: true,
+                                                  }
                                               )
-                                              .format("Do MMM, YYYY")
-                                        : "_"}
-                                </span>
+                                            : "_"}
+                                    </span>
+                                </div>
+                                <div className="text-xs">
+                                    <span className="font-semibold text-ash-gray-500">
+                                        {"// "}
+                                    </span>
+                                    <span className="font-bold text-ash-gray-500">
+                                        Your rank
+                                    </span>
+                                </div>
                             </div>
-                            <div className="text-xs">
-                                <span className="font-semibold text-ash-gray-500">
-                                    {"// "}
-                                </span>
-                                <span className="font-bold text-ash-gray-500">
-                                    Your 1st day
-                                </span>
+                            <div>
+                                <div className="mb-2">
+                                    <span className="font-bold text-2xl text-white">
+                                        {userStats?.wallet.created_at
+                                            ? moment
+                                                  .unix(
+                                                      userStats.wallet
+                                                          .created_at / 1000
+                                                  )
+                                                  .format("Do MMM, YYYY")
+                                            : "_"}
+                                    </span>
+                                </div>
+                                <div className="text-xs">
+                                    <span className="font-semibold text-ash-gray-500">
+                                        {"// "}
+                                    </span>
+                                    <span className="font-bold text-ash-gray-500">
+                                        Your 1st day
+                                    </span>
+                                </div>
                             </div>
+                        </div>
+                        <div className="sm:col-span-2 lg:col-span-1 p-4 bg-ash-dark-600 space-y-9">
+                            <div>
+                                <div className="mb-2">
+                                    <span className="font-bold text-2xl text-white">
+                                        {userAddress
+                                            ? formatAmount(
+                                                  userStats?.wallet
+                                                      .race_point || 0,
+                                                  {
+                                                      isInteger: true,
+                                                      notation: "standard",
+                                                  }
+                                              )
+                                            : "_"}
+                                        &nbsp;
+                                    </span>
+                                    <span className="font-semibold text-xs text-stake-gray-500">
+                                        pts
+                                    </span>
+                                </div>
+                                <div className="text-xs">
+                                    <span className="font-semibold text-ash-gray-500">
+                                        {"// "}
+                                    </span>
+                                    <span className="font-bold text-ash-gray-500">
+                                        Race Points
+                                    </span>
+                                </div>
+                            </div>
+                            <div>
+                                <div className="mb-2">
+                                    <span className="font-bold text-2xl text-white">
+                                        {userAddress
+                                            ? formatAmount(
+                                                  userStats?.wallet
+                                                      .user_invited,
+                                                  {
+                                                      notation: "standard",
+                                                      isInteger: true,
+                                                  }
+                                              )
+                                            : "_"}
+                                    </span>
+                                </div>
+                                <div className="text-xs">
+                                    <span className="font-semibold text-ash-gray-500">
+                                        {"// "}
+                                    </span>
+                                    <span className="font-bold text-ash-gray-500">
+                                        Friends Invited
+                                    </span>
+                                </div>
+                            </div>
+                            <div>
+                                <div className="mb-2">
+                                    <span className="font-bold text-2xl text-white">
+                                        {userAddress
+                                            ? formatAmount(
+                                                  userStats?.wallet.user_staked,
+                                                  {
+                                                      notation: "standard",
+                                                      isInteger: true,
+                                                  }
+                                              )
+                                            : "_"}
+                                    </span>
+                                </div>
+                                <div className="text-xs">
+                                    <span className="font-semibold text-ash-gray-500">
+                                        {"// "}
+                                    </span>
+                                    <span className="font-bold text-ash-gray-500">
+                                        Friends Stake
+                                    </span>
+                                </div>
+                            </div>
+                            <a
+                                href="https://medium.com/@ashswap/ashswap-launch-race-4463e9b1f47"
+                                target="_blank"
+                                rel="noreferrer"
+                            >
+                                <GlowingButton theme="purple" className="mt-10 h-11 md:h-[5.5rem] w-full font-bold text-sm md:text-lg">
+                                    How to join Launch Race?
+                                </GlowingButton>
+                            </a>
                         </div>
                     </div>
                 </div>
 
                 {!isRegistered ? (
                     <div className="grow flex flex-col items-center px-12 mt-10 lg:mt-0">
-                        <div className="font-bold text-3xl lg:text-5xl text-stake-gray-500 leading-tight mb-16">
+                        <div className="font-bold text-3xl lg:text-5xl text-stake-gray-500 text-center leading-tight mb-16">
                             2 small steps to start!
                         </div>
 
@@ -514,7 +624,9 @@ const QuestOverview = () => {
                             </div>
                         </div>
                         {errMsg && (
-                            <span className="text-center mt-4">{errMsg}</span>
+                            <span className="text-center mt-4 break-words whitespace-pre-wrap">
+                                {errMsg}
+                            </span>
                         )}
                     </div>
                 ) : (

@@ -16,6 +16,7 @@ import {
     AccountInfoSliceNetworkType,
     SignedTransactionType,
     TransactionBatchStatusesEnum,
+    TransactionsDisplayInfoType,
     TransactionServerStatusesEnum,
 } from "@elrondnetwork/dapp-core/types";
 import {
@@ -34,7 +35,12 @@ import ICHourGlass from "assets/svg/hourglass.svg";
 import ICNewTabRound from "assets/svg/new-tab-round.svg";
 import { networkConfigState } from "atoms/dappState";
 import CopyBtn from "components/CopyBtn";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
+import { clickedHarvestModalState } from "atoms/harvestState";
+import { collapseModalState } from "atoms/collapseState";
+import { clickedUnstakeModalState } from "atoms/unstakeState";
+import { clickedStakeModalState } from "atoms/stakeState";
+import { clickedGovStakeModalState } from "atoms/govstakeStake";
 const averageTxDurationMs = 6000;
 const crossShardRounds = 5;
 interface TransactionToastPropsType {
@@ -55,7 +61,6 @@ interface TransactionToastPropsType {
     onClose?: (toastId: string) => void;
     onCollapsedChange?: (val: boolean) => void;
 }
-
 const StatusIconMap: Record<
     TransactionServerStatusesEnum | "timedOut",
     JSX.Element
@@ -78,6 +83,118 @@ const TxRecord = ({
     collapse?: boolean;
 }) => {
     const { hash, status } = tx;
+    const [isClickedHarvestButton, setIsClickedHarvestButton] = useRecoilState(
+        clickedHarvestModalState
+    );
+    const [isClickedCollapse, setIsClickedCollapse] =
+        useRecoilState(collapseModalState);
+    const [isClickedUnstake, setIsClickedUnstake] = useRecoilState(
+        clickedUnstakeModalState
+    );
+    const [isClickedStakeButton, setIsClickedStakeButton] = useRecoilState(
+        clickedStakeModalState
+    );
+    const [isClickedGovStakeButton, setIsClickedGovStakeButton] =
+        useRecoilState(clickedGovStakeModalState);
+    useEffect(() => {
+        if (
+            window &&
+            status != "pending" &&
+            window.location.href.includes("pool") &&
+            !isClickedCollapse
+        ) {
+            let dataLayer = (window as any).dataLayer || [];
+            dataLayer.push({
+                event: "add_liquidity",
+                hash: hash,
+                status: status,
+            });
+        }
+    }, [status]);
+    useEffect(() => {
+        if (
+            window &&
+            status != "pending" &&
+            window.location.href.includes("swap") &&
+            !isClickedCollapse
+        ) {
+            let dataLayer = (window as any).dataLayer || [];
+            dataLayer.push({
+                event: "swap",
+                hash: hash,
+                status: status,
+            });
+        }
+    }, [status]);
+    useEffect(() => {
+        if (
+            window &&
+            status != "pending" &&
+            window.location.href.includes("farms") &&
+            !isClickedCollapse &&
+            isClickedStakeButton
+        ) {
+            let dataLayer = (window as any).dataLayer || [];
+            dataLayer.push({
+                event: "liquidity_stake",
+                hash: hash,
+                status: status,
+            });
+            setIsClickedStakeButton(false);
+        }
+    }, [status, isClickedStakeButton]);
+    useEffect(() => {
+        if (
+            window &&
+            status != "pending" &&
+            window.location.href.includes("farms") &&
+            !isClickedCollapse &&
+            isClickedHarvestButton
+        ) {
+            let dataLayer = (window as any).dataLayer || [];
+            dataLayer.push({
+                event: "harvest_liquidity_stake",
+                hash: hash,
+                status: status,
+            });
+            setIsClickedHarvestButton(false);
+        }
+    }, [status, isClickedHarvestButton]);
+    useEffect(() => {
+        if (
+            window &&
+            status != "pending" &&
+            window.location.href.includes("farms") &&
+            !isClickedCollapse &&
+            isClickedUnstake
+        ) {
+            let dataLayer = (window as any).dataLayer || [];
+            dataLayer.push({
+                event: "liquidity_unstake",
+                hash: hash,
+                status: status,
+            });
+            setIsClickedUnstake(false);
+        }
+    }, [status, isClickedUnstake]);
+    useEffect(() => {
+        if (
+            window &&
+            status != "pending" &&
+            window.location.href.includes("gov") &&
+            !isClickedCollapse &&
+            isClickedGovStakeButton
+        ) {
+            let dataLayer = (window as any).dataLayer || [];
+            console.log("dataLayer", dataLayer);
+            dataLayer.push({
+                event: "gov_stake",
+                hash: hash,
+                status: status,
+            });
+            setIsClickedGovStakeButton(false);
+        }
+    }, [status, isClickedGovStakeButton]);
     const network: AccountInfoSliceNetworkType =
         useRecoilValue(networkConfigState).network;
     const iconEl = useMemo(() => {

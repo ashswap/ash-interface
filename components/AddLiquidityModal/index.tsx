@@ -1,4 +1,4 @@
-import IconRight from "assets/svg/right-white.svg";
+import ICChevronRight from "assets/svg/chevron-right.svg";
 import { addLPSessionIdAtom } from "atoms/addLiquidity";
 import {
     accIsInsufficientEGLDState,
@@ -13,7 +13,6 @@ import { tokenMapState } from "atoms/tokensState";
 import BigNumber from "bignumber.js";
 import Avatar from "components/Avatar";
 import BaseModal from "components/BaseModal";
-import Checkbox from "components/Checkbox";
 import GlowingButton from "components/GlowingButton";
 import InputCurrency from "components/InputCurrency";
 import TextAmt from "components/TextAmt";
@@ -29,10 +28,10 @@ import { useScreenSize } from "hooks/useScreenSize";
 import produce from "immer";
 import { Unarray } from "interface/utilities";
 import Link from "next/link";
-import { useCallback } from "react";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRecoilCallback, useRecoilValue, useSetRecoilState } from "recoil";
 import { theme } from "tailwind.config";
+import { useDebounce } from "use-debounce";
 
 interface Props {
     open?: boolean;
@@ -62,6 +61,17 @@ const TokenInput = ({
         },
         [_onChangeValue]
     );
+    const [deboundValue] = useDebounce(value, 500);
+    useEffect(() => {
+        if (window && value) {
+            let dataLayer = (window as any).dataLayer || [];
+            dataLayer.push({
+                event: "input_liquidity_value",
+                amount: value,
+                token: token.identifier,
+            });
+        }
+    }, [deboundValue, token]);
     return (
         <>
             <div className="bg-ash-dark-700 sm:bg-transparent flex space-x-1 items-center sm:items-stretch">
@@ -110,7 +120,7 @@ const TokenInput = ({
                             Insufficient fund -{" "}
                             <Link href="/swap" passHref>
                                 <span className="text-insufficent-fund select-none cursor-pointer">
-                                    Go trade!
+                                    Swap for more tokens!
                                 </span>
                             </Link>
                         </span>
@@ -135,7 +145,6 @@ const TokenInput = ({
     );
 };
 const AddLiquidityContent = ({ onClose, poolData }: Props) => {
-    const [isAgree, setAgree] = useState<boolean>(false);
     const [inputRawValues, setInputRawValues] = useState(
         poolData.pool.tokens.map(() => "")
     );
@@ -154,9 +163,6 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
     const { pool, liquidityData } = poolData;
     const [onboardingDepositInput, setOnboardedDepositInput] =
         useOnboarding("pool_deposit_input");
-    const [onboardingPoolCheck, setOnboardedPoolCheck] = useOnboarding(
-        "pool_deposit_checkbox"
-    );
 
     const screenSize = useScreenSize();
 
@@ -214,7 +220,6 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
             setAddLPSessionId,
         ]
     );
-
     const tokenInputProps = useMemo(() => {
         return pool.tokens.map((t, i) => {
             const userInput = Fraction.fromBigNumber(inputValues[i] || 0);
@@ -245,7 +250,6 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
 
     const canAddLP = useMemo(() => {
         return (
-            isAgree &&
             !isInsufficientEGLD &&
             tokenInputProps.every((t) => !t.isInsufficientFund) &&
             !adding &&
@@ -253,7 +257,7 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
                 .reduce((total, val) => total.plus(val || 0), new BigNumber(0))
                 .eq(0)
         );
-    }, [isAgree, isInsufficientEGLD, adding, inputValues, tokenInputProps]);
+    }, [isInsufficientEGLD, adding, inputValues, tokenInputProps]);
 
     useEffect(() => {
         if (liquidityValue.gt(0)) {
@@ -266,23 +270,34 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
             <div className="inline-flex justify-between items-center">
                 <div className="mr-2">
                     {/* <div className="text-text-input-3 text-xs">Deposit</div> */}
-                    <div className="flex flex-row items-baseline text-lg sm:text-2xl font-bold">
-                        <span>{pool.tokens[0].symbol}</span>
-                        <span className="text-sm px-3">&</span>
-                        <span>{pool.tokens[1].symbol}</span>
+                    <div className="text-lg sm:text-2xl font-bold">
+                        {pool.tokens.map((t, i) => {
+                            return (
+                                <span key={t.identifier}>
+                                    <span>{t.symbol}</span>
+                                    {i !== pool.tokens.length - 1 && (
+                                        <span className="text-sm">
+                                            &nbsp;&&nbsp;
+                                        </span>
+                                    )}
+                                </span>
+                            );
+                        })}
                     </div>
                 </div>
                 <div className="flex flex-row justify-between items-center">
-                    <Avatar
-                        src={pool.tokens[0].logoURI}
-                        alt={pool.tokens[0].symbol}
-                        className="w-6 h-6 sm:w-9 sm:h-9"
-                    />
-                    <Avatar
-                        src={pool.tokens[1].logoURI}
-                        alt={pool.tokens[1].symbol}
-                        className="w-6 h-6 sm:w-9 sm:h-9 -ml-1 sm:ml-[-0.375rem]"
-                    />
+                    {pool.tokens.map((t, i) => {
+                        return (
+                            <Avatar
+                                key={t.identifier}
+                                src={t.logoURI}
+                                alt={t.symbol}
+                                className={`w-6 h-6 sm:w-9 sm:h-9 ${
+                                    i > 0 && "-ml-2"
+                                }`}
+                            />
+                        );
+                    })}
                 </div>
             </div>
             <div className="my-10">
@@ -302,7 +317,7 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
                             </OnboardTooltip.Panel>
                         )}
                     >
-                        <div>
+                        <div className="mb-8">
                             {tokenInputProps.map((p, i) => {
                                 return (
                                     <div
@@ -336,6 +351,9 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
                                                 10
                                             )}
                                         />
+                                        {i !== tokenInputProps.length - 1 && (
+                                            <div>&</div>
+                                        )}
                                     </div>
                                 );
                             })}
@@ -344,7 +362,7 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
 
                     <div className="flex items-center space-x-1 bg-ash-dark-700 sm:bg-transparent mb-11 sm:mb-0">
                         <div className="flex items-center font-bold w-24 sm:w-1/3 px-4 sm:px-0 border-r border-r-ash-gray-500 sm:border-r-0">
-                            <IconRight className="mr-4" />
+                            <ICChevronRight className="mr-4 text-pink-600" />
                             <span>TOTAL</span>
                         </div>
                         <div className="flex-1 overflow-hidden bg-ash-dark-700 text-right text-lg h-[4.5rem] px-5 outline-none flex items-center justify-end">
@@ -358,62 +376,25 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
                             </span>
                         </div>
                     </div>
-
-                    <div className="absolute left-0 ml-2" style={{ top: 62 }}>
-                        &
-                    </div>
                 </div>
             </div>
 
             <div className="sm:flex gap-8">
-                <OnboardTooltip
-                    open={
-                        onboardingPoolCheck &&
-                        !onboardingDepositInput &&
-                        screenSize.md
-                    }
-                    placement="bottom-start"
-                    onArrowClick={() => setOnboardedPoolCheck(true)}
-                    arrowStyle={() => ({ left: 0 })}
-                    content={({ size }) => (
-                        <OnboardTooltip.Panel size={size} className="w-36">
-                            <div className="p-3 text-xs font-bold">
-                                <span className="text-stake-green-500">
-                                    Click check box{" "}
-                                </span>
-                                <span>to verify your actions</span>
-                            </div>
-                        </OnboardTooltip.Panel>
-                    )}
-                >
-                    <div>
-                        <Checkbox
-                            className="w-full mb-12 sm:mb-0 sm:w-2/3"
-                            checked={isAgree}
-                            onChange={(val) => {
-                                setAgree(val);
-                                setOnboardedPoolCheck(true);
-                            }}
-                            text={
-                                <span>
-                                    I verify that I have read the{" "}
-                                    <a
-                                        href="https://docs.ashswap.io/guides/add-remove-liquidity"
-                                        target="_blank"
-                                        rel="noreferrer"
-                                    >
-                                        <b className="text-white">
-                                            <u>AshSwap Pools Guide</u>
-                                        </b>
-                                    </a>{" "}
-                                    and understand the risks of providing
-                                    liquidity, including impermanent loss.
-                                </span>
-                            }
-                        />
-                    </div>
-                </OnboardTooltip>
-
+                <div className="w-full mb-12 sm:mb-0 sm:w-2/3">
+                    <span className="text-xs text-ash-gray-500">
+                        Make sure you have read the{" "}
+                        <a
+                            href="https://docs.ashswap.io/guides/add-remove-liquidity"
+                            target="_blank"
+                            rel="noreferrer"
+                        >
+                            <b className="text-white">
+                                <u>AshSwap Pools Guide</u>
+                            </b>
+                        </a>{" "}
+                        and understood the associated risks.
+                    </span>
+                </div>
                 <div className="w-full sm:w-1/3">
                     <div className="border-notch-x border-notch-white/50">
                         <GlowingButton

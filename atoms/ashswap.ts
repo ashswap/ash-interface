@@ -46,3 +46,7 @@ export const gqlQueryOptionsSelector = selector<GraphOptions>({
         return Object.fromEntries(entries);
     }
 })
+export const openLegalModalAtom = atom({
+    key: "is_open_legal_modal",
+    default: false,
+})

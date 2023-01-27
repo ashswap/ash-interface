@@ -23,6 +23,7 @@ export const TxCompletedTracker = () => {
 
     useEffect(() => {
         if (!socketExtra) return;
+        const decoder = new TransactionDecoder();
         const onCheckBatchResult = (txs: GetTransactionsByHashesReturnType) => {
             const decoder = new TransactionDecoder();
             txs.map((tx) => {

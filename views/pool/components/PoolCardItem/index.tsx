@@ -1,6 +1,6 @@
 import { AccountInfoSliceNetworkType } from "@elrondnetwork/dapp-core/types";
 import Down from "assets/svg/down-white.svg";
-import { networkConfigState } from "atoms/dappState";
+import { accIsLoggedInState, networkConfigState } from "atoms/dappState";
 import { PoolsState } from "atoms/poolsState";
 import AddLiquidityModal from "components/AddLiquidityModal";
 import Avatar from "components/Avatar";
@@ -11,9 +11,67 @@ import OnboardTooltip from "components/Tooltip/OnboardTooltip";
 import { formatAmount } from "helper/number";
 import { useOnboarding } from "hooks/useOnboarding";
 import { useScreenSize } from "hooks/useScreenSize";
+import IPool from "interface/pool";
 import { Unarray } from "interface/utilities";
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRecoilValue } from "recoil";
+
+const NTokensHeader = ({ pool }: { pool: IPool }) => {
+    const n = useMemo(() => pool.tokens.length, [pool.tokens.length]);
+    const name = useMemo(
+        () => pool.tokens.map((t) => t.symbol).join("/"),
+        [pool.tokens]
+    );
+
+    return n === 2 ? (
+        <div className="flex flex-row justify-between items-start mb-12 h-16 sm:-mr-4">
+            <div className="overflow-hidden">
+                <div className="text-text-input-3 text-xs pb-2.5">Deposit</div>
+                <div className="text-2xl font-bold truncate">
+                    <span>{pool.tokens[0].symbol}</span>
+                    <span className="text-sm px-3">&</span>
+                    <span>{pool.tokens[1].symbol}</span>
+                </div>
+            </div>
+            <div className="shrink-0 flex flex-row justify-between items-center">
+                <Avatar
+                    src={pool.tokens[0].logoURI}
+                    alt={pool.tokens[0].symbol}
+                    className="w-[3.25rem] h-[3.25rem]"
+                />
+                <Avatar
+                    src={pool.tokens[1].logoURI}
+                    alt={pool.tokens[1].symbol}
+                    className="w-[3.25rem] h-[3.25rem] -ml-2.5"
+                />
+            </div>
+        </div>
+    ) : (
+        <div className="flex flex-row justify-between items-start mb-12 h-16 sm:-mr-4">
+            <div className="overflow-hidden">
+                <div className="text-text-input-3 text-xs pb-2.5">Deposit</div>
+                <div className="font-bold text-lg text-white truncate">{name}</div>
+            </div>
+            <div className="flex flex-wrap justify-center max-w-[4.5rem]">
+                <Avatar
+                    src={pool.tokens[0].logoURI}
+                    alt={pool.tokens[0].symbol}
+                    className="w-9 h-9"
+                />
+                <Avatar
+                    src={pool.tokens[1].logoURI}
+                    alt={pool.tokens[1].symbol}
+                    className="w-9 h-9 -ml-1.5"
+                />
+                <Avatar
+                    src={pool.tokens[2].logoURI}
+                    alt={pool.tokens[2].symbol}
+                    className="w-9 h-9 -mt-2.5"
+                />
+            </div>
+        </div>
+    );
+};
 
 function PoolCardItem({
     poolData,
@@ -25,6 +83,15 @@ function PoolCardItem({
     const { pool } = poolData;
     const [isExpand, setIsExpand] = useState<boolean>(false);
     const [openAddLiquidity, setOpenAddLiquidity] = useState<boolean>(false);
+    const loggedIn = useRecoilValue(accIsLoggedInState);
+    useEffect(() => {
+        if (window && openAddLiquidity && loggedIn) {
+            let dataLayer = (window as any).dataLayer || [];
+            dataLayer.push({
+                event: "click_deposit",
+            });
+        }
+    }, [openAddLiquidity]);
     const network: AccountInfoSliceNetworkType =
         useRecoilValue(networkConfigState).network;
     const {
@@ -39,30 +106,7 @@ function PoolCardItem({
         <div
             className={`bg-ash-dark-700 clip-corner-4 clip-corner-tr pt-8 pb-5 px-6 sm:px-11 text-white`}
         >
-            <div className="flex flex-row justify-between items-start mb-12">
-                <div>
-                    <div className="text-text-input-3 text-xs pb-2.5">
-                        Deposit
-                    </div>
-                    <div className="flex flex-row items-baseline text-2xl font-bold">
-                        <span>{pool.tokens[0].symbol}</span>
-                        <span className="text-sm px-3">&</span>
-                        <span>{pool.tokens[1].symbol}</span>
-                    </div>
-                </div>
-                <div className="flex flex-row justify-between items-center">
-                    <Avatar
-                        src={pool.tokens[0].logoURI}
-                        alt={pool.tokens[0].symbol}
-                        className="w-[3.25rem] h-[3.25rem]"
-                    />
-                    <Avatar
-                        src={pool.tokens[1].logoURI}
-                        alt={pool.tokens[1].symbol}
-                        className="w-[3.25rem] h-[3.25rem] -ml-2.5"
-                    />
-                </div>
-            </div>
+            <NTokensHeader pool={pool} />
             <div className="flex flex-row my-12 justify-between items-center">
                 <div>
                     <CardTooltip

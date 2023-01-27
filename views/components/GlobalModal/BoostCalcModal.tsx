@@ -23,6 +23,7 @@ import Image from "components/Image";
 import { useEffect, useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { ENVIRONMENT } from "const/env";
+import { poolStatsRefresherAtom } from "atoms/poolsState";
 
 const LOCK_OPTS_BOY = [
     { value: 2 * 7 * 24 * 3600, label: "2 weeks" },
@@ -154,24 +155,24 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
         existFarmTokenBal,
     ]);
 
-    // const ashStakeMaxBoostArr = useMemo(() => {
-    //     return [
-    //         veForMaxBoost,
-    //         veForMaxBoost.div(0.75),
-    //         veForMaxBoost.div(0.5),
-    //         veForMaxBoost.div(0.25),
-    //     ].map((ash, i) => ({
-    //         amt: ash.toNumber(),
-    //         year: 4 - i,
-    //     }));
-    // }, [veForMaxBoost]);
-
     const ashStakeMaxBoostArr = useMemo(() => {
-        return [veForMaxBoost, veForMaxBoost.div(0.5)].map((ash, i) => ({
+        return [
+            veForMaxBoost,
+            veForMaxBoost.div(0.75),
+            veForMaxBoost.div(0.5),
+            veForMaxBoost.div(0.25),
+        ].map((ash, i) => ({
             amt: ash.toNumber(),
-            week: 2 - i,
+            year: 4 - i,
         }));
     }, [veForMaxBoost]);
+
+    // const ashStakeMaxBoostArr = useMemo(() => {
+    //     return [veForMaxBoost, veForMaxBoost.div(0.5)].map((ash, i) => ({
+    //         amt: ash.toNumber(),
+    //         week: 2 - i,
+    //     }));
+    // }, [veForMaxBoost]);
 
     useEffect(() => {
         if (farmAddress && !isUserInput) {
@@ -393,7 +394,7 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
                             <CardTooltip
                                 content={
                                     <div className="text-xs text-white space-y-2">
-                                        {/* {ashStakeMaxBoostArr.map(
+                                        {ashStakeMaxBoostArr.map(
                                             ({ amt, year }) => {
                                                 return (
                                                     <div key={year}>
@@ -408,8 +409,8 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
                                                     </div>
                                                 );
                                             }
-                                        )} */}
-                                        {ashStakeMaxBoostArr.map(
+                                        )}
+                                        {/* {ashStakeMaxBoostArr.map(
                                             ({ amt, week }) => {
                                                 return (
                                                     <div key={week}>
@@ -424,7 +425,7 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
                                                     </div>
                                                 );
                                             }
-                                        )}
+                                        )} */}
                                     </div>
                                 }
                             >
@@ -435,7 +436,7 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
                             <div className="flex items-center text-pink-600">
                                 <ICChevronDown className="w-2 h-auto mr-2" />
                                 <span className="text-lg font-bold">
-                                    {formatAmount(veForMaxBoost.toNumber())}
+                                    {veForMaxBoost.isNaN() ? "invalid" : formatAmount(veForMaxBoost.toNumber())}
                                 </span>
                             </div>
                         </div>
@@ -564,6 +565,12 @@ function BoostCalcModal({
     ...modalProps
 }: BaseModalType & BoostCalcProps) {
     const screenSize = useScreenSize();
+    const poolStatsRefresher = useRecoilValue(poolStatsRefresherAtom);
+    useEffect(() => {
+        if(modalProps.isOpen){
+            poolStatsRefresher?.()
+        }
+    }, [modalProps.isOpen, poolStatsRefresher]);
     return (
         <>
             <BaseModal

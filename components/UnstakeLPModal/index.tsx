@@ -1,11 +1,14 @@
 import { Slider } from "antd";
 import ICChevronRight from "assets/svg/chevron-right.svg";
-import { accIsInsufficientEGLDState } from "atoms/dappState";
+import {
+    accIsInsufficientEGLDState,
+    accIsLoggedInState,
+} from "atoms/dappState";
 import { FarmRecord } from "atoms/farmsState";
+import { clickedUnstakeModalState } from "atoms/unstakeState";
 import BigNumber from "bignumber.js";
 import Avatar from "components/Avatar";
 import BaseModal from "components/BaseModal";
-import Checkbox from "components/Checkbox";
 import GlowingButton from "components/GlowingButton";
 import InputCurrency from "components/InputCurrency";
 import TextAmt from "components/TextAmt";
@@ -17,7 +20,7 @@ import { formatAmount } from "helper/number";
 import useExitFarm from "hooks/useFarmContract/useExitFarm";
 import { useScreenSize } from "hooks/useScreenSize";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { theme } from "tailwind.config";
 import { useDebounce } from "use-debounce";
 type props = {
@@ -34,8 +37,10 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
         farmTokenSupply,
         emissionAPR,
     } = farmData;
-    const [token0, token1] = pool.tokens;
-    const [isAgree, setIsAgree] = useState(false);
+    const loggedIn = useRecoilValue(accIsLoggedInState);
+    const [isClickedUnstake, setIsClickedUnstake] = useRecoilState(
+        clickedUnstakeModalState
+    );
     const [unStakeAmt, setUnStakeAmt] = useState<BigNumber>(new BigNumber(0));
     const [deboundedUnstakeAmt] = useDebounce(unStakeAmt, 500);
     const [rawStakeAmt, setRawStakeAmt] = useState("");
@@ -43,7 +48,6 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
     const [rewardOnExit, setRewardOnExit] = useState(new BigNumber(0));
     const insufficientEGLD = useRecoilValue(accIsInsufficientEGLDState);
     const { exitFarm, estimateRewardOnExit } = useExitFarm();
-
     const setMaxStakeAmt = useCallback(() => {
         if (!stakedData?.totalStakedLP) return;
         setUnStakeAmt(stakedData.totalStakedLP);
@@ -53,13 +57,24 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
             )
         );
     }, [stakedData, farm]);
-
+    useEffect(() => {
+        if (window && loggedIn && !deboundedUnstakeAmt.eq(0)) {
+            let dataLayer = (window as any).dataLayer || [];
+            dataLayer.push({
+                event: "input_unstake_value",
+                amount: deboundedUnstakeAmt.toNumber() / 10 ** 18,
+                lp_token: pool?.lpToken?.symbol,
+            });
+        }
+    }, [deboundedUnstakeAmt]);
     const ashPerDay = useMemo(() => {
         if (!stakedData) return new BigNumber(0);
         const totalAshPerDay = ashPerBlock
             .multipliedBy(24 * 60 * 60)
             .div(blockTimeMs / 1000);
-        const shareOfFarm = stakedData.totalStakedLP.multipliedBy(0.4).div(farmTokenSupply);
+        const shareOfFarm = stakedData.totalStakedLP
+            .multipliedBy(0.4)
+            .div(farmTokenSupply);
         return totalAshPerDay.multipliedBy(shareOfFarm);
     }, [stakedData, farmTokenSupply, ashPerBlock]);
 
@@ -69,7 +84,9 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
             .multipliedBy(24 * 60 * 60)
             .div(blockTimeMs / 1000);
         const baseFarmToken = unStakeAmt.multipliedBy(0.4);
-        const newStaked = stakedData.totalStakedLP.multipliedBy(0.4).minus(baseFarmToken);
+        const newStaked = stakedData.totalStakedLP
+            .multipliedBy(0.4)
+            .minus(baseFarmToken);
         if (newStaked.lte(0)) return new BigNumber(0);
         const shareOfFarm = newStaked.div(farmTokenSupply.minus(baseFarmToken));
         return totalAshPerDay.multipliedBy(shareOfFarm);
@@ -80,13 +97,8 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
         return unStakeAmt.gt(stakedData?.totalStakedLP);
     }, [stakedData, unStakeAmt]);
     const canUnstake = useMemo(() => {
-        return (
-            isAgree &&
-            unStakeAmt.gt(0) &&
-            !insufficientFarmToken &&
-            !insufficientEGLD
-        );
-    }, [isAgree, unStakeAmt, insufficientFarmToken, insufficientEGLD]);
+        return unStakeAmt.gt(0) && !insufficientFarmToken && !insufficientEGLD;
+    }, [unStakeAmt, insufficientFarmToken, insufficientEGLD]);
     const unStake = useCallback(async () => {
         if (!stakedData?.totalStakedLP) return;
         const { sessionId } = await exitFarm(
@@ -143,16 +155,14 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
                             </div>
                             <div className="bg-ash-dark-400/30 h-14 lg:h-18 px-6 flex items-center">
                                 <div className="flex mr-2">
-                                    <Avatar
-                                        src={token0.logoURI}
-                                        alt={token0.symbol}
-                                        className="w-4 h-4"
-                                    />
-                                    <Avatar
-                                        src={token1.logoURI}
-                                        alt={token1.symbol}
-                                        className="w-4 h-4 -ml-1"
-                                    />
+                                    {pool.tokens.map((t) => (
+                                        <Avatar
+                                            key={t.identifier}
+                                            src={t.logoURI}
+                                            alt={t.symbol}
+                                            className="w-4 h-4 first:ml-0 -ml-1"
+                                        />
+                                    ))}
                                 </div>
                                 <div className="text-ash-gray-500 text-sm lg:text-lg font-bold">
                                     {pool?.lpToken?.symbol}
@@ -176,6 +186,7 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
                                     const amt = toWei(pool.lpToken, raw);
                                     setRawStakeAmt(raw);
                                     setUnStakeAmt(amt);
+                                    setIsClickedUnstake(true);
                                 }}
                             />
                             <div className="text-right text-2xs lg:text-xs mt-2">
@@ -319,26 +330,19 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
             </div>
             <div className="sm:flex sm:space-x-8 lg:space-x-24">
                 <div className="w-full mb-12 sm:mb-0 sm:grow">
-                    <Checkbox
-                        checked={isAgree}
-                        onChange={setIsAgree}
-                        text={
-                            <span className="text-ash-gray-500">
-                                I verify that I have read the{" "}
-                                <a
-                                    href="https://docs.ashswap.io/testnet-guides/liquidity-staking"
-                                    target="_blank"
-                                    rel="noreferrer"
-                                >
-                                    <b className="text-white">
-                                        <u>AshSwap Liquidity Staking Guide</u>
-                                    </b>
-                                </a>{" "}
-                                and understand the risks of providing liquidity,
-                                including impermanent loss.
-                            </span>
-                        }
-                    />
+                    <span className="text-xs text-ash-gray-500">
+                        Make sure you  have read the{" "}
+                        <a
+                            href="https://docs.ashswap.io/testnet-guides/liquidity-staking"
+                            target="_blank"
+                            rel="noreferrer"
+                        >
+                            <b className="text-white">
+                                <u>AshSwap Liquidity Staking Guide</u>
+                            </b>
+                        </a>{" "}
+                        and understood the associated risks.
+                    </span>
                 </div>
                 <div className="w-full sm:w-1/3 lg:w-[17.8125rem] shrink-0">
                     <div className="border-notch-x border-notch-white/50">

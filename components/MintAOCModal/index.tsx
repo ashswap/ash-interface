@@ -18,7 +18,6 @@ type props = {
 };
 function MintAOCModal({ open, onClose }: props) {
     const [feePct, setFeePct] = useState(0);
-    const [isAgree, setIsAgree] = useState(false);
     const insufficientEGLD = useRecoilValue(accIsInsufficientEGLDState);
     const screenSize = useScreenSize();
     return (
@@ -210,26 +209,19 @@ function MintAOCModal({ open, onClose }: props) {
                     </div>
                     <div className="sm:flex sm:gap-8 lg:gap-24">
                         <div className="w-full mb-12 sm:mb-0 sm:grow">
-                            <Checkbox
-                                checked={isAgree}
-                                onChange={setIsAgree}
-                                text={
-                                    <span>
-                                        I verify that I have read the{" "}
-                                        <a
-                                            href="https://docs.ashswap.io/guides/add-remove-liquidity"
-                                            target="_blank"
-                                            rel="noreferrer"
-                                        >
-                                            <b className="text-white">
-                                                <u>AshSwap Pools Guide</u>
-                                            </b>
-                                        </a>{" "}
-                                        and understand the risks of providing
-                                        liquidity, including impermanent loss.
-                                    </span>
-                                }
-                            />
+                            <span className="text-xs text-ash-gray-500">
+                                Make sure you  have read the{" "}
+                                <a
+                                    href="https://docs.ashswap.io/guides/add-remove-liquidity"
+                                    target="_blank"
+                                    rel="noreferrer"
+                                >
+                                    <b className="text-white">
+                                        <u>AshSwap Pools Guide</u>
+                                    </b>
+                                </a>{" "}
+                                and understood the associated risks.
+                            </span>
                         </div>
                         <div className="w-full sm:w-1/3 shrink-0">
                             <div className="border-notch-x border-notch-white/50">

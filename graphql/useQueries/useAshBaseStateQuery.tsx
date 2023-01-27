@@ -110,6 +110,7 @@ const useAshBaseStateQuery = (config?: SWRConfiguration) => {
                         lastRewardBlockNone
                         divisionSafetyConstant
                         farmingTokenBalance
+                        produceRewardEnabled
                         account {
                             slopeBoosted
                         }

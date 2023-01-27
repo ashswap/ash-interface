@@ -37,7 +37,7 @@ import useMounted from "hooks/useMounted";
 import { useScreenSize } from "hooks/useScreenSize";
 import moment from "moment";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
 import useSWR from "swr";
 import GovMenu from "./components/GovMenu";
@@ -85,7 +85,15 @@ function GovStats() {
         transactionId: harvestId,
         onSuccess: () => setOpenHarvestResult(true),
     });
-
+    useEffect(() => {
+        if (window && openStakeGov && loggedIn) {
+            let dataLayer = (window as any).dataLayer || [];
+            console.log("dataLayer", dataLayer);
+            dataLayer.push({
+                event: "click_stake_gov",
+            });
+        }
+    }, [openStakeGov]);
     const { claimReward } = useGovClaimReward();
     const { unlockASH } = useGovUnlockASH();
     const loggedIn = useRecoilValue(accIsLoggedInState);
@@ -494,7 +502,7 @@ function GovStats() {
                                 onClick={() => setIsQAExpand((val) => !val)}
                             >
                                 <div className="line-clamp-2 text-xs lg:text-sm font-bold grow text-left mr-4">
-                                    OMG? Does it mean user will lose money
+                                    Does it mean user will lose money
                                     everyday?
                                 </div>
                                 {isQAExpand ? (
@@ -508,15 +516,12 @@ function GovStats() {
                                     <div className="mb-4">
                                         Of course not, when your veASH decreases
                                         to 0. It also means that the lock period
-                                        of your ASH is done. You can withdraw
+                                        of your ASH is over. You can withdraw
                                         your staked ASH right away.
                                     </div>
                                     <div>
                                         However, If you want to keep your veASH
-                                        stays on the maximum, just{" "}
-                                        <span className="text-pink-600 underline font-bold">
-                                            extend
-                                        </span>{" "}
+                                        stays on the maximum, just extend
                                         your lock period.
                                     </div>
                                 </div>

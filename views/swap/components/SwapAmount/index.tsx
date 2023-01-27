@@ -44,7 +44,7 @@ const SwapAmount = (props: Props) => {
     } = useSwap();
     const tokenMap = useRecoilValue(tokenMapState);
     const screenSize = useScreenSize();
-    const [debounceValueFrom] = useDebounce(valueFrom, 500);
+    const [deboundValueFrom] = useDebounce(valueFrom, 500);
     const [onboardingQuickSelectToken, setOnboardedQuickSelectToken] =
         useOnboarding("swap_quick_select_token");
     const [onboardingInputAmt, setOnboardedInputAmt] =
@@ -64,7 +64,7 @@ const SwapAmount = (props: Props) => {
                 amount: valueFrom,
             });
         }
-    }, [debounceValueFrom, props.type, tokenTo, valueFrom]);
+    }, [deboundValueFrom, props.type, tokenTo]);
     const onChangeValue = useMemo(() => {
         if (props.type === "from") {
             return setValueFrom;
@@ -264,10 +264,10 @@ const SwapAmount = (props: Props) => {
                     <div>
                         <span>Balance: </span>
                         <span
-                            className={`text-earn ${
+                            className={`${
                                 tokenMap[token.identifier] &&
                                 props.type === "from"
-                                    ? "select-none cursor-pointer"
+                                    ? "select-none cursor-pointer text-earn"
                                     : ""
                             }`}
                             onClick={() => {
