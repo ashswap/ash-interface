@@ -45,8 +45,8 @@ function Countdown({ timestamp, small = false, xs = false }: { timestamp: number
                 return (
                     <div key={i} className="flex">
                         <div className={`flex ${small ? "space-x-[1px]" : xs ? "space-x-[1px]" : "space-x-1"}`}>
-                            <CountBlock num={n1} small={small} xs />
-                            <CountBlock num={n2} small={small} xs />
+                            <CountBlock num={n1} small={small} xs={xs} />
+                            <CountBlock num={n2} small={small} xs={xs} />
                             
                         </div>
                         {i < remainArr.length - 1 && (
