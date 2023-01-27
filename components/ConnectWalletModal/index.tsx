@@ -25,6 +25,7 @@ import platform from "platform";
 import QRCode from "qrcode";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
+import { useConnectMethod } from "hooks/useConnectMethod";
 const MAIAR_WALLET_LINK = {
     PLAY_STORE: "https://maiar.onelink.me/HLcx/52dcde54",
     APP_STORE: "https://maiar.onelink.me/HLcx/f0b7455c",
@@ -54,6 +55,7 @@ function ConnectWalletModal() {
     const [webWalletLogin] = useWebWalletLogin({
         callbackRoute: "",
     });        
+    const loginMethodName = useConnectMethod()
     useEffect(() => {
         if (!isOpenConnectWalletModal) {
             setIsOpenQR(false);
@@ -81,19 +83,18 @@ function ConnectWalletModal() {
             window.localStorage.setItem("address", dappCore.account.address);
             window.localStorage.setItem(
                 "method",
-                dappCore.loginInfo.loginMethod
+                loginMethodName
             );
             dataLayer.push({
                 event: "success_connect_wallet",
                 address: dappCore.account.address,
-                method: dappCore.loginInfo.loginMethod,
+                method: loginMethodName
             });
         }
     }, [loggedIn, dappCore.account.address, dappCore.loginInfo.loginMethod]);
     useEffect(() => {
         if (window && !loggedIn && notFirstRender) {
             let dataLayer = (window as any).dataLayer || [];
-            console.log("dataLayer", dataLayer);
             dataLayer.push({
                 event: "disconnect_wallet",
                 address: window.localStorage.getItem("address"),
