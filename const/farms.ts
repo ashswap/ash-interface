@@ -64,50 +64,50 @@ const devnet: FarmConfig = {
             farm_token_decimal: 18,
             active: true,
         },
-        {
-            farm_address:
-                "erd1qqqqqqqqqqqqqpgqdxj0uz39u33vrnmt8dfpp9v6wqxsk762rmcqx2nkte",
-            reward_token_id: "ASH-4ce444",
-            reward_token_decimal: 18,
-            farming_token_id: "ALP-fc47a2",
-            farming_token_decimal: 18,
-            farm_token_id: "FARM-6e2d3c",
-            farm_token_decimal: 18,
-            active: true,
-        },
-        {
-            farm_address:
-                "erd1qqqqqqqqqqqqqpgq0w3ceg72srdy5xacnlgy7v2083gm3vrqrmcqtmp497",
-            reward_token_id: "ASH-77a5df",
-            reward_token_decimal: 18,
-            farming_token_id: "ALP-fc47a2",
-            farming_token_decimal: 18,
-            farm_token_id: "FARM-00609b",
-            farm_token_decimal: 18,
-            active: true,
-        },
-        {
-            farm_address:
-                "erd1qqqqqqqqqqqqqpgqu47nsvmmkutxz6hk8hg958y3e0nsq5a5rmcqhj3quc",
-            reward_token_id: "ASH-77a5df",
-            reward_token_decimal: 18,
-            farming_token_id: "LPT-820467",
-            farming_token_decimal: 18,
-            farm_token_id: "FUU-d16487",
-            farm_token_decimal: 18,
-            active: true,
-        },
-        {
-            farm_address:
-                "erd1qqqqqqqqqqqqqpgqz2mclldgm9xz85f40l7llu3kv0xunddmrmcqg7mg2f",
-            reward_token_id: "ASH-77a5df",
-            reward_token_decimal: 18,
-            farming_token_id: "LPT-2de32e",
-            farming_token_decimal: 18,
-            farm_token_id: "FUU-58274b",
-            farm_token_decimal: 18,
-            active: true,
-        },
+        // {
+        //     farm_address:
+        //         "erd1qqqqqqqqqqqqqpgqdxj0uz39u33vrnmt8dfpp9v6wqxsk762rmcqx2nkte",
+        //     reward_token_id: "ASH-4ce444",
+        //     reward_token_decimal: 18,
+        //     farming_token_id: "ALP-fc47a2",
+        //     farming_token_decimal: 18,
+        //     farm_token_id: "FARM-6e2d3c",
+        //     farm_token_decimal: 18,
+        //     active: true,
+        // },
+        // {
+        //     farm_address:
+        //         "erd1qqqqqqqqqqqqqpgq0w3ceg72srdy5xacnlgy7v2083gm3vrqrmcqtmp497",
+        //     reward_token_id: "ASH-77a5df",
+        //     reward_token_decimal: 18,
+        //     farming_token_id: "ALP-fc47a2",
+        //     farming_token_decimal: 18,
+        //     farm_token_id: "FARM-00609b",
+        //     farm_token_decimal: 18,
+        //     active: true,
+        // },
+        // {
+        //     farm_address:
+        //         "erd1qqqqqqqqqqqqqpgqu47nsvmmkutxz6hk8hg958y3e0nsq5a5rmcqhj3quc",
+        //     reward_token_id: "ASH-77a5df",
+        //     reward_token_decimal: 18,
+        //     farming_token_id: "LPT-820467",
+        //     farming_token_decimal: 18,
+        //     farm_token_id: "FUU-d16487",
+        //     farm_token_decimal: 18,
+        //     active: true,
+        // },
+        // {
+        //     farm_address:
+        //         "erd1qqqqqqqqqqqqqpgqz2mclldgm9xz85f40l7llu3kv0xunddmrmcqg7mg2f",
+        //     reward_token_id: "ASH-77a5df",
+        //     reward_token_decimal: 18,
+        //     farming_token_id: "LPT-2de32e",
+        //     farming_token_decimal: 18,
+        //     farm_token_id: "FUU-58274b",
+        //     farm_token_decimal: 18,
+        //     active: true,
+        // },
     ],
 };
 
