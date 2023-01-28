@@ -1,7 +1,12 @@
 import { useGetPendingTransactions } from "@elrondnetwork/dapp-core/hooks";
 import { Address, TokenPayment } from "@elrondnetwork/erdjs/out";
 import { accAddressState } from "atoms/dappState";
-import { govTotalSupplyVeASH, govVeASHAmtState } from "atoms/govState";
+import {
+    govLockedAmtState,
+    govTotalSupplyVeASH,
+    govUnlockTSState,
+    govVeASHAmtState,
+} from "atoms/govState";
 import BigNumber from "bignumber.js";
 import Avatar from "components/Avatar";
 import GlowingButton from "components/GlowingButton";
@@ -32,6 +37,7 @@ import Heading from "./Heading";
 import Image from "components/Image";
 import UnlockASHModal from "components/UnlockASHModal";
 import moment from "moment";
+import useGovUnlockASH from "hooks/useGovContract/useGovUnlockASH";
 
 function PrizePool() {
     const [isOpenStake, setIsOpenStake] = useState(false);
@@ -45,7 +51,10 @@ function PrizePool() {
     const userAddress = useRecoilValue(accAddressState);
     const veSupply = useRecoilValue(govTotalSupplyVeASH);
     const currentVe = useRecoilValue(govVeASHAmtState);
+    const lockedAmt = useRecoilValue(govLockedAmtState);
+    const unlockTS = useRecoilValue(govUnlockTSState);
     const pendingTxKey = usePendingTxKey();
+    const { unlockASH } = useGovUnlockASH();
 
     const {
         claim,
@@ -67,6 +76,14 @@ function PrizePool() {
             100
         );
     }, [currentVe]);
+
+    const canUnlockASH = useMemo(() => {
+        return (
+            lockedAmt.gt(0) &&
+            unlockTS &&
+            unlockTS.minus(moment().unix()).lte(0)
+        );
+    }, [unlockTS, lockedAmt]);
 
     useEffect(() => {
         if (!userAddress) {
@@ -93,7 +110,7 @@ function PrizePool() {
                     startClaimTs || moment().unix()
                 )
                 .then((val) => {
-                    console.log('%', val.toString());
+                    console.log("%", val.toString());
                     setSharePct(val.multipliedBy(100).div(1e11).toNumber());
                     setRewardAmount(
                         new TokenAmount(
@@ -381,13 +398,24 @@ function PrizePool() {
                                 </div>
                             </div>
                             <div className="mt-11 grid grid-cols-2 gap-4">
-                                <GlowingButton
-                                    theme="pink"
-                                    className="w-full h-14 clip-corner-1 clip-corner-br font-bold text-sm underline"
-                                    onClick={() => setIsOpenStake(true)}
-                                >
-                                    Stake
-                                </GlowingButton>
+                                {canUnlockASH ? (
+                                    <GlowingButton
+                                        theme="yellow"
+                                        className="w-full h-14 clip-corner-1 clip-corner-br font-bold text-sm underline"
+                                        onClick={() => unlockASH()}
+                                    >
+                                        Withdraw
+                                    </GlowingButton>
+                                ) : (
+                                    <GlowingButton
+                                        theme="pink"
+                                        className="w-full h-14 clip-corner-1 clip-corner-br font-bold text-sm underline"
+                                        onClick={() => setIsOpenStake(true)}
+                                    >
+                                        Stake
+                                    </GlowingButton>
+                                )}
+
                                 <GlowingButton
                                     theme="pink"
                                     className="w-full h-14 clip-corner-1 clip-corner-br font-bold text-sm underline"
