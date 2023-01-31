@@ -254,9 +254,7 @@ const MAINNET_TOKENS: IESDTInfo[] = [
 
 export const TOKENS =
     ENVIRONMENT.NETWORK === "devnet"
-        ? ENVIRONMENT.ENV === "alpha"
-            ? DEVNET_TOKENS_ALPHA
-            : DEVNET_TOKENS_BETA
+        ? DEVNET_TOKENS_BETA
         : MAINNET_TOKENS;
 /**@deprecate */
 export const TOKENS_MAP = Object.fromEntries(
@@ -266,9 +264,7 @@ export const TOKENS_MAP = Object.fromEntries(
 export const ASH_TOKEN: IESDTInfo =
     TOKENS_MAP[
         ENVIRONMENT.NETWORK == "devnet"
-            ? ENVIRONMENT.ENV === "alpha"
-                ? "ASH-a0d8e5"
-                : "ASH-4ce444"
+            ? "ASH-4ce444"
             : "ASH-a85626"
     ];
 export const ESDT_MAP = Object.fromEntries(
@@ -277,8 +273,6 @@ export const ESDT_MAP = Object.fromEntries(
 export const ASH_ESDT =
     ESDT_MAP[
         ENVIRONMENT.NETWORK == "devnet"
-            ? ENVIRONMENT.ENV === "alpha"
-                ? "ASH-a0d8e5"
-                : "ASH-4ce444"
+            ? "ASH-4ce444"
             : "ASH-a85626"
     ];

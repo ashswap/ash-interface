@@ -29,7 +29,7 @@ const dappContractMainnet: DappContracts = {
 
 const dappContract =
     ENVIRONMENT.NETWORK == "devnet"
-        ? dappContractDevnet[ENVIRONMENT.ENV]
+        ? dappContractDevnet.beta // dappContractDevnet[ENVIRONMENT.ENV]
         : dappContractMainnet;
 
 export const VE_CONFIG = {

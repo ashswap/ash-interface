@@ -187,7 +187,7 @@ const mainnet: IPool[] = [
 ];
 
 const pools =
-    ENVIRONMENT.NETWORK == "devnet" ? [...devnet[ENVIRONMENT.ENV], ...MAIAR_POOLS] : [...mainnet, ...MAIAR_POOLS];
+    ENVIRONMENT.NETWORK == "devnet" ? [...devnet["beta" || ENVIRONMENT.ENV], ...MAIAR_POOLS] : [...mainnet, ...MAIAR_POOLS];
 export const POOLS_MAP_ADDRESS = Object.fromEntries(
     pools.map((p) => [p.address, p])
 );
