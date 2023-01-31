@@ -21,20 +21,24 @@ export type formatAmountNotation = "compact" | "standard";
  * @returns formatted string ready to be displayed
  */
 export const formatAmount = (
-    amount: number | undefined,
+    _amount: BigNumber.Value | undefined,
     options?: {
         notation?: formatAmountNotation;
         displayThreshold?: number;
         tokenPrecision?: boolean;
         isInteger?: boolean;
+        isIntegerAuto?: boolean;
     }
 ) => {
+    const amount = new BigNumber(_amount || 0).toNumber();
     const {
         notation = "compact",
         displayThreshold = 0.01,
         tokenPrecision,
-        isInteger,
+        isInteger: _isInteger,
+        isIntegerAuto
     } = options || { notation: "compact", displayThreshold: 0.01 };
+    const isInteger = isIntegerAuto ? new BigNumber(_amount || 0).isInteger() : _isInteger;
     if (amount === 0) {
         if (isInteger) {
             return "0";
