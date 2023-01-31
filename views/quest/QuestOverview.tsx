@@ -1,8 +1,10 @@
 import { logout } from "@elrondnetwork/dapp-core/utils";
 import ImgDiscord from "assets/images/discord.png";
-import ImgTwitter from "assets/images/twitter.png";
 import ImgRewardPoolBanner from "assets/images/reward-pool-banner.jpeg";
+import ImgTwitter from "assets/images/twitter.png";
+import ICBambooShootSolid from "assets/svg/bamboo-shoot-solid.svg";
 import ICCaretRight from "assets/svg/caret-right.svg";
+import ICELetter from "assets/svg/e-letter.svg";
 import { atomQuestUserStats } from "atoms/ashpoint";
 import { accAddressState } from "atoms/dappState";
 import BaseModal from "components/BaseModal";
@@ -20,12 +22,13 @@ import { useConnectWallet } from "hooks/useConnectWallet";
 import usePrevState from "hooks/usePrevState";
 import { useScreenSize } from "hooks/useScreenSize";
 import { GeetestCaptchaObj } from "interface/geetest";
-import { QuestActionType, QuestUserStatsModel } from "interface/quest";
+import { QuestUserStatsModel } from "interface/quest";
 import moment from "moment";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
-import QuestItem from "./QuestItem";
+import DailyQuests from "./DailyQuests";
+import EventQuests from "./EventQuests";
 
 type PlatformType = "twitter" | "discord";
 const Star = ({ active = false }: { active?: boolean }) => {
@@ -62,6 +65,7 @@ const QuestOverview = () => {
     const captchaObjRef = useRef<GeetestCaptchaObj>();
     const [firstLoad, setFirstLoad] = useState(true);
     const [isOpenPlatformModal, setIsOpenPlatformModal] = useState(false);
+    const [questType, setQuestType] = useState<"daily" | "event">("daily");
     const screenSize = useScreenSize();
 
     const [platform, setPlatform] = useState<PlatformType>();
@@ -257,9 +261,36 @@ const QuestOverview = () => {
                     layout="responsive"
                 />
             </a>
-            <h1 className="mt-10 text-2xl md:text-5xl font-bold text-white mb-7 md:mb-11">
+            <h1 className="mt-6 sm:mt-10 text-2xl md:text-5xl font-bold text-white mb-7 md:mb-11">
                 Quest
             </h1>
+            {ENVIRONMENT.ENV !== "beta" && (
+                <div className="mb-6 -mx-6 px-6 sm:px-0 sm:mx-0 scrollbar-hide flex space-x-2 overflow-auto">
+                    <button
+                        className={`shrink-0 flex items-center h-8 sm:h-12 px-6 bg-ash-dark-600 text-xs sm:text-sm font-bold ${
+                            questType === "daily"
+                                ? "text-pink-600"
+                                : "text-stake-gray-500"
+                        }`}
+                        onClick={() => setQuestType("daily")}
+                    >
+                        <ICBambooShootSolid className="w-3 h-3 mr-2" />
+                        Daily Quest
+                    </button>
+                    <button
+                        className={`shrink-0 flex items-center h-8 sm:h-12 px-6 bg-ash-dark-600 text-xs sm:text-sm font-bold ${
+                            questType === "event"
+                                ? "text-pink-600"
+                                : "text-stake-gray-500"
+                        }`}
+                        onClick={() => setQuestType("event")}
+                    >
+                        <ICELetter className="w-3 h-3 mr-2" />
+                        Event Quest
+                    </button>
+                </div>
+            )}
+
             <div className="lg:flex lg:space-x-2">
                 <div className="shrink-0 min-w-[20rem]">
                     <div className="grid sm:grid-cols-2 lg:grid-cols-1 gap-x-4 gap-y-2">
@@ -466,7 +497,7 @@ const QuestOverview = () => {
                                         {userAddress
                                             ? formatAmount(
                                                   userStats?.wallet
-                                                      .user_invited,
+                                                      .user_invited || 0,
                                                   {
                                                       notation: "standard",
                                                       isInteger: true,
@@ -489,7 +520,8 @@ const QuestOverview = () => {
                                     <span className="font-bold text-2xl text-white">
                                         {userAddress
                                             ? formatAmount(
-                                                  userStats?.wallet.user_staked,
+                                                  userStats?.wallet
+                                                      .user_staked || 0,
                                                   {
                                                       notation: "standard",
                                                       isInteger: true,
@@ -512,7 +544,10 @@ const QuestOverview = () => {
                                 target="_blank"
                                 rel="noreferrer"
                             >
-                                <GlowingButton theme="purple" className="mt-10 h-11 md:h-[5.5rem] w-full font-bold text-sm md:text-lg">
+                                <GlowingButton
+                                    theme="purple"
+                                    className="mt-10 h-11 md:h-[5.5rem] w-full font-bold text-sm md:text-lg"
+                                >
                                     How to join Launch Race?
                                 </GlowingButton>
                             </a>
@@ -630,18 +665,11 @@ const QuestOverview = () => {
                         )}
                     </div>
                 ) : (
-                    <div className="mt-4 lg:mt-0 grow md:min-w-[40rem] flex flex-col space-y-2">
-                        {Object.entries(userStats?.action || {})
-                            .sort(([k1, q1], [k2, q2]) =>
-                                q2.is_claimed ? -1 : 1
-                            )
-                            .map(([k, q]) => (
-                                <QuestItem
-                                    key={k}
-                                    questData={q}
-                                    type={k as QuestActionType}
-                                />
-                            ))}
+                    <div className="mt-4 lg:mt-0 grow md:min-w-[40rem]">
+                        <div className="w-full flex flex-col space-y-2">
+                            {questType === "daily" && <DailyQuests />}
+                            {questType === "event" && <EventQuests />}
+                        </div>
                     </div>
                 )}
             </div>
