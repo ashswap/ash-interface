@@ -37,7 +37,7 @@ export const TxCompletedTracker = () => {
                 socketExtra.emit("transactionCompletedClient", receiver, hash);
                 logApi.post("/api/v1/tracking/ash-point", {
                     action_time: Date.now(),
-                    action_name: raw?.function,
+                    action_name: raw?.function || raw?.arguments?.functionName || raw?.action?.name,
                     action_metadata: raw,
                 });
             });
