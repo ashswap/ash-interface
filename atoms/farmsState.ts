@@ -33,7 +33,8 @@ export type FarmRecord = {
         weightBoost: BigNumber;
         yieldBoost: number;
     };
-    ashPerBlock: BigNumber;
+    ashPerSec: BigNumber;
+    lastRewardBlockTs: number;
     farmTokenSupply: BigNumber;
     lpLockedAmt: BigNumber;
     totalLiquidityValue: BigNumber;
@@ -154,7 +155,7 @@ export const farmOwnerTokensState = selector<FarmToken[]>({
     get: ({ get }) => {
         const tokens = get(farmTokensState);
         const address = get(accAddressState);
-        return tokens.filter((t) => t.attributes.booster === address);
+        return tokens.filter((t) => t.attributes.booster.bech32() === address);
     },
     cachePolicy_UNSTABLE: {
         eviction: "most-recent",
@@ -166,7 +167,7 @@ export const farmTransferedTokensState = selector<FarmToken[]>({
     get: ({ get }) => {
         const tokens = get(farmTokensState);
         const address = get(accAddressState);
-        return tokens.filter((t) => t.attributes.booster !== address);
+        return tokens.filter((t) => t.attributes.booster.bech32() !== address);
     },
     cachePolicy_UNSTABLE: {
         eviction: "most-recent",
@@ -204,7 +205,7 @@ export const farmOwnerTokensQuery = selectorFamily({
             const address = get(accAddressState);
             return (
                 farmRecord.stakedData?.farmTokens?.filter(
-                    (f) => f.attributes.booster === address
+                    (f) => f.attributes.booster.bech32() === address
                 ) || []
             );
         },
@@ -222,7 +223,7 @@ export const farmTransferedTokensQuery = selectorFamily({
             const address = get(accAddressState);
             return (
                 farmRecord.stakedData?.farmTokens?.filter(
-                    (f) => f.attributes.booster !== address
+                    (f) => f.attributes.booster.bech32() !== address
                 ) || []
             );
         },
@@ -241,19 +242,6 @@ export const farmPoolQuery = selectorFamily({
         },
 });
 // refactor
-
-export const farmBlockRewardMapSelector = selector<Record<string, BigNumber>>({
-    key: "farm_block_reward_map_by_address_selector",
-    get: ({ get }) => {
-        const base = get(ashswapBaseState);
-        return Object.fromEntries(
-            base.farms.map((f) => [
-                f.address,
-                new BigNumber(f.perBlockReward || "0"),
-            ])
-        );
-    },
-});
 
 export const ashRawFarmQuery = selectorFamily({
     key: "ash_base_state_raw_farm_query_by_address",

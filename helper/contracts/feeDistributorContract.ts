@@ -2,7 +2,7 @@ import Contract from "./contract";
 import feeDistributorAbi from "assets/abi/fee_distributor.abi.json";
 import { Address } from "@elrondnetwork/erdjs/out";
 
-class FeeDistributorContract extends Contract {
+class FeeDistributorContract extends Contract<typeof feeDistributorAbi> {
     constructor(address: string) {
         super(address, feeDistributorAbi);
     }

@@ -30,11 +30,11 @@ const useEnterFarm = (trackStatus = false) => {
                     return { sessionId: "" };
                 const farmContract = ContractManager.getFarmContract(
                     farm.farm_address
-                );
+                ).withLastRewardBlockTs(farmData.lastRewardBlockTs);
 
                 const farmTokenInWallet =
                     farmData.stakedData?.farmTokens.filter(
-                        (f) => f.attributes.booster === address
+                        (f) => f.attributes.booster.bech32() === address
                     ) || [];
 
                 const tokenPayments = farmTokenInWallet.map((t) =>
