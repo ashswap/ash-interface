@@ -88,7 +88,7 @@ const useExitFarm = (trackStatus = false) => {
                 if (!loggedIn) return { sessionId: "" };
                 const farmContract = ContractManager.getFarmContract(
                     farm.farm_address
-                );
+                ).withLastRewardBlockTs(farmRecord.lastRewardBlockTs);
                 if (!farmRecord || !farmRecord.stakedData)
                     return { sessionId: "" };
                 const { stakedData } = farmRecord;

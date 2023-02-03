@@ -79,7 +79,7 @@ const CustomTransactionsTracker: typeof TransactionsTracker = () => {
                         } else {
                             intervalRef.current = { [sessionId]: interval };
                         }
-                    }, 2 * 60000);
+                    }, 60000);
                     timeoutRef.current[sessionId] = timeout;
                 }
             }

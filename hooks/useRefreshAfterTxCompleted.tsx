@@ -7,7 +7,7 @@ import { useFetchBalances } from "./useFetchBalances";
 export const useRefreshAfterTxCompleted = () => {
     const fetchBalances = useFetchBalances();
     const lastCompletedTxHash = useRecoilValue(lastCompletedTxHashAtom);
-    const [deboundLastTxHash] = useDebounce(lastCompletedTxHash, 500);
+    const [deboundLastTxHash] = useDebounce(lastCompletedTxHash, 750);
 
     useEffect(() => {
         if (deboundLastTxHash) {

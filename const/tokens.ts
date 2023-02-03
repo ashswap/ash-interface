@@ -14,7 +14,7 @@ export const VE_ASH_DECIMALS = 18;
 
 const DEVNET_TOKENS_ALPHA: IESDTInfo[] = [
     {
-        identifier: "ASH-a0d8e5",
+        identifier: "ASH-84eab0",
         chainId: ChainId.Devnet,
         symbol: "ASH",
         name: "Ashswap Token",
@@ -22,7 +22,7 @@ const DEVNET_TOKENS_ALPHA: IESDTInfo[] = [
         logoURI: ImgAshIcon.src,
     },
     {
-        identifier: "USDT-2c4852",
+        identifier: "USDT-3e3720",
         chainId: ChainId.Devnet,
         symbol: "USDT",
         name: "Tether",
@@ -30,7 +30,7 @@ const DEVNET_TOKENS_ALPHA: IESDTInfo[] = [
         logoURI: IconUSDT.src,
     },
     {
-        identifier: "USDC-89351f",
+        identifier: "USDC-fd47e9",
         chainId: ChainId.Devnet,
         symbol: "USDC",
         name: "USD Coin",
@@ -38,31 +38,15 @@ const DEVNET_TOKENS_ALPHA: IESDTInfo[] = [
         logoURI: IconUSDC.src,
     },
     {
-        identifier: "BUSD-104d95",
+        identifier: "BUSD-b53884",
         chainId: ChainId.Devnet,
         symbol: "BUSD",
         name: "Binance USD",
-        decimals: 6,
+        decimals: 18,
         logoURI: IconBUSD.src,
     },
     {
-        identifier: "RENBTC-61ff58",
-        chainId: ChainId.Devnet,
-        symbol: "renBTC",
-        name: "Ren BTC",
-        decimals: 8,
-        logoURI: IconBTC.src,
-    },
-    {
-        identifier: "WBTC-3965ad",
-        chainId: ChainId.Devnet,
-        symbol: "wBTC",
-        name: "Wrapped BTC",
-        decimals: 8,
-        logoURI: IconWBTC.src,
-    },
-    {
-        identifier: "WEGLD-d6dee7",
+        identifier: "WEGLD-578a26",
         chainId: ChainId.Devnet,
         symbol: "wEGLD",
         name: "Wrapped EGLD",
@@ -70,7 +54,7 @@ const DEVNET_TOKENS_ALPHA: IESDTInfo[] = [
         logoURI: IconWEGLD.src,
     },
     {
-        identifier: "AEGLD-3e2d88",
+        identifier: "AEGLD-126d13",
         chainId: ChainId.Devnet,
         symbol: "aEGLD",
         name: "A EGLD",
@@ -254,7 +238,9 @@ const MAINNET_TOKENS: IESDTInfo[] = [
 
 export const TOKENS =
     ENVIRONMENT.NETWORK === "devnet"
-        ? DEVNET_TOKENS_BETA
+        ? ENVIRONMENT.ENV === "alpha"
+            ? DEVNET_TOKENS_ALPHA
+            : DEVNET_TOKENS_BETA
         : MAINNET_TOKENS;
 /**@deprecate */
 export const TOKENS_MAP = Object.fromEntries(
@@ -264,7 +250,9 @@ export const TOKENS_MAP = Object.fromEntries(
 export const ASH_TOKEN: IESDTInfo =
     TOKENS_MAP[
         ENVIRONMENT.NETWORK == "devnet"
-            ? "ASH-4ce444"
+            ? ENVIRONMENT.ENV === "alpha"
+                ? "ASH-84eab0"
+                : "ASH-4ce444"
             : "ASH-a85626"
     ];
 export const ESDT_MAP = Object.fromEntries(
@@ -273,6 +261,8 @@ export const ESDT_MAP = Object.fromEntries(
 export const ASH_ESDT =
     ESDT_MAP[
         ENVIRONMENT.NETWORK == "devnet"
-            ? "ASH-4ce444"
+            ? ENVIRONMENT.ENV === "alpha"
+                ? "ASH-84eab0"
+                : "ASH-4ce444"
             : "ASH-a85626"
     ];

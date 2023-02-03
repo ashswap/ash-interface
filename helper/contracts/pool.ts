@@ -76,7 +76,7 @@ export const queryPoolContract = {
     calculateAmountOut,
     getReserveMaiarPool,
 };
-class PoolContract extends Contract {
+class PoolContract extends Contract<typeof poolAbi> {
     constructor(address: string) {
         super(address, poolAbi);
     }

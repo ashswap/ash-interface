@@ -31,7 +31,7 @@ const devnet: MaiarPoolConfig = {
         //         chainId: CHAIN_ID.DEVNET,
         //         name: "Maiar LP",
         //     },
-        //     tokens: [TOKENS_MAP["USDC-89351f"], TOKENS_MAP["AEGLD-3e2d88"]],
+        //     tokens: [TOKENS_MAP["USDC-89351f"], TOKENS_MAP["AEGLD-126d13"]],
         //     isMaiarPool: true,
         // },
         // {
@@ -131,7 +131,7 @@ const mainnet: IPool[] = [
     //     tokens: [TOKENS_MAP["USDT-821a84"], TOKENS_MAP["ASH-a85626"]],
     //     isMaiarPool: true,
     // },
-]
+];
 
 export const MAIAR_POOLS =
     ENVIRONMENT.NETWORK === "devnet" ? devnet[ENVIRONMENT.ENV] : mainnet;

@@ -29,14 +29,8 @@ type props = {
     farmData: FarmRecord;
 };
 const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
-    const {
-        pool,
-        farm,
-        stakedData,
-        ashPerBlock,
-        farmTokenSupply,
-        emissionAPR,
-    } = farmData;
+    const { pool, farm, stakedData, ashPerSec, farmTokenSupply, emissionAPR } =
+        farmData;
     const loggedIn = useRecoilValue(accIsLoggedInState);
     const [isClickedUnstake, setIsClickedUnstake] = useRecoilState(
         clickedUnstakeModalState
@@ -69,20 +63,16 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
     }, [deboundedUnstakeAmt]);
     const ashPerDay = useMemo(() => {
         if (!stakedData) return new BigNumber(0);
-        const totalAshPerDay = ashPerBlock
-            .multipliedBy(24 * 60 * 60)
-            .div(blockTimeMs / 1000);
+        const totalAshPerDay = ashPerSec.multipliedBy(24 * 60 * 60);
         const shareOfFarm = stakedData.totalStakedLP
             .multipliedBy(0.4)
             .div(farmTokenSupply);
         return totalAshPerDay.multipliedBy(shareOfFarm);
-    }, [stakedData, farmTokenSupply, ashPerBlock]);
+    }, [stakedData, farmTokenSupply, ashPerSec]);
 
     const afterUnstakeAshPerDay = useMemo(() => {
         if (!stakedData) return new BigNumber(0);
-        const totalAshPerDay = ashPerBlock
-            .multipliedBy(24 * 60 * 60)
-            .div(blockTimeMs / 1000);
+        const totalAshPerDay = ashPerSec.multipliedBy(24 * 60 * 60);
         const baseFarmToken = unStakeAmt.multipliedBy(0.4);
         const newStaked = stakedData.totalStakedLP
             .multipliedBy(0.4)
@@ -90,7 +80,7 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
         if (newStaked.lte(0)) return new BigNumber(0);
         const shareOfFarm = newStaked.div(farmTokenSupply.minus(baseFarmToken));
         return totalAshPerDay.multipliedBy(shareOfFarm);
-    }, [stakedData, farmTokenSupply, ashPerBlock, unStakeAmt]);
+    }, [stakedData, farmTokenSupply, ashPerSec, unStakeAmt]);
 
     const insufficientFarmToken = useMemo(() => {
         if (!stakedData?.totalStakedLP) return true;
@@ -331,7 +321,7 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
             <div className="sm:flex sm:space-x-8 lg:space-x-24">
                 <div className="w-full mb-12 sm:mb-0 sm:grow">
                     <span className="text-xs text-ash-gray-500">
-                        Make sure you  have read the{" "}
+                        Make sure you have read the{" "}
                         <a
                             href="https://docs.ashswap.io/testnet-guides/liquidity-staking"
                             target="_blank"

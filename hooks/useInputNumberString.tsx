@@ -9,7 +9,7 @@ const useInputNumberString = (value: BigNumber.Value, decimalPlaces = 3) => {
         () =>
             bigValue.isNaN()
                 ? ""
-                : bigValue.decimalPlaces(decimalPlaces).toString(10),
+                : bigValue.decimalPlaces(decimalPlaces ?? 3).toString(10),
         [bigValue, decimalPlaces]
     );
     useEffect(

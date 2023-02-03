@@ -2,7 +2,7 @@ import Contract from "./contract";
 import votingEscowAbi from "assets/abi/voting_escrow.abi.json";
 import { TokenPayment } from "@elrondnetwork/erdjs/out";
 import BigNumber from "bignumber.js";
-class VotingEscrowContract extends Contract {
+class VotingEscrowContract extends Contract<typeof votingEscowAbi> {
     constructor(address: string) {
         super(address, votingEscowAbi);
     }
