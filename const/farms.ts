@@ -153,7 +153,7 @@ const mainnet: IFarm[] = [
 ];
 
 export const FARMS =
-    (ENVIRONMENT.NETWORK == "devnet" ? devnet["beta" || ENVIRONMENT.ENV] : mainnet) || [];
+    (ENVIRONMENT.NETWORK == "devnet" ? devnet[ENVIRONMENT.ENV] : mainnet) || [];
 export const ACTIVE_FARMS = FARMS.filter((f) => f.active);
 export const FARMS_MAP = Object.fromEntries(
     FARMS.map((f) => [f.farm_address, f])
