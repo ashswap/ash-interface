@@ -64,8 +64,9 @@ const renderActiveShape = (props: PieSectorDataItem) => {
                     <feDropShadow
                         dx="0"
                         dy="0"
-                        stdDeviation="6"
+                        stdDeviation="4"
                         floodColor={fill}
+                        floodOpacity={0.5}
                     />
                 </filter>
             </defs>
@@ -149,25 +150,26 @@ function AllocationChart({ data, radius }: AllocationChartProps) {
                         width: radius * 1.5,
                         height: radius * 1.5,
                         transform: `translate(-50%, -50%) scale(${Math.min(
-                            radius / 200,
+                            radius / 130,
                             1
                         )})`,
                     }}
                 >
+                    <div className="font-semibold text-xs text-stake-gray-500 mb-3">
+                        Weight
+                    </div>
                     <div className="flex items-center mb-4">
                         <div
                             className="w-4 h-4 mr-2.5"
                             style={{ backgroundColor: activeRecord.color }}
                         ></div>
-                        <div className="font-bold text-2xl text-white">
+                        <div className="font-bold text-sm text-white">
                             {activeRecord.name}
                         </div>
                     </div>
-                    <div className="font-semibold text-xs text-stake-gray-500 mb-3">
-                        Weight
-                    </div>
-                    <div className="font-bold text-5xl text-white">
-                        {formatAmount(activeRecord.value * 100 / 10_000)}%
+
+                    <div className="font-bold text-4xl text-white">
+                        {formatAmount((activeRecord.value * 100) / 10_000)}%
                     </div>
                 </div>
             )}

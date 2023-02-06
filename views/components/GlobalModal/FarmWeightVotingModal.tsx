@@ -1,39 +1,38 @@
-import BaseModal, { BaseModalType } from "components/BaseModal";
-import { useScreenSize } from "hooks/useScreenSize";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { Slider } from "antd";
 import ICBribe from "assets/svg/bribe.svg";
 import ICChevronDown from "assets/svg/chevron-down.svg";
 import ICChevronRight from "assets/svg/chevron-right.svg";
 import ICLock from "assets/svg/lock.svg";
-import BasePopover from "components/BasePopover";
-import { FARMS, FARMS_MAP } from "const/farms";
-import { POOLS_MAP_LP } from "const/pool";
-import Avatar from "components/Avatar";
-import { Slider } from "antd";
-import { theme } from "tailwind.config";
-import GlowingButton from "components/GlowingButton";
-import OnboardTooltip from "components/Tooltip/OnboardTooltip";
-import { useOnboarding } from "hooks/useOnboarding";
-import CardTooltip from "components/Tooltip/CardTooltip";
-import TextAmt from "components/TextAmt";
-import useGraphQLQueryOptions from "graphql/useQueries/useGraphQLQueryOptions";
-import { GraphOptions } from "graphql/type";
-import { useRecoilValue } from "recoil";
 import { ashswapBaseState } from "atoms/ashswap";
-import BigNumber from "bignumber.js";
+import { fbHasBribe, fbTotalRewardsUSD } from "atoms/farmBribeState";
 import {
     fcAccountFarmSelector,
     fcFarmSelector,
-    fcTypeSelector,
+    fcTypeSelector
 } from "atoms/farmControllerState";
-import { formatAmount } from "helper/number";
-import { ContractManager } from "helper/contracts/contractManager";
-import useVoteForFarm from "hooks/useFarmControllerContract/useVoteForFarm";
-import moment from "moment";
-import { WEEK } from "const/ve";
-import { govPointSelector, govUnlockTSState } from "atoms/govState";
-import { fbFarmSelector, fbTotalRewardsUSD } from "atoms/farmBribeState";
+import { govPointSelector } from "atoms/govState";
+import BigNumber from "bignumber.js";
+import Avatar from "components/Avatar";
+import BaseModal, { BaseModalType } from "components/BaseModal";
+import BasePopover from "components/BasePopover";
+import GlowingButton from "components/GlowingButton";
+import TextAmt from "components/TextAmt";
+import CardTooltip from "components/Tooltip/CardTooltip";
+import OnboardTooltip from "components/Tooltip/OnboardTooltip";
+import { FARMS_MAP } from "const/farms";
+import { POOLS_MAP_LP } from "const/pool";
 import { VE_ASH_DECIMALS } from "const/tokens";
+import { WEEK } from "const/ve";
+import { GraphOptions } from "graphql/type";
+import useGraphQLQueryOptions from "graphql/useQueries/useGraphQLQueryOptions";
+import { formatAmount } from "helper/number";
+import useVoteForFarm from "hooks/useFarmControllerContract/useVoteForFarm";
+import { useOnboarding } from "hooks/useOnboarding";
+import { useScreenSize } from "hooks/useScreenSize";
+import moment from "moment";
+import { useEffect, useMemo, useState } from "react";
+import { useRecoilValue } from "recoil";
+import { theme } from "tailwind.config";
 
 type Props = BaseModalType & {
     farmAddress?: string;
@@ -51,15 +50,10 @@ const FarmWeightVotingContent = ({ farmAddress: farmAddressProp }: Props) => {
     );
     const ashBase = useRecoilValue(ashswapBaseState);
     const vePoint = useRecoilValue(govPointSelector);
-    const fbFarm = useRecoilValue(fbFarmSelector(farmAddress || ""));
     const totalRewardsUSD = useRecoilValue(
         fbTotalRewardsUSD(farmAddress || "")
     );
-    const hasBribe = useMemo(() => {
-        return fbFarm?.rewards.some((r) =>
-            new BigNumber(r.rewardPerVote).idiv(10 ** 18).gt(0)
-        );
-    }, [fbFarm]);
+    const hasBribe = useRecoilValue(fbHasBribe(farmAddress || ""));
     const nextTime = useMemo(() => {
         return moment
             .unix(Math.floor(moment().unix() / WEEK) * WEEK + WEEK)
@@ -253,7 +247,7 @@ const FarmWeightVotingContent = ({ farmAddress: farmAddressProp }: Props) => {
                             <div>
                                 <OnboardTooltip
                                     placement="right"
-                                    open={onboardingDAOFarmBribe}
+                                    open={onboardingDAOFarmBribe && hasBribe}
                                     onArrowClick={() =>
                                         setOnboardedDAOFarmBribe(true)
                                     }

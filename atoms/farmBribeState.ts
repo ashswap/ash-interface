@@ -14,12 +14,22 @@ export const fbFarmSelector = selectorFamily<FBFarm | undefined, string>({
     }
 });
 
-export const fbTreasuresSelector = selectorFamily<TokenAmount[], string>({
-    key: "farm_bribe_treasures_selector",
+export const fbCurrentRoundTreasuresSelector = selectorFamily<TokenAmount[], string>({
+    key: "farm_bribe_total_treasures_allocation_current_round_selector",
     get: (farmAddress) => ({get}) => {
         const fbFarm = get(fbFarmSelector(farmAddress));
         return fbFarm?.rewards.map(r => {
             return new TokenAmount(TOKENS_MAP[r.tokenId], r.reserve);
+        }) || [];
+    }
+})
+
+export const fbTreasuresSelector = selectorFamily<TokenAmount[], string>({
+    key: "farm_bribe_total_availabel_treasures_selector",
+    get: (farmAddress) => ({get}) => {
+        const fbFarm = get(fbFarmSelector(farmAddress));
+        return fbFarm?.rewards.map(r => {
+            return new TokenAmount(TOKENS_MAP[r.tokenId], new BigNumber(r.total).minus(r.claimed));
         }) || [];
     }
 })
@@ -55,5 +65,14 @@ export const fbTotalClaimableUSDSelector = selectorFamily<number, string>({
         const rewards = get(fbClaimableRewardsSelector(farmAddress));
         const tokenMap = get(tokenMapState);
         return rewards.reduce((sum, r) => sum.plus(r.egld.multipliedBy(tokenMap[r.token.identifier].price)), new BigNumber(0)).toNumber() || 0;
+    }
+})
+
+export const fbHasBribe = selectorFamily<boolean, string>({
+    key: "farm_bribe_has_bribe_selector",
+    get: (farmAddress) => ({get}) => {
+        const treasures = get(fbTreasuresSelector(farmAddress));
+        // if total treasures in wei units is less than 10 -> should be ignored
+        return !!treasures?.some((r) => r.raw.gt(10));
     }
 })

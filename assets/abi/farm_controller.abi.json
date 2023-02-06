@@ -10,7 +10,7 @@
         "contractCrate": {
             "name": "farm_controller",
             "version": "0.0.0",
-            "git_version": "da57eb6"
+            "git_version": "36212f0"
         },
         "framework": {
             "name": "elrond-wasm",
@@ -314,6 +314,16 @@
             ]
         },
         {
+            "name": "getPointsTotal",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
             "name": "getAdmin",
             "mutability": "readonly",
             "inputs": [],
@@ -492,21 +502,6 @@
             "outputs": [
                 {
                     "type": "u64"
-                }
-            ]
-        },
-        {
-            "name": "getPointsTotal",
-            "mutability": "readonly",
-            "inputs": [
-                {
-                    "name": "ts",
-                    "type": "u64"
-                }
-            ],
-            "outputs": [
-                {
-                    "type": "BigUint"
                 }
             ]
         },

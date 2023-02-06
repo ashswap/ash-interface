@@ -3,14 +3,20 @@ import ICCapacity from "assets/svg/capacity.svg";
 import ICChevronDown from "assets/svg/chevron-down.svg";
 import ICChevronUp from "assets/svg/chevron-up.svg";
 import ICLock from "assets/svg/lock.svg";
-import { fbClaimableRewardsSelector, fbTotalClaimableUSDSelector } from "atoms/farmBribeState";
-import { fcAccountFarmSelector, fcFarmSelector } from "atoms/farmControllerState";
+import {
+    fbClaimableRewardsSelector, fbTotalClaimableUSDSelector,
+    fbTotalRewardsUSD, fbTreasuresSelector
+} from "atoms/farmBribeState";
+import {
+    fcAccountFarmSelector,
+    fcFarmSelector
+} from "atoms/farmControllerState";
 import BigNumber from "bignumber.js";
 import Avatar from "components/Avatar";
 import GlowingButton from "components/GlowingButton";
 import TextAmt from "components/TextAmt";
 import CardTooltip from "components/Tooltip/CardTooltip";
-import { VE_MAX_TIME, WEEK } from "const/ve";
+import { WEEK } from "const/ve";
 import { FBFarm } from "graphql/type.graphql";
 import { formatAmount } from "helper/number";
 import useFarmBribeData from "hooks/useFarmBribeData";
@@ -24,21 +30,35 @@ type Props = {
     fbFarm: FBFarm;
 };
 function BribeCard({ fbFarm }: Props) {
-    const { pool, rewards, totalTreasureUSD } = useFarmBribeData(
-        fbFarm.address
-    );
+    const { pool } = useFarmBribeData(fbFarm.address);
     const [isExpanded, setIsExpanded] = useState(false);
     const [isOpenClaim, setIsOpenClaim] = useState(false);
-    const claimableRewards = useRecoilValue(fbClaimableRewardsSelector(fbFarm.address));
-    const totalRewardUSD = useRecoilValue(fbTotalClaimableUSDSelector(fbFarm.address));
+    const claimableRewards = useRecoilValue(
+        fbClaimableRewardsSelector(fbFarm.address)
+    );
+    const rewards = useRecoilValue(fbTreasuresSelector(fbFarm.address));
+    const totalTreasureUSD = useRecoilValue(fbTotalRewardsUSD(fbFarm.address));
+    const totalRewardUSD = useRecoilValue(
+        fbTotalClaimableUSDSelector(fbFarm.address)
+    );
     const fcFarm = useRecoilValue(fcFarmSelector(fbFarm.address));
     const fcAccountFarm = useRecoilValue(fcAccountFarmSelector(fbFarm.address));
     const nextTime = useMemo(() => {
-        return moment.unix(Math.floor(moment().unix() / WEEK) * WEEK + WEEK).format("Do MMM, YYYY");
+        return moment
+            .unix(Math.floor(moment().unix() / WEEK) * WEEK + WEEK)
+            .format("Do MMM, YYYY");
     }, []);
     const capacity = useMemo(() => {
-        if(!fcFarm || !fcAccountFarm?.voteUserSlope?.slope || fcFarm.votedPoint.slope === "0") return 0;
-        return new BigNumber(fcAccountFarm.voteUserSlope.slope).multipliedBy(100).div(fcFarm.votedPoint.slope).toNumber();
+        if (
+            !fcFarm ||
+            !fcAccountFarm?.voteUserSlope?.slope ||
+            fcFarm.votedPoint.slope === "0"
+        )
+            return 0;
+        return new BigNumber(fcAccountFarm.voteUserSlope.slope)
+            .multipliedBy(100)
+            .div(fcFarm.votedPoint.slope)
+            .toNumber();
     }, [fcFarm, fcAccountFarm]);
     const { encode } = useRouteModal("farm_weight_voting");
     if (!pool) return null;
@@ -65,24 +85,26 @@ function BribeCard({ fbFarm }: Props) {
                                     Vote to earn rewards
                                 </div>
                             </div>
-                            {claimableRewards.length > 0 && <div className="shrink-0 w-24 flex flex-col justify-end p-2 -mt-10 -mr-10 bg-stake-gray-500/10">
-                                <div className="mb-7 font-bold text-sm text-stake-gray-500">
-                                    ~ <span className="font-normal">$</span>
-                                    <TextAmt
-                                        number={totalRewardUSD}
-                                        options={{ notation: "standard" }}
-                                        className="text-yellow-500"
-                                        decimalClassName="text-stake-gray-500"
-                                    />
+                            {claimableRewards.length > 0 && (
+                                <div className="shrink-0 w-24 flex flex-col justify-end p-2 -mt-10 -mr-10 bg-stake-gray-500/10">
+                                    <div className="mb-7 font-bold text-sm text-stake-gray-500">
+                                        ~ <span className="font-normal">$</span>
+                                        <TextAmt
+                                            number={totalRewardUSD}
+                                            options={{ notation: "standard" }}
+                                            className="text-yellow-500"
+                                            decimalClassName="text-stake-gray-500"
+                                        />
+                                    </div>
+                                    <GlowingButton
+                                        theme="yellow"
+                                        className="clip-corner-1 clip-corner-br w-full py-2 px-2 truncate font-bold text-xs text-ash-dark-400"
+                                        onClick={() => setIsOpenClaim(true)}
+                                    >
+                                        Claim
+                                    </GlowingButton>
                                 </div>
-                                <GlowingButton
-                                    theme="yellow"
-                                    className="clip-corner-1 clip-corner-br w-full py-2 px-2 truncate font-bold text-xs text-ash-dark-400"
-                                    onClick={() => setIsOpenClaim(true)}
-                                >
-                                    Claim
-                                </GlowingButton>
-                            </div>}
+                            )}
                         </div>
                         <div className="grid grid-cols-2 gap-x-2 items-center mt-16">
                             <div className="font-bold">
@@ -101,11 +123,11 @@ function BribeCard({ fbFarm }: Props) {
                             </div>
                             <Link
                                 href={{
+                                    pathname: "/stake/gov/farmweight",
                                     query: {
-                                        p: encode({
-                                            farmAddress: fbFarm.address,
-                                        }),
+                                        farmAddress: fbFarm.address,
                                     },
+                                    hash: "voting"
                                 }}
                                 scroll={false}
                             >
@@ -190,7 +212,9 @@ function BribeCard({ fbFarm }: Props) {
                                         </span>
                                     </CardTooltip>
                                 </div>
-                                <div className="text-xs font-bold">{formatAmount(capacity)}%</div>
+                                <div className="text-xs font-bold">
+                                    {formatAmount(capacity)}%
+                                </div>
                             </div>
                         </div>
                         <div className="mt-14 flex justify-center">
@@ -209,7 +233,13 @@ function BribeCard({ fbFarm }: Props) {
                     </div>
                 </div>
                 <div className="absolute right-4 -top-6">
-                    <ICBribe className={`w-16 h-16 colored-drop-shadow-xs  ${claimableRewards.length > 0 ? 'text-yellow-500 colored-drop-shadow-yellow-500' : 'text-pink-600 colored-drop-shadow-pink-600'}`} />
+                    <ICBribe
+                        className={`w-16 h-16 colored-drop-shadow-xs  ${
+                            claimableRewards.length > 0
+                                ? "text-yellow-500 colored-drop-shadow-yellow-500"
+                                : "text-pink-600 colored-drop-shadow-pink-600"
+                        }`}
+                    />
                 </div>
             </div>
             <ClaimBribeRewardModal
