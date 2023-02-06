@@ -120,7 +120,6 @@ function FarmWeightOverview() {
     }, [ashBase]);
 
     useEffect(() => {
-        console.log(hash)
         if(hash === "voting") {
             setTimeout(() => votingRef.current?.scrollIntoView({
                 behavior: "smooth",

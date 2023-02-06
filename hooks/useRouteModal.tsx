@@ -20,7 +20,6 @@ function useRouteModal<T extends keyof ModalType>(key: keyof ModalType) {
 
     const encode = useCallback(
         (params?: ModalType[T]) => {
-            console.log(key)
             if (!params) return key;
             const _params = Object.fromEntries(
                 Object.entries(params).filter(

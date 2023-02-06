@@ -258,7 +258,6 @@ function FarmWeightVoting({defaultFarmAddress}: FarmWeightVotingProps) {
         return ashBase.farmController?.farms?.map((f) => f.address) || [];
     }, [ashBase]);
     useEffect(() => setSelectedFarmAddress(defaultFarmAddress || ""), [defaultFarmAddress]);
-    useEffect(() => console.log(defaultFarmAddress || ""), [defaultFarmAddress]);
     
 
     return (

@@ -16,9 +16,6 @@ function updateOptions(
 const useGraphQLQueryOptions = (opt: GraphOptions) => {
     const setOptions = useSetRecoilState(gqlQueryOptionsAtom);
     useEffect(() => {
-        console.log("set options", opt)
-    }, [opt]);
-    useEffect(() => {
         setOptions((state) => {
             return updateOptions(state, opt);
         });
