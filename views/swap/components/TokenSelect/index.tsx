@@ -102,7 +102,6 @@ const TokenSelect = ({
         if (value) setOnboardedSearchToken(true);
         if (value && window) {
             let dataLayer = (window as any).dataLayer || [];
-            console.log("dataLayer", dataLayer);
             dataLayer.push({
                 event: "select_token",
                 type: type,
