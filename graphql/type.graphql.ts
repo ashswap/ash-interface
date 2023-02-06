@@ -151,6 +151,8 @@ export class FBReward {
     rewardPerVote: string;
     activePeriod: number;
     reserve: string;
+    claimed: string;
+    total: string;
 }
 
 export class FBAccount {
@@ -176,6 +178,7 @@ export class FarmController {
     address: string;
     timeTotal: number;
     totalWeight: string;
+    nextTotalWeight: string;
     farmTypes?: Nullable<FarmType[]>;
     farms?: Nullable<FarmInController[]>;
     account?: Nullable<FcAccount>;

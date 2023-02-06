@@ -1,7 +1,7 @@
 import ICBribe from "assets/svg/bribe.svg";
 import ICLock from "assets/svg/lock.svg";
 import { ashswapBaseState } from "atoms/ashswap";
-import { fbFarmSelector, fbTotalRewardsUSD } from "atoms/farmBribeState";
+import { fbHasBribe, fbTotalRewardsUSD } from "atoms/farmBribeState";
 import {
     fcFarmWeightChartRecordsAtom,
     fcNextFarmWeightChartRecordsAtom
@@ -15,26 +15,23 @@ import TextAmt from "components/TextAmt";
 import CardTooltip from "components/Tooltip/CardTooltip";
 import { ASH_ESDT } from "const/tokens";
 import { WEEK } from "const/ve";
-import useRouteModal from "hooks/useRouteModal";
+import useRouteHash from "hooks/useRouteHash";
 import { useScreenSize } from "hooks/useScreenSize";
 import moment from "moment";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/router";
+import { useEffect, useMemo, useRef } from "react";
 import { useRecoilValue } from "recoil";
 import AllocationChart from "./AllocationChart";
+import FarmWeightVoting from "./FarmWeightVoting";
 
 const BribeSymbol = ({ farmAddress }: { farmAddress: string }) => {
-    const fbFarm = useRecoilValue(fbFarmSelector(farmAddress));
     const nextTime = useMemo(() => {
         return moment
             .unix(Math.floor(moment().unix() / WEEK) * WEEK + WEEK)
             .format("Do MMM, YYYY");
     }, []);
-    const hasBribe = useMemo(() => {
-        return fbFarm?.rewards.some((r) =>
-            new BigNumber(r.rewardPerVote).idiv(10**18).gt(0)
-        );
-    }, [fbFarm]);
+    const hasBribe = useRecoilValue(fbHasBribe(farmAddress));
     const totalRewardsUSD = useRecoilValue(fbTotalRewardsUSD(farmAddress));
 
     return hasBribe ? (
@@ -79,8 +76,6 @@ const BribeSymbol = ({ farmAddress }: { farmAddress: string }) => {
     );
 };
 function FarmWeightOverview() {
-    const { encode } = useRouteModal("farm_weight_voting");
-    const [timeLeft, setTimeLeft] = useState("");
     const screens = useScreenSize();
     const ashBase = useRecoilValue(ashswapBaseState);
     const veSupply = useRecoilValue(govTotalSupplyVeASH);
@@ -88,9 +83,17 @@ function FarmWeightOverview() {
     const nextFarmWeightChartRecords = useRecoilValue(
         fcNextFarmWeightChartRecordsAtom
     );
+    const router = useRouter();
+    const hash = useRouteHash();
+    const votingRef = useRef<HTMLElement>(null);
+    const defaultFarmAddress = useMemo(() => router.query.farmAddress as string || "", [router]);
     const radius = useMemo(() => {
-        return screens.lg ? 200 : screens.sm ? 150 : 100;
+        return screens.md ? 130 : screens.sm ? 90 : 120;
     }, [screens]);
+    const currentTime = useMemo(
+        () => Math.floor(moment().unix() / WEEK) * WEEK,
+        []
+    );
     const nextTime = useMemo(() => {
         return Math.floor(moment().unix() / WEEK) * WEEK + WEEK;
     }, []);
@@ -107,43 +110,35 @@ function FarmWeightOverview() {
         return BigNumber.max(veSupply.div(1e18).minus(totalUsedVe), 0);
     }, [totalUsedVe, veSupply]);
     const weeklyReward = useMemo(() => {
-        if(ashBase?.rewarder?.rewardPerSec){
-            return new BigNumber(ashBase.rewarder.rewardPerSec).multipliedBy(7 * 24 * 3600).idiv(10**ASH_ESDT.decimals).toNumber();
+        if (ashBase?.rewarder?.rewardPerSec) {
+            return new BigNumber(ashBase.rewarder.rewardPerSec)
+                .multipliedBy(7 * 24 * 3600)
+                .idiv(10 ** ASH_ESDT.decimals)
+                .toNumber();
         }
         return 0;
     }, [ashBase]);
-    useEffect(() => {
-        const func = () => {
-            const duration = moment.duration(
-                moment.unix(nextTime).diff(moment())
-            );
-            if (duration.milliseconds() > 0) {
-                const d = Math.floor(duration.asDays());
-                const h = duration.hours();
-                const m = duration.minutes();
-                setTimeLeft(`${d}D ${h}H ${m}M`);
-            } else {
-                setTimeLeft(`0D 0H 0M`);
-            }
-        };
-        func();
-        const interval = setInterval(func, 30000);
-        return () => {
-            clearInterval(interval);
-        };
-    }, [nextTime]);
 
+    useEffect(() => {
+        console.log(hash)
+        if(hash === "voting") {
+            setTimeout(() => votingRef.current?.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            }), 0);
+        }
+    }, [hash]);
     return (
         <>
             <div className="flex flex-col xl:flex-row gap-7.5">
-                <div className="w-full xl:w-2/3 py-11 px-7.5 bg-stake-dark-300">
-                    <div className="flex justify-between space-x-4">
-                        <h2 className="font-bold text-2xl text-white leading-tight mb-4">
+                <div className="w-full py-11 px-7.5 bg-stake-dark-300">
+                    <div className="flex justify-between space-x-4 mb-10 lg:mb-16">
+                        <h2 className="font-bold text-2xl text-white leading-tight">
                             Farm weight allocation
                         </h2>
                     </div>
-                    <div className="flex flex-col-reverse sm:flex-row">
-                        <div className="grid grid-cols-2 gap-4 sm:flex sm:flex-col sm:w-1/3 lg:w-1/4 shrink-0 grow-0 xl:grow mt-10 py-1 overflow-auto max-h-[28rem]">
+                    <div className="flex flex-col-reverse lg:flex-row lg:space-x-7.5 overflow-hidden">
+                        <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-1 gap-4 lg:w-1/4 shrink-0 mt-10 py-1 overflow-auto max-h-[18rem] lg:self-start">
                             {farmWeightChartRecords.map((f) => {
                                 return (
                                     <div
@@ -166,25 +161,56 @@ function FarmWeightOverview() {
                                 );
                             })}
                         </div>
-                        <div className="grow xl:grow-0 xl:w-[30rem] sm:-mr-7.5 overflow-hidden">
-                            <div className="h-[28rem]">
-                                <AllocationChart
-                                    data={farmWeightChartRecords}
-                                    radius={radius}
-                                />
+                        <div className="lg:grow flex flex-col sm:flex-row justify-between overflow-hidden">
+                            <div className="lg:grow-0 grow flex flex-col items-center justify-between text-center">
+                                <div>
+                                    <div className="font-bold text-base text-white mb-2">
+                                        On voting...
+                                    </div>
+                                    <div className="scale-75">
+                                        <Countdown timestamp={nextTime} small />
+                                    </div>
+                                </div>
+                                <div className="w-72 h-72 sm:w-64 md:w-72 md:h-72">
+                                    <AllocationChart
+                                        data={nextFarmWeightChartRecords}
+                                        radius={radius}
+                                    />
+                                </div>
+                            </div>
+                            <div className="hidden sm:block border-r border-r-black"></div>
+                            <div className="lg:grow-0 grow mt-10 sm:mt-0 flex flex-col items-center justify-between text-center">
+                                <div>
+                                    <div className="font-bold text-base text-white mb-2">
+                                        Current allocation
+                                    </div>
+                                    <div className="font-bold text-sm text-stake-gray-500">
+                                        {moment
+                                            .unix(currentTime)
+                                            .format("Do MMM, YYYY")}{" "}
+                                        -{" "}
+                                        {moment
+                                            .unix(nextTime)
+                                            .format("Do MMM, YYYY")}
+                                    </div>
+                                </div>
+                                <div className="w-72 h-72 sm:w-64 md:w-72 md:h-72">
+                                    <AllocationChart
+                                        data={farmWeightChartRecords}
+                                        radius={radius}
+                                    />
+                                </div>
                             </div>
                         </div>
                     </div>
                     <div className="mt-9">
                         <Link
                             href={{
-                                query: {
-                                    p: encode(),
-                                },
+                                hash: "voting",
                             }}
-                            scroll={false}
+                            shallow
                         >
-                            <a>
+                            <a onClick={e => {e.preventDefault(); votingRef.current?.scrollIntoView({behavior: "smooth"})}}>
                                 <GlowingButton
                                     theme="pink"
                                     className="w-full sm:w-64 h-[3.375rem] sm:h-18 font-bold text-sm sm:text-lg"
@@ -194,110 +220,61 @@ function FarmWeightOverview() {
                             </a>
                         </Link>
                     </div>
-                </div>
-                <div className="w-full xl:w-1/3 py-11 px-7.5 bg-stake-dark-300">
-                    <h2 className="font-bold text-2xl text-white leading-tight mb-4">
-                        Current DAO stats
-                    </h2>
-                    <div className="font-bold text-sm text-stake-gray-500 mb-12">
-                        {timeLeft} lefts
-                    </div>
-                    <div className="grid md:grid-cols-2 xl:grid-cols-1 gap-6">
-                        <div className="py-7 px-10 bg-ash-dark-400/30">
-                            <div className="font-bold text-sm text-stake-gray-500 uppercase leading-tight mb-6">
-                                Total veash voted
-                            </div>
-                            <div className="flex items-center">
-                                <div className="w-4.5 h-4.5 rounded-full bg-ash-purple-500 mr-2"></div>
-                                <TextAmt
-                                    number={totalUsedVe}
-                                    className="font-bold text-lg text-white"
-                                    options={{ notation: "standard" }}
-                                />
-                            </div>
-                        </div>
-                        <div className="py-7 px-10 bg-ash-dark-400/30">
-                            <div className="font-bold text-sm text-stake-gray-500 uppercase leading-tight mb-6">
-                                veash unused
-                            </div>
-                            <div className="flex items-center">
-                                <div className="w-4.5 h-4.5 rounded-full bg-ash-purple-500 mr-2"></div>
-                                <TextAmt
-                                    number={totalUnusedVe}
-                                    className="font-bold text-lg text-white"
-                                    options={{ notation: "standard" }}
-                                />
-                            </div>
-                        </div>
-                        <div className="py-7 px-10 bg-ash-dark-400/30">
-                            <div className="font-bold text-sm text-stake-gray-500 uppercase leading-tight mb-6">
-                                Weekly rewards
-                            </div>
-                            <div className="flex items-center">
-                                <Avatar src={ASH_ESDT.logoURI} className="w-4.5 h-4.5 mr-2"/>
-                                <TextAmt
-                                    number={weeklyReward}
-                                    className="font-bold text-lg text-white"
-                                    options={{ notation: "standard" }}
-                                />
-                            </div>
-                        </div>
-                        <div className="py-7 px-10 bg-ash-dark-400/30">
-                            <div className="font-bold text-sm text-stake-gray-500 uppercase leading-tight mb-6">
-                                Voting time left
-                            </div>
-                            <div className="flex">
-                                <div className="font-bold text-lg text-white">
-                                    {timeLeft}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div className="bg-stake-dark-300 mt-9 p-7.5">
-                <div className="flex justify-between">
-                    <div className="grow">
+                    <div className="w-full py-11">
                         <h2 className="font-bold text-2xl text-white leading-tight mb-4">
-                            [Current] Farm weight relative
+                            Current DAO stats
                         </h2>
-                    </div>
-                    <div className="shrink-0">
-                        <div className="font-bold text-base text-stake-gray-500 text-right mb-3">
-                            This DAO will ends in
-                        </div>
-                        <Countdown timestamp={nextTime} small />
-                    </div>
-                </div>
-                <div className="flex flex-col-reverse sm:flex-row mt-10">
-                    <div className="grid grid-cols-2 gap-4 sm:flex sm:flex-col sm:w-1/3 lg:w-1/4 shrink-0 grow-0 mt-10 py-1 overflow-auto max-h-[28rem]">
-                        {nextFarmWeightChartRecords.map((f) => {
-                            return (
-                                <div
-                                    key={f.farmAddress}
-                                    className="flex items-center"
-                                >
-                                    <div
-                                        className="w-4 h-4 mr-4"
-                                        style={{ backgroundColor: f.color }}
-                                    ></div>
-                                    <div className="font-bold text-xs text-white">
-                                        {f.name}
-                                    </div>
+                        <div className="grid md:grid-cols-3 gap-6">
+                            <div className="py-7 px-10 bg-ash-dark-400/30">
+                                <div className="font-bold text-sm text-stake-gray-500 uppercase leading-tight mb-6">
+                                    Total veash voted
                                 </div>
-                            );
-                        })}
-                    </div>
-                    <div className="grow flex justify-center overflow-hidden">
-                        <div className="w-[30rem] h-[28rem] sm:-mr-7.5">
-                            <AllocationChart
-                                data={nextFarmWeightChartRecords}
-                                radius={radius}
-                            />
+                                <div className="flex items-center">
+                                    <div className="w-4.5 h-4.5 rounded-full bg-ash-purple-500 mr-2"></div>
+                                    <TextAmt
+                                        number={totalUsedVe}
+                                        className="font-bold text-lg text-white"
+                                        options={{ notation: "standard" }}
+                                    />
+                                </div>
+                            </div>
+                            <div className="py-7 px-10 bg-ash-dark-400/30">
+                                <div className="font-bold text-sm text-stake-gray-500 uppercase leading-tight mb-6">
+                                    veash unused
+                                </div>
+                                <div className="flex items-center">
+                                    <div className="w-4.5 h-4.5 rounded-full bg-ash-purple-500 mr-2"></div>
+                                    <TextAmt
+                                        number={totalUnusedVe}
+                                        className="font-bold text-lg text-white"
+                                        options={{ notation: "standard" }}
+                                    />
+                                </div>
+                            </div>
+                            <div className="py-7 px-10 bg-ash-dark-400/30">
+                                <div className="font-bold text-sm text-stake-gray-500 uppercase leading-tight mb-6">
+                                    Weekly rewards
+                                </div>
+                                <div className="flex items-center">
+                                    <Avatar
+                                        src={ASH_ESDT.logoURI}
+                                        className="w-4.5 h-4.5 mr-2"
+                                    />
+                                    <TextAmt
+                                        number={weeklyReward}
+                                        className="font-bold text-lg text-white"
+                                        options={{ notation: "standard" }}
+                                    />
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+            <section id="voting" ref={votingRef} className="[overflow-anchor:none]">
+
+            <FarmWeightVoting defaultFarmAddress={defaultFarmAddress}/>
+            </section>
         </>
     );
 }

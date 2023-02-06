@@ -10,7 +10,7 @@
         "contractCrate": {
             "name": "farm_bribe",
             "version": "0.0.0",
-            "git_version": "da57eb6"
+            "git_version": "936cd89"
         },
         "framework": {
             "name": "elrond-wasm",
@@ -22,10 +22,6 @@
         "inputs": [
             {
                 "name": "farm_controller_address",
-                "type": "Address"
-            },
-            {
-                "name": "voting_escrow_address",
                 "type": "Address"
             }
         ],
@@ -105,29 +101,6 @@
             ]
         },
         {
-            "name": "getTokensForBribe",
-            "mutability": "readonly",
-            "inputs": [
-                {
-                    "name": "address",
-                    "type": "Address"
-                },
-                {
-                    "name": "farm_address",
-                    "type": "Address"
-                },
-                {
-                    "name": "reward_token_id",
-                    "type": "TokenIdentifier"
-                }
-            ],
-            "outputs": [
-                {
-                    "type": "BigUint"
-                }
-            ]
-        },
-        {
             "name": "getClaimable",
             "mutability": "readonly",
             "inputs": [
@@ -190,7 +163,7 @@
             ]
         },
         {
-            "name": "getVotingEscrowAddress",
+            "name": "getFarmControllerAddress",
             "mutability": "readonly",
             "inputs": [],
             "outputs": [
@@ -200,12 +173,40 @@
             ]
         },
         {
-            "name": "getFarmControllerAddress",
+            "name": "getClaimsPerFarm",
             "mutability": "readonly",
-            "inputs": [],
+            "inputs": [
+                {
+                    "name": "farm_address",
+                    "type": "Address"
+                },
+                {
+                    "name": "reward_token_id",
+                    "type": "TokenIdentifier"
+                }
+            ],
             "outputs": [
                 {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getRewardPerFarm",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "farm_address",
                     "type": "Address"
+                },
+                {
+                    "name": "reward_token_id",
+                    "type": "TokenIdentifier"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
                 }
             ]
         },

@@ -13,6 +13,7 @@ const queryOptions: { [key in keyof GraphOptions]: string } = {
             address
             timeTotal
             totalWeight
+            nextTotalWeight
             farms {
                 address
                 relativeWeight
@@ -61,6 +62,8 @@ const queryOptions: { [key in keyof GraphOptions]: string } = {
                     rewardPerVote
                     activePeriod
                     reserve
+                    claimed
+                    total
                 }
             }
             account{

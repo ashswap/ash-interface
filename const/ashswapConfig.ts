@@ -20,13 +20,13 @@ const dappContractDevnet: DappContractConfig = {
     },
     alpha: {
         voteEscrowedContract:
-            "erd1qqqqqqqqqqqqqpgqgk39h00x9j6hjgurn90xwzff9k3dkydcrmcqzpesjq",
+            "erd1qqqqqqqqqqqqqpgqvmw0jsrdqtqv699wfumkvxewcesd2cdhrmcqycmcvr",
         feeDistributor:
-            "erd1qqqqqqqqqqqqqpgq700445ukjzsrlejd7pup4vkg83g0astcrmcq838fr6",
+            "erd1qqqqqqqqqqqqqpgq43l3v63uqasa7wl4wmkczc4ranzzu96srmcq08kpes",
         farmController:
-            "erd1qqqqqqqqqqqqqpgqm8dtgnytakajykvu54h6tw8j2ttk8jskrmcq7ja2uw",
+            "erd1qqqqqqqqqqqqqpgqkqsurgj65vst7dj7mannzuzu287n4zhwrmcqxtjr5e",
         farmBribe:
-            "erd1qqqqqqqqqqqqqpgqsvpgf7kkarvag2uprda30ks5lf4aauh8rmcqeczevh",
+            "erd1qqqqqqqqqqqqqpgqz8az8y5alcexhljsn5quja5vx4d9jf8hrmcqrljhrn",
     },
 };
 
