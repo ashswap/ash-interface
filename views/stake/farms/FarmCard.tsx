@@ -118,7 +118,6 @@ function FarmCard({ farmData, viewType }: props) {
     useEffect(() => {
         if (window && openStakeLP && loggedIn) {
             let dataLayer = (window as any).dataLayer || [];
-            console.log("dataLayer", dataLayer);
             dataLayer.push({
                 event: "click_stake_lp",
             });
@@ -127,7 +126,6 @@ function FarmCard({ farmData, viewType }: props) {
     useEffect(() => {
         if (window && openUnstakeLP && loggedIn) {
             let dataLayer = (window as any).dataLayer || [];
-            console.log("dataLayer", dataLayer);
             dataLayer.push({
                 event: "click_unstake_lp",
             });

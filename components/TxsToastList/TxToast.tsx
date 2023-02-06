@@ -186,7 +186,6 @@ const TxRecord = ({
             isClickedGovStakeButton
         ) {
             let dataLayer = (window as any).dataLayer || [];
-            console.log("dataLayer", dataLayer);
             dataLayer.push({
                 event: "gov_stake",
                 hash: hash,

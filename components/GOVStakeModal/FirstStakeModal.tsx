@@ -94,7 +94,6 @@ const FirstStakeContent = ({ open, onClose }: props) => {
     useEffect(() => {
         if (window && loggedIn && deboundRawLockAmt) {
             let dataLayer = (window as any).dataLayer || [];
-            console.log("dataLayer", dataLayer);
             dataLayer.push({
                 event: "input_lock_value",
                 amount: deboundRawLockAmt,
