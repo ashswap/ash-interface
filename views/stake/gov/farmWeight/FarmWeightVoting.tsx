@@ -3,13 +3,9 @@ import ICBribe from "assets/svg/bribe.svg";
 import ICChevronRight from "assets/svg/chevron-right.svg";
 import ICNewTab from "assets/svg/new-tab.svg";
 import { ashswapBaseState } from "atoms/ashswap";
-import {
-    fbHasBribe,
-    fbTotalRewardsUSD
-} from "atoms/farmBribeState";
-import {
-    fcAccountFarmSelector
-} from "atoms/farmControllerState";
+import { fbHasBribe, fbTotalRewardsUSD } from "atoms/farmBribeState";
+import { fcAccountFarmSelector } from "atoms/farmControllerState";
+import { govVeASHAmtState } from "atoms/govState";
 import BigNumber from "bignumber.js";
 import Avatar from "components/Avatar";
 import GlowingButton from "components/GlowingButton";
@@ -22,6 +18,8 @@ import useInputNumberString from "hooks/useInputNumberString";
 import { memo, useEffect, useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { theme } from "tailwind.config";
+import Link from "next/link";
+import { accIsLoggedInState } from "atoms/dappState";
 type FarmRecordProps = {
     farmAddress: string;
     selected?: boolean;
@@ -131,6 +129,7 @@ const VoteEditor = memo(function VoteEditor({ farmAddress }: VoteEditorProps) {
     const [weightStr, setWeightStr] = useInputNumberString(weightPct);
     const fcAccFarm = useRecoilValue(fcAccountFarmSelector(farmAddress));
     const ashBase = useRecoilValue(ashswapBaseState);
+    const veAmt = useRecoilValue(govVeASHAmtState);
     const {
         voteFarmWeight,
         trackingData: { isPending },
@@ -155,15 +154,15 @@ const VoteEditor = memo(function VoteEditor({ farmAddress }: VoteEditorProps) {
         [powerUsed, powerUsedForCurrentFarm]
     );
     const canVote = useMemo(() => {
-        return farmAddress && weight >= 0 && !isPending;
-    }, [farmAddress, weight, isPending]);
+        return veAmt.gt(0) && farmAddress && weight >= 0 && !isPending;
+    }, [farmAddress, weight, isPending, veAmt]);
 
     useEffect(
         () => setWeight(powerUsedForCurrentFarm),
         [powerUsedForCurrentFarm]
     );
     return (
-        <div className="flex flex-col md:flex-row md:items-center space-y-10 md:space-y-0 md:space-x-4">
+        <div className="flex flex-col md:flex-row md:items-start space-y-10 md:space-y-0 md:space-x-4">
             <div className="grow overflow-hidden">
                 <div className="font-bold text-xs sm:text-sm text-stake-gray-500 mb-3">
                     {pool?.tokens.map((t) => t.symbol).join("-") ||
@@ -204,7 +203,7 @@ const VoteEditor = memo(function VoteEditor({ farmAddress }: VoteEditorProps) {
                     </div>
                 </div>
             </div>
-            <div className="md:w-5/12 flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+            <div className="md:w-1/2 lg:w-5/12 flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
                 <label
                     className="py-6 px-4 w-full sm:w-1/2 md:w-2/5 h-14 sm:h-18 shrink-0 bg-ash-dark-400 flex items-center font-bold text-lg cursor-text"
                     htmlFor="vote-editor-pct"
@@ -240,9 +239,28 @@ const VoteEditor = memo(function VoteEditor({ farmAddress }: VoteEditorProps) {
                         disabled={!canVote}
                         onClick={() => voteFarmWeight(farmAddress, weight)}
                     >
-                        Confirm
-                        <ICChevronRight className="w-2 h-auto ml-2" />
+                        {veAmt.gt(0) ? (
+                            <>
+                                Confirm{" "}
+                                <ICChevronRight className="w-2 h-auto ml-2" />
+                            </>
+                        ) : (
+                            "YOU DON’T HAVE VEASH"
+                        )}
                     </GlowingButton>
+                    {veAmt.eq(0) && (
+                        <div className="mt-2 font-bold text-2xs text-stake-gray-500">
+                            Stake ASH{" "}
+                            <Link href="/stake/gov">
+                                <a>
+                                    <span className="text-pink-600 underline">
+                                        here
+                                    </span>
+                                </a>
+                            </Link>{" "}
+                            to get veASH
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
@@ -250,15 +268,19 @@ const VoteEditor = memo(function VoteEditor({ farmAddress }: VoteEditorProps) {
 });
 type FarmWeightVotingProps = {
     defaultFarmAddress?: string;
-}
-function FarmWeightVoting({defaultFarmAddress}: FarmWeightVotingProps) {
+};
+function FarmWeightVoting({ defaultFarmAddress }: FarmWeightVotingProps) {
     const [selectedFarmAddress, setSelectedFarmAddress] = useState("");
     const ashBase = useRecoilValue(ashswapBaseState);
+    const isLoggedIn = useRecoilValue(accIsLoggedInState);
     const farms = useMemo(() => {
         return ashBase.farmController?.farms?.map((f) => f.address) || [];
     }, [ashBase]);
-    useEffect(() => setSelectedFarmAddress(defaultFarmAddress || ""), [defaultFarmAddress]);
-    
+
+    useEffect(
+        () => setSelectedFarmAddress(defaultFarmAddress || ""),
+        [defaultFarmAddress]
+    );
 
     return (
         <div className="bg-stake-dark-300 mt-9 pt-11 pb-20 px-7.5">
@@ -276,21 +298,27 @@ function FarmWeightVoting({defaultFarmAddress}: FarmWeightVotingProps) {
             </div>
             <div className="overflow-auto mb-12">
                 <table className="w-full space-y-4 border-separate border-spacing-y-4 min-w-[25rem]">
-                    <tr className="text-left font-bold text-xs sm:text-sm text-stake-gray-500 underline">
-                        <th className="w-auto">Farm</th>
-                        <th className="w-2/12">Voted</th>
-                        <th className="min-w-[10rem] w-4/12 lg:w-3/12">
-                            Bribe
-                        </th>
-                    </tr>
-                    {farms.map((f) => (
-                        <FarmRecord
-                            key={f}
-                            farmAddress={f}
-                            selected={selectedFarmAddress === f}
-                            onClick={() => setSelectedFarmAddress(f)}
-                        />
-                    ))}
+                    <thead>
+                        <tr className="text-left font-bold text-xs sm:text-sm text-stake-gray-500 underline">
+                            <th className="w-auto">Farm</th>
+                            <th className="w-2/12">Voted</th>
+                            <th className="min-w-[10rem] w-4/12 lg:w-3/12">
+                                Bribe
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {farms.map((f) => (
+                            <FarmRecord
+                                key={f}
+                                farmAddress={f}
+                                selected={selectedFarmAddress === f}
+                                onClick={() =>
+                                    isLoggedIn && setSelectedFarmAddress(f)
+                                }
+                            />
+                        ))}
+                    </tbody>
                 </table>
             </div>
             <VoteEditor farmAddress={selectedFarmAddress} />

@@ -4,6 +4,7 @@ import {
     fcNextFarmWeightChartRecordsAtom,
 } from "atoms/farmControllerState";
 import BigNumber from "bignumber.js";
+import { HEX_COLORS } from "const/colors";
 import { FARMS_MAP } from "const/farms";
 import { POOLS_MAP_LP } from "const/pool";
 import { getHexColor } from "helper/color";
@@ -24,7 +25,7 @@ const useFarmControllerState = () => {
         if (!ashBase.farmController?.farms) return;
         const records: FarmWeightChartRecord[] = [];
         const nextRecords: FarmWeightChartRecord[] = [];
-        ashBase.farmController.farms.map((f) => {
+        ashBase.farmController.farms.map((f, i) => {
             const lp = FARMS_MAP[f.address].farming_token_id;
             const pool = POOLS_MAP_LP[lp];
             const name = pool.tokens.map((t) => t.symbol).join("-");
@@ -32,7 +33,7 @@ const useFarmControllerState = () => {
                 name,
                 farmAddress: f.address,
                 value: new BigNumber(f.relativeWeight).div(10 ** 14).toNumber(),
-                color: getHexColor(lp),
+                color: HEX_COLORS[i] || getHexColor(lp),
             };
             const nextRecord: FarmWeightChartRecord = {
                 name: pool.tokens.map((t) => t.symbol).join("-"),
@@ -40,7 +41,7 @@ const useFarmControllerState = () => {
                 value: new BigNumber(f.nextRelativeWeight)
                     .div(10 ** 14)
                     .toNumber(),
-                color: getHexColor(lp),
+                color: HEX_COLORS[i] || getHexColor(lp),
             };
             records.push(record);
             nextRecords.push(nextRecord);
