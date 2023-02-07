@@ -11,12 +11,16 @@ import { useDebounce } from "use-debounce";
 import BribeCard from "./BribeCard";
 import FarmBribeModal from "./FarmBribeModal";
 import ImgASHSleep from "assets/images/ash-sleep.png";
+import { useConnectWallet } from "hooks/useConnectWallet";
+import { accIsLoggedInState } from "atoms/dappState";
 
 function BribeOverview() {
     const [keyword, setKeyword] = useState("");
     const [debounceKeyword] = useDebounce(keyword, 500);
     const [isOpenBribe, setIsOpenBribe] = useState(false);
     const { farmBribe } = useRecoilValue(ashswapBaseState);
+    const isLoggedIn = useRecoilValue(accIsLoggedInState);
+    const connectWallet = useConnectWallet();
 
     const displayFarms = useMemo(() => {
         const lowercase = debounceKeyword.toLowerCase();
@@ -58,7 +62,7 @@ function BribeOverview() {
                     <GlowingButton
                         theme="cyan"
                         className="w-full sm:max-w-xs h-20 flex items-center justify-center font-bold text-lg text-ash-dark-400"
-                        onClick={() => setIsOpenBribe(true)}
+                        onClick={() => isLoggedIn ? setIsOpenBribe(true) : connectWallet()}
                     >
                         Create Bribe
                     </GlowingButton>
