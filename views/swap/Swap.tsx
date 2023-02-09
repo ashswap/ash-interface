@@ -247,7 +247,6 @@ const Swap = () => {
             !slippage.equalTo(new Percent(100, 100_000))
         ) {
             let dataLayer = (window as any).dataLayer || [];
-            console.log("dataLayer", dataLayer);
             dataLayer.push({
                 event: "set_slippage",
                 amount:

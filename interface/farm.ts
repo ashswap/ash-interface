@@ -1,3 +1,4 @@
+import { Address } from "@elrondnetwork/erdjs/out";
 import BigNumber from "bignumber.js";
 import { ElrondStruct, ElrondType } from "./elrond";
 
@@ -12,14 +13,20 @@ export interface IFarm {
     active: boolean;
 }
 
+export interface FarmAdditionalReward {
+    token: string;
+    reward_per_share: BigNumber;
+}
+
 export interface FarmTokenAttrs {
     reward_per_share: BigNumber;
     slope_used: BigNumber;
-    booster: string;
+    booster: Address;
     // after boost amount of token
     initial_farm_amount: BigNumber;
     // real input token for boosting -> boost = initial_farm_amount / initial_farming_amount
     initial_farming_amount: BigNumber;
+    reward_tokens: FarmAdditionalReward[]
 }
 
 export interface FarmBoostInfo {
@@ -33,4 +40,5 @@ export const FarmTokenAttrsStruct: ElrondStruct<FarmTokenAttrs> = {
     "3_booster": ElrondType.MANAGED_ADDRESS,
     "4_initial_farm_amount": ElrondType.BIG_UINT,
     "5_initial_farming_amount": ElrondType.BIG_UINT,
+    "6_reward_tokens": ElrondType.BIG_UINT
 };

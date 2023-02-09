@@ -12,4 +12,8 @@ const customTwMerge = extendTailwindMerge({
     }
 });
 
+export function mergeClassObject<T extends Record<any, any>>(...obj: T[]) {
+    return obj.reduce((sum, o) => ({...sum, ...Object.fromEntries(Object.entries(o).map(([k, v]) => [k, customTwMerge(sum[k], v)]))}), obj[0]);
+}
+
 export default customTwMerge;

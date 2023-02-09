@@ -1,5 +1,6 @@
 import BigNumber from "bignumber.js";
 import pools from "const/pool";
+import { VE_MAX_TIME, WEEK } from "const/ve";
 import { Fraction } from "helper/fraction/fraction";
 import { TokenAmount } from "helper/token/tokenAmount";
 import moment from "moment";
@@ -35,6 +36,22 @@ export const govUnlockTSState = selector<BigNumber>({
         );
     },
 });
+
+export const govPointSelector = selector({
+    key: "gov_point",
+    get: ({get}) => {
+        const base = get(ashswapBaseState);
+        const amt = get(govLockedAmtState);
+        const end = get(govUnlockTSState);
+        const slope = amt.div(VE_MAX_TIME);
+        const dt = end.minus(Math.floor(moment().unix() / WEEK) * WEEK)
+        return {
+            slope,
+            bias: slope.multipliedBy(dt),
+            end
+        }
+    }
+})
 
 export const govTotalSupplyVeASH = selector<BigNumber>({
     key: "gov_total_supply_veash",

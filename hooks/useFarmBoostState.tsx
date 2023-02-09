@@ -45,7 +45,7 @@ export const useFarmBoostTransferState = (
     const getCurrentBoost = useRecoilCallback(
         ({ snapshot }) =>
             async () => {
-                const ownerAddress = farmToken.attributes.booster;
+                const ownerAddress = farmToken.attributes.booster.bech32();
                 const locked = await ContractManager.getVotingEscrowContract(
                     ASHSWAP_CONFIG.dappContract.voteEscrowedContract
                 ).getUserLocked(ownerAddress);
@@ -148,7 +148,7 @@ export const useFarmBoostOwnerState = (farmData: FarmRecord) => {
                 const unlockTs = await snapshot.getPromise(govUnlockTSState);
                 const ownerTokens =
                     farmData.stakedData?.farmTokens.filter(
-                        (f) => f.attributes.booster === address
+                        (f) => f.attributes.booster.bech32() === address
                     ) || [];
                 const slopeRefill = ownerTokens.reduce((total, f) => {
                     const slope = f.balance
@@ -225,7 +225,7 @@ export const useFarmBoostOwnerState = (farmData: FarmRecord) => {
                 const unlockTs = await snapshot.getPromise(govUnlockTSState);
                 const ownerTokens =
                     farmData.stakedData?.farmTokens.filter(
-                        (f) => f.attributes.booster === ownerAddress
+                        (f) => f.attributes.booster.bech32() === ownerAddress
                     ) || [];
                 const totalLP = ownerTokens.reduce(
                     (total, f) => total.plus(f.balance.div(f.perLP)),

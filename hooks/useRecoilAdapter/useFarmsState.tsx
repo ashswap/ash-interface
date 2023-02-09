@@ -9,24 +9,34 @@ import {
     FarmRecord,
     farmRecordsState,
     farmSessionIdMapState,
-    FarmToken,
+    FarmToken
 } from "atoms/farmsState";
 import { LPBreakDownQuery, poolRecordsState } from "atoms/poolsState";
 import { farmTokenMapState, tokenMapState } from "atoms/tokensState";
 import BigNumber from "bignumber.js";
-import { blockTimeMs } from "const/dappConfig";
-import { FARMS } from "const/farms";
+import { FARMS, FARMS_MAP } from "const/farms";
 import pools from "const/pool";
 import { ASH_TOKEN } from "const/tokens";
 import { toEGLDD } from "helper/balance";
+import { ContractManager } from "helper/contracts/contractManager";
 import { calcYieldBoostFromFarmToken } from "helper/farmBooster";
-import { decodeNestedStringBase64 } from "helper/serializer";
-import { FarmTokenAttrs, FarmTokenAttrsStruct, IFarm } from "interface/farm";
+import { FarmTokenAttrs, IFarm } from "interface/farm";
 import IPool from "interface/pool";
-import { Dispatch, SetStateAction, useCallback, useEffect } from "react";
+import moment from "moment";
+import {
+    Dispatch,
+    SetStateAction,
+    useCallback,
+    useEffect,
+    useMemo,
+    useState
+} from "react";
 import { useRecoilCallback, useRecoilValue, useSetRecoilState } from "recoil";
 import { useDebounce } from "use-debounce";
-
+type RewardSnapshot = {
+    ts: number;
+    reward: BigNumber;
+};
 export type FarmsState = {
     farmRecords: FarmRecord[];
     farmToDisplay: FarmRecord[];
@@ -78,6 +88,12 @@ const useFarmsState = () => {
     const setDeboundKeyword = useSetRecoilState(farmDeboundKeywordState);
     const setLoadingMap = useSetRecoilState(farmLoadingMapState);
     const setFarmRecordsState = useSetRecoilState(farmRecordsState);
+    const [lastQueryRewardMap, setLastQueryRewardMap] = useState<
+        Record<string, RewardSnapshot>
+    >({});
+    const rewardPerSecKey = useMemo(() => {
+        return ashBase.farms.map(f => f.rewardPerSec).join("-");
+    }, [ashBase.farms]);
 
     const [deboundKeyword] = useDebounce(keyword, 500);
 
@@ -101,15 +117,15 @@ const useFarmsState = () => {
                 shard,
                 farmTokenSupply,
                 divisionSafetyConstant,
-                perBlockReward,
-                lastRewardBlockNone,
+                rewardPerSec,
+                lastRewardBlockTs,
                 rewardPerShare,
             } = farmRaw || {};
             const produceRewardEnable = !!farmRaw?.produceRewardEnabled;
             if (
                 !shard ||
                 !farmTokenSupply ||
-                !lastRewardBlockNone ||
+                !lastRewardBlockTs ||
                 !divisionSafetyConstant ||
                 wei.lte(0) ||
                 wei.gt(farmTokenSupply)
@@ -125,8 +141,8 @@ const useFarmsState = () => {
                 return new BigNumber(0);
             let reward_increase = calculatePerBlockRewards(
                 new BigNumber(currentBlockNonce),
-                new BigNumber(lastRewardBlockNone),
-                new BigNumber(perBlockReward || 0),
+                new BigNumber(lastRewardBlockTs),
+                new BigNumber(rewardPerSec || 0),
                 produceRewardEnable
             );
 
@@ -160,6 +176,50 @@ const useFarmsState = () => {
         []
     );
 
+    const queryReward = useRecoilCallback(
+        ({ snapshot }) =>
+            async (farmAddress: string) => {
+                const tokenMap = await snapshot.getPromise(farmTokenMapState);
+                const tokens = tokenMap[FARMS_MAP[farmAddress].farm_token_id];
+                const contract = ContractManager.getFarmContract(farmAddress);
+                const estimateds = await Promise.all(
+                    tokens.map((t) => {
+                        return contract.calculateRewardsForGivenPosition(
+                            t.balance,
+                            contract.parseCustomType<FarmTokenAttrs>(
+                                t.attributes,
+                                "FarmTokenAttributes"
+                            )
+                        );
+                    })
+                );
+                return estimateds.reduce((s, e) => s.plus(e), new BigNumber(0));
+            },
+        []
+    );
+
+    const queryRewards = useRecoilCallback(
+        () => async () => {
+            if (farmTokenMap && rewardPerSecKey) {
+                const rewards = await Promise.all(
+                    FARMS.map((f) => queryReward(f.farm_address))
+                );
+                setLastQueryRewardMap(
+                    FARMS.reduce((map, f, i) => {
+                        return {
+                            ...map,
+                            [f.farm_address]: {
+                                reward: rewards[i],
+                                ts: moment().unix(),
+                            },
+                        };
+                    }, {})
+                );
+            }
+        },
+        [farmTokenMap, rewardPerSecKey, queryReward]
+    );
+
     const getFarmRecord = useCallback(
         async (f: IFarm, p: IPool) => {
             const rawFarm = ashBase.farms.find(
@@ -180,23 +240,24 @@ const useFarmsState = () => {
                 lpLockedAmt.toString()
             );
 
-            const ashPerBlock = new BigNumber(rawFarm?.perBlockReward || 0);
+            const ashPerSec = new BigNumber(rawFarm?.rewardPerSec || 0);
             const totalASH = toEGLDD(
                 ASH_TOKEN.decimals,
-                ashPerBlock
-                    .multipliedBy(365 * 24 * 60 * 60)
-                    .div(blockTimeMs / 1000)
+                ashPerSec.multipliedBy(365 * 24 * 60 * 60)
             );
-            const emissionAPR = totalLiquidityValue.gt(0) ? totalASH
-                .multipliedBy(tokenMap[ASH_TOKEN.identifier]?.price || 0)
-                .multipliedBy(100)
-                .div(totalLiquidityValue) : new BigNumber(0);
+            const emissionAPR = totalLiquidityValue.gt(0)
+                ? totalASH
+                      .multipliedBy(tokenMap[ASH_TOKEN.identifier]?.price || 0)
+                      .multipliedBy(100)
+                      .div(totalLiquidityValue)
+                : new BigNumber(0);
 
             const record: FarmRecord = {
                 pool: p,
                 farm: f,
                 poolStats: poolState?.poolStats,
-                ashPerBlock,
+                ashPerSec,
+                lastRewardBlockTs: rawFarm?.lastRewardBlockTs || 0,
                 farmTokenSupply,
                 lpLockedAmt,
                 totalLiquidityValue,
@@ -206,9 +267,11 @@ const useFarmsState = () => {
 
             const collectionTokens = farmTokenMap[f.farm_token_id];
             const farmTokens: FarmToken[] = collectionTokens.map((token) => {
-                const attributes = decodeNestedStringBase64(
-                    token.attributes || "",
-                    FarmTokenAttrsStruct
+                const attributes = ContractManager.getFarmContract(
+                    f.farm_address
+                ).parseCustomType<FarmTokenAttrs>(
+                    token.attributes,
+                    "FarmTokenAttributes"
                 );
                 const perLP = attributes.initial_farm_amount.div(
                     attributes.initial_farming_amount
@@ -243,15 +306,13 @@ const useFarmsState = () => {
             });
             const isFarmed = farmTokens.some(({ balance }) => balance.gt(0));
             if (isFarmed) {
-                const totalRewards = await Promise.all(
-                    farmTokens.map((t) =>
-                        calculateRewardsForGivenPositionLocal(
-                            t.balance,
-                            t.attributes,
-                            f.farm_address
-                        )
-                    )
+                const farmBalance = farmTokens.reduce(
+                    (total, f) => total.plus(f.balance),
+                    new BigNumber(0)
                 );
+                const lastSnapshotReward = lastQueryRewardMap[f.farm_address];
+                const rewardIncrease = BigNumber.max(moment().unix() - lastSnapshotReward.ts, 0).multipliedBy(ashPerSec).multipliedBy(farmBalance).idiv(farmTokenSupply);
+                const estimatedReward = lastSnapshotReward.reward.plus(rewardIncrease);
                 const totalStakedLP = farmTokens.reduce(
                     (total, val) =>
                         total.plus(
@@ -259,10 +320,6 @@ const useFarmsState = () => {
                                 .div(val.perLP)
                                 .integerValue(BigNumber.ROUND_FLOOR)
                         ),
-                    new BigNumber(0)
-                );
-                const farmBalance = farmTokens.reduce(
-                    (total, f) => total.plus(f.balance),
                     new BigNumber(0)
                 );
                 const yieldBoostRaw = calcYieldBoostFromFarmToken(
@@ -274,10 +331,7 @@ const useFarmsState = () => {
                 record.stakedData = {
                     farmTokens,
                     totalStakedLP,
-                    totalRewardAmt: totalRewards.reduce(
-                        (total, val) => total.plus(val),
-                        new BigNumber(0)
-                    ),
+                    totalRewardAmt: estimatedReward,
                     totalStakedLPValue: totalStakedLP
                         .multipliedBy(totalLiquidityValue)
                         .div(lpLockedAmt),
@@ -291,15 +345,7 @@ const useFarmsState = () => {
             return record;
         },
 
-        [
-            accAddress,
-            ashBase.farms,
-            calculateRewardsForGivenPositionLocal,
-            farmTokenMap,
-            poolRecords,
-            tokenMap,
-            lpBreak,
-        ]
+        [ashBase.farms, poolRecords, lpBreak, tokenMap, accAddress, farmTokenMap, lastQueryRewardMap]
     );
 
     const getFarmRecords = useCallback(async () => {
@@ -321,11 +367,17 @@ const useFarmsState = () => {
         }
     }, [getFarmRecord, setFarmRecordsState]);
 
-    const [deboundGetFarmRecords] = useDebounce(getFarmRecords, 500);
+    const [deboundGetFarmRecords] = useDebounce(getFarmRecords, 1000);
 
     useEffect(() => {
         deboundGetFarmRecords();
     }, [deboundGetFarmRecords]);
+
+    const [debounceQueryRewards] = useDebounce(queryRewards, 500);
+
+    useEffect(() => {
+        debounceQueryRewards()
+    }, [debounceQueryRewards]);
 
     useEffect(() => {
         if (Object.keys(sessionIdsMap).length > 0) {

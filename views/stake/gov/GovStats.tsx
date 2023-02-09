@@ -88,7 +88,6 @@ function GovStats() {
     useEffect(() => {
         if (window && openStakeGov && loggedIn) {
             let dataLayer = (window as any).dataLayer || [];
-            console.log("dataLayer", dataLayer);
             dataLayer.push({
                 event: "click_stake_gov",
             });

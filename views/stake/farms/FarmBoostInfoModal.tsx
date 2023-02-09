@@ -274,7 +274,7 @@ const FarmRecordTransfer = ({
             currentBoost={currentFarmBoost}
             maxBoost={maxFarmBoost}
             lpAmt={farmToken.lpAmt}
-            booster={farmToken.attributes.booster}
+            booster={farmToken.attributes.booster.bech32()}
             onSelfBoostTransferedToken={() => selfBoostHandle()}
             onboarding={onboarding}
             withHexIcon
@@ -365,7 +365,7 @@ const FarmBoostInfo = ({ farmData, onClose }: FarmBoostInfoType) => {
                                             lpAmt={lpAmt}
                                             booster={
                                                 ownerTokens[0].attributes
-                                                    .booster
+                                                    .booster.bech32()
                                             }
                                             isBoosting={isBoosting}
                                             withHexIcon={

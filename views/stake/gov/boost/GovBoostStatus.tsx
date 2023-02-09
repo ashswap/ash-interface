@@ -241,7 +241,7 @@ const FarmRecordOwner = ({
             maxBoost={maxFarmBoost}
             veAvailable={availableVe}
             lpAmt={lpAmt}
-            booster={ownerTokens[0].attributes.booster}
+            booster={ownerTokens[0].attributes.booster.bech32()}
         />
     );
 };
@@ -268,7 +268,7 @@ const FarmRecordTransfer = ({
             veConsume={new BigNumber(0)}
             currentBoost={currentFarmBoost}
             lpAmt={farmToken.lpAmt}
-            booster={farmToken.attributes.booster}
+            booster={farmToken.attributes.booster.bech32()}
             onSelfBoostTransferedToken={() => selfBoost()}
         />
     );
@@ -299,7 +299,7 @@ function GovBoostStatus() {
                     .map((record) => {
                         const ownerTokens =
                             record.stakedData?.farmTokens.filter(
-                                (f) => f.attributes.booster === accAddress
+                                (f) => f.attributes.booster.bech32() === accAddress
                             ) || [];
                         return { ownerTokens, farm: record.farm };
                     })
@@ -345,7 +345,7 @@ function GovBoostStatus() {
             (record) =>
                 (
                     record.stakedData?.farmTokens.filter(
-                        (t) => t.attributes.booster === accAddress
+                        (t) => t.attributes.booster.bech32() === accAddress
                     ) || []
                 ).length > 0
         );
@@ -473,7 +473,7 @@ function GovBoostStatus() {
                                 f.stakedData?.farmTokens
                                     .filter(
                                         (t) =>
-                                            t.attributes.booster !== accAddress
+                                            t.attributes.booster.bech32() !== accAddress
                                     )
                                     .map((t) => (
                                         <FarmRecordTransfer
