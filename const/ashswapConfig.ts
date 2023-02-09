@@ -12,11 +12,11 @@ type DappContractConfig = {
 const dappContractDevnet: DappContractConfig = {
     beta: {
         voteEscrowedContract:
-            "erd1qqqqqqqqqqqqqpgqmvv8hpzg2d6fc5z9tcm8p2aes7qve26krmcqpw84n5",
+            "erd1qqqqqqqqqqqqqpgqh9xd98pe9h465j468sthawmqsjsk2hazrmcq60qw03",
         feeDistributor:
-            "erd1qqqqqqqqqqqqqpgqylsfrzwl65ez8d34lqzu8zxks6vnua3trmcq6cr5v4",
-        farmController: "",
-        farmBribe: "",
+            "erd1qqqqqqqqqqqqqpgqypagz2qyxuqgxckhuzqqdxq0rsc9khsyrmcqctcn4t",
+        farmController: "erd1qqqqqqqqqqqqqpgqgv76spde87ul9f0psv8en0t767mel2q7rmcqv75vw9",
+        farmBribe: "erd1qqqqqqqqqqqqqpgq8fwcyssfxrpv0ef22zdwgszc2hcsyqckrmcq945tw4",
     },
     alpha: {
         voteEscrowedContract:

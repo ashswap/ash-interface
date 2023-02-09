@@ -38,9 +38,9 @@ const devnet: PoolConfig = {
     beta: [
         {
             address:
-                "erd1qqqqqqqqqqqqqpgqcuyp4e20elkc2yjfskdqqe6d70zdqkhhrmcqrqx8dj",
+                "erd1qqqqqqqqqqqqqpgq80q950zr245yeslsdkawum9x9fva02mmrmcqlsdvfj",
             lpToken: {
-                identifier: "ALP-07fca7",
+                identifier: "ALP-5c3c3f",
                 chainId: ChainId.Devnet,
                 symbol: "ALP3USD",
                 name: "Ashswap LP",
@@ -48,8 +48,8 @@ const devnet: PoolConfig = {
             },
             tokens: [
                 TOKENS_MAP["USDC-8d4068"],
-                TOKENS_MAP["USDT-324eda"],
-                TOKENS_MAP["BUSD-85dac0"],
+                TOKENS_MAP["USDT-188935"],
+                TOKENS_MAP["BUSD-632f7d"],
             ],
         },
         // {

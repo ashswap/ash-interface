@@ -33,12 +33,12 @@ const devnet: FarmConfig = {
     beta: [
         {
             farm_address:
-                "erd1qqqqqqqqqqqqqpgqkqcs7q3whfl3fdcuyldy9776a89aqzf0rmcq5ytc6q",
+                "erd1qqqqqqqqqqqqqpgqtm0nn8p933fld3dzcd2hcngq0n2hqlkyrmcqzswwdx",
             reward_token_id: "ASH-4ce444",
             reward_token_decimal: 18,
-            farming_token_id: "ALP-07fca7",
+            farming_token_id: "ALP-5c3c3f",
             farming_token_decimal: 18,
-            farm_token_id: "FARM-ec7d1b",
+            farm_token_id: "FARM-0ed604",
             farm_token_decimal: 18,
             active: true,
         },
