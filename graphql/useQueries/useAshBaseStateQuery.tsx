@@ -138,6 +138,14 @@ const useAshBaseStateQuery = (config?: SWRConfiguration) => {
                         ampFactor
                         state
                     }
+                    poolsV2 {
+                        address
+                        lpToken {
+                            ...allTokenProps
+                        }
+                        totalSupply
+                        reserves
+                    }
                     tokens {
                         ...allTokenProps
                     }

@@ -1,5 +1,5 @@
 import { ChainId, IESDTInfo } from "helper/token/token";
-import IPool from "interface/pool";
+import IPool, { EPoolType } from "interface/pool";
 import { ENVIRONMENT } from "./env";
 import { MAIAR_POOLS } from "./maiarPools";
 import { TOKENS_MAP } from "./tokens";
@@ -21,6 +21,7 @@ const devnet: PoolConfig = {
                 decimals: 18,
             },
             tokens: [TOKENS_MAP["USDC-fd47e9"], TOKENS_MAP["USDT-3e3720"], TOKENS_MAP["BUSD-b53884"]],
+            type: EPoolType.PlainPool,
         },
         {
             address:
@@ -33,6 +34,20 @@ const devnet: PoolConfig = {
                 decimals: 18,
             },
             tokens: [TOKENS_MAP["WEGLD-578a26"], TOKENS_MAP["AEGLD-126d13"]],
+            type: EPoolType.PlainPool,
+        },
+        {
+            address:
+                "erd1qqqqqqqqqqqqqpgq4d8z6s7r47vwemry4pm4jrssetckkc8rrmcqxuqc4q",
+            lpToken: {
+                identifier: "ALP-1096a5",
+                chainId: ChainId.Devnet,
+                symbol: "LPT-wEGLD-aEGLD",
+                name: "Ashswap LP",
+                decimals: 18,
+            },
+            tokens: [TOKENS_MAP["WEGLD-578a26"], TOKENS_MAP["BUSD-b53884"]],
+            type: EPoolType.PoolV2,
         },
     ],
     beta: [
@@ -51,6 +66,7 @@ const devnet: PoolConfig = {
                 TOKENS_MAP["USDT-188935"],
                 TOKENS_MAP["BUSD-632f7d"],
             ],
+            type: EPoolType.PlainPool,
         },
         // {
         //     address:
@@ -155,6 +171,7 @@ const mainnet: IPool[] = [
             TOKENS_MAP["USDT-821a84"],
             TOKENS_MAP["BUSD-7f6b0f"],
         ],
+        type: EPoolType.PlainPool,
     },
     {
         address:
@@ -171,6 +188,7 @@ const mainnet: IPool[] = [
             TOKENS_MAP["USDT-f8c08c"],
             TOKENS_MAP["BUSD-40b57e"],
         ],
+        type: EPoolType.PlainPool,
     },
 ];
 

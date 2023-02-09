@@ -2,10 +2,11 @@ import { Slider } from "antd";
 import IconRight from "assets/svg/right-yellow.svg";
 import { accIsInsufficientEGLDState } from "atoms/dappState";
 import {
-    ashRawPoolByAddressQuery,
+    ashRawPoolV1ByAddressQuery,
     LPBreakDownQuery,
     PoolsState,
 } from "atoms/poolsState";
+import { lpTokenMapState } from "atoms/tokensState";
 import BigNumber from "bignumber.js";
 import Avatar from "components/Avatar";
 import BaseModal from "components/BaseModal";
@@ -17,6 +18,7 @@ import OnboardTooltip from "components/Tooltip/OnboardTooltip";
 import { useSwap } from "context/swap";
 import { toEGLDD } from "helper/balance";
 import { Fraction } from "helper/fraction/fraction";
+import { formatAmount } from "helper/number";
 import { TokenAmount } from "helper/token/tokenAmount";
 import { useOnboarding } from "hooks/useOnboarding";
 import usePoolRemoveLP from "hooks/usePoolContract/usePoolRemoveLP";
@@ -48,9 +50,7 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
     const { slippage } = useSwap();
     const [displayInputLiquidity, setDisplayInputLiquidity] =
         useState<string>("");
-    const rawPool = useRecoilValue(
-        ashRawPoolByAddressQuery(poolData.pool.address)
-    );
+    const lpTokenMap = useRecoilValue(lpTokenMapState);
 
     const [onboardingWithdrawInput, setOnboardedWithdrawInput] = useOnboarding(
         "pool_withdraw_input"
@@ -62,8 +62,8 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
     );
 
     const pricePerLP = useMemo(() => {
-        return new BigNumber(rawPool?.lpToken.price || 0);
-    }, [rawPool]);
+        return lpTokenMap[poolData.pool.lpToken.identifier].price;
+    }, [lpTokenMap, poolData]);
 
     const lpAmount = useMemo(() => {
         return new TokenAmount(pool.lpToken, ownLiquidity);
@@ -77,6 +77,7 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
                     .multiply(Fraction.fromBigNumber(pricePerLP))
                     .toBigNumber();
                 setDisplayInputLiquidity(validVal.toString(10));
+                console.log("validate", pricePerLP.toString(), val.toString())
                 return validVal;
             }
             return val;
@@ -91,11 +92,14 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
 
     // calculate % LP tokens - source of truth: totalUsd
     useEffect(() => {
-        const pct = pricePerLP.eq(0) || lpAmount.equalTo(0) ? 0 : totalUsd
-            .div(pricePerLP)
-            .div(lpAmount.toBigNumber())
-            .multipliedBy(100)
-            .toNumber();
+        const pct =
+            new BigNumber(pricePerLP).eq(0) || lpAmount.equalTo(0)
+                ? 0
+                : totalUsd
+                      .div(pricePerLP)
+                      .div(lpAmount.toBigNumber())
+                      .multipliedBy(100)
+                      .toNumber();
         setLiquidityPercent(pct);
     }, [pricePerLP, totalUsd, lpAmount]);
 
@@ -244,7 +248,9 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
                         <div className="flex flex-row items-center">
                             <div className="sm:w-24"></div>
                             <div className="flex flex-row items-center flex-1 gap-4">
-                                <div className="w-9 shrink-0 font-bold text-sm text-yellow-500">{liquidityPercent}%</div>
+                                <div className="w-9 shrink-0 font-bold text-sm text-yellow-500">
+                                    {formatAmount(liquidityPercent)}%
+                                </div>
                                 <Slider
                                     className="ash-slider pt-4 w-full"
                                     step={1}

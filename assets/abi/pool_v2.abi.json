@@ -1,0 +1,900 @@
+{
+    "buildInfo": {
+        "rustc": {
+            "version": "1.69.0-nightly",
+            "commitHash": "bd39bbb4bb92df439bf6d85470e296cc6a47ffbd",
+            "commitDate": "2023-02-07",
+            "channel": "Nightly",
+            "short": "rustc 1.69.0-nightly (bd39bbb4b 2023-02-07)"
+        },
+        "contractCrate": {
+            "name": "pool_v2",
+            "version": "0.0.0",
+            "git_version": "2d20827-modified"
+        },
+        "framework": {
+            "name": "elrond-wasm",
+            "version": "0.33.1"
+        }
+    },
+    "name": "PoolV2",
+    "constructor": {
+        "inputs": [
+            {
+                "name": "_factory",
+                "type": "Address"
+            },
+            {
+                "name": "_a",
+                "type": "BigUint"
+            },
+            {
+                "name": "_gamma",
+                "type": "BigUint"
+            },
+            {
+                "name": "_mid_fee",
+                "type": "BigUint"
+            },
+            {
+                "name": "_out_fee",
+                "type": "BigUint"
+            },
+            {
+                "name": "_allowed_extra_profit",
+                "type": "BigUint"
+            },
+            {
+                "name": "_fee_gamma",
+                "type": "BigUint"
+            },
+            {
+                "name": "_adjustment_step",
+                "type": "BigUint"
+            },
+            {
+                "name": "_admin_fee",
+                "type": "BigUint"
+            },
+            {
+                "name": "_ma_half_time",
+                "type": "u64"
+            },
+            {
+                "name": "_initial_price",
+                "type": "BigUint"
+            },
+            {
+                "name": "_precisions",
+                "type": "BigUint"
+            },
+            {
+                "name": "_tokens",
+                "type": "variadic<TokenIdentifier>",
+                "multi_arg": true
+            }
+        ],
+        "outputs": []
+    },
+    "endpoints": [
+        {
+            "name": "getPrecisions",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "tuple<BigUint,BigUint>"
+                }
+            ]
+        },
+        {
+            "name": "exchange",
+            "mutability": "mutable",
+            "payableInTokens": [
+                "*"
+            ],
+            "inputs": [
+                {
+                    "name": "min_dy",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "addLiquidity",
+            "mutability": "mutable",
+            "payableInTokens": [
+                "*"
+            ],
+            "inputs": [
+                {
+                    "name": "min_mint_amount",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "opt_receiver",
+                    "type": "optional<Address>",
+                    "multi_arg": true
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "removeLiquidity",
+            "mutability": "mutable",
+            "payableInTokens": [
+                "*"
+            ],
+            "inputs": [
+                {
+                    "name": "min_amounts",
+                    "type": "List<BigUint>"
+                },
+                {
+                    "name": "opt_receiver",
+                    "type": "optional<Address>",
+                    "multi_arg": true
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "List<BigUint>"
+                }
+            ]
+        },
+        {
+            "name": "removeLiquidityOneCoin",
+            "mutability": "mutable",
+            "payableInTokens": [
+                "*"
+            ],
+            "inputs": [
+                {
+                    "name": "i",
+                    "type": "u32"
+                },
+                {
+                    "name": "min_amount",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "opt_receiver",
+                    "type": "optional<Address>",
+                    "multi_arg": true
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "claimAdminFees",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "rampAGamma",
+            "onlyOwner": true,
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "_future_a",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "_future_gamma",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "future_time",
+                    "type": "u64"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "stopRampAGamma",
+            "onlyOwner": true,
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "commitNewParameters",
+            "onlyOwner": true,
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "new_mid_fee",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "new_out_fee",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "new_admin_fee",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "new_fee_gamma",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "new_allowed_extra_profit",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "new_adjustment_step",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "new_ma_half_time",
+                    "type": "u64"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "applyNewParameters",
+            "onlyOwner": true,
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "revertNewParameters",
+            "onlyOwner": true,
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "estimateAmountOut",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "i",
+                    "type": "u32"
+                },
+                {
+                    "name": "j",
+                    "type": "u32"
+                },
+                {
+                    "name": "dx",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                },
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "estimateAddLiquidity",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "amounts",
+                    "type": "List<BigUint>"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "estimateRemoveLiquidityOneCoin",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "token_amount",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "i",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getLpPrice",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getA",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getGamma",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getFee",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getVirtualPrice",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getPriceOracle",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getLpTokenSupply",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "setLpTokenIdentifier",
+            "onlyOwner": true,
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "token_identifier",
+                    "type": "TokenIdentifier"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "getLpTokenIdentifier",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "TokenIdentifier"
+                }
+            ]
+        },
+        {
+            "name": "getTokens",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "List<TokenIdentifier>"
+                }
+            ]
+        },
+        {
+            "name": "getBalances",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "List<BigUint>"
+                }
+            ]
+        },
+        {
+            "name": "getPriceScale",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getLastPrices",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getLastPriceTs",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "getInitialAGamma",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getFutureAGamma",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getInitialAGammaTime",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "getFutureAGammaTime",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "getAllowedExtraProfit",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getFutureAllowedExtraProfit",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getFeeGamma",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getFutureFeeGamma",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getAdjustmentStep",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getFutureAdjustmentStep",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getMaHalfTime",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "getFutureMAHalfTime",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "getMidFee",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getOutFee",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getAdminFee",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getFutureMidFee",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getFutureOutFee",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getFutureAdminFee",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getD",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getFactory",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "Address"
+                }
+            ]
+        },
+        {
+            "name": "getXcpProfit",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getXcpProfitA",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "isNotAdjusted",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "getAdminActionsDeadline",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        }
+    ],
+    "events": [],
+    "hasCallback": false,
+    "types": {
+        "AddLiquidityEvent": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "token_amounts",
+                    "type": "List<BigUint>"
+                },
+                {
+                    "name": "fee",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "token_supply",
+                    "type": "BigUint"
+                }
+            ]
+        },
+        "ClaimAdminFeeEvent": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "tokens",
+                    "type": "BigUint"
+                }
+            ]
+        },
+        "CommitNewParametersEvent": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "admin_fee",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "mid_fee",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "out_fee",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "fee_gamma",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "allowed_extra_profit",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "adjustment_step",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "ma_half_time",
+                    "type": "BigUint"
+                }
+            ]
+        },
+        "NewParametersEvent": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "admin_fee",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "mid_fee",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "out_fee",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "fee_gamma",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "allowed_extra_profit",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "adjustment_step",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "ma_half_time",
+                    "type": "BigUint"
+                }
+            ]
+        },
+        "RampAgammaEvent": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "initial_a",
+                    "type": "u64"
+                },
+                {
+                    "name": "future_a",
+                    "type": "u64"
+                },
+                {
+                    "name": "initial_gamma",
+                    "type": "u64"
+                },
+                {
+                    "name": "future_gamma",
+                    "type": "u64"
+                },
+                {
+                    "name": "initial_time",
+                    "type": "u64"
+                },
+                {
+                    "name": "future_time",
+                    "type": "u64"
+                }
+            ]
+        },
+        "RemoveLiquidityEvent": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "token_amounts",
+                    "type": "List<BigUint>"
+                },
+                {
+                    "name": "token_supply",
+                    "type": "BigUint"
+                }
+            ]
+        },
+        "RemoveLiquidityOneEvent": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "token_amount",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "coin_index",
+                    "type": "u64"
+                },
+                {
+                    "name": "coin_amount",
+                    "type": "BigUint"
+                }
+            ]
+        },
+        "StopRampAEvent": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "current_a",
+                    "type": "u64"
+                },
+                {
+                    "name": "current_gamma",
+                    "type": "u64"
+                },
+                {
+                    "name": "time",
+                    "type": "u64"
+                }
+            ]
+        },
+        "TokenExchangeEvent": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "sold_id",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "tokens_sold",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "bought_id",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "tokens_bought",
+                    "type": "BigUint"
+                }
+            ]
+        }
+    }
+}

@@ -5,7 +5,7 @@ import ImgTwitter from "assets/images/twitter.png";
 import ICBambooShootSolid from "assets/svg/bamboo-shoot-solid.svg";
 import ICCaretRight from "assets/svg/caret-right.svg";
 import ICELetter from "assets/svg/e-letter.svg";
-import { atomQuestUserStats } from "atoms/ashpoint";
+import { atomQuestUserStats, questIsRegisteredSelector } from "atoms/ashpoint";
 import { accAddressState } from "atoms/dappState";
 import BaseModal from "components/BaseModal";
 import CopyBtn from "components/CopyBtn";
@@ -67,6 +67,7 @@ const QuestOverview = () => {
     const [isOpenPlatformModal, setIsOpenPlatformModal] = useState(false);
     const [questType, setQuestType] = useState<"daily" | "event">("daily");
     const screenSize = useScreenSize();
+    const isRegistered = useRecoilValue(questIsRegisteredSelector);
 
     const [platform, setPlatform] = useState<PlatformType>();
 
@@ -109,14 +110,6 @@ const QuestOverview = () => {
         });
         return `https://twitter.com/intent/tweet?${text.toString()}`;
     }, [inviteLink]);
-
-    const isRegistered = useMemo(() => {
-        return (
-            (userStats?.wallet?.twitter_username ||
-                userStats?.wallet?.discord_id) &&
-            userStats.wallet.wallet_address === userAddress
-        );
-    }, [userStats, userAddress]);
 
     const getUserStats = useCallback(() => {
         logApi

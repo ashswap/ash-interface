@@ -13,7 +13,7 @@ import { formatAmount } from "helper/number";
 import { IESDTInfo } from "helper/token/token";
 import { useCreateTransaction } from "helper/transactionMethods";
 import useSendTxsWithTrackStatus from "hooks/useSendTxsWithTrackStatus";
-import IPool from "interface/pool";
+import IPool, { EPoolType } from "interface/pool";
 import { useRecoilCallback } from "recoil";
 
 const usePoolSwap = (trackStatus = false) => {
@@ -42,7 +42,16 @@ const usePoolSwap = (trackStatus = false) => {
                             new BigUIntValue(minWeiOut),
                         ],
                     });
+                } else if(pool.type === EPoolType.PoolV2) {
+                    const poolContract = ContractManager.getPoolV2Contract(pool.address);
+                    const tokenPayment = TokenPayment.fungibleFromBigInteger(
+                        tokenIn.identifier,
+                        weiIn,
+                        tokenIn.decimals
+                    );
+                    tx = await poolContract.exchange(tokenPayment, minWeiOut);
                 } else {
+
                     const poolContract = ContractManager.getPoolContract(
                         pool.address
                     );
@@ -64,7 +73,7 @@ const usePoolSwap = (trackStatus = false) => {
                         successMessage: `Swap succeed ${formatAmount(
                             toEGLDD(tokenIn.decimals, weiIn).toNumber(),
                             { notation: "standard" }
-                        )} ${tokenIn.symbol} to ${formatAmount(
+                        )} ${tokenIn.symbol} to at least ${formatAmount(
                             toEGLDD(tokenOut.decimals, minWeiOut).toNumber(),
                             { notation: "standard" }
                         )} ${tokenOut.symbol}`,
