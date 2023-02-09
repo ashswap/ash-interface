@@ -33,7 +33,6 @@ const MAIAR_WALLET_LINK = {
     CHROME_EXT:
         "https://chrome.google.com/webstore/detail/maiar-defi-wallet/dngmlblcodfobpdpecaadgfbcggfjfnm",
 };
-
 function ConnectWalletModal() {
     const loggedIn = useRecoilValue(accIsLoggedInState);
     const accAddress = useRecoilValue(accAddressState);
