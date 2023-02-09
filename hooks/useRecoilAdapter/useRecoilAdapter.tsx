@@ -33,7 +33,8 @@ const fakePrice = [
     { id: "USDC-fd47e9", price: 1 },
     { id: "BUSD-b53884", price: 1 },
     { id: "ALP-68ec91", price: 1 },
-    { id: "ALP-1d42c1", price: 40 },
+    { id: "ALP-836706", price: 100 },
+    { id: "ALP-1096a5", price: 40 },
 ];
 export function useRecoilAdapter() {
     // copy whole dappContext to recoil
@@ -56,11 +57,13 @@ export function useRecoilAdapter() {
         // const x = [...data.pools];
         // x[0] = {...data.pools[0], lpToken: fakePrice[4]}
         // x[1] = {...data.pools[1], lpToken: fakePrice[5]}
+        // const y = [...data.poolsV2];
+        // y[0] = {...data.poolsV2[0], lpToken: fakePrice[6]}
 
         // if(data.farmController){
         //     data.farmController = {...data.farmController, farms: data.farmController.farms.filter((f: any) => FARMS.map(_f => _f.farm_address).includes(f.address))}
         // }
-        // data && setAshBaseState((state) => ({ ...state, ...data, tokens: fakePrice, pools: x }));
+        // data && setAshBaseState((state) => ({ ...state, ...data, tokens: fakePrice, pools: x, poolsV2: y }));
     }, [data, setAshBaseState]);
 
     // fetch tokens balance

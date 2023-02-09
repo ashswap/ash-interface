@@ -310,7 +310,7 @@ const useFarmsState = () => {
                     (total, f) => total.plus(f.balance),
                     new BigNumber(0)
                 );
-                const lastSnapshotReward = lastQueryRewardMap[f.farm_address];
+                const lastSnapshotReward = lastQueryRewardMap[f.farm_address] || {reward: new BigNumber(0), ts: moment().unix()};
                 const rewardIncrease = BigNumber.max(moment().unix() - lastSnapshotReward.ts, 0).multipliedBy(ashPerSec).multipliedBy(farmBalance).idiv(farmTokenSupply);
                 const estimatedReward = lastSnapshotReward.reward.plus(rewardIncrease);
                 const totalStakedLP = farmTokens.reduce(

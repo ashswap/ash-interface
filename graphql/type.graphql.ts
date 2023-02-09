@@ -57,6 +57,8 @@ export abstract class IQuery {
 
     abstract liquidity(): Nullable<Nullable<number[]>[]> | Promise<Nullable<Nullable<number[]>[]>>;
 
+    abstract poolsV2(): PoolV2[] | Promise<PoolV2[]>;
+
     abstract pools(pool_address?: Nullable<string>): Nullable<Nullable<Pool>[]> | Promise<Nullable<Nullable<Pool>[]>>;
 
     abstract liquidityDistribution(pool_addresses?: Nullable<string>): Nullable<Nullable<LiquidityDistribution>[]> | Promise<Nullable<Nullable<LiquidityDistribution>[]>>;
@@ -275,6 +277,21 @@ export class Summary {
     from_timestamp?: Nullable<string>;
     to_timestamp?: Nullable<string>;
     total_admin_fee_in_usd?: Nullable<number>;
+}
+
+export class PoolV2 {
+    __typename?: 'PoolV2';
+    address: string;
+    lpToken: Token;
+    tokens: Token[];
+    reserves: string[];
+    totalSupply: string;
+    lpPrice: string;
+    ampFactor: string;
+    gamma: string;
+    fee: string;
+    virtualPrice: string;
+    priceOracle: string;
 }
 
 export class Pool {

@@ -72,6 +72,7 @@ const CustomTransactionsTracker: typeof TransactionsTracker = () => {
                             checkBatch({
                                 sessionId,
                                 transactionBatch: batch,
+                                getTransactionsByHash: getTransactionByHashesIntercept
                             });
                         }, 2000);
                         if (intervalRef.current) {
@@ -105,7 +106,7 @@ const CustomTransactionsTracker: typeof TransactionsTracker = () => {
             }
         });
 
-    }, [pendingBatches]);
+    }, [getTransactionByHashesIntercept, pendingBatches]);
 
     return null;
 };

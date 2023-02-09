@@ -8,6 +8,7 @@ import {
 import { DAPP_CONFIG } from "const/dappConfig";
 import pools from "const/pool";
 import { TOKENS } from "const/tokens";
+import { Pool, PoolV2 } from "graphql/type.graphql";
 import { toEGLDD } from "helper/balance";
 import { fetcher } from "helper/common";
 import produce from "immer";
@@ -17,7 +18,7 @@ import useSWR, { SWRConfiguration } from "swr";
 
 const useGetTokens = (config?: SWRConfiguration) => {
     const accAddress = useRecoilValue(accAddressState);
-    const { tokens, pools: rawPools } = useRecoilValue(ashswapBaseState);
+    const { tokens, pools: rawPoolsV1, poolsV2: rawPoolsV2 } = useRecoilValue(ashswapBaseState);
     const setTokenMap = useSetRecoilState(tokenMapState);
     const setLPTokenMap = useSetRecoilState(lpTokenMapState);
     const setTokenRefresher = useSetRecoilState(tokensRefresherAtom);
@@ -62,8 +63,10 @@ const useGetTokens = (config?: SWRConfiguration) => {
     useEffect(() => {
         setLPTokenMap((state) => {
             const map = produce(state, (draft) => {
-                const rawPoolMap = Object.fromEntries(
-                    rawPools.map((p) => [p.lpToken.id, p])
+                const entriesV1 = rawPoolsV1.map((p) => [p.lpToken.id, p]);
+                const entriesV2 = rawPoolsV2.map((p) => [p.lpToken.id, p]);
+                const rawPoolMap: Record<string, Pool | PoolV2> = Object.fromEntries(
+                    [...entriesV1, ...entriesV2]
                 );
                 const dataMap = Object.fromEntries(
                     data?.map((t) => [t.identifier, t]) || []
@@ -81,7 +84,7 @@ const useGetTokens = (config?: SWRConfiguration) => {
             });
             return { ...map };
         });
-    }, [data, rawPools, setLPTokenMap]);
+    }, [data, rawPoolsV1, rawPoolsV2, setLPTokenMap]);
 
     useEffect(() => {
         setTokenRefresher(() => mutate);

@@ -1,7 +1,7 @@
 import BigNumber from "bignumber.js";
 import { POOLS_MAP_ADDRESS } from "const/pool";
 import { Percent } from "helper/fraction/percent";
-import IPool from "interface/pool";
+import IPool, { EPoolType } from "interface/pool";
 import { PoolStatsRecord } from "interface/poolStats";
 import { atom, selector, selectorFamily } from "recoil";
 import { KeyedMutator } from "swr";
@@ -75,16 +75,12 @@ export const poolToDisplayState = selector<PoolRecord[]>({
         switch (sortOption) {
             case "apr":
                 result = result.sort(
-                    (x, y) =>
-                        (y.poolStats?.apr || 0) -
-                        (x.poolStats?.apr || 0)
+                    (x, y) => (y.poolStats?.apr || 0) - (x.poolStats?.apr || 0)
                 );
                 break;
             case "liquidity":
                 result = result.sort(
-                    (x, y) =>
-                        (y.poolStats?.tvl || 0) -
-                        (x.poolStats?.tvl || 0)
+                    (x, y) => (y.poolStats?.tvl || 0) - (x.poolStats?.tvl || 0)
                 );
                 break;
             case "volume":
@@ -102,27 +98,12 @@ export const poolToDisplayState = selector<PoolRecord[]>({
 
 // refactor
 
-export const ashRawPoolMapByIdSelector = selector({
-    key: "ash_base_state_raw_pool_map_by_id",
-    get: ({ get }) => {
-        const base = get(ashswapBaseState);
-        return Object.fromEntries(
-            base.pools.map((p) => {
-                return [p.lpToken.id, p];
-            })
-        );
-    },
-    cachePolicy_UNSTABLE: {
-        eviction: "most-recent",
-    },
-});
-
-export const ashRawPoolByAddressQuery = selectorFamily({
-    key: "ash_base_state_raw_pool_by_address_query",
+export const ashRawPoolV1ByAddressQuery = selectorFamily({
+    key: "ash_base_state_raw_pool_v1_by_address_query",
     get:
         (address: string) =>
-        ({ get }) => 
-            get(ashswapBaseState).pools.find(p => p.address === address),
+        ({ get }) =>
+            get(ashswapBaseState).pools.find((p) => p.address === address),
 });
 
 export const LPBreakDownQuery = selectorFamily({
@@ -130,8 +111,11 @@ export const LPBreakDownQuery = selectorFamily({
     get:
         (props: { poolAddress: string; wei: string }) =>
         ({ get }) => {
-            const pool = get(ashRawPoolByAddressQuery(props.poolAddress));
             const poolConfig = POOLS_MAP_ADDRESS[props.poolAddress];
+            const pool =
+                poolConfig.type === EPoolType.PoolV2
+                    ? get(ashRawPoolV2ByAddressQuery(props.poolAddress))
+                    : get(ashRawPoolV1ByAddressQuery(props.poolAddress));
             const lpReserves = poolConfig.tokens.map((t, i) => {
                 if (!pool?.totalSupply) return new BigNumber(0);
                 const val = new BigNumber(props.wei)
@@ -139,30 +123,45 @@ export const LPBreakDownQuery = selectorFamily({
                     .div(pool.totalSupply);
                 return val.integerValue(BigNumber.ROUND_FLOOR);
             });
-            const valueUsd = new BigNumber(props.wei).multipliedBy(pool?.lpToken.price || 0).div(10 ** poolConfig.lpToken.decimals);
+            const valueUsd = new BigNumber(props.wei)
+                .multipliedBy(pool?.lpToken.price || 0)
+                .div(10 ** poolConfig.lpToken.decimals);
             return { lpReserves, valueUsd };
         },
-    cachePolicy_UNSTABLE: {eviction: "most-recent"}
+    cachePolicy_UNSTABLE: { eviction: "most-recent" },
 });
 
 export const poolRecordQuery = selectorFamily({
     key: "pool_record_query_by_address",
-    get: (address: string) => ({get}) => get(poolRecordsState).find(p => p.pool.address === address)
-})
+    get:
+        (address: string) =>
+        ({ get }) =>
+            get(poolRecordsState).find((p) => p.pool.address === address),
+});
 
-export const poolFeesQuery = selectorFamily({
-    key: "pool_fees_selector_by_address",
-    get: (address: string) => ({get}) => {
-        const pool = get(ashRawPoolByAddressQuery(address));
-        const fees = {
-            swap: new Percent(pool?.swapFeePercent || 0, 100_000),
-            admin: new Percent(pool?.adminFeePercent || 0, 100_000)
-        }
-        return fees;
-    }
-})
+export const poolV1FeesQuery = selectorFamily({
+    key: "pool_v1_fees_selector_by_address",
+    get:
+        (address: string) =>
+        ({ get }) => {
+            const pool = get(ashRawPoolV1ByAddressQuery(address));
+            const fees = {
+                swap: new Percent(pool?.swapFeePercent || 0, 100_000),
+                admin: new Percent(pool?.adminFeePercent || 0, 100_000),
+            };
+            return fees;
+        },
+});
 
 export const poolStatsRefresherAtom = atom<KeyedMutator<PoolStatsRecord[]>>({
     key: "pool_stats_record_refresher_atom",
     default: () => Promise.resolve(undefined),
+});
+
+export const ashRawPoolV2ByAddressQuery = selectorFamily({
+    key: "ash_base_state_raw_pool_v2_by_address_query",
+    get:
+        (address: string) =>
+        ({ get }) =>
+            get(ashswapBaseState).poolsV2.find((p) => p.address === address),
 });
