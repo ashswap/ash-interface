@@ -13,7 +13,10 @@ export const TxCompletedTracker = () => {
     useEffect(() => {
         if (!socket) return;
         const onTxCompleted = (hash: string) => {
-            setLastCompletedTxHash(hash);
+            // delay to get reliable transaction status
+            setTimeout(() => {
+                setLastCompletedTxHash(hash);
+            }, 500);
         };
         socket.on("transactionCompleted", onTxCompleted);
         return () => {
@@ -23,8 +26,8 @@ export const TxCompletedTracker = () => {
 
     useEffect(() => {
         if (!socketExtra) return;
-        const decoder = new TransactionDecoder();
         const onCheckBatchResult = (txs: GetTransactionsByHashesReturnType) => {
+            const decoder = new TransactionDecoder();
             txs.map((tx) => {
                 const { hash, raw } = tx;
                 const { receiver } = decoder.getTransactionMetadata({
@@ -39,7 +42,7 @@ export const TxCompletedTracker = () => {
                     action_time: Date.now(),
                     action_name: raw?.function || raw?.arguments?.functionName || raw?.action?.name,
                     action_metadata: raw,
-                });
+                }).catch((err) => console.log(err));
             });
         };
         emitter.on("onCheckBatchResult", onCheckBatchResult);

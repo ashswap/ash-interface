@@ -1,8 +1,9 @@
 import { FARMS } from "const/farms";
 import pools from "const/pool";
-import { TOKENS } from "const/tokens";
+import { TOKENS, TOKENS_MAP } from "const/tokens";
+import { TokenAmount } from "helper/token/tokenAmount";
 import { IMetaESDT } from "interface/tokens";
-import { atom } from "recoil";
+import { atom, selectorFamily } from "recoil";
 import { KeyedMutator } from "swr";
 type Token = {
     identifier: string;
@@ -74,4 +75,13 @@ export const tokensRefresherAtom = atom<
 >({
     key: "refresh_tokens_balance",
     default: () => Promise.resolve(undefined),
+});
+
+export const tokenBalanceSelector = selectorFamily<TokenAmount | undefined, string>({
+    key: "token_balance_selector",
+    get: (tokenId: string) => ({get}) => {
+        const tokenMap = get(tokenMapState);
+        if (!TOKENS_MAP[tokenId] || !tokenMap[tokenId]) return undefined;
+        return new TokenAmount(TOKENS_MAP[tokenId], tokenMap[tokenId].balance);
+    }
 });

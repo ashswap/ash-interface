@@ -38,7 +38,7 @@ const useFarmClaimReward = (trackStatus = false) => {
                 );
                 const txs = await ContractManager.getFarmContract(
                     farm.farm_address
-                ).claimRewards(tokenPayments, false);
+                ).withLastRewardBlockTs(farmRecord.lastRewardBlockTs).claimRewards(tokenPayments, false);
                 const payload: DappSendTransactionsPropsType = {
                     transactions: txs,
                     transactionsDisplayInfo: {

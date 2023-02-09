@@ -15,6 +15,7 @@ import InputCurrency from "components/InputCurrency";
 import TextAmt from "components/TextAmt";
 import CardTooltip from "components/Tooltip/CardTooltip";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
+import { ENVIRONMENT } from "const/env";
 import { ASH_TOKEN, VE_ASH_DECIMALS } from "const/tokens";
 import { VE_LOCK_LABEL } from "const/ve";
 import { toEGLD, toEGLDD, toWei } from "helper/balance";
@@ -60,7 +61,20 @@ const LOCK_CONFIG_MAIN = {
     minLock: 7 * 24 * 60 * 60,
     sliderStep: 24 * 60 * 60,
 };
-const LOCK_CONFIG = LOCK_CONFIG_MAIN;
+const LOCK_CONFIG_ALPHA = {
+    predefinedLockPeriod: [
+        // { value: 7 * 24 * 60 * 60, label: "1 week" },
+        // { value: 4 * 7 * 24 * 60 * 60, label: "4 weeks" },
+        { value: 1 * 365 * 24 * 60 * 60, label: "1 year" },
+        { value: 2 * 365 * 24 * 60 * 60, label: "2 years" },
+        { value: 3 * 365 * 24 * 60 * 60, label: "3 years" },
+        { value: 4 * 365 * 24 * 60 * 60, label: "4 years" },
+    ],
+    maxLock: 4 * 365 * 24 * 60 * 60,
+    minLock: 10 * 60,
+    sliderStep: 10 * 60,
+};
+const LOCK_CONFIG = ENVIRONMENT.ENV === "alpha" ? LOCK_CONFIG_ALPHA : LOCK_CONFIG_MAIN;
 const FirstStakeContent = ({ open, onClose }: props) => {
     const tokenMap = useRecoilValue(tokenMapState);
     const insufficientEGLD = useRecoilValue(accIsInsufficientEGLDState);
@@ -80,7 +94,6 @@ const FirstStakeContent = ({ open, onClose }: props) => {
     useEffect(() => {
         if (window && loggedIn && deboundRawLockAmt) {
             let dataLayer = (window as any).dataLayer || [];
-            console.log("dataLayer", dataLayer);
             dataLayer.push({
                 event: "input_lock_value",
                 amount: deboundRawLockAmt,
@@ -464,7 +477,7 @@ function FirstStakeModal({ open, onClose }: props) {
                 isOpen={open}
                 onRequestClose={() => onClose()}
                 type={`${isMobile ? "drawer_btt" : "modal"}`}
-                className="bg-stake-dark-400 p-4 sm:ash-container flex flex-col max-h-full"
+                className="bg-stake-dark-400 p-4 w-screen max-w-[70rem] sm:mx-auto flex flex-col max-h-full"
             >
                 <div className="flex justify-end mb-4">
                     <BaseModal.CloseBtn />

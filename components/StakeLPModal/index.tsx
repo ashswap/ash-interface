@@ -28,7 +28,7 @@ type props = {
 };
 const StakeLPContent = ({ open, onClose, farmData }: props) => {
     const loggedIn = useRecoilValue(accIsLoggedInState);
-    const { pool, farm, farmTokenSupply, ashPerBlock, emissionAPR } = farmData;
+    const { pool, farm, farmTokenSupply, ashPerSec, emissionAPR } = farmData;
     const lpTokenMap = useRecoilValue(lpTokenMapState);
     const insufficientEGLD = useRecoilValue(accIsInsufficientEGLDState);
     const [stakeAmt, setStakeAmt] = useState<BigNumber>(new BigNumber(0));
@@ -56,14 +56,14 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
     }, [LPBalance, pool]);
     const ashPerDay = useMemo(() => {
         const baseFarmToken = stakeAmt.multipliedBy(0.4);
-        const totalAshPerDay = ashPerBlock
+        const totalAshPerDay = ashPerSec
             .multipliedBy(24 * 60 * 60)
-            .div(blockTimeMs / 1000);
+            ;
         const shareOfFarm = baseFarmToken.div(
             farmTokenSupply.plus(baseFarmToken)
         );
         return totalAshPerDay.multipliedBy(shareOfFarm);
-    }, [stakeAmt, farmTokenSupply, ashPerBlock]);
+    }, [stakeAmt, farmTokenSupply, ashPerSec]);
     const insufficientLP = useMemo(() => {
         return !LPBalance || LPBalance.eq(0) || stakeAmt.gt(LPBalance);
     }, [LPBalance, stakeAmt]);

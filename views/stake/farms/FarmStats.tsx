@@ -49,7 +49,6 @@ function FarmStats({ onClickAll }: { onClickAll?: () => void }) {
     useEffect(() => {
         if (window && isClickedHarvestButton && loggedIn) {
             let dataLayer = (window as any).dataLayer || [];
-            console.log("dataLayer", dataLayer);
             dataLayer.push({
                 event: "click_harvest_liquidity_stake",
             });

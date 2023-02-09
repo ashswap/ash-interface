@@ -26,6 +26,7 @@ export type UserOnboardingStatus = {
     farm_expected_ve?: boolean;
     farm_transfered_token_guide?: boolean;
     farm_max_boost?: boolean;
+    dao_farm_weight_bribe?: boolean;
 };
 export const useOnboarding = (key: keyof UserOnboardingStatus) => {
     const [onboardingState, setStorageUserOnboardingState] =
