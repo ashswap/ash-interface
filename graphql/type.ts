@@ -1,8 +1,9 @@
-import { Blockchain, Farm, FarmBribe, FarmController, FeeDistributor, Pool, Rewarder, Token, VotingEscrow } from "./type.graphql"
+import { Blockchain, Farm, FarmBribe, FarmController, FeeDistributor, Pool, PoolV2, Rewarder, Token, VotingEscrow } from "./type.graphql"
 
 export type AshBaseState = {
     farms: Required<Farm>[];
     pools: Required<Pool>[];
+    poolsV2: Required<PoolV2>[];
     tokens: Required<Token>[];
     votingEscrows: Required<VotingEscrow>[];
     feeDistributor: FeeDistributor | null;

@@ -7,6 +7,7 @@ export const ashswapBaseState = atom<AshBaseState>({
     default: {
         farms: [],
         pools: [],
+        poolsV2: [],
         tokens: [],
         votingEscrows: [],
         feeDistributor: null,

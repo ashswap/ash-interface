@@ -5,8 +5,8 @@ import {
     accIsLoggedInState,
 } from "atoms/dappState";
 import {
-    ashRawPoolByAddressQuery,
-    poolFeesQuery,
+    ashRawPoolV1ByAddressQuery,
+    poolV1FeesQuery,
     PoolsState,
 } from "atoms/poolsState";
 import { tokenMapState } from "atoms/tokensState";
@@ -18,6 +18,7 @@ import InputCurrency from "components/InputCurrency";
 import TextAmt from "components/TextAmt";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
 import { toEGLDD, toWei } from "helper/balance";
+import { ContractManager } from "helper/contracts/contractManager";
 import { Fraction } from "helper/fraction/fraction";
 import { calculateEstimatedMintAmount } from "helper/stableswap/calculator/amounts";
 import { IESDTInfo } from "helper/token/token";
@@ -26,6 +27,7 @@ import { useOnboarding } from "hooks/useOnboarding";
 import usePoolAddLP from "hooks/usePoolContract/usePoolAddLP";
 import { useScreenSize } from "hooks/useScreenSize";
 import produce from "immer";
+import { EPoolType } from "interface/pool";
 import { Unarray } from "interface/utilities";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -169,18 +171,26 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
     const addLP = useRecoilCallback(
         ({ snapshot }) =>
             async () => {
-                const poolData = await snapshot.getPromise(
-                    ashRawPoolByAddressQuery(pool.address)
-                );
-                const poolFee = await snapshot.getPromise(
-                    poolFeesQuery(pool.address)
-                );
-                if (!loggedIn || adding || !poolData) return;
-                const { ampFactor, reserves, totalSupply } = poolData;
-                if (!ampFactor || !reserves || !totalSupply) return;
                 setAdding(true);
+                let mintAmt = new BigNumber(0);
+                if (pool.type === EPoolType.PoolV2) {
+                    const amts = pool.tokens.map((t, i) =>
+                        toWei(t, inputValues[i].toString() || "0")
+                    );
+                    mintAmt = await ContractManager.getPoolV2Contract(
+                        pool.address
+                    ).estimateAddLiquidity(amts);
+                } else {
+                    const poolData = await snapshot.getPromise(
+                        ashRawPoolV1ByAddressQuery(pool.address)
+                    );
+                    const poolFee = await snapshot.getPromise(
+                        poolV1FeesQuery(pool.address)
+                    );
+                    if (!loggedIn || adding || !poolData) return;
+                    const { ampFactor, reserves, totalSupply } = poolData;
+                    if (!ampFactor || !reserves || !totalSupply) return;
 
-                try {
                     const { mintAmount } = calculateEstimatedMintAmount(
                         new BigNumber(ampFactor),
                         pool.tokens.map(
@@ -192,16 +202,18 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
                             toWei(t, inputValues[i].toString() || "0")
                         )
                     );
+                    mintAmt = mintAmount.raw;
+                }
+                try {
                     const { sessionId } = await addPoolLP(
                         pool,
                         pool.tokens.map((t, i) =>
                             toWei(t, inputValues[i].toString() || "0")
                         ),
-                        mintAmount.raw
+                        mintAmt
                             .multipliedBy(0.99) // expected receive at least 99% of estimation LP
                             .integerValue(BigNumber.ROUND_DOWN)
                     );
-
                     setAddLPSessionId(sessionId || "");
                     if (sessionId) onClose?.();
                 } catch (error) {
