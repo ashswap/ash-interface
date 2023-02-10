@@ -31,7 +31,6 @@ export const TxCompletedTracker = () => {
     }, [socket, setLastCompletedTxHash]);
 
     useEffect(() => {
-        if (!socketExtra) return;
         const onCheckBatchResult = (txs: GetTransactionsByHashesReturnType) => {
             const decoder = new TransactionDecoder();
             txs.map((tx) => {
@@ -43,7 +42,9 @@ export const TxCompletedTracker = () => {
                     value: "0",
                     type: "",
                 });
-                socketExtra.emit("transactionCompletedClient", receiver, hash);
+                if(socketExtra){
+                    // socketExtra.emit("transactionCompletedClient", receiver, hash);
+                }
                 if (isRegistered) {
                     logApi.post("/api/v1/tracking/ash-point", {
                         action_time: Date.now(),

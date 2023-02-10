@@ -8,6 +8,7 @@ import {
     ashRawPoolV1ByAddressQuery,
     poolV1FeesQuery,
     PoolsState,
+    ashRawPoolV2ByAddressQuery,
 } from "atoms/poolsState";
 import { tokenMapState } from "atoms/tokensState";
 import BigNumber from "bignumber.js";
@@ -174,12 +175,13 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
                 setAdding(true);
                 let mintAmt = new BigNumber(0);
                 if (pool.type === EPoolType.PoolV2) {
+                    const rawPoolV2 = await snapshot.getPromise(ashRawPoolV2ByAddressQuery(pool.address));
                     const amts = pool.tokens.map((t, i) =>
                         toWei(t, inputValues[i].toString() || "0")
                     );
-                    mintAmt = await ContractManager.getPoolV2Contract(
+                    mintAmt = rawPoolV2?.reserves.reduce((sum, r) => sum.plus(r), new BigNumber(0)).gt(0) ? await ContractManager.getPoolV2Contract(
                         pool.address
-                    ).estimateAddLiquidity(amts);
+                    ).estimateAddLiquidity(amts) : new BigNumber(0);
                 } else {
                     const poolData = await snapshot.getPromise(
                         ashRawPoolV1ByAddressQuery(pool.address)

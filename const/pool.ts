@@ -38,9 +38,9 @@ const devnet: PoolConfig = {
         },
         {
             address:
-                "erd1qqqqqqqqqqqqqpgq4d8z6s7r47vwemry4pm4jrssetckkc8rrmcqxuqc4q",
+                "erd1qqqqqqqqqqqqqpgqdvevg6lndevn0ad0747laznzlu8sy8gdrmcq7l7x6n",
             lpToken: {
-                identifier: "ALP-1096a5",
+                identifier: "ALP-8dcaa8",
                 chainId: ChainId.Devnet,
                 symbol: "LPT-wEGLD-aEGLD",
                 name: "Ashswap LP",
