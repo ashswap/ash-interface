@@ -1,5 +1,6 @@
 import { TransactionDecoder } from "@elrondnetwork/transaction-decoder";
 import { atomQuestUserStats, questIsRegisteredSelector } from "atoms/ashpoint";
+import { accIsLoggedInState } from "atoms/dappState";
 import { lastCompletedTxHashAtom } from "atoms/transactions";
 import { useSocket } from "context/socket";
 import emitter from "helper/emitter";
@@ -14,6 +15,7 @@ export const TxCompletedTracker = () => {
     const setUserStats = useSetRecoilState(atomQuestUserStats);
     const setLastCompletedTxHash = useSetRecoilState(lastCompletedTxHashAtom);
     const isRegistered = useRecoilValue(questIsRegisteredSelector);
+    const isLoggedIn = useRecoilValue(accIsLoggedInState);
     useEffect(() => {
         if (!socket) return;
         const onTxCompleted = (hash: string) => {
@@ -29,7 +31,6 @@ export const TxCompletedTracker = () => {
     }, [socket, setLastCompletedTxHash]);
 
     useEffect(() => {
-        if (!socketExtra) return;
         const onCheckBatchResult = (txs: GetTransactionsByHashesReturnType) => {
             const decoder = new TransactionDecoder();
             txs.map((tx) => {
@@ -41,7 +42,9 @@ export const TxCompletedTracker = () => {
                     value: "0",
                     type: "",
                 });
-                socketExtra.emit("transactionCompletedClient", receiver, hash);
+                if(socketExtra){
+                    // socketExtra.emit("transactionCompletedClient", receiver, hash);
+                }
                 if (isRegistered) {
                     logApi.post("/api/v1/tracking/ash-point", {
                         action_time: Date.now(),
@@ -58,10 +61,12 @@ export const TxCompletedTracker = () => {
     }, [socketExtra, isRegistered]);
 
     useEffect(() => {
-        logApi
+        if(isLoggedIn){
+            logApi
             .get<QuestUserStatsModel>("/api/v1/wallet")
             .then((res) => setUserStats(res.data))
             .catch((err) => console.log(err))
-    }, [setUserStats]);
+        }
+    }, [setUserStats, isLoggedIn]);
     return null;
 };

@@ -260,7 +260,7 @@ const TokenSelect = ({
                                                 ? type === "to"
                                                     ? "swap to"
                                                     : "swap from"
-                                                : "Search or try usdt-usdc"
+                                                : "Search"
                                         }
                                         suffix={<Search />}
                                         outline
