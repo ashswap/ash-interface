@@ -163,7 +163,7 @@ const TokenDetailPage: Page<props> = ({ token }: props) => {
                                 <span className="hidden md:inline">
                                     View on{" "}
                                 </span>
-                                <span>Elrond Explorer</span>
+                                <span>MultiversX Explorer</span>
                             </span>
                         </span>
                     </a>

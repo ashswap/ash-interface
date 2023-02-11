@@ -55,7 +55,6 @@ function PoolDetailPage({ pool }: Props) {
         fetcher,
         { refreshInterval: 5 * 60 * 1000 }
     );
-    const [token1, token2] = useMemo(() => pool.tokens, [pool]);
     const network: AccountInfoSliceNetworkType =
         useRecoilValue(networkConfigState).network;
     const adminFee = useMemo(() => {
@@ -90,25 +89,23 @@ function PoolDetailPage({ pool }: Props) {
                 <li>
                     <ICArrowRight className="inline mr-1 text-ash-gray-500" />
                     <span className="text-ash-gray-500">
-                        {token1.symbol} & {token2.symbol}
+                        {pool.tokens.map((t) => t.symbol).join(" & ")}
                     </span>
                 </li>
             </ul>
             <div className="flex items-center mb-4 lg:mb-5">
                 <div className="text-2xl lg:text-4xl font-bold mr-4 lg:mr-7">
-                    {token1.symbol} & {token2.symbol}
+                    {pool.tokens.map((t) => t.symbol).join(" & ")}
                 </div>
                 <div className="flex">
-                    <Avatar
-                        src={token1.logoURI}
-                        alt={token1.symbol}
-                        className="w-6 h-6 lg:w-8 lg:h-8"
-                    />
-                    <Avatar
-                        src={token2.logoURI}
-                        alt={token2.symbol}
-                        className="w-6 h-6 lg:w-8 lg:h-8 -ml-1.5"
-                    />
+                    {pool.tokens.map((t) => (
+                        <Avatar
+                            key={t.identifier}
+                            src={t.logoURI}
+                            alt={t.symbol}
+                            className="w-6 h-6 lg:w-8 lg:h-8 -ml-1.5 first:ml-0"
+                        />
+                    ))}
                 </div>
             </div>
             <div className="flex flex-wrap mb-9 lg:mb-20">
@@ -123,28 +120,24 @@ function PoolDetailPage({ pool }: Props) {
                         </CopyBtn>
                     </div>
                 </div>
-                <div className="flex items-center bg-ash-dark-600 h-8 lg:h-10 px-2.5 lg:px-4 mr-2 mb-2">
-                    <div className="text-xs lg:text-sm">{token1.symbol}</div>
-                    <div className="text-2xs lg:text-xs text-stake-gray-500 px-2.5 border-r border-r-stake-gray-500">
-                        {token1.identifier}
-                    </div>
-                    <div className="pl-2.5 flex lg:pl-5">
-                        <CopyBtn text={token1.identifier}>
-                            <ICCopy className="w-4 h-4 lg:w-5 lg:h-5" />
-                        </CopyBtn>
-                    </div>
-                </div>
-                <div className="flex items-center bg-ash-dark-600 h-8 lg:h-10 px-2.5 lg:px-4 mr-2 mb-2">
-                    <div className="text-xs lg:text-sm">{token2.symbol}</div>
-                    <div className="text-2xs lg:text-xs text-stake-gray-500 px-2.5 border-r border-r-stake-gray-500">
-                        {token2.identifier}
-                    </div>
-                    <div className="pl-2.5 flex lg:pl-5">
-                        <CopyBtn text={token2.identifier}>
-                            <ICCopy className="w-4 h-4 lg:w-5 lg:h-5" />
-                        </CopyBtn>
-                    </div>
-                </div>
+                {pool.tokens.map((t) => {
+                    return (
+                        <div
+                            key={t.identifier}
+                            className="flex items-center bg-ash-dark-600 h-8 lg:h-10 px-2.5 lg:px-4 mr-2 mb-2"
+                        >
+                            <div className="text-xs lg:text-sm">{t.symbol}</div>
+                            <div className="text-2xs lg:text-xs text-stake-gray-500 px-2.5 border-r border-r-stake-gray-500">
+                                {t.identifier}
+                            </div>
+                            <div className="pl-2.5 flex lg:pl-5">
+                                <CopyBtn text={t.identifier}>
+                                    <ICCopy className="w-4 h-4 lg:w-5 lg:h-5" />
+                                </CopyBtn>
+                            </div>
+                        </div>
+                    );
+                })}
             </div>
             <div className="flex space-x-2 text-xs md:text-sm mb-4 lg:mb-18">
                 <Link href={`/swap`}>
@@ -174,7 +167,7 @@ function PoolDetailPage({ pool }: Props) {
                         <ICNewTabRound className="w-4 h-4 md:w-5 md:h-5" />
                         <span className="ml-2">
                             <span className="hidden sm:inline">View on </span>
-                            Elrond Explorer
+                            MultiversX Explorer
                         </span>
                     </div>
                 </a>
@@ -186,36 +179,31 @@ function PoolDetailPage({ pool }: Props) {
                         <div className="mb-5 sm:mb-8 text-2xs sm:text-xs">
                             Pooled Tokens
                         </div>
-                        <div className="flex items-center justify-between text-sm sm:text-lg mb-2.5 sm:mb-6">
-                            <div>
-                                <span>
-                                    {formatAmount(stats?.token_1_amount)}{" "}
-                                </span>
-                                <span className="text-stake-gray-500">
-                                    {token1.symbol}
-                                </span>
-                            </div>
-                            <Avatar
-                                src={token1.logoURI}
-                                alt={token1.symbol}
-                                className="w-4.5 h-4.5 sm:w-6 sm:h-6"
-                            />
-                        </div>
-                        <div className="flex items-center justify-between text-sm sm:text-lg">
-                            <div>
-                                <span>
-                                    {formatAmount(stats?.token_2_amount)}{" "}
-                                </span>
-                                <span className="text-stake-gray-500">
-                                    {token2.symbol}
-                                </span>
-                            </div>
-                            <Avatar
-                                src={token2.logoURI}
-                                alt={token2.symbol}
-                                className="w-4.5 h-4.5 sm:w-6 sm:h-6"
-                            />
-                        </div>
+                        {pool.tokens.map((t, i) => {
+                            const key = `token_${
+                                i + 1
+                            }_amount` as keyof PoolStatsRecord;
+                            return (
+                                <div
+                                    key={t.identifier}
+                                    className="flex items-center justify-between text-sm sm:text-lg mb-2.5 sm:mb-6 last:mb-0"
+                                >
+                                    <div>
+                                        <span>
+                                            {formatAmount(stats?.[key] || 0)}{" "}
+                                        </span>
+                                        <span className="text-stake-gray-500">
+                                            {t.symbol}
+                                        </span>
+                                    </div>
+                                    <Avatar
+                                        src={t.logoURI}
+                                        alt={t.symbol}
+                                        className="w-4.5 h-4.5 sm:w-6 sm:h-6"
+                                    />
+                                </div>
+                            );
+                        })}
                     </div>
                     <div className="px-4 md:px-[1.625rem] py-4 md:pt-5 md:pb-8 bg-ash-dark-600 flex flex-col justify-between">
                         <div className="mb-2 text-2xs sm:text-xs">

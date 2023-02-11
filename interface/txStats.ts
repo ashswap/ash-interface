@@ -1,16 +1,16 @@
 export type TxStatsRecord = {
     action: "exchange" | "addLiquidity" | "removeLiquidity";
-    admin_fee_1: null;
+    admin_fee_1: string;
     admin_fee_1_usd: number;
     admin_fee_2: string;
     admin_fee_2_usd: number;
-    admin_fee_3: null;
+    admin_fee_3: string;
     admin_fee_3_usd: number;
     amount_1: string;
     amount_1_usd: number;
     amount_2: string;
     amount_2_usd: number;
-    amount_3: null;
+    amount_3: string;
     amount_3_usd: number;
     caller: string;
     lp_token_amount: null;
@@ -18,16 +18,16 @@ export type TxStatsRecord = {
     receiver: string;
     reserve_1: string;
     reserve_2: string;
-    reserve_3: null;
+    reserve_3: string;
     timestamp: number;
     token_id_1: string;
     token_id_2: string;
-    token_id_3: null;
-    total_fee_1: null;
+    token_id_3: string;
+    total_fee_1: string;
     total_fee_1_usd: number;
     total_fee_2: string;
     total_fee_2_usd: number;
-    total_fee_3: null;
+    total_fee_3: string;
     total_fee_3_usd: number;
     transaction_hash: string;
     // add from client
