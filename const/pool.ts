@@ -12,9 +12,9 @@ const devnet: PoolConfig = {
     alpha: [
         {
             address:
-                "erd1qqqqqqqqqqqqqpgqxhmvqrtnk928dsf33yqzgpcv9dvm05f9rmcqn5wgcj",
+                "erd1qqqqqqqqqqqqqpgq6qsg6mlsmt8m23d528sfqhl3ftuj5ffmrmcqpp7m9v",
             lpToken: {
-                identifier: "ALP-c0c25f",
+                identifier: "ALP-4a39e0",
                 chainId: ChainId.Devnet,
                 symbol: "LPT-3pool",
                 name: "Ashswap LP",
@@ -25,9 +25,9 @@ const devnet: PoolConfig = {
         },
         {
             address:
-                "erd1qqqqqqqqqqqqqpgqlz37jmhm43s4qw9q4x0syvs0j0ujun26rmcq249aqg",
+                "erd1qqqqqqqqqqqqqpgqsqpjjtn9nqzaswunwwjtgsjm7g88v4n4rmcq8p46qk",
             lpToken: {
-                identifier: "ALP-836706",
+                identifier: "ALP-506311",
                 chainId: ChainId.Devnet,
                 symbol: "LPT-wEGLD-aEGLD",
                 name: "Ashswap LP",
@@ -38,15 +38,28 @@ const devnet: PoolConfig = {
         },
         {
             address:
-                "erd1qqqqqqqqqqqqqpgqdvevg6lndevn0ad0747laznzlu8sy8gdrmcq7l7x6n",
+                "erd1qqqqqqqqqqqqqpgq9aq6hlk73pg7hlxlmsjfjd5y42v5r44frmcqud4tqs",
             lpToken: {
-                identifier: "ALP-8dcaa8",
+                identifier: "ALP-f59e0a",
                 chainId: ChainId.Devnet,
                 symbol: "LPT-wEGLD-aEGLD",
                 name: "Ashswap LP",
                 decimals: 18,
             },
             tokens: [TOKENS_MAP["WEGLD-578a26"], TOKENS_MAP["BUSD-b53884"]],
+            type: EPoolType.PoolV2,
+        },
+        {
+            address:
+                "erd1qqqqqqqqqqqqqpgq8tkmv8gqlkz8llprvqzp96mputsqwl78rmcqjyeqy9",
+            lpToken: {
+                identifier: "ALP-5351b7",
+                chainId: ChainId.Devnet,
+                symbol: "LPT-ASH-USDT",
+                name: "Ashswap LP",
+                decimals: 18,
+            },
+            tokens: [TOKENS_MAP["ASH-84eab0"], TOKENS_MAP["USDT-3e3720"]],
             type: EPoolType.PoolV2,
         },
     ],
