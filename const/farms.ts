@@ -9,34 +9,34 @@ const devnet: FarmConfig = {
     alpha: [
         {
             farm_address:
-                "erd1qqqqqqqqqqqqqpgq9xeuvvegr3zp5sc2w9l7akchjtjlyzpdrmcq2nyzd6",
+                "erd1qqqqqqqqqqqqqpgq0xlvg8aq2ufupue0msudrulcf5a77vw4rmcqq6v8c2",
             reward_token_id: "ASH-84eab0",
             reward_token_decimal: 18,
-            farming_token_id: "ALP-995f14",
+            farming_token_id: "ALP-466f16",
             farming_token_decimal: 18,
-            farm_token_id: "FARM-fc9b69",
+            farm_token_id: "FARM-d0fc82",
             farm_token_decimal: 18,
             active: true,
         },
         {
             farm_address:
-                "erd1qqqqqqqqqqqqqpgql8rf57cf0hmjh0n2fn0c4ykwcqhsqxxtrmcqdek6a6",
+                "erd1qqqqqqqqqqqqqpgqt3h2uklsgw0mfgg692q4v9hsk7ke4s32rmcqguglhg",
             reward_token_id: "ASH-84eab0",
             reward_token_decimal: 18,
-            farming_token_id: "ALP-93ad26",
+            farming_token_id: "ALP-f4f347",
             farming_token_decimal: 18,
-            farm_token_id: "FARM-955343",
+            farm_token_id: "FARM-16faed",
             farm_token_decimal: 18,
             active: true,
         },
         {
             farm_address:
-                "erd1qqqqqqqqqqqqqpgqh6yc4whuz4jw2ytxel653xtf6w4veklprmcqnv0v7t",
+                "erd1qqqqqqqqqqqqqpgqcfxgycr8jme8qmha2u43p7qp7g8lydscrmcqdwvtxv",
             reward_token_id: "ASH-84eab0",
             reward_token_decimal: 18,
-            farming_token_id: "ALP-96336c",
+            farming_token_id: "ALP-d01cf8",
             farming_token_decimal: 18,
-            farm_token_id: "FARM-c52679",
+            farm_token_id: "FARM-fb9cb3",
             farm_token_decimal: 18,
             active: true,
         },
