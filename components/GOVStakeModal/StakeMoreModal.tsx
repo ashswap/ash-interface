@@ -50,31 +50,46 @@ const EXTEND_BOY = {
     maxLock: 2 * 7 * 24 * 60 * 60,
     minLock: 12 * 60 * 60,
 };
-const EXTEND_CONFIG_MAIN = {
-    options: [
-        // test purpose
-        // { value: 7 * 24 * 60 * 60, label: "+ 1 week" },
-        // { value: 4 * 7 * 24 * 60 * 60, label: "+ 4 weeks" },
-        { value: 1 * 365 * 24 * 60 * 60, label: "+ 1 year" },
-        { value: 2 * 365 * 24 * 60 * 60, label: "+ 2 years" },
-        { value: 3 * 365 * 24 * 60 * 60, label: "+ 3 years" },
-    ],
-    maxLock: 4 * 365 * 24 * 60 * 60,
-    minLock: 7 * 24 * 60 * 60,
-};
-const EXTEND_CONFIG_ALPHA = {
-    options: [
-        // test purpose
-        // { value: 7 * 24 * 60 * 60, label: "+ 1 week" },
-        // { value: 4 * 7 * 24 * 60 * 60, label: "+ 4 weeks" },
-        { value: 1 * 10 * 60, label: "+ 10 minutes" },
-        { value: 2 * 10 * 60, label: "+ 20 minutes" },
-        { value: 3 * 10 * 60, label: "+ 30 minutes" },
-    ],
-    maxLock: 4 * 365 * 24 * 60 * 60,
-    minLock: 7 * 24 * 60 * 60,
-};
-const EXTEND_CONFIG = ENVIRONMENT.ENV === "alpha" ? EXTEND_CONFIG_ALPHA : EXTEND_CONFIG_MAIN;
+const EXTEND_CONFIGS = {
+    alpha: {
+        options: [
+            // test purpose
+            // { value: 7 * 24 * 60 * 60, label: "+ 1 week" },
+            // { value: 4 * 7 * 24 * 60 * 60, label: "+ 4 weeks" },
+            { value: 1 * 10 * 60, label: "+ 10 minutes" },
+            { value: 2 * 10 * 60, label: "+ 20 minutes" },
+            { value: 3 * 10 * 60, label: "+ 30 minutes" },
+        ],
+        maxLock: 4 * 365 * 24 * 60 * 60,
+        minLock: 7 * 24 * 60 * 60,
+    },
+    beta: {
+        options: [
+            // test purpose
+            // { value: 7 * 24 * 60 * 60, label: "+ 1 week" },
+            // { value: 4 * 7 * 24 * 60 * 60, label: "+ 4 weeks" },
+            { value: 1 * 30 * 60, label: "+ 30 minutes" },
+            { value: 1 * 60 * 60, label: "+ 60 minutes" },
+            { value: 1 * 7 * 24 * 60 * 60, label: "+ 1 week" },
+            { value: 2 * 7 * 24 * 60 * 60, label: "+ 2 weeks" },
+        ],
+        maxLock: 4 * 365 * 24 * 60 * 60,
+        minLock: 7 * 24 * 60 * 60,
+    },
+    mainnet: {
+        options: [
+            // test purpose
+            // { value: 7 * 24 * 60 * 60, label: "+ 1 week" },
+            // { value: 4 * 7 * 24 * 60 * 60, label: "+ 4 weeks" },
+            { value: 1 * 365 * 24 * 60 * 60, label: "+ 1 year" },
+            { value: 2 * 365 * 24 * 60 * 60, label: "+ 2 years" },
+            { value: 3 * 365 * 24 * 60 * 60, label: "+ 3 years" },
+        ],
+        maxLock: 4 * 365 * 24 * 60 * 60,
+        minLock: 7 * 24 * 60 * 60,
+    }
+}
+const EXTEND_CONFIG = ENVIRONMENT.NETWORK === "devnet" ? EXTEND_CONFIGS[ENVIRONMENT.ENV] : EXTEND_CONFIGS.mainnet;
 const StakeMoreContent = ({ open, onClose }: props) => {
     const lockedAmt = useRecoilValue(govLockedAmtState);
     const unlockTS = useRecoilValue(govUnlockTSState);
