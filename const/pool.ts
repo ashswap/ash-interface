@@ -85,7 +85,7 @@ const devnet: PoolConfig = {
             address:
                 "erd1qqqqqqqqqqqqqpgqy7tg9y8c4p5kaf205f87m0zhleexjnzp2gesrdg5yr",
             lpToken: {
-                identifier: "ALP-d01cf8",
+                identifier: "ALP-48f785",
                 chainId: ChainId.Devnet,
                 symbol: "LPT-ASH-USDT",
                 name: "Ashswap LP",

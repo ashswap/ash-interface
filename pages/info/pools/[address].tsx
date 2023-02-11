@@ -5,6 +5,7 @@ import ICNewTabRound from "assets/svg/new-tab-round.svg";
 import ICPlus from "assets/svg/plus.svg";
 import ICSwap from "assets/svg/swap.svg";
 import { networkConfigState } from "atoms/dappState";
+import BigNumber from "bignumber.js";
 import Avatar from "components/Avatar";
 import CopyBtn from "components/CopyBtn";
 import InfoLayout from "components/Layout/Info";
@@ -57,17 +58,11 @@ function PoolDetailPage({ pool }: Props) {
     );
     const network: AccountInfoSliceNetworkType =
         useRecoilValue(networkConfigState).network;
-    const adminFee = useMemo(() => {
-        if (!stats) return 0;
-        return getTotalFees(stats, (i) => `token_${i}_admin_fee_usd`);
-    }, [stats]);
-    const totalFee = useMemo(() => {
-        if (!stats) return 0;
-        return getTotalFees(stats, (i) => `token_${i}_total_fee_usd`);
-    }, [stats]);
     const fees = useMemo(() => {
-        return totalFee - adminFee;
-    }, [totalFee, adminFee]);
+        return new BigNumber(stats?.tvl || 0)
+            .multipliedBy(stats?.apr || 0)
+            .div(100);
+    }, [stats]);
     return (
         <div className="text-white py-7 max-w-6xl mx-auto px-6 sm:px-0">
             <ul className="flex space-x-1 text-xs mb-6">

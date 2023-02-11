@@ -20,6 +20,7 @@ import { useRecoilValue } from "recoil";
 import { theme } from "tailwind.config";
 import Link from "next/link";
 import { accIsLoggedInState } from "atoms/dappState";
+import { ENVIRONMENT } from "const/env";
 type FarmRecordProps = {
     farmAddress: string;
     selected?: boolean;
@@ -108,9 +109,17 @@ const FarmRecord = memo(function FarmRecord({
                             </a>
                         </>
                     ) : (
-                        <div className="font-bold text-lg text-ash-gray-600">
-                            No
-                        </div>
+                        <>
+                            {ENVIRONMENT.ENV === "alpha" ? (
+                                <div className="font-bold text-lg text-ash-gray-600">
+                                    No
+                                </div>
+                            ) : (
+                                <div className="font-bold text-sm text-ash-gray-600">
+                                    Coming soon
+                                </div>
+                            )}
+                        </>
                     )}
                 </div>
             </td>
