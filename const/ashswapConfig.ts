@@ -48,6 +48,9 @@ export const VE_CONFIG = ENVIRONMENT.ENV === "alpha" ? {
     // for alpha test
     maxLock: 4 * 365 * 24 * 3600,
     minLock: 10 * 60,
+} : ENVIRONMENT.ENV === "beta" ? {
+    maxLock: 4 * 365 * 24 * 3600,
+    minLock: 30 * 60,
 } : {
     // main config
     maxLock: 4 * 365 * 24 * 3600,

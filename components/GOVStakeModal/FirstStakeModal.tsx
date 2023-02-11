@@ -15,6 +15,7 @@ import InputCurrency from "components/InputCurrency";
 import TextAmt from "components/TextAmt";
 import CardTooltip from "components/Tooltip/CardTooltip";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
+import { VE_CONFIG } from "const/ashswapConfig";
 import { ENVIRONMENT } from "const/env";
 import { ASH_TOKEN, VE_ASH_DECIMALS } from "const/tokens";
 import { VE_LOCK_LABEL } from "const/ve";
@@ -48,33 +49,45 @@ const LOCK_CONFIG_BOY = {
     minLock: 12 * 60 * 60,
     sliderStep: 12 * 60 * 60,
 };
-const LOCK_CONFIG_MAIN = {
-    predefinedLockPeriod: [
-        // { value: 7 * 24 * 60 * 60, label: "1 week" },
-        // { value: 4 * 7 * 24 * 60 * 60, label: "4 weeks" },
-        { value: 1 * 365 * 24 * 60 * 60, label: "1 year" },
-        { value: 2 * 365 * 24 * 60 * 60, label: "2 years" },
-        { value: 3 * 365 * 24 * 60 * 60, label: "3 years" },
-        { value: 4 * 365 * 24 * 60 * 60, label: "4 years" },
-    ],
-    maxLock: 4 * 365 * 24 * 60 * 60,
-    minLock: 7 * 24 * 60 * 60,
-    sliderStep: 24 * 60 * 60,
-};
-const LOCK_CONFIG_ALPHA = {
-    predefinedLockPeriod: [
-        // { value: 7 * 24 * 60 * 60, label: "1 week" },
-        // { value: 4 * 7 * 24 * 60 * 60, label: "4 weeks" },
-        { value: 1 * 365 * 24 * 60 * 60, label: "1 year" },
-        { value: 2 * 365 * 24 * 60 * 60, label: "2 years" },
-        { value: 3 * 365 * 24 * 60 * 60, label: "3 years" },
-        { value: 4 * 365 * 24 * 60 * 60, label: "4 years" },
-    ],
-    maxLock: 4 * 365 * 24 * 60 * 60,
-    minLock: 10 * 60,
-    sliderStep: 10 * 60,
-};
-const LOCK_CONFIG = ENVIRONMENT.ENV === "alpha" ? LOCK_CONFIG_ALPHA : LOCK_CONFIG_MAIN;
+const LOCK_CONFIGS = {
+    alpha: {
+        predefinedLockPeriod: [
+            // { value: 7 * 24 * 60 * 60, label: "1 week" },
+            // { value: 4 * 7 * 24 * 60 * 60, label: "4 weeks" },
+            { value: 1 * 365 * 24 * 60 * 60, label: "1 year" },
+            { value: 2 * 365 * 24 * 60 * 60, label: "2 years" },
+            { value: 3 * 365 * 24 * 60 * 60, label: "3 years" },
+            { value: 4 * 365 * 24 * 60 * 60, label: "4 years" },
+        ],
+        ...VE_CONFIG,
+        sliderStep: VE_CONFIG.minLock,
+    },
+    beta: {
+        predefinedLockPeriod: [
+            // { value: 7 * 24 * 60 * 60, label: "1 week" },
+            // { value: 4 * 7 * 24 * 60 * 60, label: "4 weeks" },
+            { value: 1 * 365 * 24 * 60 * 60, label: "1 year" },
+            { value: 2 * 365 * 24 * 60 * 60, label: "2 years" },
+            { value: 3 * 365 * 24 * 60 * 60, label: "3 years" },
+            { value: 4 * 365 * 24 * 60 * 60, label: "4 years" },
+        ],
+        ...VE_CONFIG,
+        sliderStep: VE_CONFIG.minLock,
+    },
+    mainnet: {
+        predefinedLockPeriod: [
+            // { value: 7 * 24 * 60 * 60, label: "1 week" },
+            // { value: 4 * 7 * 24 * 60 * 60, label: "4 weeks" },
+            { value: 1 * 365 * 24 * 60 * 60, label: "1 year" },
+            { value: 2 * 365 * 24 * 60 * 60, label: "2 years" },
+            { value: 3 * 365 * 24 * 60 * 60, label: "3 years" },
+            { value: 4 * 365 * 24 * 60 * 60, label: "4 years" },
+        ],
+        ...VE_CONFIG,
+        sliderStep: VE_CONFIG.minLock,
+    }
+}
+const LOCK_CONFIG = ENVIRONMENT.NETWORK === "devnet" ? LOCK_CONFIGS[ENVIRONMENT.ENV] : LOCK_CONFIGS.mainnet;
 const FirstStakeContent = ({ open, onClose }: props) => {
     const tokenMap = useRecoilValue(tokenMapState);
     const insufficientEGLD = useRecoilValue(accIsInsufficientEGLDState);
