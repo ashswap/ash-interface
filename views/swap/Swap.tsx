@@ -283,7 +283,7 @@ const Swap = () => {
         [pool, tokenFrom, tokenTo, tokenAmountTo, tokenAmountFrom, fees]
     );
 
-    const [calcPriceImpactDebounce] = useDebounce(calcPriceImpact, 500);
+    const [calcPriceImpactDebounce] = useDebounce(calcPriceImpact, 750);
 
     const minimumReceive = useMemo(() => {
         if (!tokenAmountTo) {

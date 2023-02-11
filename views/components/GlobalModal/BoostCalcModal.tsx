@@ -194,32 +194,22 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
         setIsUserInput(false);
     }, [farmAddress]);
 
-    const [token1, token2] = pool?.tokens || [];
-
     return (
         <div className="px-2 sm:px-12 py-4">
             <div className="flex justify-between mb-14">
                 <div className="shrink-0">
                     <div className="flex items-center mb-4">
-                        {token1 && token2 ? (
-                            <>
-                                <Avatar
-                                    src={token1?.logoURI}
-                                    alt={token1.name}
-                                    className="w-9 h-9"
-                                />
-                                <Avatar
-                                    src={token2?.logoURI}
-                                    alt={token2.name}
-                                    className="w-9 h-9 -ml-1"
-                                />
-                            </>
-                        ) : (
-                            <>
-                                <div className="w-9 h-9 rounded-full bg-ash-dark-400"></div>
-                                <div className="w-9 h-9 rounded-full bg-ash-dark-400 -ml-1"></div>
-                            </>
-                        )}
+                        {pool &&
+                            pool.tokens.map((t) => {
+                                return (
+                                    <Avatar
+                                        key={t.identifier}
+                                        src={t.logoURI}
+                                        alt={t.name}
+                                        className="w-9 h-9 -ml-1 first:ml-0"
+                                    />
+                                );
+                            })}
                     </div>
                     <BasePopover
                         className="absolute text-white left-0 top-2 w-max overflow-auto bg-ash-dark-700 "
@@ -233,7 +223,9 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
                             <div className="text-xs sm:text-sm font-bold text-stake-gray-500 cursor-pointer flex">
                                 {pool ? (
                                     <>
-                                        {token1?.symbol}-{token2?.symbol}
+                                        {pool.tokens
+                                            .map((t) => t.symbol)
+                                            .join(" - ")}
                                     </>
                                 ) : (
                                     <>Select farm to start</>
@@ -246,9 +238,8 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
                             return (
                                 <ul className="py-6">
                                     {FARMS.map((f) => {
-                                        const [t1, t2] =
-                                            POOLS_MAP_LP[f.farming_token_id]
-                                                .tokens;
+                                        const _pool =
+                                            POOLS_MAP_LP[f.farming_token_id];
                                         return (
                                             <li
                                                 key={f.farm_address}
@@ -263,7 +254,9 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
                                                         close();
                                                     }}
                                                 >
-                                                    {t1.symbol}-{t2.symbol}
+                                                    {_pool.tokens
+                                                        .map((t) => t.symbol)
+                                                        .join(" - ")}
                                                 </button>
                                                 {f.farm_address ===
                                                     farmAddress && (
@@ -436,7 +429,11 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
                             <div className="flex items-center text-pink-600">
                                 <ICChevronDown className="w-2 h-auto mr-2" />
                                 <span className="text-lg font-bold">
-                                    {veForMaxBoost.isNaN() ? "invalid" : formatAmount(veForMaxBoost.toNumber())}
+                                    {veForMaxBoost.isNaN()
+                                        ? "invalid"
+                                        : formatAmount(
+                                              veForMaxBoost.toNumber()
+                                          )}
                                 </span>
                             </div>
                         </div>
@@ -567,8 +564,8 @@ function BoostCalcModal({
     const screenSize = useScreenSize();
     const poolStatsRefresher = useRecoilValue(poolStatsRefresherAtom);
     useEffect(() => {
-        if(modalProps.isOpen){
-            poolStatsRefresher?.()
+        if (modalProps.isOpen) {
+            poolStatsRefresher?.();
         }
     }, [modalProps.isOpen, poolStatsRefresher]);
     return (

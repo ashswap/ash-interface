@@ -21,7 +21,7 @@ const PoolRecord = ({
     poolData: PoolWithStatsRecords;
 }) => {
     const screenSize = useScreenSize();
-    const [token1, token2] = poolData?.pool?.tokens || [];
+    const tokens = useMemo(() => poolData?.pool?.tokens || [], [poolData]);
     const format = useCallback(
         (val: number) => {
             if (typeof val !== "number") return "";
@@ -53,19 +53,19 @@ const PoolRecord = ({
                     <div className="flex-1 overflow-hidden">
                         <div className="flex items-center mr-2 overflow-hidden">
                             <div className="shrink-0 flex">
-                                <Avatar
-                                    src={token1?.logoURI || ""}
-                                    alt={token1?.symbol}
-                                    className="w-4 h-4 lg:w-6 lg:h-6"
-                                />
-                                <Avatar
-                                    src={token2?.logoURI || ""}
-                                    alt={token2?.symbol}
-                                    className="w-4 h-4 lg:w-6 lg:h-6 -ml-1"
-                                />
+                                {tokens.map((t) => {
+                                    return (
+                                        <Avatar
+                                            key={t.identifier}
+                                            src={t.logoURI}
+                                            alt={t.symbol}
+                                            className="w-4 h-4 lg:w-6 lg:h-6 -ml-1 first:ml-0"
+                                        />
+                                    );
+                                })}
                             </div>
                             <div className="ml-2 lg:ml-4 font-bold text-xs lg:text-sm text-white truncate">
-                                {token1?.symbol} & {token2?.symbol}
+                                {tokens.map((t) => t.symbol).join(" & ")}
                             </div>
                         </div>
                     </div>

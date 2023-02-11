@@ -288,7 +288,6 @@ type FarmBoostInfoType = {
 };
 const FarmBoostInfo = ({ farmData, onClose }: FarmBoostInfoType) => {
     const { pool, farm } = farmData;
-    const [token1, token2] = pool?.tokens;
     const [boostId, setBoostId] = useState<string | null>(null);
     const [isSelfBoostTToken, setIsSelfBoostTToken] = useState(false);
     const { isPending } = useTrackTransactionStatus({
@@ -336,18 +335,20 @@ const FarmBoostInfo = ({ farmData, onClose }: FarmBoostInfoType) => {
                                         Boost Panel
                                     </div>
                                     <div className="flex items-center text-sm font-bold text-stake-gray-500">
-                                        <Avatar
-                                            src={token1.logoURI}
-                                            alt={token1.name}
-                                            className="w-5 h-5"
-                                        />
-                                        <Avatar
-                                            src={token2.logoURI}
-                                            alt={token2.name}
-                                            className="w-5 h-5 -ml-0.5 mr-2"
-                                        />
-                                        <div className="mr-2">
-                                            {token1.symbol}-{token2.symbol}
+                                        {pool.tokens.map((t) => {
+                                            return (
+                                                <Avatar
+                                                    key={t.identifier}
+                                                    src={t.logoURI}
+                                                    alt={t.name}
+                                                    className="w-5 h-5 -ml-0.5 first:ml-0"
+                                                />
+                                            );
+                                        })}
+                                        <div className="mx-2">
+                                            {pool.tokens
+                                                .map((t) => t.symbol)
+                                                .join("-")}
                                         </div>
                                         {/* <ICChevronDown /> */}
                                     </div>
@@ -363,10 +364,7 @@ const FarmBoostInfo = ({ farmData, onClose }: FarmBoostInfoType) => {
                                                 0
                                             )}
                                             lpAmt={lpAmt}
-                                            booster={
-                                                ownerTokens[0].attributes
-                                                    .booster.bech32()
-                                            }
+                                            booster={ownerTokens[0].attributes.booster.bech32()}
                                             isBoosting={isBoosting}
                                             withHexIcon={
                                                 transferedTokens.length > 0
