@@ -94,7 +94,15 @@ const DEVNET_TOKENS_BETA: IESDTInfo[] = [
         name: "BUSD",
         decimals: 18,
         logoURI: IconBUSD.src,
-    }
+    },
+    {
+        identifier: "WEGLD-d7c6bb",
+        chainId: ChainId.Devnet,
+        symbol: "wEGLD",
+        name: "Wrapped EGLD",
+        decimals: 18,
+        logoURI: IconWEGLD.src,
+    },
 ];
 
 const MAINNET_TOKENS: IESDTInfo[] = [
