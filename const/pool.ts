@@ -12,9 +12,9 @@ const devnet: PoolConfig = {
     alpha: [
         {
             address:
-                "erd1qqqqqqqqqqqqqpgq6qsg6mlsmt8m23d528sfqhl3ftuj5ffmrmcqpp7m9v",
+                "erd1qqqqqqqqqqqqqpgq7lmsm3k3h6l9jl8zdvsruz9mmw4cefxhrmcqlpcxmm",
             lpToken: {
-                identifier: "ALP-4a39e0",
+                identifier: "ALP-96336c",
                 chainId: ChainId.Devnet,
                 symbol: "LPT-3pool",
                 name: "Ashswap LP",
@@ -25,41 +25,28 @@ const devnet: PoolConfig = {
         },
         {
             address:
-                "erd1qqqqqqqqqqqqqpgqsqpjjtn9nqzaswunwwjtgsjm7g88v4n4rmcq8p46qk",
+                "erd1qqqqqqqqqqqqqpgq97t9duagdhtjvgskxjhc6yg4w75w9679rmcqkn9cf7",
             lpToken: {
-                identifier: "ALP-506311",
+                identifier: "ALP-93ad26",
                 chainId: ChainId.Devnet,
                 symbol: "LPT-wEGLD-aEGLD",
                 name: "Ashswap LP",
                 decimals: 18,
             },
-            tokens: [TOKENS_MAP["WEGLD-578a26"], TOKENS_MAP["AEGLD-126d13"]],
-            type: EPoolType.PlainPool,
-        },
-        {
-            address:
-                "erd1qqqqqqqqqqqqqpgq9aq6hlk73pg7hlxlmsjfjd5y42v5r44frmcqud4tqs",
-            lpToken: {
-                identifier: "ALP-f59e0a",
-                chainId: ChainId.Devnet,
-                symbol: "LPT-wEGLD-aEGLD",
-                name: "Ashswap LP",
-                decimals: 18,
-            },
-            tokens: [TOKENS_MAP["WEGLD-578a26"], TOKENS_MAP["BUSD-b53884"]],
+            tokens: [TOKENS_MAP["BUSD-b53884"], TOKENS_MAP["WEGLD-578a26"]],
             type: EPoolType.PoolV2,
         },
         {
             address:
-                "erd1qqqqqqqqqqqqqpgq8tkmv8gqlkz8llprvqzp96mputsqwl78rmcqjyeqy9",
+                "erd1qqqqqqqqqqqqqpgqfgvhyeqfckgl264p9tr87s7qp39wpd2grmcqhc9gdw",
             lpToken: {
-                identifier: "ALP-5351b7",
+                identifier: "ALP-995f14",
                 chainId: ChainId.Devnet,
                 symbol: "LPT-ASH-USDT",
                 name: "Ashswap LP",
                 decimals: 18,
             },
-            tokens: [TOKENS_MAP["ASH-84eab0"], TOKENS_MAP["USDT-3e3720"]],
+            tokens: [TOKENS_MAP["USDT-3e3720"], TOKENS_MAP["ASH-84eab0"]],
             type: EPoolType.PoolV2,
         },
     ],
