@@ -25,10 +25,10 @@ const useAshBaseStateQuery = (config?: SWRConfiguration) => {
                             ...allTokenProps
                         }
                         farmTokenSupply
-                        perBlockReward
+                        rewardPerSec
                         rewardPerShare
                         state
-                        lastRewardBlockNone
+                        lastRewardBlockTs
                         divisionSafetyConstant
                         farmingTokenBalance
                         produceRewardEnabled
