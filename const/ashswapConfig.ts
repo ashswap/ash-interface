@@ -44,14 +44,7 @@ const dappContract =
         ? dappContractDevnet[ENVIRONMENT.ENV]
         : dappContractMainnet;
 
-export const VE_CONFIG = ENVIRONMENT.ENV === "alpha" ? {
-    // for alpha test
-    maxLock: 4 * 365 * 24 * 3600,
-    minLock: 10 * 60,
-} : ENVIRONMENT.ENV === "beta" ? {
-    maxLock: 4 * 365 * 24 * 3600,
-    minLock: 30 * 60,
-} : {
+export const VE_CONFIG = ENVIRONMENT.NETWORK === "mainnet" ? {
     // main config
     maxLock: 4 * 365 * 24 * 3600,
     minLock: 7 * 24 * 3600,
@@ -59,6 +52,14 @@ export const VE_CONFIG = ENVIRONMENT.ENV === "alpha" ? {
     // maxLock: 2 * 7 * 24 * 3600,
     // minLock: 12 * 60 * 60,
 
+} : ENVIRONMENT.ENV === "alpha" ? {
+    // for alpha test
+    maxLock: 4 * 365 * 24 * 3600,
+    minLock: 10 * 60,
+} : {
+    // beta
+    maxLock: 4 * 365 * 24 * 3600,
+    minLock: 30 * 60,
 };
 
 export const ASHSWAP_CONFIG = {
