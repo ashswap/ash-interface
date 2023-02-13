@@ -37,7 +37,6 @@ const NTokensHeader = ({ pool }: { pool: IPool }) => {
             <div className="shrink-0 flex flex-row justify-between items-center">
                 {pool.tokens.map((_t) => {
                     const t = getTokenFromId(_t.identifier);
-                    console.log(t)
                     return (
                         <Avatar
                             key={t.identifier}
