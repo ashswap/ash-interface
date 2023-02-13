@@ -51,6 +51,7 @@ import SwapAmount from "./components/SwapAmount";
 import styles from "./Swap.module.css";
 import { useDebounce } from "use-debounce";
 import { ContractManager } from "helper/contracts/contractManager";
+import { getTokenIdFromCoin } from "helper/token";
 
 const MaiarPoolTooltip = ({
     children,
@@ -216,10 +217,10 @@ const Swap = () => {
                         ashRawPoolV2ByAddressQuery(pool.address)
                     );
                     const tokenFromIndex = pool.tokens.findIndex(
-                        (t) => t.identifier === tokenFrom.identifier
+                        (t) => t.identifier === getTokenIdFromCoin(tokenFrom.identifier)
                     );
                     const tokenToIndex = pool.tokens.findIndex(
-                        (t) => t.identifier === tokenTo.identifier
+                        (t) => t.identifier === getTokenIdFromCoin(tokenTo.identifier)
                     );
                     const inputAmountNum = BigNumber.max(
                         1_000_000,
@@ -342,11 +343,12 @@ const Swap = () => {
             ) => {
                 if (pool.type === EPoolType.PoolV2) {
                     const tokenInIndex = pool.tokens.findIndex(
-                        (t) => t.identifier === tokenAmountFrom.token.identifier
+                        (t) => t.identifier === getTokenIdFromCoin(tokenAmountFrom.token.identifier)
                     );
                     const tokenOutIndex = pool.tokens.findIndex(
-                        (t) => t.identifier === tokenTo.identifier
+                        (t) => t.identifier === getTokenIdFromCoin(tokenTo.identifier)
                     );
+                    console.log(tokenInIndex, tokenOutIndex);
                     console.log("es", tokenAmountFrom.raw.toString());
                     const { outputAmount, fee } =
                         await ContractManager.getPoolV2Contract(
@@ -428,7 +430,7 @@ const Swap = () => {
                 tokenFrom,
                 tokenTo,
                 tokenAmountFrom.raw,
-                minWeiOut
+                minWeiOut,
             );
         } catch (error) {
             console.error(error);

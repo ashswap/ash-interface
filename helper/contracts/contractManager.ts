@@ -5,6 +5,7 @@ import FeeDistributorContract from "./feeDistributorContract";
 import PoolContract from "./pool";
 import PoolV2Contract from "./poolV2Contract";
 import VotingEscrowContract from "./votingEscrowContract";
+import WrappedEGLDContract from "./wrappedEGLD";
 
 const poolContracts: Record<string, PoolContract> = {};
 const poolV2Contracts: Record<string, PoolV2Contract> = {};
@@ -13,6 +14,7 @@ const veContracts: Record<string, VotingEscrowContract> = {};
 const feeDistributorContracts: Record<string, FeeDistributorContract> = {};
 const farmControllerContracts: Record<string, FarmControllerContract> = {};
 const farmBribeContracts: Record<string, FarmBribeContract> = {};
+const wrappedEGLDContracts: Record<string, WrappedEGLDContract> = {};
 const getPoolContract = (address: string) => {
     return (
         poolContracts[address] ??
@@ -58,6 +60,12 @@ const getFarmBribeContract = (address: string) => {
         (farmBribeContracts[address] = new FarmBribeContract(address))
     );
 };
+const getWrappedEGLDContract = (address: string) => {
+    return (
+        wrappedEGLDContracts[address] ??
+        (wrappedEGLDContracts[address] = new WrappedEGLDContract(address))
+    );
+};
 
 export const ContractManager = {
     getPoolContract,
@@ -67,4 +75,5 @@ export const ContractManager = {
     getFarmControllerContract,
     getFarmBribeContract,
     getPoolV2Contract,
+    getWrappedEGLDContract,
 };

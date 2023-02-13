@@ -1,6 +1,7 @@
 import pools from "const/pool";
 import { emptyFunc } from "helper/common";
 import { Percent } from "helper/fraction/percent";
+import { getTokenIdFromCoin } from "helper/token";
 import { IESDTInfo } from "helper/token/token";
 import IPool from "interface/pool";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
@@ -42,7 +43,9 @@ interface Props {
 }
 
 export function SwapProvider({ children }: Props) {
-    const [tokenFrom, setTokenFrom] = useState<IESDTInfo | undefined>(undefined);
+    const [tokenFrom, setTokenFrom] = useState<IESDTInfo | undefined>(
+        undefined
+    );
     const [valueFrom, setValueFrom] = useState<string>("");
     const [slippage, setSlippage] = useState<Percent>(initState.slippage);
     const [tokenTo, setTokenTo] = useState<IESDTInfo | undefined>(undefined);
@@ -58,10 +61,13 @@ export function SwapProvider({ children }: Props) {
         const pool = pools.find((p) => {
             return (
                 p.tokens.findIndex(
-                    (t) => t.identifier === tokenFrom?.identifier
+                    (t) =>
+                        t.identifier ===
+                        getTokenIdFromCoin(tokenFrom?.identifier)
                 ) !== -1 &&
                 p.tokens.findIndex(
-                    (t) => t.identifier === tokenTo?.identifier
+                    (t) =>
+                        t.identifier === getTokenIdFromCoin(tokenTo?.identifier)
                 ) !== -1
             );
         });

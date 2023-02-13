@@ -3,6 +3,7 @@ import IPool, { EPoolType } from "interface/pool";
 import { ENVIRONMENT } from "./env";
 import { MAIAR_POOLS } from "./maiarPools";
 import { TOKENS_MAP } from "./tokens";
+import { WRAPPED_EGLD } from "./wrappedEGLD";
 
 type PoolConfig = {
     beta: IPool[];
@@ -194,12 +195,14 @@ export const POOLS_MAP_LP = Object.fromEntries(
 );
 const getTokenFromPools = (...pools: IPool[]) => {
     const map = new Map<string, IESDTInfo>();
+    let useWEGLD = false;
     pools.map((pool) => {
         pool.tokens.map((token) => {
+            useWEGLD = useWEGLD || WRAPPED_EGLD.wegld === token.identifier;
             map.set(token.identifier, token);
         });
     });
-    return Array.from(map.values());
+    return [...(useWEGLD ? [TOKENS_MAP["EGLD"]] : []), ...Array.from(map.values())];
 };
 
 export const IN_POOL_TOKENS = getTokenFromPools(...pools);

@@ -1,5 +1,5 @@
 import { ashswapBaseState } from "atoms/ashswap";
-import { accAddressState } from "atoms/dappState";
+import { accAddressState, accBalanceState } from "atoms/dappState";
 import {
     lpTokenMapState,
     tokenMapState,
@@ -19,12 +19,13 @@ import useSWR, { SWRConfiguration } from "swr";
 const useGetTokens = (config?: SWRConfiguration) => {
     const accAddress = useRecoilValue(accAddressState);
     const { tokens, pools: rawPoolsV1, poolsV2: rawPoolsV2 } = useRecoilValue(ashswapBaseState);
+    const egldBalance = useRecoilValue(accBalanceState);
     const setTokenMap = useSetRecoilState(tokenMapState);
     const setLPTokenMap = useSetRecoilState(lpTokenMapState);
     const setTokenRefresher = useSetRecoilState(tokensRefresherAtom);
     const tokenIds = useMemo(
         () => [
-            ...TOKENS.map((t) => t.identifier),
+            ...TOKENS.map((t) => t.identifier).filter(t => t !== "EGLD"),
             ...pools.map((p) => p.lpToken.identifier),
         ],
         []
@@ -48,7 +49,7 @@ const useGetTokens = (config?: SWRConfiguration) => {
                 );
                 Object.keys(draft).map((id) => {
                     draft[id].price = tokenMap[id]?.price || 0;
-                    draft[id].balance = dataMap[id]?.balance || "0";
+                    draft[id].balance = id === "EGLD" ? egldBalance.toString() : dataMap[id]?.balance || "0";
                     draft[id].valueUsd = toEGLDD(
                         draft[id].decimals,
                         draft[id].balance

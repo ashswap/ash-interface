@@ -48,7 +48,6 @@ const TokenBalance = ({
 function WalletBalance() {
     const tokenMap = useRecoilValue(tokenMapState);
     const lpTokenMap = useRecoilValue(lpTokenMapState);
-    const egldBalance = useRecoilValue(accBalanceState);
     const ashSupportedBalances = useMemo(() => {
         const supportedTokens: TokenWithBalance[] = TOKENS.map((t) => {
             return {
@@ -71,29 +70,12 @@ function WalletBalance() {
 
         return [...supportedTokens, ...lpTokens];
     }, [tokenMap, lpTokenMap]);
-    const egld: Omit<TokenWithBalance, "identifier"> = useMemo(() => {
-        return {
-            chainId:
-                ENVIRONMENT.NETWORK === "devnet"
-                    ? CHAIN_ID.DEVNET
-                    : CHAIN_ID.MAINNET,
-            symbol:
-                ENVIRONMENT.NETWORK === "devnet"
-                    ? "dEGLD"
-                    : "EGLD",
-            name: "Elrond eGold",
-            balance: new BigNumber(egldBalance),
-            icon: ImgEgldIcon,
-            decimals: 18,
-        };
-    }, [egldBalance]);
     return (
         <div className="bg-stake-dark-500 py-4">
             <div className="px-6 text-stake-gray-500 text-xs font-bold mb-4">
                 Wallet
             </div>
             <div className="overflow-auto flex flex-col h-40">
-                <TokenBalance data={egld} />
                 {ashSupportedBalances.map((t) => {
                     return <TokenBalance key={t.identifier} data={t} />;
                 })}

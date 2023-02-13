@@ -1,4 +1,6 @@
 import ImgAshIcon from "assets/images/ash-icon.png";
+import ImgWEGLDIcon from "assets/images/wEGLD-icon.png";
+import ImgEgldIcon from "assets/images/egld-icon.png";
 import IconBTC from "assets/images/btc-icon.png";
 import IconUSDC from "assets/images/usdc-icon.png";
 import IconUSDT from "assets/images/usdt-icon.png";
@@ -13,6 +15,22 @@ import { ENVIRONMENT } from "./env";
 export const VE_ASH_DECIMALS = 18;
 
 const DEVNET_TOKENS_ALPHA: IESDTInfo[] = [
+    {
+        identifier: "EGLD",
+        chainId: ChainId.Devnet,
+        symbol: "xEGLD",
+        name: "MultiversX",
+        decimals: 18,
+        logoURI: ImgEgldIcon.src,
+    },
+    {
+        identifier: "WEGLD-d7c6bb",
+        chainId: ChainId.Devnet,
+        symbol: "wEGLD",
+        name: "Wrapped EGLD",
+        decimals: 18,
+        logoURI: ImgWEGLDIcon.src,
+    },
     {
         identifier: "ASH-84eab0",
         chainId: ChainId.Devnet,
@@ -64,6 +82,22 @@ const DEVNET_TOKENS_ALPHA: IESDTInfo[] = [
 ];
 const DEVNET_TOKENS_BETA: IESDTInfo[] = [
     {
+        identifier: "EGLD",
+        chainId: ChainId.Devnet,
+        symbol: "xEGLD",
+        name: "MultiversX",
+        decimals: 18,
+        logoURI: ImgEgldIcon.src,
+    },
+    {
+        identifier: "WEGLD-d7c6bb",
+        chainId: ChainId.Devnet,
+        symbol: "wEGLD",
+        name: "Wrapped EGLD",
+        decimals: 18,
+        logoURI: ImgWEGLDIcon.src,
+    },
+    {
         identifier: "ASH-4ce444",
         chainId: ChainId.Devnet,
         symbol: "ASH",
@@ -95,17 +129,25 @@ const DEVNET_TOKENS_BETA: IESDTInfo[] = [
         decimals: 18,
         logoURI: IconBUSD.src,
     },
-    {
-        identifier: "WEGLD-d7c6bb",
-        chainId: ChainId.Devnet,
-        symbol: "wEGLD",
-        name: "Wrapped EGLD",
-        decimals: 18,
-        logoURI: IconWEGLD.src,
-    },
 ];
 
 const MAINNET_TOKENS: IESDTInfo[] = [
+    {
+        identifier: "EGLD",
+        chainId: ChainId.Mainnet,
+        symbol: "EGLD",
+        name: "MultiversX",
+        decimals: 18,
+        logoURI: ImgEgldIcon.src,
+    },
+    {
+        identifier: "WEGLD-bd4d79",
+        chainId: ChainId.Mainnet,
+        symbol: "wEGLD",
+        name: "Wrapped EGLD",
+        decimals: 18,
+        logoURI: ImgWEGLDIcon.src,
+    },
     {
         identifier: "ASH-a85626",
         chainId: ChainId.Mainnet,

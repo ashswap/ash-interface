@@ -8,6 +8,7 @@ import BaseModal from "components/BaseModal";
 import Input from "components/Input";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
 import { IN_POOL_TOKENS_MAP } from "const/pool";
+import { getTokenIdFromCoin } from "helper/token";
 import { IESDTInfo } from "helper/token/token";
 import { useOnboarding } from "hooks/useOnboarding";
 import { useScreenSize } from "hooks/useScreenSize";
@@ -90,7 +91,11 @@ const TokenSelect = ({
         if (validPools && pivotToken) {
             return validPools.filter((p) =>
                 p.tokens
-                    .filter((t) => t.identifier !== pivotToken?.identifier)[0]
+                    .filter(
+                        (t) =>
+                            t.identifier !==
+                            getTokenIdFromCoin(pivotToken?.identifier)
+                    )[0]
                     .symbol.toLowerCase()
                     .includes(debounceKeyword.toLowerCase())
             );
