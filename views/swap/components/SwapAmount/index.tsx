@@ -126,8 +126,11 @@ const SwapAmount = (props: Props) => {
         });
 
         const useEgld = tokens.some(t => t.identifier === WRAPPED_EGLD.wegld);
-        if(useEgld) {
+        if(useEgld || poolWithToken?.identifier === WRAPPED_EGLD.wegld) {
             tokens.push(TOKENS_MAP["EGLD"]);
+        }
+        if(poolWithToken?.identifier === "EGLD"){
+            tokens.push(TOKENS_MAP[WRAPPED_EGLD.wegld]);
         }
         return tokens;
     }, [validPools, poolWithToken]);
@@ -191,7 +194,7 @@ const SwapAmount = (props: Props) => {
                 }
             >
                 <div
-                    className={`bg-bg flex px-2.5 pt-3.5 pb-4 sm:pb-5.5 ${styles.content}`}
+                    className={`bg-bg flex gap-2 px-2.5 pt-3.5 pb-4 sm:pb-5.5 ${styles.content}`}
                 >
                     <TokenSelect
                         modalTitle={

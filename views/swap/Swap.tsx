@@ -52,6 +52,8 @@ import styles from "./Swap.module.css";
 import { useDebounce } from "use-debounce";
 import { ContractManager } from "helper/contracts/contractManager";
 import { getTokenIdFromCoin } from "helper/token";
+import useWrapEGLD from "hooks/useWrappedEGLDContract/useWrapEGLD";
+import useUnwrapWEGLD from "hooks/useWrappedEGLDContract/useUnwrapWEGLD";
 
 const MaiarPoolTooltip = ({
     children,
@@ -141,7 +143,17 @@ const Swap = () => {
         pool,
         isInsufficentFund,
         slippage,
+        isUnwrap,
+        isWrap,
     } = useSwap();
+    const {
+        wrapEGLD,
+        trackingData: { isPending: isWrapPending },
+    } = useWrapEGLD(true);
+    const {
+        unwrapWEGLD,
+        trackingData: { isPending: isUnwrapPending },
+    } = useUnwrapWEGLD(true);
     const [deboundSlippage] = useDebounce(slippage, 500);
     const fees = useRecoilValue(poolV1FeesQuery(pool?.address || ""));
     const [swapFeeAmt, setSwapFeeAmt] = useState(0);
@@ -210,17 +222,20 @@ const Swap = () => {
                     !tokenAmountTo
                 )
                     return;
-
                 let price: Price;
                 if (pool.type === EPoolType.PoolV2) {
                     const rawPool = await snapshot.getPromise(
                         ashRawPoolV2ByAddressQuery(pool.address)
                     );
                     const tokenFromIndex = pool.tokens.findIndex(
-                        (t) => t.identifier === getTokenIdFromCoin(tokenFrom.identifier)
+                        (t) =>
+                            t.identifier ===
+                            getTokenIdFromCoin(tokenFrom.identifier)
                     );
                     const tokenToIndex = pool.tokens.findIndex(
-                        (t) => t.identifier === getTokenIdFromCoin(tokenTo.identifier)
+                        (t) =>
+                            t.identifier ===
+                            getTokenIdFromCoin(tokenTo.identifier)
                     );
                     const inputAmountNum = BigNumber.max(
                         1_000_000,
@@ -249,13 +264,6 @@ const Swap = () => {
                         inputAmountNum
                     );
                     price = new Price(inputAmount, amt);
-                    console.log(
-                        "input",
-                        outputAmount.toString(),
-                        tokenFromIndex,
-                        tokenToIndex,
-                        inputAmountNum.toString()
-                    );
                 } else {
                     const rawPool = await snapshot.getPromise(
                         ashRawPoolV1ByAddressQuery(pool.address)
@@ -272,7 +280,6 @@ const Swap = () => {
                         fees
                     );
                 }
-                console.log("price", price.invert().toBigNumber().toString());
                 const rate = new Price(tokenAmountTo, tokenAmountFrom);
                 const priceImpact = new Fraction(1)
                     .subtract(rate.divide(price.invert().asFraction))
@@ -343,13 +350,15 @@ const Swap = () => {
             ) => {
                 if (pool.type === EPoolType.PoolV2) {
                     const tokenInIndex = pool.tokens.findIndex(
-                        (t) => t.identifier === getTokenIdFromCoin(tokenAmountFrom.token.identifier)
+                        (t) =>
+                            t.identifier ===
+                            getTokenIdFromCoin(tokenAmountFrom.token.identifier)
                     );
                     const tokenOutIndex = pool.tokens.findIndex(
-                        (t) => t.identifier === getTokenIdFromCoin(tokenTo.identifier)
+                        (t) =>
+                            t.identifier ===
+                            getTokenIdFromCoin(tokenTo.identifier)
                     );
-                    console.log(tokenInIndex, tokenOutIndex);
-                    console.log("es", tokenAmountFrom.raw.toString());
                     const { outputAmount, fee } =
                         await ContractManager.getPoolV2Contract(
                             pool.address
@@ -430,14 +439,11 @@ const Swap = () => {
                 tokenFrom,
                 tokenTo,
                 tokenAmountFrom.raw,
-                minWeiOut,
+                minWeiOut
             );
         } catch (error) {
             console.error(error);
         }
-
-        setValueTo("");
-        setValueFrom("");
     }, [
         loggedIn,
         tokenFrom,
@@ -447,8 +453,44 @@ const Swap = () => {
         tokenAmountFrom,
         minimumReceive,
         swap,
-        setValueTo,
+    ]);
+
+    const wrapHandle = useCallback(async () => {
+        if (tokenAmountFrom && !isWrapPending) {
+            await wrapEGLD(tokenAmountFrom.raw);
+        }
+    }, [tokenAmountFrom, isWrapPending, wrapEGLD]);
+
+    const unwrapHandle = useCallback(async () => {
+        if (tokenAmountFrom && !isUnwrapPending) {
+            await unwrapWEGLD(tokenAmountFrom);
+        }
+    }, [tokenAmountFrom, isUnwrapPending, unwrapWEGLD]);
+
+    const onClickSwapBtn = useCallback(async () => {
+        if (loggedIn) {
+            if (isWrap) {
+                wrapHandle();
+            } else if (isUnwrap) {
+                unwrapHandle();
+            } else {
+                swapHandle();
+            }
+            setValueTo("");
+            setValueFrom("");
+        } else {
+            connectWallet();
+        }
+    }, [
+        connectWallet,
+        isUnwrap,
+        isWrap,
+        loggedIn,
         setValueFrom,
+        setValueTo,
+        swapHandle,
+        unwrapHandle,
+        wrapHandle,
     ]);
 
     return (
@@ -818,14 +860,12 @@ const Swap = () => {
                                         className="w-full clip-corner-1 clip-corner-tl uppercase h-12 text-xs sm:text-sm font-bold"
                                         disabled={
                                             swapping ||
+                                            isWrapPending ||
+                                            isUnwrapPending ||
                                             isInsufficentFund ||
                                             isInsufficientEGLD
                                         }
-                                        onClick={
-                                            loggedIn
-                                                ? swapHandle
-                                                : () => connectWallet()
-                                        }
+                                        onClick={onClickSwapBtn}
                                     >
                                         <div className="flex items-center space-x-2.5">
                                             {!loggedIn && <IconWallet />}

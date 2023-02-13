@@ -8,6 +8,7 @@ import {
 import { DAPP_CONFIG } from "const/dappConfig";
 import pools from "const/pool";
 import { TOKENS } from "const/tokens";
+import { WRAPPED_EGLD } from "const/wrappedEGLD";
 import { Pool, PoolV2 } from "graphql/type.graphql";
 import { toEGLDD } from "helper/balance";
 import { fetcher } from "helper/common";
@@ -48,7 +49,7 @@ const useGetTokens = (config?: SWRConfiguration) => {
                     data?.map((t) => [t.identifier, t]) || []
                 );
                 Object.keys(draft).map((id) => {
-                    draft[id].price = tokenMap[id]?.price || 0;
+                    draft[id].price = (id === "EGLD" ? tokenMap[WRAPPED_EGLD.wegld]?.price : tokenMap[id]?.price) || 0;
                     draft[id].balance = id === "EGLD" ? egldBalance.toString() : dataMap[id]?.balance || "0";
                     draft[id].valueUsd = toEGLDD(
                         draft[id].decimals,
@@ -60,7 +61,7 @@ const useGetTokens = (config?: SWRConfiguration) => {
             });
             return { ...map };
         });
-    }, [data, tokens, setTokenMap]);
+    }, [data, tokens, setTokenMap, egldBalance]);
     useEffect(() => {
         setLPTokenMap((state) => {
             const map = produce(state, (draft) => {
