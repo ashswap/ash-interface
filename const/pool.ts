@@ -149,28 +149,11 @@ const mainnet: IPool[] = [
     // },
     {
         address:
-            "erd1qqqqqqqqqqqqqpgqjnl9caf076m864tg6rc05e6alxd2fpm2tk2qgx729y",
+            "erd1qqqqqqqqqqqqqpgqs8p2v9wr8j48vqrmudcj94wu47kqra3r4fvshfyd9c",
         lpToken: {
-            identifier: "ALP-8efbbe",
+            identifier: "ALP-afc922",
             chainId: ChainId.Mainnet,
-            symbol: "LPT-3pool",
-            name: "Ashswap LP",
-            decimals: 18,
-        },
-        tokens: [
-            TOKENS_MAP["USDC-bb1e62"],
-            TOKENS_MAP["USDT-821a84"],
-            TOKENS_MAP["BUSD-7f6b0f"],
-        ],
-        type: EPoolType.PlainPool,
-    },
-    {
-        address:
-            "erd1qqqqqqqqqqqqqpgqu4qzl6qdm4467dqpavce39y3usrwjwagtk2qvjcy7g",
-        lpToken: {
-            identifier: "ALP-c011fd",
-            chainId: ChainId.Mainnet,
-            symbol: "LPT-3pool",
+            symbol: "ALP-3pool",
             name: "Ashswap LP",
             decimals: 18,
         },
@@ -180,6 +163,38 @@ const mainnet: IPool[] = [
             TOKENS_MAP["BUSD-40b57e"],
         ],
         type: EPoolType.PlainPool,
+    },
+    {
+        address:
+            "erd1qqqqqqqqqqqqqpgq5l05l0ts4lphdktx33apl0ss9rzf4r244fvsva6j53",
+        lpToken: {
+            identifier: "ALP-5f9191",
+            chainId: ChainId.Mainnet,
+            symbol: "ALP-BUSD-WEGLD",
+            name: "Ashswap LP",
+            decimals: 18,
+        },
+        tokens: [
+            TOKENS_MAP["BUSD-40b57e"],
+            TOKENS_MAP["WEGLD-bd4d79"],
+        ],
+        type: EPoolType.PoolV2,
+    },
+    {
+        address:
+            "erd1qqqqqqqqqqqqqpgqn7969pvzaatp8p9yu6u5h2ce2gyw0x9j4fvsplvthl",
+        lpToken: {
+            identifier: "ALP-2d0cf8",
+            chainId: ChainId.Mainnet,
+            symbol: "ALP-USDT-ASH",
+            name: "Ashswap LP",
+            decimals: 18,
+        },
+        tokens: [
+            TOKENS_MAP["USDT-f8c08c"],
+            TOKENS_MAP["ASH-a642d1"],
+        ],
+        type: EPoolType.PoolV2,
     },
 ];
 
