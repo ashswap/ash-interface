@@ -21,6 +21,7 @@ import { theme } from "tailwind.config";
 import Link from "next/link";
 import { accIsLoggedInState } from "atoms/dappState";
 import { ENVIRONMENT } from "const/env";
+import { getTokenFromId } from "helper/token";
 type FarmRecordProps = {
     farmAddress: string;
     selected?: boolean;
@@ -55,16 +56,17 @@ const FarmRecord = memo(function FarmRecord({
             <td className="border border-black p-4">
                 <div className="flex flex-col sm:flex-row sm:items-center">
                     <div className="flex -space-x-0.5 mr-2 mb-2 sm:mb-0">
-                        {pool.tokens.map((t) => (
-                            <Avatar
+                        {pool.tokens.map((_t) => {
+                            const t = getTokenFromId(_t.identifier);
+                            return <Avatar
                                 key={t.identifier}
                                 src={t.logoURI}
                                 className="w-4 h-4"
                             />
-                        ))}
+                        })}
                     </div>
                     <div className="font-bold text-xs sm:text-sm md:text-lg text-stake-gray-500">
-                        {pool.tokens.map((t) => t.symbol).join("-")}
+                        {pool.tokens.map((t) => getTokenFromId(t.identifier).symbol).join("-")}
                     </div>
                 </div>
             </td>

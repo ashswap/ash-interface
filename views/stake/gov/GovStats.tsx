@@ -1,4 +1,5 @@
 import { useTrackTransactionStatus } from "@elrondnetwork/dapp-core/hooks";
+import ImgVEASH from "assets/images/ve-ash.png";
 import ICCapacity from "assets/svg/capacity.svg";
 import ICChevronDown from "assets/svg/chevron-down.svg";
 import ICChevronUp from "assets/svg/chevron-up.svg";
@@ -15,7 +16,7 @@ import {
     govTotalLockedPctState,
     govTotalSupplyVeASH,
     govUnlockTSState,
-    govVeASHAmtState,
+    govVeASHAmtState
 } from "atoms/govState";
 import { tokenMapState } from "atoms/tokensState";
 import Avatar from "components/Avatar";
@@ -296,7 +297,7 @@ function GovStats() {
                                     {/* <div className="w-[1.125rem] h-[1.125rem] mr-2">
                                         <Image src={ImgUsdt} alt="token icon" />
                                     </div> */}
-                                    <div className="w-[1.125rem] h-[1.125rem] mr-2 rounded-full bg-ash-purple-500"></div>
+                                    <Avatar src={ImgVEASH} alt="veASH" className="w-[1.125rem] h-[1.125rem] mr-2"/>
                                     <div className="text-lg text-white font-bold">
                                         <TextAmt
                                             number={toEGLDD(
@@ -441,7 +442,7 @@ function GovStats() {
                                 {/* <div className="w-[1.125rem] h-[1.125rem] mr-2">
                                     <Image src={ImgUsdt} alt="token icon" />
                                 </div> */}
-                                <div className="w-[1.125rem] h-[1.125rem] mr-2 rounded-full bg-ash-purple-500"></div>
+                                <Avatar src={ImgVEASH} alt="veASH" className="w-[1.125rem] h-[1.125rem] mr-2"/>
                                 <div className="text-white text-lg font-bold">
                                     <TextAmt
                                         number={toEGLDD(

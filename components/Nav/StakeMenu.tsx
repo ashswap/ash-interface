@@ -25,10 +25,10 @@ import ICGovVoteSquare from "assets/svg/gov-vote-square.svg";
 import { useTrackTransactionStatus } from "@elrondnetwork/dapp-core/hooks";
 import { ENVIRONMENT } from "const/env";
 const SOCIALS = [
-    {
+    ...(ENVIRONMENT.NETWORK === "devnet" ? [{
         name: "Liquidity Stake",
         url: "/stake/farms",
-    },
+    }] : []),
     { name: "Governance Stake", url: "/stake/gov" },
 ];
 function HeadlessLink(
