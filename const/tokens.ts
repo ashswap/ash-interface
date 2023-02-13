@@ -1,5 +1,5 @@
 import ImgAshIcon from "assets/images/ash-icon.png";
-import ImgWEGLDIcon from "assets/images/wEGLD-icon.png";
+import ImgWEGLDIcon from "assets/images/wegld-icon.png";
 import ImgEgldIcon from "assets/images/egld-icon.png";
 import IconBTC from "assets/images/btc-icon.png";
 import IconUSDC from "assets/images/usdc-icon.png";
