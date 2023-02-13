@@ -12,6 +12,7 @@ import TextAmt from "components/TextAmt";
 import CardTooltip from "components/Tooltip/CardTooltip";
 import { toEGLDD } from "helper/balance";
 import { formatAmount } from "helper/number";
+import { getTokenFromId } from "helper/token";
 import { Unarray } from "interface/utilities";
 import { useEffect, useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
@@ -65,7 +66,8 @@ function StakedPoolCardItem({
                             is2Pool ? "" : "mb-3"
                         }`}
                     >
-                        {pool.tokens.map((t, i) => {
+                        {pool.tokens.map((_t, i) => {
+                            const t = getTokenFromId(_t.identifier);
                             return (
                                 <div
                                     key={t.identifier}
@@ -115,7 +117,8 @@ function StakedPoolCardItem({
                             is2Pool ? "-mx-2.5" : "max-w-[4.5rem]"
                         }`}
                     >
-                        {pool.tokens.map((t, i) => {
+                        {pool.tokens.map((_t, i) => {
+                            const t = getTokenFromId(_t.identifier);
                             return (
                                 <Avatar
                                     key={t.identifier}
@@ -246,7 +249,7 @@ function StakedPoolCardItem({
                                         ownLiquidity || 0
                                     )}
                                 />{" "}
-                                {pool.tokens[0].symbol}-{pool.tokens[1].symbol}
+                                {pool.tokens.map(t => getTokenFromId(t.identifier).symbol).join("-")}
                             </div>
                         </div>
                         <div className="flex flex-row justify-between items-center h-12 px-4">
