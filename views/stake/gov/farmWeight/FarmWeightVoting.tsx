@@ -81,7 +81,7 @@ const FarmRecord = memo(function FarmRecord({
                         className={`transition-all duration-300 shrink-0 mr-2 md:mr-6 w-4 sm:w-8 h-auto ${
                             hasBribe
                                 ? "text-pink-600/80 colored-drop-shadow-xs colored-drop-shadow-pink-600"
-                                : "text-ash-dark-400/60 stroke-ash-dark-400 group-hover:text-stake-gray-500/60"
+                                : selected ? "text-stake-gray-500/60" : "text-ash-dark-400/60 stroke-ash-dark-400 group-hover:text-stake-gray-500/60"
                         }`}
                     />
                     {hasBribe ? (
@@ -176,7 +176,7 @@ const VoteEditor = memo(function VoteEditor({ farmAddress }: VoteEditorProps) {
         <div className="flex flex-col md:flex-row md:items-start space-y-10 md:space-y-0 md:space-x-4">
             <div className="grow overflow-hidden">
                 <div className="font-bold text-xs sm:text-sm text-stake-gray-500 mb-3">
-                    {pool?.tokens.map((t) => t.symbol).join("-") ||
+                    {pool?.tokens.map((t) => getTokenFromId(t.identifier).symbol).join("-") ||
                         "Select a farm to start"}
                 </div>
                 <Slider
