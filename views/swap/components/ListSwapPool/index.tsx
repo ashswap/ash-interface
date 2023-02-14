@@ -1,9 +1,12 @@
 // import Token from "components/Token";
 import ICArrowRightRounded from "assets/svg/arrow-right-rounded.svg";
 import Avatar from "components/Avatar";
+import { TOKENS_MAP } from "const/tokens";
+import { WRAPPED_EGLD } from "const/wrappedEGLD";
+import { getTokenIdFromCoin } from "helper/token";
 import { IESDTInfo } from "helper/token/token";
 import IPool from "interface/pool";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 interface Props {
     items: IPool[];
     className?: string | undefined;
@@ -40,9 +43,17 @@ const Pair = ({
     "onSelect" | "isPivotFirst" | "pivotToken"
 >) => {
     const pairTokens = useMemo(() => {
-        return pool.tokens.filter(
-            (t) => t.identifier !== props.pivotToken.identifier
+        const tokens = pool.tokens.filter(
+            (t) => t.identifier !== getTokenIdFromCoin(props.pivotToken.identifier)
         );
+        const useEgld = tokens.some(t => t.identifier === WRAPPED_EGLD.wegld);
+        if(useEgld || props.pivotToken.identifier === WRAPPED_EGLD.wegld){
+            tokens.push(TOKENS_MAP["EGLD"]);
+        }
+        if(props.pivotToken.identifier === "EGLD"){
+            tokens.push(TOKENS_MAP[WRAPPED_EGLD.wegld]);
+        }
+        return tokens;
     }, [pool, props.pivotToken]);
     return (
         <>

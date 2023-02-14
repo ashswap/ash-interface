@@ -20,7 +20,6 @@ class PoolV2Contract extends Contract<typeof poolV2Abi> {
             tokenAmtIn,
         ]);
         const { firstValue, secondValue } = await this.runQuery(interaction);
-        console.log(firstValue?.valueOf().toString(), secondValue?.valueOf().toString());
         return {
             fee: firstValue?.valueOf(),
             outputAmount: secondValue?.valueOf(),

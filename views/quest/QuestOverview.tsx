@@ -257,7 +257,7 @@ const QuestOverview = () => {
             <h1 className="mt-6 sm:mt-10 text-2xl md:text-5xl font-bold text-white mb-7 md:mb-11">
                 Quest
             </h1>
-            {ENVIRONMENT.ENV !== "beta" && (
+            {(ENVIRONMENT.ENV === "alpha" || ENVIRONMENT.NETWORK === "mainnet") && (
                 <div className="mb-6 -mx-6 px-6 sm:px-0 sm:mx-0 scrollbar-hide flex space-x-2 overflow-auto">
                     <button
                         className={`shrink-0 flex items-center h-8 sm:h-12 px-6 bg-ash-dark-600 text-xs sm:text-sm font-bold ${

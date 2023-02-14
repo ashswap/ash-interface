@@ -3,6 +3,7 @@ import ConnectWalletModal from "components/ConnectWalletModal";
 import { customComponents } from "components/DappCoreCustom";
 import { TxCompletedTracker } from "components/DappCoreCustom/TxCompletedTracker";
 import ErrorBoundary from "components/ErrorBoundary";
+import GlowingButton from "components/GlowingButton";
 import SignTxNotification from "components/SignTxNotification";
 import SignTxsModal from "components/SignTxsModal";
 import TxsToastList from "components/TxsToastList";
@@ -130,7 +131,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
                 `,
                 }}
             />
-            <Script src="https://static.geetest.com/v4/gt4.js"/>  
+            <Script src="https://static.geetest.com/v4/gt4.js" />
             <Head>
                 <meta
                     name="viewport"
@@ -178,16 +179,33 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
                             <TxCompletedTracker />
                         </SocketProvider>
                         <GlobalModals />
-                        <a
-                            href="https://forms.gle/VfEEfzTG3LnJPPxC9"
-                            rel="noreferrer"
-                            target="_blank"
-                            className="fixed bottom-20 left-6 bg-pink-600 backdrop-blur-[25px] px-4 py-3"
-                        >
-                            <span className="text-xs font-bold text-white">
-                                Bug Report
-                            </span>
-                        </a>
+                        <div className="flex sm:flex-col fixed bottom-20 left-6 gap-4 text-center z-10">
+                            <a
+                                href="https://event.ashswap.io"
+                                rel="noreferrer"
+                                target="_blank"
+                                className="block"
+                            >
+                                <GlowingButton
+                                    theme="green"
+                                    className="w-full bg-stake-green-500 backdrop-blur-[25px] px-4 py-3"
+                                >
+                                    <span className="text-xs font-bold text-ash-dark-400">
+                                        Event
+                                    </span>
+                                </GlowingButton>
+                            </a>
+                            <a
+                                href="https://forms.gle/VfEEfzTG3LnJPPxC9"
+                                rel="noreferrer"
+                                target="_blank"
+                                className="bg-ash-dark-600 backdrop-blur-[25px] px-4 py-3"
+                            >
+                                <span className="text-xs font-bold text-white">
+                                    Bug Report
+                                </span>
+                            </a>
+                        </div>
                     </TestnetGuard>
                 </DappProvider>
             </RecoilRoot>

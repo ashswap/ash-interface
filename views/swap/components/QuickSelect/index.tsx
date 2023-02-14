@@ -18,7 +18,7 @@ const QuickSelect = (props: Props) => {
     return (
         <div className={`${styles.container} ${props.className || ""}`}>
             <div>
-                <div className="flex flex-wrap">
+                <div className="flex flex-wrap gap-2">
                     {props.tokens.slice(0, 5).map((t) => (
                         // <Token
                         //     key={t.id}
@@ -29,7 +29,7 @@ const QuickSelect = (props: Props) => {
                         // />
                         <div
                             key={t.identifier}
-                            className="rounded-lg bg-ash-dark-600 hover:bg-ash-dark-700 transition-all flex items-center space-x-2 w-20 text-2xs font-bold cursor-pointer p-2.5 mr-2"
+                            className="rounded-lg bg-ash-dark-600 hover:bg-ash-dark-700 transition-all flex items-center space-x-2 w-20 text-2xs font-bold cursor-pointer p-2.5"
                             onClick={() => onSelectToken(t)}
                         >
                             <Avatar
