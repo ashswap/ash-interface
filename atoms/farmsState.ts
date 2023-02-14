@@ -32,13 +32,21 @@ export type FarmRecord = {
         totalStakedLPValue: BigNumber;
         weightBoost: BigNumber;
         yieldBoost: number;
+        totalAPR: number;
     };
     ashPerSec: BigNumber;
     lastRewardBlockTs: number;
     farmTokenSupply: BigNumber;
     lpLockedAmt: BigNumber;
     totalLiquidityValue: BigNumber;
-    emissionAPR: BigNumber;
+    ashBaseAPR: number;
+    tokensAPR: {
+        tokenId: string;
+        apr: number;
+    }[];
+    tradingAPR: number;
+    totalAPRMin: number;
+    totalAPRMax: number;
 };
 
 export type FarmSortOption = "apr" | "liquidity" | "volume";
@@ -106,9 +114,7 @@ export const farmToDisplayState = selector<FarmRecord[]>({
         }
         switch (sortOption) {
             case "apr":
-                result = result.sort((x, y) =>
-                    y.emissionAPR.minus(x.emissionAPR).toNumber()
-                );
+                result = result.sort((x, y) => (y.totalAPRMax) - x.totalAPRMax);
                 break;
             case "liquidity":
                 result = result.sort((x, y) =>
