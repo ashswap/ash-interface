@@ -61,7 +61,7 @@ function FarmDetailPage({ pool }: Props) {
         useRecoilValue(networkConfigState).network;
     const fees = useMemo(() => {
         return new BigNumber(stats?.tvl || 0)
-            .multipliedBy(stats?.apr || 0)
+            .multipliedBy(stats?.apr || 0).div(365)
             .div(100);
     }, [stats]);
     return (

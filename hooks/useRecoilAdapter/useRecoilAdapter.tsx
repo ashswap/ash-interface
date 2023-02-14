@@ -34,7 +34,7 @@ const fakePrice = [
     { id: "BUSD-b53884", price: 1 },
     { id: "ALP-68ec91", price: 1 },
     { id: "ALP-836706", price: 100 },
-    { id: "ALP-1096a5", price: 40 },
+    { id: "ALP-8dcaa8", price: 40 },
 ];
 export function useRecoilAdapter() {
     // copy whole dappContext to recoil
