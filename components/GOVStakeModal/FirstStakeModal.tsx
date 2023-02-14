@@ -1,6 +1,10 @@
 import { Slider } from "antd";
 import ICChevronRight from "assets/svg/chevron-right.svg";
-import { accIsInsufficientEGLDState } from "atoms/dappState";
+import {
+    accIsInsufficientEGLDState,
+    accIsLoggedInState,
+} from "atoms/dappState";
+import { clickedGovStakeModalState } from "atoms/govstakeStake";
 import { govTotalSupplyVeASH } from "atoms/govState";
 import { tokenMapState } from "atoms/tokensState";
 import BigNumber from "bignumber.js";
@@ -11,6 +15,8 @@ import InputCurrency from "components/InputCurrency";
 import TextAmt from "components/TextAmt";
 import CardTooltip from "components/Tooltip/CardTooltip";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
+import { VE_CONFIG } from "const/ashswapConfig";
+import { ENVIRONMENT } from "const/env";
 import { ASH_TOKEN, VE_ASH_DECIMALS } from "const/tokens";
 import { VE_LOCK_LABEL } from "const/ve";
 import { toEGLD, toEGLDD, toWei } from "helper/balance";
@@ -21,8 +27,9 @@ import { useOnboarding } from "hooks/useOnboarding";
 import { useScreenSize } from "hooks/useScreenSize";
 import moment from "moment";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { theme } from "tailwind.config";
+import { useDebounce } from "use-debounce";
 import LockPeriod, { lockPeriodFormater } from "./LockPeriod";
 type props = {
     open: boolean;
@@ -42,20 +49,45 @@ const LOCK_CONFIG_BOY = {
     minLock: 12 * 60 * 60,
     sliderStep: 12 * 60 * 60,
 };
-const LOCK_CONFIG_MAIN = {
-    predefinedLockPeriod: [
-        // { value: 7 * 24 * 60 * 60, label: "1 week" },
-        // { value: 4 * 7 * 24 * 60 * 60, label: "4 weeks" },
-        { value: 1 * 365 * 24 * 60 * 60, label: "1 year" },
-        { value: 2 * 365 * 24 * 60 * 60, label: "2 years" },
-        { value: 3 * 365 * 24 * 60 * 60, label: "3 years" },
-        { value: 4 * 365 * 24 * 60 * 60, label: "4 years" },
-    ],
-    maxLock: 4 * 365 * 24 * 60 * 60,
-    minLock: 7 * 24 * 60 * 60,
-    sliderStep: 24 * 60 * 60,
-};
-const LOCK_CONFIG = LOCK_CONFIG_MAIN;
+const LOCK_CONFIGS = {
+    alpha: {
+        predefinedLockPeriod: [
+            // { value: 7 * 24 * 60 * 60, label: "1 week" },
+            // { value: 4 * 7 * 24 * 60 * 60, label: "4 weeks" },
+            { value: 1 * 365 * 24 * 60 * 60, label: "1 year" },
+            { value: 2 * 365 * 24 * 60 * 60, label: "2 years" },
+            { value: 3 * 365 * 24 * 60 * 60, label: "3 years" },
+            { value: 4 * 365 * 24 * 60 * 60, label: "4 years" },
+        ],
+        ...VE_CONFIG,
+        sliderStep: VE_CONFIG.minLock,
+    },
+    beta: {
+        predefinedLockPeriod: [
+            // { value: 7 * 24 * 60 * 60, label: "1 week" },
+            // { value: 4 * 7 * 24 * 60 * 60, label: "4 weeks" },
+            { value: 1 * 365 * 24 * 60 * 60, label: "1 year" },
+            { value: 2 * 365 * 24 * 60 * 60, label: "2 years" },
+            { value: 3 * 365 * 24 * 60 * 60, label: "3 years" },
+            { value: 4 * 365 * 24 * 60 * 60, label: "4 years" },
+        ],
+        ...VE_CONFIG,
+        sliderStep: VE_CONFIG.minLock,
+    },
+    mainnet: {
+        predefinedLockPeriod: [
+            // { value: 7 * 24 * 60 * 60, label: "1 week" },
+            // { value: 4 * 7 * 24 * 60 * 60, label: "4 weeks" },
+            { value: 1 * 365 * 24 * 60 * 60, label: "1 year" },
+            { value: 2 * 365 * 24 * 60 * 60, label: "2 years" },
+            { value: 3 * 365 * 24 * 60 * 60, label: "3 years" },
+            { value: 4 * 365 * 24 * 60 * 60, label: "4 years" },
+        ],
+        ...VE_CONFIG,
+        sliderStep: VE_CONFIG.minLock,
+    }
+}
+const LOCK_CONFIG = ENVIRONMENT.NETWORK === "devnet" ? LOCK_CONFIGS[ENVIRONMENT.ENV] : LOCK_CONFIGS.mainnet;
 const FirstStakeContent = ({ open, onClose }: props) => {
     const tokenMap = useRecoilValue(tokenMapState);
     const insufficientEGLD = useRecoilValue(accIsInsufficientEGLDState);
@@ -70,9 +102,22 @@ const FirstStakeContent = ({ open, onClose }: props) => {
     );
     const [lockAmt, setLockAmt] = useState<BigNumber>(new BigNumber(0));
     const [rawLockAmt, setRawLockAmt] = useState("");
+    const [deboundRawLockAmt] = useDebounce(rawLockAmt, 500);
+    const loggedIn = useRecoilValue(accIsLoggedInState);
+    useEffect(() => {
+        if (window && loggedIn && deboundRawLockAmt) {
+            let dataLayer = (window as any).dataLayer || [];
+            dataLayer.push({
+                event: "input_lock_value",
+                amount: deboundRawLockAmt,
+            });
+        }
+    }, [deboundRawLockAmt]);
     const [onboardingStakeGov, setOnboardedStakeGov] =
         useOnboarding("stake_gov_1st");
     const [openOnboardStakeTooltip, setOpenOnboardTooltip] = useState(false);
+    const [isClickedGovStakeButton, setIsClickedGovStakeButton] =
+        useRecoilState(clickedGovStakeModalState);
     const isTouchScreen = useMediaQuery("(hover: none)");
     const screenSize = useScreenSize();
 
@@ -320,7 +365,7 @@ const FirstStakeContent = ({ open, onClose }: props) => {
                     </div>
                     <div className="w-full sm:w-1/3 lg:w-[17.8125rem] shrink-0 bg-stake-dark-500 py-[2.375rem] px-10">
                         <div className="text-white text-lg font-bold mb-16">
-                            Estimated Staking
+                            Staking Estimate
                         </div>
                         <div className="flex flex-col space-y-11">
                             <div>
@@ -333,7 +378,7 @@ const FirstStakeContent = ({ open, onClose }: props) => {
                                     }
                                 >
                                     <div className="inline-block text-stake-gray-500 text-xs underline mb-2">
-                                        VeASH Receive
+                                        veASH Received
                                     </div>
                                 </CardTooltip>
 
@@ -359,7 +404,7 @@ const FirstStakeContent = ({ open, onClose }: props) => {
                                     }
                                 >
                                     <div className="inline-block text-stake-gray-500 text-xs underline mb-2">
-                                        Your capacity
+                                        Your share
                                     </div>
                                 </CardTooltip>
 
@@ -403,7 +448,7 @@ const FirstStakeContent = ({ open, onClose }: props) => {
                                     <u>AshSwap Stake Guide</u>
                                 </b>
                             </a>{" "}
-                            and understand the associated risks.
+                            and understood the associated risks.
                         </span>
                     </div>
                     <div className="w-full sm:w-[17.8125rem] shrink-0">
@@ -412,7 +457,12 @@ const FirstStakeContent = ({ open, onClose }: props) => {
                                 theme="pink"
                                 className={`clip-corner-1 clip-corner-tl transition w-full h-12 flex items-center justify-center text-sm font-bold text-white`}
                                 disabled={!canStake}
-                                onClick={() => canStake && lock()}
+                                onClick={() => {
+                                    if (canStake) {
+                                        lock();
+                                        setIsClickedGovStakeButton(true);
+                                    }
+                                }}
                             >
                                 {insufficientEGLD ? (
                                     "INSUFFICIENT EGLD BALANCE"
@@ -440,7 +490,7 @@ function FirstStakeModal({ open, onClose }: props) {
                 isOpen={open}
                 onRequestClose={() => onClose()}
                 type={`${isMobile ? "drawer_btt" : "modal"}`}
-                className="bg-stake-dark-400 p-4 sm:ash-container flex flex-col max-h-full"
+                className="bg-stake-dark-400 p-4 w-screen max-w-[70rem] sm:mx-auto flex flex-col max-h-full"
             >
                 <div className="flex justify-end mb-4">
                     <BaseModal.CloseBtn />

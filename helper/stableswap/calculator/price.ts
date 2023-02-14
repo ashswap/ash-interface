@@ -3,7 +3,7 @@ import { Fraction } from "helper/fraction/fraction";
 import { Price } from "helper/token/price";
 import { IESDTInfo } from "helper/token/token";
 import { TokenAmount } from "helper/token/tokenAmount";
-import { calculateEstimatedSwapOutputAmount } from "./amounts";
+import { calculateEstimatedSwapOutputAmount2 } from "./amounts";
 
 /**
  * Gets the price of the second token in the swap, i.e. "Token 1", with respect to "Token 0".
@@ -44,13 +44,12 @@ export const calculateSwapPrice = (
     );
 
     const inputAmount = new TokenAmount(fromToken, inputAmountNum);
-    const outputAmount = calculateEstimatedSwapOutputAmount(
+    const outputAmount = calculateEstimatedSwapOutputAmount2(
         amp,
-        toReserves,
         reserves,
         inputAmount,
+        toReserves.token,
         fees
     ).outputAmount;
-
     return new Price(inputAmount, outputAmount);
 };

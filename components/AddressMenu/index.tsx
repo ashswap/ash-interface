@@ -98,7 +98,7 @@ function AddressMenu({ infoLayout, dropdownBtn, connectBtn }: AddressMenuProp) {
                             )}
                         >
                             {({ close }) => (
-                                <div className="bg-stake-dark-400 min-w-[17.5rem] max-w-full px-4 py-6">
+                                <div className="bg-stake-dark-400 min-w-[22rem] max-w-full px-4 py-6">
                                     <button
                                         className="px-4 w-full h-10 hover:bg-ash-dark-500 flex items-center justify-between text-white font-bold text-xs mb-5"
                                         onClick={() =>

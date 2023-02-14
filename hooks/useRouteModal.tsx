@@ -3,6 +3,8 @@ import { useCallback, useEffect, useMemo, useRef } from "react";
 
 type ModalType = {
     calc_boost: { farmAddress?: string };
+    farm_weight_voting: { farmAddress?: string };
+
 };
 function useRouteModal<T extends keyof ModalType>(key: keyof ModalType) {
     const router = useRouter();

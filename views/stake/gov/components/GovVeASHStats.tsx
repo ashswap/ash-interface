@@ -1,18 +1,20 @@
-import React, { useMemo } from "react";
-import ICLock from "assets/svg/lock.svg";
+import ImgVEASH from "assets/images/ve-ash.png";
 import ICCapacity from "assets/svg/capacity.svg";
-import CardTooltip from "components/Tooltip/CardTooltip";
-import moment from "moment";
-import { useRecoilValue } from "recoil";
+import ICLock from "assets/svg/lock.svg";
 import {
     govLockedAmtState,
     govTotalSupplyVeASH,
     govUnlockTSState,
-    govVeASHAmtState,
+    govVeASHAmtState
 } from "atoms/govState";
+import Avatar from "components/Avatar";
 import TextAmt from "components/TextAmt";
-import { toEGLDD } from "helper/balance";
+import CardTooltip from "components/Tooltip/CardTooltip";
 import { VE_ASH_DECIMALS } from "const/tokens";
+import { toEGLDD } from "helper/balance";
+import moment from "moment";
+import { useMemo } from "react";
+import { useRecoilValue } from "recoil";
 
 function GovVeASHStats() {
     const lockedAmt = useRecoilValue(govLockedAmtState);
@@ -45,7 +47,7 @@ function GovVeASHStats() {
                     {/* <div className="w-[1.125rem] h-[1.125rem] mr-2">
                                         <Image src={ImgUsdt} alt="token icon" />
                                     </div> */}
-                    <div className="w-[1.125rem] h-[1.125rem] mr-2 rounded-full bg-ash-purple-500"></div>
+                    <Avatar src={ImgVEASH} alt="veASH" className="w-[1.125rem] h-[1.125rem] mr-2"/>
                     <div className="text-lg text-white font-bold">
                         <TextAmt
                             number={toEGLDD(VE_ASH_DECIMALS, veASH)}

@@ -8,6 +8,7 @@ import BaseModal from "components/BaseModal";
 import Input from "components/Input";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
 import { IN_POOL_TOKENS_MAP } from "const/pool";
+import { getTokenIdFromCoin } from "helper/token";
 import { IESDTInfo } from "helper/token/token";
 import { useOnboarding } from "hooks/useOnboarding";
 import { useScreenSize } from "hooks/useScreenSize";
@@ -75,17 +76,8 @@ const TokenSelect = ({
 
     const onSelectToken = (t: IESDTInfo) => {
         setOpen(false);
-        if (window && onChange) {
-            onChange(t);       
-            let dataLayer = (window as any).dataLayer || [];
-            console.log("dataLayer",dataLayer);
-            dataLayer.push({
-                'event': 'select_token',
-                'type': type,
-                'token_name': t.name,
-                'token_symbol': t.symbol,
-                'token_identifier': t.identifier
-            });
+        if (onChange) {
+            onChange(t);
         }
     };
 
@@ -99,7 +91,11 @@ const TokenSelect = ({
         if (validPools && pivotToken) {
             return validPools.filter((p) =>
                 p.tokens
-                    .filter((t) => t.identifier !== pivotToken?.identifier)[0]
+                    .filter(
+                        (t) =>
+                            t.identifier !==
+                            getTokenIdFromCoin(pivotToken?.identifier)
+                    )[0]
                     .symbol.toLowerCase()
                     .includes(debounceKeyword.toLowerCase())
             );
@@ -109,6 +105,16 @@ const TokenSelect = ({
 
     useEffect(() => {
         if (value) setOnboardedSearchToken(true);
+        if (value && window) {
+            let dataLayer = (window as any).dataLayer || [];
+            dataLayer.push({
+                event: "select_token",
+                type: type,
+                token_name: value.name,
+                token_symbol: value.symbol,
+                token_identifier: value.identifier,
+            });
+        }
     }, [value, setOnboardedSearchToken]);
 
     const renderPivotToken = () => {
@@ -259,10 +265,10 @@ const TokenSelect = ({
                                                 ? type === "to"
                                                     ? "swap to"
                                                     : "swap from"
-                                                : "Search or try usdt-usdc"
+                                                : "Search"
                                         }
                                         suffix={<Search />}
-                                        outline                                      
+                                        outline
                                         value={keyword}
                                         onChange={(e) => {
                                             setKeyword(e.target.value);

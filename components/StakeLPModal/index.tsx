@@ -1,5 +1,9 @@
+import { useDebounce } from "use-debounce";
 import ICChevronRight from "assets/svg/chevron-right.svg";
-import { accIsInsufficientEGLDState } from "atoms/dappState";
+import {
+    accIsInsufficientEGLDState,
+    accIsLoggedInState,
+} from "atoms/dappState";
 import { FarmRecord } from "atoms/farmsState";
 import { lpTokenMapState } from "atoms/tokensState";
 import BigNumber from "bignumber.js";
@@ -15,7 +19,7 @@ import { toEGLDD, toWei } from "helper/balance";
 import { formatAmount } from "helper/number";
 import useEnterFarm from "hooks/useFarmContract/useEnterFarm";
 import { useScreenSize } from "hooks/useScreenSize";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
 type props = {
     open: boolean;
@@ -23,11 +27,23 @@ type props = {
     farmData: FarmRecord;
 };
 const StakeLPContent = ({ open, onClose, farmData }: props) => {
-    const { pool, farm, farmTokenSupply, ashPerBlock, emissionAPR } = farmData;
+    const loggedIn = useRecoilValue(accIsLoggedInState);
+    const { pool, farm, farmTokenSupply, ashPerSec, emissionAPR } = farmData;
     const lpTokenMap = useRecoilValue(lpTokenMapState);
     const insufficientEGLD = useRecoilValue(accIsInsufficientEGLDState);
     const [stakeAmt, setStakeAmt] = useState<BigNumber>(new BigNumber(0));
     const [rawStakeAmt, setRawStakeAmt] = useState("");
+    const [deboundRawStakeAmt] = useDebounce(rawStakeAmt, 500);
+    useEffect(() => {
+        if (window && loggedIn && deboundRawStakeAmt) {
+            let dataLayer = (window as any).dataLayer || [];
+            dataLayer.push({
+                event: "input_stake_value",
+                amount: deboundRawStakeAmt,
+                lp_token: pool?.lpToken?.symbol,
+            });
+        }
+    }, [deboundRawStakeAmt]);
     const { enterFarm } = useEnterFarm();
     const LPBalance = useMemo(
         () => new BigNumber(lpTokenMap[pool.lpToken.identifier]?.balance || 0),
@@ -40,14 +56,14 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
     }, [LPBalance, pool]);
     const ashPerDay = useMemo(() => {
         const baseFarmToken = stakeAmt.multipliedBy(0.4);
-        const totalAshPerDay = ashPerBlock
+        const totalAshPerDay = ashPerSec
             .multipliedBy(24 * 60 * 60)
-            .div(blockTimeMs / 1000);
+            ;
         const shareOfFarm = baseFarmToken.div(
             farmTokenSupply.plus(baseFarmToken)
         );
         return totalAshPerDay.multipliedBy(shareOfFarm);
-    }, [stakeAmt, farmTokenSupply, ashPerBlock]);
+    }, [stakeAmt, farmTokenSupply, ashPerSec]);
     const insufficientLP = useMemo(() => {
         return !LPBalance || LPBalance.eq(0) || stakeAmt.gt(LPBalance);
     }, [LPBalance, stakeAmt]);
@@ -177,7 +193,7 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
                                 <u>AshSwap Liquidity Staking Guide</u>
                             </b>
                         </a>{" "}
-                        and understand the associated risks.
+                        and understood the associated risks.
                     </span>
                 </div>
                 <div className="w-full sm:w-1/3 lg:w-[17.8125rem] shrink-0">

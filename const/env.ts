@@ -10,6 +10,8 @@ interface Environment {
     ASH_SOCKET: string;
     ASH_SOCKET_EXTRA: string;
     ENV: Env;
+    LOGIN_TWITTER_LINK: string;
+    LOGIN_DISCORD_LINK: string;
 }
 
 export const ENVIRONMENT: Environment = {
@@ -21,4 +23,6 @@ export const ENVIRONMENT: Environment = {
     ASH_SOCKET: process.env.NEXT_PUBLIC_ASH_SOCKET!,
     ASH_SOCKET_EXTRA: process.env.NEXT_PUBLIC_ASH_SOCKET_EXTRA!,
     ENV: (process.env.NEXT_PUBLIC_ASH_ENV as Env) || "beta",
+    LOGIN_TWITTER_LINK: process.env.NEXT_PUBLIC_ASH_LOGIN_TWITTER_LINK!,
+    LOGIN_DISCORD_LINK: process.env.NEXT_PUBLIC_ASH_LOGIN_DISCORD_LINK!,
 };

@@ -1,19 +1,18 @@
 import { ashswapBaseState } from "atoms/ashswap";
 import {
-    ashRawPoolMapByIdSelector,
     LPBreakDownQuery,
     poolDeboundKeywordState,
     poolKeywordState,
     PoolRecord,
     poolRecordsState,
-    poolStatsRefresherAtom,
+    poolStatsRefresherAtom
 } from "atoms/poolsState";
 import { lpTokenMapState } from "atoms/tokensState";
 import BigNumber from "bignumber.js";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 import pools from "const/pool";
 import { fetcher } from "helper/common";
-import IPool from "interface/pool";
+import IPool, { EPoolType } from "interface/pool";
 import { PoolStatsRecord } from "interface/poolStats";
 import { useCallback, useEffect } from "react";
 import { useRecoilCallback, useRecoilValue, useSetRecoilState } from "recoil";
@@ -23,7 +22,6 @@ import { useDebounce } from "use-debounce";
 const usePoolsState = () => {
     const keyword = useRecoilValue(poolKeywordState);
     const ashBase = useRecoilValue(ashswapBaseState);
-    const poolMapById = useRecoilValue(ashRawPoolMapByIdSelector);
     const lpTokenMap = useRecoilValue(lpTokenMapState);
     // const setPoolRecords = useSetRecoilState(poolRecordsState);
     const setPoolRecordsRefresher = useSetRecoilState(poolStatsRefresherAtom);
@@ -40,15 +38,6 @@ const usePoolsState = () => {
         fetcher
     );
 
-    const getPortion = useCallback(
-        async (lpTokenId: string, ownLiquidity: BigNumber) => {
-            const totalSupply = poolMapById[lpTokenId]?.totalSupply || "0";
-            if (totalSupply === "0") return new BigNumber(0);
-            return ownLiquidity.multipliedBy(100).div(totalSupply);
-        },
-        [poolMapById]
-    );
-
     const lpBreak = useRecoilCallback(
         ({ snapshot }) =>
             async (poolAddress: string, wei: string) => {
@@ -61,37 +50,37 @@ const usePoolsState = () => {
 
     const getPoolRecord = useCallback(
         async (p: IPool) => {
-            const rawPool = ashBase.pools.find(
+            const rawPool = p.type === EPoolType.PoolV2 ? ashBase.poolsV2.find(_p => _p.address === p.address) : ashBase.pools.find(
                 (_p) => _p.address === p.address
             );
+            const totalSupply = new BigNumber(rawPool?.totalSupply || 0);
             let record: PoolRecord = {
                 pool: p,
                 poolStats: poolStatsRecords?.find(
                     (stats) => stats.address === p.address
                 ),
-                totalSupply: new BigNumber(rawPool?.totalSupply || 0),
+                totalSupply,
             };
             const ownLP = new BigNumber(
                 lpTokenMap[p.lpToken.identifier]?.balance || 0
             );
+
             if (ownLP.gt(0)) {
                 const { lpReserves, valueUsd: lpValueUsd } = await lpBreak(
                     p.address,
                     ownLP.toString()
                 );
+
                 record.liquidityData = {
                     ownLiquidity: ownLP,
-                    capacityPercent: await getPortion(
-                        p.lpToken.identifier,
-                        ownLP
-                    ),
+                    capacityPercent: BigNumber.min(totalSupply.eq(0) ? new BigNumber(0) : ownLP.multipliedBy(100).div(totalSupply), 100),
                     lpReserves,
                     lpValueUsd,
                 };
             }
             return record;
         },
-        [getPortion, poolStatsRecords, ashBase, lpBreak, lpTokenMap]
+        [poolStatsRecords, ashBase, lpBreak, lpTokenMap]
     );
 
     const getPoolRecords = useRecoilCallback(

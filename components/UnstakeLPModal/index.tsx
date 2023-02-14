@@ -1,7 +1,11 @@
 import { Slider } from "antd";
 import ICChevronRight from "assets/svg/chevron-right.svg";
-import { accIsInsufficientEGLDState } from "atoms/dappState";
+import {
+    accIsInsufficientEGLDState,
+    accIsLoggedInState,
+} from "atoms/dappState";
 import { FarmRecord } from "atoms/farmsState";
+import { clickedUnstakeModalState } from "atoms/unstakeState";
 import BigNumber from "bignumber.js";
 import Avatar from "components/Avatar";
 import BaseModal from "components/BaseModal";
@@ -16,7 +20,7 @@ import { formatAmount } from "helper/number";
 import useExitFarm from "hooks/useFarmContract/useExitFarm";
 import { useScreenSize } from "hooks/useScreenSize";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { theme } from "tailwind.config";
 import { useDebounce } from "use-debounce";
 type props = {
@@ -25,14 +29,12 @@ type props = {
     farmData: FarmRecord;
 };
 const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
-    const {
-        pool,
-        farm,
-        stakedData,
-        ashPerBlock,
-        farmTokenSupply,
-        emissionAPR,
-    } = farmData;
+    const { pool, farm, stakedData, ashPerSec, farmTokenSupply, emissionAPR } =
+        farmData;
+    const loggedIn = useRecoilValue(accIsLoggedInState);
+    const [isClickedUnstake, setIsClickedUnstake] = useRecoilState(
+        clickedUnstakeModalState
+    );
     const [unStakeAmt, setUnStakeAmt] = useState<BigNumber>(new BigNumber(0));
     const [deboundedUnstakeAmt] = useDebounce(unStakeAmt, 500);
     const [rawStakeAmt, setRawStakeAmt] = useState("");
@@ -40,7 +42,6 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
     const [rewardOnExit, setRewardOnExit] = useState(new BigNumber(0));
     const insufficientEGLD = useRecoilValue(accIsInsufficientEGLDState);
     const { exitFarm, estimateRewardOnExit } = useExitFarm();
-
     const setMaxStakeAmt = useCallback(() => {
         if (!stakedData?.totalStakedLP) return;
         setUnStakeAmt(stakedData.totalStakedLP);
@@ -50,23 +51,28 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
             )
         );
     }, [stakedData, farm]);
-
+    useEffect(() => {
+        if (window && loggedIn && !deboundedUnstakeAmt.eq(0)) {
+            let dataLayer = (window as any).dataLayer || [];
+            dataLayer.push({
+                event: "input_unstake_value",
+                amount: deboundedUnstakeAmt.toNumber() / 10 ** 18,
+                lp_token: pool?.lpToken?.symbol,
+            });
+        }
+    }, [deboundedUnstakeAmt]);
     const ashPerDay = useMemo(() => {
         if (!stakedData) return new BigNumber(0);
-        const totalAshPerDay = ashPerBlock
-            .multipliedBy(24 * 60 * 60)
-            .div(blockTimeMs / 1000);
+        const totalAshPerDay = ashPerSec.multipliedBy(24 * 60 * 60);
         const shareOfFarm = stakedData.totalStakedLP
             .multipliedBy(0.4)
             .div(farmTokenSupply);
         return totalAshPerDay.multipliedBy(shareOfFarm);
-    }, [stakedData, farmTokenSupply, ashPerBlock]);
+    }, [stakedData, farmTokenSupply, ashPerSec]);
 
     const afterUnstakeAshPerDay = useMemo(() => {
         if (!stakedData) return new BigNumber(0);
-        const totalAshPerDay = ashPerBlock
-            .multipliedBy(24 * 60 * 60)
-            .div(blockTimeMs / 1000);
+        const totalAshPerDay = ashPerSec.multipliedBy(24 * 60 * 60);
         const baseFarmToken = unStakeAmt.multipliedBy(0.4);
         const newStaked = stakedData.totalStakedLP
             .multipliedBy(0.4)
@@ -74,7 +80,7 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
         if (newStaked.lte(0)) return new BigNumber(0);
         const shareOfFarm = newStaked.div(farmTokenSupply.minus(baseFarmToken));
         return totalAshPerDay.multipliedBy(shareOfFarm);
-    }, [stakedData, farmTokenSupply, ashPerBlock, unStakeAmt]);
+    }, [stakedData, farmTokenSupply, ashPerSec, unStakeAmt]);
 
     const insufficientFarmToken = useMemo(() => {
         if (!stakedData?.totalStakedLP) return true;
@@ -170,6 +176,7 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
                                     const amt = toWei(pool.lpToken, raw);
                                     setRawStakeAmt(raw);
                                     setUnStakeAmt(amt);
+                                    setIsClickedUnstake(true);
                                 }}
                             />
                             <div className="text-right text-2xs lg:text-xs mt-2">
@@ -314,7 +321,7 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
             <div className="sm:flex sm:space-x-8 lg:space-x-24">
                 <div className="w-full mb-12 sm:mb-0 sm:grow">
                     <span className="text-xs text-ash-gray-500">
-                        I verify that I have read the{" "}
+                        Make sure you have read the{" "}
                         <a
                             href="https://docs.ashswap.io/testnet-guides/liquidity-staking"
                             target="_blank"
@@ -324,8 +331,7 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
                                 <u>AshSwap Liquidity Staking Guide</u>
                             </b>
                         </a>{" "}
-                        and understand the risks of providing liquidity,
-                        including impermanent loss.
+                        and understood the associated risks.
                     </span>
                 </div>
                 <div className="w-full sm:w-1/3 lg:w-[17.8125rem] shrink-0">

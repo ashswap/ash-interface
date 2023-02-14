@@ -21,7 +21,7 @@ const FarmRecord = ({
     order: number;
     farmData: FarmWithStatsRecords;
 }) => {
-    const [token1, token2] = farmData?.pool?.tokens || [];
+    const tokens = useMemo(() => farmData?.pool?.tokens, [farmData.pool]);
     const format = useCallback((val: number) => {
         if (typeof val !== "number") return "";
         return formatAmount(val)?.toUpperCase() || "";
@@ -44,19 +44,19 @@ const FarmRecord = ({
                     <div className="flex-1 overflow-hidden">
                         <div className="flex items-center mr-2 overflow-hidden">
                             <div className="shrink-0 flex">
-                                <Avatar
-                                    src={token1?.logoURI || ""}
-                                    alt="token"
-                                    className="w-4 h-4 lg:w-6 lg:h-6"
-                                />
-                                <Avatar
-                                    src={token2?.logoURI || ""}
-                                    alt="token"
-                                    className="w-4 h-4 lg:w-6 lg:h-6 -ml-1"
-                                />
+                                {tokens?.map((t) => {
+                                    return (
+                                        <Avatar
+                                            key={t.identifier}
+                                            src={t.logoURI}
+                                            alt={t.name}
+                                            className="w-4 h-4 lg:w-6 lg:h-6 -ml-1 first:ml-0"
+                                        />
+                                    );
+                                })}
                             </div>
                             <div className="ml-2 lg:ml-4 font-bold text-xs lg:text-sm text-white truncate">
-                                {token1?.symbol} & {token2?.symbol}
+                                {tokens?.map((t) => t.symbol).join(" & ")}
                             </div>
                         </div>
                     </div>

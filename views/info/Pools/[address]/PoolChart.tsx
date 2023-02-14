@@ -2,9 +2,8 @@ import { CHART_INTERVAL } from "const/time";
 import { ChartTimeUnitType } from "interface/chart";
 import IPool from "interface/pool";
 import { ValueOf } from "interface/utilities";
-import React, { useMemo, useState } from "react";
+import { useState } from "react";
 import PoolLiquidityChart from "./PoolLiquidityChart";
-import PoolPriceRatioAreaChart from "./PoolPriceRatioAreaChart";
 import PoolVolumeChart from "./PoolVolumeChart";
 const CHART_TYPES = {
     LIQUIDITY: "Liquidity",
@@ -18,7 +17,6 @@ type Props = { pool: IPool };
 function PoolChart({ pool }: Props) {
     const [chartType, setChartType] = useState<ChartType>("Liquidity");
     const [timeUnit, setTimeUnit] = useState<ChartTimeUnitType>("D");
-    const [token1, token2] = useMemo(() => pool.tokens, [pool]);
     return (
         <div className="flex flex-col px-4 md:px-8 py-4 md:pb-8 md:pt-7 bg-ash-dark-600 h-full overflow-hidden">
             <div className="text-ash-gray-500 flex space-x-2 shrink-0">

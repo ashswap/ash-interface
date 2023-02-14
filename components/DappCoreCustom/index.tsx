@@ -1,16 +1,18 @@
+import { TransactionSender } from "@elrondnetwork/dapp-core/components/TransactionSender";
 import { TransactionsTracker } from "@elrondnetwork/dapp-core/components/TransactionsTracker";
 import { useGetPendingTransactions } from "@elrondnetwork/dapp-core/hooks";
 import { checkBatch } from "@elrondnetwork/dapp-core/hooks/transactions/useCheckTransactionStatus/checkBatch";
-import { GetTransactionsByHashesReturnType, PendingTransactionsType, SignedTransactionsBodyType } from "@elrondnetwork/dapp-core/types";
+import { PendingTransactionsType, SignedTransactionsBodyType } from "@elrondnetwork/dapp-core/types";
 import {
     getIsTransactionPending
 } from "@elrondnetwork/dapp-core/utils";
 import { CustomComponentsType } from "@elrondnetwork/dapp-core/wrappers/DappProvider/CustomComponents";
 import { lastCompletedTxHashAtom } from "atoms/transactions";
+import emitter from "helper/emitter";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useRecoilValue } from "recoil";
-import {getTransactionsByHashes} from "@elrondnetwork/dapp-core/apiCalls/transactions/getTransactionsByHashes";
-import emitter from "helper/emitter";
+import { getTransactionsByHashes } from "./getTransactionsByHashes";
+import { sendSignedTransactionsAsync } from "./sendSignedTransactionAsync";
 
 const CustomTransactionsTracker: typeof TransactionsTracker = () => {
     const { pendingTransactionsArray } = useGetPendingTransactions();
@@ -31,7 +33,7 @@ const CustomTransactionsTracker: typeof TransactionsTracker = () => {
     }, [pendingTransactionsArray]);
 
     const getTransactionByHashesIntercept = useCallback(async (pendingTxs: PendingTransactionsType) => {
-        const serverTransactions: GetTransactionsByHashesReturnType = await getTransactionsByHashes(pendingTxs);
+        const serverTransactions = await getTransactionsByHashes(pendingTxs);
         const completedTxs = serverTransactions.filter(tx => tx.status !== 'pending');
         emitter.emit('onCheckBatchResult', completedTxs);
         return serverTransactions;
@@ -72,6 +74,7 @@ const CustomTransactionsTracker: typeof TransactionsTracker = () => {
                             checkBatch({
                                 sessionId,
                                 transactionBatch: batch,
+                                getTransactionsByHash: getTransactionByHashesIntercept
                             });
                         }, 2000);
                         if (intervalRef.current) {
@@ -79,7 +82,7 @@ const CustomTransactionsTracker: typeof TransactionsTracker = () => {
                         } else {
                             intervalRef.current = { [sessionId]: interval };
                         }
-                    }, 2 * 60000);
+                    }, 60000);
                     timeoutRef.current[sessionId] = timeout;
                 }
             }
@@ -105,7 +108,7 @@ const CustomTransactionsTracker: typeof TransactionsTracker = () => {
             }
         });
 
-    }, [pendingBatches]);
+    }, [getTransactionByHashesIntercept, pendingBatches]);
 
     return null;
 };
@@ -113,5 +116,11 @@ const CustomTransactionsTracker: typeof TransactionsTracker = () => {
 export const customComponents: CustomComponentsType = {
     transactionTracker: {
         component: CustomTransactionsTracker,
+    },
+    transactionSender: {
+        component: TransactionSender,
+        props: {
+            sendSignedTransactionsAsync
+        }
     },
 };

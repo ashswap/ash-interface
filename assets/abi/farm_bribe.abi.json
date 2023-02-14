@@ -1,0 +1,317 @@
+{
+    "buildInfo": {
+        "rustc": {
+            "version": "1.69.0-nightly",
+            "commitHash": "dc1d9d50fba2f6a1ccab8748a0050cde38253f60",
+            "commitDate": "2023-01-31",
+            "channel": "Nightly",
+            "short": "rustc 1.69.0-nightly (dc1d9d50f 2023-01-31)"
+        },
+        "contractCrate": {
+            "name": "farm_bribe",
+            "version": "0.0.0",
+            "git_version": "936cd89"
+        },
+        "framework": {
+            "name": "elrond-wasm",
+            "version": "0.33.1"
+        }
+    },
+    "name": "FarmBribeContract",
+    "constructor": {
+        "inputs": [
+            {
+                "name": "farm_controller_address",
+                "type": "Address"
+            }
+        ],
+        "outputs": []
+    },
+    "endpoints": [
+        {
+            "name": "commitTransferOwnership",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "_address",
+                    "type": "Address"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "applyTransferOwnership",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "addWhitelistToken",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "token_id",
+                    "type": "TokenIdentifier"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "removeWhitelistToken",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "token_id",
+                    "type": "TokenIdentifier"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "addRewardAmount",
+            "mutability": "mutable",
+            "payableInTokens": [
+                "*"
+            ],
+            "inputs": [
+                {
+                    "name": "farm_address",
+                    "type": "Address"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "checkpointRewardPerToken",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "farm_address",
+                    "type": "Address"
+                },
+                {
+                    "name": "reward_token_id",
+                    "type": "TokenIdentifier"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getClaimable",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "address",
+                    "type": "Address"
+                },
+                {
+                    "name": "farm_address",
+                    "type": "Address"
+                },
+                {
+                    "name": "reward_token_id",
+                    "type": "TokenIdentifier"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "claimReward",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "farm_address",
+                    "type": "Address"
+                },
+                {
+                    "name": "reward_token_id",
+                    "type": "TokenIdentifier"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getAdmin",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "Address"
+                }
+            ]
+        },
+        {
+            "name": "getFutureAdmin",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "Address"
+                }
+            ]
+        },
+        {
+            "name": "getFarmControllerAddress",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "Address"
+                }
+            ]
+        },
+        {
+            "name": "getClaimsPerFarm",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "farm_address",
+                    "type": "Address"
+                },
+                {
+                    "name": "reward_token_id",
+                    "type": "TokenIdentifier"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getRewardPerFarm",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "farm_address",
+                    "type": "Address"
+                },
+                {
+                    "name": "reward_token_id",
+                    "type": "TokenIdentifier"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getActivePeriod",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "farm_address",
+                    "type": "Address"
+                },
+                {
+                    "name": "reward_token_id",
+                    "type": "TokenIdentifier"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "getLastUserClaim",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "address",
+                    "type": "Address"
+                },
+                {
+                    "name": "farm_address",
+                    "type": "Address"
+                },
+                {
+                    "name": "reward_token_id",
+                    "type": "TokenIdentifier"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "getRewardsPerFarm",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "farm_address",
+                    "type": "Address"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "variadic<TokenIdentifier>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "getFarmsPerReward",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "reward_token_id",
+                    "type": "TokenIdentifier"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "variadic<Address>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "getWhitelistTokens",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "variadic<TokenIdentifier>",
+                    "multi_result": true
+                }
+            ]
+        }
+    ],
+    "events": [
+        {
+            "identifier": "claim_reward_event",
+            "inputs": [
+                {
+                    "name": "caller",
+                    "type": "Address",
+                    "indexed": true
+                },
+                {
+                    "name": "last_user_claim",
+                    "type": "u64"
+                }
+            ]
+        }
+    ],
+    "hasCallback": false,
+    "types": {}
+}
