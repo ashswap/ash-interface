@@ -17,6 +17,7 @@ import OnboardTooltip from "components/Tooltip/OnboardTooltip";
 import { useSwap } from "context/swap";
 import { toEGLDD } from "helper/balance";
 import { formatAmount } from "helper/number";
+import { getTokenFromId } from "helper/token";
 import { TokenAmount } from "helper/token/tokenAmount";
 import useInputNumberString from "hooks/useInputNumberString";
 import { useOnboarding } from "hooks/useOnboarding";
@@ -41,7 +42,10 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
     const [liquidityStr, setLiquidityStr] = useInputNumberString(liquidity, pool.lpToken.decimals);
     const [liquidityPercent, setLiquidityPercent] = useState<number>(0);
     const [outputValues, setOutputValues] = useState(
-        pool.tokens.map((t) => new TokenAmount(t, 0))
+        pool.tokens.map((_t) => {
+            const t = getTokenFromId(_t.identifier);
+            return new TokenAmount(t, 0)
+        })
     );
     const [liquidityDebounce] = useDebounce(liquidityWei, 500);
     const screenSize = useScreenSize();
@@ -92,7 +96,10 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
             async () => {
                 if (liquidityDebounce.eq(0) || liquidityDebounce.isNaN()) {
                     setOutputValues(
-                        pool.tokens.map((t, i) => new TokenAmount(t, 0))
+                        pool.tokens.map((_t, i) => {
+                            const t = getTokenFromId(_t.identifier);
+                            return new TokenAmount(t, 0);
+                        })
                     );
                 }
                 const { lpReserves } = await snapshot.getPromise(
@@ -102,7 +109,10 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
                     })
                 );
                 setOutputValues(
-                    pool.tokens.map((t, i) => new TokenAmount(t, lpReserves[i]))
+                    pool.tokens.map((_t, i) => {
+                        const t = getTokenFromId(_t.identifier);
+                        return new TokenAmount(t, lpReserves[i]);
+                    })
                 );
             },
         [pool.address, pool.tokens, liquidityDebounce]
@@ -114,7 +124,7 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
             const { sessionId } = await removeLP(
                 pool,
                 liquidityWei,
-                outputValues.map((amt) => amt.raw),
+                outputValues,
                 slippage
             );
             if (sessionId) onClose?.();
@@ -133,18 +143,19 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
             <div className="flex flex-row items-center mb-3">
                 <div className="mr-3">
                     <div className="text-text-input-3 text-xs">
-                        {pool.tokens.map((t) => t.symbol).join(" & ")}
+                        {pool.tokens.map((t) => getTokenFromId(t.identifier).symbol).join(" & ")}
                     </div>
                 </div>
                 <div className="flex flex-row justify-between items-center">
-                    {pool.tokens.map((t) => (
-                        <Avatar
+                    {pool.tokens.map((_t) => {
+                        const t = getTokenFromId(_t.identifier);
+                        return <Avatar
                             key={t.identifier}
                             src={t.logoURI}
                             alt={t.symbol}
                             className="w-3.5 h-3.5 first:-ml-0 -ml-1"
-                        />
-                    ))}
+                        />;
+                    })}
                 </div>
             </div>
             <div className="flex items-baseline text-2xl font-bold text-yellow-700">
@@ -244,7 +255,8 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
                         </div>
                     </div>
                     <div className="relative">
-                        {pool.tokens.map((t, i) => {
+                        {pool.tokens.map((_t, i) => {
+                            const t = getTokenFromId(_t.identifier);
                             return (
                                 <div key={t.identifier} className="my-1.5">
                                     <div className="flex items-center flex-row space-x-1 bg-ash-dark-700 sm:bg-transparent pl-4 sm:pl-0">
@@ -275,7 +287,7 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
                                                     notation: "standard",
                                                 }}
                                             />{" "}
-                                            {pool.tokens[i].symbol}
+                                            {t.symbol}
                                         </span>
                                     </div>
                                     {i !== pool.tokens.length - 1 && (

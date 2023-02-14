@@ -37,13 +37,14 @@ const moduleExports = withReactSvg(
             { dev, dir, outDir, distDir, buildId }
         ) {
             const ignorePaths = process.env.NEXT_PUBLIC_ASH_ENV === "alpha" ? [] : ["/stake/gov/bribe"];
+            const mainnetIgnorePaths = process.env.NEXT_PUBLIC_NETWORK === "mainnet" ? ["/stake/farms", "/swap", "/pool"] : [];
             const entries = Object.entries(defaultPathMap).map(
                 ([path, pageObj]) => {
                     return [
                         path,
                         {
                             ...pageObj,
-                            page: ignorePaths.includes(pageObj.page)
+                            page: [...ignorePaths, ...mainnetIgnorePaths].includes(pageObj.page)
                                 ? "/404"
                                 : pageObj.page,
                         },

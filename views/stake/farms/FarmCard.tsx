@@ -23,6 +23,7 @@ import { ASH_TOKEN } from "const/tokens";
 import { TRANSITIONS } from "const/transitions";
 import { toEGLDD } from "helper/balance";
 import { formatAmount } from "helper/number";
+import { getTokenFromId } from "helper/token";
 import useFarmClaimReward from "hooks/useFarmContract/useFarmClaimReward";
 import { useScreenSize } from "hooks/useScreenSize";
 import { useEffect, useMemo, useState } from "react";
@@ -168,7 +169,7 @@ function FarmCard({ farmData, viewType }: props) {
                                 }`}
                             >
                                 {farmData.pool.tokens
-                                    .map((t) => t.symbol)
+                                    .map((t) => getTokenFromId(t.identifier).symbol)
                                     .join(is2Pool ? " & " : "/")}
                             </div>
                         </div>
@@ -177,7 +178,8 @@ function FarmCard({ farmData, viewType }: props) {
                                 is2Pool ? "" : "-mr-2 max-w-[4.5rem]"
                             }`}
                         >
-                            {farmData.pool.tokens.map((t, i) => {
+                            {farmData.pool.tokens.map((_t, i) => {
+                                const t = getTokenFromId(_t.identifier);
                                 return (
                                     <Avatar
                                         key={t.identifier}
@@ -508,7 +510,8 @@ function FarmCard({ farmData, viewType }: props) {
                                 <div
                                     className={`shrink-0 flex flex-wrap justify-center w-8 md:w-12 lg:w-18`}
                                 >
-                                    {farmData.pool.tokens.map((t, i) => {
+                                    {farmData.pool.tokens.map((_t, i) => {
+                                        const t = getTokenFromId(_t.identifier);
                                         return (
                                             <Avatar
                                                 key={t.identifier}
@@ -528,9 +531,10 @@ function FarmCard({ farmData, viewType }: props) {
                                     })}
                                 </div>
                                 <div className="flex flex-col text-xs lg:text-lg font-bold md:space-y-2 leading-tight">
-                                    {farmData.pool.tokens.map((t) => (
-                                        <div key={t.identifier}>{t.symbol}</div>
-                                    ))}
+                                    {farmData.pool.tokens.map((_t) => {
+                                        const t = getTokenFromId(_t.identifier);
+                                        return <div key={t.identifier}>{t.symbol}</div>;
+                                    })}
                                 </div>
                             </div>
                             {/* emission APR */}

@@ -3,6 +3,7 @@ import IPool, { EPoolType } from "interface/pool";
 import { ENVIRONMENT } from "./env";
 import { MAIAR_POOLS } from "./maiarPools";
 import { TOKENS_MAP } from "./tokens";
+import { WRAPPED_EGLD } from "./wrappedEGLD";
 
 type PoolConfig = {
     beta: IPool[];
@@ -148,28 +149,11 @@ const mainnet: IPool[] = [
     // },
     {
         address:
-            "erd1qqqqqqqqqqqqqpgqjnl9caf076m864tg6rc05e6alxd2fpm2tk2qgx729y",
+            "erd1qqqqqqqqqqqqqpgqs8p2v9wr8j48vqrmudcj94wu47kqra3r4fvshfyd9c",
         lpToken: {
-            identifier: "ALP-8efbbe",
+            identifier: "ALP-afc922",
             chainId: ChainId.Mainnet,
-            symbol: "LPT-3pool",
-            name: "Ashswap LP",
-            decimals: 18,
-        },
-        tokens: [
-            TOKENS_MAP["USDC-bb1e62"],
-            TOKENS_MAP["USDT-821a84"],
-            TOKENS_MAP["BUSD-7f6b0f"],
-        ],
-        type: EPoolType.PlainPool,
-    },
-    {
-        address:
-            "erd1qqqqqqqqqqqqqpgqu4qzl6qdm4467dqpavce39y3usrwjwagtk2qvjcy7g",
-        lpToken: {
-            identifier: "ALP-c011fd",
-            chainId: ChainId.Mainnet,
-            symbol: "LPT-3pool",
+            symbol: "ALP-3pool",
             name: "Ashswap LP",
             decimals: 18,
         },
@@ -180,12 +164,44 @@ const mainnet: IPool[] = [
         ],
         type: EPoolType.PlainPool,
     },
+    {
+        address:
+            "erd1qqqqqqqqqqqqqpgq5l05l0ts4lphdktx33apl0ss9rzf4r244fvsva6j53",
+        lpToken: {
+            identifier: "ALP-5f9191",
+            chainId: ChainId.Mainnet,
+            symbol: "ALP-BUSD-WEGLD",
+            name: "Ashswap LP",
+            decimals: 18,
+        },
+        tokens: [
+            TOKENS_MAP["BUSD-40b57e"],
+            TOKENS_MAP["WEGLD-bd4d79"],
+        ],
+        type: EPoolType.PoolV2,
+    },
+    {
+        address:
+            "erd1qqqqqqqqqqqqqpgqn7969pvzaatp8p9yu6u5h2ce2gyw0x9j4fvsplvthl",
+        lpToken: {
+            identifier: "ALP-2d0cf8",
+            chainId: ChainId.Mainnet,
+            symbol: "ALP-USDT-ASH",
+            name: "Ashswap LP",
+            decimals: 18,
+        },
+        tokens: [
+            TOKENS_MAP["USDT-f8c08c"],
+            TOKENS_MAP["ASH-a642d1"],
+        ],
+        type: EPoolType.PoolV2,
+    },
 ];
 
 const pools =
     ENVIRONMENT.NETWORK == "devnet"
         ? [...devnet[ENVIRONMENT.ENV], ...MAIAR_POOLS]
-        : [...mainnet, ...MAIAR_POOLS];
+        : [...mainnet];
 export const POOLS_MAP_ADDRESS = Object.fromEntries(
     pools.map((p) => [p.address, p])
 );
@@ -194,12 +210,14 @@ export const POOLS_MAP_LP = Object.fromEntries(
 );
 const getTokenFromPools = (...pools: IPool[]) => {
     const map = new Map<string, IESDTInfo>();
+    let useWEGLD = false;
     pools.map((pool) => {
         pool.tokens.map((token) => {
+            useWEGLD = useWEGLD || WRAPPED_EGLD.wegld === token.identifier;
             map.set(token.identifier, token);
         });
     });
-    return Array.from(map.values());
+    return [...(useWEGLD ? [TOKENS_MAP["EGLD"]] : []), ...Array.from(map.values())];
 };
 
 export const IN_POOL_TOKENS = getTokenFromPools(...pools);

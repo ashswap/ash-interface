@@ -3,10 +3,12 @@ import BigNumber from "bignumber.js";
 import InputCurrency from "components/InputCurrency";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
 import pools from "const/pool";
+import { TOKENS_MAP } from "const/tokens";
+import { MINIMUM_EGLD_AMT, WRAPPED_EGLD } from "const/wrappedEGLD";
 import { useSwap } from "context/swap";
 import { toEGLDD } from "helper/balance";
-import { Percent } from "helper/fraction/percent";
 import { formatAmount, formatToSignificant } from "helper/number";
+import { getTokenIdFromCoin } from "helper/token";
 import { IESDTInfo } from "helper/token/token";
 import { useOnboarding } from "hooks/useOnboarding";
 import { useScreenSize } from "hooks/useScreenSize";
@@ -103,22 +105,33 @@ const SwapAmount = (props: Props) => {
         return pools.filter(
             (p) =>
                 p.tokens.findIndex(
-                    (t) => t.identifier == poolWithToken?.identifier
+                    (t) =>
+                        t.identifier ==
+                        getTokenIdFromCoin(poolWithToken.identifier)
                 ) !== -1
         );
     }, [poolWithToken]);
 
     let suggestedTokens = useMemo(() => {
         let tokens: IESDTInfo[] = [];
-
         validPools?.map((p) => {
             p.tokens.forEach((t) => {
-                if (t.identifier !== poolWithToken?.identifier) {
+                if (
+                    t.identifier !==
+                    getTokenIdFromCoin(poolWithToken?.identifier)
+                ) {
                     tokens.push(t);
                 }
             });
         });
 
+        const useEgld = tokens.some(t => t.identifier === WRAPPED_EGLD.wegld);
+        if(useEgld || poolWithToken?.identifier === WRAPPED_EGLD.wegld) {
+            tokens.push(TOKENS_MAP["EGLD"]);
+        }
+        if(poolWithToken?.identifier === "EGLD"){
+            tokens.push(TOKENS_MAP[WRAPPED_EGLD.wegld]);
+        }
         return tokens;
     }, [validPools, poolWithToken]);
 
@@ -181,7 +194,7 @@ const SwapAmount = (props: Props) => {
                 }
             >
                 <div
-                    className={`bg-bg flex px-2.5 pt-3.5 pb-4 sm:pb-5.5 ${styles.content}`}
+                    className={`bg-bg flex gap-2 px-2.5 pt-3.5 pb-4 sm:pb-5.5 ${styles.content}`}
                 >
                     <TokenSelect
                         modalTitle={
@@ -272,7 +285,7 @@ const SwapAmount = (props: Props) => {
                             }`}
                             onClick={() => {
                                 props.type === "from" &&
-                                    onChangeValue(balance.toString());
+                                    onChangeValue(token.identifier === "EGLD" ? BigNumber.max(balance.minus(MINIMUM_EGLD_AMT.div(10**18)), 0).toString() : balance.toString());
                             }}
                         >
                             {formatAmount(balance.toNumber(), {

@@ -21,6 +21,7 @@ import { theme } from "tailwind.config";
 import Link from "next/link";
 import { accIsLoggedInState } from "atoms/dappState";
 import { ENVIRONMENT } from "const/env";
+import { getTokenFromId } from "helper/token";
 type FarmRecordProps = {
     farmAddress: string;
     selected?: boolean;
@@ -55,16 +56,17 @@ const FarmRecord = memo(function FarmRecord({
             <td className="border border-black p-4">
                 <div className="flex flex-col sm:flex-row sm:items-center">
                     <div className="flex -space-x-0.5 mr-2 mb-2 sm:mb-0">
-                        {pool.tokens.map((t) => (
-                            <Avatar
+                        {pool.tokens.map((_t) => {
+                            const t = getTokenFromId(_t.identifier);
+                            return <Avatar
                                 key={t.identifier}
                                 src={t.logoURI}
                                 className="w-4 h-4"
                             />
-                        ))}
+                        })}
                     </div>
                     <div className="font-bold text-xs sm:text-sm md:text-lg text-stake-gray-500">
-                        {pool.tokens.map((t) => t.symbol).join("-")}
+                        {pool.tokens.map((t) => getTokenFromId(t.identifier).symbol).join("-")}
                     </div>
                 </div>
             </td>
@@ -79,7 +81,7 @@ const FarmRecord = memo(function FarmRecord({
                         className={`transition-all duration-300 shrink-0 mr-2 md:mr-6 w-4 sm:w-8 h-auto ${
                             hasBribe
                                 ? "text-pink-600/80 colored-drop-shadow-xs colored-drop-shadow-pink-600"
-                                : "text-ash-dark-400/60 stroke-ash-dark-400 group-hover:text-stake-gray-500/60"
+                                : selected ? "text-stake-gray-500/60" : "text-ash-dark-400/60 stroke-ash-dark-400 group-hover:text-stake-gray-500/60"
                         }`}
                     />
                     {hasBribe ? (
@@ -110,7 +112,7 @@ const FarmRecord = memo(function FarmRecord({
                         </>
                     ) : (
                         <>
-                            {ENVIRONMENT.ENV === "alpha" ? (
+                            {(ENVIRONMENT.ENV === "alpha" && ENVIRONMENT.NETWORK === "devnet") ? (
                                 <div className="font-bold text-lg text-ash-gray-600">
                                     No
                                 </div>
@@ -174,7 +176,7 @@ const VoteEditor = memo(function VoteEditor({ farmAddress }: VoteEditorProps) {
         <div className="flex flex-col md:flex-row md:items-start space-y-10 md:space-y-0 md:space-x-4">
             <div className="grow overflow-hidden">
                 <div className="font-bold text-xs sm:text-sm text-stake-gray-500 mb-3">
-                    {pool?.tokens.map((t) => t.symbol).join("-") ||
+                    {pool?.tokens.map((t) => getTokenFromId(t.identifier).symbol).join("-") ||
                         "Select a farm to start"}
                 </div>
                 <Slider

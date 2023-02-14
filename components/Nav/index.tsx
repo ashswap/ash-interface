@@ -9,6 +9,7 @@ import ICChart from "assets/svg/chart.svg";
 import ICNewTab from "assets/svg/new-tab.svg";
 import ICStake from "assets/svg/stake.svg";
 import StakeMenu from "./StakeMenu";
+import { ENVIRONMENT } from "const/env";
 
 const Nav = () => {
     const router = useRouter();
@@ -26,26 +27,30 @@ const Nav = () => {
         <div
             className={`${styles.container} text-black dark:text-white sm:space-x-[0.375rem]`}
         >
-            <Link href="/swap" passHref>
-                <div
-                    className={`transition ${styles.btn} ${
-                        isActive("/swap") ? styles.active : ""
-                    }`}
-                >
-                    <ICSwap className="inline-block w-4 h-4 md:mr-2 transition-none" />
-                    <span className="inline-block">Swap</span>
-                </div>
-            </Link>
-            <Link href="/pool" passHref>
-                <div
-                    className={`transition ${styles.btn} ${
-                        isActive("/pool") ? styles.active : ""
-                    }`}
-                >
-                    <ICPool className="inline-block w-4 h-4 md:mr-2 transition-none" />
-                    <span className="inline-block">Pool</span>
-                </div>
-            </Link>
+            {ENVIRONMENT.NETWORK !== "mainnet" && (
+                <>
+                    <Link href="/swap" passHref>
+                        <div
+                            className={`transition ${styles.btn} ${
+                                isActive("/swap") ? styles.active : ""
+                            }`}
+                        >
+                            <ICSwap className="inline-block w-4 h-4 md:mr-2 transition-none" />
+                            <span className="inline-block">Swap</span>
+                        </div>
+                    </Link>
+                    <Link href="/pool" passHref>
+                        <div
+                            className={`transition ${styles.btn} ${
+                                isActive("/pool") ? styles.active : ""
+                            }`}
+                        >
+                            <ICPool className="inline-block w-4 h-4 md:mr-2 transition-none" />
+                            <span className="inline-block">Pool</span>
+                        </div>
+                    </Link>
+                </>
+            )}
             {/* <Link href="/stake/gov" passHref>
                 <div
                     className={`transition ${styles.btn} ${
@@ -56,7 +61,7 @@ const Nav = () => {
                     <span className="inline-block">Stake</span>
                 </div>
             </Link> */}
-            <StakeMenu/>
+            <StakeMenu />
             <Link href="/info" passHref>
                 <a target="_blank">
                     <div
@@ -66,7 +71,9 @@ const Nav = () => {
                     >
                         <ICChart className="inline-block w-4 h-4 md:mr-2 transition-none" />
                         <div className="flex items-center">
-                            <span className="inline-block mr-1 truncate">Analytic</span>
+                            <span className="inline-block mr-1 truncate">
+                                Analytic
+                            </span>
                             <ICNewTab className="inline-block w-2.5 h-2.5 transition-none" />
                         </div>
                     </div>
