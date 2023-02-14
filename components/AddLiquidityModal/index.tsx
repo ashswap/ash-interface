@@ -5,9 +5,10 @@ import {
     accIsLoggedInState,
 } from "atoms/dappState";
 import {
-    ashRawPoolByAddressQuery,
-    poolFeesQuery,
+    ashRawPoolV1ByAddressQuery,
+    poolV1FeesQuery,
     PoolsState,
+    ashRawPoolV2ByAddressQuery,
 } from "atoms/poolsState";
 import { tokenMapState } from "atoms/tokensState";
 import BigNumber from "bignumber.js";
@@ -18,19 +19,23 @@ import InputCurrency from "components/InputCurrency";
 import TextAmt from "components/TextAmt";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
 import { toEGLDD, toWei } from "helper/balance";
+import { ContractManager } from "helper/contracts/contractManager";
 import { Fraction } from "helper/fraction/fraction";
 import { calculateEstimatedMintAmount } from "helper/stableswap/calculator/amounts";
+import { getTokenFromId } from "helper/token";
 import { IESDTInfo } from "helper/token/token";
 import { TokenAmount } from "helper/token/tokenAmount";
 import { useOnboarding } from "hooks/useOnboarding";
 import usePoolAddLP from "hooks/usePoolContract/usePoolAddLP";
 import { useScreenSize } from "hooks/useScreenSize";
 import produce from "immer";
+import { EPoolType } from "interface/pool";
 import { Unarray } from "interface/utilities";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRecoilCallback, useRecoilValue, useSetRecoilState } from "recoil";
 import { theme } from "tailwind.config";
+import { useDebounce } from "use-debounce";
 
 interface Props {
     open?: boolean;
@@ -60,6 +65,17 @@ const TokenInput = ({
         },
         [_onChangeValue]
     );
+    const [deboundValue] = useDebounce(value, 500);
+    useEffect(() => {
+        if (window && value) {
+            let dataLayer = (window as any).dataLayer || [];
+            dataLayer.push({
+                event: "input_liquidity_value",
+                amount: value,
+                token: token.identifier,
+            });
+        }
+    }, [deboundValue, token]);
     return (
         <>
             <div className="bg-ash-dark-700 sm:bg-transparent flex space-x-1 items-center sm:items-stretch">
@@ -141,7 +157,7 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
     );
     const [isProMode, setIsProMode] = useState(false);
     const [adding, setAdding] = useState(false);
-    const addPoolLP = usePoolAddLP();
+    const {addLiquidity: addPoolLP} = usePoolAddLP();
     // recoil
     const tokenMap = useRecoilValue(tokenMapState);
     const loggedIn = useRecoilValue(accIsLoggedInState);
@@ -157,18 +173,33 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
     const addLP = useRecoilCallback(
         ({ snapshot }) =>
             async () => {
-                const poolData = await snapshot.getPromise(
-                    ashRawPoolByAddressQuery(pool.address)
-                );
-                const poolFee = await snapshot.getPromise(
-                    poolFeesQuery(pool.address)
-                );
-                if (!loggedIn || adding || !poolData) return;
-                const { ampFactor, reserves, totalSupply } = poolData;
-                if (!ampFactor || !reserves || !totalSupply) return;
                 setAdding(true);
+                let mintAmt = new BigNumber(0);
+                if (pool.type === EPoolType.PoolV2) {
+                    const rawPoolV2 = await snapshot.getPromise(
+                        ashRawPoolV2ByAddressQuery(pool.address)
+                    );
+                    const amts = pool.tokens.map((t, i) => {
+                        return toWei(t, inputValues[i].toString() || "0");
+                    });
+                    mintAmt = rawPoolV2?.reserves
+                        .reduce((sum, r) => sum.plus(r), new BigNumber(0))
+                        .gt(0)
+                        ? await ContractManager.getPoolV2Contract(
+                              pool.address
+                          ).estimateAddLiquidity(amts)
+                        : new BigNumber(0);
+                } else {
+                    const poolData = await snapshot.getPromise(
+                        ashRawPoolV1ByAddressQuery(pool.address)
+                    );
+                    const poolFee = await snapshot.getPromise(
+                        poolV1FeesQuery(pool.address)
+                    );
+                    if (!loggedIn || adding || !poolData) return;
+                    const { ampFactor, reserves, totalSupply } = poolData;
+                    if (!ampFactor || !reserves || !totalSupply) return;
 
-                try {
                     const { mintAmount } = calculateEstimatedMintAmount(
                         new BigNumber(ampFactor),
                         pool.tokens.map(
@@ -180,16 +211,19 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
                             toWei(t, inputValues[i].toString() || "0")
                         )
                     );
+                    mintAmt = mintAmount.raw;
+                }
+                try {
                     const { sessionId } = await addPoolLP(
                         pool,
-                        pool.tokens.map((t, i) =>
-                            toWei(t, inputValues[i].toString() || "0")
-                        ),
-                        mintAmount.raw
+                        pool.tokens.map((_t, i) => {
+                            const t = getTokenFromId(_t.identifier);
+                            return new TokenAmount(t, toWei(t, inputValues[i].toString() || "0"));
+                        }),
+                        mintAmt
                             .multipliedBy(0.99) // expected receive at least 99% of estimation LP
                             .integerValue(BigNumber.ROUND_DOWN)
                     );
-
                     setAddLPSessionId(sessionId || "");
                     if (sessionId) onClose?.();
                 } catch (error) {
@@ -208,9 +242,9 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
             setAddLPSessionId,
         ]
     );
-
     const tokenInputProps = useMemo(() => {
-        return pool.tokens.map((t, i) => {
+        return pool.tokens.map((_t, i) => {
+            const t = getTokenFromId(_t.identifier);
             const userInput = Fraction.fromBigNumber(inputValues[i] || 0);
             const tokenAmt = new TokenAmount(
                 t,
@@ -260,7 +294,8 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
                 <div className="mr-2">
                     {/* <div className="text-text-input-3 text-xs">Deposit</div> */}
                     <div className="text-lg sm:text-2xl font-bold">
-                        {pool.tokens.map((t, i) => {
+                        {pool.tokens.map((_t, i) => {
+                            const t = getTokenFromId(_t.identifier);
                             return (
                                 <span key={t.identifier}>
                                     <span>{t.symbol}</span>
@@ -275,7 +310,8 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
                     </div>
                 </div>
                 <div className="flex flex-row justify-between items-center">
-                    {pool.tokens.map((t, i) => {
+                    {pool.tokens.map((_t, i) => {
+                        const t = getTokenFromId(_t.identifier);
                         return (
                             <Avatar
                                 key={t.identifier}
@@ -381,7 +417,7 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
                                 <u>AshSwap Pools Guide</u>
                             </b>
                         </a>{" "}
-                        and understand the associated risks.
+                        and understood the associated risks.
                     </span>
                 </div>
                 <div className="w-full sm:w-1/3">

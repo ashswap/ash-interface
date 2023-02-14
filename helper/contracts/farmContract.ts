@@ -5,10 +5,19 @@ import { getAddress } from "@elrondnetwork/dapp-core/utils";
 import BigNumber from "bignumber.js";
 import { FarmTokenAttrs } from "interface/farm";
 import chunk from "lodash.chunk";
-class FarmContract extends Contract {
+import moment from "moment";
+import { WEEK } from "const/ve";
+class FarmContract extends Contract<typeof farmAbi> {
     private readonly MAX_TOKEN_PROCESS = 5;
+    lastRewardBlockTs = 0;
     constructor(address: string) {
         super(address, farmAbi);
+    }
+
+    private _getBaseGasLimit() {
+        const week = Math.floor(moment().unix() / WEEK) - Math.floor(this.lastRewardBlockTs / WEEK);
+        // each interation by week of checkpoint cost 12_000_000 (farm contract) + checkpoint farm (farm controller) cost 10_000_000
+        return week * 12_000_000 + 10_000_000;
     }
 
     private async _enterFarm(tokenPayments: TokenPayment[], selfBoost = false) {
@@ -18,7 +27,7 @@ class FarmContract extends Contract {
             tokenPayments,
             new Address(sender)
         );
-        interaction.withGasLimit(13_000_000 + tokenPayments.length * 2_000_000);
+        interaction.withGasLimit(20_000_000 + tokenPayments.length * 2_000_000 + this._getBaseGasLimit());
         return this.interceptInteraction(interaction)
             .check()
             .buildTransaction();
@@ -31,7 +40,7 @@ class FarmContract extends Contract {
             tokenPayments,
             new Address(sender)
         );
-        interaction.withGasLimit(13_000_000 + tokenPayments.length * 2_000_000);
+        interaction.withGasLimit(20_000_000 + tokenPayments.length * 2_000_000 + this._getBaseGasLimit());
         return this.interceptInteraction(interaction)
             .check()
             .buildTransaction();
@@ -47,7 +56,7 @@ class FarmContract extends Contract {
             tokenPayments,
             new Address(sender)
         );
-        interaction.withGasLimit(13_000_000 + tokenPayments.length * 2_500_000);
+        interaction.withGasLimit(20_000_000 + tokenPayments.length * 2_500_000 + this._getBaseGasLimit());
         return this.interceptInteraction(interaction)
             .check()
             .buildTransaction();
@@ -90,6 +99,11 @@ class FarmContract extends Contract {
         let interaction = this.contract.methods.getSlopeBoosted([address]);
         const { firstValue } = await this.runQuery(interaction);
         return (firstValue?.valueOf() as BigNumber) || new BigNumber(0);
+    }
+
+    withLastRewardBlockTs(ts: number){
+        this.lastRewardBlockTs = ts;
+        return this;
     }
 }
 

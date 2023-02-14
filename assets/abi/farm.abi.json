@@ -1,16 +1,16 @@
 {
     "buildInfo": {
         "rustc": {
-            "version": "1.66.0-nightly",
-            "commitHash": "7fcf850d7942804990a1d2e3fe036622a0fe4c74",
-            "commitDate": "2022-10-23",
+            "version": "1.69.0-nightly",
+            "commitHash": "dc1d9d50fba2f6a1ccab8748a0050cde38253f60",
+            "commitDate": "2023-01-31",
             "channel": "Nightly",
-            "short": "rustc 1.66.0-nightly (7fcf850d7 2022-10-23)"
+            "short": "rustc 1.69.0-nightly (dc1d9d50f 2023-01-31)"
         },
         "contractCrate": {
             "name": "farm",
             "version": "0.0.0",
-            "git_version": "a2dab03"
+            "git_version": "da57eb6"
         },
         "framework": {
             "name": "elrond-wasm",
@@ -33,11 +33,15 @@
                 "type": "BigUint"
             },
             {
+                "name": "voting_escrow_address",
+                "type": "Address"
+            },
+            {
                 "name": "rewarder_address",
                 "type": "Address"
             },
             {
-                "name": "voting_escrow_address",
+                "name": "farm_controller_address",
                 "type": "Address"
             }
         ],
@@ -113,56 +117,10 @@
             ]
         },
         {
-            "name": "end_produce_rewards",
-            "onlyOwner": true,
+            "name": "checkpointFarmRewards",
             "mutability": "mutable",
             "inputs": [],
             "outputs": []
-        },
-        {
-            "name": "setPerBlockRewardAmount",
-            "onlyOwner": true,
-            "mutability": "mutable",
-            "inputs": [
-                {
-                    "name": "per_block_amount",
-                    "type": "BigUint"
-                }
-            ],
-            "outputs": []
-        },
-        {
-            "name": "registerFarmToken",
-            "onlyOwner": true,
-            "mutability": "mutable",
-            "payableInTokens": [
-                "EGLD"
-            ],
-            "inputs": [
-                {
-                    "name": "token_display_name",
-                    "type": "bytes"
-                },
-                {
-                    "name": "token_ticker",
-                    "type": "bytes"
-                },
-                {
-                    "name": "num_decimals",
-                    "type": "u32"
-                }
-            ],
-            "outputs": []
-        },
-        {
-            "name": "getFarmTokenId",
-            "mutability": "readonly",
-            "inputs": [],
-            "outputs": [
-                {
-                    "type": "TokenIdentifier"
-                }
-            ]
         },
         {
             "name": "startProduceRewards",
@@ -172,24 +130,11 @@
             "outputs": []
         },
         {
-            "name": "getRewardPerShare",
-            "mutability": "readonly",
+            "name": "endProduceRewards",
+            "onlyOwner": true,
+            "mutability": "mutable",
             "inputs": [],
-            "outputs": [
-                {
-                    "type": "BigUint"
-                }
-            ]
-        },
-        {
-            "name": "getRewardReserve",
-            "mutability": "readonly",
-            "inputs": [],
-            "outputs": [
-                {
-                    "type": "BigUint"
-                }
-            ]
+            "outputs": []
         },
         {
             "name": "pause",
@@ -204,6 +149,16 @@
             "mutability": "mutable",
             "inputs": [],
             "outputs": []
+        },
+        {
+            "name": "getMaxTokenToProcess",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
         },
         {
             "name": "setMaxTokenToProcess",
@@ -238,6 +193,28 @@
             ]
         },
         {
+            "name": "getFarmTokenId",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "TokenIdentifier"
+                }
+            ]
+        },
+        {
+            "name": "setFarmTokenId",
+            "onlyOwner": true,
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "token_id",
+                    "type": "TokenIdentifier"
+                }
+            ],
+            "outputs": []
+        },
+        {
             "name": "getFarmingTokenId",
             "mutability": "readonly",
             "inputs": [],
@@ -258,7 +235,7 @@
             ]
         },
         {
-            "name": "getPerBlockRewardAmount",
+            "name": "getRewardPerSec",
             "mutability": "readonly",
             "inputs": [],
             "outputs": [
@@ -278,7 +255,7 @@
             ]
         },
         {
-            "name": "getLastRewardBlockNonce",
+            "name": "getLastRewardBlockTs",
             "mutability": "readonly",
             "inputs": [],
             "outputs": [
@@ -289,6 +266,26 @@
         },
         {
             "name": "getDivisionSafetyConstant",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getRewardPerShare",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getRewardReserve",
             "mutability": "readonly",
             "inputs": [],
             "outputs": [
@@ -333,14 +330,49 @@
             ]
         },
         {
-            "name": "getMaxTokenToProcess",
+            "name": "getFarmControllerAddress",
             "mutability": "readonly",
             "inputs": [],
             "outputs": [
                 {
-                    "type": "u64"
+                    "type": "Address"
                 }
             ]
+        },
+        {
+            "name": "getAdditionalRewards",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "token",
+                    "type": "TokenIdentifier"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "FarmAdditionalRewards"
+                }
+            ]
+        },
+        {
+            "name": "setAdditionalRewards",
+            "onlyOwner": true,
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "token",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "reward_per_sec",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "period_reward_end",
+                    "type": "u64"
+                }
+            ],
+            "outputs": []
         }
     ],
     "events": [
@@ -364,7 +396,7 @@
             ]
         }
     ],
-    "hasCallback": true,
+    "hasCallback": false,
     "types": {
         "KeyValue": {
             "type": "struct",
@@ -375,6 +407,19 @@
                 },
                 {
                     "name": "value",
+                    "type": "BigUint"
+                }
+            ]
+        },
+        "RewardTokens": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "token",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "reward_per_share",
                     "type": "BigUint"
                 }
             ]
@@ -393,6 +438,23 @@
                 {
                     "name": "amount",
                     "type": "BigUint"
+                }
+            ]
+        },
+        "FarmAdditionalRewards": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "reward_per_sec",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "reward_per_share",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "period_reward_end",
+                    "type": "u64"
                 }
             ]
         },
@@ -418,6 +480,10 @@
                 {
                     "name": "initial_farming_amount",
                     "type": "BigUint"
+                },
+                {
+                    "name": "reward_tokens",
+                    "type": "List<RewardTokens>"
                 }
             ]
         },

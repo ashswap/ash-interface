@@ -1,0 +1,831 @@
+{
+    "buildInfo": {
+        "rustc": {
+            "version": "1.69.0-nightly",
+            "commitHash": "dc1d9d50fba2f6a1ccab8748a0050cde38253f60",
+            "commitDate": "2023-01-31",
+            "channel": "Nightly",
+            "short": "rustc 1.69.0-nightly (dc1d9d50f 2023-01-31)"
+        },
+        "contractCrate": {
+            "name": "farm_controller",
+            "version": "0.0.0",
+            "git_version": "36212f0"
+        },
+        "framework": {
+            "name": "elrond-wasm",
+            "version": "0.33.1"
+        }
+    },
+    "name": "FarmControllerContract",
+    "constructor": {
+        "inputs": [
+            {
+                "name": "_voting_escrow",
+                "type": "Address"
+            }
+        ],
+        "outputs": []
+    },
+    "endpoints": [
+        {
+            "name": "commitTransferOwnership",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "_address",
+                    "type": "Address"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "applyTransferOwnership",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "addFarm",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "farm_address",
+                    "type": "Address"
+                },
+                {
+                    "name": "farm_type",
+                    "type": "u64"
+                },
+                {
+                    "name": "weight",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "checkpoint",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "checkpointFarm",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "farm_address",
+                    "type": "Address"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "getFarmRelativeWeight",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "farm_address",
+                    "type": "Address"
+                },
+                {
+                    "name": "time",
+                    "type": "u64"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "addType",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "name",
+                    "type": "bytes"
+                },
+                {
+                    "name": "weight",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "changeTypeWeight",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "farm_type",
+                    "type": "u64"
+                },
+                {
+                    "name": "weight",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "changeFarmWeight",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "farm_address",
+                    "type": "Address"
+                },
+                {
+                    "name": "weight",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "voteForFarmWeights",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "farm_address",
+                    "type": "Address"
+                },
+                {
+                    "name": "user_weight",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "getAllFarmMetadata",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "variadic<FarmMetadata>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "getAllFarmTypeMetadata",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "variadic<FarmTypeMetadata>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "getFarmTypes",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "_farm_address",
+                    "type": "Address"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "getPointsSum",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "farm_type",
+                    "type": "u64"
+                },
+                {
+                    "name": "t",
+                    "type": "u64"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "VotedPoint"
+                }
+            ]
+        },
+        {
+            "name": "getPointsWeight",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "farm_address",
+                    "type": "Address"
+                },
+                {
+                    "name": "t",
+                    "type": "u64"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "VotedPoint"
+                }
+            ]
+        },
+        {
+            "name": "getVoteUserSlope",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "address",
+                    "type": "Address"
+                },
+                {
+                    "name": "farm_address",
+                    "type": "Address"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "VotedSlope"
+                }
+            ]
+        },
+        {
+            "name": "getFarmWeight",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "farm_address",
+                    "type": "Address"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getTypeWeight",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "farm_type",
+                    "type": "u64"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getTotalWeight",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getWeightsSumPerType",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "farm_type",
+                    "type": "u64"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getPointsTotal",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getAdmin",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "Address"
+                }
+            ]
+        },
+        {
+            "name": "getFutureAdmin",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "Address"
+                }
+            ]
+        },
+        {
+            "name": "getVotingEscrowAddress",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "Address"
+                }
+            ]
+        },
+        {
+            "name": "getNFarmTypes",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "getNFarms",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "getFarmTypeName",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "farm_type",
+                    "type": "u64"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "bytes"
+                }
+            ]
+        },
+        {
+            "name": "getFarmByIndex",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "index",
+                    "type": "u64"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "Address"
+                }
+            ]
+        },
+        {
+            "name": "getVoteUserPower",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "address",
+                    "type": "Address"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getLastUserVote",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "address",
+                    "type": "Address"
+                },
+                {
+                    "name": "farm_address",
+                    "type": "Address"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "getChangesWeight",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "farm_address",
+                    "type": "Address"
+                },
+                {
+                    "name": "ts",
+                    "type": "u64"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getTimeWeight",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "farm_address",
+                    "type": "Address"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "getChangesSum",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "farm_type",
+                    "type": "u64"
+                },
+                {
+                    "name": "ts",
+                    "type": "u64"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getTimeSum",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "farm_type",
+                    "type": "u64"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "getTimeTotal",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "getPointsTypeWeight",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "farm_type",
+                    "type": "u64"
+                },
+                {
+                    "name": "ts",
+                    "type": "u64"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getTimeTypeWeight",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "farm_type",
+                    "type": "u64"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        }
+    ],
+    "events": [
+        {
+            "identifier": "commit_ownership_event",
+            "inputs": [
+                {
+                    "name": "caller",
+                    "type": "Address",
+                    "indexed": true
+                },
+                {
+                    "name": "admin",
+                    "type": "Address",
+                    "indexed": true
+                }
+            ]
+        },
+        {
+            "identifier": "apply_ownership_event",
+            "inputs": [
+                {
+                    "name": "caller",
+                    "type": "Address",
+                    "indexed": true
+                },
+                {
+                    "name": "admin",
+                    "type": "Address",
+                    "indexed": true
+                }
+            ]
+        },
+        {
+            "identifier": "add_type_event",
+            "inputs": [
+                {
+                    "name": "caller",
+                    "type": "Address",
+                    "indexed": true
+                },
+                {
+                    "name": "add_type_event",
+                    "type": "AddTypeEvent"
+                }
+            ]
+        },
+        {
+            "identifier": "new_type_weight_event",
+            "inputs": [
+                {
+                    "name": "caller",
+                    "type": "Address",
+                    "indexed": true
+                },
+                {
+                    "name": "new_type_weight_event",
+                    "type": "NewTypeWeightEvent"
+                }
+            ]
+        },
+        {
+            "identifier": "new_farm_weight_event",
+            "inputs": [
+                {
+                    "name": "caller",
+                    "type": "Address",
+                    "indexed": true
+                },
+                {
+                    "name": "new_farm_weight_event",
+                    "type": "NewFarmWeightEvent"
+                }
+            ]
+        },
+        {
+            "identifier": "vote_for_farm_event",
+            "inputs": [
+                {
+                    "name": "caller",
+                    "type": "Address",
+                    "indexed": true
+                },
+                {
+                    "name": "vote_for_farm_event",
+                    "type": "VoteForFarmEvent"
+                }
+            ]
+        },
+        {
+            "identifier": "new_farm_event",
+            "inputs": [
+                {
+                    "name": "caller",
+                    "type": "Address",
+                    "indexed": true
+                },
+                {
+                    "name": "new_farm_event",
+                    "type": "NewFarmEvent"
+                }
+            ]
+        }
+    ],
+    "hasCallback": false,
+    "types": {
+        "VotedPoint": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "bias",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "slope",
+                    "type": "BigUint"
+                }
+            ]
+        },
+        "AddTypeEvent": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "name",
+                    "type": "bytes"
+                },
+                {
+                    "name": "farm_type",
+                    "type": "u64"
+                }
+            ]
+        },
+        "FarmMetadata": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "address",
+                    "type": "Address"
+                },
+                {
+                    "name": "relative_weight",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "next_relative_weight",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "farm_type",
+                    "type": "u64"
+                },
+                {
+                    "name": "voted_point",
+                    "type": "VotedPoint"
+                },
+                {
+                    "name": "next_voted_point",
+                    "type": "VotedPoint"
+                }
+            ]
+        },
+        "FarmTypeMetadata": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "farm_type",
+                    "type": "u64"
+                },
+                {
+                    "name": "name",
+                    "type": "bytes"
+                },
+                {
+                    "name": "weight",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "next_weight",
+                    "type": "BigUint"
+                }
+            ]
+        },
+        "NewFarmEvent": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "address",
+                    "type": "Address"
+                },
+                {
+                    "name": "farm_type",
+                    "type": "u64"
+                },
+                {
+                    "name": "weight",
+                    "type": "BigUint"
+                }
+            ]
+        },
+        "NewFarmWeightEvent": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "farm_address",
+                    "type": "Address"
+                },
+                {
+                    "name": "time",
+                    "type": "u64"
+                },
+                {
+                    "name": "weight",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "total_weight",
+                    "type": "BigUint"
+                }
+            ]
+        },
+        "NewTypeWeightEvent": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "farm_type",
+                    "type": "u64"
+                },
+                {
+                    "name": "time",
+                    "type": "u64"
+                },
+                {
+                    "name": "weight",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "total_weight",
+                    "type": "BigUint"
+                }
+            ]
+        },
+        "VoteForFarmEvent": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "time",
+                    "type": "u64"
+                },
+                {
+                    "name": "user",
+                    "type": "Address"
+                },
+                {
+                    "name": "farm_address",
+                    "type": "Address"
+                },
+                {
+                    "name": "weight",
+                    "type": "BigUint"
+                }
+            ]
+        },
+        "VotedSlope": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "slope",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "power",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "end",
+                    "type": "u64"
+                }
+            ]
+        }
+    }
+}

@@ -12,17 +12,15 @@ import { toEGLDD } from "helper/balance";
 import { IESDTInfo } from "helper/token/token";
 import { useMemo } from "react";
 import { useRecoilValue } from "recoil";
+import Link from "next/link";
+import { WRAPPED_EGLD } from "const/wrappedEGLD";
 type TokenWithBalance = IESDTInfo & {
     balance: BigNumber;
 };
-const TokenBalance = ({
-    data,
-}: {
-    data: Omit<TokenWithBalance, "identifier">;
-}) => {
+const TokenBalance = ({ data }: { data: TokenWithBalance }) => {
     return (
-        <div className="flex justify-between px-6 py-2">
-            <div className="flex items-center mr-2">
+        <div className="flex items-center justify-between px-6">
+            <div className="flex items-center mr-2 h-8">
                 {data.logoURI ? (
                     <Avatar
                         src={data.logoURI}
@@ -35,6 +33,32 @@ const TokenBalance = ({
                 <span className="text-white text-xs font-bold ml-2">
                     {data.symbol}
                 </span>
+                {data.identifier === "EGLD" && (
+                    <Link href={{
+                        pathname: "/swap",
+                        query: {
+                            tokenIn: "EGLD",
+                            tokenOut: WRAPPED_EGLD.wegld
+                        }
+                    }}>
+                        <a>
+                            <button className="border boder-white font-medium text-2xs text-white p-1 ml-2">Wrap</button>
+                        </a>
+                    </Link>
+                )}
+                {data.identifier === WRAPPED_EGLD.wegld && (
+                    <Link href={{
+                        pathname: "/swap",
+                        query: {
+                            tokenIn: WRAPPED_EGLD.wegld,
+                            tokenOut: "EGLD"
+                        }
+                    }}>
+                        <a>
+                            <button className="border boder-white font-medium text-2xs text-white p-1 ml-2">Unwrap</button>
+                        </a>
+                    </Link>
+                )}
             </div>
             <div className="text-stake-gray-500 text-xs">
                 <TextAmt
@@ -48,7 +72,6 @@ const TokenBalance = ({
 function WalletBalance() {
     const tokenMap = useRecoilValue(tokenMapState);
     const lpTokenMap = useRecoilValue(lpTokenMapState);
-    const egldBalance = useRecoilValue(accBalanceState);
     const ashSupportedBalances = useMemo(() => {
         const supportedTokens: TokenWithBalance[] = TOKENS.map((t) => {
             return {
@@ -71,29 +94,12 @@ function WalletBalance() {
 
         return [...supportedTokens, ...lpTokens];
     }, [tokenMap, lpTokenMap]);
-    const egld: Omit<TokenWithBalance, "identifier"> = useMemo(() => {
-        return {
-            chainId:
-                ENVIRONMENT.NETWORK === "devnet"
-                    ? CHAIN_ID.DEVNET
-                    : CHAIN_ID.MAINNET,
-            symbol:
-                ENVIRONMENT.NETWORK === "devnet"
-                    ? "dEGLD"
-                    : "EGLD",
-            name: "Elrond eGold",
-            balance: new BigNumber(egldBalance),
-            icon: ImgEgldIcon,
-            decimals: 18,
-        };
-    }, [egldBalance]);
     return (
         <div className="bg-stake-dark-500 py-4">
             <div className="px-6 text-stake-gray-500 text-xs font-bold mb-4">
                 Wallet
             </div>
             <div className="overflow-auto flex flex-col h-40">
-                <TokenBalance data={egld} />
                 {ashSupportedBalances.map((t) => {
                     return <TokenBalance key={t.identifier} data={t} />;
                 })}

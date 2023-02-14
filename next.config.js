@@ -32,6 +32,28 @@ const moduleExports = withReactSvg(
             disableServerWebpackPlugin: process.env.BUILD_ENV !== "prod",
             disableClientWebpackPlugin: process.env.BUILD_ENV !== "prod",
         },
+        exportPathMap: async function (
+            defaultPathMap,
+            { dev, dir, outDir, distDir, buildId }
+        ) {
+            const ignorePaths = process.env.NEXT_PUBLIC_ASH_ENV === "alpha" ? [] : ["/stake/gov/bribe"];
+            const mainnetIgnorePaths = process.env.NEXT_PUBLIC_NETWORK === "mainnet" ? ["/stake/farms", "/swap", "/pool"] : [];
+            const entries = Object.entries(defaultPathMap).map(
+                ([path, pageObj]) => {
+                    return [
+                        path,
+                        {
+                            ...pageObj,
+                            page: [...ignorePaths, ...mainnetIgnorePaths].includes(pageObj.page)
+                                ? "/404"
+                                : pageObj.page,
+                        },
+                    ];
+                }
+            );
+            const pathMap = Object.fromEntries(entries);
+            return pathMap;
+        },
     })
 );
 

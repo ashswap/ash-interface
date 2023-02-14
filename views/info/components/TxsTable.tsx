@@ -3,35 +3,97 @@ import ICArrowLeft from "assets/svg/arrow-left.svg";
 import ICArrowRight from "assets/svg/arrow-right.svg";
 import ICChevronDown from "assets/svg/chevron-down.svg";
 import { networkConfigState } from "atoms/dappState";
+import BigNumber from "bignumber.js";
 import BasePopover from "components/BasePopover";
+import { POOLS_MAP_ADDRESS } from "const/pool";
 import { TOKENS_MAP } from "const/tokens";
 import { toEGLDD } from "helper/balance";
 import { formatAmount } from "helper/number";
+import { IESDTInfo } from "helper/token/token";
+import { TokenAmount } from "helper/token/tokenAmount";
 import { useScreenSize } from "hooks/useScreenSize";
 import { TxStatsRecord } from "interface/txStats";
 import moment from "moment";
 import { useEffect, useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
 
-const actionLabelMap: Record<
-    TxStatsRecord["action"],
-    { action: string; separator: string }
-> = {
-    exchange: { action: "swap", separator: "to" },
-    addLiquidity: { action: "deposit", separator: "and" },
-    removeLiquidity: { action: "withdraw", separator: "and" },
-};
 const TxRecord = ({ txStats }: { txStats: TxStatsRecord }) => {
-    const tokenId1 = txStats.token_id_1;
-    const tokenId2 = txStats.token_id_2;
-    const amt1 = txStats.amount_1;
-    const amt2 = txStats.amount_2;
-    const token1 = TOKENS_MAP[tokenId1];
-    const token2 = TOKENS_MAP[tokenId2];
-    const label = actionLabelMap[txStats.action];
     const [time, setTime] = useState("");
     const network: AccountInfoSliceNetworkType =
         useRecoilValue(networkConfigState).network;
+
+    const displayTx = useMemo(() => {
+        const {
+            action,
+            transaction_hash,
+            amount_1,
+            amount_2,
+            amount_3,
+            token_id_1,
+            token_id_2,
+            token_id_3,
+            receiver,
+            lp_token_amount,
+        } = txStats;
+        const token1 = TOKENS_MAP[token_id_1];
+        const token2 = TOKENS_MAP[token_id_2];
+        const token3 = TOKENS_MAP[token_id_3];
+        const pool = POOLS_MAP_ADDRESS[receiver];
+        switch (action) {
+            case "exchange":
+                if (!amount_1 || !amount_2 || !token1 || !token2) {
+                    return null;
+                }
+                return {
+                    msg: `Swap ${toEGLDD(
+                        token1.decimals,
+                        amount_1
+                    ).decimalPlaces(7)} ${token1.symbol} to ${toEGLDD(
+                        token2.decimals,
+                        amount_2
+                    ).decimalPlaces(7)} ${token2.symbol}`,
+                    txHash: transaction_hash,
+                    status: "success",
+                    tokensIn: [new TokenAmount(token1, amount_1)],
+                    tokensOut: [new TokenAmount(token2, amount_2)],
+                };
+            case "addLiquidity":
+            case "removeLiquidity":
+                const tokenTuples = [
+                    [token1, amount_1],
+                    [token2, amount_2],
+                    [token3, amount_3],
+                ] as [IESDTInfo, string][];
+                const msg = tokenTuples
+                    .map(([t, amt]) => {
+                        if (!t || !amt) return "";
+                        const egld = toEGLDD(t.decimals, amt);
+                        return `${formatAmount(egld.toNumber())} ${t.symbol}`;
+                    })
+                    .join(", ")
+                    .replace(/, $/, "");
+                const tokensIn = tokenTuples
+                    .filter(([t, amt]) => {
+                        const bigAmt = new BigNumber(amt || 0);
+                        return !!t && bigAmt.gt(0);
+                    })
+                    .map(([t, amt]) => new TokenAmount(t, amt));
+                const tokensOut = [
+                    new TokenAmount(pool.lpToken, lp_token_amount || 0),
+                ];
+                return {
+                    msg: `${
+                        action === "addLiquidity" ? "Add" : "Remove"
+                    } ${msg}`,
+                    txHash: transaction_hash,
+                    status: "success",
+                    tokensIn: action === "addLiquidity" ? tokensIn : tokensOut,
+                    tokensOut: action === "addLiquidity" ? tokensOut : tokensIn,
+                };
+            default:
+                return null;
+        }
+    }, [txStats]);
     useEffect(() => {
         const ts = moment.unix(txStats.timestamp);
         const func = () => {
@@ -52,34 +114,39 @@ const TxRecord = ({ txStats }: { txStats: TxStatsRecord }) => {
     }, [txStats]);
 
     return (
-        <div className="px-4 lg:px-7 h-12 bg-ash-dark-600 hover:bg-ash-dark-700 text-xs grid items-center gap-x-4 grid-cols-[2fr,repeat(2,1fr)] md:grid-cols-[2fr,repeat(4,1fr)] xl:grid-cols-[2fr,0.8fr,repeat(4,1fr)]">
+        <div className="px-4 lg:px-7 py-1 min-h-[3rem] bg-ash-dark-600 hover:bg-ash-dark-700 text-xs grid items-center gap-x-4 grid-cols-[2fr,repeat(2,1fr)] md:grid-cols-[2fr,repeat(4,1fr)] xl:grid-cols-[2fr,0.8fr,repeat(4,1fr)]">
             <div>
                 <a
                     href={`${network.explorerAddress}/transactions/${txStats.transaction_hash}`}
                     target="_blank"
                     rel="noreferrer"
                 >
-                    <span className="text-pink-600">
-                        {label.action} {token1.symbol} {label.separator}{" "}
-                        {token2.symbol}
-                    </span>
+                    <span className="text-pink-600">{displayTx?.msg}</span>
                 </a>
             </div>
             <div className="text-right">
                 <span className="text-ash-gray-600">$ </span>
-                <span className="text-white">{formatAmount(txStats.txValue || 0)}</span>
-            </div>
-            <div className="text-right hidden md:block">
                 <span className="text-white">
-                    {formatAmount(toEGLDD(token1.decimals, amt1).toNumber())}{" "}
-                    {token1.symbol}
+                    {formatAmount(txStats.txValue || 0)}
                 </span>
             </div>
             <div className="text-right hidden md:block">
-                <span className="text-white">
-                    {formatAmount(toEGLDD(token2.decimals, amt2).toNumber())}{" "}
-                    {token2.symbol}
-                </span>
+                {displayTx?.tokensIn.map((t) => {
+                    return (
+                        <div key={t.token.identifier} className="text-white">
+                            {formatAmount(t.egld)} {t.token.symbol}
+                        </div>
+                    );
+                })}
+            </div>
+            <div className="text-right hidden md:block">
+                {displayTx?.tokensOut.map((t) => {
+                    return (
+                        <div key={t.token.identifier} className="text-white">
+                            {formatAmount(t.egld)} {t.token.symbol}
+                        </div>
+                    );
+                })}
             </div>
             <div className="text-right hidden xl:block">
                 <a

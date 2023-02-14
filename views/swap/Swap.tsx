@@ -1,4 +1,3 @@
-import { useDebounce } from "@elrondnetwork/dapp-core/hooks";
 import Fire from "assets/images/fire.png";
 import ICArrowDownRounded from "assets/svg/arrow-down-rounded.svg";
 import ICChevronDown from "assets/svg/chevron-down.svg";
@@ -10,9 +9,13 @@ import ICSetting from "assets/svg/setting.svg";
 import IconWallet from "assets/svg/wallet.svg";
 import {
     accIsInsufficientEGLDState,
-    accIsLoggedInState
+    accIsLoggedInState,
 } from "atoms/dappState";
-import { ashRawPoolByAddressQuery, poolFeesQuery } from "atoms/poolsState";
+import {
+    ashRawPoolV1ByAddressQuery,
+    ashRawPoolV2ByAddressQuery,
+    poolV1FeesQuery,
+} from "atoms/poolsState";
 import BigNumber from "bignumber.js";
 import Avatar from "components/Avatar";
 import BaseButton from "components/BaseButton";
@@ -31,9 +34,7 @@ import { queryPoolContract } from "helper/contracts/pool";
 import { Fraction } from "helper/fraction/fraction";
 import { Percent } from "helper/fraction/percent";
 import { formatAmount } from "helper/number";
-import {
-    calculateEstimatedSwapOutputAmount2
-} from "helper/stableswap/calculator/amounts";
+import { calculateEstimatedSwapOutputAmount2 } from "helper/stableswap/calculator/amounts";
 import { calculateSwapPrice } from "helper/stableswap/calculator/price";
 import { Price } from "helper/token/price";
 import { IESDTInfo } from "helper/token/token";
@@ -43,11 +44,17 @@ import useMounted from "hooks/useMounted";
 import { useOnboarding } from "hooks/useOnboarding";
 import usePoolSwap from "hooks/usePoolContract/usePoolSwap";
 import { useScreenSize } from "hooks/useScreenSize";
-import IPool from "interface/pool";
+import IPool, { EPoolType } from "interface/pool";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRecoilCallback, useRecoilValue } from "recoil";
 import SwapAmount from "./components/SwapAmount";
 import styles from "./Swap.module.css";
+import { useDebounce } from "use-debounce";
+import { ContractManager } from "helper/contracts/contractManager";
+import { getTokenIdFromCoin } from "helper/token";
+import useWrapEGLD from "hooks/useWrappedEGLDContract/useWrapEGLD";
+import useUnwrapWEGLD from "hooks/useWrappedEGLDContract/useUnwrapWEGLD";
+
 const MaiarPoolTooltip = ({
     children,
     pool,
@@ -136,9 +143,20 @@ const Swap = () => {
         pool,
         isInsufficentFund,
         slippage,
+        isUnwrap,
+        isWrap,
     } = useSwap();
-    const debounceSlippage = useDebounce(slippage, 500);
-    const fees = useRecoilValue(poolFeesQuery(pool?.address || ""));
+    const {
+        wrapEGLD,
+        trackingData: { isPending: isWrapPending },
+    } = useWrapEGLD(true);
+    const {
+        unwrapWEGLD,
+        trackingData: { isPending: isUnwrapPending },
+    } = useUnwrapWEGLD(true);
+    const [deboundSlippage] = useDebounce(slippage, 500);
+    const fees = useRecoilValue(poolV1FeesQuery(pool?.address || ""));
+    const [swapFeeAmt, setSwapFeeAmt] = useState(0);
     const [showSetting, setShowSetting] = useState<boolean>(false);
     const [isOpenHistoryModal, openHistoryModal] = useState<boolean>(false);
     const [isOpenFairPrice, setIsOpenFairPrice] = useState(false);
@@ -204,21 +222,64 @@ const Swap = () => {
                     !tokenAmountTo
                 )
                     return;
-                const rawPool = await snapshot.getPromise(
-                    ashRawPoolByAddressQuery(pool.address)
-                );
-                if (!rawPool) return;
-                const reserves = pool.tokens.map(
-                    (t, i) => new TokenAmount(t, rawPool.reserves[i])
-                );
-                const price = calculateSwapPrice(
-                    new BigNumber(rawPool?.ampFactor || 0),
-                    reserves,
-                    tokenFrom,
-                    tokenTo,
-                    fees
-                );
-
+                let price: Price;
+                if (pool.type === EPoolType.PoolV2) {
+                    const rawPool = await snapshot.getPromise(
+                        ashRawPoolV2ByAddressQuery(pool.address)
+                    );
+                    const tokenFromIndex = pool.tokens.findIndex(
+                        (t) =>
+                            t.identifier ===
+                            getTokenIdFromCoin(tokenFrom.identifier)
+                    );
+                    const tokenToIndex = pool.tokens.findIndex(
+                        (t) =>
+                            t.identifier ===
+                            getTokenIdFromCoin(tokenTo.identifier)
+                    );
+                    const inputAmountNum = BigNumber.max(
+                        1_000_000,
+                        BigNumber.min(
+                            new BigNumber(10).exponentiatedBy(
+                                tokenFrom.decimals
+                            ),
+                            new BigNumber(
+                                rawPool?.reserves[tokenFromIndex] || 0
+                            )
+                                .idiv(100)
+                                .toFixed(0)
+                        )
+                    );
+                    const { outputAmount } =
+                        await ContractManager.getPoolV2Contract(
+                            pool.address
+                        ).estimateAmountOut(
+                            tokenFromIndex,
+                            tokenToIndex,
+                            inputAmountNum
+                        );
+                    const amt = new TokenAmount(tokenTo, outputAmount);
+                    const inputAmount = new TokenAmount(
+                        tokenFrom,
+                        inputAmountNum
+                    );
+                    price = new Price(inputAmount, amt);
+                } else {
+                    const rawPool = await snapshot.getPromise(
+                        ashRawPoolV1ByAddressQuery(pool.address)
+                    );
+                    if (!rawPool) return;
+                    const reserves = pool.tokens.map(
+                        (t, i) => new TokenAmount(t, rawPool.reserves[i])
+                    );
+                    price = calculateSwapPrice(
+                        new BigNumber(rawPool?.ampFactor || 0),
+                        reserves,
+                        tokenFrom,
+                        tokenTo,
+                        fees
+                    );
+                }
                 const rate = new Price(tokenAmountTo, tokenAmountFrom);
                 const priceImpact = new Fraction(1)
                     .subtract(rate.divide(price.invert().asFraction))
@@ -229,6 +290,8 @@ const Swap = () => {
             },
         [pool, tokenFrom, tokenTo, tokenAmountTo, tokenAmountFrom, fees]
     );
+
+    const [calcPriceImpactDebounce] = useDebounce(calcPriceImpact, 750);
 
     const minimumReceive = useMemo(() => {
         if (!tokenAmountTo) {
@@ -244,32 +307,34 @@ const Swap = () => {
     useEffect(() => {
         if (
             window &&
-            slippage &&
+            deboundSlippage &&
             !slippage.equalTo(new Percent(100, 100_000))
         ) {
-            console.log(slippage);
             let dataLayer = (window as any).dataLayer || [];
             dataLayer.push({
                 event: "set_slippage",
-                amount: slippage.toString(),
+                amount:
+                    slippage.numerator.toNumber() /
+                    slippage.denominator.toNumber(),
             });
-            console.log("dataLayer", dataLayer);
         }
-    }, [debounceSlippage]);
+    }, [deboundSlippage]);
     useEffect(() => {
         if (!tokenFrom) {
             setValueFrom("");
+            setSwapFeeAmt(0);
         }
     }, [tokenFrom, setValueFrom]);
     useEffect(() => {
         if (!tokenTo) {
             setValueTo("");
+            setSwapFeeAmt(0);
         }
     }, [tokenTo, setValueTo]);
 
     useEffect(() => {
-        calcPriceImpact();
-    }, [calcPriceImpact]);
+        calcPriceImpactDebounce();
+    }, [calcPriceImpactDebounce]);
 
     useEffect(() => {
         setShowSetting(false);
@@ -283,24 +348,52 @@ const Swap = () => {
                 tokenAmountFrom: TokenAmount,
                 tokenTo: IESDTInfo
             ) => {
-                const fees = await snapshot.getPromise(
-                    poolFeesQuery(pool.address || "")
-                );
-                const rawPool = await snapshot.getPromise(
-                    ashRawPoolByAddressQuery(pool.address || "")
-                );
-                if (!rawPool) return;
-                const reserves = pool.tokens.map(
-                    (t, i) => new TokenAmount(t, rawPool.reserves[i])
-                );
-                const estimated = calculateEstimatedSwapOutputAmount2(
-                    new BigNumber(rawPool?.ampFactor || 0),
-                    reserves,
-                    tokenAmountFrom,
-                    tokenTo,
-                    fees
-                );
-                return estimated;
+                if (pool.type === EPoolType.PoolV2) {
+                    const tokenInIndex = pool.tokens.findIndex(
+                        (t) =>
+                            t.identifier ===
+                            getTokenIdFromCoin(tokenAmountFrom.token.identifier)
+                    );
+                    const tokenOutIndex = pool.tokens.findIndex(
+                        (t) =>
+                            t.identifier ===
+                            getTokenIdFromCoin(tokenTo.identifier)
+                    );
+                    const { outputAmount, fee } =
+                        await ContractManager.getPoolV2Contract(
+                            pool.address
+                        ).estimateAmountOut(
+                            tokenInIndex,
+                            tokenOutIndex,
+                            tokenAmountFrom.raw
+                        );
+                    return {
+                        outputAmount: new TokenAmount(
+                            tokenTo,
+                            outputAmount || 0
+                        ),
+                        fee: new TokenAmount(tokenTo, fee || 0),
+                    };
+                } else {
+                    const fees = await snapshot.getPromise(
+                        poolV1FeesQuery(pool.address || "")
+                    );
+                    const rawPool = await snapshot.getPromise(
+                        ashRawPoolV1ByAddressQuery(pool.address || "")
+                    );
+                    if (!rawPool) return;
+                    const reserves = pool.tokens.map(
+                        (t, i) => new TokenAmount(t, rawPool.reserves[i])
+                    );
+                    const estimated = calculateEstimatedSwapOutputAmount2(
+                        new BigNumber(rawPool?.ampFactor || 0),
+                        reserves,
+                        tokenAmountFrom,
+                        tokenTo,
+                        fees
+                    );
+                    return estimated;
+                }
             },
         []
     );
@@ -322,10 +415,12 @@ const Swap = () => {
                 });
             return;
         }
-        getAmountOut(pool, tokenAmountFrom, tokenTo).then(
-            (estimated) =>
-                estimated && setValueTo(estimated.outputAmount.egld.toString())
-        );
+        getAmountOut(pool, tokenAmountFrom, tokenTo).then((estimated) => {
+            if (estimated) {
+                setValueTo(estimated.outputAmount.egld.toString());
+                setSwapFeeAmt(estimated.fee.egld.toNumber());
+            }
+        });
     }, [getAmountOut, setValueTo, pool, tokenTo, tokenAmountFrom]);
 
     const swapHandle = useCallback(async () => {
@@ -349,9 +444,6 @@ const Swap = () => {
         } catch (error) {
             console.error(error);
         }
-
-        setValueTo("");
-        setValueFrom("");
     }, [
         loggedIn,
         tokenFrom,
@@ -361,8 +453,44 @@ const Swap = () => {
         tokenAmountFrom,
         minimumReceive,
         swap,
-        setValueTo,
+    ]);
+
+    const wrapHandle = useCallback(async () => {
+        if (tokenAmountFrom && !isWrapPending) {
+            await wrapEGLD(tokenAmountFrom.raw);
+        }
+    }, [tokenAmountFrom, isWrapPending, wrapEGLD]);
+
+    const unwrapHandle = useCallback(async () => {
+        if (tokenAmountFrom && !isUnwrapPending) {
+            await unwrapWEGLD(tokenAmountFrom);
+        }
+    }, [tokenAmountFrom, isUnwrapPending, unwrapWEGLD]);
+
+    const onClickSwapBtn = useCallback(async () => {
+        if (loggedIn) {
+            if (isWrap) {
+                wrapHandle();
+            } else if (isUnwrap) {
+                unwrapHandle();
+            } else {
+                swapHandle();
+            }
+            setValueTo("");
+            setValueFrom("");
+        } else {
+            connectWallet();
+        }
+    }, [
+        connectWallet,
+        isUnwrap,
+        isWrap,
+        loggedIn,
         setValueFrom,
+        setValueTo,
+        swapHandle,
+        unwrapHandle,
+        wrapHandle,
     ]);
 
     return (
@@ -708,11 +836,7 @@ const Swap = () => {
                                                 >
                                                     {tokenAmountTo ? (
                                                         <TextAmt
-                                                            number={tokenAmountTo
-                                                                .multiply(
-                                                                    fees.swap
-                                                                )
-                                                                .toBigNumber()}
+                                                            number={swapFeeAmt}
                                                             options={{
                                                                 notation:
                                                                     "standard",
@@ -736,14 +860,12 @@ const Swap = () => {
                                         className="w-full clip-corner-1 clip-corner-tl uppercase h-12 text-xs sm:text-sm font-bold"
                                         disabled={
                                             swapping ||
+                                            isWrapPending ||
+                                            isUnwrapPending ||
                                             isInsufficentFund ||
                                             isInsufficientEGLD
                                         }
-                                        onClick={
-                                            loggedIn
-                                                ? swapHandle
-                                                : () => connectWallet()
-                                        }
+                                        onClick={onClickSwapBtn}
                                     >
                                         <div className="flex items-center space-x-2.5">
                                             {!loggedIn && <IconWallet />}

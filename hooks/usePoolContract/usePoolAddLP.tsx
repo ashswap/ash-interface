@@ -1,21 +1,34 @@
 import { TokenPayment } from "@elrondnetwork/erdjs/out";
+import { accInfoState } from "atoms/dappState";
 import BigNumber from "bignumber.js";
+import { WRAPPED_EGLD } from "const/wrappedEGLD";
 import { toEGLDD } from "helper/balance";
+import { ContractManager } from "helper/contracts/contractManager";
 import PoolContract from "helper/contracts/pool";
 import { formatAmount } from "helper/number";
-import { sendTransactions } from "helper/transactionMethods";
-import IPool from "interface/pool";
+import { TokenAmount } from "helper/token/tokenAmount";
+import useSendTxsWithTrackStatus from "hooks/useSendTxsWithTrackStatus";
+import IPool, { EPoolType } from "interface/pool";
 import { useRecoilCallback } from "recoil";
 
-const usePoolAddLP = () => {
-    const func = useRecoilCallback(
-        () =>
+const usePoolAddLP = (trackStatus = false) => {
+    const { sendTransactions, trackingData, sessionId } =
+        useSendTxsWithTrackStatus(trackStatus);
+    const addLiquidity = useRecoilCallback(
+        ({ snapshot }) =>
             async (
                 pool: IPool,
-                tokensWei: BigNumber[],
+                tokenAmounts: TokenAmount[],
                 mintAmtMin: BigNumber
             ) => {
-                const poolContract = new PoolContract(pool.address);
+                const poolContract =
+                    pool.type === EPoolType.PoolV2
+                        ? ContractManager.getPoolV2Contract(pool.address)
+                        : ContractManager.getPoolContract(pool.address);
+                const tokensWei = tokenAmounts.map((t) => t.raw);
+                const egldAmt = tokenAmounts.find(
+                    (t) => t.token.identifier === "EGLD"
+                );
                 const payments = pool.tokens
                     .map((t, i) =>
                         TokenPayment.fungibleFromBigInteger(
@@ -30,6 +43,16 @@ const usePoolAddLP = () => {
                     payments,
                     mintAmtMin
                 );
+                const txs = [tx];
+                if (egldAmt) {
+                    const shard =
+                        (await snapshot.getPromise(accInfoState)).shard || 0;
+                    const wrapTx = await ContractManager.getWrappedEGLDContract(
+                        WRAPPED_EGLD.wegldContracts[shard]
+                    ).wrapEgld(egldAmt.raw);
+
+                    txs.unshift(wrapTx);
+                }
                 const receipt = pool.tokens
                     .map(
                         (t, i) =>
@@ -41,14 +64,15 @@ const usePoolAddLP = () => {
                     .join(", ")
                     .replace(/\,$/, "");
                 return await sendTransactions({
-                    transactions: tx,
+                    transactions: txs,
                     transactionsDisplayInfo: {
                         successMessage: `Add liquidity Success ${receipt}`,
                     },
                 });
-            }
+            },
+        [sendTransactions]
     );
-    return func;
+    return { addLiquidity, trackingData, sessionId };
 };
 
 export default usePoolAddLP;
