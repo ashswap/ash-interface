@@ -1,4 +1,5 @@
 import { useTrackTransactionStatus } from "@elrondnetwork/dapp-core/hooks";
+import ImgVEASH from "assets/images/ve-ash.png";
 import ICCapacity from "assets/svg/capacity.svg";
 import ICChevronDown from "assets/svg/chevron-down.svg";
 import ICChevronUp from "assets/svg/chevron-up.svg";
@@ -30,6 +31,7 @@ import { VE_LOCK_LABEL } from "const/ve";
 import { toEGLDD } from "helper/balance";
 import { fetcher } from "helper/common";
 import { formatAmount } from "helper/number";
+import { getTokenFromId } from "helper/token";
 import { useConnectWallet } from "hooks/useConnectWallet";
 import useGovClaimReward from "hooks/useGovContract/useGovClaimReward";
 import useGovUnlockASH from "hooks/useGovContract/useGovUnlockASH";
@@ -158,29 +160,20 @@ function GovStats() {
                                 </CardTooltip>
                                 <div className="flex items-center">
                                     {rewardLPToken && (
-                                        <div className="flex items-center">
-                                            <Avatar
-                                                src={
-                                                    rewardLPToken.tokens[0]
-                                                        .logoURI
-                                                }
-                                                alt={
-                                                    rewardLPToken.tokens[0]
-                                                        .symbol
-                                                }
-                                                className="w-[1.125rem] h-[1.125rem]"
-                                            />
-                                            <Avatar
-                                                src={
-                                                    rewardLPToken.tokens[1]
-                                                        .logoURI
-                                                }
-                                                alt={
-                                                    rewardLPToken.tokens[1]
-                                                        .symbol
-                                                }
-                                                className="w-[1.125rem] h-[1.125rem] -ml-1 mr-2"
-                                            />
+                                        <div className="flex items-center mr-2">
+                                            {rewardLPToken.tokens.map((_t) => {
+                                                const t = getTokenFromId(
+                                                    _t.identifier
+                                                );
+                                                return (
+                                                    <Avatar
+                                                        key={t.identifier}
+                                                        src={t.logoURI}
+                                                        alt={t.symbol}
+                                                        className="w-[1.125rem] h-[1.125rem] -ml-1 first:ml-0"
+                                                    />
+                                                );
+                                            })}
                                         </div>
                                     )}
                                     <div className="text-lg">
@@ -296,7 +289,11 @@ function GovStats() {
                                     {/* <div className="w-[1.125rem] h-[1.125rem] mr-2">
                                         <Image src={ImgUsdt} alt="token icon" />
                                     </div> */}
-                                    <div className="w-[1.125rem] h-[1.125rem] mr-2 rounded-full bg-ash-purple-500"></div>
+                                    <Avatar
+                                        src={ImgVEASH}
+                                        alt="veASH"
+                                        className="w-[1.125rem] h-[1.125rem] mr-2"
+                                    />
                                     <div className="text-lg text-white font-bold">
                                         <TextAmt
                                             number={toEGLDD(
@@ -441,7 +438,11 @@ function GovStats() {
                                 {/* <div className="w-[1.125rem] h-[1.125rem] mr-2">
                                     <Image src={ImgUsdt} alt="token icon" />
                                 </div> */}
-                                <div className="w-[1.125rem] h-[1.125rem] mr-2 rounded-full bg-ash-purple-500"></div>
+                                <Avatar
+                                    src={ImgVEASH}
+                                    alt="veASH"
+                                    className="w-[1.125rem] h-[1.125rem] mr-2"
+                                />
                                 <div className="text-white text-lg font-bold">
                                     <TextAmt
                                         number={toEGLDD(
@@ -501,8 +502,7 @@ function GovStats() {
                                 onClick={() => setIsQAExpand((val) => !val)}
                             >
                                 <div className="line-clamp-2 text-xs lg:text-sm font-bold grow text-left mr-4">
-                                    Does it mean user will lose money
-                                    everyday?
+                                    Does it mean user will lose money everyday?
                                 </div>
                                 {isQAExpand ? (
                                     <ICChevronUp className="w-3 h-auto" />
@@ -520,8 +520,8 @@ function GovStats() {
                                     </div>
                                     <div>
                                         However, If you want to keep your veASH
-                                        stays on the maximum, just extend
-                                        your lock period.
+                                        stays on the maximum, just extend your
+                                        lock period.
                                     </div>
                                 </div>
                             )}
@@ -549,25 +549,21 @@ function GovStats() {
                         </div>
                         {rewardLPToken && (
                             <>
-                                <div className="flex items-center mb-9">
-                                    <Avatar
-                                        src={rewardLPToken.tokens[0].logoURI}
-                                        alt={rewardLPToken.tokens[0].symbol}
-                                        className="w-8 h-8"
+                                <div className="flex items-center mb-9 mr-2">
+                                    {rewardLPToken.tokens.map(_t => {
+                                        const t = getTokenFromId(_t.identifier);
+                                        return <Avatar key={t.identifier}
+                                        src={t.logoURI}
+                                        alt={t.symbol}
+                                        className="w-8 h-8 -ml-1 first:ml-0"
                                     />
-                                    <Avatar
-                                        src={rewardLPToken.tokens[1].logoURI}
-                                        alt={rewardLPToken.tokens[1].symbol}
-                                        className="w-8 h-8 -ml-1 mr-2"
-                                    />
+                                    })}
                                 </div>
                                 <div className="text-center text-ash-gray-500 text-lg font-bold">
                                     <TextAmt
                                         number={rewardTokenAmount.toFixed(0)}
                                     />
-                                    &nbsp; LP-
-                                    {rewardLPToken.tokens[0].symbol}
-                                    {rewardLPToken.tokens[1].symbol} has been
+                                    &nbsp; {rewardLPToken.lpToken.symbol} has been
                                     sent to your wallet
                                 </div>
                             </>

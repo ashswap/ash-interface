@@ -1,3 +1,4 @@
+import { TransactionSender } from "@elrondnetwork/dapp-core/components/TransactionSender";
 import { TransactionsTracker } from "@elrondnetwork/dapp-core/components/TransactionsTracker";
 import { useGetPendingTransactions } from "@elrondnetwork/dapp-core/hooks";
 import { checkBatch } from "@elrondnetwork/dapp-core/hooks/transactions/useCheckTransactionStatus/checkBatch";
@@ -7,10 +8,11 @@ import {
 } from "@elrondnetwork/dapp-core/utils";
 import { CustomComponentsType } from "@elrondnetwork/dapp-core/wrappers/DappProvider/CustomComponents";
 import { lastCompletedTxHashAtom } from "atoms/transactions";
+import emitter from "helper/emitter";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useRecoilValue } from "recoil";
-import emitter from "helper/emitter";
 import { getTransactionsByHashes } from "./getTransactionsByHashes";
+import { sendSignedTransactionsAsync } from "./sendSignedTransactionAsync";
 
 const CustomTransactionsTracker: typeof TransactionsTracker = () => {
     const { pendingTransactionsArray } = useGetPendingTransactions();
@@ -114,5 +116,11 @@ const CustomTransactionsTracker: typeof TransactionsTracker = () => {
 export const customComponents: CustomComponentsType = {
     transactionTracker: {
         component: CustomTransactionsTracker,
+    },
+    transactionSender: {
+        component: TransactionSender,
+        props: {
+            sendSignedTransactionsAsync
+        }
     },
 };

@@ -1,3 +1,4 @@
+import ImgVEASH from "assets/images/ve-ash.png";
 import ICBribe from "assets/svg/bribe.svg";
 import ICLock from "assets/svg/lock.svg";
 import { ashswapBaseState } from "atoms/ashswap";
@@ -229,11 +230,10 @@ function FarmWeightOverview() {
                                     Total veash voted
                                 </div>
                                 <div className="flex items-center">
-                                    <div className="w-4.5 h-4.5 rounded-full bg-ash-purple-500 mr-2"></div>
+                                    <Avatar src={ImgVEASH} alt="veASH" className="w-4.5 h-4.5 mr-2"/>
                                     <TextAmt
                                         number={totalUsedVe}
                                         className="font-bold text-lg text-white"
-                                        options={{ notation: "standard" }}
                                     />
                                 </div>
                             </div>
@@ -242,11 +242,10 @@ function FarmWeightOverview() {
                                     veash unused
                                 </div>
                                 <div className="flex items-center">
-                                    <div className="w-4.5 h-4.5 rounded-full bg-ash-purple-500 mr-2"></div>
+                                    <Avatar src={ImgVEASH} alt="veASH" className="w-4.5 h-4.5 mr-2"/>
                                     <TextAmt
                                         number={totalUnusedVe}
                                         className="font-bold text-lg text-white"
-                                        options={{ notation: "standard" }}
                                     />
                                 </div>
                             </div>
@@ -262,7 +261,6 @@ function FarmWeightOverview() {
                                     <TextAmt
                                         number={weeklyReward}
                                         className="font-bold text-lg text-white"
-                                        options={{ notation: "standard" }}
                                     />
                                 </div>
                             </div>

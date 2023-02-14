@@ -8,6 +8,7 @@ import { HEX_COLORS } from "const/colors";
 import { FARMS_MAP } from "const/farms";
 import { POOLS_MAP_LP } from "const/pool";
 import { getHexColor } from "helper/color";
+import { getTokenFromId } from "helper/token";
 import { FarmWeightChartRecord } from "interface/chart";
 import { useEffect } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
@@ -28,20 +29,21 @@ const useFarmControllerState = () => {
         ashBase.farmController.farms.map((f, i) => {
             const lp = FARMS_MAP[f.address].farming_token_id;
             const pool = POOLS_MAP_LP[lp];
-            const name = pool.tokens.map((t) => t.symbol).join("-");
+            const name = pool.tokens.map((t) => getTokenFromId(t.identifier).symbol).join("-");
+            const color = HEX_COLORS[i] || getHexColor(lp);
             const record: FarmWeightChartRecord = {
                 name,
                 farmAddress: f.address,
                 value: new BigNumber(f.relativeWeight).div(10 ** 14).toNumber(),
-                color: HEX_COLORS[i] || getHexColor(lp),
+                color,
             };
             const nextRecord: FarmWeightChartRecord = {
-                name: pool.tokens.map((t) => t.symbol).join("-"),
+                name,
                 farmAddress: f.address,
                 value: new BigNumber(f.nextRelativeWeight)
                     .div(10 ** 14)
                     .toNumber(),
-                color: HEX_COLORS[i] || getHexColor(lp),
+                color,
             };
             records.push(record);
             nextRecords.push(nextRecord);

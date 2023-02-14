@@ -32,11 +32,11 @@ const dappContractDevnet: DappContractConfig = {
 
 const dappContractMainnet: DappContracts = {
     voteEscrowedContract:
-        "erd1qqqqqqqqqqqqqpgq0679eygvlua6wxaqvvdgy3k6kjahk7a4tk2qpwlv8z",
+        "erd1qqqqqqqqqqqqqpgq58elfqng8edp0z83pywy3825vzhawfqp4fvsaldek8",
     feeDistributor:
-        "erd1qqqqqqqqqqqqqpgqg6c8dasj4nnyqn7m97vd4a234rd4ypd4tk2qxxw9qw",
-    farmController: "",
-    farmBribe: "",
+        "erd1qqqqqqqqqqqqqpgqjrlge5rgml6d48tjgu3afqvems88lqzw4fvs9f7lhs",
+    farmController: "erd1qqqqqqqqqqqqqpgqzhm689ehkacadr7elzkc3z70h6cqmz0q4fvsftax5t",
+    farmBribe: "erd1qqqqqqqqqqqqqpgqgulmfcu8prrv2pmx3nqn5stqu3c42fsz4fvsa9rwdl",
 };
 
 const dappContract =
@@ -44,14 +44,7 @@ const dappContract =
         ? dappContractDevnet[ENVIRONMENT.ENV]
         : dappContractMainnet;
 
-export const VE_CONFIG = ENVIRONMENT.ENV === "alpha" ? {
-    // for alpha test
-    maxLock: 4 * 365 * 24 * 3600,
-    minLock: 10 * 60,
-} : ENVIRONMENT.ENV === "beta" ? {
-    maxLock: 4 * 365 * 24 * 3600,
-    minLock: 30 * 60,
-} : {
+export const VE_CONFIG = ENVIRONMENT.NETWORK === "mainnet" ? {
     // main config
     maxLock: 4 * 365 * 24 * 3600,
     minLock: 7 * 24 * 3600,
@@ -59,6 +52,14 @@ export const VE_CONFIG = ENVIRONMENT.ENV === "alpha" ? {
     // maxLock: 2 * 7 * 24 * 3600,
     // minLock: 12 * 60 * 60,
 
+} : ENVIRONMENT.ENV === "alpha" ? {
+    // for alpha test
+    maxLock: 4 * 365 * 24 * 3600,
+    minLock: 10 * 60,
+} : {
+    // beta
+    maxLock: 4 * 365 * 24 * 3600,
+    minLock: 30 * 60,
 };
 
 export const ASHSWAP_CONFIG = {
