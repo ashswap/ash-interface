@@ -37,7 +37,7 @@ const moduleExports = withReactSvg(
             { dev, dir, outDir, distDir, buildId }
         ) {
             const ignorePaths = process.env.NEXT_PUBLIC_ASH_ENV === "alpha" ? [] : ["/stake/gov/bribe"];
-            const mainnetIgnorePaths = process.env.NEXT_PUBLIC_NETWORK === "mainnet" ? ["/stake/farms", "/swap", "/pool"] : [];
+            const mainnetIgnorePaths = process.env.NEXT_PUBLIC_NETWORK === "mainnet" ? ["/stake/farms", "/swap", "/pool", "/stake", "/stake/mint"] : [];
             const entries = Object.entries(defaultPathMap).map(
                 ([path, pageObj]) => {
                     return [
@@ -50,7 +50,8 @@ const moduleExports = withReactSvg(
                         },
                     ];
                 }
-            );
+            ).filter(entry => entry[0] !== "/redirect");
+            ["/launch-race", "/reward-pool"].map(pathname => entries.push([pathname, {page: "/redirect"}]))
             const pathMap = Object.fromEntries(entries);
             return pathMap;
         },
