@@ -292,6 +292,7 @@ export class PoolV2 {
     fee: string;
     virtualPrice: string;
     priceOracle: string;
+    priceScale: string;
 }
 
 export class Pool {
