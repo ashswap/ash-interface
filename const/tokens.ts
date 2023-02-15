@@ -140,7 +140,7 @@ const DEVNET_TOKENS_BETA: IESDTInfo[] = [
         logoURI: IconHTM.src,
     },
     {
-        identifier: "UTK-2f80e9",
+        identifier: "UTK-a2a792",
         chainId: ChainId.Devnet,
         symbol: "UTK",
         name: "UTK",
