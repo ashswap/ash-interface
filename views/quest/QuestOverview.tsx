@@ -244,7 +244,7 @@ const QuestOverview = () => {
         <>
             <div ref={captchaElRef}></div>
             <a
-                href="https://app.ashswap.io/reward-pool"
+                href="https://event.ashswap.io/reward-pool"
                 target="_blank"
                 rel="noreferrer"
             >
