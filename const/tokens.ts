@@ -9,6 +9,8 @@ import IconWUSDC from "assets/images/wusdc-icon.png";
 import IconBUSD from "assets/images/busd-icon.png";
 import IconWEGLD from "assets/images/wegld-icon-boy.png";
 import IconAEGLD from "assets/images/aegld-icon.png";
+import IconUTK from "assets/images/utk-icon.png";
+import IconHTM from "assets/images/htm-icon.png";
 import { ChainId, ESDT, IESDTInfo } from "helper/token/token";
 import { ENVIRONMENT } from "./env";
 
@@ -129,6 +131,22 @@ const DEVNET_TOKENS_BETA: IESDTInfo[] = [
         decimals: 18,
         logoURI: IconBUSD.src,
     },
+    {
+        identifier: "HTM-fe1f69",
+        chainId: ChainId.Devnet,
+        symbol: "HTM",
+        name: "HTM",
+        decimals: 18,
+        logoURI: IconHTM.src,
+    },
+    {
+        identifier: "UTK-2f80e9",
+        chainId: ChainId.Devnet,
+        symbol: "UTK",
+        name: "UTK",
+        decimals: 18,
+        logoURI: IconUTK.src,
+    }
 ];
 
 const MAINNET_TOKENS: IESDTInfo[] = [

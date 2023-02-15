@@ -95,6 +95,19 @@ const devnet: PoolConfig = {
             tokens: [TOKENS_MAP["USDT-188935"], TOKENS_MAP["ASH-4ce444"]],
             type: EPoolType.PoolV2,
         },
+        {
+            address:
+                "erd1qqqqqqqqqqqqqpgqhc5gj3kqfc9uemje6q4j9zmsacygwm9l2gesc4zy4z",
+            lpToken: {
+                identifier: "ALP-34fed0",
+                chainId: ChainId.Devnet,
+                symbol: "LPT-BUSD-UTK",
+                name: "Ashswap LP",
+                decimals: 18,
+            },
+            tokens: [TOKENS_MAP["BUSD-632f7d"], TOKENS_MAP["UTK-2f80e9"]],
+            type: EPoolType.PoolV2,
+        },
     ],
 };
 
