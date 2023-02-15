@@ -175,7 +175,8 @@ const FarmAPRBreakdown = ({
                                         >
                                             <span className="underline">
                                                 {formatAmount(
-                                                    stakedData.yieldBoost * ashBaseAPR
+                                                    stakedData.yieldBoost *
+                                                        ashBaseAPR
                                                 )}
                                             </span>
                                         </BaseTooltip>
@@ -433,62 +434,55 @@ function FarmCard({ farmData, viewType }: props) {
                             {...TRANSITIONS.fadeIn}
                             {...TRANSITIONS.fadeOut}
                             enter="duration-300 delay-300"
+                            className="flex flex-col justify-between"
                         >
-                            <div>
-                                <div className="inline-flex items-center mb-2.5">
-                                    <CardTooltip
-                                        strategy="fixed"
-                                        content={
-                                            <div>
-                                                Total APR = Token rewards +
-                                                Trading APR
-                                            </div>
-                                        }
-                                    >
-                                        <span className="inline-block text-stake-gray-500 text-xs font-bold underline mr-2">
-                                            Total APR
+                            <div className="inline-flex items-center mb-2.5">
+                                <CardTooltip
+                                    strategy="fixed"
+                                    content={
+                                        <div>
+                                            Total APR = Token rewards + Trading
+                                            APR
+                                        </div>
+                                    }
+                                >
+                                    <span className="inline-block text-stake-gray-500 text-xs font-bold underline mr-2">
+                                        Total APR
+                                    </span>
+                                </CardTooltip>
+
+                                <button
+                                    onClick={() => setIsOpenAPRBreakdown(true)}
+                                >
+                                    <ICChevronDown className="text-ash-cyan-500" />
+                                </button>
+                            </div>
+
+                            <div className="h-8 px-2.5 space-x-1.5 border border-black bg-stake-gray-500/10 flex items-center text-sm font-bold text-ash-cyan-500">
+                                {stakedData ? (
+                                    <div>
+                                        <span className="underline">
+                                            {formatAmount(stakedData.totalAPR)}
                                         </span>
-                                    </CardTooltip>
-
-                                    <button
-                                        onClick={() =>
-                                            setIsOpenAPRBreakdown(true)
-                                        }
-                                    >
-                                        <ICChevronDown className="text-ash-cyan-500" />
-                                    </button>
-                                </div>
-
-                                <div className="h-8 px-2.5 space-x-1.5 border border-black bg-stake-gray-500/10 flex items-center text-sm font-bold text-ash-cyan-500">
-                                    {stakedData ? (
+                                        <span className="text-2xs">%</span>
+                                    </div>
+                                ) : (
+                                    <>
                                         <div>
                                             <span className="underline">
-                                                {formatAmount(stakedData.totalAPR)}
+                                                {formatAmount(totalAPRMin)}
                                             </span>
                                             <span className="text-2xs">%</span>
                                         </div>
-                                    ) : (
-                                        <>
-                                            <div>
-                                                <span className="underline">
-                                                    {formatAmount(totalAPRMin)}
-                                                </span>
-                                                <span className="text-2xs">
-                                                    %
-                                                </span>
-                                            </div>
-                                            <ICArrowRight className="w-3 h-auto" />
-                                            <div>
-                                                <span className="underline">
-                                                    {formatAmount(totalAPRMax)}
-                                                </span>
-                                                <span className="text-2xs">
-                                                    %
-                                                </span>
-                                            </div>
-                                        </>
-                                    )}
-                                </div>
+                                        <ICArrowRight className="w-3 h-auto" />
+                                        <div>
+                                            <span className="underline">
+                                                {formatAmount(totalAPRMax)}
+                                            </span>
+                                            <span className="text-2xs">%</span>
+                                        </div>
+                                    </>
+                                )}
                             </div>
                         </Transition>
                         <div

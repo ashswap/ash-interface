@@ -16,8 +16,10 @@ import Avatar from "components/Avatar";
 import BaseModal from "components/BaseModal";
 import GlowingButton from "components/GlowingButton";
 import InputCurrency from "components/InputCurrency";
+import Switch from "components/Switch";
 import TextAmt from "components/TextAmt";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
+import { POOLS_MAP_ADDRESS } from "const/pool";
 import { toEGLDD, toWei } from "helper/balance";
 import { ContractManager } from "helper/contracts/contractManager";
 import { Fraction } from "helper/fraction/fraction";
@@ -152,12 +154,13 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
     const [inputRawValues, setInputRawValues] = useState(
         poolData.pool.tokens.map(() => "")
     );
-    const [inputValues, setInputValues] = useState(
+    const [inputWeiValues, setInputWeiValues] = useState(
         poolData.pool.tokens.map(() => new BigNumber(0))
     );
+    const [isBalanced, setIsBalanced] = useState(true);
     const [isProMode, setIsProMode] = useState(false);
     const [adding, setAdding] = useState(false);
-    const {addLiquidity: addPoolLP} = usePoolAddLP();
+    const { addLiquidity: addPoolLP } = usePoolAddLP();
     // recoil
     const tokenMap = useRecoilValue(tokenMapState);
     const loggedIn = useRecoilValue(accIsLoggedInState);
@@ -180,7 +183,7 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
                         ashRawPoolV2ByAddressQuery(pool.address)
                     );
                     const amts = pool.tokens.map((t, i) => {
-                        return toWei(t, inputValues[i].toString() || "0");
+                        return inputWeiValues[i];
                     });
                     mintAmt = rawPoolV2?.reserves
                         .reduce((sum, r) => sum.plus(r), new BigNumber(0))
@@ -207,9 +210,7 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
                         ),
                         poolFee.swap,
                         new TokenAmount(pool.lpToken, totalSupply),
-                        pool.tokens.map((t, i) =>
-                            toWei(t, inputValues[i].toString() || "0")
-                        )
+                        pool.tokens.map((t, i) => inputWeiValues[i])
                     );
                     mintAmt = mintAmount.raw;
                 }
@@ -218,7 +219,7 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
                         pool,
                         pool.tokens.map((_t, i) => {
                             const t = getTokenFromId(_t.identifier);
-                            return new TokenAmount(t, toWei(t, inputValues[i].toString() || "0"));
+                            return new TokenAmount(t, inputWeiValues[i]);
                         }),
                         mintAmt
                             .multipliedBy(0.99) // expected receive at least 99% of estimation LP
@@ -233,7 +234,7 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
                 }
             },
         [
-            inputValues,
+            inputWeiValues,
             pool,
             onClose,
             adding,
@@ -242,10 +243,92 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
             setAddLPSessionId,
         ]
     );
+
+    const onChangeInputValue = useRecoilCallback(
+        ({ snapshot }) =>
+            async (val: string, num: BigNumber, i: number) => {
+                const p = POOLS_MAP_ADDRESS[pool.address];
+                const inputWei = toWei(p.tokens[i], num.toString());
+                if (isBalanced) {
+                    let inputValues: BigNumber[] = [];
+                    if (p.type === EPoolType.PoolV2) {
+                        const poolV2 = await snapshot.getPromise(
+                            ashRawPoolV2ByAddressQuery(pool.address)
+                        );
+                        if (!poolV2) return;
+                        const priceScales = [
+                            new BigNumber(1e18),
+                            new BigNumber(poolV2.priceScale),
+                        ];
+                        const precisions = p.tokens.map((t) =>
+                            new BigNumber(10).pow(18 - t.decimals)
+                        );
+                        const target = inputWei
+                            .multipliedBy(priceScales[i])
+                            .multipliedBy(precisions[i]);
+                        // .idiv(1e18);
+                        inputValues = priceScales.map((scale, j) => {
+                            return (
+                                target
+                                    // .multipliedBy(1e18)
+                                    .idiv(precisions[j].multipliedBy(scale))
+                            );
+                        });
+
+                        const inputValuesX = p.tokens.map((t, j) => {
+                            return inputWei
+                                .multipliedBy(poolV2.reserves[j])
+                                .idiv(poolV2.reserves[i]);
+                        });
+                    } else if (p.type === EPoolType.PlainPool) {
+                        const poolV1 = await snapshot.getPromise(
+                            ashRawPoolV1ByAddressQuery(pool.address)
+                        );
+                        if (!poolV1) return;
+                        inputValues = p.tokens.map((t, j) => {
+                            return inputWei
+                                .multipliedBy(poolV1.reserves[j])
+                                .idiv(poolV1.reserves[i]);
+                        });
+                    }
+                    setInputWeiValues(inputValues);
+                    setInputRawValues(
+                        inputValues.map((input, j) =>
+                            j === i
+                                ? val
+                                : new TokenAmount(
+                                      p.tokens[j],
+                                      input
+                                  ).egld.toString(10)
+                        )
+                    );
+                } else {
+                    setInputRawValues((state) =>
+                        produce(state, (draft) => {
+                            draft[i] = val;
+                        })
+                    );
+                    setInputWeiValues((state) => {
+                        return produce(state, (draft) => {
+                            draft[i] = inputWei;
+                        });
+                    });
+                }
+            },
+        [pool.address, isBalanced]
+    );
+
+    const onChangeIsBalanced = useCallback((val: boolean) => {
+        const p = POOLS_MAP_ADDRESS[pool.address];
+        setInputRawValues(p.tokens.map(t => ""));
+        setInputWeiValues(p.tokens.map(t => new BigNumber(0)));
+        setIsBalanced(val);
+    }, [pool.address]);
+
     const tokenInputProps = useMemo(() => {
         return pool.tokens.map((_t, i) => {
             const t = getTokenFromId(_t.identifier);
-            const userInput = Fraction.fromBigNumber(inputValues[i] || 0);
+            const userInput = new TokenAmount(t, inputWeiValues[i]);
             const tokenAmt = new TokenAmount(
                 t,
                 tokenMap[t.identifier]?.balance || 0
@@ -257,30 +340,30 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
                 token: t,
             };
         });
-    }, [pool, tokenMap, inputValues]);
+    }, [pool, tokenMap, inputWeiValues]);
 
     const liquidityValue = useMemo(() => {
         return pool.tokens.reduce(
             (total, t, i) =>
                 total.plus(
-                    new BigNumber(inputValues[i] || 0).multipliedBy(
+                    toEGLDD(t.decimals, inputWeiValues[i]).multipliedBy(
                         tokenMap[t.identifier]?.price || 0
                     )
                 ),
             new BigNumber(0)
         );
-    }, [pool, tokenMap, inputValues]);
+    }, [pool, tokenMap, inputWeiValues]);
 
     const canAddLP = useMemo(() => {
         return (
             !isInsufficientEGLD &&
             tokenInputProps.every((t) => !t.isInsufficientFund) &&
             !adding &&
-            !inputValues
+            !inputWeiValues
                 .reduce((total, val) => total.plus(val || 0), new BigNumber(0))
                 .eq(0)
         );
-    }, [isInsufficientEGLD, adding, inputValues, tokenInputProps]);
+    }, [isInsufficientEGLD, adding, inputWeiValues, tokenInputProps]);
 
     useEffect(() => {
         if (liquidityValue.gt(0)) {
@@ -290,7 +373,7 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
 
     return (
         <div className="px-8 pb-16 sm:pb-7 grow overflow-auto">
-            <div className="inline-flex justify-between items-center">
+            <div className="mb-7 inline-flex justify-between items-center">
                 <div className="mr-2">
                     {/* <div className="text-text-input-3 text-xs">Deposit</div> */}
                     <div className="text-lg sm:text-2xl font-bold">
@@ -325,6 +408,29 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
                     })}
                 </div>
             </div>
+            <div className="px-6 py-7 bg-ash-dark-600 flex flex-col sm:flex-row sm:items-center">
+                <div className="sm:w-1/2 mb-4 sm:mb-0">
+                    <Switch
+                        checked={isBalanced}
+                        onChange={onChangeIsBalanced}
+                        className="inline-flex items-center mb-7"
+                    >
+                        <span className="ml-2 font-bold text-sm text-stake-gray-500 underline">
+                            Balanced Deposit
+                        </span>
+                    </Switch>
+                    <div className="font-bold text-xs text-white">
+                        We recommend that you always make a balanced deposit to
+                        the pool for better fees.
+                    </div>
+                </div>
+                <div className="hidden sm:block mx-9 border-l border-ash-gray-600 self-stretch"></div>
+                <div className="sm:w-1/2 font-medium text-2xs text-stake-gray-500">
+                    i.e. deposit each token in the same proportion as indicated
+                    in the pool token breakdown section. Imbalanced/single token
+                    deposits might result in a loss of funds.
+                </div>
+            </div>
             <div className="my-10">
                 <div className="relative">
                     <OnboardTooltip
@@ -357,18 +463,9 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
                                                     0
                                             )}
                                             value={inputRawValues[i]}
-                                            onChangeValue={(val, num) => {
-                                                setInputRawValues((state) =>
-                                                    produce(state, (draft) => {
-                                                        draft[i] = val;
-                                                    })
-                                                );
-                                                setInputValues((state) =>
-                                                    produce(state, (draft) => {
-                                                        draft[i] = num;
-                                                    })
-                                                );
-                                            }}
+                                            onChangeValue={(val, num) =>
+                                                onChangeInputValue(val, num, i)
+                                            }
                                             isInsufficentFund={
                                                 p.isInsufficientFund
                                             }
@@ -447,7 +544,7 @@ const AddLiquidityModal = (props: Props) => {
             isOpen={!!open}
             onRequestClose={() => onClose && onClose()}
             type={screenSize.msm ? "drawer_btt" : "modal"}
-            className={`clip-corner-4 clip-corner-tl bg-ash-dark-600 text-white p-4 flex flex-col max-h-full max-w-4xl mx-auto`}
+            className={`clip-corner-4 clip-corner-tl bg-ash-dark-400 text-white p-4 flex flex-col max-h-full max-w-4xl mx-auto`}
         >
             <div className="flex justify-end mb-6">
                 <BaseModal.CloseBtn />

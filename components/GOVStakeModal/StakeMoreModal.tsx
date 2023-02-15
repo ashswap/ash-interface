@@ -56,9 +56,9 @@ const EXTEND_CONFIGS = {
             // test purpose
             // { value: 7 * 24 * 60 * 60, label: "+ 1 week" },
             // { value: 4 * 7 * 24 * 60 * 60, label: "+ 4 weeks" },
-            { value: 1 * 10 * 60, label: "+ 10 minutes" },
-            { value: 2 * 10 * 60, label: "+ 20 minutes" },
-            { value: 3 * 10 * 60, label: "+ 30 minutes" },
+            { value: 1 * 10 * 60, label: "+ 30 minutes" },
+            { value: 1 * 24 * 60 * 60, label: "+ 1 day" },
+            { value: 2 * 24 * 60 * 60, label: "+ 2 days" },
         ],
         maxLock: 4 * 365 * 24 * 60 * 60,
         minLock: 7 * 24 * 60 * 60,
