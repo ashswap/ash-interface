@@ -29,6 +29,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
 import DailyQuests from "./DailyQuests";
 import EventQuests from "./EventQuests";
+import * as Sentry from "@sentry/nextjs";
 
 type PlatformType = "twitter" | "discord";
 const Star = ({ active = false }: { active?: boolean }) => {
@@ -115,7 +116,7 @@ const QuestOverview = () => {
         logApi
             .get<QuestUserStatsModel>("/api/v1/wallet")
             .then((res) => setUserStats(res.data))
-            .catch((err) => console.log(err))
+            .catch((err) => Sentry.captureException(err))
             .finally(() => setFirstLoad(false));
     }, [setUserStats]);
 

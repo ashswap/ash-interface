@@ -145,6 +145,7 @@ const useAshBaseStateQuery = (config?: SWRConfiguration) => {
                         }
                         totalSupply
                         reserves
+                        priceScale
                     }
                     tokens {
                         ...allTokenProps
