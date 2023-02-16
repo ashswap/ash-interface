@@ -135,7 +135,7 @@ const DEVNET_TOKENS_BETA: IESDTInfo[] = [
         identifier: "HTM-fe1f69",
         chainId: ChainId.Devnet,
         symbol: "HTM",
-        name: "HTM",
+        name: "Hatom Protocol",
         decimals: 18,
         logoURI: IconHTM.src,
     },
@@ -143,7 +143,7 @@ const DEVNET_TOKENS_BETA: IESDTInfo[] = [
         identifier: "UTK-a2a792",
         chainId: ChainId.Devnet,
         symbol: "UTK",
-        name: "UTK",
+        name: "Utrust",
         decimals: 18,
         logoURI: IconUTK.src,
     }

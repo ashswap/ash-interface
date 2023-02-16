@@ -97,8 +97,8 @@ module.exports = {
 
             },
             zIndex: {
-                modal: 998,
-                toast: 999,
+                toast: 998,
+                modal: 999,
                 tooltip: 1000,
             }
         },

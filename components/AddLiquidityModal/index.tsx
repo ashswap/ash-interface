@@ -318,12 +318,15 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
         [pool.address, isBalanced]
     );
 
-    const onChangeIsBalanced = useCallback((val: boolean) => {
-        const p = POOLS_MAP_ADDRESS[pool.address];
-        setInputRawValues(p.tokens.map(t => ""));
-        setInputWeiValues(p.tokens.map(t => new BigNumber(0)));
-        setIsBalanced(val);
-    }, [pool.address]);
+    const onChangeIsBalanced = useCallback(
+        (val: boolean) => {
+            const p = POOLS_MAP_ADDRESS[pool.address];
+            setInputRawValues(p.tokens.map((t) => ""));
+            setInputWeiValues(p.tokens.map((t) => new BigNumber(0)));
+            setIsBalanced(val);
+        },
+        [pool.address]
+    );
 
     const tokenInputProps = useMemo(() => {
         return pool.tokens.map((_t, i) => {
@@ -420,15 +423,20 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
                         </span>
                     </Switch>
                     <div className="font-bold text-xs text-white">
-                        We recommend that you always make a balanced deposit to
-                        the pool for better fees.
+                        We recommend that you make a balanced deposit if you
+                        can.
                     </div>
                 </div>
                 <div className="hidden sm:block mx-9 border-l border-ash-gray-600 self-stretch"></div>
                 <div className="sm:w-1/2 font-medium text-2xs text-stake-gray-500">
-                    i.e. deposit each token in the same proportion as indicated
-                    in the pool token breakdown section. Imbalanced/single token
-                    deposits might result in a loss of funds.
+                    <div className="mb-4">
+                        i.e. Depositing with balanced proportions incurs the
+                        least fees.
+                    </div>
+                    <div>
+                        But if you need to swap to have the correct amounts, it
+                        is better to deposit in unbalanced/single-side ways.
+                    </div>
                 </div>
             </div>
             <div className="my-10">
