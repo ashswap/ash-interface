@@ -11,6 +11,6 @@ const VE_LOCK_LABEL_MAIN = [
     { label: "1 year", amt: 0.25 },
 ];
 
-export const WEEK = ENVIRONMENT.NETWORK === "mainnet" ? 7 * 24 * 3600 : ENVIRONMENT.ENV === "alpha" ? 600 : 30 * 60;
+export const WEEK = ENVIRONMENT.NETWORK === "mainnet" ? 7 * 24 * 3600 : ENVIRONMENT.ENV === "alpha" ? 30 * 60 : 30 * 60;
 export const VE_MAX_TIME = 4 * 365 * 24 * 3600;
 export const VE_LOCK_LABEL = VE_LOCK_LABEL_MAIN;

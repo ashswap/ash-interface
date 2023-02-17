@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/nextjs";
 import Fire from "assets/images/fire.png";
 import ICArrowDownRounded from "assets/svg/arrow-down-rounded.svg";
 import ICChevronDown from "assets/svg/chevron-down.svg";
@@ -9,12 +10,12 @@ import ICSetting from "assets/svg/setting.svg";
 import IconWallet from "assets/svg/wallet.svg";
 import {
     accIsInsufficientEGLDState,
-    accIsLoggedInState,
+    accIsLoggedInState
 } from "atoms/dappState";
 import {
     ashRawPoolV1ByAddressQuery,
     ashRawPoolV2ByAddressQuery,
-    poolV1FeesQuery,
+    poolV1FeesQuery
 } from "atoms/poolsState";
 import BigNumber from "bignumber.js";
 import Avatar from "components/Avatar";
@@ -28,32 +29,34 @@ import Setting from "components/Setting";
 import TextAmt from "components/TextAmt";
 import CardTooltip from "components/Tooltip/CardTooltip";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
+import { blockTimeMs } from "const/dappConfig";
 import { useSwap } from "context/swap";
 import { toEGLDD } from "helper/balance";
 import { queryPoolContract } from "helper/contracts/pool";
+import CurveV2 from "helper/curveV2/swap";
 import { Fraction } from "helper/fraction/fraction";
 import { Percent } from "helper/fraction/percent";
 import { formatAmount } from "helper/number";
 import { calculateEstimatedSwapOutputAmount2 } from "helper/stableswap/calculator/amounts";
 import { calculateSwapPrice } from "helper/stableswap/calculator/price";
+import { getTokenIdFromCoin } from "helper/token";
 import { Price } from "helper/token/price";
 import { IESDTInfo } from "helper/token/token";
 import { TokenAmount } from "helper/token/tokenAmount";
 import { useConnectWallet } from "hooks/useConnectWallet";
+import useInterval from "hooks/useInterval";
 import useMounted from "hooks/useMounted";
 import { useOnboarding } from "hooks/useOnboarding";
 import usePoolSwap from "hooks/usePoolContract/usePoolSwap";
 import { useScreenSize } from "hooks/useScreenSize";
+import useUnwrapWEGLD from "hooks/useWrappedEGLDContract/useUnwrapWEGLD";
+import useWrapEGLD from "hooks/useWrappedEGLDContract/useWrapEGLD";
 import IPool, { EPoolType } from "interface/pool";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRecoilCallback, useRecoilValue } from "recoil";
+import { useDebounce } from "use-debounce";
 import SwapAmount from "./components/SwapAmount";
 import styles from "./Swap.module.css";
-import { useDebounce } from "use-debounce";
-import { ContractManager } from "helper/contracts/contractManager";
-import { getTokenIdFromCoin } from "helper/token";
-import useWrapEGLD from "hooks/useWrappedEGLDContract/useWrapEGLD";
-import useUnwrapWEGLD from "hooks/useWrappedEGLDContract/useUnwrapWEGLD";
 
 const MaiarPoolTooltip = ({
     children,
@@ -211,9 +214,99 @@ const Swap = () => {
         return new Price(tokenAmountTo, tokenAmountFrom);
     }, [tokenAmountFrom, tokenAmountTo]);
 
+    const minimumReceive = useMemo(() => {
+        if (!tokenAmountTo) {
+            return new Fraction(0);
+        }
+        return new TokenAmount(
+            tokenAmountTo.token,
+            new Percent(100, 100)
+                .subtract(slippage)
+                .multiply(tokenAmountTo.raw).quotient
+        );
+    }, [tokenAmountTo, slippage]);
+
+    const getAmountOut = useRecoilCallback(
+        ({ snapshot, set }) =>
+            async (
+                pool: IPool,
+                tokenAmountFrom: TokenAmount,
+                tokenTo: IESDTInfo
+            ) => {
+                const defaultResult = {
+                    outputAmount: new TokenAmount(tokenTo, 0),
+                    fee: new TokenAmount(tokenTo, 0),
+                };
+                if (pool.type === EPoolType.PoolV2) {
+                    const rawPoolV2 = await snapshot.getPromise(
+                        ashRawPoolV2ByAddressQuery(pool.address)
+                    );
+                    const tokenInIndex = pool.tokens.findIndex(
+                        (t) =>
+                            t.identifier ===
+                            getTokenIdFromCoin(tokenAmountFrom.token.identifier)
+                    );
+                    const tokenOutIndex = pool.tokens.findIndex(
+                        (t) =>
+                            t.identifier ===
+                            getTokenIdFromCoin(tokenTo.identifier)
+                    );
+                    if (rawPoolV2) {
+                        const curveV2 = new CurveV2(pool.tokens, {
+                            ...rawPoolV2,
+                            ann: rawPoolV2.ampFactor,
+                        });
+                        try {
+                            const { fee, dy } = curveV2.estimateAmountOut(
+                                tokenInIndex,
+                                tokenOutIndex,
+                                tokenAmountFrom.raw
+                            );
+                            return {
+                                outputAmount: new TokenAmount(tokenTo, dy),
+                                fee: new TokenAmount(tokenTo, fee),
+                            };
+                        } catch (err) {
+                            Sentry.captureException(err, {
+                                extra: { poolV2: pool.address },
+                            });
+                            return defaultResult;
+                        }
+                    } else {
+                        Sentry.captureMessage(
+                            "cannot find pool v2 from graphql",
+                            { extra: { poolV2: pool.address } }
+                        );
+                        return defaultResult;
+                    }
+                } else {
+                    const fees = await snapshot.getPromise(
+                        poolV1FeesQuery(pool.address || "")
+                    );
+                    const rawPool = await snapshot.getPromise(
+                        ashRawPoolV1ByAddressQuery(pool.address || "")
+                    );
+                    if (!rawPool) return;
+                    const reserves = pool.tokens.map(
+                        (t, i) => new TokenAmount(t, rawPool.reserves[i])
+                    );
+                    const estimated = calculateEstimatedSwapOutputAmount2(
+                        new BigNumber(rawPool?.ampFactor || 0),
+                        reserves,
+                        tokenAmountFrom,
+                        tokenTo,
+                        fees
+                    );
+                    return estimated;
+                }
+            },
+        []
+    );
+
     const calcPriceImpact = useRecoilCallback(
         ({ snapshot }) =>
             async () => {
+                
                 if (
                     !pool ||
                     !tokenFrom ||
@@ -250,20 +343,27 @@ const Swap = () => {
                                 .toFixed(0)
                         )
                     );
-                    const { outputAmount } =
-                        await ContractManager.getPoolV2Contract(
-                            pool.address
-                        ).estimateAmountOut(
-                            tokenFromIndex,
-                            tokenToIndex,
-                            inputAmountNum
-                        );
-                    const amt = new TokenAmount(tokenTo, outputAmount);
                     const inputAmount = new TokenAmount(
                         tokenFrom,
                         inputAmountNum
                     );
-                    price = new Price(inputAmount, amt);
+                    price = new Price(inputAmount, new TokenAmount(tokenTo, 0));
+                    if (rawPool) {
+                        try {
+                            const { dy } = new CurveV2(pool.tokens, {
+                                ...rawPool,
+                                ann: rawPool?.ampFactor,
+                            }).estimateAmountOut(
+                                tokenFromIndex,
+                                tokenToIndex,
+                                inputAmountNum
+                            );
+                            const amt = new TokenAmount(tokenTo, dy);
+                            price = new Price(inputAmount, amt);
+                        } catch (error) {
+                            Sentry.captureException(error, {extra: {poolV2: pool.address}})
+                        }
+                    }
                 } else {
                     const rawPool = await snapshot.getPromise(
                         ashRawPoolV1ByAddressQuery(pool.address)
@@ -290,138 +390,6 @@ const Swap = () => {
             },
         [pool, tokenFrom, tokenTo, tokenAmountTo, tokenAmountFrom, fees]
     );
-
-    const [calcPriceImpactDebounce] = useDebounce(calcPriceImpact, 750);
-
-    const minimumReceive = useMemo(() => {
-        if (!tokenAmountTo) {
-            return new Fraction(0);
-        }
-        return new TokenAmount(
-            tokenAmountTo.token,
-            new Percent(100, 100)
-                .subtract(slippage)
-                .multiply(tokenAmountTo.raw).quotient
-        );
-    }, [tokenAmountTo, slippage]);
-    useEffect(() => {
-        if (
-            window &&
-            deboundSlippage &&
-            !slippage.equalTo(new Percent(100, 100_000))
-        ) {
-            let dataLayer = (window as any).dataLayer || [];
-            dataLayer.push({
-                event: "set_slippage",
-                amount:
-                    slippage.numerator.toNumber() /
-                    slippage.denominator.toNumber(),
-            });
-        }
-    }, [deboundSlippage]);
-    useEffect(() => {
-        if (!tokenFrom) {
-            setValueFrom("");
-            setSwapFeeAmt(0);
-        }
-    }, [tokenFrom, setValueFrom]);
-    useEffect(() => {
-        if (!tokenTo) {
-            setValueTo("");
-            setSwapFeeAmt(0);
-        }
-    }, [tokenTo, setValueTo]);
-
-    useEffect(() => {
-        calcPriceImpactDebounce();
-    }, [calcPriceImpactDebounce]);
-
-    useEffect(() => {
-        setShowSetting(false);
-        openHistoryModal(false);
-    }, [screenSize.isMobile]);
-
-    const getAmountOut = useRecoilCallback(
-        ({ snapshot, set }) =>
-            async (
-                pool: IPool,
-                tokenAmountFrom: TokenAmount,
-                tokenTo: IESDTInfo
-            ) => {
-                if (pool.type === EPoolType.PoolV2) {
-                    const tokenInIndex = pool.tokens.findIndex(
-                        (t) =>
-                            t.identifier ===
-                            getTokenIdFromCoin(tokenAmountFrom.token.identifier)
-                    );
-                    const tokenOutIndex = pool.tokens.findIndex(
-                        (t) =>
-                            t.identifier ===
-                            getTokenIdFromCoin(tokenTo.identifier)
-                    );
-                    const { outputAmount, fee } =
-                        await ContractManager.getPoolV2Contract(
-                            pool.address
-                        ).estimateAmountOut(
-                            tokenInIndex,
-                            tokenOutIndex,
-                            tokenAmountFrom.raw
-                        );
-                    return {
-                        outputAmount: new TokenAmount(
-                            tokenTo,
-                            outputAmount || 0
-                        ),
-                        fee: new TokenAmount(tokenTo, fee || 0),
-                    };
-                } else {
-                    const fees = await snapshot.getPromise(
-                        poolV1FeesQuery(pool.address || "")
-                    );
-                    const rawPool = await snapshot.getPromise(
-                        ashRawPoolV1ByAddressQuery(pool.address || "")
-                    );
-                    if (!rawPool) return;
-                    const reserves = pool.tokens.map(
-                        (t, i) => new TokenAmount(t, rawPool.reserves[i])
-                    );
-                    const estimated = calculateEstimatedSwapOutputAmount2(
-                        new BigNumber(rawPool?.ampFactor || 0),
-                        reserves,
-                        tokenAmountFrom,
-                        tokenTo,
-                        fees
-                    );
-                    return estimated;
-                }
-            },
-        []
-    );
-
-    useEffect(() => {
-        if (!pool || !tokenTo || !tokenAmountFrom) {
-            setTimeout(() => setValueTo(""), 0);
-            return;
-        }
-        if (pool.isMaiarPool) {
-            queryPoolContract
-                .getAmountOutMaiarPool(
-                    pool.address,
-                    tokenAmountFrom.token.identifier,
-                    tokenAmountFrom.raw
-                )
-                .then((res) => {
-                    setValueTo(toEGLDD(tokenTo.decimals, res).toString());
-                });
-            return;
-        }
-        getAmountOut(pool, tokenAmountFrom, tokenTo).then((estimated) => {
-            if (estimated) {
-                setValueTo(estimated.outputAmount.egld.toString());
-                setSwapFeeAmt(estimated.fee.egld.toNumber());
-            }
-        });
-    }, [getAmountOut, setValueTo, pool, tokenTo, tokenAmountFrom]);
 
     const swapHandle = useCallback(async () => {
         if (!loggedIn || !tokenFrom || !tokenTo || swapping || !pool) {
@@ -492,6 +460,69 @@ const Swap = () => {
         unwrapHandle,
         wrapHandle,
     ]);
+
+    const calcAmountOut = useCallback(() => {
+        if (!pool || !tokenTo || !tokenAmountFrom) {
+            setTimeout(() => setValueTo(""), 0);
+            return;
+        }
+        if (pool.isMaiarPool) {
+            queryPoolContract
+                .getAmountOutMaiarPool(
+                    pool.address,
+                    tokenAmountFrom.token.identifier,
+                    tokenAmountFrom.raw
+                )
+                .then((res) => {
+                    setValueTo(toEGLDD(tokenTo.decimals, res).toString());
+                });
+            return;
+        }
+        getAmountOut(pool, tokenAmountFrom, tokenTo).then((estimated) => {
+            if (estimated) {
+                setValueTo(estimated.outputAmount.egld.toString());
+                setSwapFeeAmt(estimated.fee.egld.toNumber());
+            }
+        });
+    }, [getAmountOut, setValueTo, pool, tokenTo, tokenAmountFrom])
+
+    const [calcPriceImpactDebounce] = useDebounce(calcPriceImpact, 750);
+    const [calcAmountOutDebounce] = useDebounce(calcAmountOut, 200);
+    useInterval(calcPriceImpactDebounce, blockTimeMs);
+    useInterval(calcAmountOutDebounce, blockTimeMs);
+
+    useEffect(() => {
+        if (
+            window &&
+            deboundSlippage &&
+            !slippage.equalTo(new Percent(100, 100_000))
+        ) {
+            let dataLayer = (window as any).dataLayer || [];
+            dataLayer.push({
+                event: "set_slippage",
+                amount:
+                    slippage.numerator.toNumber() /
+                    slippage.denominator.toNumber(),
+            });
+        }
+    }, [deboundSlippage]);
+    useEffect(() => {
+        if (!tokenFrom) {
+            setValueFrom("");
+            setSwapFeeAmt(0);
+        }
+    }, [tokenFrom, setValueFrom]);
+    useEffect(() => {
+        if (!tokenTo) {
+            setValueTo("");
+            setSwapFeeAmt(0);
+        }
+    }, [tokenTo, setValueTo]);
+
+    useEffect(() => {
+        setShowSetting(false);
+        openHistoryModal(false);
+    }, [screenSize.isMobile]);
 
     return (
         <div className="flex flex-col items-center pt-3.5 pb-12 px-6">

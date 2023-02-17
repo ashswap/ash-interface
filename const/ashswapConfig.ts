@@ -20,13 +20,13 @@ const dappContractDevnet: DappContractConfig = {
     },
     alpha: {
         voteEscrowedContract:
-            "erd1qqqqqqqqqqqqqpgq5xjphmtheu87zpcgvt3v6wkwlg0sfvzjrmcqzu363p",
+            "erd1qqqqqqqqqqqqqpgqe5q4g4yv554yl40n0y2ntpax9duk69ghrmcq7zt30m",
         feeDistributor:
-            "erd1qqqqqqqqqqqqqpgqheeffqc8atf5xrx5k4lrzd35d3sp3ukmrmcqsj4fzm",
+            "erd1qqqqqqqqqqqqqpgqxczm7t7da8ktaapszfh6js8tc4k36xs4rmcqhrcjaw",
         farmController:
-            "erd1qqqqqqqqqqqqqpgq4ljdjsuguhfr5xjvhnaj2qk63nqhyrjgrmcqst8z0r",
+            "erd1qqqqqqqqqqqqqpgqk44khghvkuq0d7h8j6kv9pwh8hu0tncvrmcqwyra92",
         farmBribe:
-            "erd1qqqqqqqqqqqqqpgqufy2dxja0dpp4c8dn59cuz6v67xw7sf9rmcqe0s4as",
+            "erd1qqqqqqqqqqqqqpgqw8npzkng2j5pt5ht07h0jhh4wky0cgkcrmcqyk7wne",
     },
 };
 
@@ -55,7 +55,7 @@ export const VE_CONFIG = ENVIRONMENT.NETWORK === "mainnet" ? {
 } : ENVIRONMENT.ENV === "alpha" ? {
     // for alpha test
     maxLock: 4 * 365 * 24 * 3600,
-    minLock: 10 * 60,
+    minLock: 30 * 60,
 } : {
     // beta
     maxLock: 4 * 365 * 24 * 3600,

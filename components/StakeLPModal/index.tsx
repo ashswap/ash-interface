@@ -1,5 +1,6 @@
 import { useDebounce } from "use-debounce";
 import ICChevronRight from "assets/svg/chevron-right.svg";
+import ICArrowRight from "assets/svg/arrow-right.svg";
 import {
     accIsInsufficientEGLDState,
     accIsLoggedInState,
@@ -28,7 +29,7 @@ type props = {
 };
 const StakeLPContent = ({ open, onClose, farmData }: props) => {
     const loggedIn = useRecoilValue(accIsLoggedInState);
-    const { pool, farm, farmTokenSupply, ashPerSec, emissionAPR } = farmData;
+    const { pool, farm, farmTokenSupply, ashPerSec, ashBaseAPR } = farmData;
     const lpTokenMap = useRecoilValue(lpTokenMapState);
     const insufficientEGLD = useRecoilValue(accIsInsufficientEGLDState);
     const [stakeAmt, setStakeAmt] = useState<BigNumber>(new BigNumber(0));
@@ -54,13 +55,22 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
         setStakeAmt(LPBalance);
         setRawStakeAmt(toEGLDD(pool.lpToken.decimals, LPBalance).toString(10));
     }, [LPBalance, pool]);
-    const ashPerDay = useMemo(() => {
+    const ashPerDayBase = useMemo(() => {
         const baseFarmToken = stakeAmt.multipliedBy(0.4);
         const totalAshPerDay = ashPerSec
             .multipliedBy(24 * 60 * 60)
             ;
         const shareOfFarm = baseFarmToken.div(
             farmTokenSupply.plus(baseFarmToken)
+        );
+        return totalAshPerDay.multipliedBy(shareOfFarm);
+    }, [stakeAmt, farmTokenSupply, ashPerSec]);
+    const ashPerDayMax = useMemo(() => {
+        const totalAshPerDay = ashPerSec
+            .multipliedBy(24 * 60 * 60)
+            ;
+        const shareOfFarm = stakeAmt.div(
+            farmTokenSupply.plus(stakeAmt)
         );
         return totalAshPerDay.multipliedBy(shareOfFarm);
     }, [stakeAmt, farmTokenSupply, ashPerSec]);
@@ -160,7 +170,15 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
                                 <TextAmt
                                     number={toEGLDD(
                                         ASH_TOKEN.decimals,
-                                        ashPerDay
+                                        ashPerDayBase
+                                    )}
+                                    decimalClassName="text-stake-gray-500"
+                                />
+                                <ICArrowRight/>
+                                <TextAmt
+                                    number={toEGLDD(
+                                        ASH_TOKEN.decimals,
+                                        ashPerDayMax
                                     )}
                                     decimalClassName="text-stake-gray-500"
                                 />
@@ -168,13 +186,23 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
                         </div>
                         <div>
                             <div className="text-ash-gray-500 text-xs mb-2">
-                                Emission APR
+                                ASH rewards
                             </div>
                             <div className="text-white text-lg font-bold">
-                                {formatAmount(emissionAPR?.toNumber() || 0, {
+                                <span>
+
+                                {formatAmount(ashBaseAPR || 0, {
                                     notation: "standard",
                                 })}
                                 %
+                                </span>
+                                <ICArrowRight/>
+                                <span>
+                                {formatAmount(ashBaseAPR * 2.5 || 0, {
+                                    notation: "standard",
+                                })}
+                                %
+                                </span>
                             </div>
                         </div>
                     </div>

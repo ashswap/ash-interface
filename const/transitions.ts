@@ -19,9 +19,15 @@ const fadeZoomIn: TransitionClasses = {
     enterFrom: "scale-50 opacity-0",
     enterTo: "scale-100 opacity-100",
 };
+const fadeZoomOut: TransitionClasses = {
+    leave: "duration-300 ease-out",
+    leaveFrom: "scale-100 opacity-100",
+    leaveTo: "scale-50 opacity-0",
+};
 export const TRANSITIONS = {
     fadeIn,
     fadeOut,
     zoomIn,
     fadeZoomIn,
+    fadeZoomOut,
 } as const;

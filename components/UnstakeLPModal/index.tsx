@@ -29,7 +29,7 @@ type props = {
     farmData: FarmRecord;
 };
 const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
-    const { pool, farm, stakedData, ashPerSec, farmTokenSupply, emissionAPR } =
+    const { pool, farm, stakedData, ashPerSec, farmTokenSupply } =
         farmData;
     const loggedIn = useRecoilValue(accIsLoggedInState);
     const [isClickedUnstake, setIsClickedUnstake] = useRecoilState(
@@ -64,8 +64,7 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
     const ashPerDay = useMemo(() => {
         if (!stakedData) return new BigNumber(0);
         const totalAshPerDay = ashPerSec.multipliedBy(24 * 60 * 60);
-        const shareOfFarm = stakedData.totalStakedLP
-            .multipliedBy(0.4)
+        const shareOfFarm = stakedData.farmTokens.reduce((sum, t) => sum.plus(t.balance), new BigNumber(0))
             .div(farmTokenSupply);
         return totalAshPerDay.multipliedBy(shareOfFarm);
     }, [stakedData, farmTokenSupply, ashPerSec]);
@@ -73,12 +72,13 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
     const afterUnstakeAshPerDay = useMemo(() => {
         if (!stakedData) return new BigNumber(0);
         const totalAshPerDay = ashPerSec.multipliedBy(24 * 60 * 60);
-        const baseFarmToken = unStakeAmt.multipliedBy(0.4);
-        const newStaked = stakedData.totalStakedLP
-            .multipliedBy(0.4)
-            .minus(baseFarmToken);
-        if (newStaked.lte(0)) return new BigNumber(0);
-        const shareOfFarm = newStaked.div(farmTokenSupply.minus(baseFarmToken));
+        const oldTotalLP = stakedData.totalStakedLP;
+        const oldFarmAmt = stakedData.farmTokens.reduce((sum, t) => sum.plus(t.balance), new BigNumber(0));
+        const unstakeFarmAmt = unStakeAmt.multipliedBy(oldFarmAmt).idiv(oldTotalLP);
+        const newFarmAmt = oldFarmAmt.minus(unstakeFarmAmt);
+
+        if (newFarmAmt.lte(0)) return new BigNumber(0);
+        const shareOfFarm = newFarmAmt.div(farmTokenSupply.minus(unstakeFarmAmt));
         return totalAshPerDay.multipliedBy(shareOfFarm);
     }, [stakedData, farmTokenSupply, ashPerSec, unStakeAmt]);
 
@@ -304,7 +304,7 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
                                 </div>
                             )}
                         </div>
-                        <div>
+                        {/* <div>
                             <div className="text-ash-gray-500 text-xs mb-2">
                                 Emission APR
                             </div>
@@ -314,7 +314,7 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
                                 })}
                                 %
                             </div>
-                        </div>
+                        </div> */}
                     </div>
                 </div>
             </div>

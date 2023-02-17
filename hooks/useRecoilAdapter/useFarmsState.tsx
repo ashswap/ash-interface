@@ -9,7 +9,7 @@ import {
     FarmRecord,
     farmRecordsState,
     farmSessionIdMapState,
-    FarmToken
+    FarmToken,
 } from "atoms/farmsState";
 import { LPBreakDownQuery, poolRecordsState } from "atoms/poolsState";
 import { farmTokenMapState, tokenMapState } from "atoms/tokensState";
@@ -29,7 +29,7 @@ import {
     useCallback,
     useEffect,
     useMemo,
-    useState
+    useState,
 } from "react";
 import { useRecoilCallback, useRecoilValue, useSetRecoilState } from "recoil";
 import { useDebounce } from "use-debounce";
@@ -92,7 +92,7 @@ const useFarmsState = () => {
         Record<string, RewardSnapshot>
     >({});
     const rewardPerSecKey = useMemo(() => {
-        return ashBase.farms.map(f => f.rewardPerSec).join("-");
+        return ashBase.farms.map((f) => f.rewardPerSec).join("-");
     }, [ashBase.farms]);
 
     const [deboundKeyword] = useDebounce(keyword, 500);
@@ -241,16 +241,20 @@ const useFarmsState = () => {
             );
 
             const ashPerSec = new BigNumber(rawFarm?.rewardPerSec || 0);
-            const totalASH = toEGLDD(
+            const totalASHPerYear = toEGLDD(
                 ASH_TOKEN.decimals,
                 ashPerSec.multipliedBy(365 * 24 * 60 * 60)
             );
-            const emissionAPR = totalLiquidityValue.gt(0)
-                ? totalASH
+            const ashBaseAPR = totalLiquidityValue.gt(0)
+                ? totalASHPerYear
                       .multipliedBy(tokenMap[ASH_TOKEN.identifier]?.price || 0)
+                      .multipliedBy(0.4)
                       .multipliedBy(100)
                       .div(totalLiquidityValue)
-                : new BigNumber(0);
+                      .toNumber()
+                : 0;
+            const tradingAPR = poolState?.poolStats?.apr || 0;
+            const tokensAPR: FarmRecord["tokensAPR"] = [];
 
             const record: FarmRecord = {
                 pool: p,
@@ -261,7 +265,17 @@ const useFarmsState = () => {
                 farmTokenSupply,
                 lpLockedAmt,
                 totalLiquidityValue,
-                emissionAPR,
+                ashBaseAPR,
+                tokensAPR,
+                tradingAPR,
+                totalAPRMin:
+                    ashBaseAPR +
+                    tradingAPR +
+                    tokensAPR.reduce((sum, t) => (sum += t.apr), 0),
+                totalAPRMax:
+                    ashBaseAPR * 2.5 +
+                    tradingAPR +
+                    tokensAPR.reduce((sum, t) => (sum += t.apr), 0),
             };
             if (!accAddress) return record;
 
@@ -310,9 +324,18 @@ const useFarmsState = () => {
                     (total, f) => total.plus(f.balance),
                     new BigNumber(0)
                 );
-                const lastSnapshotReward = lastQueryRewardMap[f.farm_address] || {reward: new BigNumber(0), ts: moment().unix()};
-                const rewardIncrease = BigNumber.max(moment().unix() - lastSnapshotReward.ts, 0).multipliedBy(ashPerSec).multipliedBy(farmBalance).idiv(farmTokenSupply);
-                const estimatedReward = lastSnapshotReward.reward.plus(rewardIncrease);
+                const lastSnapshotReward = lastQueryRewardMap[
+                    f.farm_address
+                ] || { reward: new BigNumber(0), ts: moment().unix() };
+                const rewardIncrease = BigNumber.max(
+                    moment().unix() - lastSnapshotReward.ts,
+                    0
+                )
+                    .multipliedBy(ashPerSec)
+                    .multipliedBy(farmBalance)
+                    .idiv(farmTokenSupply);
+                const estimatedReward =
+                    lastSnapshotReward.reward.plus(rewardIncrease);
                 const totalStakedLP = farmTokens.reduce(
                     (total, val) =>
                         total.plus(
@@ -328,6 +351,10 @@ const useFarmsState = () => {
                     totalStakedLP,
                     f
                 );
+                const yieldBoost = +new BigNumber(yieldBoostRaw).toFixed(
+                    2,
+                    BigNumber.ROUND_DOWN
+                );
                 record.stakedData = {
                     farmTokens,
                     totalStakedLP,
@@ -336,16 +363,25 @@ const useFarmsState = () => {
                         .multipliedBy(totalLiquidityValue)
                         .div(lpLockedAmt),
                     weightBoost: farmBalance.div(totalStakedLP).div(0.4),
-                    yieldBoost: +new BigNumber(yieldBoostRaw).toFixed(
-                        2,
-                        BigNumber.ROUND_DOWN
-                    ),
+                    yieldBoost,
+                    totalAPR:
+                        ashBaseAPR * yieldBoost +
+                        tradingAPR +
+                        tokensAPR.reduce((sum, t) => (sum += t.apr), 0),
                 };
             }
             return record;
         },
 
-        [ashBase.farms, poolRecords, lpBreak, tokenMap, accAddress, farmTokenMap, lastQueryRewardMap]
+        [
+            ashBase.farms,
+            poolRecords,
+            lpBreak,
+            tokenMap,
+            accAddress,
+            farmTokenMap,
+            lastQueryRewardMap,
+        ]
     );
 
     const getFarmRecords = useCallback(async () => {
@@ -376,7 +412,7 @@ const useFarmsState = () => {
     const [debounceQueryRewards] = useDebounce(queryRewards, 500);
 
     useEffect(() => {
-        debounceQueryRewards()
+        debounceQueryRewards();
     }, [debounceQueryRewards]);
 
     useEffect(() => {

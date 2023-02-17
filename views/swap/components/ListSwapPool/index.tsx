@@ -28,7 +28,7 @@ const Token = ({ token }: { token: IESDTInfo }) => {
                     {token.symbol}
                 </div>
                 <div className="text-2xs text-ash-gray-600 truncate">
-                    {token.symbol}
+                    {token.name}
                 </div>
             </div>
         </div>

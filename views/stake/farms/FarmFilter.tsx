@@ -78,7 +78,7 @@ function FarmFilter() {
                         >
                             <ICGrid className="w-6 h-6" />
                         </button>
-                        <button
+                        {/* <button
                             className={`mr-2 transition-all lg:mr-8 shrink-0 ${
                                 viewType === ViewType.List
                                     ? "text-ash-cyan-500"
@@ -87,7 +87,7 @@ function FarmFilter() {
                             onClick={() => onChangeViewType(ViewType.List)}
                         >
                             <ICList className="w-6 h-6" />
-                        </button>
+                        </button> */}
                         {screenSize.md && (
                             <div className="grow overflow-hidden">
                                 {SearchBox}

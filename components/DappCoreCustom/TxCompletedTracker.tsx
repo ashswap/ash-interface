@@ -9,6 +9,7 @@ import { QuestUserStatsModel } from "interface/quest";
 import { useEffect } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { GetTransactionsByHashesReturnType } from "./getTransactionsByHashes";
+import * as Sentry from "@sentry/nextjs";
 
 export const TxCompletedTracker = () => {
     const { socket, socketExtra } = useSocket();
@@ -50,7 +51,9 @@ export const TxCompletedTracker = () => {
                         action_time: Date.now(),
                         action_name: raw?.function || raw?.arguments?.functionName || raw?.action?.name,
                         action_metadata: raw,
-                    }).catch((err) => console.log(err));
+                    }).catch((err) => {
+                        Sentry.captureException(err);
+                    });
                 }
             });
         };
@@ -65,7 +68,7 @@ export const TxCompletedTracker = () => {
             logApi
             .get<QuestUserStatsModel>("/api/v1/wallet")
             .then((res) => setUserStats(res.data))
-            .catch((err) => console.log(err))
+            .catch((err) => Sentry.captureException(err))
         }
     }, [setUserStats, isLoggedIn]);
     return null;

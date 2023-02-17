@@ -5,6 +5,7 @@ import ICChevronUp from "assets/svg/chevron-up.svg";
 import ICGovBoost from "assets/svg/gov-boost.svg";
 import ICMinus from "assets/svg/minus.svg";
 import ICPlus from "assets/svg/plus.svg";
+import ICArrowRight from "assets/svg/arrow-right.svg";
 import { accIsLoggedInState } from "atoms/dappState";
 import { farmLoadingMapState, FarmRecord } from "atoms/farmsState";
 import { clickedHarvestModalState } from "atoms/harvestState";
@@ -19,18 +20,19 @@ import StakeLPModal from "components/StakeLPModal";
 import TextAmt from "components/TextAmt";
 import CardTooltip from "components/Tooltip/CardTooltip";
 import UnstakeLPModal from "components/UnstakeLPModal";
-import { ASH_TOKEN } from "const/tokens";
+import { ASH_TOKEN, TOKENS_MAP } from "const/tokens";
 import { TRANSITIONS } from "const/transitions";
 import { toEGLDD } from "helper/balance";
 import { formatAmount } from "helper/number";
 import { getTokenFromId } from "helper/token";
 import useFarmClaimReward from "hooks/useFarmContract/useFarmClaimReward";
 import { useScreenSize } from "hooks/useScreenSize";
-import { useEffect, useMemo, useState } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
 import FarmBoostInfoModal from "./FarmBoostInfoModal";
 import { ViewType } from "./FarmFilter";
 import FarmListLayoutContainer from "./FarmListLayoutContainer";
+import BaseTooltip from "components/BaseTooltip";
 
 type props = {
     farmData: FarmRecord;
@@ -76,8 +78,211 @@ const EstimateInUSD = ({
         </span>
     );
 };
+const ASHRewardBreakdownTable = memo(function ASHRewardBreakdownTable({
+    currentBoost,
+    baseAPR,
+}: {
+    currentBoost: number;
+    baseAPR: number;
+}) {
+    return (
+        <table className="border border-ash-gray-600">
+            <tbody>
+                <tr>
+                    <td className="px-4 py-1 border border-ash-gray-600 font-bold text-2xs sm:text-xs text-stake-gray-500">
+                        Current <br /> ASH reward
+                    </td>
+                    <td className="px-4 py-1 border border-ash-gray-600 font-bold text-ash-purple-500">
+                        <span className="text-sm sm:text-lg underline">
+                            {formatAmount(currentBoost * baseAPR)}
+                        </span>
+                        <span className="text-2xs">%</span>
+                    </td>
+                    <td className="px-4 py-1 border border-ash-gray-600 font-bold text-2xs sm:text-sm text-white">
+                        <span>Boosted: </span>
+                        <span className="inline-flex items-center text-pink-600">
+                            x{formatAmount(currentBoost)}{" "}
+                            <ICGovBoost className="w-3 h-auto -mt-1 ml-1" />
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td className="px-4 py-1 border border-ash-gray-600 font-bold text-2xs sm:text-xs text-stake-gray-500">
+                        Max reward <br /> can reach
+                    </td>
+                    <td className="px-4 py-1 border border-ash-gray-600 font-bold text-ash-purple-500">
+                        <span className="text-sm sm:text-lg underline">
+                            {formatAmount(2.5 * baseAPR)}
+                        </span>
+                        <span className="text-2xs">%</span>
+                    </td>
+                    <td className="px-4 py-1 border border-ash-gray-600 font-bold text-2xs sm:text-xs text-white">
+                        <span>When boost: </span>
+                        <span className="inline-flex items-center">
+                            x2.5{" "}
+                            <ICGovBoost className="w-2.5 h-auto -mt-1 ml-1" />
+                        </span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    );
+});
+const FarmAPRBreakdown = ({
+    farmData,
+    onClose,
+}: {
+    farmData: FarmRecord;
+    onClose: () => void;
+}) => {
+    const {
+        ashBaseAPR,
+        tradingAPR,
+        tokensAPR,
+        totalAPRMin,
+        totalAPRMax,
+        stakedData,
+    } = farmData;
+    const boost = useMemo(() => farmData.stakedData?.yieldBoost, [farmData]);
+    return (
+        <div className="colored-drop-shadow-md colored-drop-shadow-black/50">
+            <div className="clip-corner-4 clip-corner-br bg-ash-dark-600 p-[1px] ">
+                <div className="clip-corner-4 clip-corner-br bg-ash-dark-400 px-7 pt-8 pb-4">
+                    <div className="mb-6 font-bold text-xs text-stake-gray-500">
+                        Total APR = Token rewards + Trading APR
+                    </div>
+                    <div className="flex flex-col space-y-4">
+                        <div>
+                            <div className="flex justify-between items-center">
+                                {stakedData ? (
+                                    <span className="font-bold text-sm text-ash-purple-500">
+                                        <BaseTooltip
+                                            placement="bottom"
+                                            content={
+                                                <div
+                                                    className={`max-w-[25rem] sm:max-w-[28rem] clip-corner-4 clip-corner-bl bg-clip-border p-[1px] backdrop-blur-[30px] transition-all overflow-hidden`}
+                                                >
+                                                    <div className="clip-corner-4 clip-corner-br p-7 bg-ash-dark-600/50 backdrop-blur-[30px] text-stake-gray-500 font-bold text-xs sm:text-sm break-words">
+                                                        <ASHRewardBreakdownTable
+                                                            baseAPR={ashBaseAPR}
+                                                            currentBoost={
+                                                                stakedData.yieldBoost
+                                                            }
+                                                        />
+                                                    </div>
+                                                </div>
+                                            }
+                                        >
+                                            <span className="underline">
+                                                {formatAmount(
+                                                    stakedData.yieldBoost *
+                                                        ashBaseAPR
+                                                )}
+                                            </span>
+                                        </BaseTooltip>
+                                        <span className="text-2xs">%</span>
+                                    </span>
+                                ) : (
+                                    <div className="flex items-center space-x-1.5 font-bold text-sm text-ash-purple-500">
+                                        <span>
+                                            <span className="underline">
+                                                {formatAmount(ashBaseAPR)}
+                                            </span>
+                                            <span className="text-2xs">%</span>
+                                        </span>
+                                        <ICArrowRight className="w-3 h-auto" />
+                                        <span>
+                                            <span className="underline">
+                                                {formatAmount(ashBaseAPR * 2.5)}
+                                            </span>
+                                            <span className="text-2xs">%</span>
+                                        </span>
+                                    </div>
+                                )}
+                                <div className="font-bold text-xs text-stake-gray-500 underline">
+                                    ASH reward
+                                </div>
+                            </div>
+                        </div>
+                        {tokensAPR.map((t) => {
+                            const token = TOKENS_MAP[t.tokenId];
+                            return (
+                                <div
+                                    key={t.tokenId}
+                                    className="flex justify-between items-center"
+                                >
+                                    <div className="flex items-center font-bold text-sm text-ash-purple-500">
+                                        <span>
+                                            <span className="underline">
+                                                {formatAmount(t.apr)}
+                                            </span>
+                                            <span className="text-2xs">%</span>
+                                        </span>
+                                    </div>
+                                    <div className="font-bold text-xs text-stake-gray-500 underline">
+                                        {token?.symbol} incentive
+                                    </div>
+                                </div>
+                            );
+                        })}
+                        <div className="flex justify-between items-center">
+                            <div className="flex items-center font-bold text-sm text-yellow-600">
+                                <span>
+                                    <span className="underline">
+                                        {formatAmount(tradingAPR)}
+                                    </span>
+                                    <span className="text-2xs">%</span>
+                                </span>
+                            </div>
+                            <div className="font-bold text-xs text-stake-gray-500 underline">
+                                Trading APR
+                            </div>
+                        </div>
+                        <div className="border-t border-ash-cyan-500"></div>
+                        <div className="flex justify-between items-center">
+                            {stakedData ? (
+                                <span className="font-bold text-sm text-ash-cyan-500">
+                                    <span className="underline">
+                                        {formatAmount(stakedData.totalAPR)}
+                                    </span>
+                                    <span className="text-2xs">%</span>
+                                </span>
+                            ) : (
+                                <div className="flex items-center space-x-1.5 font-bold text-sm text-ash-cyan-500">
+                                    <span>
+                                        <span className="underline">
+                                            {formatAmount(totalAPRMin)}
+                                        </span>
+                                        <span className="text-2xs">%</span>
+                                    </span>
+                                    <ICArrowRight className="w-3 h-auto" />
+                                    <span>
+                                        <span className="underline">
+                                            {formatAmount(totalAPRMax)}
+                                        </span>
+                                        <span className="text-2xs">%</span>
+                                    </span>
+                                </div>
+                            )}
+
+                            <div className="font-bold text-sm text-white underline">
+                                Total APR
+                            </div>
+                        </div>
+                    </div>
+                    <div className="mt-14 -mb-1 flex justify-center">
+                        <button className="p-1" onClick={onClose}>
+                            <ICChevronUp className="w-2 h-auto text-ash-cyan-500" />
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
 function FarmCard({ farmData, viewType }: props) {
-    const { stakedData, farm, totalLiquidityValue, emissionAPR } = farmData;
+    const { stakedData, farm, totalLiquidityValue, totalAPRMin, totalAPRMax } =
+        farmData;
     const [openStakeLP, setOpenStakeLP] = useState<boolean>(false);
     const [openUnstakeLP, setOpenUnstakeLP] = useState<boolean>(false);
     const [openBoostInfo, setOpenBoostInfo] = useState(false);
@@ -86,6 +291,7 @@ function FarmCard({ farmData, viewType }: props) {
     const loadingMap = useRecoilValue(farmLoadingMapState);
     const { claimReward } = useFarmClaimReward();
     const [isExpand, setIsExpand] = useState(false);
+    const [isOpenAPRBreakdown, setIsOpenAPRBreakdown] = useState(false);
     const tokenMap = useRecoilValue(tokenMapState);
     const stakedLPAmt = useMemo(() => {
         if (!stakedData?.totalStakedLP || stakedData?.totalStakedLP.eq(0))
@@ -169,7 +375,10 @@ function FarmCard({ farmData, viewType }: props) {
                                 }`}
                             >
                                 {farmData.pool.tokens
-                                    .map((t) => getTokenFromId(t.identifier).symbol)
+                                    .map(
+                                        (t) =>
+                                            getTokenFromId(t.identifier).symbol
+                                    )
                                     .join(is2Pool ? " & " : "/")}
                             </div>
                         </div>
@@ -203,31 +412,91 @@ function FarmCard({ farmData, viewType }: props) {
                             })}
                         </div>
                     </div>
-                    <div className="mb-12 flex justify-between">
-                        <div>
-                            <CardTooltip
-                                strategy="fixed"
-                                content={
-                                    <div>
-                                        Emission Annual Percentage Rate. This
-                                        summary is calculated by the ASH you
-                                        have farmed every day by staking LP.
-                                    </div>
-                                }
-                            >
-                                <div className="inline-block text-stake-gray-500 text-xs font-bold underline mb-4">
-                                    Emission APR
-                                </div>
-                            </CardTooltip>
-                            <div className="text-lg font-bold text-ash-cyan-500">
-                                {formatAmount(emissionAPR?.toNumber() || 0, {
-                                    notation: "standard",
-                                })}
-                                %
-                            </div>
+                    <Transition
+                        show={isOpenAPRBreakdown}
+                        enter="transition duration-500"
+                        enterFrom="-translate-y-1/3 opacity-0"
+                        enterTo="translate-y-0 opacity-100"
+                        leave="transition duration-300"
+                        leaveFrom="translate-y-0 opacity-100"
+                        leaveTo="-translate-y-1/3 opacity-0"
+                    >
+                        <div className="-mx-4 mb-10">
+                            <FarmAPRBreakdown
+                                farmData={farmData}
+                                onClose={() => setIsOpenAPRBreakdown(false)}
+                            />
                         </div>
-                        <div className="flex flex-col items-end">
-                            <div className="mb-2.5">
+                    </Transition>
+                    <div className="mb-12 flex justify-between">
+                        <Transition
+                            show={!isOpenAPRBreakdown}
+                            {...TRANSITIONS.fadeIn}
+                            {...TRANSITIONS.fadeOut}
+                            enter="duration-300 delay-300"
+                            className="flex flex-col justify-between"
+                        >
+                            <div className="inline-flex items-center mb-2.5">
+                                <CardTooltip
+                                    strategy="fixed"
+                                    content={
+                                        <div>
+                                            Total APR = Token rewards + Trading
+                                            APR
+                                        </div>
+                                    }
+                                >
+                                    <span className="inline-block text-stake-gray-500 text-xs font-bold underline mr-2">
+                                        Total APR
+                                    </span>
+                                </CardTooltip>
+
+                                <button
+                                    onClick={() => setIsOpenAPRBreakdown(true)}
+                                >
+                                    <ICChevronDown className="text-ash-cyan-500" />
+                                </button>
+                            </div>
+
+                            <div className="h-8 px-2.5 space-x-1.5 border border-black bg-stake-gray-500/10 flex items-center text-sm font-bold text-ash-cyan-500">
+                                {stakedData ? (
+                                    <div>
+                                        <span className="underline">
+                                            {formatAmount(stakedData.totalAPR)}
+                                        </span>
+                                        <span className="text-2xs">%</span>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <div>
+                                            <span className="underline">
+                                                {formatAmount(totalAPRMin)}
+                                            </span>
+                                            <span className="text-2xs">%</span>
+                                        </div>
+                                        <ICArrowRight className="w-3 h-auto" />
+                                        <div>
+                                            <span className="underline">
+                                                {formatAmount(totalAPRMax)}
+                                            </span>
+                                            <span className="text-2xs">%</span>
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+                        </Transition>
+                        <div
+                            className={`transition-all flex flex-col items-end ${
+                                isOpenAPRBreakdown && "w-full"
+                            }`}
+                        >
+                            <div
+                                className={`transition-all mb-2.5 w-full relative ${
+                                    isOpenAPRBreakdown
+                                        ? "text-left"
+                                        : "text-right"
+                                }`}
+                            >
                                 <CardTooltip
                                     zIndex={10}
                                     content={
@@ -249,7 +518,9 @@ function FarmCard({ farmData, viewType }: props) {
                                 </CardTooltip>
                             </div>
                             <div
-                                className={`w-[120px] -mr-1 cursor-pointer`}
+                                className={`transition-all duration-500 ease-in-out -mr-1 cursor-pointer ${
+                                    isOpenAPRBreakdown ? "w-full" : "w-[120px]"
+                                }`}
                                 onClick={() => setOpenBoostInfo(true)}
                             >
                                 <BoostBar
@@ -533,13 +804,17 @@ function FarmCard({ farmData, viewType }: props) {
                                 <div className="flex flex-col text-xs lg:text-lg font-bold md:space-y-2 leading-tight">
                                     {farmData.pool.tokens.map((_t) => {
                                         const t = getTokenFromId(_t.identifier);
-                                        return <div key={t.identifier}>{t.symbol}</div>;
+                                        return (
+                                            <div key={t.identifier}>
+                                                {t.symbol}
+                                            </div>
+                                        );
                                     })}
                                 </div>
                             </div>
                             {/* emission APR */}
                             <div className="text-ash-cyan-500 text-xs lg:text-lg font-bold">
-                                {formatAmount(emissionAPR?.toNumber() || 0, {
+                                {formatAmount(totalAPRMin, {
                                     notation: "standard",
                                 })}
                                 %
