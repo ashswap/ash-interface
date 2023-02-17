@@ -8,6 +8,7 @@ import Nav from "components/Nav";
 import { useScreenSize } from "hooks/useScreenSize";
 import Image from "components/Image";
 import Link from "next/link";
+import { ENVIRONMENT } from "const/env";
 
 const AppBar = () => {
     const { isMobile } = useScreenSize();
@@ -40,15 +41,21 @@ const AppBar = () => {
                     <Nav />
                 </div>
                 <div className="flex items-center">
-                    <div className="mr-6 bg-ash-dark-600 relative">
-                        <Link href="/ashpoint" passHref>
-                            <div className={`h-10 flex items-center transition px-3 cursor-pointer`}>
-                                <ICBambooShootSolid className="inline-block w-4 h-4 md:mr-2 transition-none text-stake-gray-500 fill-current" />
-                                <span className="inline-block font-bold text-xs text-white">Quest</span>
-                            </div>
-                        </Link>
-                        <div className="w-2 h-2 rotate-45 bg-stake-green-500 absolute top-0 right-0 colored-drop-shadow-xs colored-drop-shadow-stake-green-500"></div>
-                    </div>
+                    {ENVIRONMENT.ENABLE_ASHPOINT && (
+                        <div className="mr-6 bg-ash-dark-600 relative">
+                            <Link href="/ashpoint" passHref>
+                                <div
+                                    className={`h-10 flex items-center transition px-3 cursor-pointer`}
+                                >
+                                    <ICBambooShootSolid className="inline-block w-4 h-4 md:mr-2 transition-none text-stake-gray-500 fill-current" />
+                                    <span className="inline-block font-bold text-xs text-white">
+                                        Quest
+                                    </span>
+                                </div>
+                            </Link>
+                            <div className="w-2 h-2 rotate-45 bg-stake-green-500 absolute top-0 right-0 colored-drop-shadow-xs colored-drop-shadow-stake-green-500"></div>
+                        </div>
+                    )}
                     <AddressMenu
                         connectBtn={(connect) => {
                             return (
