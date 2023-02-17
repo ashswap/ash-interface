@@ -34,7 +34,7 @@ const CustomTransactionsTracker: typeof TransactionsTracker = () => {
 
     const getTransactionByHashesIntercept = useCallback(async (pendingTxs: PendingTransactionsType) => {
         const serverTransactions = await getTransactionsByHashes(pendingTxs);
-        const completedTxs = serverTransactions.filter(tx => tx.status !== 'pending');
+        const completedTxs = serverTransactions.filter(tx => tx.raw && tx.status !== 'pending');
         emitter.emit('onCheckBatchResult', completedTxs);
         return serverTransactions;
     }, []);
