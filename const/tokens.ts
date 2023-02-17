@@ -195,7 +195,7 @@ const MAINNET_TOKENS: IESDTInfo[] = [
         chainId: ChainId.Mainnet,
         symbol: "BUSD",
         name: "Binance USD",
-        decimals: 6,
+        decimals: 18,
         logoURI: IconBUSD.src,
     },
 ];

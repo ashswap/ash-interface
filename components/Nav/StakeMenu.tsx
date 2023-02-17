@@ -23,12 +23,8 @@ import ICGovFarmSquare from "assets/svg/gov-farm-square.svg";
 import ICGovBoostSquare from "assets/svg/gov-boost-square.svg";
 import ICGovVoteSquare from "assets/svg/gov-vote-square.svg";
 import { useTrackTransactionStatus } from "@elrondnetwork/dapp-core/hooks";
-import { ENVIRONMENT } from "const/env";
 const SOCIALS = [
-    ...(ENVIRONMENT.NETWORK === "devnet" ? [{
-        name: "Liquidity Stake",
-        url: "/stake/farms",
-    }] : []),
+    { name: "Liquidity Stake", url: "/stake/farms" },
     { name: "Governance Stake", url: "/stake/gov" },
 ];
 function HeadlessLink(
@@ -73,7 +69,9 @@ function StakeMenu() {
                     onOpenChange={(val) => setOpenTooltip(val)}
                     content={
                         <div className="grid grid-cols-3 w-screen max-w-5xl gap-1">
-                            <Link href={ENVIRONMENT.NETWORK !== "mainnet" ? "/stake/farms" : ""}>
+                            <Link
+                                href="/stake/farms"
+                            >
                                 <a>
                                     <div
                                         className={`transition-all bg-stake-dark-400 hover:bg-[#454765] ${styles.stakeMenuItem} p-4 md:p-8 h-full`}
