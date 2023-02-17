@@ -25,6 +25,7 @@ Sentry.init({
         /static\.woopra\.com\/js\/woopra\.js/i,
         // Chrome extensions
         /extensions\//i,
+        /chrome-extension\//i,
         /^chrome:\/\//i,
         // Other plugins
         /127\.0\.0\.1:4001\/isrunning/i, // Cacaoweb
