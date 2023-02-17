@@ -44,7 +44,7 @@ const usePoolAddLP = (trackStatus = false) => {
                     mintAmtMin
                 );
                 const txs = [tx];
-                if (egldAmt) {
+                if (egldAmt && egldAmt.greaterThan(0)) {
                     const shard =
                         (await snapshot.getPromise(accInfoState)).shard || 0;
                     const wrapTx = await ContractManager.getWrappedEGLDContract(
