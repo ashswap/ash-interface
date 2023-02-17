@@ -3,6 +3,7 @@ import ICQuestPrac1 from "assets/svg/quest-practical-1.svg";
 import ICQuestPrac2 from "assets/svg/quest-practical-2.svg";
 import { atomQuestUserStats } from "atoms/ashpoint";
 import GlowingButton from "components/GlowingButton";
+import { ENVIRONMENT } from "const/env";
 import logApi from "helper/logHelper";
 import { formatAmount } from "helper/number";
 import {
@@ -332,11 +333,13 @@ function QuestItemBase({
     const getUserStats = useRecoilCallback(
         ({ set }) =>
             async () => {
-                const stats = await logApi
-                    .get<QuestUserStatsModel>("/api/v1/wallet")
-                    .then((res) => res.data)
-                    .catch(() => undefined);
-                set(atomQuestUserStats, stats);
+                if(ENVIRONMENT.ENABLE_ASHPOINT){
+                    const stats = await logApi
+                        .get<QuestUserStatsModel>("/api/v1/wallet")
+                        .then((res) => res.data)
+                        .catch(() => undefined);
+                    set(atomQuestUserStats, stats);
+                }
             },
         []
     );

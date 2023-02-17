@@ -12,9 +12,10 @@ interface Environment {
     ENV: Env;
     LOGIN_TWITTER_LINK: string;
     LOGIN_DISCORD_LINK: string;
+    ENABLE_ASHPOINT: boolean;
 }
 
-export const ENVIRONMENT: Environment = {
+const _ENVIRONMENT: Omit<Environment, "ENABLE_ASHPOINT"> = {
     ASH_API: process.env.NEXT_PUBLIC_ASH_API!,
     ASH_DOMAIN: process.env.NEXT_PUBLIC_ASH_DOMAIN!,
     NETWORK: process.env.NEXT_PUBLIC_NETWORK as Network,
@@ -25,4 +26,10 @@ export const ENVIRONMENT: Environment = {
     ENV: (process.env.NEXT_PUBLIC_ASH_ENV as Env) || "beta",
     LOGIN_TWITTER_LINK: process.env.NEXT_PUBLIC_ASH_LOGIN_TWITTER_LINK!,
     LOGIN_DISCORD_LINK: process.env.NEXT_PUBLIC_ASH_LOGIN_DISCORD_LINK!,
+    
 };
+
+export const ENVIRONMENT: Environment = {
+    ..._ENVIRONMENT,
+    ENABLE_ASHPOINT: _ENVIRONMENT.NETWORK == "mainnet" || (_ENVIRONMENT.NETWORK === "devnet" && _ENVIRONMENT.ENV === "alpha")
+}

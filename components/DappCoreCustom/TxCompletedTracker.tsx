@@ -10,6 +10,7 @@ import { useEffect } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { GetTransactionsByHashesReturnType } from "./getTransactionsByHashes";
 import * as Sentry from "@sentry/nextjs";
+import { ENVIRONMENT } from "const/env";
 
 export const TxCompletedTracker = () => {
     const { socket, socketExtra } = useSocket();
@@ -46,7 +47,7 @@ export const TxCompletedTracker = () => {
                 if(socketExtra){
                     // socketExtra.emit("transactionCompletedClient", receiver, hash);
                 }
-                if (isRegistered) {
+                if (isRegistered && ENVIRONMENT.ENABLE_ASHPOINT) {
                     logApi.post("/api/v1/tracking/ash-point", {
                         action_time: Date.now(),
                         action_name: raw?.function || raw?.arguments?.functionName || raw?.action?.name,
@@ -64,7 +65,7 @@ export const TxCompletedTracker = () => {
     }, [socketExtra, isRegistered]);
 
     useEffect(() => {
-        if(isLoggedIn){
+        if(isLoggedIn && ENVIRONMENT.ENABLE_ASHPOINT){
             logApi
             .get<QuestUserStatsModel>("/api/v1/wallet")
             .then((res) => setUserStats(res.data))
