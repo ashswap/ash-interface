@@ -9,6 +9,7 @@ import ICChart from "assets/svg/chart.svg";
 import ICNewTab from "assets/svg/new-tab.svg";
 import ICStake from "assets/svg/stake.svg";
 import StakeMenu from "./StakeMenu";
+import { ENVIRONMENT } from "const/env";
 
 const Nav = () => {
     const router = useRouter();
@@ -26,16 +27,19 @@ const Nav = () => {
         <div
             className={`${styles.container} text-black dark:text-white sm:space-x-[0.375rem]`}
         >
-            <Link href="/swap" passHref>
-                <div
-                    className={`transition ${styles.btn} ${
-                        isActive("/swap") ? styles.active : ""
-                    }`}
-                >
-                    <ICSwap className="inline-block w-4 h-4 md:mr-2 transition-none" />
-                    <span className="inline-block">Swap</span>
-                </div>
-            </Link>
+            {ENVIRONMENT.NETWORK !== "mainnet" && (
+                <Link href="/swap" passHref>
+                    <div
+                        className={`transition ${styles.btn} ${
+                            isActive("/swap") ? styles.active : ""
+                        }`}
+                    >
+                        <ICSwap className="inline-block w-4 h-4 md:mr-2 transition-none" />
+                        <span className="inline-block">Swap</span>
+                    </div>
+                </Link>
+            )}
+
             <Link href="/pool" passHref>
                 <div
                     className={`transition ${styles.btn} ${
