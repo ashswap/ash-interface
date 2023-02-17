@@ -17,7 +17,7 @@ const useInputNumberString = (value: BigNumber.Value, decimalPlaces = 3) => {
         setIsDirty(true);
     }, []);
     useEffect(
-        () => setValueStr((val) => (/^\d*\.0*$/.test(val) || val === "" ? val : bigValueStr)),
+        () => setValueStr((val) => val === "" && bigValueStr === "0" ? "" : (/^\d*\.0*$/.test(val) ? val : bigValueStr)),
         [bigValueStr]
     );
     return [valueStr, setValStr] as [

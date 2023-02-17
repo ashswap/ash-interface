@@ -293,6 +293,12 @@ export class PoolV2 {
     virtualPrice: string;
     priceOracle: string;
     priceScale: string;
+    xp: string[];
+    futureAGammaTime: number;
+    d: string;
+    midFee: string;
+    outFee: string;
+    feeGamma: string;
 }
 
 export class Pool {
