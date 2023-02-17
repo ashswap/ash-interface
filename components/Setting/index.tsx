@@ -3,13 +3,13 @@ import InputCurrency from "components/InputCurrency";
 import SlippageSelect from "components/SlippageSelect";
 import { useSwap } from "context/swap";
 import { Percent } from "helper/fraction/percent";
-import { useState } from "react";
+import useInputNumberString from "hooks/useInputNumberString";
 
 interface Props {}
 
 const Setting = (props: Props) => {
     const { slippage, setSlippage } = useSwap();
-    const [displaySlip, setDisplaySlip] = useState("");
+    const [displaySlip, setDisplaySlip] = useInputNumberString(slippage.toFixed(2), 2);
     return (
         <div>
             <div className="font-bold text-lg">Settings</div>
@@ -48,6 +48,7 @@ const Setting = (props: Props) => {
                     className="grow bg-transparent outline-none"
                     placeholder="Custom"
                     value={displaySlip}
+                    decimals={2}
                     onChange={(e) => {
                         const raw = e.target.value;
                         setDisplaySlip(raw);
