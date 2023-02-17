@@ -37,7 +37,7 @@ const moduleExports = withReactSvg(
             { dev, dir, outDir, distDir, buildId }
         ) {
             const ignorePathsBase = ["/stake", "/stake/mint"];
-            const ignorePaths = process.env.NEXT_PUBLIC_NETWORK === "mainnet" ? ["/stake/gov/bribe"] : process.env.NEXT_PUBLIC_ASH_ENV === "alpha" ? [] : ["/stake/gov/bribe"];
+            const ignorePaths = process.env.NEXT_PUBLIC_NETWORK === "mainnet" ? ["/stake/gov/bribe", "/swap"] : process.env.NEXT_PUBLIC_ASH_ENV === "alpha" ? [] : ["/stake/gov/bribe"];
             const entries = Object.entries(defaultPathMap).map(
                 ([path, pageObj]) => {
                     return [
