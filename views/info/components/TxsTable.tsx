@@ -190,12 +190,13 @@ const filterOptions = [
     { label: "Deposits", value: EFilterType.DEPOSIT },
     { label: "Withdraws", value: EFilterType.WITHDRAW },
 ];
-function TxsTable({ data }: { data: TxStatsRecord[] }) {
+function TxsTable({ data: dataProps }: { data: TxStatsRecord[] }) {
     const [filter, setFilter] = useState<EFilterType>(EFilterType.ALL);
     const [orderBy, setOrderBy] = useState<EOrderBy>(EOrderBy.TIME);
     const [pageIndex, setPageIndex] = useState(0);
     const [pageSize, setPageSize] = useState(10);
     const screenSize = useScreenSize();
+    const data = useMemo(() => dataProps.filter(tx => tx.caller && tx.action && tx.timestamp), [dataProps]);
     useEffect(() => {
         setOrderBy(EOrderBy.TIME);
     }, [screenSize.xl, screenSize.lg, screenSize.md, screenSize.sm]);
