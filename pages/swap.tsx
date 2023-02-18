@@ -11,7 +11,7 @@ const Home: NextPage = () => {
     const router = useRouter();
     useEffect(() => {
         if (ENVIRONMENT.NETWORK === "mainnet" && router.route === "/swap") {
-            router.replace("/stake/gov");
+            router.replace("/pool");
         }
     }, [router]);
     return (
