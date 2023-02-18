@@ -144,11 +144,7 @@ const StakeMoreContent = ({ open, onClose }: props) => {
     const [extendLockPeriod, setExtendLockPeriod] = useState(
         extendOpts[0].value
     ); // in seconds
-    useEffect(() => {
-        if (currentLockSeconds === 0) {
-            setIsExtend(true);
-        }
-    }, [currentLockSeconds]);
+
     const setMaxLockAmt = useCallback(() => {
         if (!ASHBalance) return;
         setLockAmt(ASHBalance);
@@ -215,9 +211,9 @@ const StakeMoreContent = ({ open, onClose }: props) => {
     const estimatedCapacity = useMemo(() => {
         const pct = estimatedVeASH
             .multipliedBy(100)
-            .div(totalSupplyVeASH.plus(estimatedVeASH));
+            .div(totalSupplyVeASH.plus(estimatedVeASH).minus(veASH));
         return pct.lt(0.01) ? "< 0.01" : pct.toFixed(2);
-    }, [estimatedVeASH, totalSupplyVeASH]);
+    }, [estimatedVeASH, totalSupplyVeASH, veASH]);
     const currentCapacity = useMemo(() => {
         const pct = veASH.multipliedBy(100).div(totalSupplyVeASH);
         return pct.lt(0.01) ? "< 0.01" : pct.toFixed(2);
@@ -244,12 +240,17 @@ const StakeMoreContent = ({ open, onClose }: props) => {
         const interval = setInterval(func, 60 * 1000);
         return () => clearInterval(interval);
     }, [unlockTS]);
-    const aClass = "";
     const lockSubmit = useCallback(() => {
         if (canStake) {
             lockMore(), setIsClickedGovStakeButton(true);
         }
-    }, [canStake, lockMore]);
+    }, [canStake, lockMore, setIsClickedGovStakeButton]);
+
+    useEffect(() => {
+        if (extendOpts.length === 1) {
+            setExtendLockPeriod(extendOpts[0].value);
+        }
+    }, [extendOpts]);
     return (
         <>
             <div className="px-6 lg:px-20 pb-12 overflow-auto relative">
