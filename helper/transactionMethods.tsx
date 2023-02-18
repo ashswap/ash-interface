@@ -3,7 +3,7 @@ import {
     AccountInfoSliceNetworkType,
     LoginMethodsEnum
 } from "@elrondnetwork/dapp-core/types";
-import { getAccountProviderType } from "@elrondnetwork/dapp-core/utils";
+import { getAccountProviderType, getAddress } from "@elrondnetwork/dapp-core/utils";
 import { ExtensionProvider } from "@elrondnetwork/erdjs-extension-provider/out";
 import {
     Address,
@@ -62,9 +62,13 @@ export const sendTransactions = async (
     payload: DappSendTransactionsPropsType
 ) => {
     const accProviderType = getAccountProviderType();
+    const accAddress = await getAddress();
     if (accProviderType === LoginMethodsEnum.extension) {
         await ExtensionProvider.getInstance()?.cancelAction?.();
     }
+
+    const txs = Array.isArray(payload.transactions) ? payload.transactions : [payload.transactions];
+    payload.transactions = txs.map(tx => Transaction.fromPlainObject({...tx.toPlainObject(), sender: accAddress}))
     
     return await _sendTxs(payload);
 };
