@@ -101,11 +101,13 @@ export const accAddressState = selector<string>({
 
 export const accBalanceState = selector<BigNumber>({
     key: "dapp_acc_egld_balance",
-    get: ({ get }) =>
-        new BigNumber(
+    get: ({ get }) => {
+        const balance = new BigNumber(
             get(dappCoreState).account.accounts[get(accAddressState)]
                 ?.balance || 0
-        ),
+        );
+        return balance.isNaN() ? new BigNumber(0) : balance;
+    },
 });
 
 export const accIsInsufficientEGLDState = selector<boolean>({
