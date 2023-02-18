@@ -20,6 +20,7 @@ import Switch from "components/Switch";
 import TextAmt from "components/TextAmt";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
 import { POOLS_MAP_ADDRESS } from "const/pool";
+import { MINIMUM_EGLD_AMT } from "const/wrappedEGLD";
 import { toEGLDD, toWei } from "helper/balance";
 import { ContractManager } from "helper/contracts/contractManager";
 import { Fraction } from "helper/fraction/fraction";
@@ -136,7 +137,18 @@ const TokenInput = ({
                     <span>Balance: </span>
                     <span
                         className="text-earn select-none cursor-pointer"
-                        onClick={() => onChangeValue(balance)}
+                        onClick={() => {
+                            onChangeValue(
+                                token.identifier === "EGLD"
+                                    ? BigNumber.max(
+                                          new BigNumber(balance).minus(
+                                              MINIMUM_EGLD_AMT.div(10 ** 18)
+                                          ),
+                                          0
+                                      ).toString()
+                                    : balance.toString()
+                            );
+                        }}
                     >
                         <TextAmt
                             number={balance}
