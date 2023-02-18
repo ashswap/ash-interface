@@ -1,6 +1,6 @@
 import { logout } from "@elrondnetwork/dapp-core/utils";
 import ImgDiscord from "assets/images/discord.png";
-import ImgRewardPoolBanner from "assets/images/reward-pool-banner.jpeg";
+import ImgAPYBoostBanner from "assets/images/apy-boost-banner.jpeg";
 import ImgTwitter from "assets/images/twitter.png";
 import ICBambooShootSolid from "assets/svg/bamboo-shoot-solid.svg";
 import ICCaretRight from "assets/svg/caret-right.svg";
@@ -30,6 +30,7 @@ import { useRecoilState, useRecoilValue } from "recoil";
 import DailyQuests from "./DailyQuests";
 import EventQuests from "./EventQuests";
 import * as Sentry from "@sentry/nextjs";
+import Link from "next/link";
 
 type PlatformType = "twitter" | "discord";
 const Star = ({ active = false }: { active?: boolean }) => {
@@ -244,21 +245,20 @@ const QuestOverview = () => {
     return (
         <>
             <div ref={captchaElRef}></div>
-            <a
-                href="https://event.ashswap.io/reward-pool"
-                target="_blank"
-                rel="noreferrer"
-            >
-                <Image
-                    src={ImgRewardPoolBanner}
-                    alt="reward pool banner"
-                    layout="responsive"
-                />
-            </a>
+            <Link href="/stake/farms">
+                <a>
+                    <Image
+                        src={ImgAPYBoostBanner}
+                        alt="APY boost banner"
+                        layout="responsive"
+                    />
+                </a>
+            </Link>
             <h1 className="mt-6 sm:mt-10 text-2xl md:text-5xl font-bold text-white mb-7 md:mb-11">
                 Quest
             </h1>
-            {(ENVIRONMENT.ENV === "alpha" || ENVIRONMENT.NETWORK === "mainnet") && (
+            {(ENVIRONMENT.ENV === "alpha" ||
+                ENVIRONMENT.NETWORK === "mainnet") && (
                 <div className="mb-6 -mx-6 px-6 sm:px-0 sm:mx-0 scrollbar-hide flex space-x-2 overflow-auto">
                     <button
                         className={`shrink-0 flex items-center h-8 sm:h-12 px-6 bg-ash-dark-600 text-xs sm:text-sm font-bold ${
@@ -455,96 +455,6 @@ const QuestOverview = () => {
                                     </span>
                                 </div>
                             </div>
-                        </div>
-                        <div className="sm:col-span-2 lg:col-span-1 p-4 bg-ash-dark-600 space-y-9">
-                            <div>
-                                <div className="mb-2">
-                                    <span className="font-bold text-2xl text-white">
-                                        {userAddress
-                                            ? formatAmount(
-                                                  userStats?.wallet
-                                                      .race_point || 0,
-                                                  {
-                                                      isInteger: true,
-                                                      notation: "standard",
-                                                  }
-                                              )
-                                            : "_"}
-                                        &nbsp;
-                                    </span>
-                                    <span className="font-semibold text-xs text-stake-gray-500">
-                                        pts
-                                    </span>
-                                </div>
-                                <div className="text-xs">
-                                    <span className="font-semibold text-ash-gray-500">
-                                        {"// "}
-                                    </span>
-                                    <span className="font-bold text-ash-gray-500">
-                                        Race Points
-                                    </span>
-                                </div>
-                            </div>
-                            <div>
-                                <div className="mb-2">
-                                    <span className="font-bold text-2xl text-white">
-                                        {userAddress
-                                            ? formatAmount(
-                                                  userStats?.wallet
-                                                      .user_invited || 0,
-                                                  {
-                                                      notation: "standard",
-                                                      isInteger: true,
-                                                  }
-                                              )
-                                            : "_"}
-                                    </span>
-                                </div>
-                                <div className="text-xs">
-                                    <span className="font-semibold text-ash-gray-500">
-                                        {"// "}
-                                    </span>
-                                    <span className="font-bold text-ash-gray-500">
-                                        Friends Invited
-                                    </span>
-                                </div>
-                            </div>
-                            <div>
-                                <div className="mb-2">
-                                    <span className="font-bold text-2xl text-white">
-                                        {userAddress
-                                            ? formatAmount(
-                                                  userStats?.wallet
-                                                      .user_staked || 0,
-                                                  {
-                                                      notation: "standard",
-                                                      isInteger: true,
-                                                  }
-                                              )
-                                            : "_"}
-                                    </span>
-                                </div>
-                                <div className="text-xs">
-                                    <span className="font-semibold text-ash-gray-500">
-                                        {"// "}
-                                    </span>
-                                    <span className="font-bold text-ash-gray-500">
-                                        Friends Stake
-                                    </span>
-                                </div>
-                            </div>
-                            <a
-                                href="https://medium.com/@ashswap/ashswap-launch-race-4463e9b1f47"
-                                target="_blank"
-                                rel="noreferrer"
-                            >
-                                <GlowingButton
-                                    theme="purple"
-                                    className="mt-10 h-11 md:h-[5.5rem] w-full font-bold text-sm md:text-lg"
-                                >
-                                    How to join Launch Race?
-                                </GlowingButton>
-                            </a>
                         </div>
                     </div>
                 </div>
