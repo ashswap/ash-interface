@@ -11,6 +11,8 @@ import { useRecoilValue, useSetRecoilState } from "recoil";
 import { GetTransactionsByHashesReturnType } from "./getTransactionsByHashes";
 import * as Sentry from "@sentry/nextjs";
 import { ENVIRONMENT } from "const/env";
+import { getAccountProviderType } from "@elrondnetwork/dapp-core/utils";
+import { LoginMethodsEnum } from "@elrondnetwork/dapp-core/types";
 
 export const TxCompletedTracker = () => {
     const { socket, socketExtra } = useSocket();
@@ -47,7 +49,8 @@ export const TxCompletedTracker = () => {
                 if(socketExtra){
                     // socketExtra.emit("transactionCompletedClient", receiver, hash);
                 }
-                if (isRegistered && ENVIRONMENT.ENABLE_ASHPOINT) {
+                const provider = getAccountProviderType();
+                if (isRegistered && ENVIRONMENT.ENABLE_ASHPOINT && provider !== LoginMethodsEnum.wallet) {
                     logApi.post("/api/v1/tracking/ash-point", {
                         action_time: Date.now(),
                         action_name: raw?.function || raw?.arguments?.functionName || raw?.action?.name,
@@ -65,7 +68,8 @@ export const TxCompletedTracker = () => {
     }, [socketExtra, isRegistered]);
 
     useEffect(() => {
-        if(isLoggedIn && ENVIRONMENT.ENABLE_ASHPOINT){
+        const provider = getAccountProviderType();
+        if(isLoggedIn && ENVIRONMENT.ENABLE_ASHPOINT && provider !== LoginMethodsEnum.wallet){
             logApi
             .get<QuestUserStatsModel>("/api/v1/wallet")
             .then((res) => setUserStats(res.data))
