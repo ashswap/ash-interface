@@ -15,7 +15,8 @@ class FarmContract extends Contract<typeof farmAbi> {
     }
 
     private _getBaseGasLimit() {
-        const week = Math.floor(moment().unix() / WEEK) - Math.floor(this.lastRewardBlockTs / WEEK);
+        // fallback to 5 weeks
+        const week = this.lastRewardBlockTs === 0 ? 5 : Math.floor(moment().unix() / WEEK) - Math.floor(this.lastRewardBlockTs / WEEK);
         // each interation by week of checkpoint cost 12_000_000 (farm contract) + checkpoint farm (farm controller) cost 10_000_000
         return week * 12_000_000 + 10_000_000;
     }
