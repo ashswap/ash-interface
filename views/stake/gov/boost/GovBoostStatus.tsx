@@ -301,10 +301,10 @@ function GovBoostStatus() {
                             record.stakedData?.farmTokens.filter(
                                 (f) => f.attributes.booster.bech32() === accAddress
                             ) || [];
-                        return { ownerTokens, farm: record.farm };
+                        return { ownerTokens, farm: record.farm, lastRewardBlockTs: record.lastRewardBlockTs };
                     })
                     .filter(({ ownerTokens }) => ownerTokens.length > 0)
-                    .map(({ ownerTokens, farm }) => {
+                    .map(({ ownerTokens, farm, lastRewardBlockTs }) => {
                         const tokenPayments: TokenPayment[] = ownerTokens.map(
                             (t) =>
                                 TokenPayment.metaEsdtFromBigInteger(
@@ -316,7 +316,7 @@ function GovBoostStatus() {
                         farmsAddress.push(farm.farm_address);
                         return ContractManager.getFarmContract(
                             farm.farm_address
-                        ).claimRewards(tokenPayments);
+                        ).withLastRewardBlockTs(lastRewardBlockTs).claimRewards(tokenPayments);
                     });
                 const { sessionId, error } = await sendTransactions({
                     transactions: (
