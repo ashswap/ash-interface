@@ -223,7 +223,7 @@ export function CustomQuestItem({ questData, onClaim }: { questData: ICustomQues
         }
         if (isSwapQuest(questData)) {
             setName(
-                `Trading volume greather than ${formatAmount(
+                `Trading volume greater than ${formatAmount(
                     questData.require,
                     { notation: "standard", isIntegerAuto: true }
                 )}$`
