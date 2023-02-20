@@ -101,7 +101,7 @@ export const useFarmBoostTransferState = (
                 );
                 const txs = await ContractManager.getFarmContract(
                     farmData.farm.farm_address
-                ).claimRewards(tokenPayments, true);
+                ).withLastRewardBlockTs(farmData.lastRewardBlockTs).claimRewards(tokenPayments, true);
                 const result = await sendTransactions({
                     transactions: txs,
                     transactionsDisplayInfo: {
