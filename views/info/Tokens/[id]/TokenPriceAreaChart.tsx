@@ -64,7 +64,8 @@ function TokenPriceAreaChart({
     }, [data]);
     const { displayChartData, timestampTicks: ticks } = useValueChart(
         chartData,
-        timeUnit
+        timeUnit,
+        "avg"
     );
     // Xaxis formatter
     const tickFormatter = useCallback(
