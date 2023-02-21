@@ -59,7 +59,8 @@ function TVLLPChart() {
     }, [data]);
     const { displayChartData, timestampTicks: ticks } = useValueChart(
         chartData,
-        timeUnit
+        timeUnit,
+        "latest"
     );
 
     // Xaxis formatter

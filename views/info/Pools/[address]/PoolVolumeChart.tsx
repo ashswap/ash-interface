@@ -69,7 +69,8 @@ function PoolVolumeChart({
     }, [data]);
     const { displayChartData, timestampTicks: ticks } = useValueChart(
         chartData,
-        timeUnit
+        timeUnit,
+        "sum"
     );
     // Xaxis formatter
     const tickFormatter = useCallback(
@@ -127,7 +128,7 @@ function PoolVolumeChart({
                     type="number"
                     axisLine={false}
                     tickLine={false}
-                    padding={{ right: 30 }}
+                    padding={{ right: 30, left: 20 }}
                     interval="preserveStart"
                     domain={["dataMin", "dataMax"]}
                     ticks={ticks}
