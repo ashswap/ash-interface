@@ -62,7 +62,8 @@ function TokenLiquidityChart({
     }, [data]);
     const { displayChartData, timestampTicks: ticks } = useValueChart(
         chartData,
-        timeUnit
+        timeUnit,
+        "latest"
     );
     // Xaxis formatter
     const tickFormatter = useCallback(
