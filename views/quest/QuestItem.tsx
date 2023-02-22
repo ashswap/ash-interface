@@ -12,6 +12,7 @@ import {
     ICustomQuest,
     isFarmQuest,
     isGovQuest,
+    isManualQuest,
     isSwapQuest,
     QuestAction,
     QuestActionType,
@@ -114,6 +115,7 @@ function QuestItem({
 
 export function CustomQuestItem({ questData, onClaim }: { questData: ICustomQuest, onClaim?: () => Promise<void> }) {
     const [name, setName] = useState("");
+    const [note, setNote] = useState("");
     const [status, setStatus] = useState(0);
     const [point, setPoint] = useState(0);
     const [require, setRequire] = useState(0);
@@ -249,6 +251,14 @@ export function CustomQuestItem({ questData, onClaim }: { questData: ICustomQues
                 },
             ]);
         }
+        if (isManualQuest(questData)) {
+            setName(questData.title);
+            setStatus(0);
+            setPoint(questData.point);
+            setNote(questData.note);
+            // setRequire(questData.require);
+            // setProgresses([{current: }])
+        }
     }, [questData]);
 
     return (
@@ -260,6 +270,7 @@ export function CustomQuestItem({ questData, onClaim }: { questData: ICustomQues
             point={point}
             progressData={progresses}
             onClaim={claim}
+            note={note}
         />
     );
 }
@@ -317,6 +328,7 @@ type QuestItemBaseProps = {
     name: string;
     type: QuestActionType | keyof CustomQuestMapModel;
     progressData: ProgressData[];
+    note?: string;
     onClaim: () => Promise<void>;
 };
 function QuestItemBase({
@@ -326,6 +338,7 @@ function QuestItemBase({
     name,
     type,
     progressData,
+    note,
     onClaim,
 }: QuestItemBaseProps) {
     const [claiming, setClaiming] = useState(false);
@@ -377,7 +390,8 @@ function QuestItemBase({
             </div>
             <div className="grow flex">
                 <div className="grow flex flex-col justify-between">
-                    <div className="mb-7 text-2xs sm:text-sm leading-tight">
+                    <div className="mb-7">
+                    <div className="text-2xs sm:text-sm leading-tight">
                         <span className="font-semibold text-ash-gray-600">
                             {"//"}
                         </span>
@@ -390,6 +404,8 @@ function QuestItemBase({
                         >
                             {name}
                         </span>
+                    </div>
+                    {note && <div className="font-bold text-2xs sm:text-xs text-stake-gray-500">{note}</div>}
                     </div>
                     <div
                         className={`relative max-w-[9rem] px-2 py-1 sm:px-4 sm:py-2 bg-ash-gray-600/10 ${colorClasses[status]}`}

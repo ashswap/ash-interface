@@ -1,25 +1,21 @@
+import { LoginMethodsEnum } from "@elrondnetwork/dapp-core/types";
+import { getAccountProviderType } from "@elrondnetwork/dapp-core/utils";
 import { TransactionDecoder } from "@elrondnetwork/transaction-decoder";
-import { atomQuestUserStats, questIsRegisteredSelector } from "atoms/ashpoint";
-import { accIsLoggedInState } from "atoms/dappState";
+import * as Sentry from "@sentry/nextjs";
+import { questIsRegisteredAtom } from "atoms/ashpoint";
 import { lastCompletedTxHashAtom } from "atoms/transactions";
+import { ENVIRONMENT } from "const/env";
 import { useSocket } from "context/socket";
 import emitter from "helper/emitter";
 import logApi from "helper/logHelper";
-import { QuestUserStatsModel } from "interface/quest";
 import { useEffect } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { GetTransactionsByHashesReturnType } from "./getTransactionsByHashes";
-import * as Sentry from "@sentry/nextjs";
-import { ENVIRONMENT } from "const/env";
-import { getAccountProviderType } from "@elrondnetwork/dapp-core/utils";
-import { LoginMethodsEnum } from "@elrondnetwork/dapp-core/types";
 
 export const TxCompletedTracker = () => {
     const { socket, socketExtra } = useSocket();
-    const setUserStats = useSetRecoilState(atomQuestUserStats);
     const setLastCompletedTxHash = useSetRecoilState(lastCompletedTxHashAtom);
-    const isRegistered = useRecoilValue(questIsRegisteredSelector);
-    const isLoggedIn = useRecoilValue(accIsLoggedInState);
+    const isRegistered = useRecoilValue(questIsRegisteredAtom);
     useEffect(() => {
         if (!socket) return;
         const onTxCompleted = (hash: string) => {
@@ -46,18 +42,27 @@ export const TxCompletedTracker = () => {
                     value: "0",
                     type: "",
                 });
-                if(socketExtra){
+                if (socketExtra) {
                     // socketExtra.emit("transactionCompletedClient", receiver, hash);
                 }
                 const provider = getAccountProviderType();
-                if (isRegistered && ENVIRONMENT.ENABLE_ASHPOINT && provider !== LoginMethodsEnum.wallet) {
-                    logApi.post("/api/v1/tracking/ash-point", {
-                        action_time: Date.now(),
-                        action_name: raw?.function || raw?.arguments?.functionName || raw?.action?.name,
-                        action_metadata: raw,
-                    }).catch((err) => {
-                        Sentry.captureException(err);
-                    });
+                if (
+                    isRegistered &&
+                    ENVIRONMENT.ENABLE_ASHPOINT &&
+                    provider !== LoginMethodsEnum.wallet
+                ) {
+                    logApi
+                        .post("/api/v1/tracking/ash-point", {
+                            action_time: Date.now(),
+                            action_name:
+                                raw?.function ||
+                                raw?.arguments?.functionName ||
+                                raw?.action?.name,
+                            action_metadata: raw,
+                        })
+                        .catch((err) => {
+                            Sentry.captureException(err);
+                        });
                 }
             });
         };
@@ -67,14 +72,5 @@ export const TxCompletedTracker = () => {
         };
     }, [socketExtra, isRegistered]);
 
-    useEffect(() => {
-        const provider = getAccountProviderType();
-        if(isLoggedIn && ENVIRONMENT.ENABLE_ASHPOINT && provider !== LoginMethodsEnum.wallet){
-            logApi
-            .get<QuestUserStatsModel>("/api/v1/wallet")
-            .then((res) => setUserStats(res.data))
-            .catch((err) => Sentry.captureException(err))
-        }
-    }, [setUserStats, isLoggedIn]);
     return null;
 };
