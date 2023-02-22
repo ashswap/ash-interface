@@ -1,5 +1,6 @@
 import { atomCustomQuestData } from "atoms/ashpoint";
 import { accIsLoggedInState } from "atoms/dappState";
+import { ENVIRONMENT } from "const/env";
 import logApi from "helper/logHelper";
 import {
     CustomQuestMapModel,
@@ -83,7 +84,7 @@ function EventQuests() {
         mutate,
         isValidating,
     } = useSWR<CustomQuestMapModel>(
-        isLoggedIn ? `/api/v1/wallet/quest` : null,
+        isLoggedIn && ENVIRONMENT.ENABLE_ASHPOINT ? `/api/v1/wallet/quest` : null,
         logFetcher
     );
     const [cachedData, setCachedData] = useRecoilState(atomCustomQuestData);

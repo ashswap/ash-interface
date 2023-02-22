@@ -6,7 +6,7 @@ import {
     atomQuestUserStats,
     questIsOpenOwnerSignModalAtom,
     questIsRegisteredAtom,
-    questOwnerSignatureSelector
+    questOwnerSignatureSelector,
 } from "atoms/ashpoint";
 import { accAddressState, accIsLoggedInState } from "atoms/dappState";
 import { ENVIRONMENT } from "const/env";
@@ -40,7 +40,12 @@ const useAshpoint = () => {
 
     useEffect(() => {
         const provider = getAccountProviderType();
-        if (accAddress && isLoggedIn && provider !== LoginMethodsEnum.wallet) {
+        if (
+            accAddress &&
+            isLoggedIn &&
+            provider !== LoginMethodsEnum.wallet &&
+            ENVIRONMENT.ENABLE_ASHPOINT
+        ) {
             logApi
                 .get("/api/v1/no-auth/wallet", {
                     params: { wallet: accAddress },
@@ -55,7 +60,8 @@ const useAshpoint = () => {
         if (
             providerType !== LoginMethodsEnum.wallet &&
             address &&
-            !ashpointSignature
+            !ashpointSignature &&
+            ENVIRONMENT.ENABLE_ASHPOINT
         ) {
             if (
                 router.pathname.startsWith("/ashpoint") ||
