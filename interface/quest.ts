@@ -102,6 +102,12 @@ export type SwapQuest = ICustomQuest & {
     swap_amount: number;
 }
 
+export type ManualQuest = ICustomQuest & {
+    title: string;
+    note: string;
+    point: number;
+}
+
 export function isFarmQuest(quest: ICustomQuest): quest is FarmQuest {
     return quest.__typename === "farm_quest";
 }
@@ -110,6 +116,9 @@ export function isGovQuest(quest: ICustomQuest): quest is GovQuest {
 }
 export function isSwapQuest(quest: ICustomQuest): quest is SwapQuest {
     return quest.__typename === "swap_quest";
+}
+export function isManualQuest(quest: ICustomQuest): quest is ManualQuest {
+    return quest.__typename === "manual_quest";
 }
 
 export type DiscordMetadata = {

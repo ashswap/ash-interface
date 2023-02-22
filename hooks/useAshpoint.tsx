@@ -43,7 +43,7 @@ const useAshpoint = () => {
         if (accAddress && isLoggedIn && provider !== LoginMethodsEnum.wallet) {
             logApi
                 .get("/api/v1/no-auth/wallet", {
-                    params: { address: accAddress },
+                    params: { wallet: accAddress },
                 })
                 .then((data) => setIsRegistered(data.data.is_exist));
         }
