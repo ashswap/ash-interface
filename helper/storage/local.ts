@@ -9,7 +9,8 @@ type LocalStorageKey =
     | "ledgerLogin"
     | "userOnboarding"
     | "invitationCode"
-    | "acceptedLegal";
+    | "acceptedLegal"
+    | "ashpointOwners"
 export const setItem = ({
     key,
     data,

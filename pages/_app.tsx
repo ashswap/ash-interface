@@ -10,6 +10,7 @@ import TxsToastList from "components/TxsToastList";
 import { DAPP_CONFIG } from "const/dappConfig";
 import { ENVIRONMENT } from "const/env";
 import { SocketProvider } from "context/socket";
+import useAshpoint from "hooks/useAshpoint";
 import { useRecoilAdapter } from "hooks/useRecoilAdapter/useRecoilAdapter";
 import { useRefreshAfterTxCompleted } from "hooks/useRefreshAfterTxCompleted";
 import useSentryUser from "hooks/useSentryUser";
@@ -48,6 +49,7 @@ const GlobalHooks = () => {
     useRecoilAdapter();
     useSentryUser();
     useRefreshAfterTxCompleted();
+    useAshpoint();
     return null;
 };
 const TestnetGuard = ({ children }: any) => {

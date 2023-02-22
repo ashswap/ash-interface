@@ -5,7 +5,12 @@ import ImgTwitter from "assets/images/twitter.png";
 import ICBambooShootSolid from "assets/svg/bamboo-shoot-solid.svg";
 import ICCaretRight from "assets/svg/caret-right.svg";
 import ICELetter from "assets/svg/e-letter.svg";
-import { atomQuestUserStats, questIsRegisteredSelector } from "atoms/ashpoint";
+import {
+    atomQuestUserStats,
+    questIsOpenOwnerSignModalAtom,
+    questIsRegisteredAtom,
+    questOwnerSignatureSelector,
+} from "atoms/ashpoint";
 import { accAddressState } from "atoms/dappState";
 import BaseModal from "components/BaseModal";
 import CopyBtn from "components/CopyBtn";
@@ -26,11 +31,12 @@ import { QuestUserStatsModel } from "interface/quest";
 import moment from "moment";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import DailyQuests from "./DailyQuests";
 import EventQuests from "./EventQuests";
 import * as Sentry from "@sentry/nextjs";
 import Link from "next/link";
+import emitter from "helper/emitter";
 
 type PlatformType = "twitter" | "discord";
 const Star = ({ active = false }: { active?: boolean }) => {
@@ -65,11 +71,18 @@ const QuestOverview = () => {
     const prevAddr = usePrevState(userAddress);
     const captchaElRef = useRef(null);
     const captchaObjRef = useRef<GeetestCaptchaObj>();
-    const [firstLoad, setFirstLoad] = useState(true);
     const [isOpenPlatformModal, setIsOpenPlatformModal] = useState(false);
     const [questType, setQuestType] = useState<"daily" | "event">("daily");
     const screenSize = useScreenSize();
-    const isRegistered = useRecoilValue(questIsRegisteredSelector);
+    const [isRegistered, setIsRegistered] = useRecoilState(
+        questIsRegisteredAtom
+    );
+    const { signature: ashpointSignature } = useRecoilValue(
+        questOwnerSignatureSelector
+    );
+    const setIsOpenOwnerSignModal = useSetRecoilState(
+        questIsOpenOwnerSignModalAtom
+    );
 
     const [platform, setPlatform] = useState<PlatformType>();
 
@@ -117,8 +130,7 @@ const QuestOverview = () => {
         logApi
             .get<QuestUserStatsModel>("/api/v1/wallet")
             .then((res) => setUserStats(res.data))
-            .catch((err) => Sentry.captureException(err))
-            .finally(() => setFirstLoad(false));
+            .catch((err) => Sentry.captureException(err));
     }, [setUserStats]);
 
     const register = useCallback(
@@ -141,6 +153,7 @@ const QuestOverview = () => {
                         },
                     }
                 )
+                .then(() => setIsRegistered(true))
                 .catch((err) => {
                     const msg =
                         err?.response?.data?.error ||
@@ -153,7 +166,7 @@ const QuestOverview = () => {
                     setIsRegistering(false);
                 });
         },
-        [code, getUserStats]
+        [code, getUserStats, setIsRegistered]
     );
 
     const unlinkSocial = useCallback(
@@ -162,22 +175,17 @@ const QuestOverview = () => {
                 .post("/api/v1/wallet/unlink", {
                     platform,
                 })
-                .then(() => setCode(undefined))
+                .then(() => {
+                    setCode(undefined);
+                    setIsRegistered(false);
+                })
                 .finally(() => getUserStats());
         },
-        [getUserStats]
+        [getUserStats, setIsRegistered]
     );
 
     useEffect(() => {
-        if (userAddress) {
-            getUserStats();
-        } else {
-            setUserStats(undefined);
-        }
-    }, [userAddress, setUserStats, getUserStats]);
-
-    useEffect(() => {
-        if (code && userAddress && platform) {
+        if (code && userAddress && platform && ashpointSignature) {
             initGeetest4({ product: "bind", riskType: "slide" }, (obj) => {
                 captchaObjRef.current?.destroy();
                 captchaObjRef.current = obj
@@ -196,7 +204,7 @@ const QuestOverview = () => {
             captchaObjRef.current?.destroy();
             captchaObjRef.current = undefined;
         };
-    }, [code, userAddress, platform, register]);
+    }, [code, userAddress, platform, register, ashpointSignature]);
 
     useEffect(() => {
         const query = router.query;
@@ -239,8 +247,6 @@ const QuestOverview = () => {
             });
         }
     }, [router]);
-
-    if (firstLoad && !userStats && userAddress) return null;
 
     return (
         <>
@@ -337,7 +343,7 @@ const QuestOverview = () => {
                                         ? userStats?.wallet.twitter_metadata
                                               ?.user.username ||
                                           userStats?.wallet.discord_metadata
-                                              .user.username
+                                              ?.user.username
                                         : "_"}
                                 </div>
                                 {isRegistered && platform && (
@@ -462,7 +468,7 @@ const QuestOverview = () => {
                 {!isRegistered ? (
                     <div className="grow flex flex-col items-center px-12 mt-10 lg:mt-0">
                         <div className="font-bold text-3xl lg:text-5xl text-stake-gray-500 text-center leading-tight mb-16">
-                            2 small steps to start!
+                            3 small steps to start!
                         </div>
 
                         <div className="flex flex-col">
@@ -491,10 +497,9 @@ const QuestOverview = () => {
                                     )}
                                 </div>
                             </div>
-
-                            <div className="flex items-center justify-between">
+                            <div className="flex items-center justify-between mb-10">
                                 <div className="flex items-center">
-                                    <Star active={!!code} />
+                                    <Star active={!!ashpointSignature} />
                                     <ICCaretRight className="w-2 h-2" />
                                 </div>
                                 <div className="w-14 mx-4 border-t border-t-stake-gray-500 border-dashed"></div>
@@ -503,9 +508,36 @@ const QuestOverview = () => {
                                 </div>
 
                                 <GlowingButton
+                                    theme="pink"
+                                    className="w-40 h-14 ml-6 clip-corner-1 clip-corner-br font-bold text-sm capitalize disabled:bg-ash-dark-300"
+                                    disabled={
+                                        !!ashpointSignature || !userAddress
+                                    }
+                                    onClick={() =>
+                                        setIsOpenOwnerSignModal(true)
+                                    }
+                                >
+                                    {ashpointSignature ? "Verified" : "Verify"}
+                                </GlowingButton>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center">
+                                    <Star active={!!code} />
+                                    <ICCaretRight className="w-2 h-2" />
+                                </div>
+                                <div className="w-14 mx-4 border-t border-t-stake-gray-500 border-dashed"></div>
+                                <div className="font-bold text-4xl text-white">
+                                    3
+                                </div>
+
+                                <GlowingButton
                                     theme="cyan"
                                     className="w-40 h-14 ml-6 clip-corner-1 clip-corner-br font-bold text-sm capitalize disabled:bg-ash-dark-300"
-                                    disabled={!!code || !userAddress}
+                                    disabled={
+                                        !!code ||
+                                        !userAddress ||
+                                        !ashpointSignature
+                                    }
                                     onClick={() => setIsOpenPlatformModal(true)}
                                 >
                                     {code
