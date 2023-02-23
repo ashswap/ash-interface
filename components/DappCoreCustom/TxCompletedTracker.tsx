@@ -1,4 +1,7 @@
-import { LoginMethodsEnum } from "@elrondnetwork/dapp-core/types";
+import {
+    LoginMethodsEnum,
+    TransactionServerStatusesEnum,
+} from "@elrondnetwork/dapp-core/types";
 import { getAccountProviderType } from "@elrondnetwork/dapp-core/utils";
 import { TransactionDecoder } from "@elrondnetwork/transaction-decoder";
 import * as Sentry from "@sentry/nextjs";
@@ -49,7 +52,8 @@ export const TxCompletedTracker = () => {
                 if (
                     isRegistered &&
                     ENVIRONMENT.ENABLE_ASHPOINT &&
-                    provider !== LoginMethodsEnum.wallet
+                    provider !== LoginMethodsEnum.wallet &&
+                    tx.status === TransactionServerStatusesEnum.success
                 ) {
                     logApi
                         .post("/api/v1/tracking/ash-point", {
@@ -71,7 +75,6 @@ export const TxCompletedTracker = () => {
             emitter.off("onCheckBatchResult", onCheckBatchResult);
         };
     }, [socketExtra, isRegistered]);
-
 
     return null;
 };
