@@ -1,5 +1,6 @@
 import { getAddress } from "@elrondnetwork/dapp-core/utils";
 import axios from "axios";
+import { ENVIRONMENT } from "const/env";
 import storage from "./storage";
 
 async function getAshAuthen(address: string, ts: number) {
@@ -26,7 +27,7 @@ logApi.interceptors.request.use(async (config) => {
         ...config.headers,
         "X-ASH-authen": ashAuth,
         "X-ASH-verify": verify,
-        "X-ASH-SIGNING": storage.local.getItem("ashpointOwners")?.[verifyObj.wallet]?.signature,
+        "X-ASH-SIGNING": ENVIRONMENT.ENABLE_ASHPOINT_SIGN ? storage.local.getItem("ashpointOwners")?.[verifyObj.wallet]?.signature : undefined,
         // "ngrok-skip-browser-warning": "FU_NGROK"
     };
     config.baseURL = process.env.NEXT_PUBLIC_ASH_LOG_API;

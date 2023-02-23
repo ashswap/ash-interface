@@ -122,21 +122,22 @@ function EventQuests() {
 
     return (
         <>
-            {isValidating && !data && (
+            {isValidating && !data ? (
                 <div className="flex justify-center py-10">
                     <div className="w-10 h-10 rounded-full border-t-transparent border-pink-600 border-4 animate-spin"></div>
                 </div>
+            ) : (
+                customQuests.map((q) => {
+                    const key = q.__typename + q.quest_name;
+                    return (
+                        <CustomQuestItem
+                            key={key}
+                            questData={q}
+                            onClaim={onClaim}
+                        />
+                    );
+                })
             )}
-            {customQuests.map((q) => {
-                const key = q.__typename + q.quest_name;
-                return (
-                    <CustomQuestItem
-                        key={key}
-                        questData={q}
-                        onClaim={onClaim}
-                    />
-                );
-            })}
         </>
     );
 }
