@@ -468,7 +468,7 @@ const QuestOverview = () => {
                 {!isRegistered ? (
                     <div className="grow flex flex-col items-center px-12 mt-10 lg:mt-0">
                         <div className="font-bold text-3xl lg:text-5xl text-stake-gray-500 text-center leading-tight mb-16">
-                            3 small steps to start!
+                            {ENVIRONMENT.ENABLE_ASHPOINT_SIGN ? 3 : 2} small steps to start!
                         </div>
 
                         <div className="flex flex-col">
@@ -497,7 +497,7 @@ const QuestOverview = () => {
                                     )}
                                 </div>
                             </div>
-                            <div className="flex items-center justify-between mb-10">
+                            {ENVIRONMENT.ENABLE_ASHPOINT_SIGN && <div className="flex items-center justify-between mb-10">
                                 <div className="flex items-center">
                                     <Star active={!!ashpointSignature} />
                                     <ICCaretRight className="w-2 h-2" />
@@ -519,7 +519,8 @@ const QuestOverview = () => {
                                 >
                                     {ashpointSignature ? "Verified" : "Verify"}
                                 </GlowingButton>
-                            </div>
+                            </div>}
+                            
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center">
                                     <Star active={!!code} />
@@ -527,7 +528,7 @@ const QuestOverview = () => {
                                 </div>
                                 <div className="w-14 mx-4 border-t border-t-stake-gray-500 border-dashed"></div>
                                 <div className="font-bold text-4xl text-white">
-                                    3
+                                    {ENVIRONMENT.ENABLE_ASHPOINT_SIGN ? 3 : 2}
                                 </div>
 
                                 <GlowingButton
@@ -536,7 +537,7 @@ const QuestOverview = () => {
                                     disabled={
                                         !!code ||
                                         !userAddress ||
-                                        !ashpointSignature
+                                        (!ashpointSignature && ENVIRONMENT.ENABLE_ASHPOINT_SIGN)
                                     }
                                     onClick={() => setIsOpenPlatformModal(true)}
                                 >
