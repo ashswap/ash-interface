@@ -49,9 +49,6 @@ function AshPoint() {
             router.replace("/swap");
         }
     }, [router]);
-    useEffect(() => {
-        console.log(loginMethod, isLoggedIn);
-    }, [loginMethod, isLoggedIn]);
     if (!ENVIRONMENT.ENABLE_ASHPOINT) return null;
     if (loginMethod === LoginMethodsEnum.wallet)
         return (

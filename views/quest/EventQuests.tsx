@@ -1,11 +1,13 @@
 import { atomCustomQuestData } from "atoms/ashpoint";
 import { accIsLoggedInState } from "atoms/dappState";
+import { ENVIRONMENT } from "const/env";
 import logApi from "helper/logHelper";
 import {
     CustomQuestMapModel,
     FarmQuest,
     GovQuest,
     ICustomQuest,
+    ManualQuest,
     SwapQuest,
 } from "interface/quest";
 import React, {
@@ -58,6 +60,22 @@ const DEFAULT_QUEST_MAP: Record<keyof CustomQuestMapModel, ICustomQuest> = {
     swap_quest: DEFAULT_SWAP_QUEST,
 };
 
+const MANUAL_QUESTS: ManualQuest[] = [
+    {
+        title: "Spread The Heat",
+        note: "*Reward will be manually added after having the result.",
+        redirect:
+            "https://gleam.io/bxumG/spread-the-heat-ash-point-custom-quest",
+        __typename: "manual_quest",
+        point: 10000,
+        start: 1676736000,
+        end: 1677945600,
+        require: 1,
+        last_claimed: 0,
+        quest_name: "spread-the-heat",
+    },
+];
+
 const logFetcher = (url: string) => logApi.get(url).then((res) => res.data);
 function EventQuests() {
     const isLoggedIn = useRecoilValue(accIsLoggedInState);
@@ -66,7 +84,7 @@ function EventQuests() {
         mutate,
         isValidating,
     } = useSWR<CustomQuestMapModel>(
-        isLoggedIn ? `/api/v1/wallet/quest` : null,
+        isLoggedIn && ENVIRONMENT.ENABLE_ASHPOINT ? `/api/v1/wallet/quest` : null,
         logFetcher
     );
     const [cachedData, setCachedData] = useRecoilState(atomCustomQuestData);
@@ -76,7 +94,7 @@ function EventQuests() {
     }, [_data, cachedData]);
     const customQuests = useMemo(() => {
         const entries = Object.entries(data || {});
-        return entries.reduce((total: ICustomQuest[], [k, v]) => {
+        const fromServer = entries.reduce((total: ICustomQuest[], [k, v]) => {
             const questEntries: [string, ICustomQuest][] = Object.entries(v);
             return [
                 ...total,
@@ -88,6 +106,7 @@ function EventQuests() {
                 })),
             ];
         }, []);
+        return [...fromServer, ...MANUAL_QUESTS];
     }, [data]);
     const onClaim = useCallback(async () => {
         await mutateRef.current?.();
@@ -103,21 +122,22 @@ function EventQuests() {
 
     return (
         <>
-            {isValidating && !data && (
+            {isValidating && !data ? (
                 <div className="flex justify-center py-10">
                     <div className="w-10 h-10 rounded-full border-t-transparent border-pink-600 border-4 animate-spin"></div>
                 </div>
+            ) : (
+                customQuests.map((q) => {
+                    const key = q.__typename + q.quest_name;
+                    return (
+                        <CustomQuestItem
+                            key={key}
+                            questData={q}
+                            onClaim={onClaim}
+                        />
+                    );
+                })
             )}
-            {customQuests.map((q) => {
-                const key = q.__typename + q.quest_name;
-                return (
-                    <CustomQuestItem
-                        key={key}
-                        questData={q}
-                        onClaim={onClaim}
-                    />
-                );
-            })}
         </>
     );
 }
