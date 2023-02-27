@@ -4,8 +4,8 @@ import {
     ContractFunction,
     TokenIdentifierValue,
     TokenPayment,
-    Transaction
-} from "@elrondnetwork/erdjs/out";
+    Transaction,
+} from "@multiversx/sdk-core/out";
 import { accInfoState } from "atoms/dappState";
 import BigNumber from "bignumber.js";
 import { TOKENS_MAP } from "const/tokens";
@@ -25,13 +25,13 @@ const usePoolSwap = (trackStatus = false) => {
         useSendTxsWithTrackStatus(trackStatus);
     const createTx = useCreateTransaction();
     const swap = useRecoilCallback(
-        ({snapshot}) =>
+        ({ snapshot }) =>
             async (
                 pool: IPool,
                 tokenIn: IESDTInfo,
                 tokenOut: IESDTInfo,
                 weiIn: BigNumber,
-                minWeiOut: BigNumber,
+                minWeiOut: BigNumber
             ) => {
                 const useEgldIn = tokenIn.identifier === "EGLD";
                 const useEgldOut = tokenOut.identifier === "EGLD";
@@ -44,15 +44,21 @@ const usePoolSwap = (trackStatus = false) => {
                         func: new ContractFunction("ESDTTransfer"),
                         gasLimit: 8_000_000,
                         args: [
-                            new TokenIdentifierValue(getTokenIdFromCoin(tokenIn.identifier)!),
+                            new TokenIdentifierValue(
+                                getTokenIdFromCoin(tokenIn.identifier)!
+                            ),
                             new BigUIntValue(weiIn),
                             new TokenIdentifierValue("swapTokensFixedInput"),
-                            new TokenIdentifierValue(getTokenIdFromCoin(tokenOut.identifier)!),
+                            new TokenIdentifierValue(
+                                getTokenIdFromCoin(tokenOut.identifier)!
+                            ),
                             new BigUIntValue(minWeiOut),
                         ],
                     });
-                } else if(pool.type === EPoolType.PoolV2) {
-                    const poolContract = ContractManager.getPoolV2Contract(pool.address);
+                } else if (pool.type === EPoolType.PoolV2) {
+                    const poolContract = ContractManager.getPoolV2Contract(
+                        pool.address
+                    );
                     const tokenPayment = TokenPayment.fungibleFromBigInteger(
                         getTokenIdFromCoin(tokenIn.identifier)!,
                         weiIn,
@@ -60,7 +66,6 @@ const usePoolSwap = (trackStatus = false) => {
                     );
                     tx = await poolContract.exchange(tokenPayment, minWeiOut);
                 } else {
-
                     const poolContract = ContractManager.getPoolContract(
                         pool.address
                     );
@@ -77,12 +82,23 @@ const usePoolSwap = (trackStatus = false) => {
                 }
 
                 const txs = [tx];
-                if(useEgldIn){
-                    const wrapTx = await ContractManager.getWrappedEGLDContract(wegldContract).wrapEgld(weiIn);
+                if (useEgldIn) {
+                    const wrapTx = await ContractManager.getWrappedEGLDContract(
+                        wegldContract
+                    ).wrapEgld(weiIn);
                     txs.unshift(wrapTx);
                 }
-                if(useEgldOut){
-                    const unwrapTx = await ContractManager.getWrappedEGLDContract(wegldContract).unwrapEgld(TokenPayment.fungibleFromBigInteger(wegld.identifier, minWeiOut, wegld.decimals));
+                if (useEgldOut) {
+                    const unwrapTx =
+                        await ContractManager.getWrappedEGLDContract(
+                            wegldContract
+                        ).unwrapEgld(
+                            TokenPayment.fungibleFromBigInteger(
+                                wegld.identifier,
+                                minWeiOut,
+                                wegld.decimals
+                            )
+                        );
                     txs.push(unwrapTx);
                 }
 

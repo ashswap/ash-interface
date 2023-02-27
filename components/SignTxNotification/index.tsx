@@ -1,5 +1,5 @@
-import { useGetNotification } from "@elrondnetwork/dapp-core/hooks";
-import { NotificationTypesEnum } from "@elrondnetwork/dapp-core/types";
+import { useGetNotification } from "@multiversx/sdk-dapp/hooks";
+import { NotificationTypesEnum } from "@multiversx/sdk-dapp/types";
 import { Transition } from "@headlessui/react";
 import ICClose from "assets/svg/close.svg";
 import React, { Fragment, useEffect, useMemo } from "react";

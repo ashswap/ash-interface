@@ -1,4 +1,4 @@
-import { TokenPayment, Transaction } from "@elrondnetwork/erdjs/out";
+import { TokenPayment, Transaction } from "@multiversx/sdk-core/out";
 import { accIsLoggedInState } from "atoms/dappState";
 import { govUnlockTSState } from "atoms/govState";
 import BigNumber from "bignumber.js";

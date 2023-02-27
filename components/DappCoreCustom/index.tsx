@@ -1,25 +1,26 @@
-import { TransactionSender } from "@elrondnetwork/dapp-core/components/TransactionSender";
-import { TransactionsTracker } from "@elrondnetwork/dapp-core/components/TransactionsTracker";
-import { useGetPendingTransactions } from "@elrondnetwork/dapp-core/hooks";
-import { checkBatch } from "@elrondnetwork/dapp-core/hooks/transactions/useCheckTransactionStatus/checkBatch";
-import { PendingTransactionsType, SignedTransactionsBodyType } from "@elrondnetwork/dapp-core/types";
+import { TransactionSender } from "@multiversx/sdk-dapp/components/TransactionSender";
+import { useGetPendingTransactions } from "@multiversx/sdk-dapp/hooks";
+import { checkBatch } from "@multiversx/sdk-dapp/hooks/transactions/useCheckTransactionStatus/checkBatch";
 import {
-    getIsTransactionPending
-} from "@elrondnetwork/dapp-core/utils";
-import { CustomComponentsType } from "@elrondnetwork/dapp-core/wrappers/DappProvider/CustomComponents";
+    PendingTransactionsType,
+    SignedTransactionsBodyType
+} from "@multiversx/sdk-dapp/types";
+import { getIsTransactionPending } from "@multiversx/sdk-dapp/utils";
+import { CustomComponentsType } from "@multiversx/sdk-dapp/wrappers/DappProvider/CustomComponents";
 import { lastCompletedTxHashAtom } from "atoms/transactions";
 import emitter from "helper/emitter";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useRecoilValue } from "recoil";
 import { getTransactionsByHashes } from "./getTransactionsByHashes";
 import { sendSignedTransactionsAsync } from "./sendSignedTransactionAsync";
-
-const CustomTransactionsTracker: typeof TransactionsTracker = () => {
+const CustomTransactionsTracker = () => {
     const { pendingTransactionsArray } = useGetPendingTransactions();
     const lastCompletedTxHash = useRecoilValue(lastCompletedTxHashAtom);
     const intervalRef = useRef<Record<string, any>>({});
     const timeoutRef = useRef<Record<string, any>>({});
-    const pendingBatchTxsRef = useRef<[string, SignedTransactionsBodyType][]>([]);
+    const pendingBatchTxsRef = useRef<[string, SignedTransactionsBodyType][]>(
+        []
+    );
 
     const pendingBatches = useMemo(() => {
         return pendingTransactionsArray.filter(
@@ -32,19 +33,26 @@ const CustomTransactionsTracker: typeof TransactionsTracker = () => {
         );
     }, [pendingTransactionsArray]);
 
-    const getTransactionByHashesIntercept = useCallback(async (pendingTxs: PendingTransactionsType) => {
-        const serverTransactions = await getTransactionsByHashes(pendingTxs);
-        const completedTxs = serverTransactions.filter(tx => tx.raw && tx.status !== 'pending');
-        emitter.emit('onCheckBatchResult', completedTxs);
-        return serverTransactions;
-    }, []);
+    const getTransactionByHashesIntercept = useCallback(
+        async (pendingTxs: PendingTransactionsType) => {
+            const serverTransactions = await getTransactionsByHashes(
+                pendingTxs
+            );
+            const completedTxs = serverTransactions.filter(
+                (tx) => tx.raw && tx.status !== "pending"
+            );
+            emitter.emit("onCheckBatchResult", completedTxs);
+            return serverTransactions;
+        },
+        []
+    );
 
     useEffect(() => {
         pendingBatchTxsRef.current = pendingBatches || [];
-    }, [pendingBatches])
+    }, [pendingBatches]);
 
     useEffect(() => {
-        if(!lastCompletedTxHash) return;
+        if (!lastCompletedTxHash) return;
         pendingBatchTxsRef.current.map(
             ([sessionId, batch]: [string, SignedTransactionsBodyType]) => {
                 const matchedTx = batch.transactions?.find(
@@ -55,9 +63,10 @@ const CustomTransactionsTracker: typeof TransactionsTracker = () => {
                         sessionId,
                         transactionBatch: {
                             transactions: [matchedTx],
-                            customTransactionInformation: batch.customTransactionInformation
+                            customTransactionInformation:
+                                batch.customTransactionInformation,
                         },
-                        getTransactionsByHash: getTransactionByHashesIntercept
+                        getTransactionsByHash: getTransactionByHashesIntercept,
                     });
                 }
             }
@@ -74,7 +83,8 @@ const CustomTransactionsTracker: typeof TransactionsTracker = () => {
                             checkBatch({
                                 sessionId,
                                 transactionBatch: batch,
-                                getTransactionsByHash: getTransactionByHashesIntercept
+                                getTransactionsByHash:
+                                    getTransactionByHashesIntercept,
                             });
                         }, 2000);
                         if (intervalRef.current) {
@@ -107,7 +117,6 @@ const CustomTransactionsTracker: typeof TransactionsTracker = () => {
                 delete intervalRef.current[sessionId];
             }
         });
-
     }, [getTransactionByHashesIntercept, pendingBatches]);
 
     return null;
@@ -120,7 +129,7 @@ export const customComponents: CustomComponentsType = {
     transactionSender: {
         component: TransactionSender,
         props: {
-            sendSignedTransactionsAsync
-        }
+            sendSignedTransactionsAsync,
+        },
     },
 };

@@ -192,11 +192,11 @@ const VoteEditor = memo(function VoteEditor({ farmAddress }: VoteEditorProps) {
                     className="ash-slider ash-slider-pink my-0"
                     step={1}
                     marks={{
-                        "0": "",
-                        "2500": "",
-                        "5000": "",
-                        "7500": "",
-                        "10000": "",
+                        0: <></>,
+                        2500: <></>,
+                        5000: <></>,
+                        7500: <></>,
+                        10000: <></>,
                     }}
                     handleStyle={{
                         backgroundColor: theme.extend.colors.pink[600],
@@ -208,7 +208,7 @@ const VoteEditor = memo(function VoteEditor({ farmAddress }: VoteEditorProps) {
                     min={0}
                     max={10_000}
                     value={weight}
-                    tooltipVisible={false}
+                    tooltip={{ open: false }}
                     onChange={(e) => {
                         setWeight(Math.min(maxPower, e));
                     }}
@@ -272,11 +272,9 @@ const VoteEditor = memo(function VoteEditor({ farmAddress }: VoteEditorProps) {
                         <div className="mt-2 font-bold text-2xs text-stake-gray-500">
                             Stake ASH{" "}
                             <Link href="/stake/gov">
-                                <a>
-                                    <span className="text-pink-600 underline">
-                                        here
-                                    </span>
-                                </a>
+                                <span className="text-pink-600 underline">
+                                    here
+                                </span>
                             </Link>{" "}
                             to get veASH
                         </div>

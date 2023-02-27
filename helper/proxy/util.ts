@@ -1,10 +1,10 @@
-import { AccountInfoSliceNetworkType } from "@elrondnetwork/dapp-core/types";
-import { getNetworkConfig } from "@elrondnetwork/dapp-core/utils";
+import { AccountInfoSliceNetworkType } from "@multiversx/sdk-dapp/types";
+import { getNetworkConfig } from "@multiversx/sdk-dapp/utils";
 import {
     ApiNetworkProvider,
     ProxyNetworkProvider,
-} from "@elrondnetwork/erdjs-network-providers/out";
-import ElrondProxyProvider from "./elrondProxyProvider";
+} from "@multiversx/sdk-network-providers/out";
+import MultiversXProxyProvider from "./multiversXProxyProvider";
 
 let proxyProvider: ProxyNetworkProvider | null = null;
 export const getProxyNetworkProvider = () => {
@@ -27,11 +27,13 @@ export const getApiNetworkProvider = () => {
     return apiProvider;
 };
 
-let elrondProxyProvider: ElrondProxyProvider | null = null;
-export const getElrondProxyProvider = () => {
+let MVXProxyProvider: MultiversXProxyProvider | null = null;
+export const getMVXProxyProvider = () => {
     const network: AccountInfoSliceNetworkType = getNetworkConfig();
-    if (!elrondProxyProvider) {
-        elrondProxyProvider = new ElrondProxyProvider(network.apiAddress, {timeout: +network.apiTimeout});
+    if (!MVXProxyProvider) {
+        MVXProxyProvider = new MultiversXProxyProvider(network.apiAddress, {
+            timeout: +network.apiTimeout,
+        });
     }
-    return elrondProxyProvider;
+    return MVXProxyProvider;
 };

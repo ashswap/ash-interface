@@ -115,7 +115,7 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                 amount: deboundRawLockAmt,
             });
         }
-    }, [deboundRawLockAmt]);
+    }, [deboundRawLockAmt, loggedIn]);
     const [currentLockSeconds, setCurrentLockSeconds] = useState(0);
 
     const [isExtend, setIsExtend] = useState(false);

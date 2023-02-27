@@ -14,7 +14,7 @@ function Avatar({ src, alt, ...props }: Props) {
     return (
         <span {...props} className={className}>
             {src && (
-                <Image src={src} alt={alt} layout="fill" objectFit="cover" />
+                <Image src={src} alt={alt || ""} fill style={{objectFit: "cover"}} />
             )}
         </span>
     );

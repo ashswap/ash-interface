@@ -1,4 +1,4 @@
-import { AccountInfoSliceNetworkType } from "@elrondnetwork/dapp-core/types";
+import { AccountInfoSliceNetworkType } from "@multiversx/sdk-dapp/types";
 import { Tooltip } from "antd";
 import ICArrowRight from "assets/svg/arrow-right.svg";
 import ICCopy from "assets/svg/copy.svg";
@@ -67,17 +67,13 @@ const TokenDetailPage: Page<props> = ({ token }: props) => {
                 <ul className="flex space-x-1 text-xs mb-6">
                     <li>
                         <Link href="/info">
-                            <a>
-                                <span className="text-white">Dashboard</span>
-                            </a>
+                            <span className="text-white">Dashboard</span>
                         </Link>
                     </li>
                     <li>
                         <ICArrowRight className="inline mr-1 text-ash-gray-500" />
                         <Link href="/info/tokens">
-                            <a>
-                                <span className="text-white">Tokens</span>
-                            </a>
+                            <span className="text-white">Tokens</span>
                         </Link>
                     </li>
                     <li>
@@ -135,14 +131,12 @@ const TokenDetailPage: Page<props> = ({ token }: props) => {
                 <div className="flex space-x-2 mb-4 md:mb-18">
                     {/* TODO: set swap pair by query params */}
                     <Link href="/swap">
-                        <a>
-                            <span className="bg-pink-600 w-8 md:w-auto h-8 md:h-10 flex items-center justify-center md:px-4 text-sm text-white">
-                                <ICSwap className="w-4 h-4 md:w-5 md:h-5" />
-                                <span className="hidden md:inline-block ml-2">
-                                    Swap
-                                </span>
+                        <span className="bg-pink-600 w-8 md:w-auto h-8 md:h-10 flex items-center justify-center md:px-4 text-sm text-white">
+                            <ICSwap className="w-4 h-4 md:w-5 md:h-5" />
+                            <span className="hidden md:inline-block ml-2">
+                                Swap
                             </span>
-                        </a>
+                        </span>
                     </Link>
                     {/* <button className="bg-ash-dark-500 h-10 flex items-center px-4 text-sm">
                         <ICStarOutline className="w-5 h-5 mr-2" />

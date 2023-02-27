@@ -1,7 +1,8 @@
 import {
-    useExtensionLogin, useWalletConnectLogin,
-    useWebWalletLogin
-} from "@elrondnetwork/dapp-core/hooks";
+    useExtensionLogin,
+    useWalletConnectLogin,
+    useWebWalletLogin,
+} from "@multiversx/sdk-dapp/hooks";
 import connectWalletBg from "assets/images/connect-wallet-bg.png";
 import downloadAppGallery from "assets/images/download-app-gallery.png";
 import downloadAppStore from "assets/images/download-app-store.png";
@@ -14,7 +15,7 @@ import ICConnectWebWallet from "assets/svg/connect-web-wallet.svg";
 import {
     accAddressState,
     accIsLoggedInState,
-    dappCoreState
+    dappCoreState,
 } from "atoms/dappState";
 import { notFirstRenderConnectWallet } from "atoms/firstRenderConnectWalletState";
 import { walletIsOpenConnectModalState } from "atoms/walletState";
@@ -53,8 +54,8 @@ function ConnectWalletModal() {
     );
     const [webWalletLogin] = useWebWalletLogin({
         callbackRoute: "",
-    });        
-    const loginMethodName = useConnectMethod()
+    });
+    const loginMethodName = useConnectMethod();
     useEffect(() => {
         if (!isOpenConnectWalletModal) {
             setIsOpenQR(false);
@@ -80,17 +81,20 @@ function ConnectWalletModal() {
         if (window && loggedIn && isOpenConnectWalletModal) {
             let dataLayer = (window as any).dataLayer || [];
             window.localStorage.setItem("address", dappCore.account.address);
-            window.localStorage.setItem(
-                "method",
-                loginMethodName
-            );
+            window.localStorage.setItem("method", loginMethodName);
             dataLayer.push({
                 event: "success_connect_wallet",
                 address: dappCore.account.address,
-                method: loginMethodName
+                method: loginMethodName,
             });
         }
-    }, [loggedIn, dappCore.account.address, dappCore.loginInfo.loginMethod]);
+    }, [
+        loggedIn,
+        dappCore.account.address,
+        dappCore.loginInfo.loginMethod,
+        isOpenConnectWalletModal,
+        loginMethodName,
+    ]);
     useEffect(() => {
         if (window && !loggedIn && notFirstRender) {
             let dataLayer = (window as any).dataLayer || [];
@@ -103,6 +107,7 @@ function ConnectWalletModal() {
         if (window && !loggedIn) {
             setNotFirstRender(true);
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [loggedIn]);
     return (
         <>
@@ -430,8 +435,12 @@ const WalletConnect = ({
         })();
     }, [walletConnectUri]);
 
-    useEffect(initConnect, [initConnect]);
-    useEffect(buildQrCode, [buildQrCode]);
+    useEffect(() => {
+        initConnect();
+    }, [initConnect]);
+    useEffect(() => {
+        buildQrCode();
+    }, [buildQrCode]);
 
     return (
         <div className="text-white flex flex-col items-center" ref={ref}>

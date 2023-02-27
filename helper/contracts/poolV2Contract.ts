@@ -1,5 +1,5 @@
-import { getAddress } from "@elrondnetwork/dapp-core/utils";
-import { Address, TokenPayment } from "@elrondnetwork/erdjs/out";
+import { getAddress } from "@multiversx/sdk-dapp/utils";
+import { Address, TokenPayment } from "@multiversx/sdk-core/out";
 import poolV2Abi from "assets/abi/pool_v2.abi.json";
 import BigNumber from "bignumber.js";
 import Contract from "./contract";
@@ -13,7 +13,7 @@ class PoolV2Contract extends Contract<typeof poolV2Abi> {
         tokenInIndex: number,
         tokenOutIndex: number,
         tokenAmtIn: BigNumber
-    ): Promise<{fee: BigNumber, outputAmount: BigNumber}> {
+    ): Promise<{ fee: BigNumber; outputAmount: BigNumber }> {
         let interaction = this.contract.methods.estimateAmountOut([
             tokenInIndex,
             tokenOutIndex,
@@ -23,7 +23,7 @@ class PoolV2Contract extends Contract<typeof poolV2Abi> {
         return {
             fee: firstValue?.valueOf(),
             outputAmount: secondValue?.valueOf(),
-        }
+        };
     }
 
     async estimateAddLiquidity(amounts: BigNumber[]): Promise<BigNumber> {
@@ -32,8 +32,14 @@ class PoolV2Contract extends Contract<typeof poolV2Abi> {
         return firstValue?.valueOf();
     }
 
-    async estimateRemoveLiquidityOneCoin(lpAmount: BigNumber, tokenOutIndex: number): Promise<BigNumber> {
-        let interaction = this.contract.methods.estimateRemoveLiquidityOneCoin([lpAmount, tokenOutIndex]);
+    async estimateRemoveLiquidityOneCoin(
+        lpAmount: BigNumber,
+        tokenOutIndex: number
+    ): Promise<BigNumber> {
+        let interaction = this.contract.methods.estimateRemoveLiquidityOneCoin([
+            lpAmount,
+            tokenOutIndex,
+        ]);
         const { firstValue } = await this.runQuery(interaction);
         return firstValue?.valueOf();
     }
@@ -44,24 +50,50 @@ class PoolV2Contract extends Contract<typeof poolV2Abi> {
         return firstValue?.valueOf();
     }
 
-    async addLiquidity(tokenPayments: TokenPayment[], minMintAmount: BigNumber, receiver?: Address) {
+    async addLiquidity(
+        tokenPayments: TokenPayment[],
+        minMintAmount: BigNumber,
+        receiver?: Address
+    ) {
         const address = await getAddress();
-        let interaction = this.contract.methods.addLiquidity([minMintAmount, receiver || new Address(address)]);
-        interaction.withMultiESDTNFTTransfer(tokenPayments, new Address(address)).withGasLimit(35_000_000);
-        return this.interceptInteraction(interaction).check().buildTransaction();
+        let interaction = this.contract.methods.addLiquidity([
+            minMintAmount,
+            receiver || new Address(address),
+        ]);
+        interaction
+            .withMultiESDTNFTTransfer(tokenPayments, new Address(address))
+            .withGasLimit(35_000_000);
+        return this.interceptInteraction(interaction)
+            .check()
+            .buildTransaction();
     }
 
     async exchange(tokenPayment: TokenPayment, mintWeiOut: BigNumber) {
         let interaction = this.contract.methods.exchange([mintWeiOut]);
-        interaction.withSingleESDTTransfer(tokenPayment).withGasLimit(35_000_000);
-        return this.interceptInteraction(interaction).check().buildTransaction();
+        interaction
+            .withSingleESDTTransfer(tokenPayment)
+            .withGasLimit(35_000_000);
+        return this.interceptInteraction(interaction)
+            .check()
+            .buildTransaction();
     }
 
-    async removeLiquidity(tokenPayment: TokenPayment, minAmounts: BigNumber[], receiver?: Address) {
+    async removeLiquidity(
+        tokenPayment: TokenPayment,
+        minAmounts: BigNumber[],
+        receiver?: Address
+    ) {
         const address = await getAddress();
-        let interaction = this.contract.methods.removeLiquidity([minAmounts, receiver || new Address(address)]);
-        interaction.withSingleESDTTransfer(tokenPayment).withGasLimit(12_000_000);
-        return this.interceptInteraction(interaction).check().buildTransaction();
+        let interaction = this.contract.methods.removeLiquidity([
+            minAmounts,
+            receiver || new Address(address),
+        ]);
+        interaction
+            .withSingleESDTTransfer(tokenPayment)
+            .withGasLimit(12_000_000);
+        return this.interceptInteraction(interaction)
+            .check()
+            .buildTransaction();
     }
 }
 

@@ -408,12 +408,12 @@ const TopLabel = () => {
                                             }),
                                         },
                                     }}
-                                >
-                                    <a onClick={close}>
-                                        <span className="text-stake-green-500">
-                                            calculator
-                                        </span>
-                                    </a>
+                                    onClick={close}>
+
+                                    <span className="text-stake-green-500">
+                                        calculator
+                                    </span>
+
                                 </Link>{" "}
                                 or{" "}
                                 <span className="text-stake-green-500">

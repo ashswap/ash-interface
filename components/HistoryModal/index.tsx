@@ -1,9 +1,9 @@
-import { AccountInfoSliceNetworkType } from "@elrondnetwork/dapp-core/types";
+import { AccountInfoSliceNetworkType } from "@multiversx/sdk-dapp/types";
 import IconNewTab from "assets/svg/new-tab.svg";
 import {
     accAddressState,
     accIsLoggedInState,
-    networkConfigState
+    networkConfigState,
 } from "atoms/dappState";
 import BaseModal from "components/BaseModal";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
@@ -83,11 +83,22 @@ const HistoryModal = ({ open, onClose }: Props) => {
                         };
                     case "addLiquidity":
                     case "removeLiquidity":
-                        const msg = ([[token1, record.amount_1], [token2, record.amount_2], [token3, record.amount_3]] as [IESDTInfo, string][]).map(([t, amt]) => {
-                            if(!t || !amt) return '';
-                            const egld = toEGLDD(t.decimals, amt);
-                            return `${formatAmount(egld.toNumber())} ${t.symbol}`;
-                        }).join(', ').replace(/, $/, '');
+                        const msg = (
+                            [
+                                [token1, record.amount_1],
+                                [token2, record.amount_2],
+                                [token3, record.amount_3],
+                            ] as [IESDTInfo, string][]
+                        )
+                            .map(([t, amt]) => {
+                                if (!t || !amt) return "";
+                                const egld = toEGLDD(t.decimals, amt);
+                                return `${formatAmount(egld.toNumber())} ${
+                                    t.symbol
+                                }`;
+                            })
+                            .join(", ")
+                            .replace(/, $/, "");
                         return {
                             msg: `${
                                 action === "addLiquidity" ? "Add" : "Remove"
@@ -131,7 +142,6 @@ const HistoryModal = ({ open, onClose }: Props) => {
             <div className="px-4 font-bold text-2xl mb-5">History</div>
             <div className="grow overflow-auto">
                 <div className="px-4">
-                    
                     {displayTx.slice(0, 50).map((record) => {
                         if (!record) {
                             return null;

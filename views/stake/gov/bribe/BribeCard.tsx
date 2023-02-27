@@ -4,12 +4,14 @@ import ICChevronDown from "assets/svg/chevron-down.svg";
 import ICChevronUp from "assets/svg/chevron-up.svg";
 import ICLock from "assets/svg/lock.svg";
 import {
-    fbClaimableRewardsSelector, fbTotalClaimableUSDSelector,
-    fbTotalRewardsUSD, fbTreasuresSelector
+    fbClaimableRewardsSelector,
+    fbTotalClaimableUSDSelector,
+    fbTotalRewardsUSD,
+    fbTreasuresSelector,
 } from "atoms/farmBribeState";
 import {
     fcAccountFarmSelector,
-    fcFarmSelector
+    fcFarmSelector,
 } from "atoms/farmControllerState";
 import BigNumber from "bignumber.js";
 import Avatar from "components/Avatar";
@@ -127,18 +129,16 @@ function BribeCard({ fbFarm }: Props) {
                                     query: {
                                         farmAddress: fbFarm.address,
                                     },
-                                    hash: "voting"
+                                    hash: "voting",
                                 }}
                                 scroll={false}
                             >
-                                <a>
-                                    <GlowingButton
-                                        theme="pink"
-                                        className="w-full h-14 clip-corner-1 clip-corner-br flex items-center font-bold"
-                                    >
-                                        Vote
-                                    </GlowingButton>
-                                </a>
+                                <GlowingButton
+                                    theme="pink"
+                                    className="w-full h-14 clip-corner-1 clip-corner-br flex items-center font-bold"
+                                >
+                                    Vote
+                                </GlowingButton>
                             </Link>
                         </div>
                         {isExpanded && (

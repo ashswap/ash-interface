@@ -1,4 +1,4 @@
-import { DappProvider } from "@elrondnetwork/dapp-core/wrappers";
+import { DappProvider } from "@multiversx/sdk-dapp/wrappers";
 import ConnectWalletModal from "components/ConnectWalletModal";
 import { customComponents } from "components/DappCoreCustom";
 import { TxCompletedTracker } from "components/DappCoreCustom/TxCompletedTracker";

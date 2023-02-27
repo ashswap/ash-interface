@@ -26,7 +26,6 @@ import {
     useFocus,
     useRole,
     useDismiss,
-    useFocusTrap,
     FloatingPortal,
     arrow,
     autoPlacement,
@@ -37,7 +36,7 @@ import {
     ElementRects,
     detectOverflow,
     hide,
-} from "@floating-ui/react-dom-interactions";
+} from "@floating-ui/react";
 import { Transition } from "@headlessui/react";
 import { theme } from "tailwind.config";
 
@@ -45,8 +44,11 @@ export type BaseTooltipProps = {
     open?: boolean;
     content:
         | JSX.Element
-        | ((args: { size?: Dimensions & ElementRects, close: () => void }) => JSX.Element);
-    children: JSX.Element;
+        | ((args: {
+              size?: Dimensions & ElementRects;
+              close: () => void;
+          }) => JSX.Element);
+    children: React.ReactNode;
     placement?: Placement;
     strategy?: Strategy;
     autoPlacement?: boolean;
@@ -136,7 +138,11 @@ const BaseTooltip = (props: BaseTooltipProps) => {
             arrow({ element: arrowRef }),
             size({
                 apply(args) {
-                    setSizeState(args);
+                    setSizeState({
+                        ...args.rects,
+                        width: args.availableWidth,
+                        height: args.availableHeight,
+                    });
                 },
             }),
             useAutoPlacement
@@ -211,7 +217,10 @@ const BaseTooltip = (props: BaseTooltipProps) => {
                         leaveTo="opacity-0 scale-95"
                     >
                         {typeof content === "function"
-                            ? content({ size: sizeState, close: () => onOpenChange(false) })
+                            ? content({
+                                  size: sizeState,
+                                  close: () => onOpenChange(false),
+                              })
                             : content}
                         <div
                             ref={arrowRef}

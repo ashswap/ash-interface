@@ -1,5 +1,5 @@
-import { useTrackTransactionStatus } from "@elrondnetwork/dapp-core/hooks";
-import { TokenPayment } from "@elrondnetwork/erdjs/out";
+import { useTrackTransactionStatus } from "@multiversx/sdk-dapp/hooks";
+import { TokenPayment } from "@multiversx/sdk-core/out";
 import { accAddressState } from "atoms/dappState";
 import {
     ashRawFarmQuery,
@@ -101,7 +101,9 @@ export const useFarmBoostTransferState = (
                 );
                 const txs = await ContractManager.getFarmContract(
                     farmData.farm.farm_address
-                ).withLastRewardBlockTs(farmData.lastRewardBlockTs).claimRewards(tokenPayments, true);
+                )
+                    .withLastRewardBlockTs(farmData.lastRewardBlockTs)
+                    .claimRewards(tokenPayments, true);
                 const result = await sendTransactions({
                     transactions: txs,
                     transactionsDisplayInfo: {
