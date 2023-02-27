@@ -5,11 +5,11 @@ import {
     NetworkConfigStateType,
     ToastsSliceState,
     TransactionsSliceStateType,
-} from "@elrondnetwork/dapp-core/reduxStore/slices";
+} from "@multiversx/sdk-dapp/reduxStore/slices";
 import {
     LoginMethodsEnum,
     TransactionsDisplayInfoType,
-} from "@elrondnetwork/dapp-core/types";
+} from "@multiversx/sdk-dapp/types";
 import BigNumber from "bignumber.js";
 import { atom, selector } from "recoil";
 
@@ -36,6 +36,7 @@ export const dappCoreState = atom<DappCoreState>({
             publicKey: "",
             walletConnectAccount: null,
             shard: 0,
+            websocketEvent: null
         },
         dappModal: {},
         loginInfo: {
@@ -55,7 +56,7 @@ export const dappCoreState = atom<DappCoreState>({
         toasts: {
             customToasts: [],
             transactionToasts: [],
-            failTransactionToast: {},
+            failTransactionToast: {message: ""},
         },
         transactions: {
             signedTransactions: {},

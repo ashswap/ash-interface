@@ -1,10 +1,11 @@
-import { logout } from "@elrondnetwork/dapp-core/utils";
+import { logout } from "@multiversx/sdk-dapp/utils";
 import ImgAvatar from "assets/images/avatar.png";
-import IconChange from "assets/svg/change.svg";
 import ICChevronUp from "assets/svg/chevron-up.svg";
 import IconCopy from "assets/svg/copy.svg";
 import IconDisconnect from "assets/svg/disconnect.svg";
-import { accAddressState, accInfoState, accIsLoggedInState, dappCoreState } from "atoms/dappState";
+import {
+    accAddressState, accIsLoggedInState
+} from "atoms/dappState";
 import { walletIsOpenConnectModalState } from "atoms/walletState";
 import Avatar from "components/Avatar";
 import BaseModal from "components/BaseModal";
@@ -17,7 +18,7 @@ import {
     SetStateAction,
     useCallback,
     useEffect,
-    useState,
+    useState
 } from "react";
 import { Modifier } from "react-popper";
 import { useRecoilValue, useSetRecoilState } from "recoil";

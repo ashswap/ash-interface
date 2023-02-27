@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from "react";
 import moment from "moment";
-import { logarithmicRest, storage } from "@elrondnetwork/dapp-core/utils";
+import { logarithmicRest, storage } from "@multiversx/sdk-dapp/utils";
 
 interface Props {
     id: string;
@@ -37,7 +37,7 @@ const ToastProgress = ({
             data: toastProgress,
             expires: moment().add(expiresIn, "seconds").unix(),
         });
-    }, [id]);
+    }, [expiresIn, id]);
 
     const saveToSession = useCallback(
         ({ value }: { value: number }) => {
@@ -50,7 +50,7 @@ const ToastProgress = ({
                 expires: moment().add(expiresIn, "seconds").unix(),
             });
         },
-        [id]
+        [expiresIn, id]
     );
 
     const { totalSeconds, currentRemaining } = useMemo(() => {

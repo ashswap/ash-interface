@@ -1,5 +1,5 @@
-import { useGetPendingTransactions } from "@elrondnetwork/dapp-core/hooks";
-import { useSelector } from "@elrondnetwork/dapp-core/reduxStore/DappProviderContext";
+import { useGetPendingTransactions } from "@multiversx/sdk-dapp/hooks";
+import { useSelector } from "@multiversx/sdk-dapp/reduxStore/DappProviderContext";
 import { ashswapBaseState } from "atoms/ashswap";
 import { dappCoreState } from "atoms/dappState";
 import { FARMS } from "const/farms";

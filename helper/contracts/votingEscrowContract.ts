@@ -1,6 +1,6 @@
 import Contract from "./contract";
 import votingEscowAbi from "assets/abi/voting_escrow.abi.json";
-import { TokenPayment } from "@elrondnetwork/erdjs/out";
+import { TokenPayment } from "@multiversx/sdk-core/out";
 import BigNumber from "bignumber.js";
 class VotingEscrowContract extends Contract<typeof votingEscowAbi> {
     constructor(address: string) {
@@ -11,7 +11,7 @@ class VotingEscrowContract extends Contract<typeof votingEscowAbi> {
         let interaction = this.contract.methods.create_lock([unlockTS]);
         interaction
             .withSingleESDTTransfer(tokenPayment)
-            .withGasLimit(100_000_000);// 7m
+            .withGasLimit(100_000_000); // 7m
         return this.interceptInteraction(interaction)
             .check()
             .buildTransaction();
@@ -21,7 +21,7 @@ class VotingEscrowContract extends Contract<typeof votingEscowAbi> {
         let interaction = this.contract.methods.increase_amount([]);
         interaction
             .withSingleESDTTransfer(tokenPayment)
-            .withGasLimit(100_000_000);//7m
+            .withGasLimit(100_000_000); //7m
         return this.interceptInteraction(interaction)
             .check()
             .buildTransaction();
@@ -31,7 +31,7 @@ class VotingEscrowContract extends Contract<typeof votingEscowAbi> {
         let interaction = this.contract.methods.increase_unlock_time([
             unlockTS,
         ]);
-        interaction.withGasLimit(100_000_000);//7m
+        interaction.withGasLimit(100_000_000); //7m
         return this.interceptInteraction(interaction)
             .check()
             .buildTransaction();
@@ -39,7 +39,7 @@ class VotingEscrowContract extends Contract<typeof votingEscowAbi> {
 
     async withdraw() {
         let interaction = this.contract.methods.withdraw([]);
-        interaction.withGasLimit(100_000_000);//7m
+        interaction.withGasLimit(100_000_000); //7m
         return this.interceptInteraction(interaction)
             .check()
             .buildTransaction();

@@ -1,4 +1,4 @@
-import { Transaction, TokenPayment } from "@elrondnetwork/erdjs/out";
+import { Transaction, TokenPayment } from "@multiversx/sdk-core/out";
 import {
     farmLoadingMapState,
     farmRecordsState,
@@ -43,7 +43,9 @@ const useFarmClaimAll = (trackStatus = false) => {
                         );
                         const temp = await ContractManager.getFarmContract(
                             val.farm.farm_address
-                        ).withLastRewardBlockTs(val.lastRewardBlockTs).claimRewards(tokenPayments, false);
+                        )
+                            .withLastRewardBlockTs(val.lastRewardBlockTs)
+                            .claimRewards(tokenPayments, false);
                         txs = [...txs, ...temp];
                         totalASH = totalASH.plus(val.stakedData.totalRewardAmt);
                         farmsAddress.push(val.farm.farm_address);

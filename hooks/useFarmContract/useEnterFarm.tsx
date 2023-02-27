@@ -1,4 +1,4 @@
-import { TokenPayment } from "@elrondnetwork/erdjs/out";
+import { TokenPayment } from "@multiversx/sdk-core/out";
 import { accAddressState, accIsLoggedInState } from "atoms/dappState";
 import { farmQuery, farmSessionIdMapState } from "atoms/farmsState";
 import BigNumber from "bignumber.js";

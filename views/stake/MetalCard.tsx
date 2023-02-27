@@ -1,5 +1,6 @@
 import React from "react";
 import ImgMetalCardBg from "assets/images/metal-card-bg.png";
+import { StaticImageData } from "next/image";
 
 function MetalCard({
     children,

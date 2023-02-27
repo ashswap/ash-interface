@@ -74,7 +74,7 @@ function VotePowerChart() {
         return displayChartData.map(({ timestamp }) => timestamp);
     }, [displayChartData]);
     // Xaxis formatter
-    const tickFormatter = useCallback((val, index: number) => {
+    const tickFormatter = useCallback((val: number, index: number) => {
         const time = moment.unix(val);
         return time.format("MMM, YYYY");
     }, []);

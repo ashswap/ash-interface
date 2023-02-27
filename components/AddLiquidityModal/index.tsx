@@ -70,11 +70,11 @@ const TokenInput = ({
     );
     const [deboundValue] = useDebounce(value, 500);
     useEffect(() => {
-        if (window && value) {
+        if (window && deboundValue) {
             let dataLayer = (window as any).dataLayer || [];
             dataLayer.push({
                 event: "input_liquidity_value",
-                amount: value,
+                amount: deboundValue,
                 token: token.identifier,
             });
         }
@@ -125,7 +125,7 @@ const TokenInput = ({
                     {isInsufficentFund && (
                         <span>
                             Insufficient fund -{" "}
-                            <Link href="/swap" passHref>
+                            <Link href="/swap">
                                 <span className="text-insufficent-fund select-none cursor-pointer">
                                     Swap for more tokens!
                                 </span>

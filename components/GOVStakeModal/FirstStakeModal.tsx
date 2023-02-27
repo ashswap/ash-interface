@@ -112,7 +112,7 @@ const FirstStakeContent = ({ open, onClose }: props) => {
                 amount: deboundRawLockAmt,
             });
         }
-    }, [deboundRawLockAmt]);
+    }, [deboundRawLockAmt, loggedIn]);
     const [onboardingStakeGov, setOnboardedStakeGov] =
         useOnboarding("stake_gov_1st");
     const [openOnboardStakeTooltip, setOpenOnboardTooltip] = useState(false);
@@ -312,21 +312,21 @@ const FirstStakeContent = ({ open, onClose }: props) => {
                                         className="ash-slider ash-slider-pink my-0"
                                         step={LOCK_CONFIG.sliderStep}
                                         marks={{
-                                            [LOCK_CONFIG.minLock]: "",
+                                            [LOCK_CONFIG.minLock]: <></>,
                                             [(LOCK_CONFIG.maxLock -
                                                 LOCK_CONFIG.minLock) /
                                                 4 +
-                                            LOCK_CONFIG.minLock]: "",
+                                            LOCK_CONFIG.minLock]: <></>,
                                             [(LOCK_CONFIG.maxLock -
                                                 LOCK_CONFIG.minLock) /
                                                 2 +
-                                            LOCK_CONFIG.minLock]: "",
+                                            LOCK_CONFIG.minLock]: <></>,
                                             [((LOCK_CONFIG.maxLock -
                                                 LOCK_CONFIG.minLock) *
                                                 3) /
                                                 4 +
-                                            LOCK_CONFIG.minLock]: "",
-                                            [LOCK_CONFIG.maxLock]: "",
+                                            LOCK_CONFIG.minLock]: <></>,
+                                            [LOCK_CONFIG.maxLock]: <></>,
                                         }}
                                         handleStyle={{
                                             backgroundColor:

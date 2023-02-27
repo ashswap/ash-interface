@@ -1,8 +1,6 @@
-import { getAddress } from "@elrondnetwork/dapp-core/utils";
-import { Address, TokenPayment } from "@elrondnetwork/erdjs/out";
+import { Address, TokenPayment } from "@multiversx/sdk-core/out";
+import { getAddress } from "@multiversx/sdk-dapp/utils";
 import farmBribeAbi from "assets/abi/farm_bribe.abi.json";
-import { WEEK } from "const/ve";
-import moment from "moment";
 import Contract from "./contract";
 
 class FarmBribeContract extends Contract<typeof farmBribeAbi> {
@@ -16,12 +14,18 @@ class FarmBribeContract extends Contract<typeof farmBribeAbi> {
             .addRewardAmount([farmAddress])
             .withMultiESDTNFTTransfer(tokenPayments, new Address(sender))
             .withGasLimit(50_000_000 + tokenPayments.length * 2_000_000);
-        return this.interceptInteraction(interaction).check().buildTransaction();
+        return this.interceptInteraction(interaction)
+            .check()
+            .buildTransaction();
     }
 
-    async claimReward(farmAddress: Address, tokenId: string){
-        const interaction = this.contract.methods.claimReward([farmAddress, tokenId]).withGasLimit(50_000_000);
-        return this.interceptInteraction(interaction).check().buildTransaction();
+    async claimReward(farmAddress: Address, tokenId: string) {
+        const interaction = this.contract.methods
+            .claimReward([farmAddress, tokenId])
+            .withGasLimit(50_000_000);
+        return this.interceptInteraction(interaction)
+            .check()
+            .buildTransaction();
     }
 }
 

@@ -1,4 +1,4 @@
-import { AccountInfoSliceNetworkType } from "@elrondnetwork/dapp-core/types";
+import { AccountInfoSliceNetworkType } from "@multiversx/sdk-dapp/types";
 import ICArrowRight from "assets/svg/arrow-right.svg";
 import ICCopy from "assets/svg/copy.svg";
 import ICNewTabRound from "assets/svg/new-tab-round.svg";
@@ -61,7 +61,8 @@ function FarmDetailPage({ pool }: Props) {
         useRecoilValue(networkConfigState).network;
     const fees = useMemo(() => {
         return new BigNumber(stats?.tvl || 0)
-            .multipliedBy(stats?.apr || 0).div(365)
+            .multipliedBy(stats?.apr || 0)
+            .div(365)
             .div(100);
     }, [stats]);
     return (
@@ -69,17 +70,13 @@ function FarmDetailPage({ pool }: Props) {
             <ul className="flex space-x-1 text-xs mb-6">
                 <li>
                     <Link href="/info">
-                        <a>
-                            <span className="text-white">Dashboard</span>
-                        </a>
+                        <span className="text-white">Dashboard</span>
                     </Link>
                 </li>
                 <li>
                     <ICArrowRight className="inline mr-1 text-ash-gray-500" />
                     <Link href="/info/pools">
-                        <a>
-                            <span className="text-white">Pools</span>
-                        </a>
+                        <span className="text-white">Pools</span>
                     </Link>
                 </li>
                 <li>
@@ -139,22 +136,16 @@ function FarmDetailPage({ pool }: Props) {
             </div>
             <div className="flex space-x-2 text-xs md:text-sm mb-4 lg:mb-18">
                 <Link href={`/swap`}>
-                    <a>
-                        <div className="flex items-center justify-center bg-pink-600 w-8 h-8 md:w-auto md:h-10 text-white md:px-4">
-                            <ICSwap className="w-4 h-4 md:w-5 md:h-5" />
-                            <span className="hidden md:block ml-2">Swap</span>
-                        </div>
-                    </a>
+                    <div className="flex items-center justify-center bg-pink-600 w-8 h-8 md:w-auto md:h-10 text-white md:px-4">
+                        <ICSwap className="w-4 h-4 md:w-5 md:h-5" />
+                        <span className="hidden md:block ml-2">Swap</span>
+                    </div>
                 </Link>
                 <Link href={`/pool`}>
-                    <a>
-                        <div className="flex items-center justify-center bg-pink-600/20 w-8 h-8 md:w-auto md:h-10 text-pink-600 md:px-4">
-                            <ICPlus className="w-3 h-3" />
-                            <span className="hidden md:block ml-2">
-                                Deposit
-                            </span>
-                        </div>
-                    </a>
+                    <div className="flex items-center justify-center bg-pink-600/20 w-8 h-8 md:w-auto md:h-10 text-pink-600 md:px-4">
+                        <ICPlus className="w-3 h-3" />
+                        <span className="hidden md:block ml-2">Deposit</span>
+                    </div>
                 </Link>
                 <a
                     href={`${network.explorerAddress}/accounts/${pool.address}`}

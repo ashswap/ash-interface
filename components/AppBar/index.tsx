@@ -15,7 +15,7 @@ const AppBar = () => {
     return (
         <>
             <div className="flex justify-between items-center px-6 sm:px-12 py-5 relative z-20">
-                <Link href="/" passHref>
+                <Link href="/">
                     <div className="cursor-pointer">
                         <span className="hidden lg:inline-block">
                             <Image
@@ -43,7 +43,7 @@ const AppBar = () => {
                 <div className="flex items-center">
                     {ENVIRONMENT.ENABLE_ASHPOINT && (
                         <div className="mr-6 bg-ash-dark-600 relative">
-                            <Link href="/ashpoint" passHref>
+                            <Link href="/ashpoint">
                                 <div
                                     className={`h-10 flex items-center transition px-3 cursor-pointer`}
                                 >

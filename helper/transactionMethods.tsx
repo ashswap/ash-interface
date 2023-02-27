@@ -1,20 +1,20 @@
-import { sendTransactions as _sendTxs } from "@elrondnetwork/dapp-core/services";
+import { sendTransactions as _sendTxs } from "@multiversx/sdk-dapp/services";
 import {
     AccountInfoSliceNetworkType,
-    LoginMethodsEnum
-} from "@elrondnetwork/dapp-core/types";
-import { getAccountProviderType, getAddress } from "@elrondnetwork/dapp-core/utils";
-import { ExtensionProvider } from "@elrondnetwork/erdjs-extension-provider/out";
+    LoginMethodsEnum,
+} from "@multiversx/sdk-dapp/types";
+import { getAccountProviderType, getAddress } from "@multiversx/sdk-dapp/utils";
+import { ExtensionProvider } from "@multiversx/sdk-extension-provider/out";
 import {
     Address,
     CallArguments,
     SmartContract,
-    Transaction
-} from "@elrondnetwork/erdjs/out";
+    Transaction,
+} from "@multiversx/sdk-core/out";
 import {
     accAddressState,
     accIsLoggedInState,
-    networkConfigState
+    networkConfigState,
 } from "atoms/dappState";
 import { gasLimitBuffer, gasPrice, maxGasLimit } from "const/dappConfig";
 import { DappSendTransactionsPropsType } from "interface/dappCore";
@@ -67,8 +67,15 @@ export const sendTransactions = async (
         await ExtensionProvider.getInstance()?.cancelAction?.();
     }
 
-    const txs = Array.isArray(payload.transactions) ? payload.transactions : [payload.transactions];
-    payload.transactions = txs.map(tx => Transaction.fromPlainObject({...tx.toPlainObject(), sender: accAddress}))
-    
+    const txs = Array.isArray(payload.transactions)
+        ? payload.transactions
+        : [payload.transactions];
+    payload.transactions = txs.map((tx) =>
+        Transaction.fromPlainObject({
+            ...tx.toPlainObject(),
+            sender: accAddress,
+        })
+    );
+
     return await _sendTxs(payload);
 };

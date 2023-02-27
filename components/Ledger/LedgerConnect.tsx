@@ -30,7 +30,7 @@ export const LedgerConnect = ({
                         </h4>
 
                         <p className="font-bold text-xs md:text-base">
-                            Unlock your device &amp; open the Elrond App.
+                            Unlock your device &amp; open the MultiversX App.
                         </p>
                     </>
                 )}
