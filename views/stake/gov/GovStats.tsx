@@ -8,15 +8,15 @@ import ICUnlock from "assets/svg/unlock.svg";
 import ICWallet from "assets/svg/wallet.svg";
 import { accIsLoggedInState } from "atoms/dappState";
 import {
-    govLockedAmtState,
-    govRewardLPAmtState,
-    govRewardLPTokenState,
-    govRewardLPValueState,
-    govTotalLockedAmtState,
-    govTotalLockedPctState,
-    govTotalSupplyVeASH,
-    govUnlockTSState,
-    govVeASHAmtState,
+    govLockedAmtSelector,
+    govRewardLPAmtSelector,
+    govRewardLPTokenSelector,
+    govRewardLPValueSelector,
+    govTotalLockedAmtSelector,
+    govTotalLockedPctSelector,
+    govTotalSupplyVeASHSelector,
+    govUnlockTSSelector,
+    govVeASHAmtSelector,
 } from "atoms/govState";
 import { tokenMapState } from "atoms/tokensState";
 import Avatar from "components/Avatar";
@@ -65,15 +65,15 @@ const ExpiredLockTooltip = ({
     );
 };
 function GovStats() {
-    const lockedAmt = useRecoilValue(govLockedAmtState);
-    const veASH = useRecoilValue(govVeASHAmtState);
-    const unlockTS = useRecoilValue(govUnlockTSState);
-    const totalSupplyVeASH = useRecoilValue(govTotalSupplyVeASH);
-    const totalLockedAmt = useRecoilValue(govTotalLockedAmtState);
-    const rewardLPAmt = useRecoilValue(govRewardLPAmtState);
-    const rewardLPToken = useRecoilValue(govRewardLPTokenState);
-    const rewardTokenAmount = useRecoilValue(govRewardLPValueState);
-    const totalLockedPct = useRecoilValue(govTotalLockedPctState);
+    const lockedAmt = useRecoilValue(govLockedAmtSelector);
+    const veASH = useRecoilValue(govVeASHAmtSelector);
+    const unlockTS = useRecoilValue(govUnlockTSSelector);
+    const totalSupplyVeASH = useRecoilValue(govTotalSupplyVeASHSelector);
+    const totalLockedAmt = useRecoilValue(govTotalLockedAmtSelector);
+    const rewardLPAmt = useRecoilValue(govRewardLPAmtSelector);
+    const rewardLPToken = useRecoilValue(govRewardLPTokenSelector);
+    const rewardTokenAmount = useRecoilValue(govRewardLPValueSelector);
+    const totalLockedPct = useRecoilValue(govTotalLockedPctSelector);
 
     const { data: adminFee24h } = useSWR<number>(
         `${ASHSWAP_CONFIG.ashApiBaseUrl}/stake/governance/admin-fee`,
@@ -125,474 +125,472 @@ function GovStats() {
             unlockTS.minus(moment().unix()).lte(0)
         );
     }, [unlockTS, lockedAmt]);
-    return <>
-        <div className="mb-7">
-            <h1 className="text-pink-600 text-2xl md:text-5xl font-bold mb-7 md:mb-11">
-                Governance Stake
-            </h1>
-            <GovMenu />
-        </div>
-        <div className="flex flex-col md:flex-row">
-            <div className="md:w-[21.875rem] shrink-0 flex flex-col px-7 lg:px-9 pb-9 pt-7 lg:pt-14 bg-stake-dark-400 mb-4 md:mb-0 md:mr-4 lg:mr-[1.875rem]">
-                <h2 className="text-lg md:text-2xl mb-11 md:mb-11 font-bold text-white">
-                    Your staked
-                </h2>
-                <div className="flex flex-col space-y-6">
-                    <div className="bg-ash-dark-400/30 px-[1.25rem] pt-7 pb-5">
-                        <div className="px-5 mb-7">
-                            <CardTooltip
-                                content={
-                                    <>
-                                        <div>
-                                            By staking ASH to holding veASH,
-                                            you’ll earn bounties from
-                                            trading fees in ASHSWAP DEX. The
-                                            reward will return to the user
-                                            as LP-Tokens.
+    return (
+        <>
+            <div className="mb-7">
+                <h1 className="text-pink-600 text-2xl md:text-5xl font-bold mb-7 md:mb-11">
+                    Governance Stake
+                </h1>
+                <GovMenu />
+            </div>
+            <div className="flex flex-col md:flex-row">
+                <div className="md:w-[21.875rem] shrink-0 flex flex-col px-7 lg:px-9 pb-9 pt-7 lg:pt-14 bg-stake-dark-400 mb-4 md:mb-0 md:mr-4 lg:mr-[1.875rem]">
+                    <h2 className="text-lg md:text-2xl mb-11 md:mb-11 font-bold text-white">
+                        Your staked
+                    </h2>
+                    <div className="flex flex-col space-y-6">
+                        <div className="bg-ash-dark-400/30 px-[1.25rem] pt-7 pb-5">
+                            <div className="px-5 mb-7">
+                                <CardTooltip
+                                    content={
+                                        <>
+                                            <div>
+                                                By staking ASH to holding veASH,
+                                                you’ll earn bounties from
+                                                trading fees in ASHSWAP DEX. The
+                                                reward will return to the user
+                                                as LP-Tokens.
+                                            </div>
+                                        </>
+                                    }
+                                >
+                                    <div className="inline-block text-stake-gray-500 text-sm font-bold underline uppercase mb-7">
+                                        your reward
+                                    </div>
+                                </CardTooltip>
+                                <div className="flex items-center">
+                                    {rewardLPToken && (
+                                        <div className="flex items-center mr-2">
+                                            {rewardLPToken.tokens.map((_t) => {
+                                                const t = getTokenFromId(
+                                                    _t.identifier
+                                                );
+                                                return (
+                                                    <Avatar
+                                                        key={t.identifier}
+                                                        src={t.logoURI}
+                                                        alt={t.symbol}
+                                                        className="w-[1.125rem] h-[1.125rem] -ml-1 first:ml-0"
+                                                    />
+                                                );
+                                            })}
                                         </div>
-                                    </>
+                                    )}
+                                    <div className="text-lg">
+                                        <span className="text-ash-gray-500">
+                                            $
+                                        </span>
+                                        <span className="text-white font-bold">
+                                            <TextAmt
+                                                number={rewardTokenAmount.toFixed(
+                                                    0
+                                                )}
+                                                decimalClassName="text-stake-gray-500"
+                                            />
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <GlowingButton
+                                theme="cyan"
+                                className={`text-sm font-bold w-full h-[3.375rem]`}
+                                disabled={!canClaim}
+                                onClick={() =>
+                                    canClaim &&
+                                    claimReward().then(
+                                        ({ sessionId }) =>
+                                            sessionId && setHarvestId(sessionId)
+                                    )
                                 }
                             >
-                                <div className="inline-block text-stake-gray-500 text-sm font-bold underline uppercase mb-7">
-                                    your reward
-                                </div>
-                            </CardTooltip>
-                            <div className="flex items-center">
-                                {rewardLPToken && (
-                                    <div className="flex items-center mr-2">
-                                        {rewardLPToken.tokens.map((_t) => {
-                                            const t = getTokenFromId(
-                                                _t.identifier
-                                            );
-                                            return (
-                                                <Avatar
-                                                    key={t.identifier}
-                                                    src={t.logoURI}
-                                                    alt={t.symbol}
-                                                    className="w-[1.125rem] h-[1.125rem] -ml-1 first:ml-0"
-                                                />
-                                            );
-                                        })}
+                                Harvest
+                            </GlowingButton>
+                        </div>
+                        <div className="bg-ash-dark-400/30 px-[1.25rem] pt-7 pb-5">
+                            <div className="px-5 mb-7">
+                                <CardTooltip
+                                    content={
+                                        <div>
+                                            Total ASH that you’ve staked. You
+                                            cannot claim back until the lock
+                                            period ends.
+                                        </div>
+                                    }
+                                >
+                                    <div className="inline-block text-stake-gray-500 text-sm font-bold underline uppercase mb-7">
+                                        your staked ash
                                     </div>
-                                )}
-                                <div className="text-lg">
-                                    <span className="text-ash-gray-500">
-                                        $
-                                    </span>
-                                    <span className="text-white font-bold">
+                                </CardTooltip>
+                                <div className="flex items-center">
+                                    {/* <div className="w-[1.125rem] h-[1.125rem] mr-2">
+                                    <Image src={ImgUsdt} alt="token icon" />
+                                </div> */}
+                                    <Avatar
+                                        src={ASH_TOKEN.logoURI}
+                                        alt={ASH_TOKEN.symbol}
+                                        className="w-[1.125rem] h-[1.125rem] mr-2"
+                                    />
+                                    <div className="text-lg text-white font-bold">
                                         <TextAmt
-                                            number={rewardTokenAmount.toFixed(
-                                                0
+                                            number={toEGLDD(
+                                                ASH_TOKEN.decimals,
+                                                lockedAmt
                                             )}
                                             decimalClassName="text-stake-gray-500"
                                         />
+                                    </div>
+                                </div>
+                            </div>
+                            {canUnlockASH ? (
+                                <GlowingButton
+                                    theme="yellow"
+                                    className="text-sm font-bold w-full h-[3.375rem]"
+                                    onClick={() => unlockASH()}
+                                >
+                                    <ICUnlock className="w-6 h-6 mr-2" />
+                                    <span>Withdraw</span>
+                                </GlowingButton>
+                            ) : (
+                                <button
+                                    className="bg-ash-dark-400 text-stake-gray-500 text-sm font-bold w-full h-[3.375rem] flex items-center justify-center cursor-not-allowed"
+                                    disabled={true}
+                                >
+                                    <ICLock className="w-6 h-6 mr-2" />
+                                    <span>
+                                        {lockedAmt.gt(0)
+                                            ? moment
+                                                  .unix(unlockTS.toNumber())
+                                                  .format("DD MMM, yyyy")
+                                            : "Lock period"}
                                     </span>
+                                </button>
+                            )}
+                        </div>
+                        <div className="bg-ash-dark-400/30 px-[1.25rem] pt-7 pb-5">
+                            <div className="px-5 mb-7">
+                                <CardTooltip
+                                    content={
+                                        <div>
+                                            Voting-Escrow ASH. A type of token
+                                            that you’ll receive after staking
+                                            your ASH, veASH will reduce
+                                            day-by-day till the lock period
+                                            ends. You can extend your lock
+                                            period to recover your veASH.
+                                        </div>
+                                    }
+                                >
+                                    <div className="inline-block text-stake-gray-500 text-sm font-bold underline mb-7">
+                                        YOUR veASH
+                                    </div>
+                                </CardTooltip>
+
+                                <div className="flex items-center">
+                                    {/* <div className="w-[1.125rem] h-[1.125rem] mr-2">
+                                    <Image src={ImgUsdt} alt="token icon" />
+                                </div> */}
+                                    <Avatar
+                                        src={ImgVEASH}
+                                        alt="veASH"
+                                        className="w-[1.125rem] h-[1.125rem] mr-2"
+                                    />
+                                    <div className="text-lg text-white font-bold">
+                                        <TextAmt
+                                            number={toEGLDD(
+                                                VE_ASH_DECIMALS,
+                                                veASH
+                                            )}
+                                            decimalClassName="text-stake-gray-500"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="flex space-x-2">
+                                <div className="bg-ash-dark-400 text-stake-gray-500 px-3 py-2 w-7/12 h-[3.375rem] overflow-hidden">
+                                    <div className="flex items-center mb-2">
+                                        <ICLock className="w-3 h-3 mr-1" />
+                                        <CardTooltip
+                                            content={
+                                                <div>
+                                                    Your lock period. When this
+                                                    period ends, you can claim
+                                                    back your staked ASH.
+                                                </div>
+                                            }
+                                        >
+                                            <span className="text-2xs font-bold underline">
+                                                Lock
+                                            </span>
+                                        </CardTooltip>
+                                    </div>
+                                    <div className="text-xs font-bold">
+                                        {lockedAmt.gt(0)
+                                            ? moment
+                                                  .unix(unlockTS.toNumber())
+                                                  .format("DD MMM, yyyy")
+                                            : "_"}
+                                    </div>
+                                </div>
+                                <div className="bg-ash-dark-400 text-stake-gray-500 px-3 py-2 w-5/12 h-[3.375rem] overflow-hidden">
+                                    <div className="flex items-center mb-2">
+                                        <ICCapacity className="w-3 h-3 mr-1" />
+                                        <CardTooltip
+                                            content={
+                                                <div>
+                                                    Percentage of your veASH to
+                                                    the total veASH in ASHSWAP
+                                                    Governance Stake. It depends
+                                                    on the reward that you’ll
+                                                    receive.
+                                                </div>
+                                            }
+                                        >
+                                            <span className="text-2xs font-bold underline">
+                                                Capacity
+                                            </span>
+                                        </CardTooltip>
+                                    </div>
+                                    <div className="text-xs font-bold">
+                                        {capacityPct}%
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <GlowingButton
-                            theme="cyan"
-                            className={`text-sm font-bold w-full h-[3.375rem]`}
-                            disabled={!canClaim}
-                            onClick={() =>
-                                canClaim &&
-                                claimReward().then(
-                                    ({ sessionId }) =>
-                                        sessionId && setHarvestId(sessionId)
-                                )
-                            }
-                        >
-                            Harvest
-                        </GlowingButton>
                     </div>
-                    <div className="bg-ash-dark-400/30 px-[1.25rem] pt-7 pb-5">
-                        <div className="px-5 mb-7">
-                            <CardTooltip
-                                content={
-                                    <div>
-                                        Total ASH that you’ve staked. You
-                                        cannot claim back until the lock
-                                        period ends.
-                                    </div>
-                                }
+                    {mounted &&
+                        (loggedIn ? (
+                            <ExpiredLockTooltip disabled={!canUnlockASH}>
+                                <span>
+                                    <GlowingButton
+                                        theme="pink"
+                                        className={`text-sm md:text-lg font-bold w-full h-14 md:h-[4.5rem] mt-3`}
+                                        disabled={canUnlockASH}
+                                        onClick={() =>
+                                            !canUnlockASH &&
+                                            setOpenStakeGov(true)
+                                        }
+                                    >
+                                        Add / Manage Stake
+                                    </GlowingButton>
+                                </span>
+                            </ExpiredLockTooltip>
+                        ) : (
+                            <button
+                                className="bg-pink-600 text-white text-sm md:text-lg font-bold w-full h-14 md:h-[4.5rem] flex items-center justify-center mt-3"
+                                onClick={() => connectWallet()}
                             >
-                                <div className="inline-block text-stake-gray-500 text-sm font-bold underline uppercase mb-7">
-                                    your staked ash
-                                </div>
-                            </CardTooltip>
+                                <ICWallet className="mr-2" />
+                                <span>Connect wallet</span>
+                            </button>
+                        ))}
+                </div>
+                <div className="grow px-7 lg:px-16 pt-7 lg:pt-14 pb-9 bg-stake-dark-400">
+                    <h2 className="text-lg md:text-2xl mb-10 md:mb-11 font-bold text-white">
+                        Overall stats
+                    </h2>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 lg:gap-x-7.5 gap-y-1 sm:gap-y-4 lg:gap-y-6 mb-16">
+                        <div className="bg-ash-dark-400/30 px-[2.375rem] py-7 flex flex-col justify-between">
+                            <div className="text-stake-gray-500 text-sm font-bold mb-6 sm:mb-2 leading-tight">
+                                APR
+                            </div>
+                            <div className="text-pink-600 text-lg font-bold leading-tight">
+                                {formatAmount(apr, { notation: "standard" })}%
+                            </div>
+                        </div>
+                        <div className="bg-ash-dark-400/30 px-[2.375rem] py-7 flex flex-col justify-between">
+                            <div className="text-stake-gray-500 text-sm font-bold mb-6 sm:mb-2 uppercase leading-tight">
+                                PERCENTAGE of total ASH Locked
+                            </div>
+                            <div className="text-white text-lg font-bold leading-tight">
+                                {formatAmount(totalLockedPct)}%
+                            </div>
+                        </div>
+                        <div className="bg-ash-dark-400/30 px-[2.375rem] py-7 flex flex-col justify-between">
+                            <div className="text-stake-gray-500 text-sm font-bold mb-6">
+                                TOTAL STAKED ASH
+                            </div>
                             <div className="flex items-center">
                                 {/* <div className="w-[1.125rem] h-[1.125rem] mr-2">
-                                    <Image src={ImgUsdt} alt="token icon" />
-                                </div> */}
+                                <Image src={ImgUsdt} alt="token icon" />
+                            </div> */}
                                 <Avatar
                                     src={ASH_TOKEN.logoURI}
                                     alt={ASH_TOKEN.symbol}
                                     className="w-[1.125rem] h-[1.125rem] mr-2"
                                 />
-                                <div className="text-lg text-white font-bold">
+                                <div className="text-white text-lg font-bold">
                                     <TextAmt
                                         number={toEGLDD(
                                             ASH_TOKEN.decimals,
-                                            lockedAmt
+                                            totalLockedAmt
                                         )}
+                                        options={{ notation: "standard" }}
                                         decimalClassName="text-stake-gray-500"
                                     />
                                 </div>
                             </div>
                         </div>
-                        {canUnlockASH ? (
-                            <GlowingButton
-                                theme="yellow"
-                                className="text-sm font-bold w-full h-[3.375rem]"
-                                onClick={() => unlockASH()}
-                            >
-                                <ICUnlock className="w-6 h-6 mr-2" />
-                                <span>Withdraw</span>
-                            </GlowingButton>
-                        ) : (
-                            <button
-                                className="bg-ash-dark-400 text-stake-gray-500 text-sm font-bold w-full h-[3.375rem] flex items-center justify-center cursor-not-allowed"
-                                disabled={true}
-                            >
-                                <ICLock className="w-6 h-6 mr-2" />
-                                <span>
-                                    {lockedAmt.gt(0)
-                                        ? moment
-                                              .unix(unlockTS.toNumber())
-                                              .format("DD MMM, yyyy")
-                                        : "Lock period"}
-                                </span>
-                            </button>
-                        )}
-                    </div>
-                    <div className="bg-ash-dark-400/30 px-[1.25rem] pt-7 pb-5">
-                        <div className="px-5 mb-7">
-                            <CardTooltip
-                                content={
-                                    <div>
-                                        Voting-Escrow ASH. A type of token
-                                        that you’ll receive after staking
-                                        your ASH, veASH will reduce
-                                        day-by-day till the lock period
-                                        ends. You can extend your lock
-                                        period to recover your veASH.
-                                    </div>
-                                }
-                            >
-                                <div className="inline-block text-stake-gray-500 text-sm font-bold underline mb-7">
-                                    YOUR veASH
-                                </div>
-                            </CardTooltip>
-
+                        <div className="bg-ash-dark-400/30 px-[2.375rem] py-7 flex flex-col justify-between">
+                            <div className="text-stake-gray-500 text-sm font-bold mb-6">
+                                TOTAL veASH
+                            </div>
                             <div className="flex items-center">
                                 {/* <div className="w-[1.125rem] h-[1.125rem] mr-2">
-                                    <Image src={ImgUsdt} alt="token icon" />
-                                </div> */}
+                                <Image src={ImgUsdt} alt="token icon" />
+                            </div> */}
                                 <Avatar
                                     src={ImgVEASH}
                                     alt="veASH"
                                     className="w-[1.125rem] h-[1.125rem] mr-2"
                                 />
-                                <div className="text-lg text-white font-bold">
+                                <div className="text-white text-lg font-bold">
                                     <TextAmt
                                         number={toEGLDD(
                                             VE_ASH_DECIMALS,
-                                            veASH
+                                            totalSupplyVeASH
                                         )}
+                                        options={{ notation: "standard" }}
                                         decimalClassName="text-stake-gray-500"
                                     />
                                 </div>
                             </div>
                         </div>
-                        <div className="flex space-x-2">
-                            <div className="bg-ash-dark-400 text-stake-gray-500 px-3 py-2 w-7/12 h-[3.375rem] overflow-hidden">
-                                <div className="flex items-center mb-2">
-                                    <ICLock className="w-3 h-3 mr-1" />
-                                    <CardTooltip
-                                        content={
-                                            <div>
-                                                Your lock period. When this
-                                                period ends, you can claim
-                                                back your staked ASH.
-                                            </div>
-                                        }
+                    </div>
+                    <div className="mb-16">
+                        <div className="text-stake-gray-500 text-sm font-bold mb-4">
+                            TIPS
+                        </div>
+                        <div className="text-xs lg:text-sm mb-9">
+                            Stake ASH to receive veASH. You can both earn from
+                            transaction fee & have a power for voting!
+                        </div>
+                        <ul>
+                            {VE_LOCK_LABEL.map((lock) => {
+                                return (
+                                    <li
+                                        key={lock.amt}
+                                        className="text-sm font-bold"
                                     >
-                                        <span className="text-2xs font-bold underline">
-                                            Lock
-                                        </span>
-                                    </CardTooltip>
+                                        <span className="text-stake-green-500">
+                                            1
+                                        </span>{" "}
+                                        ASH locked for{" "}
+                                        <span className="text-stake-green-500">
+                                            {lock.label}
+                                        </span>{" "}
+                                        ={" "}
+                                        <span className="text-stake-green-500">
+                                            {lock.amt}
+                                        </span>{" "}
+                                        veASH
+                                    </li>
+                                );
+                            })}
+                        </ul>
+                    </div>
+                    <div>
+                        <div className="text-whtie text-sm font-bold mb-5">
+                            IMPORTANT NOTE
+                        </div>
+                        <div className="text-xs lg:text-sm mb-6">
+                            Your veASH weight gradually decreases as your
+                            escrowed tokens approach their lock expiry.
+                        </div>
+                        <div className="bg-ash-dark-400/30">
+                            <button
+                                className="w-full h-14 lg:h-[4.25rem] px-4 lg:px-[2.375rem] flex items-center justify-between text-pink-600"
+                                onClick={() => setIsQAExpand((val) => !val)}
+                            >
+                                <div className="line-clamp-2 text-xs lg:text-sm font-bold grow text-left mr-4">
+                                    Does it mean user will lose money everyday?
                                 </div>
-                                <div className="text-xs font-bold">
-                                    {lockedAmt.gt(0)
-                                        ? moment
-                                              .unix(unlockTS.toNumber())
-                                              .format("DD MMM, yyyy")
-                                        : "_"}
+                                {isQAExpand ? (
+                                    <ICChevronUp className="w-3 h-auto" />
+                                ) : (
+                                    <ICChevronDown className="w-3 h-auto" />
+                                )}
+                            </button>
+                            {isQAExpand && (
+                                <div className="-mt-1 pb-8 px-4 lg:px-[2.375rem] text-2xs">
+                                    <div className="mb-4">
+                                        Of course not, when your veASH decreases
+                                        to 0. It also means that the lock period
+                                        of your ASH is over. You can withdraw
+                                        your staked ASH right away.
+                                    </div>
+                                    <div>
+                                        However, If you want to keep your veASH
+                                        stays on the maximum, just extend your
+                                        lock period.
+                                    </div>
                                 </div>
-                            </div>
-                            <div className="bg-ash-dark-400 text-stake-gray-500 px-3 py-2 w-5/12 h-[3.375rem] overflow-hidden">
-                                <div className="flex items-center mb-2">
-                                    <ICCapacity className="w-3 h-3 mr-1" />
-                                    <CardTooltip
-                                        content={
-                                            <div>
-                                                Percentage of your veASH to
-                                                the total veASH in ASHSWAP
-                                                Governance Stake. It depends
-                                                on the reward that you’ll
-                                                receive.
-                                            </div>
-                                        }
-                                    >
-                                        <span className="text-2xs font-bold underline">
-                                            Capacity
-                                        </span>
-                                    </CardTooltip>
-                                </div>
-                                <div className="text-xs font-bold">
-                                    {capacityPct}%
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {mounted &&
-                    (loggedIn ? (
-                        <ExpiredLockTooltip disabled={!canUnlockASH}>
-                            <span>
-                                <GlowingButton
-                                    theme="pink"
-                                    className={`text-sm md:text-lg font-bold w-full h-14 md:h-[4.5rem] mt-3`}
-                                    disabled={canUnlockASH}
-                                    onClick={() =>
-                                        !canUnlockASH &&
-                                        setOpenStakeGov(true)
-                                    }
-                                >
-                                    Add / Manage Stake
-                                </GlowingButton>
-                            </span>
-                        </ExpiredLockTooltip>
-                    ) : (
-                        <button
-                            className="bg-pink-600 text-white text-sm md:text-lg font-bold w-full h-14 md:h-[4.5rem] flex items-center justify-center mt-3"
-                            onClick={() => connectWallet()}
-                        >
-                            <ICWallet className="mr-2" />
-                            <span>Connect wallet</span>
-                        </button>
-                    ))}
-            </div>
-            <div className="grow px-7 lg:px-16 pt-7 lg:pt-14 pb-9 bg-stake-dark-400">
-                <h2 className="text-lg md:text-2xl mb-10 md:mb-11 font-bold text-white">
-                    Overall stats
-                </h2>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 lg:gap-x-7.5 gap-y-1 sm:gap-y-4 lg:gap-y-6 mb-16">
-                    <div className="bg-ash-dark-400/30 px-[2.375rem] py-7 flex flex-col justify-between">
-                        <div className="text-stake-gray-500 text-sm font-bold mb-6 sm:mb-2 leading-tight">
-                            APR
-                        </div>
-                        <div className="text-pink-600 text-lg font-bold leading-tight">
-                            {formatAmount(apr, { notation: "standard" })}%
-                        </div>
-                    </div>
-                    <div className="bg-ash-dark-400/30 px-[2.375rem] py-7 flex flex-col justify-between">
-                        <div className="text-stake-gray-500 text-sm font-bold mb-6 sm:mb-2 uppercase leading-tight">
-                            PERCENTAGE of total ASH Locked
-                        </div>
-                        <div className="text-white text-lg font-bold leading-tight">
-                            {formatAmount(totalLockedPct)}%
-                        </div>
-                    </div>
-                    <div className="bg-ash-dark-400/30 px-[2.375rem] py-7 flex flex-col justify-between">
-                        <div className="text-stake-gray-500 text-sm font-bold mb-6">
-                            TOTAL STAKED ASH
-                        </div>
-                        <div className="flex items-center">
-                            {/* <div className="w-[1.125rem] h-[1.125rem] mr-2">
-                                <Image src={ImgUsdt} alt="token icon" />
-                            </div> */}
-                            <Avatar
-                                src={ASH_TOKEN.logoURI}
-                                alt={ASH_TOKEN.symbol}
-                                className="w-[1.125rem] h-[1.125rem] mr-2"
-                            />
-                            <div className="text-white text-lg font-bold">
-                                <TextAmt
-                                    number={toEGLDD(
-                                        ASH_TOKEN.decimals,
-                                        totalLockedAmt
-                                    )}
-                                    options={{ notation: "standard" }}
-                                    decimalClassName="text-stake-gray-500"
-                                />
-                            </div>
-                        </div>
-                    </div>
-                    <div className="bg-ash-dark-400/30 px-[2.375rem] py-7 flex flex-col justify-between">
-                        <div className="text-stake-gray-500 text-sm font-bold mb-6">
-                            TOTAL veASH
-                        </div>
-                        <div className="flex items-center">
-                            {/* <div className="w-[1.125rem] h-[1.125rem] mr-2">
-                                <Image src={ImgUsdt} alt="token icon" />
-                            </div> */}
-                            <Avatar
-                                src={ImgVEASH}
-                                alt="veASH"
-                                className="w-[1.125rem] h-[1.125rem] mr-2"
-                            />
-                            <div className="text-white text-lg font-bold">
-                                <TextAmt
-                                    number={toEGLDD(
-                                        VE_ASH_DECIMALS,
-                                        totalSupplyVeASH
-                                    )}
-                                    options={{ notation: "standard" }}
-                                    decimalClassName="text-stake-gray-500"
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div className="mb-16">
-                    <div className="text-stake-gray-500 text-sm font-bold mb-4">
-                        TIPS
-                    </div>
-                    <div className="text-xs lg:text-sm mb-9">
-                        Stake ASH to receive veASH. You can both earn from
-                        transaction fee & have a power for voting!
-                    </div>
-                    <ul>
-                        {VE_LOCK_LABEL.map((lock) => {
-                            return (
-                                <li
-                                    key={lock.amt}
-                                    className="text-sm font-bold"
-                                >
-                                    <span className="text-stake-green-500">
-                                        1
-                                    </span>{" "}
-                                    ASH locked for{" "}
-                                    <span className="text-stake-green-500">
-                                        {lock.label}
-                                    </span>{" "}
-                                    ={" "}
-                                    <span className="text-stake-green-500">
-                                        {lock.amt}
-                                    </span>{" "}
-                                    veASH
-                                </li>
-                            );
-                        })}
-                    </ul>
-                </div>
-                <div>
-                    <div className="text-whtie text-sm font-bold mb-5">
-                        IMPORTANT NOTE
-                    </div>
-                    <div className="text-xs lg:text-sm mb-6">
-                        Your veASH weight gradually decreases as your
-                        escrowed tokens approach their lock expiry.
-                    </div>
-                    <div className="bg-ash-dark-400/30">
-                        <button
-                            className="w-full h-14 lg:h-[4.25rem] px-4 lg:px-[2.375rem] flex items-center justify-between text-pink-600"
-                            onClick={() => setIsQAExpand((val) => !val)}
-                        >
-                            <div className="line-clamp-2 text-xs lg:text-sm font-bold grow text-left mr-4">
-                                Does it mean user will lose money everyday?
-                            </div>
-                            {isQAExpand ? (
-                                <ICChevronUp className="w-3 h-auto" />
-                            ) : (
-                                <ICChevronDown className="w-3 h-auto" />
                             )}
-                        </button>
-                        {isQAExpand && (
-                            <div className="-mt-1 pb-8 px-4 lg:px-[2.375rem] text-2xs">
-                                <div className="mb-4">
-                                    Of course not, when your veASH decreases
-                                    to 0. It also means that the lock period
-                                    of your ASH is over. You can withdraw
-                                    your staked ASH right away.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <GOVStakeModal
+                open={openStakeGov}
+                onClose={() => setOpenStakeGov(false)}
+            />
+            <BaseModal
+                isOpen={openHarvestResult}
+                onRequestClose={() => setOpenHarvestResult(false)}
+                type={`${screenSize.isMobile ? "drawer_btt" : "modal"}`}
+                className="clip-corner-4 clip-corner-tl bg-stake-dark-400 mx-auto max-w-[33.75rem] flex flex-col max-h-full"
+            >
+                <div className="px-4 pt-4 flex justify-end mb-4">
+                    <BaseModal.CloseBtn />
+                </div>
+                <div className="grow overflow-auto pt-10">
+                    <div className="px-[3.375rem] flex flex-col items-center pb-28 border-b border-dashed border-b-ash-gray-500">
+                        <div className="text-2xl font-bold text-stake-green-500 mb-12">
+                            Harvest successfully
+                        </div>
+                        {rewardLPToken && (
+                            <>
+                                <div className="flex items-center mb-9 mr-2">
+                                    {rewardLPToken.tokens.map((_t) => {
+                                        const t = getTokenFromId(_t.identifier);
+                                        return (
+                                            <Avatar
+                                                key={t.identifier}
+                                                src={t.logoURI}
+                                                alt={t.symbol}
+                                                className="w-8 h-8 -ml-1 first:ml-0"
+                                            />
+                                        );
+                                    })}
                                 </div>
-                                <div>
-                                    However, If you want to keep your veASH
-                                    stays on the maximum, just extend your
-                                    lock period.
+                                <div className="text-center text-ash-gray-500 text-lg font-bold">
+                                    <TextAmt
+                                        number={rewardTokenAmount.toFixed(0)}
+                                    />
+                                    &nbsp; {rewardLPToken.lpToken.symbol} has
+                                    been sent to your wallet
                                 </div>
-                            </div>
+                            </>
                         )}
                     </div>
-                </div>
-            </div>
-        </div>
-        <GOVStakeModal
-            open={openStakeGov}
-            onClose={() => setOpenStakeGov(false)}
-        />
-        <BaseModal
-            isOpen={openHarvestResult}
-            onRequestClose={() => setOpenHarvestResult(false)}
-            type={`${screenSize.isMobile ? "drawer_btt" : "modal"}`}
-            className="clip-corner-4 clip-corner-tl bg-stake-dark-400 mx-auto max-w-[33.75rem] flex flex-col max-h-full"
-        >
-            <div className="px-4 pt-4 flex justify-end mb-4">
-                <BaseModal.CloseBtn />
-            </div>
-            <div className="grow overflow-auto pt-10">
-                <div className="px-[3.375rem] flex flex-col items-center pb-28 border-b border-dashed border-b-ash-gray-500">
-                    <div className="text-2xl font-bold text-stake-green-500 mb-12">
-                        Harvest successfully
+                    <div className="px-[3.375rem] pb-8">
+                        <div className="text-center text-sm text-ash-gray-500 py-7">
+                            Suggest actions
+                        </div>
+                        <Link href="/stake/farms" passHref>
+                            <button className="w-full text-center h-12 text-sm font-bold bg-ash-dark-400 text-ash-cyan-500 mb-4">
+                                Stake for farming
+                            </button>
+                        </Link>
+                        <Link href="/pool" passHref>
+                            <button className="w-full text-center h-12 text-sm font-bold bg-ash-dark-400 text-pink-600">
+                                Withdraw immediately
+                            </button>
+                        </Link>
                     </div>
-                    {rewardLPToken && (
-                        <>
-                            <div className="flex items-center mb-9 mr-2">
-                                {rewardLPToken.tokens.map((_t) => {
-                                    const t = getTokenFromId(_t.identifier);
-                                    return (
-                                        <Avatar
-                                            key={t.identifier}
-                                            src={t.logoURI}
-                                            alt={t.symbol}
-                                            className="w-8 h-8 -ml-1 first:ml-0"
-                                        />
-                                    );
-                                })}
-                            </div>
-                            <div className="text-center text-ash-gray-500 text-lg font-bold">
-                                <TextAmt
-                                    number={rewardTokenAmount.toFixed(0)}
-                                />
-                                &nbsp; {rewardLPToken.lpToken.symbol} has
-                                been sent to your wallet
-                            </div>
-                        </>
-                    )}
                 </div>
-                <div className="px-[3.375rem] pb-8">
-                    <div className="text-center text-sm text-ash-gray-500 py-7">
-                        Suggest actions
-                    </div>
-                    <Link href="/stake/farms" passHref>
-
-                        <button className="w-full text-center h-12 text-sm font-bold bg-ash-dark-400 text-ash-cyan-500 mb-4">
-                            Stake for farming
-                        </button>
-
-                    </Link>
-                    <Link href="/pool" passHref>
-
-                        <button className="w-full text-center h-12 text-sm font-bold bg-ash-dark-400 text-pink-600">
-                            Withdraw immediately
-                        </button>
-
-                    </Link>
-                </div>
-            </div>
-        </BaseModal>
-    </>;
+            </BaseModal>
+        </>
+    );
 }
 
 export default GovStats;

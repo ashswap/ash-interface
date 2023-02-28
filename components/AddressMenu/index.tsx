@@ -87,7 +87,7 @@ function AddressMenu({ infoLayout, dropdownBtn, connectBtn }: AddressMenuProp) {
         <div>
             <div>
                 {mounted &&
-                    (loggedIn ? (
+                    (loggedIn ? isMobile ? dropdownBtn(address, setMShowMenu) : (
                         <BasePopover
                             options={{
                                 strategy: "fixed",

@@ -1,5 +1,5 @@
 import { accIsLoggedInState } from "atoms/dappState";
-import { govLockedAmtState, govUnlockTSState } from "atoms/govState";
+import { govLockedAmtSelector, govUnlockTSSelector } from "atoms/govState";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 import { ASH_TOKEN } from "const/tokens";
 import { toEGLDD } from "helper/balance";
@@ -16,8 +16,10 @@ const useGovUnlockASH = (trackStatus = false) => {
         ({ snapshot, set }) =>
             async () => {
                 const loggedIn = await snapshot.getPromise(accIsLoggedInState);
-                const unlockTS = await snapshot.getPromise(govUnlockTSState);
-                const lockedAmt = await snapshot.getPromise(govLockedAmtState);
+                const unlockTS = await snapshot.getPromise(govUnlockTSSelector);
+                const lockedAmt = await snapshot.getPromise(
+                    govLockedAmtSelector
+                );
 
                 if (!loggedIn || unlockTS.minus(moment().unix()).gt(0))
                     return { sessionId: "" };

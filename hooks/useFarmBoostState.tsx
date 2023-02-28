@@ -8,9 +8,9 @@ import {
     FarmToken,
 } from "atoms/farmsState";
 import {
-    govLockedAmtState,
-    govTotalSupplyVeASH,
-    govUnlockTSState,
+    govLockedAmtSelector,
+    govTotalSupplyVeASHSelector,
+    govUnlockTSSelector,
 } from "atoms/govState";
 import BigNumber from "bignumber.js";
 import { ASHSWAP_CONFIG, VE_CONFIG } from "const/ashswapConfig";
@@ -49,7 +49,9 @@ export const useFarmBoostTransferState = (
                 const locked = await ContractManager.getVotingEscrowContract(
                     ASHSWAP_CONFIG.dappContract.voteEscrowedContract
                 ).getUserLocked(ownerAddress);
-                const veSupply = await snapshot.getPromise(govTotalSupplyVeASH);
+                const veSupply = await snapshot.getPromise(
+                    govTotalSupplyVeASHSelector
+                );
                 const unlockTs = locked.end;
 
                 const slope = farmToken.balance
@@ -143,11 +145,13 @@ export const useFarmBoostOwnerState = (farmData: FarmRecord) => {
         ({ snapshot }) =>
             async () => {
                 const address = await snapshot.getPromise(accAddressState);
-                const veSupply = await snapshot.getPromise(govTotalSupplyVeASH);
-                const lockedAshAmt = await snapshot.getPromise(
-                    govLockedAmtState
+                const veSupply = await snapshot.getPromise(
+                    govTotalSupplyVeASHSelector
                 );
-                const unlockTs = await snapshot.getPromise(govUnlockTSState);
+                const lockedAshAmt = await snapshot.getPromise(
+                    govLockedAmtSelector
+                );
+                const unlockTs = await snapshot.getPromise(govUnlockTSSelector);
                 const ownerTokens =
                     farmData.stakedData?.farmTokens.filter(
                         (f) => f.attributes.booster.bech32() === address
@@ -224,7 +228,7 @@ export const useFarmBoostOwnerState = (farmData: FarmRecord) => {
         ({ snapshot }) =>
             async () => {
                 const ownerAddress = await snapshot.getPromise(accAddressState);
-                const unlockTs = await snapshot.getPromise(govUnlockTSState);
+                const unlockTs = await snapshot.getPromise(govUnlockTSSelector);
                 const ownerTokens =
                     farmData.stakedData?.farmTokens.filter(
                         (f) => f.attributes.booster.bech32() === ownerAddress
