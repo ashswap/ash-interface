@@ -2,8 +2,6 @@ import { useGetPendingTransactions } from "@multiversx/sdk-dapp/hooks";
 import { useSelector } from "@multiversx/sdk-dapp/reduxStore/DappProviderContext";
 import { ashswapBaseState } from "atoms/ashswap";
 import { dappCoreState } from "atoms/dappState";
-import { FARMS } from "const/farms";
-import pools from "const/pool";
 import { GraphOptions } from "graphql/type";
 import useGraphQLQueryOptions from "graphql/useQueries/useGraphQLQueryOptions";
 import { useEffect } from "react";
@@ -14,7 +12,6 @@ import useFarmsState from "./useFarmsState";
 import useGetFarmTokens from "./useGetFarmTokens";
 import useGetTokens from "./useGetTokens";
 import usePoolsState from "./usePoolsState";
-import useVEState from "./useVEState";
 
 const config: GraphOptions = {
     withBlockchain: true,
@@ -60,10 +57,8 @@ export function useRecoilAdapter() {
         // const y = [...data.poolsV2];
         // y[0] = {...data.poolsV2[0], lpToken: fakePrice[6]}
 
-        // if(data.farmController){
-        //     data.farmController = {...data.farmController, farms: data.farmController.farms.filter((f: any) => FARMS.map(_f => _f.farm_address).includes(f.address))}
-        // }
-        // data && setAshBaseState((state) => ({ ...state, ...data, tokens: fakePrice, pools: x, poolsV2: y }));
+        // const farmController = data.farmController ? {...data.farmController, farms: data.farmController.farms.filter((f: any) => FARMS.map(_f => _f.farm_address).includes(f.address))} : undefined;
+        // data && setAshBaseState((state) => ({ ...state, ...data, tokens: fakePrice, pools: x, poolsV2: y, farmController}));
     }, [data, setAshBaseState]);
 
     // fetch tokens balance
@@ -74,7 +69,6 @@ export function useRecoilAdapter() {
     useGetFarmTokens();
     usePoolsState();
     useFarmsState();
-    useVEState();
     useFarmControllerState();
     // connect re}coil state to dapp-core
     useEffect(() => {

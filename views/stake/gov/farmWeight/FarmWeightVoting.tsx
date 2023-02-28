@@ -5,7 +5,7 @@ import ICNewTab from "assets/svg/new-tab.svg";
 import { ashswapBaseState } from "atoms/ashswap";
 import { fbHasBribe, fbTotalRewardsUSD } from "atoms/farmBribeState";
 import { fcAccountFarmSelector } from "atoms/farmControllerState";
-import { govVeASHAmtState } from "atoms/govState";
+import { govVeASHAmtSelector } from "atoms/govState";
 import BigNumber from "bignumber.js";
 import Avatar from "components/Avatar";
 import GlowingButton from "components/GlowingButton";
@@ -147,7 +147,7 @@ const VoteEditor = memo(function VoteEditor({ farmAddress }: VoteEditorProps) {
     const [weightStr, setWeightStr] = useInputNumberString(weightPct);
     const fcAccFarm = useRecoilValue(fcAccountFarmSelector(farmAddress));
     const ashBase = useRecoilValue(ashswapBaseState);
-    const veAmt = useRecoilValue(govVeASHAmtState);
+    const veAmt = useRecoilValue(govVeASHAmtSelector);
     const {
         voteFarmWeight,
         trackingData: { isPending },
