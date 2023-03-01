@@ -1,6 +1,8 @@
 import {
-    useExtensionLogin, useWalletConnectLogin,
-    useWebWalletLogin
+    useExtensionLogin,
+    useWalletConnectLogin,
+    useWalletConnectV2Login,
+    useWebWalletLogin,
 } from "@elrondnetwork/dapp-core/hooks";
 import connectWalletBg from "assets/images/connect-wallet-bg.png";
 import downloadAppGallery from "assets/images/download-app-gallery.png";
@@ -14,7 +16,7 @@ import ICConnectWebWallet from "assets/svg/connect-web-wallet.svg";
 import {
     accAddressState,
     accIsLoggedInState,
-    dappCoreState
+    dappCoreState,
 } from "atoms/dappState";
 import { notFirstRenderConnectWallet } from "atoms/firstRenderConnectWalletState";
 import { walletIsOpenConnectModalState } from "atoms/walletState";
@@ -53,8 +55,8 @@ function ConnectWalletModal() {
     );
     const [webWalletLogin] = useWebWalletLogin({
         callbackRoute: "",
-    });        
-    const loginMethodName = useConnectMethod()
+    });
+    const loginMethodName = useConnectMethod();
     useEffect(() => {
         if (!isOpenConnectWalletModal) {
             setIsOpenQR(false);
@@ -80,14 +82,11 @@ function ConnectWalletModal() {
         if (window && loggedIn && isOpenConnectWalletModal) {
             let dataLayer = (window as any).dataLayer || [];
             window.localStorage.setItem("address", dappCore.account.address);
-            window.localStorage.setItem(
-                "method",
-                loginMethodName
-            );
+            window.localStorage.setItem("method", loginMethodName);
             dataLayer.push({
                 event: "success_connect_wallet",
                 address: dappCore.account.address,
-                method: loginMethodName
+                method: loginMethodName,
             });
         }
     }, [loggedIn, dappCore.account.address, dappCore.loginInfo.loginMethod]);
@@ -393,15 +392,31 @@ const WalletConnect = ({
     onLogin?: () => void;
     onLogout?: () => void;
 }) => {
+    const config = useMemo(() => {
+        return { logoutRoute: "" };
+    }, []);
+    // const [
+    //     initConnect,
+    //     { error, isLoading, isLoggedIn, loginFailed },
+    //     { uriDeepLink, walletConnectUri },
+    // ] = useWalletConnectLogin({
+    //     callbackRoute: "",
+    //     logoutRoute: "",
+    // });
     const [
         initConnect,
         { error, isLoading, isLoggedIn, loginFailed },
-        { uriDeepLink, walletConnectUri },
-    ] = useWalletConnectLogin({
-        callbackRoute: "",
-        logoutRoute: "",
-    });
+        {
+            uriDeepLink,
+            walletConnectUri,
+            cancelLogin,
+            removeExistingPairing,
+            connectExisting,
+            wcPairings,
+        },
+    ] = useWalletConnectV2Login(config);
     const ref = useRef(null);
+    const cancelRef = useRef(cancelLogin);
     const [qrSvg, setQrSvg] = useState<string>("");
 
     const isMobile =
@@ -430,8 +445,26 @@ const WalletConnect = ({
         })();
     }, [walletConnectUri]);
 
-    useEffect(initConnect, [initConnect]);
-    useEffect(buildQrCode, [buildQrCode]);
+    const clearPairings = useCallback(async () => {
+        await Promise.all(wcPairings?.map(async pair => {
+            await removeExistingPairing(pair.topic);
+        }) || []);
+    }, [removeExistingPairing, wcPairings]);
+    useEffect(() => {
+        if (!walletConnectUri) {
+            initConnect();
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [walletConnectUri]);
+    useEffect(() => {
+        buildQrCode();
+    }, [buildQrCode]);
+    useEffect(() => {cancelRef.current = cancelLogin}, [cancelLogin]);
+    useEffect(() => {
+        return () => {
+            cancelRef.current();
+        };
+    }, []);
 
     return (
         <div className="text-white flex flex-col items-center" ref={ref}>
@@ -439,7 +472,13 @@ const WalletConnect = ({
                 <span className="text-ash-blue-500">Maiar mobile </span>
                 <span>login</span>
             </div>
-            <div className="mx-auto mb-[2.125rem]" {...svgQr} />
+            <div className="mx-auto mb-[2.125rem] w-48 h-48 flex justify-center items-center">
+                {walletConnectUri ? (
+                    <div {...svgQr} />
+                ) : (
+                    <div className="w-10 h-10 rounded-full border-t-transparent border-pink-600 border-4 animate-spin"></div>
+                )}
+            </div>
             <div className="text-center mb-11 uppercase text-sm sm:text-lg font-bold">
                 <div>scan this qr by</div>
                 <div>your maiar mobile app to continue</div>
