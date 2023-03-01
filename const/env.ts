@@ -12,6 +12,7 @@ interface Environment {
     ENV: Env;
     LOGIN_TWITTER_LINK: string;
     LOGIN_DISCORD_LINK: string;
+    WALLET_CONNECT_V2_PROJECT_ID: string;
 }
 
 const _ENVIRONMENT: Environment = {
@@ -25,6 +26,7 @@ const _ENVIRONMENT: Environment = {
     ENV: (process.env.NEXT_PUBLIC_ASH_ENV as Env) || "beta",
     LOGIN_TWITTER_LINK: process.env.NEXT_PUBLIC_ASH_LOGIN_TWITTER_LINK!,
     LOGIN_DISCORD_LINK: process.env.NEXT_PUBLIC_ASH_LOGIN_DISCORD_LINK!,
+    WALLET_CONNECT_V2_PROJECT_ID: process.env.NEXT_PUBLIC_ASH_WALLET_CONNECT_V2_PROJECT_ID!,
 };
 
 export const ENVIRONMENT = {
