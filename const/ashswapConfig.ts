@@ -65,4 +65,5 @@ export const VE_CONFIG = ENVIRONMENT.NETWORK === "mainnet" ? {
 export const ASHSWAP_CONFIG = {
     ashApiBaseUrl: ENVIRONMENT.ASH_API,
     dappContract,
+    farmWeightVoteDelay: 10 * 24 * 3600,
 } as const;

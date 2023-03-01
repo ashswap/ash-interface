@@ -1,6 +1,6 @@
 import {
     useExtensionLogin,
-    useWalletConnectLogin,
+    useWalletConnectV2Login,
     useWebWalletLogin,
 } from "@multiversx/sdk-dapp/hooks";
 import connectWalletBg from "assets/images/connect-wallet-bg.png";
@@ -398,15 +398,31 @@ const WalletConnect = ({
     onLogin?: () => void;
     onLogout?: () => void;
 }) => {
+    const config = useMemo(() => {
+        return { logoutRoute: "" };
+    }, []);
+    // const [
+    //     initConnect,
+    //     { error, isLoading, isLoggedIn, loginFailed },
+    //     { uriDeepLink, walletConnectUri },
+    // ] = useWalletConnectLogin({
+    //     callbackRoute: "",
+    //     logoutRoute: "",
+    // });
     const [
         initConnect,
         { error, isLoading, isLoggedIn, loginFailed },
-        { uriDeepLink, walletConnectUri },
-    ] = useWalletConnectLogin({
-        callbackRoute: "",
-        logoutRoute: "",
-    });
+        {
+            uriDeepLink,
+            walletConnectUri,
+            cancelLogin,
+            removeExistingPairing,
+            connectExisting,
+            wcPairings,
+        },
+    ] = useWalletConnectV2Login(config);
     const ref = useRef(null);
+    const cancelRef = useRef(cancelLogin);
     const [qrSvg, setQrSvg] = useState<string>("");
 
     const isMobile =
@@ -435,12 +451,26 @@ const WalletConnect = ({
         })();
     }, [walletConnectUri]);
 
+    const clearPairings = useCallback(async () => {
+        await Promise.all(wcPairings?.map(async pair => {
+            await removeExistingPairing(pair.topic);
+        }) || []);
+    }, [removeExistingPairing, wcPairings]);
     useEffect(() => {
-        initConnect();
-    }, [initConnect]);
+        if (!walletConnectUri) {
+            initConnect();
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [walletConnectUri]);
     useEffect(() => {
         buildQrCode();
     }, [buildQrCode]);
+    useEffect(() => {cancelRef.current = cancelLogin}, [cancelLogin]);
+    useEffect(() => {
+        return () => {
+            cancelRef.current();
+        };
+    }, []);
 
     return (
         <div className="text-white flex flex-col items-center" ref={ref}>
@@ -448,7 +478,13 @@ const WalletConnect = ({
                 <span className="text-ash-blue-500">Maiar mobile </span>
                 <span>login</span>
             </div>
-            <div className="mx-auto mb-[2.125rem]" {...svgQr} />
+            <div className="mx-auto mb-[2.125rem] w-48 h-48 flex justify-center items-center">
+                {walletConnectUri ? (
+                    <div {...svgQr} />
+                ) : (
+                    <div className="w-10 h-10 rounded-full border-t-transparent border-pink-600 border-4 animate-spin"></div>
+                )}
+            </div>
             <div className="text-center mb-11 uppercase text-sm sm:text-lg font-bold">
                 <div>scan this qr by</div>
                 <div>your maiar mobile app to continue</div>
