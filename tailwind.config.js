@@ -96,6 +96,9 @@ module.exports = {
                 },
                 "stake-gray": {
                     500: "#B7B7D7"
+                },
+                "mvx": {
+                    xportal: "#23F7DD"
                 }
 
             },
