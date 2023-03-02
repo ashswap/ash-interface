@@ -7,9 +7,9 @@ export const useConnectMethod = () => {
     const loginMethodName = useMemo(() => {
         switch (loginMethod) {
             case LoginMethodsEnum.extension:
-                return "Maiar Wallet Extension";
+                return "MultiversX DeFi Wallet";
             case LoginMethodsEnum.walletconnect:
-                return "Maiar App";
+                return "xPortal App";
             case LoginMethodsEnum.wallet:
                 return "Web Wallet";
             case LoginMethodsEnum.ledger:
