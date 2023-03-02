@@ -57,7 +57,6 @@ const FarmRecord = memo(function FarmRecord({
         [fcAccFarm]
     );
     const canVote = useMemo(() => {
-        if (!lastUserVote) return false;
         const diff = moment().unix() - lastUserVote;
         return diff > ASHSWAP_CONFIG.farmWeightVoteDelay;
     }, [lastUserVote]);
@@ -228,7 +227,6 @@ const VoteEditor = memo(function VoteEditor({ farmAddress }: VoteEditorProps) {
     );
 
     const isLockedVote = useMemo(() => {
-        if (!lastUserVote) return false;
         const diff = moment().unix() - lastUserVote;
         return diff < ASHSWAP_CONFIG.farmWeightVoteDelay;
     }, [lastUserVote]);
