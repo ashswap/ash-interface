@@ -160,6 +160,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
                     environment={ENVIRONMENT.NETWORK}
                     customNetworkConfig={DAPP_CONFIG}
                     customComponents={customComponents}
+                    dappConfig={{shouldUseWebViewProvider: true}}
                     // completedTransactionsDelay={500}
                 >
                     <TestnetGuard>
