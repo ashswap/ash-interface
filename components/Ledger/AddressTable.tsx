@@ -45,7 +45,7 @@ export const AddressTable = ({
             const address = accounts[index];
             onSelectAddress({ address, index });
         }
-    }, [accounts, selectedAddress, loading, startIndex]);
+    }, [accounts, selectedAddress, loading, startIndex, onSelectAddress]);
 
     if (loading) {
         return <></>;

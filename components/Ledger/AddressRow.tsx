@@ -1,9 +1,6 @@
-import {
-    getAccountBalance,
-    getEgldLabel,
-} from "@elrondnetwork/dapp-core/utils";
+import { getAccountBalance, getEgldLabel } from "@multiversx/sdk-dapp/utils";
 import { formatAmount } from "helper/number";
-import React, { useEffect, useState, SyntheticEvent } from "react";
+import React, { useEffect, useState, SyntheticEvent, useCallback } from "react";
 import ICHexagonDuo from "assets/svg/hexagon-duo.svg";
 import ICCheck from "assets/svg/check.svg";
 import { toEGLDD } from "helper/balance";
@@ -32,7 +29,7 @@ export const AddressRow = ({
     index,
     selectedAddress,
     onSelectAddress,
-    className
+    className,
 }: AddressRowPropsType) => {
     const [balance, setBalance] = useState(noBalance);
 
@@ -44,30 +41,39 @@ export const AddressRow = ({
         }
     };
 
-    const fetchBalance = async () => {
+    const fetchBalance = useCallback(async () => {
         try {
             const balance = await getAccountBalance(address);
             setBalance(balance);
         } catch (err) {
-            console.error("error fetching balance", err, balance);
+            console.error("error fetching balance", err, address);
         }
-    };
+    }, [address]);
 
     useEffect(() => {
         fetchBalance();
-    }, []);
+    }, [fetchBalance]);
 
     return (
         <tr className={twMerge("transition-all duration-1000 ease", className)}>
-            <td className="px-4 text-left cursor-pointer group" onClick={() => onSelectAddress({address, index})}>
+            <td
+                className="px-4 text-left cursor-pointer group"
+                onClick={() => onSelectAddress({ address, index })}
+            >
                 <div className="flex items-center text-left">
                     <div className="mr-3 lg:mr-6 relative flex items-center justify-center">
                         <ICHexagonDuo
-                            className={`transition-all duration-300 w-6 h-6  ${selectedAddress === address ? "fill-pink-600/20 stroke-pink-600" : "stroke-white group-hover:stroke-pink-600"}`}
+                            className={`transition-all duration-300 w-6 h-6  ${
+                                selectedAddress === address
+                                    ? "fill-pink-600/20 stroke-pink-600"
+                                    : "stroke-white group-hover:stroke-pink-600"
+                            }`}
                         />
                         <ICCheck
                             className={`transition-all absolute w-2.5 h-2.5 ${
-                                selectedAddress === address ? "opacity-100" : "opacity-0"
+                                selectedAddress === address
+                                    ? "opacity-100"
+                                    : "opacity-0"
                             }`}
                         />
                     </div>
@@ -85,7 +91,10 @@ export const AddressRow = ({
             </td>
 
             <td className="px-4 min-w-[10rem]">
-                <div className="bg-ash-dark-400 px-3 py-1.5 font-bold text-xs text-right">{formatAmount(toEGLDD(18, balance).toNumber())} {getEgldLabel()}</div>
+                <div className="bg-ash-dark-400 px-3 py-1.5 font-bold text-xs text-right">
+                    {formatAmount(toEGLDD(18, balance).toNumber())}{" "}
+                    {getEgldLabel()}
+                </div>
             </td>
 
             <td className="px-4 text-center">{index}</td>

@@ -2,10 +2,12 @@ import { Slider } from "antd";
 import ICBribe from "assets/svg/bribe.svg";
 import ICChevronRight from "assets/svg/chevron-right.svg";
 import ICNewTab from "assets/svg/new-tab.svg";
+import ICTickCircle from "assets/svg/tick-circle.svg";
+import ICLock from "assets/svg/lock.svg";
 import { ashswapBaseState } from "atoms/ashswap";
 import { fbHasBribe, fbTotalRewardsUSD } from "atoms/farmBribeState";
 import { fcAccountFarmSelector } from "atoms/farmControllerState";
-import { govVeASHAmtState } from "atoms/govState";
+import { govVeASHAmtSelector } from "atoms/govState";
 import BigNumber from "bignumber.js";
 import Avatar from "components/Avatar";
 import GlowingButton from "components/GlowingButton";
@@ -22,6 +24,10 @@ import Link from "next/link";
 import { accIsLoggedInState } from "atoms/dappState";
 import { ENVIRONMENT } from "const/env";
 import { getTokenFromId } from "helper/token";
+import moment from "moment";
+import { ASHSWAP_CONFIG } from "const/ashswapConfig";
+import BaseModal from "components/BaseModal";
+import { useScreenSize } from "hooks/useScreenSize";
 type FarmRecordProps = {
     farmAddress: string;
     selected?: boolean;
@@ -45,6 +51,21 @@ const FarmRecord = memo(function FarmRecord({
         [fcAccFarm]
     );
     const bribeUrl = useMemo(() => "/stake/gov/bribe", []);
+
+    const lastUserVote = useMemo(
+        () => fcAccFarm?.lastUserVote || 0,
+        [fcAccFarm]
+    );
+    const canVote = useMemo(() => {
+        const diff = moment().unix() - lastUserVote;
+        return diff > ASHSWAP_CONFIG.farmWeightVoteDelay;
+    }, [lastUserVote]);
+    const nextVoteDate = useMemo(() => {
+        if (!lastUserVote) return "";
+        return moment
+            .unix(lastUserVote + ASHSWAP_CONFIG.farmWeightVoteDelay)
+            .format("HH:mm - DD MMM");
+    }, [lastUserVote]);
     if (!pool) return <></>;
     return (
         <tr
@@ -54,20 +75,26 @@ const FarmRecord = memo(function FarmRecord({
             onClick={onClick}
         >
             <td className="border border-black p-4">
-                <div className="flex flex-col sm:flex-row sm:items-center">
-                    <div className="flex -space-x-0.5 mr-2 mb-2 sm:mb-0">
+                <div className="flex flex-col md:flex-row md:items-center">
+                    <div className="flex -space-x-0.5 mr-2 mb-2 md:mb-0">
                         {pool.tokens.map((_t) => {
                             const t = getTokenFromId(_t.identifier);
                             return (
                                 <Avatar
                                     key={t.identifier}
                                     src={t.logoURI}
-                                    className="w-4 h-4"
+                                    className={`w-4 h-4 ${
+                                        canVote ? "" : "grayscale"
+                                    }`}
                                 />
                             );
                         })}
                     </div>
-                    <div className="font-bold text-xs sm:text-sm md:text-lg text-stake-gray-500">
+                    <div
+                        className={`font-bold text-xs sm:text-sm lg:text-lg ${
+                            canVote ? "text-white" : "text-ash-gray-600"
+                        }`}
+                    >
                         {pool.tokens
                             .map((t) => getTokenFromId(t.identifier).symbol)
                             .join("-")}
@@ -75,9 +102,30 @@ const FarmRecord = memo(function FarmRecord({
                 </div>
             </td>
             <td className="border border-black border-l-0 p-4">
-                <div className="font-bold text-sm md:text-lg text-stake-gray-500 text-right">
+                <div
+                    className={`font-bold text-sm md:text-lg text-right ${
+                        canVote ? "text-white" : "text-pink-600"
+                    }`}
+                >
                     {(power * 100) / 10_000}%
                 </div>
+            </td>
+            <td className="border border-black border-l-0 p-4">
+                {canVote ? (
+                    <div className="flex items-center space-x-1 md:space-x-2 text-pink-600">
+                        <ICTickCircle className="w-4 h-auto md:w-6" />
+                        <span className="font-bold text-sm md:text-base">
+                            Can vote
+                        </span>
+                    </div>
+                ) : (
+                    <div className="flex items-center space-x-1 md:space-x-2 text-ash-gray-600">
+                        <ICLock className="w-4 h-auto md:w-6" />
+                        <span className="font-bold text-sm md:text-base">
+                            {nextVoteDate}
+                        </span>
+                    </div>
+                )}
             </td>
             <td className="border border-black border-l-0 p-4">
                 <div className="flex items-center">
@@ -139,6 +187,7 @@ type VoteEditorProps = {
     farmAddress: string;
 };
 const VoteEditor = memo(function VoteEditor({ farmAddress }: VoteEditorProps) {
+    const [isOpenModal, setIsOpenModal] = useState(false);
     const [weight, setWeight] = useState(0);
     const weightPct = useMemo(
         () => new BigNumber(weight).multipliedBy(100).div(10_000),
@@ -147,11 +196,12 @@ const VoteEditor = memo(function VoteEditor({ farmAddress }: VoteEditorProps) {
     const [weightStr, setWeightStr] = useInputNumberString(weightPct);
     const fcAccFarm = useRecoilValue(fcAccountFarmSelector(farmAddress));
     const ashBase = useRecoilValue(ashswapBaseState);
-    const veAmt = useRecoilValue(govVeASHAmtState);
+    const veAmt = useRecoilValue(govVeASHAmtSelector);
     const {
         voteFarmWeight,
         trackingData: { isPending },
     } = useVoteForFarm(true);
+    const screenSize = useScreenSize();
     const powerUsed = useMemo(() => {
         if (ashBase.farmController?.account) {
             return new BigNumber(
@@ -171,9 +221,32 @@ const VoteEditor = memo(function VoteEditor({ farmAddress }: VoteEditorProps) {
         () => 10000 - powerUsed + powerUsedForCurrentFarm,
         [powerUsed, powerUsedForCurrentFarm]
     );
+    const lastUserVote = useMemo(
+        () => fcAccFarm?.lastUserVote || 0,
+        [fcAccFarm]
+    );
+
+    const isLockedVote = useMemo(() => {
+        const diff = moment().unix() - lastUserVote;
+        return diff < ASHSWAP_CONFIG.farmWeightVoteDelay;
+    }, [lastUserVote]);
+
     const canVote = useMemo(() => {
-        return veAmt.gt(0) && farmAddress && weight >= 0 && !isPending;
-    }, [farmAddress, weight, isPending, veAmt]);
+        return (
+            veAmt.gt(0) &&
+            farmAddress &&
+            weight >= 0 &&
+            !isPending &&
+            !isLockedVote
+        );
+    }, [veAmt, farmAddress, weight, isPending, isLockedVote]);
+
+    const nextVoteDate = useMemo(() => {
+        return moment
+            .unix(moment().unix() + ASHSWAP_CONFIG.farmWeightVoteDelay)
+            .format("HH:mm DD MMM, YYYY");
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isOpenModal]);
 
     useEffect(() => {
         if (farmAddress) {
@@ -181,109 +254,180 @@ const VoteEditor = memo(function VoteEditor({ farmAddress }: VoteEditorProps) {
         }
     }, [powerUsedForCurrentFarm, farmAddress]);
     return (
-        <div className="flex flex-col md:flex-row md:items-start space-y-10 md:space-y-0 md:space-x-4">
-            <div className="grow overflow-hidden">
-                <div className="font-bold text-xs sm:text-sm text-stake-gray-500 mb-3">
-                    {pool?.tokens
-                        .map((t) => getTokenFromId(t.identifier).symbol)
-                        .join("-") || "Select a farm to start"}
-                </div>
-                <Slider
-                    className="ash-slider ash-slider-pink my-0"
-                    step={1}
-                    marks={{
-                        "0": "",
-                        "2500": "",
-                        "5000": "",
-                        "7500": "",
-                        "10000": "",
-                    }}
-                    handleStyle={{
-                        backgroundColor: theme.extend.colors.pink[600],
-                        borderRadius: 0,
-                        border: "2px solid " + theme.extend.colors.pink[600],
-                        width: 7,
-                        height: 7,
-                    }}
-                    min={0}
-                    max={10_000}
-                    value={weight}
-                    tooltipVisible={false}
-                    onChange={(e) => {
-                        setWeight(Math.min(maxPower, e));
-                    }}
-                    disabled={!farmAddress}
-                />
-                <div className="flex justify-between mt-1">
-                    <div className="text-xs lg:text-sm font-bold text-stake-gray-500">
-                        0%
+        <>
+            <div className="flex flex-col md:flex-row md:items-start space-y-10 md:space-y-0 md:space-x-4">
+                <div className="grow overflow-hidden">
+                    <div className="font-bold text-xs sm:text-sm text-stake-gray-500 mb-3">
+                        {pool?.tokens
+                            .map((t) => getTokenFromId(t.identifier).symbol)
+                            .join("-") || "Select a farm to start"}
                     </div>
-                    <div className="text-xs lg:text-sm font-bold text-stake-gray-500">
-                        100%
-                    </div>
-                </div>
-            </div>
-            <div className="md:w-1/2 lg:w-5/12 flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                <label
-                    className="py-6 px-4 w-full sm:w-1/2 md:w-2/5 h-14 sm:h-18 shrink-0 bg-ash-dark-400 flex items-center font-bold text-lg cursor-text"
-                    htmlFor="vote-editor-pct"
-                >
-                    <InputCurrency
-                        id="vote-editor-pct"
-                        className="grow bg-transparent min-w-0 outline-none text-right placeholder:text-ash-gray-600"
-                        placeholder="0.0"
-                        decimals={2}
-                        value={weightStr}
-                        disabled={!farmAddress}
-                        onChange={(e) => {
-                            const str = e.target.value;
-                            const val = BigNumber.min(
-                                new BigNumber(str)
-                                    .multipliedBy(10_000)
-                                    .div(100),
-                                maxPower
-                            );
-                            const pct = val.multipliedBy(100).div(10_000);
-                            setWeight(val.toNumber());
-                            setWeightStr(
-                                new BigNumber(str).gt(pct) ? "" + pct : str
-                            );
+                    <Slider
+                        className="ash-slider ash-slider-pink my-0"
+                        step={1}
+                        marks={{
+                            0: <></>,
+                            2500: <></>,
+                            5000: <></>,
+                            7500: <></>,
+                            10000: <></>,
                         }}
+                        handleStyle={{
+                            backgroundColor: theme.extend.colors.pink[600],
+                            borderRadius: 0,
+                            border:
+                                "2px solid " + theme.extend.colors.pink[600],
+                            width: 7,
+                            height: 7,
+                        }}
+                        min={0}
+                        max={10_000}
+                        value={weight}
+                        tooltip={{ open: false }}
+                        onChange={(e) => {
+                            setWeight(Math.min(maxPower, e));
+                        }}
+                        disabled={!farmAddress}
                     />
-                    <div className="text-ash-gray-600">%</div>
-                </label>
-                <div className="grow">
-                    <GlowingButton
-                        theme="pink"
-                        className="w-full h-14 sm:h-18 px-4 font-bold text-sm"
-                        disabled={!canVote}
-                        onClick={() => voteFarmWeight(farmAddress, weight)}
-                    >
-                        {veAmt.gt(0) ? (
-                            <>
-                                Confirm{" "}
-                                <ICChevronRight className="w-2 h-auto ml-2" />
-                            </>
-                        ) : (
-                            "YOU DON’T HAVE VEASH"
-                        )}
-                    </GlowingButton>
-                    {veAmt.eq(0) && (
-                        <div className="mt-2 font-bold text-2xs text-stake-gray-500">
-                            Stake ASH{" "}
-                            <Link href="/stake/gov">
-                                <a>
-                                    <span className="text-pink-600 underline">
-                                        here
-                                    </span>
-                                </a>
-                            </Link>{" "}
-                            to get veASH
+                    <div className="flex justify-between mt-1">
+                        <div className="text-xs lg:text-sm font-bold text-stake-gray-500">
+                            0%
                         </div>
-                    )}
+                        <div className="text-xs lg:text-sm font-bold text-stake-gray-500">
+                            100%
+                        </div>
+                    </div>
+                </div>
+                <div className="md:w-1/2 lg:w-5/12 flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+                    <label
+                        className="py-6 px-4 w-full sm:w-1/2 md:w-2/5 h-14 sm:h-18 shrink-0 bg-ash-dark-400 flex items-center font-bold text-lg cursor-text"
+                        htmlFor="vote-editor-pct"
+                    >
+                        <InputCurrency
+                            id="vote-editor-pct"
+                            className="grow bg-transparent min-w-0 outline-none text-right placeholder:text-ash-gray-600"
+                            placeholder="0.0"
+                            decimals={2}
+                            value={weightStr}
+                            disabled={!farmAddress}
+                            onChange={(e) => {
+                                const str = e.target.value;
+                                const val = BigNumber.min(
+                                    new BigNumber(str)
+                                        .multipliedBy(10_000)
+                                        .div(100),
+                                    maxPower
+                                );
+                                const pct = val.multipliedBy(100).div(10_000);
+                                setWeight(val.toNumber());
+                                setWeightStr(
+                                    new BigNumber(str).gt(pct) ? "" + pct : str
+                                );
+                            }}
+                        />
+                        <div className="text-ash-gray-600">%</div>
+                    </label>
+                    <div className="grow">
+                        <GlowingButton
+                            theme="pink"
+                            className="w-full h-14 sm:h-18 px-4 font-bold text-sm"
+                            disabled={!canVote}
+                            onClick={() => setIsOpenModal(true)}
+                        >
+                            {veAmt.gt(0) ? (
+                                <>
+                                    {isLockedVote ? (
+                                        <>This farm is locked</>
+                                    ) : (
+                                        <>
+                                            Confirm{" "}
+                                            <ICChevronRight className="w-2 h-auto ml-2" />
+                                        </>
+                                    )}
+                                </>
+                            ) : (
+                                "YOU DON’T HAVE VEASH"
+                            )}
+                        </GlowingButton>
+                        {veAmt.eq(0) ? (
+                            <div className="mt-2 font-bold text-2xs text-stake-gray-500">
+                                Stake ASH{" "}
+                                <Link href="/stake/gov">
+                                    <a>
+                                        <span className="text-pink-600 underline">
+                                            here
+                                        </span>
+                                    </a>
+                                </Link>{" "}
+                                to get veASH
+                            </div>
+                        ) : (
+                            isLockedVote && (
+                                <div className="mt-2 font-bold text-2xs text-stake-gray-500">
+                                    You can only change individual farm votes
+                                    once per 10 days
+                                </div>
+                            )
+                        )}
+                    </div>
                 </div>
             </div>
-        </div>
+            <BaseModal
+                isOpen={isOpenModal}
+                onRequestClose={() => setIsOpenModal(false)}
+                type={screenSize.msm ? "drawer_btt" : "modal"}
+                className={`clip-corner-4 clip-corner-tl bg-ash-dark-400 text-white p-4 flex flex-col max-h-full max-w-4xl mx-auto`}
+            >
+                <div className="flex justify-end mb-6">
+                    <BaseModal.CloseBtn />
+                </div>
+                <div className="grow overflow-auto">
+                    <div className="flex flex-col items-center text-center px-20 pb-16">
+                        <div className="mb-5 font-bold text-2xl sm:text-5xl text-white leading-tight">
+                            You cannot change your vote
+                        </div>
+                        <div className="mb-16 font-bold text-sm sm:text-2xl text-stake-gray-500">
+                            for this farm until
+                        </div>
+                        <div>
+                            <div className="h-18 px-5 flex justify-between items-center bg-ash-dark-600">
+                                <div className="mr-10 flex items-center">
+                                    <ICLock className="w-6 h-auto mr-2" />
+                                    <span>{nextVoteDate}</span>
+                                </div>
+                                <div className="flex items-center">
+                                    {pool?.tokens.map((_t) => {
+                                        const t = getTokenFromId(_t.identifier);
+                                        return (
+                                            <Avatar
+                                                key={t.identifier}
+                                                src={t.logoURI}
+                                                alt={t.name}
+                                                className="w-5 h-5 -ml-0.5 first:ml-0"
+                                            />
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                            <div className="border-notch-x border-notch-white/50 mt-12">
+                                <GlowingButton
+                                    theme="pink"
+                                    className="clip-corner-1 clip-corner-tl w-full h-12 font-bold text-sm"
+                                    disabled={!canVote}
+                                    onClick={() => {
+                                        voteFarmWeight(farmAddress, weight);
+                                        setIsOpenModal(false);
+                                    }}
+                                >
+                                    <span className="mr-3">vote</span>
+                                    <ICChevronRight className="w-auto h-2.5" />
+                                </GlowingButton>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </BaseModal>
+        </>
     );
 });
 type FarmWeightVotingProps = {
@@ -317,12 +461,15 @@ function FarmWeightVoting({ defaultFarmAddress }: FarmWeightVotingProps) {
                 </div>
             </div>
             <div className="overflow-auto mb-12">
-                <table className="w-full space-y-4 border-separate border-spacing-y-4 min-w-[25rem]">
+                <table className="w-full space-y-4 border-separate border-spacing-y-4 min-w-[35rem]">
                     <thead>
                         <tr className="text-left font-bold text-xs sm:text-sm text-stake-gray-500 underline">
-                            <th className="w-auto">Farm</th>
+                            <th className="w-auto min-w-[10rem]">Farm</th>
                             <th className="w-2/12">Voted</th>
-                            <th className="min-w-[10rem] w-4/12 lg:w-3/12">
+                            <th className="w-2/12 min-w-[10rem] md:min-w-[12rem]">
+                                Not Voteable Until
+                            </th>
+                            <th className="min-w-[10rem] w-4/12 md:w-3/12">
                                 Bribe
                             </th>
                         </tr>

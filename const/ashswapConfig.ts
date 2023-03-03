@@ -20,13 +20,13 @@ const dappContractDevnet: DappContractConfig = {
     },
     alpha: {
         voteEscrowedContract:
-            "erd1qqqqqqqqqqqqqpgqe5q4g4yv554yl40n0y2ntpax9duk69ghrmcq7zt30m",
+            "erd1qqqqqqqqqqqqqpgqsa5zpwjthqqq24v62lq7uuv9ex44fxdrrmcqd0nf0c",
         feeDistributor:
-            "erd1qqqqqqqqqqqqqpgqxczm7t7da8ktaapszfh6js8tc4k36xs4rmcqhrcjaw",
+            "erd1qqqqqqqqqqqqqpgqcr8xthnutlnx75rrjl32243xwn5exnpmrmcqegj70z",
         farmController:
-            "erd1qqqqqqqqqqqqqpgqk44khghvkuq0d7h8j6kv9pwh8hu0tncvrmcqwyra92",
+            "erd1qqqqqqqqqqqqqpgqzs3msdeag5qredsyjm0jw9t6gued2n3armcqql9x0q",
         farmBribe:
-            "erd1qqqqqqqqqqqqqpgqw8npzkng2j5pt5ht07h0jhh4wky0cgkcrmcqyk7wne",
+            "erd1qqqqqqqqqqqqqpgqhxh8vhw5hq3qqrsa9yfsjkf9ya0qqqxprmcqrqu9zs",
     },
 };
 
@@ -65,4 +65,5 @@ export const VE_CONFIG = ENVIRONMENT.NETWORK === "mainnet" ? {
 export const ASHSWAP_CONFIG = {
     ashApiBaseUrl: ENVIRONMENT.ASH_API,
     dappContract,
+    farmWeightVoteDelay: 10 * 24 * 3600,
 } as const;

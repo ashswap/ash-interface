@@ -5,7 +5,7 @@ import {
     accIsLoggedInState,
 } from "atoms/dappState";
 import { clickedGovStakeModalState } from "atoms/govstakeStake";
-import { govTotalSupplyVeASH } from "atoms/govState";
+import { govTotalSupplyVeASHSelector } from "atoms/govState";
 import { tokenMapState } from "atoms/tokensState";
 import BigNumber from "bignumber.js";
 import Avatar from "components/Avatar";
@@ -85,13 +85,16 @@ const LOCK_CONFIGS = {
         ],
         ...VE_CONFIG,
         sliderStep: VE_CONFIG.minLock,
-    }
-}
-const LOCK_CONFIG = ENVIRONMENT.NETWORK === "devnet" ? LOCK_CONFIGS[ENVIRONMENT.ENV] : LOCK_CONFIGS.mainnet;
+    },
+};
+const LOCK_CONFIG =
+    ENVIRONMENT.NETWORK === "devnet"
+        ? LOCK_CONFIGS[ENVIRONMENT.ENV]
+        : LOCK_CONFIGS.mainnet;
 const FirstStakeContent = ({ open, onClose }: props) => {
     const tokenMap = useRecoilValue(tokenMapState);
     const insufficientEGLD = useRecoilValue(accIsInsufficientEGLDState);
-    const totalSupplyVeASH = useRecoilValue(govTotalSupplyVeASH);
+    const totalSupplyVeASH = useRecoilValue(govTotalSupplyVeASHSelector);
     const { createLock: lockASH } = useGovLockASH();
     const [lockPeriod, setLockPeriod] = useState(
         LOCK_CONFIG.predefinedLockPeriod[0].value
@@ -112,7 +115,7 @@ const FirstStakeContent = ({ open, onClose }: props) => {
                 amount: deboundRawLockAmt,
             });
         }
-    }, [deboundRawLockAmt]);
+    }, [deboundRawLockAmt, loggedIn]);
     const [onboardingStakeGov, setOnboardedStakeGov] =
         useOnboarding("stake_gov_1st");
     const [openOnboardStakeTooltip, setOpenOnboardTooltip] = useState(false);
@@ -312,21 +315,21 @@ const FirstStakeContent = ({ open, onClose }: props) => {
                                         className="ash-slider ash-slider-pink my-0"
                                         step={LOCK_CONFIG.sliderStep}
                                         marks={{
-                                            [LOCK_CONFIG.minLock]: "",
+                                            [LOCK_CONFIG.minLock]: <></>,
                                             [(LOCK_CONFIG.maxLock -
                                                 LOCK_CONFIG.minLock) /
                                                 4 +
-                                            LOCK_CONFIG.minLock]: "",
+                                            LOCK_CONFIG.minLock]: <></>,
                                             [(LOCK_CONFIG.maxLock -
                                                 LOCK_CONFIG.minLock) /
                                                 2 +
-                                            LOCK_CONFIG.minLock]: "",
+                                            LOCK_CONFIG.minLock]: <></>,
                                             [((LOCK_CONFIG.maxLock -
                                                 LOCK_CONFIG.minLock) *
                                                 3) /
                                                 4 +
-                                            LOCK_CONFIG.minLock]: "",
-                                            [LOCK_CONFIG.maxLock]: "",
+                                            LOCK_CONFIG.minLock]: <></>,
+                                            [LOCK_CONFIG.maxLock]: <></>,
                                         }}
                                         handleStyle={{
                                             backgroundColor:

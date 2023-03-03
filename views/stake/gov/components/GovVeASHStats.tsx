@@ -2,10 +2,10 @@ import ImgVEASH from "assets/images/ve-ash.png";
 import ICCapacity from "assets/svg/capacity.svg";
 import ICLock from "assets/svg/lock.svg";
 import {
-    govLockedAmtState,
-    govTotalSupplyVeASH,
-    govUnlockTSState,
-    govVeASHAmtState
+    govLockedAmtSelector,
+    govTotalSupplyVeASHSelector,
+    govUnlockTSSelector,
+    govVeASHAmtSelector,
 } from "atoms/govState";
 import Avatar from "components/Avatar";
 import TextAmt from "components/TextAmt";
@@ -17,10 +17,10 @@ import { useMemo } from "react";
 import { useRecoilValue } from "recoil";
 
 function GovVeASHStats() {
-    const lockedAmt = useRecoilValue(govLockedAmtState);
-    const veASH = useRecoilValue(govVeASHAmtState);
-    const unlockTS = useRecoilValue(govUnlockTSState);
-    const totalSupplyVeASH = useRecoilValue(govTotalSupplyVeASH);
+    const lockedAmt = useRecoilValue(govLockedAmtSelector);
+    const veASH = useRecoilValue(govVeASHAmtSelector);
+    const unlockTS = useRecoilValue(govUnlockTSSelector);
+    const totalSupplyVeASH = useRecoilValue(govTotalSupplyVeASHSelector);
     const capacityPct = useMemo(() => {
         if (totalSupplyVeASH.eq(0)) return "_";
         return veASH.multipliedBy(100).div(totalSupplyVeASH).toFixed(2);
@@ -47,7 +47,11 @@ function GovVeASHStats() {
                     {/* <div className="w-[1.125rem] h-[1.125rem] mr-2">
                                         <Image src={ImgUsdt} alt="token icon" />
                                     </div> */}
-                    <Avatar src={ImgVEASH} alt="veASH" className="w-[1.125rem] h-[1.125rem] mr-2"/>
+                    <Avatar
+                        src={ImgVEASH}
+                        alt="veASH"
+                        className="w-[1.125rem] h-[1.125rem] mr-2"
+                    />
                     <div className="text-lg text-white font-bold">
                         <TextAmt
                             number={toEGLDD(VE_ASH_DECIMALS, veASH)}

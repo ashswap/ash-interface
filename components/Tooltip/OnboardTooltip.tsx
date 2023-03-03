@@ -1,12 +1,12 @@
-import React, { createContext, useContext, useState } from "react";
+import { Dimensions, ElementRects } from "@floating-ui/react";
+import ICCaretDown from "assets/svg/caret-down.svg";
 import ICCaretLeft from "assets/svg/caret-left.svg";
 import ICCaretRight from "assets/svg/caret-right.svg";
 import ICCaretUp from "assets/svg/caret-up.svg";
-import ICCaretDown from "assets/svg/caret-down.svg";
 import ICClose from "assets/svg/close.svg";
 import BaseTooltip, { BaseTooltipProps } from "components/BaseTooltip";
 import { useScreenSize } from "hooks/useScreenSize";
-import { Dimensions, ElementRects } from "@floating-ui/react-dom-interactions";
+import React, { useState } from "react";
 const Arrow = ({
     direction,
     onClick,

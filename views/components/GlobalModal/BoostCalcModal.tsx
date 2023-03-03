@@ -2,7 +2,8 @@ import { offset } from "@popperjs/core";
 import ICChevronDown from "assets/svg/chevron-down.svg";
 import ICGovBoost from "assets/svg/gov-boost.svg";
 import { farmPoolQuery, farmQuery } from "atoms/farmsState";
-import { govTotalSupplyVeASH, govVeASHAmtState } from "atoms/govState";
+import { govTotalSupplyVeASHSelector } from "atoms/govState";
+import { poolStatsRefresherAtom } from "atoms/poolsState";
 import BigNumber from "bignumber.js";
 import Avatar from "components/Avatar";
 import BaseModal, { BaseModalType } from "components/BaseModal";
@@ -19,11 +20,8 @@ import { formatAmount } from "helper/number";
 import { estimateVeASH } from "helper/voteEscrow";
 import useInputNumberString from "hooks/useInputNumberString";
 import { useScreenSize } from "hooks/useScreenSize";
-import Image from "components/Image";
 import { useEffect, useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
-import { ENVIRONMENT } from "const/env";
-import { poolStatsRefresherAtom } from "atoms/poolsState";
 
 const LOCK_OPTS_BOY = [
     { value: 2 * 7 * 24 * 3600, label: "2 weeks" },
@@ -54,7 +52,7 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
     const [selectedLock, setSelectedLock] = useState(LOCK_OPTS[0]);
 
     const farmData = useRecoilValue(farmQuery(farmAddress || ""));
-    const veASHSupplyRecoil = useRecoilValue(govTotalSupplyVeASH);
+    const veASHSupplyRecoil = useRecoilValue(govTotalSupplyVeASHSelector);
     const pool = useRecoilValue(farmPoolQuery(farmAddress || ""));
 
     const [lpValueStr, setLpValueStr] = useInputNumberString(lpValue);

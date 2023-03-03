@@ -5,26 +5,10 @@ import BaseTooltip from "components/BaseTooltip";
 import Image from "components/Image";
 import { LEGAL_LINKS, SOCIALS } from "const/link";
 import { useScreenSize } from "hooks/useScreenSize";
-import Link from "next/link";
 import React, { useState } from "react";
 import LegalLinkItem from "./LegalLinkItem";
 import styles from "./Nav.module.css";
 
-function HeadlessLink(
-    props: React.DetailedHTMLProps<
-        React.AnchorHTMLAttributes<HTMLAnchorElement>,
-        HTMLAnchorElement
-    >
-) {
-    let { href, children, ...rest } = props;
-    return href ? (
-        <Link href={href}>
-            <a {...rest}>{children}</a>
-        </Link>
-    ) : (
-        <>{children}</>
-    );
-}
 const MenuContent = () => {
     return (
         <>

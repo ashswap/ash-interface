@@ -1,5 +1,5 @@
-import { useGetLoginInfo } from "@elrondnetwork/dapp-core/hooks";
-import { LoginMethodsEnum } from "@elrondnetwork/dapp-core/types";
+import { useGetLoginInfo } from "@multiversx/sdk-dapp/hooks";
+import { LoginMethodsEnum } from "@multiversx/sdk-dapp/types";
 import { useMemo } from "react";
 
 export const useConnectMethod = () => {
@@ -7,9 +7,9 @@ export const useConnectMethod = () => {
     const loginMethodName = useMemo(() => {
         switch (loginMethod) {
             case LoginMethodsEnum.extension:
-                return "Maiar Wallet Extension";
+                return "MultiversX DeFi Wallet";
             case LoginMethodsEnum.walletconnect:
-                return "Maiar App"
+                return "xPortal App";
             case LoginMethodsEnum.wallet:
                 return "Web Wallet";
             case LoginMethodsEnum.ledger:
@@ -18,5 +18,5 @@ export const useConnectMethod = () => {
                 return "Wallet";
         }
     }, [loginMethod]);
-    return loginMethodName
-}
+    return loginMethodName;
+};

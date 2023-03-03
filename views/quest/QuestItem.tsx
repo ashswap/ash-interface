@@ -16,7 +16,7 @@ import {
     isSwapQuest,
     QuestAction,
     QuestActionType,
-    QuestUserStatsModel
+    QuestUserStatsModel,
 } from "interface/quest";
 import moment from "moment";
 import Link from "next/link";
@@ -86,14 +86,17 @@ function QuestItem({
         return `${actionLabelMap[type]} ${requireMsg}`;
     }, [questData, type]);
 
-    const claim = useRecoilCallback(() => async () => {
-        const claimType = type === "prize" ? "prize" : "action";
-        await logApi.post("/api/v1/wallet/claim", {
-            claim_type: claimType,
-            [claimType === "action" ? "action_name" : "prize_day"]:
-                claimType === "action" ? type : questData.require,
-        });
-    }, [questData.require, type]);
+    const claim = useRecoilCallback(
+        () => async () => {
+            const claimType = type === "prize" ? "prize" : "action";
+            await logApi.post("/api/v1/wallet/claim", {
+                claim_type: claimType,
+                [claimType === "action" ? "action_name" : "prize_day"]:
+                    claimType === "action" ? type : questData.require,
+            });
+        },
+        [questData.require, type]
+    );
 
     return (
         <QuestItemBase
@@ -113,7 +116,13 @@ function QuestItem({
     );
 }
 
-export function CustomQuestItem({ questData, onClaim }: { questData: ICustomQuest, onClaim?: () => Promise<void> }) {
+export function CustomQuestItem({
+    questData,
+    onClaim,
+}: {
+    questData: ICustomQuest;
+    onClaim?: () => Promise<void>;
+}) {
     const [name, setName] = useState("");
     const [note, setNote] = useState("");
     const [status, setStatus] = useState(0);
@@ -121,14 +130,17 @@ export function CustomQuestItem({ questData, onClaim }: { questData: ICustomQues
     const [require, setRequire] = useState(0);
     const [progresses, setProgresses] = useState<ProgressData[]>([]);
 
-    const claim = useRecoilCallback(() => async () => {
-        await logApi.post("/api/v1/wallet/claim", {
-            claim_type: questData.__typename,
-            quest_name: questData.quest_name,
-            claim_amount: require,
-        });
-        onClaim?.();
-    }, [questData, require, onClaim]);
+    const claim = useRecoilCallback(
+        () => async () => {
+            await logApi.post("/api/v1/wallet/claim", {
+                claim_type: questData.__typename,
+                quest_name: questData.quest_name,
+                claim_amount: require,
+            });
+            onClaim?.();
+        },
+        [questData, require, onClaim]
+    );
 
     useEffect(() => {
         if (isFarmQuest(questData)) {
@@ -143,7 +155,8 @@ export function CustomQuestItem({ questData, onClaim }: { questData: ICustomQues
             setStatus(
                 questData.last_claimed === questData.require
                     ? 2
-                    : questData.stake_amount >= questData.require && questData.continuous_day >= questData.min_time
+                    : questData.stake_amount >= questData.require &&
+                      questData.continuous_day >= questData.min_time
                     ? 1
                     : 0
             );
@@ -181,9 +194,14 @@ export function CustomQuestItem({ questData, onClaim }: { questData: ICustomQues
                 entries.find(
                     ([_required, point]) => questData.last_claimed < +_required
                 ) || entries[entries.length - 1];
-            const currentLockDuration = Math.floor(moment
-                .duration(questData.locked_end_at - questData.create_lock_at, "seconds")
-                .asDays());
+            const currentLockDuration = Math.floor(
+                moment
+                    .duration(
+                        questData.locked_end_at - questData.create_lock_at,
+                        "seconds"
+                    )
+                    .asDays()
+            );
             setName(
                 `Stake at least ${required} veASH with minimum ${
                     questData.min_time
@@ -212,7 +230,7 @@ export function CustomQuestItem({ questData, onClaim }: { questData: ICustomQues
                 {
                     current: {
                         value: currentLockDuration,
-                        label: `${currentLockDuration}`
+                        label: `${currentLockDuration}`,
                     },
                     target: {
                         value: questData.min_time,
@@ -225,10 +243,10 @@ export function CustomQuestItem({ questData, onClaim }: { questData: ICustomQues
         }
         if (isSwapQuest(questData)) {
             setName(
-                `Trading volume greater than ${formatAmount(
-                    questData.require,
-                    { notation: "standard", isIntegerAuto: true }
-                )}$`
+                `Trading volume greater than ${formatAmount(questData.require, {
+                    notation: "standard",
+                    isIntegerAuto: true,
+                })}$`
             );
             setStatus(
                 questData.last_claimed === questData.require
@@ -346,7 +364,7 @@ function QuestItemBase({
     const getUserStats = useRecoilCallback(
         ({ set }) =>
             async () => {
-                if(ENVIRONMENT.ENABLE_ASHPOINT){
+                if (ENVIRONMENT.ENABLE_ASHPOINT) {
                     const stats = await logApi
                         .get<QuestUserStatsModel>("/api/v1/wallet")
                         .then((res) => res.data)
@@ -391,21 +409,25 @@ function QuestItemBase({
             <div className="grow flex">
                 <div className="grow flex flex-col justify-between">
                     <div className="mb-7">
-                    <div className="text-2xs sm:text-sm leading-tight">
-                        <span className="font-semibold text-ash-gray-600">
-                            {"//"}
-                        </span>
-                        <span
-                            className={`font-bold ${
-                                status === 2
-                                    ? "text-ash-gray-600"
-                                    : "text-white"
-                            }`}
-                        >
-                            {name}
-                        </span>
-                    </div>
-                    {note && <div className="font-bold text-2xs sm:text-xs text-stake-gray-500">{note}</div>}
+                        <div className="text-2xs sm:text-sm leading-tight">
+                            <span className="font-semibold text-ash-gray-600">
+                                {"//"}
+                            </span>
+                            <span
+                                className={`font-bold ${
+                                    status === 2
+                                        ? "text-ash-gray-600"
+                                        : "text-white"
+                                }`}
+                            >
+                                {name}
+                            </span>
+                        </div>
+                        {note && (
+                            <div className="font-bold text-2xs sm:text-xs text-stake-gray-500">
+                                {note}
+                            </div>
+                        )}
                     </div>
                     <div
                         className={`relative max-w-[9rem] px-2 py-1 sm:px-4 sm:py-2 bg-ash-gray-600/10 ${colorClasses[status]}`}
@@ -424,17 +446,15 @@ function QuestItemBase({
                     <div className="shrink w-20 sm:w-24 border-notch-x border-notch-white/50">
                         {status === 0 ? (
                             <Link href={redirect || "/"}>
-                                <a>
-                                    <GlowingButton
-                                        theme="purple"
-                                        className="w-full h-8 clip-corner-1 clip-corner-tl font-bold text-xs"
-                                        disabled={type === "prize"}
-                                    >
-                                        <div className="flex items-center space-x-2.5">
-                                            Go!
-                                        </div>
-                                    </GlowingButton>
-                                </a>
+                                <GlowingButton
+                                    theme="purple"
+                                    className="w-full h-8 clip-corner-1 clip-corner-tl font-bold text-xs"
+                                    disabled={type === "prize"}
+                                >
+                                    <div className="flex items-center space-x-2.5">
+                                        Go!
+                                    </div>
+                                </GlowingButton>
                             </Link>
                         ) : status === 1 ? (
                             <GlowingButton

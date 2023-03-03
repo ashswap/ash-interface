@@ -1,14 +1,19 @@
 import {
     useGetLoginInfo,
-    useSignTransactions
-} from "@elrondnetwork/dapp-core/hooks";
-import { LoginMethodsEnum } from "@elrondnetwork/dapp-core/types";
+    useSignTransactions,
+} from "@multiversx/sdk-dapp/hooks";
+import { LoginMethodsEnum } from "@multiversx/sdk-dapp/types";
 import { Transition } from "@headlessui/react";
 import { Fragment, useMemo } from "react";
 // listen for the txs to be signed in queue, if the queue is not empty prompt the modal for user
 function SignTxsModal() {
     // ! useSignTransactions auto invoke provider for signing hence just use the hook only in once place globlally
-    const { hasTransactions, transactions, error, canceledTransactionsMessage } = useSignTransactions();
+    const {
+        hasTransactions,
+        transactions,
+        error,
+        canceledTransactionsMessage,
+    } = useSignTransactions();
     // const { hasTransactions } = useSignTxs();
     const { loginMethod } = useGetLoginInfo();
 
@@ -18,9 +23,9 @@ function SignTxsModal() {
     const loginMethodName = useMemo(() => {
         switch (loginMethod) {
             case LoginMethodsEnum.extension:
-                return "Maiar Wallet Extension";
+                return "MultiversX DeFi Wallet";
             case LoginMethodsEnum.walletconnect:
-                return "Maiar App"
+                return "xPortal App";
             case LoginMethodsEnum.wallet:
                 return "Web Wallet";
             case LoginMethodsEnum.ledger:
@@ -32,7 +37,7 @@ function SignTxsModal() {
     return (
         <>
             <Transition
-                show={hasTransactions}
+                show={!!hasTransactions}
                 as={Fragment}
                 enter="transition duration-300 ease"
                 enterFrom="translate-x-full opacity-0"

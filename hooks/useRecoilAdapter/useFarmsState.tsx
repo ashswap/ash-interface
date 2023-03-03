@@ -1,5 +1,5 @@
-import { useGetPendingTransactions } from "@elrondnetwork/dapp-core/hooks";
-import { SendTransactionReturnType } from "@elrondnetwork/dapp-core/types";
+import { useGetPendingTransactions } from "@multiversx/sdk-dapp/hooks";
+import { SendTransactionReturnType } from "@multiversx/sdk-dapp/types";
 import { ashswapBaseState } from "atoms/ashswap";
 import { accAddressState } from "atoms/dappState";
 import {

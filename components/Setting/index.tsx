@@ -66,7 +66,7 @@ const Setting = (props: Props) => {
                                             .toString(10)
                                     );
                                 }
-                                const [numerator, denominator] = new BigNumber(valid).toFraction();
+                                const [numerator, denominator] = valid === 0 ? [0, 100_000] : new BigNumber(valid).toFraction();
                                 setSlippage(new Percent(numerator, denominator));
                             }
                         } else {

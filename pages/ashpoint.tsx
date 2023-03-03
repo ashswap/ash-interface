@@ -1,6 +1,6 @@
-import { useGetLoginInfo } from "@elrondnetwork/dapp-core/hooks";
-import { LoginMethodsEnum } from "@elrondnetwork/dapp-core/types";
-import { logout } from "@elrondnetwork/dapp-core/utils";
+import { useGetLoginInfo } from "@multiversx/sdk-dapp/hooks";
+import { LoginMethodsEnum } from "@multiversx/sdk-dapp/types";
+import { logout } from "@multiversx/sdk-dapp/utils";
 import ICWallet from "assets/svg/wallet.svg";
 import { accAddressState } from "atoms/dappState";
 import BaseModal, { BaseModalType } from "components/BaseModal";
@@ -35,7 +35,11 @@ const WebWalletInformModal = memo(function WebWalletInformModal(
                     <ICWallet className="h-5 w-5 mr-2" />
                     <span className="text-xs font-bold">Disconnect</span>
                 </button>
-                <Link href="/swap"><a><span className="text-stake-gray-500 text-xs">Back to swap</span></a></Link>
+                <Link href="/swap">
+                    <span className="text-stake-gray-500 text-xs">
+                        Back to swap
+                    </span>
+                </Link>
             </div>
         </BaseModal>
     );
@@ -53,7 +57,11 @@ function AshPoint() {
     if (loginMethod === LoginMethodsEnum.wallet)
         return (
             <WebWalletInformModal
-                isOpen={loginMethod === LoginMethodsEnum.wallet && isLoggedIn && !!userAddress}
+                isOpen={
+                    loginMethod === LoginMethodsEnum.wallet &&
+                    isLoggedIn &&
+                    !!userAddress
+                }
             />
         );
 

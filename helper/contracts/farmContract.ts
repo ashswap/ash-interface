@@ -1,7 +1,7 @@
 import Contract from "./contract";
 import farmAbi from "assets/abi/farm.abi.json";
-import { Address, TokenPayment } from "@elrondnetwork/erdjs/out";
-import { getAddress } from "@elrondnetwork/dapp-core/utils";
+import { Address, TokenPayment } from "@multiversx/sdk-core/out";
+import { getAddress } from "@multiversx/sdk-dapp/utils";
 import BigNumber from "bignumber.js";
 import { FarmTokenAttrs } from "interface/farm";
 import chunk from "lodash.chunk";
@@ -16,7 +16,11 @@ class FarmContract extends Contract<typeof farmAbi> {
 
     private _getBaseGasLimit() {
         // fallback to 5 weeks
-        const week = this.lastRewardBlockTs === 0 ? 5 : Math.floor(moment().unix() / WEEK) - Math.floor(this.lastRewardBlockTs / WEEK);
+        const week =
+            this.lastRewardBlockTs === 0
+                ? 5
+                : Math.floor(moment().unix() / WEEK) -
+                  Math.floor(this.lastRewardBlockTs / WEEK);
         // each interation by week of checkpoint cost 12_000_000 (farm contract) + checkpoint farm (farm controller) cost 10_000_000
         return week * 12_000_000 + 10_000_000;
     }
@@ -28,7 +32,11 @@ class FarmContract extends Contract<typeof farmAbi> {
             tokenPayments,
             new Address(sender)
         );
-        interaction.withGasLimit(20_000_000 + tokenPayments.length * 2_000_000 + this._getBaseGasLimit());
+        interaction.withGasLimit(
+            20_000_000 +
+                tokenPayments.length * 2_000_000 +
+                this._getBaseGasLimit()
+        );
         return this.interceptInteraction(interaction)
             .check()
             .buildTransaction();
@@ -41,7 +49,11 @@ class FarmContract extends Contract<typeof farmAbi> {
             tokenPayments,
             new Address(sender)
         );
-        interaction.withGasLimit(20_000_000 + tokenPayments.length * 2_000_000 + this._getBaseGasLimit());
+        interaction.withGasLimit(
+            20_000_000 +
+                tokenPayments.length * 2_000_000 +
+                this._getBaseGasLimit()
+        );
         return this.interceptInteraction(interaction)
             .check()
             .buildTransaction();
@@ -57,14 +69,21 @@ class FarmContract extends Contract<typeof farmAbi> {
             tokenPayments,
             new Address(sender)
         );
-        interaction.withGasLimit(20_000_000 + tokenPayments.length * 2_500_000 + this._getBaseGasLimit());
+        interaction.withGasLimit(
+            20_000_000 +
+                tokenPayments.length * 2_500_000 +
+                this._getBaseGasLimit()
+        );
         return this.interceptInteraction(interaction)
             .check()
             .buildTransaction();
     }
 
     async enterFarm(tokenPayments: TokenPayment[], selfBoost = false) {
-        return await this._enterFarm(tokenPayments.slice(0, this.MAX_TOKEN_PROCESS), selfBoost);
+        return await this._enterFarm(
+            tokenPayments.slice(0, this.MAX_TOKEN_PROCESS),
+            selfBoost
+        );
     }
 
     async exitFarm(tokenPayments: TokenPayment[]) {
@@ -102,7 +121,7 @@ class FarmContract extends Contract<typeof farmAbi> {
         return (firstValue?.valueOf() as BigNumber) || new BigNumber(0);
     }
 
-    withLastRewardBlockTs(ts: number){
+    withLastRewardBlockTs(ts: number) {
         this.lastRewardBlockTs = ts;
         return this;
     }

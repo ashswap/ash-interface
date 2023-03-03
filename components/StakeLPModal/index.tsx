@@ -44,7 +44,7 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
                 lp_token: pool?.lpToken?.symbol,
             });
         }
-    }, [deboundRawStakeAmt]);
+    }, [deboundRawStakeAmt, loggedIn, pool]);
     const { enterFarm } = useEnterFarm();
     const LPBalance = useMemo(
         () => new BigNumber(lpTokenMap[pool.lpToken.identifier]?.balance || 0),

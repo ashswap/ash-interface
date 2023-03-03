@@ -1,6 +1,6 @@
-import { useGetAccountProvider } from "@elrondnetwork/dapp-core/hooks";
-import { LoginMethodsEnum } from "@elrondnetwork/dapp-core/types";
-import { getAccountProviderType } from "@elrondnetwork/dapp-core/utils";
+import { useGetAccountProvider } from "@multiversx/sdk-dapp/hooks";
+import { LoginMethodsEnum } from "@multiversx/sdk-dapp/types";
+import { getAccountProviderType } from "@multiversx/sdk-dapp/utils";
 import * as Sentry from "@sentry/nextjs";
 import {
     atomQuestUserStats,
@@ -15,6 +15,7 @@ import { QuestUserStatsModel } from "interface/quest";
 import { useRouter } from "next/router";
 import { useCallback, useEffect } from "react";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { useDebouncedCallback } from "use-debounce";
 
 const useAshpoint = () => {
     const router = useRouter();
@@ -41,13 +42,16 @@ const useAshpoint = () => {
         }
     }, [ashpointSignature, setUserStats]);
 
+    const getUserStatsDebounce = useDebouncedCallback(getUserStats, 200);
+
     useEffect(() => {
         const provider = getAccountProviderType();
         if (
             accAddress &&
             isLoggedIn &&
             provider !== LoginMethodsEnum.wallet &&
-            ENVIRONMENT.ENABLE_ASHPOINT_SIGN && ENVIRONMENT.ENABLE_ASHPOINT
+            ENVIRONMENT.ENABLE_ASHPOINT_SIGN &&
+            ENVIRONMENT.ENABLE_ASHPOINT
         ) {
             logApi
                 .get("/api/v1/no-auth/wallet", {
@@ -57,7 +61,9 @@ const useAshpoint = () => {
         }
     }, [accAddress, isLoggedIn, setIsRegistered]);
 
-    useEffect(() => getUserStats(), [getUserStats]);
+    useEffect(() => {
+        getUserStatsDebounce();
+    }, [getUserStatsDebounce]);
 
     useEffect(() => {
         if (ENVIRONMENT.ENABLE_ASHPOINT_SIGN && ENVIRONMENT.ENABLE_ASHPOINT) {

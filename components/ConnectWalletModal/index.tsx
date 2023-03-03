@@ -1,12 +1,13 @@
 import {
-    useExtensionLogin, useWalletConnectLogin,
-    useWebWalletLogin
-} from "@elrondnetwork/dapp-core/hooks";
+    useExtensionLogin,
+    useWalletConnectV2Login,
+    useWebWalletLogin,
+} from "@multiversx/sdk-dapp/hooks";
 import connectWalletBg from "assets/images/connect-wallet-bg.png";
 import downloadAppGallery from "assets/images/download-app-gallery.png";
 import downloadAppStore from "assets/images/download-app-store.png";
 import downloadPlayStore from "assets/images/download-play-store.png";
-import maiarLogo from "assets/images/maiar-logo.png";
+import ICMultiversx from "assets/svg/multiversx.svg";
 import ICConnectApp from "assets/svg/connect-app.svg";
 import ICConnectExtension from "assets/svg/connect-extension.svg";
 import ICConnectLedger from "assets/svg/connect-ledger.svg";
@@ -14,7 +15,7 @@ import ICConnectWebWallet from "assets/svg/connect-web-wallet.svg";
 import {
     accAddressState,
     accIsLoggedInState,
-    dappCoreState
+    dappCoreState,
 } from "atoms/dappState";
 import { notFirstRenderConnectWallet } from "atoms/firstRenderConnectWalletState";
 import { walletIsOpenConnectModalState } from "atoms/walletState";
@@ -26,12 +27,12 @@ import QRCode from "qrcode";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { useConnectMethod } from "hooks/useConnectMethod";
-const MAIAR_WALLET_LINK = {
+const MULTIVERSX_WALLET_LINK = {
     PLAY_STORE: "https://maiar.onelink.me/HLcx/52dcde54",
     APP_STORE: "https://maiar.onelink.me/HLcx/f0b7455c",
     APP_GALLERY: "https://maiar.onelink.me/HLcx/2e18b72b",
     CHROME_EXT:
-        "https://chrome.google.com/webstore/detail/maiar-defi-wallet/dngmlblcodfobpdpecaadgfbcggfjfnm",
+        "https://chrome.google.com/webstore/detail/multiversx-defi-wallet/dngmlblcodfobpdpecaadgfbcggfjfnm",
 };
 function ConnectWalletModal() {
     const loggedIn = useRecoilValue(accIsLoggedInState);
@@ -53,8 +54,8 @@ function ConnectWalletModal() {
     );
     const [webWalletLogin] = useWebWalletLogin({
         callbackRoute: "",
-    });        
-    const loginMethodName = useConnectMethod()
+    });
+    const loginMethodName = useConnectMethod();
     useEffect(() => {
         if (!isOpenConnectWalletModal) {
             setIsOpenQR(false);
@@ -80,17 +81,20 @@ function ConnectWalletModal() {
         if (window && loggedIn && isOpenConnectWalletModal) {
             let dataLayer = (window as any).dataLayer || [];
             window.localStorage.setItem("address", dappCore.account.address);
-            window.localStorage.setItem(
-                "method",
-                loginMethodName
-            );
+            window.localStorage.setItem("method", loginMethodName);
             dataLayer.push({
                 event: "success_connect_wallet",
                 address: dappCore.account.address,
-                method: loginMethodName
+                method: loginMethodName,
             });
         }
-    }, [loggedIn, dappCore.account.address, dappCore.loginInfo.loginMethod]);
+    }, [
+        loggedIn,
+        dappCore.account.address,
+        dappCore.loginInfo.loginMethod,
+        isOpenConnectWalletModal,
+        loginMethodName,
+    ]);
     useEffect(() => {
         if (window && !loggedIn && notFirstRender) {
             let dataLayer = (window as any).dataLayer || [];
@@ -103,6 +107,7 @@ function ConnectWalletModal() {
         if (window && !loggedIn) {
             setNotFirstRender(true);
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [loggedIn]);
     return (
         <>
@@ -132,7 +137,7 @@ function ConnectWalletModal() {
                                     className="text-ash-purple-500 uppercase text-xs sm:text-sm text-center font-bold cursor-pointer"
                                     onClick={() => setIsOpenDownloadApp(true)}
                                 >
-                                    I DON’T HAVE MAIAR MOBILE APP
+                                    I DON’T HAVE xPortal APP
                                 </div>
                             </div>
                         ) : (
@@ -140,7 +145,7 @@ function ConnectWalletModal() {
                                 <div className="font-bold text-2xl mb-20 text-center">
                                     <span>Connect to </span>
                                     <span className="text-ash-blue-500">
-                                        Maiar Wallet
+                                        a wallet
                                     </span>
                                 </div>
                                 <div
@@ -153,9 +158,9 @@ function ConnectWalletModal() {
                                         />
                                     </div>
                                     <div className="text-sm font-bold uppercase">
-                                        <span>Maiar </span>
+                                        <span>MultiversX DeFi </span>
                                         <span className="text-ash-blue-500">
-                                            web extension
+                                            Wallet
                                         </span>
                                     </div>
                                 </div>
@@ -169,9 +174,9 @@ function ConnectWalletModal() {
                                         />
                                     </div>
                                     <div className="text-sm font-bold uppercase">
-                                        <span>Maiar </span>
+                                        <span>xPortal </span>
                                         <span className="text-ash-blue-500">
-                                            mobile app
+                                            App
                                         </span>
                                     </div>
                                 </div>
@@ -195,7 +200,7 @@ function ConnectWalletModal() {
                                     <div className="text-sm font-bold uppercase">
                                         <span>Ledger </span>
                                         <span className="text-ash-blue-500">
-                                            wallet
+                                            Wallet
                                         </span>
                                     </div>
                                 </div>
@@ -209,9 +214,9 @@ function ConnectWalletModal() {
                                         />
                                     </div>
                                     <div className="text-sm font-bold uppercase">
-                                        <span>Web </span>
+                                        <span>MultiversX Web </span>
                                         <span className="text-ash-blue-500">
-                                            wallet
+                                            Wallet
                                         </span>
                                     </div>
                                 </div>
@@ -231,7 +236,7 @@ function ConnectWalletModal() {
                 <div className="grow flex flex-col items-center text-center py-10 px-6">
                     <div className="text-lg sm:text-2xl font-bold mb-9">
                         Install{" "}
-                        <span className="text-ash-blue-500">Maiar Wallet</span>{" "}
+                        <span className="text-ash-blue-500">xPortal</span>{" "}
                         App
                     </div>
                     <div className="flex items-center space-x-8 mb-[5.5rem]">
@@ -246,19 +251,13 @@ function ConnectWalletModal() {
                         </div>
                         <div className="relative w-9 h-9 sm:w-[4.75rem] sm:h-[4.75rem] flex items-center justify-center">
                             <div className="bg-white rounded-lg md:rounded-2xl rotate-45 absolute w-full h-full"></div>
-                            <div className="w-4 h-4 sm:w-7 sm:h-7 relative">
-                                <Image
-                                    src={maiarLogo}
-                                    alt="maiar logo"
-                                    layout="fill"
-                                />
-                            </div>
+                            <ICMultiversx className="relative w-4 h-auto sm:w-7 text-mvx-xportal"/>
                         </div>
                     </div>
                     <div className="overflow-auto max-w-full">
                         <div className="flex space-x-2 mb-7">
                             <a
-                                href={MAIAR_WALLET_LINK.PLAY_STORE}
+                                href={MULTIVERSX_WALLET_LINK.PLAY_STORE}
                                 target="_blank"
                                 rel="noreferrer"
                                 className="border border-white/50 relative flex items-center px-1 py-[0.125rem] cursor-pointer"
@@ -274,7 +273,7 @@ function ConnectWalletModal() {
                                 <div className="absolute right-[-1px] h-3 border-r border-r-ash-dark-400"></div>
                             </a>
                             <a
-                                href={MAIAR_WALLET_LINK.APP_STORE}
+                                href={MULTIVERSX_WALLET_LINK.APP_STORE}
                                 target="_blank"
                                 rel="noreferrer"
                                 className="border border-white/50 relative flex items-center px-1 py-[0.125rem] cursor-pointer"
@@ -290,7 +289,7 @@ function ConnectWalletModal() {
                                 <div className="absolute right-[-1px] h-3 border-r border-r-ash-dark-400"></div>
                             </a>
                             <a
-                                href={MAIAR_WALLET_LINK.APP_GALLERY}
+                                href={MULTIVERSX_WALLET_LINK.APP_GALLERY}
                                 target="_blank"
                                 rel="noreferrer"
                                 className="border border-white/50 relative flex items-center px-1 py-[0.125rem] cursor-pointer"
@@ -326,8 +325,8 @@ function ConnectWalletModal() {
                 <div className="grow flex flex-col items-center text-center pt-6 pb-10 px-2 sm:px-6">
                     <div className="text-lg sm:text-2xl font-bold mb-9">
                         Install{" "}
-                        <span className="text-ash-blue-500">Maiar Wallet</span>{" "}
-                        on your Brower
+                        <span className="text-ash-blue-500">MultiversX DeFi Wallet</span>{" "}
+                        on your Browser
                     </div>
                     <div className="flex items-center space-x-8 mb-[5.5rem]">
                         <ICConnectExtension
@@ -341,17 +340,11 @@ function ConnectWalletModal() {
                         </div>
                         <div className="relative w-9 h-9 sm:w-[4.75rem] sm:h-[4.75rem] flex items-center justify-center">
                             <div className="bg-white rounded-lg sm:rounded-2xl rotate-45 absolute w-full h-full"></div>
-                            <div className="w-4 h-4 sm:w-7 sm:h-7 relative">
-                                <Image
-                                    src={maiarLogo}
-                                    alt="maiar logo"
-                                    layout="fill"
-                                />
-                            </div>
+                            <ICMultiversx className="relative w-4 h-auto sm:w-7 text-mvx-xportal"/>
                         </div>
                     </div>
                     <a
-                        href={MAIAR_WALLET_LINK.CHROME_EXT}
+                        href={MULTIVERSX_WALLET_LINK.CHROME_EXT}
                         target="_blank"
                         rel="noreferrer"
                         className="border border-white/50 relative inline-flex items-center p-1 cursor-pointer mb-5 max-w-full"
@@ -359,7 +352,7 @@ function ConnectWalletModal() {
                         <div className="absolute left-[-1px] h-3 border-l border-l-ash-dark-400"></div>
                         <div className="clip-corner-1 clip-corner-tl bg-ash-blue-500 uppercase font-bold text-sm h-12 flex justify-center items-center text-center w-96 max-w-full text-white px-4">
                             <span className="truncate">
-                                Download maiar extension
+                                Download MultiversX DeFi Wallet
                             </span>
                         </div>
                         <div className="absolute right-[-1px] h-3 border-r border-r-ash-dark-400"></div>
@@ -372,7 +365,7 @@ function ConnectWalletModal() {
                         }}
                     >
                         <span>Or, use </span>
-                        <span className="text-white">maiar mobile app</span>
+                        <span className="text-white">xPortal app</span>
                     </span>
                 </div>
             </BaseModal>
@@ -393,15 +386,31 @@ const WalletConnect = ({
     onLogin?: () => void;
     onLogout?: () => void;
 }) => {
+    const config = useMemo(() => {
+        return { logoutRoute: "" };
+    }, []);
+    // const [
+    //     initConnect,
+    //     { error, isLoading, isLoggedIn, loginFailed },
+    //     { uriDeepLink, walletConnectUri },
+    // ] = useWalletConnectLogin({
+    //     callbackRoute: "",
+    //     logoutRoute: "",
+    // });
     const [
         initConnect,
         { error, isLoading, isLoggedIn, loginFailed },
-        { uriDeepLink, walletConnectUri },
-    ] = useWalletConnectLogin({
-        callbackRoute: "",
-        logoutRoute: "",
-    });
+        {
+            uriDeepLink,
+            walletConnectUri,
+            cancelLogin,
+            removeExistingPairing,
+            connectExisting,
+            wcPairings,
+        },
+    ] = useWalletConnectV2Login(config);
     const ref = useRef(null);
+    const cancelRef = useRef(cancelLogin);
     const [qrSvg, setQrSvg] = useState<string>("");
 
     const isMobile =
@@ -430,19 +439,43 @@ const WalletConnect = ({
         })();
     }, [walletConnectUri]);
 
-    useEffect(initConnect, [initConnect]);
-    useEffect(buildQrCode, [buildQrCode]);
+    const clearPairings = useCallback(async () => {
+        await Promise.all(wcPairings?.map(async pair => {
+            await removeExistingPairing(pair.topic);
+        }) || []);
+    }, [removeExistingPairing, wcPairings]);
+    useEffect(() => {
+        if (!walletConnectUri) {
+            initConnect();
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [walletConnectUri]);
+    useEffect(() => {
+        buildQrCode();
+    }, [buildQrCode]);
+    useEffect(() => {cancelRef.current = cancelLogin}, [cancelLogin]);
+    useEffect(() => {
+        return () => {
+            cancelRef.current();
+        };
+    }, []);
 
     return (
         <div className="text-white flex flex-col items-center" ref={ref}>
             <div className="text-lg sm:text-2xl text-center font-bold mb-16">
-                <span className="text-ash-blue-500">Maiar mobile </span>
+                <span className="text-ash-blue-500">xPortal </span>
                 <span>login</span>
             </div>
-            <div className="mx-auto mb-[2.125rem]" {...svgQr} />
+            <div className="mx-auto mb-[2.125rem] w-48 h-48 flex justify-center items-center">
+                {walletConnectUri ? (
+                    <div {...svgQr} />
+                ) : (
+                    <div className="w-10 h-10 rounded-full border-t-transparent border-pink-600 border-4 animate-spin"></div>
+                )}
+            </div>
             <div className="text-center mb-11 uppercase text-sm sm:text-lg font-bold">
                 <div>scan this qr by</div>
-                <div>your maiar mobile app to continue</div>
+                <div>your xPortal app to continue</div>
             </div>
             {isMobile && (
                 <>

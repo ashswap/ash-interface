@@ -1,15 +1,21 @@
-import { GAS_PRICE } from "@elrondnetwork/dapp-core/constants";
-import { AccountInfoSliceNetworkType } from "@elrondnetwork/dapp-core/types";
-import { getNetworkConfig } from "@elrondnetwork/dapp-core/utils";
+import { GAS_PRICE } from "@multiversx/sdk-dapp/constants";
+import { AccountInfoSliceNetworkType } from "@multiversx/sdk-dapp/types";
+import { getNetworkConfig } from "@multiversx/sdk-dapp/utils";
 import {
-    AbiRegistry, Address, ArgSerializer,
-    EndpointParameterDefinition, Interaction, ResultsParser, SmartContract, SmartContractAbi
-} from "@elrondnetwork/erdjs/out";
+    AbiRegistry,
+    Address,
+    ArgSerializer,
+    EndpointParameterDefinition,
+    Interaction,
+    ResultsParser,
+    SmartContract,
+    SmartContractAbi,
+} from "@multiversx/sdk-core/out";
 import { gasLimitBuffer, maxGasLimit } from "const/dappConfig";
 import { getProxyNetworkProvider } from "../proxy/util";
 type AbiType = {
     types: Record<string, any>;
-}
+};
 export default class Contract<T extends AbiType = any> {
     protected resultParser = new ResultsParser();
     address: Address;
