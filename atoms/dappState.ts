@@ -47,6 +47,7 @@ export const dappCoreState = atom<DappCoreState>({
             walletLogin: null,
             extensionLogin: null,
             isLoginSessionInvalid: false,
+            operaLogin: null,
         },
         modals: {},
         networkConfig: {
