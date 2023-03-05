@@ -1,6 +1,6 @@
 import { logout } from "@multiversx/sdk-dapp/utils";
 import ImgDiscord from "assets/images/discord.png";
-import ImgAPYBoostBanner from "assets/images/apy-boost-banner.jpeg";
+import ImgAshswapV2Banner from "assets/images/ashswap-v2-banner.jpeg";
 import ImgTwitter from "assets/images/twitter.png";
 import ICBambooShootSolid from "assets/svg/bamboo-shoot-solid.svg";
 import ICCaretRight from "assets/svg/caret-right.svg";
@@ -250,12 +250,12 @@ const QuestOverview = () => {
 
     return <>
         <div ref={captchaElRef}></div>
-        <Link href="/stake/farms">
+        <Link href="https://bit.ly/ashswap-v2" target="_blank">
 
             <Image
-                src={ImgAPYBoostBanner}
-                alt="APY boost banner"
-                layout="responsive"
+                src={ImgAshswapV2Banner}
+                alt="Ashswap pool v2 banner"
+                className="w-full h-auto"
             />
 
         </Link>

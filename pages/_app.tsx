@@ -205,7 +205,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
                                 className="bg-ash-dark-600 backdrop-blur-[25px] px-4 py-3"
                             >
                                 <span className="text-xs font-bold text-white">
-                                    Bug Report
+                                    Support Ticket
                                 </span>
                             </a>
                         </div>
