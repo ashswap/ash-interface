@@ -22,21 +22,18 @@ import ICGovStatsSquare from "assets/svg/gov-stats-square.svg";
 import ICGovFarmSquare from "assets/svg/gov-farm-square.svg";
 import ICGovBoostSquare from "assets/svg/gov-boost-square.svg";
 import ICGovVoteSquare from "assets/svg/gov-vote-square.svg";
-import { useTrackTransactionStatus } from "@elrondnetwork/dapp-core/hooks";
+import { useTrackTransactionStatus } from "@multiversx/sdk-dapp/hooks";
 const SOCIALS = [
     { name: "Liquidity Stake", url: "/stake/farms" },
     { name: "Governance Stake", url: "/stake/gov" },
 ];
 function HeadlessLink(
-    props: React.DetailedHTMLProps<
-        React.AnchorHTMLAttributes<HTMLAnchorElement>,
-        HTMLAnchorElement
-    >
+    props: Parameters<typeof Link>[0]
 ) {
     let { href, children, ...rest } = props;
     return href ? (
-        <Link href={href}>
-            <a {...rest}>{children}</a>
+        <Link href={href} {...rest}>
+            {children}
         </Link>
     ) : (
         <>{children}</>
@@ -69,93 +66,91 @@ function StakeMenu() {
                     onOpenChange={(val) => setOpenTooltip(val)}
                     content={
                         <div className="grid grid-cols-3 w-screen max-w-5xl gap-1">
-                            <Link
-                                href="/stake/farms"
-                            >
-                                <a>
-                                    <div
-                                        className={`transition-all bg-stake-dark-400 hover:bg-[#454765] ${styles.stakeMenuItem} p-4 md:p-8 h-full`}
-                                    >
-                                        <div className="relative">
-                                            <ICStakeLP className="text-ash-gray-600/30 h-18 absolute top-0 right-0" />
-                                            <div className="mb-12">
-                                                <div className="w-12 mb-2">
-                                                    <Image
-                                                        src={ImgLPGem}
-                                                        alt="farming icon"
-                                                        layout="responsive"
-                                                    />
-                                                </div>
+                            <Link href="/stake/farms">
 
-                                                <div className="text-ash-cyan-500 text-sm font-bold">
-                                                    Liquidity Stake
-                                                </div>
+                                <div
+                                    className={`transition-all bg-stake-dark-400 hover:bg-[#454765] ${styles.stakeMenuItem} p-4 md:p-8 h-full`}
+                                >
+                                    <div className="relative">
+                                        <ICStakeLP className="text-ash-gray-600/30 h-18 absolute top-0 right-0" />
+                                        <div className="mb-12">
+                                            <div className="w-12 mb-2">
+                                                <Image
+                                                    src={ImgLPGem}
+                                                    alt="farming icon"
+                                                    layout="responsive"
+                                                />
                                             </div>
-                                            <div className="text-white bg-ash-dark-400/30 p-6 text-sm font-bold">
-                                                Stake LP-Tokens to farm ASH
-                                                everyday
+
+                                            <div className="text-ash-cyan-500 text-sm font-bold">
+                                                Liquidity Stake
                                             </div>
                                         </div>
+                                        <div className="text-white bg-ash-dark-400/30 p-6 text-sm font-bold">
+                                            Stake LP-Tokens to farm ASH
+                                            everyday
+                                        </div>
                                     </div>
-                                </a>
+                                </div>
+
                             </Link>
                             <Link href="/stake/gov">
-                                <a>
-                                    <div
-                                        className={`transition-all bg-stake-dark-400 hover:bg-[#454765] ${styles.stakeMenuItem} p-4 md:p-8 h-full`}
-                                    >
-                                        <div className="relative">
-                                            <ICStakeGov className="text-ash-gray-600/30 h-18 absolute top-0 right-0" />
-                                            <div className="mb-12">
-                                                <div className="w-12 mb-2">
-                                                    <Image
-                                                        src={ImgVoteGem}
-                                                        alt="vote-escrow icon"
-                                                        layout="responsive"
-                                                    />
-                                                </div>
 
-                                                <div className="text-pink-600 text-sm font-bold">
-                                                    Governance Stake
-                                                </div>
+                                <div
+                                    className={`transition-all bg-stake-dark-400 hover:bg-[#454765] ${styles.stakeMenuItem} p-4 md:p-8 h-full`}
+                                >
+                                    <div className="relative">
+                                        <ICStakeGov className="text-ash-gray-600/30 h-18 absolute top-0 right-0" />
+                                        <div className="mb-12">
+                                            <div className="w-12 mb-2">
+                                                <Image
+                                                    src={ImgVoteGem}
+                                                    alt="vote-escrow icon"
+                                                    style={{width: "100%", height: "auto"}}
+                                                />
                                             </div>
-                                            <div className="bg-ash-dark-400/30 p-6">
-                                                <div className="text-white text-sm font-bold mb-4">
-                                                    Stake ASH to get veASH, for:
+
+                                            <div className="text-pink-600 text-sm font-bold">
+                                                Governance Stake
+                                            </div>
+                                        </div>
+                                        <div className="bg-ash-dark-400/30 p-6">
+                                            <div className="text-white text-sm font-bold mb-4">
+                                                Stake ASH to get veASH, for:
+                                            </div>
+                                            <div className="flex flex-col space-y-2 text-stake-gray-500 text-xs font-bold">
+                                                <div className="flex">
+                                                    <ICGovStatsSquare className="w-3 h-3 text-stake-gray-500 mr-2" />
+                                                    <div>
+                                                        Earning transaction
+                                                        fees
+                                                    </div>
                                                 </div>
-                                                <div className="flex flex-col space-y-2 text-stake-gray-500 text-xs font-bold">
-                                                    <div className="flex">
-                                                        <ICGovStatsSquare className="w-3 h-3 text-stake-gray-500 mr-2" />
-                                                        <div>
-                                                            Earning transaction
-                                                            fees
-                                                        </div>
+                                                <div className="flex">
+                                                    <ICGovBoostSquare className="w-3 h-3 text-stake-gray-500 mr-2" />
+                                                    <div>Yield boost</div>
+                                                </div>
+                                                <div className="flex">
+                                                    <ICGovFarmSquare className="w-3 h-3 text-stake-gray-500 mr-2" />
+                                                    <div>
+                                                        Vote{" "}
+                                                        <span className="text-ash-cyan-500">
+                                                            Liquidity Stake
+                                                        </span>{" "}
+                                                        weight
                                                     </div>
-                                                    <div className="flex">
-                                                        <ICGovBoostSquare className="w-3 h-3 text-stake-gray-500 mr-2" />
-                                                        <div>Yield boost</div>
-                                                    </div>
-                                                    <div className="flex">
-                                                        <ICGovFarmSquare className="w-3 h-3 text-stake-gray-500 mr-2" />
-                                                        <div>
-                                                            Vote{" "}
-                                                            <span className="text-ash-cyan-500">
-                                                                Liquidity Stake
-                                                            </span>{" "}
-                                                            weight
-                                                        </div>
-                                                    </div>
-                                                    <div className="flex">
-                                                        <ICGovVoteSquare className="w-3 h-3 text-stake-gray-500 mr-2" />
-                                                        <div>
-                                                            Create Proposals
-                                                        </div>
+                                                </div>
+                                                <div className="flex">
+                                                    <ICGovVoteSquare className="w-3 h-3 text-stake-gray-500 mr-2" />
+                                                    <div>
+                                                        Create Proposals
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                </a>
+                                </div>
+
                             </Link>
                             <div
                                 className={`transition-all bg-stake-dark-400 hover:bg-[#454765] ${styles.stakeMenuItem} p-4 md:p-8`}

@@ -1,4 +1,4 @@
-import { useGetAccountInfo } from "@elrondnetwork/dapp-core/hooks";
+import { useGetAccountInfo } from "@multiversx/sdk-dapp/hooks";
 import { loginInfoState } from "atoms/dappState";
 import { useMemo } from "react";
 import { useRecoilValue } from "recoil";
@@ -58,11 +58,13 @@ export const ConfirmAddress = ({
                         <p>
                             Or, if it does not match, close this page and{" "}
                             <a
-                                href="https://help.elrond.com/en/"
+                                href="https://help.multiversx.com/en/"
                                 target="_blank"
                                 rel="noreferrer"
                             >
-                                <span className="underline">contact support</span>
+                                <span className="underline">
+                                    contact support
+                                </span>
                             </a>
                             .
                         </p>

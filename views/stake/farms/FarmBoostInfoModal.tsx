@@ -1,4 +1,4 @@
-import { useTrackTransactionStatus } from "@elrondnetwork/dapp-core/hooks";
+import { useTrackTransactionStatus } from "@multiversx/sdk-dapp/hooks";
 import { Transition } from "@headlessui/react";
 import ImgASHSleep from "assets/images/ash-sleep.png";
 import ICChevronRight from "assets/svg/chevron-right.svg";
@@ -429,11 +429,9 @@ const FarmBoostInfo = ({ farmData, onClose }: FarmBoostInfoType) => {
                                         one click, visit{" "}
                                     </span>
                                     <Link href="/stake/gov/boost">
-                                        <a>
-                                            <span className="text-pink-600 font-bold underline">
-                                                Governance Yield Boosting
-                                            </span>
-                                        </a>
+                                        <span className="text-pink-600 font-bold underline">
+                                            Governance Yield Boosting
+                                        </span>
                                     </Link>
                                 </div>
                                 <div className="flex justify-end space-x-2">
@@ -449,14 +447,12 @@ const FarmBoostInfo = ({ farmData, onClose }: FarmBoostInfoType) => {
                                         scroll={false}
                                         replace
                                     >
-                                        <a>
-                                            <BaseButton className="h-12 w-12 sm:w-auto bg-ash-dark-400 px-1 sm:px-6 uppercase text-sm font-bold text-white">
-                                                <ICEqualSquare className="text-white w-4.5 h-4.5" />
-                                                <span className="hidden sm:inline ml-1">
-                                                    Calculator
-                                                </span>
-                                            </BaseButton>
-                                        </a>
+                                        <BaseButton className="h-12 w-12 sm:w-auto bg-ash-dark-400 px-1 sm:px-6 uppercase text-sm font-bold text-white">
+                                            <ICEqualSquare className="text-white w-4.5 h-4.5" />
+                                            <span className="hidden sm:inline ml-1">
+                                                Calculator
+                                            </span>
+                                        </BaseButton>
                                     </Link>
                                     <CardTooltip
                                         disabled={

@@ -7,7 +7,7 @@ import ICLock from "assets/svg/lock.svg";
 import { ashswapBaseState } from "atoms/ashswap";
 import { fbHasBribe, fbTotalRewardsUSD } from "atoms/farmBribeState";
 import { fcAccountFarmSelector } from "atoms/farmControllerState";
-import { govVeASHAmtState } from "atoms/govState";
+import { govVeASHAmtSelector } from "atoms/govState";
 import BigNumber from "bignumber.js";
 import Avatar from "components/Avatar";
 import GlowingButton from "components/GlowingButton";
@@ -196,7 +196,7 @@ const VoteEditor = memo(function VoteEditor({ farmAddress }: VoteEditorProps) {
     const [weightStr, setWeightStr] = useInputNumberString(weightPct);
     const fcAccFarm = useRecoilValue(fcAccountFarmSelector(farmAddress));
     const ashBase = useRecoilValue(ashswapBaseState);
-    const veAmt = useRecoilValue(govVeASHAmtState);
+    const veAmt = useRecoilValue(govVeASHAmtSelector);
     const {
         voteFarmWeight,
         trackingData: { isPending },
@@ -266,11 +266,11 @@ const VoteEditor = memo(function VoteEditor({ farmAddress }: VoteEditorProps) {
                         className="ash-slider ash-slider-pink my-0"
                         step={1}
                         marks={{
-                            "0": "",
-                            "2500": "",
-                            "5000": "",
-                            "7500": "",
-                            "10000": "",
+                            0: <></>,
+                            2500: <></>,
+                            5000: <></>,
+                            7500: <></>,
+                            10000: <></>,
                         }}
                         handleStyle={{
                             backgroundColor: theme.extend.colors.pink[600],
@@ -283,7 +283,7 @@ const VoteEditor = memo(function VoteEditor({ farmAddress }: VoteEditorProps) {
                         min={0}
                         max={10_000}
                         value={weight}
-                        tooltipVisible={false}
+                        tooltip={{ open: false }}
                         onChange={(e) => {
                             setWeight(Math.min(maxPower, e));
                         }}

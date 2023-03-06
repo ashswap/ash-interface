@@ -1,4 +1,4 @@
-import { TokenPayment } from "@elrondnetwork/erdjs/out";
+import { TokenPayment } from "@multiversx/sdk-core/out";
 import BigNumber from "bignumber.js";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 import { ASH_TOKEN } from "const/tokens";
@@ -20,7 +20,7 @@ const useGovLockASH = (trackStatus = false) => {
                 ASH_TOKEN.identifier,
                 weiAmt,
                 ASH_TOKEN.decimals
-            )
+            );
             const tx = await veContract.createLock(
                 tokenPayment,
                 unlockTimestamp.toNumber()

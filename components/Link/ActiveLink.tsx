@@ -1,15 +1,18 @@
 import { useRouter } from "next/router";
 import { ReactNode, useMemo } from "react";
 
-type ActiveLinkProps = React.DetailedHTMLProps<
-    React.AnchorHTMLAttributes<HTMLAnchorElement>,
-    HTMLAnchorElement
+type ActiveLinkProps = Omit<
+    React.DetailedHTMLProps<
+        React.AnchorHTMLAttributes<HTMLAnchorElement>,
+        HTMLAnchorElement
+    >,
+    "children"
 > & {
     href: string;
     children: ReactNode | ((opt: { active: boolean }) => ReactNode);
     exact?: boolean;
 };
-const ActiveLink = ({exact, onClick, ...props}: ActiveLinkProps) => {
+const ActiveLink = ({ exact, onClick, ...props }: ActiveLinkProps) => {
     const router = useRouter();
     const { href } = props;
 

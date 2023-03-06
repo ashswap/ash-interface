@@ -1,5 +1,5 @@
-import { useGetAccountProvider } from "@elrondnetwork/dapp-core/hooks";
-import { SignableMessage } from "@elrondnetwork/erdjs/out";
+import { useGetAccountProvider } from "@multiversx/sdk-dapp/hooks";
+import { SignableMessage } from "@multiversx/sdk-core/out";
 import ICChevronRight from "assets/svg/chevron-right.svg";
 import { questOwnerSignatureSelector } from "atoms/ashpoint";
 import { accAddressState } from "atoms/dappState";

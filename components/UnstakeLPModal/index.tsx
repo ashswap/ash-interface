@@ -60,7 +60,7 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
                 lp_token: pool?.lpToken?.symbol,
             });
         }
-    }, [deboundedUnstakeAmt]);
+    }, [deboundedUnstakeAmt, loggedIn, pool]);
     const ashPerDay = useMemo(() => {
         if (!stakedData) return new BigNumber(0);
         const totalAshPerDay = ashPerSec.multipliedBy(24 * 60 * 60);
@@ -204,11 +204,11 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
                             className="ash-slider ash-slider-yellow my-0"
                             step={1}
                             marks={{
-                                0: "",
-                                25: "",
-                                50: "",
-                                75: "",
-                                100: "",
+                                0: <></>,
+                                25: <></>,
+                                50: <></>,
+                                75: <></>,
+                                100: <></>,
                             }}
                             handleStyle={{
                                 backgroundColor:

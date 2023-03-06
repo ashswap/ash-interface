@@ -19,7 +19,7 @@ import { TokenAmount } from "helper/token/tokenAmount";
 import useAddRewardAmount from "hooks/useFarmBribeContract/useAddRewardAmount";
 import useInputNumberString from "hooks/useInputNumberString";
 import BigNumber from "bignumber.js";
-import { Address, TokenPayment } from "@elrondnetwork/erdjs/out";
+import { Address, TokenPayment } from "@multiversx/sdk-core/out";
 
 type FarmBribeModalProps = {};
 const FarmBribeContent = ({}: FarmBribeModalProps) => {

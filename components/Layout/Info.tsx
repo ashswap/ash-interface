@@ -86,50 +86,50 @@ const NavLink = ({
     ...linkProps
 }: NavLinkProps) => {
     return (
-        <Link {...linkProps}>
-            <a>
-                <div
-                    className={`flex items-center relative py-3 font-bold text-sm ${
-                        active ? "text-white" : "text-ash-gray-500"
-                    } ${collapsed ? "pr-4 justify-center" : ""}`}
-                >
-                    <Icon
-                        className={`inline w-5 h-5 ${
-                            active ? "text-pink-600" : ""
-                        }`}
-                    />
-                    {!collapsed && <span className="ml-4">{name}</span>}
-                    <span
-                        className={`w-0.5 h-5 absolute right-0 ${
-                            active ? "bg-pink-600" : "bg-transparent"
-                        }`}
-                    ></span>
-                </div>
-            </a>
-        </Link>
+        (<Link {...linkProps}>
+
+            <div
+                className={`flex items-center relative py-3 font-bold text-sm ${
+                    active ? "text-white" : "text-ash-gray-500"
+                } ${collapsed ? "pr-4 justify-center" : ""}`}
+            >
+                <Icon
+                    className={`inline w-5 h-5 ${
+                        active ? "text-pink-600" : ""
+                    }`}
+                />
+                {!collapsed && <span className="ml-4">{name}</span>}
+                <span
+                    className={`w-0.5 h-5 absolute right-0 ${
+                        active ? "bg-pink-600" : "bg-transparent"
+                    }`}
+                ></span>
+            </div>
+
+        </Link>)
     );
 };
 const MNavLink = ({ active, name, Icon, ...linkProps }: NavLinkProps) => {
     return (
         <li className={`flex-1`}>
             <Link {...linkProps}>
-                <a>
-                    <div
-                        className={`h-[4.5rem] flex flex-col items-center justify-center text-center
-                                    ${
-                                        active
-                                            ? "text-white"
-                                            : "text-ash-gray-500"
-                                    }`}
-                    >
-                        <Icon
-                            className={`w-5 h-5 mb-1 ${
-                                active ? "text-pink-600" : ""
-                            }`}
-                        />
-                        <div className="font-bold text-2xs">{name}</div>
-                    </div>
-                </a>
+
+                <div
+                    className={`h-[4.5rem] flex flex-col items-center justify-center text-center
+                                ${
+                                    active
+                                        ? "text-white"
+                                        : "text-ash-gray-500"
+                                }`}
+                >
+                    <Icon
+                        className={`w-5 h-5 mb-1 ${
+                            active ? "text-pink-600" : ""
+                        }`}
+                    />
+                    <div className="font-bold text-2xs">{name}</div>
+                </div>
+
             </Link>
         </li>
     );
@@ -183,20 +183,20 @@ function InfoLayout({ children }: any) {
                             )}
                         </button>
                         <Link href="/swap">
-                            <a>
-                                <div
-                                    className={`relative shrink-0 mb-5 ${
-                                        openSidebar ? "w-14 h-14" : "w-10 h-10"
-                                    }`}
-                                >
-                                    <Image
-                                        src={ImgLogo}
-                                        alt="ashswap logo"
-                                        layout="fill"
-                                        objectFit="contain"
-                                    ></Image>
-                                </div>
-                            </a>
+
+                            <div
+                                className={`relative shrink-0 mb-5 ${
+                                    openSidebar ? "w-14 h-14" : "w-10 h-10"
+                                }`}
+                            >
+                                <Image
+                                    src={ImgLogo}
+                                    alt="ashswap logo"
+                                    layout="fill"
+                                    objectFit="contain"
+                                ></Image>
+                            </div>
+
                         </Link>
                         <div className="grow overflow-auto">
                             <ul>
@@ -360,14 +360,14 @@ function InfoLayout({ children }: any) {
             <header className="sticky top-0 left-0 right-0 z-20 w-full h-[4.5rem] flex items-center justify-between px-6 text-white bg-ash-dark-400">
                 <div className="mr-5 shrink-0">
                     <Link href="/swap">
-                        <a>
-                            <Image
-                                src={ImgLogo}
-                                alt="ash logo"
-                                width={28}
-                                height={42}
-                            />
-                        </a>
+
+                        <Image
+                            src={ImgLogo}
+                            alt="ash logo"
+                            width={28}
+                            height={42}
+                        />
+
                     </Link>
                 </div>
                 <div className="grow flex items-center space-x-1 overflow-hidden">

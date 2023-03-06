@@ -54,6 +54,7 @@ class CurveV2 {
         assert(i != j, "same input and output token");
         assert(i < this.nCoins, "coin index out of range");
         assert(j < this.nCoins, "coin index out of range");
+        if(dx.eq(0)) return {fee: new BigNumber(0), dy: new BigNumber(0)};
 
         const [p0, p1] = this.precisions;
         const price_scale = new BigNumber(this.context.priceScale).multipliedBy(p1);

@@ -40,51 +40,49 @@ const PoolRecord = ({
     }, [format, poolData.tvl]);
     return (
         <Link href={`/info/pools/${poolData.address}`}>
-            <a>
-                <div className="flex items-center bg-ash-dark-600 hover:bg-ash-dark-700 px-4 lg:px-[1.625rem] text-ash-gray-500 space-x-2 text-xs h-14 overflow-hidden">
-                    {/* <div className="w-5">
-                {active ? (
-                    <ICStar className="w-4 h-4 text-pink-600" />
-                ) : (
-                    <ICStarOutline className="w-4 h-4 text-ash-gray-500" />
-                )}
-            </div> */}
-                    <div className="w-5">{order}</div>
-                    <div className="flex-1 overflow-hidden">
-                        <div className="flex items-center mr-2 overflow-hidden">
-                            <div className="shrink-0 flex">
-                                {tokens.map((t) => {
-                                    return (
-                                        <Avatar
-                                            key={t.identifier}
-                                            src={t.logoURI}
-                                            alt={t.symbol}
-                                            className="w-4 h-4 lg:w-6 lg:h-6 -ml-1 first:ml-0"
-                                        />
-                                    );
-                                })}
-                            </div>
-                            <div className="ml-2 lg:ml-4 font-bold text-xs lg:text-sm text-white truncate">
-                                {tokens.map((t) => t.symbol).join(" & ")}
-                            </div>
+            <div className="flex items-center bg-ash-dark-600 hover:bg-ash-dark-700 px-4 lg:px-[1.625rem] text-ash-gray-500 space-x-2 text-xs h-14 overflow-hidden">
+                {/* <div className="w-5">
+            {active ? (
+                <ICStar className="w-4 h-4 text-pink-600" />
+            ) : (
+                <ICStarOutline className="w-4 h-4 text-ash-gray-500" />
+            )}
+        </div> */}
+                <div className="w-5">{order}</div>
+                <div className="flex-1 overflow-hidden">
+                    <div className="flex items-center mr-2 overflow-hidden">
+                        <div className="shrink-0 flex">
+                            {tokens.map((t) => {
+                                return (
+                                    <Avatar
+                                        key={t.identifier}
+                                        src={t.logoURI}
+                                        alt={t.symbol}
+                                        className="w-4 h-4 lg:w-6 lg:h-6 -ml-1 first:ml-0"
+                                    />
+                                );
+                            })}
+                        </div>
+                        <div className="ml-2 lg:ml-4 font-bold text-xs lg:text-sm text-white truncate">
+                            {tokens.map((t) => t.symbol).join(" & ")}
                         </div>
                     </div>
-                    <div className="w-16 lg:w-24 xl:w-32 text-xs text-right">
-                        <span className="text-ash-gray-500">$</span>
-                        <span className="text-white">{volume}</span>
-                    </div>
-                    <div className="w-16 lg:w-24 xl:w-32 text-xs text-right">
-                        <span className="text-ash-gray-500">$</span>
-                        <span className="text-white">{liquidity}</span>
-                    </div>
-                    <div className="hidden md:block w-16 lg:w-24 xl:w-32 text-xs text-right text-white">
-                        {formatAmount(poolData.apr || 0, {
-                            notation: "standard",
-                        })}
-                        %
-                    </div>
                 </div>
-            </a>
+                <div className="w-16 lg:w-24 xl:w-32 text-xs text-right">
+                    <span className="text-ash-gray-500">$</span>
+                    <span className="text-white">{volume}</span>
+                </div>
+                <div className="w-16 lg:w-24 xl:w-32 text-xs text-right">
+                    <span className="text-ash-gray-500">$</span>
+                    <span className="text-white">{liquidity}</span>
+                </div>
+                <div className="hidden md:block w-16 lg:w-24 xl:w-32 text-xs text-right text-white">
+                    {formatAmount(poolData.apr || 0, {
+                        notation: "standard",
+                    })}
+                    %
+                </div>
+            </div>
         </Link>
     );
 };
