@@ -1,4 +1,4 @@
-import { AccountInfoSliceNetworkType } from "@elrondnetwork/dapp-core/types";
+import { AccountInfoSliceNetworkType } from "@multiversx/sdk-dapp/types";
 import ICArrowLeft from "assets/svg/arrow-left.svg";
 import ICArrowRight from "assets/svg/arrow-right.svg";
 import ICChevronDown from "assets/svg/chevron-down.svg";
@@ -196,7 +196,10 @@ function TxsTable({ data: dataProps }: { data: TxStatsRecord[] }) {
     const [pageIndex, setPageIndex] = useState(0);
     const [pageSize, setPageSize] = useState(10);
     const screenSize = useScreenSize();
-    const data = useMemo(() => dataProps.filter(tx => tx.caller && tx.action && tx.timestamp), [dataProps]);
+    const data = useMemo(
+        () => dataProps.filter((tx) => tx.caller && tx.action && tx.timestamp),
+        [dataProps]
+    );
     useEffect(() => {
         setOrderBy(EOrderBy.TIME);
     }, [screenSize.xl, screenSize.lg, screenSize.md, screenSize.sm]);

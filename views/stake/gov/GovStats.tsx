@@ -1,4 +1,4 @@
-import { useTrackTransactionStatus } from "@elrondnetwork/dapp-core/hooks";
+import { useTrackTransactionStatus } from "@multiversx/sdk-dapp/hooks";
 import ImgVEASH from "assets/images/ve-ash.png";
 import ICCapacity from "assets/svg/capacity.svg";
 import ICChevronDown from "assets/svg/chevron-down.svg";
@@ -8,15 +8,15 @@ import ICUnlock from "assets/svg/unlock.svg";
 import ICWallet from "assets/svg/wallet.svg";
 import { accIsLoggedInState } from "atoms/dappState";
 import {
-    govLockedAmtState,
-    govRewardLPAmtState,
-    govRewardLPTokenState,
-    govRewardLPValueState,
-    govTotalLockedAmtState,
-    govTotalLockedPctState,
-    govTotalSupplyVeASH,
-    govUnlockTSState,
-    govVeASHAmtState,
+    govLockedAmtSelector,
+    govRewardLPAmtSelector,
+    govRewardLPTokenSelector,
+    govRewardLPValueSelector,
+    govTotalLockedAmtSelector,
+    govTotalLockedPctSelector,
+    govTotalSupplyVeASHSelector,
+    govUnlockTSSelector,
+    govVeASHAmtSelector,
 } from "atoms/govState";
 import { tokenMapState } from "atoms/tokensState";
 import Avatar from "components/Avatar";
@@ -65,15 +65,15 @@ const ExpiredLockTooltip = ({
     );
 };
 function GovStats() {
-    const lockedAmt = useRecoilValue(govLockedAmtState);
-    const veASH = useRecoilValue(govVeASHAmtState);
-    const unlockTS = useRecoilValue(govUnlockTSState);
-    const totalSupplyVeASH = useRecoilValue(govTotalSupplyVeASH);
-    const totalLockedAmt = useRecoilValue(govTotalLockedAmtState);
-    const rewardLPAmt = useRecoilValue(govRewardLPAmtState);
-    const rewardLPToken = useRecoilValue(govRewardLPTokenState);
-    const rewardTokenAmount = useRecoilValue(govRewardLPValueState);
-    const totalLockedPct = useRecoilValue(govTotalLockedPctState);
+    const lockedAmt = useRecoilValue(govLockedAmtSelector);
+    const veASH = useRecoilValue(govVeASHAmtSelector);
+    const unlockTS = useRecoilValue(govUnlockTSSelector);
+    const totalSupplyVeASH = useRecoilValue(govTotalSupplyVeASHSelector);
+    const totalLockedAmt = useRecoilValue(govTotalLockedAmtSelector);
+    const rewardLPAmt = useRecoilValue(govRewardLPAmtSelector);
+    const rewardLPToken = useRecoilValue(govRewardLPTokenSelector);
+    const rewardTokenAmount = useRecoilValue(govRewardLPValueSelector);
+    const totalLockedPct = useRecoilValue(govTotalLockedPctSelector);
 
     const { data: adminFee24h } = useSWR<number>(
         `${ASHSWAP_CONFIG.ashApiBaseUrl}/stake/governance/admin-fee`,
@@ -223,8 +223,8 @@ function GovStats() {
                                 </CardTooltip>
                                 <div className="flex items-center">
                                     {/* <div className="w-[1.125rem] h-[1.125rem] mr-2">
-                                        <Image src={ImgUsdt} alt="token icon" />
-                                    </div> */}
+                                    <Image src={ImgUsdt} alt="token icon" />
+                                </div> */}
                                     <Avatar
                                         src={ASH_TOKEN.logoURI}
                                         alt={ASH_TOKEN.symbol}
@@ -287,8 +287,8 @@ function GovStats() {
 
                                 <div className="flex items-center">
                                     {/* <div className="w-[1.125rem] h-[1.125rem] mr-2">
-                                        <Image src={ImgUsdt} alt="token icon" />
-                                    </div> */}
+                                    <Image src={ImgUsdt} alt="token icon" />
+                                </div> */}
                                     <Avatar
                                         src={ImgVEASH}
                                         alt="veASH"
@@ -411,8 +411,8 @@ function GovStats() {
                             </div>
                             <div className="flex items-center">
                                 {/* <div className="w-[1.125rem] h-[1.125rem] mr-2">
-                                    <Image src={ImgUsdt} alt="token icon" />
-                                </div> */}
+                                <Image src={ImgUsdt} alt="token icon" />
+                            </div> */}
                                 <Avatar
                                     src={ASH_TOKEN.logoURI}
                                     alt={ASH_TOKEN.symbol}
@@ -436,8 +436,8 @@ function GovStats() {
                             </div>
                             <div className="flex items-center">
                                 {/* <div className="w-[1.125rem] h-[1.125rem] mr-2">
-                                    <Image src={ImgUsdt} alt="token icon" />
-                                </div> */}
+                                <Image src={ImgUsdt} alt="token icon" />
+                            </div> */}
                                 <Avatar
                                     src={ImgVEASH}
                                     alt="veASH"
@@ -550,21 +550,24 @@ function GovStats() {
                         {rewardLPToken && (
                             <>
                                 <div className="flex items-center mb-9 mr-2">
-                                    {rewardLPToken.tokens.map(_t => {
+                                    {rewardLPToken.tokens.map((_t) => {
                                         const t = getTokenFromId(_t.identifier);
-                                        return <Avatar key={t.identifier}
-                                        src={t.logoURI}
-                                        alt={t.symbol}
-                                        className="w-8 h-8 -ml-1 first:ml-0"
-                                    />
+                                        return (
+                                            <Avatar
+                                                key={t.identifier}
+                                                src={t.logoURI}
+                                                alt={t.symbol}
+                                                className="w-8 h-8 -ml-1 first:ml-0"
+                                            />
+                                        );
                                     })}
                                 </div>
                                 <div className="text-center text-ash-gray-500 text-lg font-bold">
                                     <TextAmt
                                         number={rewardTokenAmount.toFixed(0)}
                                     />
-                                    &nbsp; {rewardLPToken.lpToken.symbol} has been
-                                    sent to your wallet
+                                    &nbsp; {rewardLPToken.lpToken.symbol} has
+                                    been sent to your wallet
                                 </div>
                             </>
                         )}
@@ -574,18 +577,14 @@ function GovStats() {
                             Suggest actions
                         </div>
                         <Link href="/stake/farms" passHref>
-                            <a>
-                                <button className="w-full text-center h-12 text-sm font-bold bg-ash-dark-400 text-ash-cyan-500 mb-4">
-                                    Stake for farming
-                                </button>
-                            </a>
+                            <button className="w-full text-center h-12 text-sm font-bold bg-ash-dark-400 text-ash-cyan-500 mb-4">
+                                Stake for farming
+                            </button>
                         </Link>
                         <Link href="/pool" passHref>
-                            <a>
-                                <button className="w-full text-center h-12 text-sm font-bold bg-ash-dark-400 text-pink-600">
-                                    Withdraw immediately
-                                </button>
-                            </a>
+                            <button className="w-full text-center h-12 text-sm font-bold bg-ash-dark-400 text-pink-600">
+                                Withdraw immediately
+                            </button>
                         </Link>
                     </div>
                 </div>

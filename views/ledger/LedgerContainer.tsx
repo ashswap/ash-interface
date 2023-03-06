@@ -1,4 +1,4 @@
-import { useGetAccountInfo, useGetLoginInfo } from "@elrondnetwork/dapp-core/hooks";
+import { useGetAccountInfo, useGetLoginInfo } from "@multiversx/sdk-dapp/hooks";
 import ICBambooShootXL from "assets/svg/bamboo-shoot-xl.svg";
 import ICSkewStep from "assets/svg/skew-step.svg";
 import { LedgerLogin } from "components/Ledger/LedgerLogin";
@@ -8,17 +8,19 @@ function LedgerContainer() {
     const router = useRouter();
     const routerRef = useRef(router);
     const { ledgerAccount } = useGetAccountInfo();
-    const {isLoggedIn, loginMethod} = useGetLoginInfo();
+    const { isLoggedIn, loginMethod } = useGetLoginInfo();
     const [isConfirm, setIsConfirm] = useState(false);
     const callbackUrl = useMemo(() => {
-        return router.query.callbackUrl as string || "/"
-    }, [router.query])
+        return (router.query.callbackUrl as string) || "/";
+    }, [router.query]);
     useEffect(() => {
         setIsConfirm(!!ledgerAccount);
     }, [ledgerAccount]);
-    useEffect(() => {routerRef.current = router;}, [router]);
     useEffect(() => {
-        if(isLoggedIn) {
+        routerRef.current = router;
+    }, [router]);
+    useEffect(() => {
+        if (isLoggedIn) {
             routerRef.current.push(callbackUrl);
         }
     }, [isLoggedIn, callbackUrl]);
@@ -26,7 +28,7 @@ function LedgerContainer() {
         <div className="ash-container py-10">
             <div className="sm:flex sm:space-x-7.5">
                 <div className="w-full sm:w-5/12 relative">
-                    <ICBambooShootXL className="absolute -z-10 top-14 max-w-full w-60 h-auto"/>
+                    <ICBambooShootXL className="absolute -z-10 top-14 max-w-full w-60 h-auto" />
                     <h1 className="font-bold text-2xl md:text-4xl lg:text-5xl text-white leading-tight mb-12 md:mb-24">
                         Ledger Connectors
                     </h1>
@@ -59,7 +61,7 @@ function LedgerContainer() {
                     )}
                 </div>
                 <div className="sm:w-7/12 mt-10 sm:mt-0 -mx-6 md:mx-0">
-                    <LedgerLogin/>
+                    <LedgerLogin />
                 </div>
             </div>
         </div>

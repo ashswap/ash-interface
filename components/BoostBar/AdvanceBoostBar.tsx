@@ -80,11 +80,11 @@ const AdvanceBoostBar = ({
                                         },
                                     }}
                                 >
-                                    <a>
-                                        <span className="text-stake-green-500 underline">
-                                            calculator
-                                        </span>
-                                    </a>
+
+                                    <span className="text-stake-green-500 underline">
+                                        calculator
+                                    </span>
+
                                 </Link>{" "}
                                 or{" "}
                                 <span className="text-stake-green-500 underline">

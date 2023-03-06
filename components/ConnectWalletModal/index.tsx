@@ -1,9 +1,8 @@
 import {
     useExtensionLogin,
-    useWalletConnectLogin,
     useWalletConnectV2Login,
     useWebWalletLogin,
-} from "@elrondnetwork/dapp-core/hooks";
+} from "@multiversx/sdk-dapp/hooks";
 import connectWalletBg from "assets/images/connect-wallet-bg.png";
 import downloadAppGallery from "assets/images/download-app-gallery.png";
 import downloadAppStore from "assets/images/download-app-store.png";
@@ -89,7 +88,13 @@ function ConnectWalletModal() {
                 method: loginMethodName,
             });
         }
-    }, [loggedIn, dappCore.account.address, dappCore.loginInfo.loginMethod]);
+    }, [
+        loggedIn,
+        dappCore.account.address,
+        dappCore.loginInfo.loginMethod,
+        isOpenConnectWalletModal,
+        loginMethodName,
+    ]);
     useEffect(() => {
         if (window && !loggedIn && notFirstRender) {
             let dataLayer = (window as any).dataLayer || [];
@@ -102,6 +107,7 @@ function ConnectWalletModal() {
         if (window && !loggedIn) {
             setNotFirstRender(true);
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [loggedIn]);
     return (
         <>

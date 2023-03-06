@@ -1,6 +1,6 @@
-import { TokenPayment, Transaction } from "@elrondnetwork/erdjs/out";
+import { TokenPayment, Transaction } from "@multiversx/sdk-core/out";
 import { accIsLoggedInState } from "atoms/dappState";
-import { govUnlockTSState } from "atoms/govState";
+import { govUnlockTSSelector } from "atoms/govState";
 import BigNumber from "bignumber.js";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 import { ASH_TOKEN } from "const/tokens";
@@ -21,7 +21,7 @@ const useGovLockMore = (trackStatus = false) => {
                 unlockTimestamp,
             }: { weiAmt?: BigNumber; unlockTimestamp?: BigNumber } = {}) => {
                 const loggedIn = await snapshot.getPromise(accIsLoggedInState);
-                const unlockTS = await snapshot.getPromise(govUnlockTSState);
+                const unlockTS = await snapshot.getPromise(govUnlockTSSelector);
 
                 if (!loggedIn) return { sessionId: "" };
                 let txs: Transaction[] = [];

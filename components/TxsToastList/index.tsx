@@ -1,11 +1,11 @@
 import {
     useGetPendingTransactions,
     useGetSignedTransactions,
-} from "@elrondnetwork/dapp-core/hooks";
+} from "@multiversx/sdk-dapp/hooks";
 import {
     SignedTransactionsBodyType,
     SignedTransactionsType,
-} from "@elrondnetwork/dapp-core/types";
+} from "@multiversx/sdk-dapp/types";
 import { collapseModalState } from "atoms/collapseState";
 import {
     getToastsIdsFromStorage,
@@ -32,7 +32,7 @@ function TxsToastList({
     pendingTransactions,
     signedTransactions,
     successfulToastLifetime = 30,
-}: Props) {
+}: Props): JSX.Element {
     const [toastsIds, setToastsIds] = useState<string[]>([]);
     const [collapsed, setCollapsed] = useState(false);
     const [isClickedCollapse, setIsClickedCollapse] =
@@ -120,6 +120,7 @@ function TxsToastList({
         return () => {
             saveSessionStorageToasts();
         };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     useEffect(() => {

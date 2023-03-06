@@ -1,11 +1,9 @@
-import { Address } from "@elrondnetwork/erdjs/out";
+import { Address } from "@multiversx/sdk-core/out";
 import { accAddressState, accIsLoggedInState } from "atoms/dappState";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 import { ContractManager } from "helper/contracts/contractManager";
-import FeeDistributorContract from "helper/contracts/feeDistributorContract";
 import useSendTxsWithTrackStatus from "hooks/useSendTxsWithTrackStatus";
 import { DappSendTransactionsPropsType } from "interface/dappCore";
-import { useEffect } from "react";
 import { useRecoilCallback } from "recoil";
 
 const useGovClaimReward = (trackStatus = false) => {

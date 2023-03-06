@@ -8,7 +8,7 @@ import { fbHasBribe, fbTotalRewardsUSD } from "atoms/farmBribeState";
 import {
     fcAccountFarmSelector,
     fcFarmSelector,
-    fcTypeSelector
+    fcTypeSelector,
 } from "atoms/farmControllerState";
 import { govPointSelector } from "atoms/govState";
 import BigNumber from "bignumber.js";
@@ -104,14 +104,31 @@ const FarmWeightVotingContent = ({ farmAddress: farmAddressProp }: Props) => {
     }, [vePoint, accountFarm, farmWeight, weight]);
 
     const estimatedNextRelativeWeight = useMemo(() => {
-        if(!ashBase.farmController || !farmInController) return 0;
-        const typeWeight = ashBase.farmController.farmTypes?.find(type => type.farmType === farmInController.farmType);
-        if(!typeWeight || typeWeight.weight === "0") return 0;
+        if (!ashBase.farmController || !farmInController) return 0;
+        const typeWeight = ashBase.farmController.farmTypes?.find(
+            (type) => type.farmType === farmInController.farmType
+        );
+        if (!typeWeight || typeWeight.weight === "0") return 0;
         const oldBias = new BigNumber(farmInController.votedPoint.bias);
-        const nextBias = oldBias.minus(farmWeight).plus(estimatedNextFarmWeight);
-        const nextTotalWeight = new BigNumber(ashBase.farmController.totalWeight).minus(oldBias.multipliedBy(typeWeight.weight)).plus(nextBias.multipliedBy(typeWeight.weight));
-        return nextBias.multipliedBy(typeWeight.weight).multipliedBy(100).div(nextTotalWeight).toNumber();
-    }, [ashBase.farmController, estimatedNextFarmWeight, farmInController, farmWeight]);
+        const nextBias = oldBias
+            .minus(farmWeight)
+            .plus(estimatedNextFarmWeight);
+        const nextTotalWeight = new BigNumber(
+            ashBase.farmController.totalWeight
+        )
+            .minus(oldBias.multipliedBy(typeWeight.weight))
+            .plus(nextBias.multipliedBy(typeWeight.weight));
+        return nextBias
+            .multipliedBy(typeWeight.weight)
+            .multipliedBy(100)
+            .div(nextTotalWeight)
+            .toNumber();
+    }, [
+        ashBase.farmController,
+        estimatedNextFarmWeight,
+        farmInController,
+        farmWeight,
+    ]);
 
     const pool = useMemo(() => {
         if (!farmAddress) return undefined;
@@ -332,11 +349,11 @@ const FarmWeightVotingContent = ({ farmAddress: farmAddressProp }: Props) => {
                                 className="ash-slider ash-slider-pink my-0"
                                 step={1}
                                 marks={{
-                                    "0": "",
-                                    "2500": "",
-                                    "5000": "",
-                                    "7500": "",
-                                    "10000": "",
+                                    0: <></>,
+                                    2500: <></>,
+                                    5000: <></>,
+                                    7500: <></>,
+                                    10000: <></>,
                                 }}
                                 handleStyle={{
                                     backgroundColor:
@@ -351,7 +368,7 @@ const FarmWeightVotingContent = ({ farmAddress: farmAddressProp }: Props) => {
                                 min={0}
                                 max={10000}
                                 value={weight}
-                                tooltipVisible={false}
+                                tooltip={{ open: false }}
                                 onChange={(e) => {
                                     setWeight(
                                         Math.min(
@@ -404,7 +421,13 @@ const FarmWeightVotingContent = ({ farmAddress: farmAddressProp }: Props) => {
                             Farm weight changes
                         </div>
                         <div className="font-bold text-lg text-stake-gray-500 mb-2 line-through">
-                            {formatAmount(new BigNumber(farmRelativeWeight).multipliedBy(100).div(1e18).toNumber())}%
+                            {formatAmount(
+                                new BigNumber(farmRelativeWeight)
+                                    .multipliedBy(100)
+                                    .div(1e18)
+                                    .toNumber()
+                            )}
+                            %
                         </div>
                         <div className="font-bold text-lg text-white mb-2">
                             {formatAmount(estimatedNextRelativeWeight)}%

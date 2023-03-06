@@ -4,7 +4,7 @@ import {
     EndpointParameterDefinition,
     TypeExpressionParser,
     TypeMapper,
-} from "@elrondnetwork/erdjs/out";
+} from "@multiversx/sdk-core/out";
 import BigNumber from "bignumber.js";
 import { ElrondStruct, ElrondType } from "interface/elrond";
 
@@ -48,14 +48,14 @@ export const contractArgsDeserialize = (
     return decodedValues;
 };
 
-
-
-export const decodeNestedStringHex = <T>(data: string, data_structure: ElrondStruct<T>) => {
+export const decodeNestedStringHex = <T>(
+    data: string,
+    data_structure: ElrondStruct<T>
+) => {
     const getArbitraryWidthHexString: (
         data: string,
         index: number
     ) => [string, number] = (data: string, index: number) => {
-
         const length_encoded = Number.parseInt(
             data.slice(index, index + 8),
             16
@@ -138,6 +138,12 @@ export const decodeNestedStringHex = <T>(data: string, data_structure: ElrondStr
     return result as T;
 };
 
-export const decodeNestedStringBase64 = <T>(data: string, data_structure: ElrondStruct<T>) => {
-    return decodeNestedStringHex(Buffer.from(data, "base64").toString("hex"), data_structure);
-}
+export const decodeNestedStringBase64 = <T>(
+    data: string,
+    data_structure: ElrondStruct<T>
+) => {
+    return decodeNestedStringHex(
+        Buffer.from(data, "base64").toString("hex"),
+        data_structure
+    );
+};

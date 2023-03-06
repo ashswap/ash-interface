@@ -63,11 +63,9 @@ function MintStakeCard() {
                         More Details
                     </button>
                     <Link href="/stake/mint">
-                        <a>
-                            <button className="w-[5.75rem] h-14 px-4 bg-stake-green-500 text-center flex items-center justify-center text-ash-dark-400 text-sm font-bold">
-                                Stake
-                            </button>
-                        </a>
+                        <button className="w-[5.75rem] h-14 px-4 bg-stake-green-500 text-center flex items-center justify-center text-ash-dark-400 text-sm font-bold">
+                            Stake
+                        </button>
                     </Link>
                 </div>
             </div>

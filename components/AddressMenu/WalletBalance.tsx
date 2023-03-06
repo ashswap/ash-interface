@@ -34,29 +34,33 @@ const TokenBalance = ({ data }: { data: TokenWithBalance }) => {
                     {data.symbol}
                 </span>
                 {data.identifier === "EGLD" && (
-                    <Link href={{
-                        pathname: "/swap",
-                        query: {
-                            tokenIn: "EGLD",
-                            tokenOut: WRAPPED_EGLD.wegld
-                        }
-                    }}>
-                        <a>
-                            <button className="border boder-white font-medium text-2xs text-white p-1 ml-2">Wrap</button>
-                        </a>
+                    <Link
+                        href={{
+                            pathname: "/swap",
+                            query: {
+                                tokenIn: "EGLD",
+                                tokenOut: WRAPPED_EGLD.wegld,
+                            },
+                        }}
+                    >
+                        <button className="border boder-white font-medium text-2xs text-white p-1 ml-2">
+                            Wrap
+                        </button>
                     </Link>
                 )}
                 {data.identifier === WRAPPED_EGLD.wegld && (
-                    <Link href={{
-                        pathname: "/swap",
-                        query: {
-                            tokenIn: WRAPPED_EGLD.wegld,
-                            tokenOut: "EGLD"
-                        }
-                    }}>
-                        <a>
-                            <button className="border boder-white font-medium text-2xs text-white p-1 ml-2">Unwrap</button>
-                        </a>
+                    <Link
+                        href={{
+                            pathname: "/swap",
+                            query: {
+                                tokenIn: WRAPPED_EGLD.wegld,
+                                tokenOut: "EGLD",
+                            },
+                        }}
+                    >
+                        <button className="border boder-white font-medium text-2xs text-white p-1 ml-2">
+                            Unwrap
+                        </button>
                     </Link>
                 )}
             </div>

@@ -1,9 +1,6 @@
-import {
-    useGetAccountInfo,
-    useLedgerLogin
-} from "@elrondnetwork/dapp-core/hooks";
-import { UseLedgerLoginPropsType } from "@elrondnetwork/dapp-core/hooks/login/useLedgerLogin";
-import { } from "@elrondnetwork/dapp-core/types/login.types";
+import { useGetAccountInfo, useLedgerLogin } from "@multiversx/sdk-dapp/hooks";
+import { UseLedgerLoginPropsType } from "@multiversx/sdk-dapp/hooks/login/useLedgerLogin";
+import {} from "@multiversx/sdk-dapp/types/login.types";
 import { AddressTable } from "./AddressTable";
 import { ConfirmAddress } from "./ConfirmAddress";
 import { LedgerConnect } from "./LedgerConnect";
@@ -24,7 +21,6 @@ export const LedgerLogin = ({
     token,
     nativeAuth,
 }: LedgerLoginContainerPropsType) => {
-
     const { ledgerAccount } = useGetAccountInfo();
     const [
         onStartLogin,
@@ -39,15 +35,16 @@ export const LedgerLogin = ({
             startIndex,
             selectedAddress,
         },
-    ] = useLedgerLogin({ callbackRoute, token, onLoginRedirect });//nativeAuth
+    ] = useLedgerLogin({ callbackRoute, token, onLoginRedirect, nativeAuth: true }); //nativeAuth
 
     function getContent() {
         if (isLoading) {
-            return <div className="flex flex-col items-center py-10">
-                <div className="w-10 h-10 mb-10 rounded-full border-4 border-t-transparent border-pink-600 animate-spin">
+            return (
+                <div className="flex flex-col items-center py-10">
+                    <div className="w-10 h-10 mb-10 rounded-full border-4 border-t-transparent border-pink-600 animate-spin"></div>
+                    {ledgerWaitingText}
                 </div>
-                {ledgerWaitingText}
-            </div>;
+            );
         }
         if (ledgerAccount != null && !error) {
             return <ConfirmAddress token={token} />;

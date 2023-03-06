@@ -1,4 +1,4 @@
-import { getAddress } from "@elrondnetwork/dapp-core/utils";
+import { getAddress } from "@multiversx/sdk-dapp/utils";
 import axios from "axios";
 import { ENVIRONMENT } from "const/env";
 import storage from "./storage";
@@ -23,13 +23,22 @@ logApi.interceptors.request.use(async (config) => {
     const verifyObj = await getAshVerifyObj();
     const ashAuth = await getAshAuthen(verifyObj.wallet, verifyObj.ts);
     const verify = Buffer.from(JSON.stringify(verifyObj)).toString("base64");
-    config.headers = {
-        ...config.headers,
-        "X-ASH-authen": ashAuth,
-        "X-ASH-verify": verify,
-        "X-ASH-SIGNING": ENVIRONMENT.ENABLE_ASHPOINT_SIGN ? storage.local.getItem("ashpointOwners")?.[verifyObj.wallet]?.signature : undefined,
-        // "ngrok-skip-browser-warning": "FU_NGROK"
-    };
+    // config.headers = {
+    //     ...config.headers,
+    //     "X-ASH-authen": ashAuth,
+    //     "X-ASH-verify": verify,
+    //     "X-ASH-SIGNING": ENVIRONMENT.ENABLE_ASHPOINT_SIGN
+    //         ? storage.local.getItem("ashpointOwners")?.[verifyObj.wallet]
+    //               ?.signature
+    //         : undefined,
+    //     // "ngrok-skip-browser-warning": "FU_NGROK"
+    // };
+    config.headers.set("X-ASH-authen", ashAuth);
+    config.headers.set("X-ASH-verify", verify);
+    config.headers.set("X-ASH-SIGNING", ENVIRONMENT.ENABLE_ASHPOINT_SIGN
+    ? storage.local.getItem("ashpointOwners")?.[verifyObj.wallet]
+          ?.signature
+    : undefined);
     config.baseURL = process.env.NEXT_PUBLIC_ASH_LOG_API;
     return config;
 });
