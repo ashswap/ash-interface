@@ -1,9 +1,5 @@
-import {
-    TokenPayment
-} from "@elrondnetwork/erdjs/out";
-import {
-    farmQuery, farmSessionIdMapState
-} from "atoms/farmsState";
+import { TokenPayment } from "@multiversx/sdk-core/out";
+import { farmQuery, farmSessionIdMapState } from "atoms/farmsState";
 import { ASH_TOKEN } from "const/tokens";
 
 import { toEGLDD } from "helper/balance";
@@ -38,7 +34,9 @@ const useFarmClaimReward = (trackStatus = false) => {
                 );
                 const txs = await ContractManager.getFarmContract(
                     farm.farm_address
-                ).withLastRewardBlockTs(farmRecord.lastRewardBlockTs).claimRewards(tokenPayments, false);
+                )
+                    .withLastRewardBlockTs(farmRecord.lastRewardBlockTs)
+                    .claimRewards(tokenPayments, false);
                 const payload: DappSendTransactionsPropsType = {
                     transactions: txs,
                     transactionsDisplayInfo: {

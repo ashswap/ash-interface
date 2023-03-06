@@ -1,4 +1,4 @@
-import { AccountInfoSliceNetworkType } from "@elrondnetwork/dapp-core/types";
+import { AccountInfoSliceNetworkType } from "@multiversx/sdk-dapp/types";
 import ICChevronDown from "assets/svg/chevron-down.svg";
 import ICChevronUp from "assets/svg/chevron-up.svg";
 import ICMinus from "assets/svg/minus.svg";
@@ -249,7 +249,12 @@ function StakedPoolCardItem({
                                         ownLiquidity || 0
                                     )}
                                 />{" "}
-                                {pool.tokens.map(t => getTokenFromId(t.identifier).symbol).join("-")}
+                                {pool.tokens
+                                    .map(
+                                        (t) =>
+                                            getTokenFromId(t.identifier).symbol
+                                    )
+                                    .join("-")}
                             </div>
                         </div>
                         <div className="flex flex-row justify-between items-center h-12 px-4">

@@ -1,4 +1,4 @@
-import { AccountInfoSliceNetworkType } from "@elrondnetwork/dapp-core/types";
+import { AccountInfoSliceNetworkType } from "@multiversx/sdk-dapp/types";
 import ICChevronRight from "assets/svg/chevron-right.svg";
 import { accAddressState, networkConfigState } from "atoms/dappState";
 import { FarmRecord } from "atoms/farmsState";

@@ -1,4 +1,4 @@
-import { AccountInfoSliceNetworkType } from "@elrondnetwork/dapp-core/types";
+import { AccountInfoSliceNetworkType } from "@multiversx/sdk-dapp/types";
 import Down from "assets/svg/down-white.svg";
 import { accIsLoggedInState, networkConfigState } from "atoms/dappState";
 import { PoolsState } from "atoms/poolsState";
@@ -29,9 +29,13 @@ const NTokensHeader = ({ pool }: { pool: IPool }) => {
             <div className="overflow-hidden">
                 <div className="text-text-input-3 text-xs pb-2.5">Deposit</div>
                 <div className="text-2xl font-bold truncate">
-                    <span>{getTokenFromId(pool.tokens[0].identifier).symbol}</span>
+                    <span>
+                        {getTokenFromId(pool.tokens[0].identifier).symbol}
+                    </span>
                     <span className="text-sm px-3">&</span>
-                    <span>{getTokenFromId(pool.tokens[1].identifier).symbol}</span>
+                    <span>
+                        {getTokenFromId(pool.tokens[1].identifier).symbol}
+                    </span>
                 </div>
             </div>
             <div className="shrink-0 flex flex-row justify-between items-center">
@@ -57,13 +61,16 @@ const NTokensHeader = ({ pool }: { pool: IPool }) => {
                 </div>
             </div>
             <div className="flex flex-wrap justify-center max-w-[4.5rem]">
-                {pool.tokens.map(_t => {
+                {pool.tokens.map((_t) => {
                     const t = getTokenFromId(_t.identifier);
-                    return                 <Avatar key={t.identifier}
-                    src={t.logoURI}
-                    alt={t.symbol}
-                    className="w-9 h-9 -ml-2.5 first:ml-0 last:ml-0 last:-mt-2.5"
-                />
+                    return (
+                        <Avatar
+                            key={t.identifier}
+                            src={t.logoURI}
+                            alt={t.symbol}
+                            className="w-9 h-9 -ml-2.5 first:ml-0 last:ml-0 last:-mt-2.5"
+                        />
+                    );
                 })}
             </div>
         </div>

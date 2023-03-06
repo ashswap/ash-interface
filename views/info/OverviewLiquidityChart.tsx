@@ -60,7 +60,7 @@ function OverviewLiquidityChart() {
     );
     // Xaxis formatter
     const tickFormatter = useCallback(
-        (val, index: number) => {
+        (val: number, index: number) => {
             const time = moment.unix(val);
             return timeUnit === "D"
                 ? time.format("DD/MM/yyyy")

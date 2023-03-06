@@ -1,5 +1,5 @@
-import { useTrackTransactionStatus } from "@elrondnetwork/dapp-core/hooks";
-import { TokenPayment } from "@elrondnetwork/erdjs/out";
+import { useTrackTransactionStatus } from "@multiversx/sdk-dapp/hooks";
+import { TokenPayment } from "@multiversx/sdk-core/out";
 import { Transition } from "@headlessui/react";
 import ImgASHSleep from "assets/images/ash-sleep.png";
 import ICArrowBarRight from "assets/svg/arrow-bar-right.svg";
@@ -113,15 +113,18 @@ const FarmRecord = ({
                     </div>
                 </FarmBoostTooltip>
                 <div className="absolute flex bottom-0 translate-y-1/2 left-1/2 -translate-x-1/2">
-                    {pool.tokens.map(t => <Avatar key={t.identifier}
-                        src={t.logoURI}
-                        alt={t.name}
-                        className="w-4 h-4 first:ml-0 -ml-1"
-                    />)}
+                    {pool.tokens.map((t) => (
+                        <Avatar
+                            key={t.identifier}
+                            src={t.logoURI}
+                            alt={t.name}
+                            className="w-4 h-4 first:ml-0 -ml-1"
+                        />
+                    ))}
                 </div>
             </div>
             <div className="hidden sm:block text-sm text-stake-gray-500 font-bold mr-2 truncate">
-                {pool.tokens.map(t => t.symbol).join("-")}
+                {pool.tokens.map((t) => t.symbol).join("-")}
             </div>
             <div className="hidden md:block space-y-2">
                 <div className="text-stake-gray-500 text-xs font-bold">
@@ -299,9 +302,14 @@ function GovBoostStatus() {
                     .map((record) => {
                         const ownerTokens =
                             record.stakedData?.farmTokens.filter(
-                                (f) => f.attributes.booster.bech32() === accAddress
+                                (f) =>
+                                    f.attributes.booster.bech32() === accAddress
                             ) || [];
-                        return { ownerTokens, farm: record.farm, lastRewardBlockTs: record.lastRewardBlockTs };
+                        return {
+                            ownerTokens,
+                            farm: record.farm,
+                            lastRewardBlockTs: record.lastRewardBlockTs,
+                        };
                     })
                     .filter(({ ownerTokens }) => ownerTokens.length > 0)
                     .map(({ ownerTokens, farm, lastRewardBlockTs }) => {
@@ -316,7 +324,9 @@ function GovBoostStatus() {
                         farmsAddress.push(farm.farm_address);
                         return ContractManager.getFarmContract(
                             farm.farm_address
-                        ).withLastRewardBlockTs(lastRewardBlockTs).claimRewards(tokenPayments);
+                        )
+                            .withLastRewardBlockTs(lastRewardBlockTs)
+                            .claimRewards(tokenPayments);
                     });
                 const { sessionId, error } = await sendTransactions({
                     transactions: (
@@ -385,8 +395,7 @@ function GovBoostStatus() {
                                 <Image
                                     src={ImgASHSleep}
                                     alt="ash sleep"
-                                    layout="responsive"
-                                    className="mix-blend-luminosity"
+                                    className="w-full h-auto mix-blend-luminosity"
                                 />
                             </div>
                             <div className="text-lg font-bold text-stake-gray-500">
@@ -394,11 +403,9 @@ function GovBoostStatus() {
                                 <div>
                                     Go{" "}
                                     <Link href="/stake/farms">
-                                        <a>
-                                            <span className="underline text-ash-cyan-500">
-                                                stake LP-Tokens
-                                            </span>
-                                        </a>
+                                        <span className="underline text-ash-cyan-500">
+                                            stake LP-Tokens
+                                        </span>
                                     </Link>{" "}
                                     now
                                 </div>
@@ -420,14 +427,12 @@ function GovBoostStatus() {
                             replace
                             passHref
                         >
-                            <a>
-                                <BaseButton className="h-12 w-12 shrink-0 sm:w-auto bg-ash-dark-400 px-1 sm:px-6 uppercase text-sm font-bold text-white">
-                                    <ICEqualSquare className="text-white w-4.5 h-4.5" />
-                                    <span className="hidden sm:inline ml-1">
-                                        Calculator
-                                    </span>
-                                </BaseButton>
-                            </a>
+                            <BaseButton className="h-12 w-12 shrink-0 sm:w-auto bg-ash-dark-400 px-1 sm:px-6 uppercase text-sm font-bold text-white">
+                                <ICEqualSquare className="text-white w-4.5 h-4.5" />
+                                <span className="hidden sm:inline ml-1">
+                                    Calculator
+                                </span>
+                            </BaseButton>
                         </Link>
                         <CardTooltip
                             disabled={
@@ -473,7 +478,8 @@ function GovBoostStatus() {
                                 f.stakedData?.farmTokens
                                     .filter(
                                         (t) =>
-                                            t.attributes.booster.bech32() !== accAddress
+                                            t.attributes.booster.bech32() !==
+                                            accAddress
                                     )
                                     .map((t) => (
                                         <FarmRecordTransfer

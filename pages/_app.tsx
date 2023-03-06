@@ -1,4 +1,4 @@
-import { DappProvider } from "@elrondnetwork/dapp-core/wrappers";
+import { DappProvider } from "@multiversx/sdk-dapp/wrappers";
 import ConnectWalletModal from "components/ConnectWalletModal";
 import { customComponents } from "components/DappCoreCustom";
 import { TxCompletedTracker } from "components/DappCoreCustom/TxCompletedTracker";
@@ -160,6 +160,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
                     environment={ENVIRONMENT.NETWORK}
                     customNetworkConfig={DAPP_CONFIG}
                     customComponents={customComponents}
+                    dappConfig={{shouldUseWebViewProvider: true}}
                     // completedTransactionsDelay={500}
                 >
                     <TestnetGuard>
@@ -204,7 +205,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
                                 className="bg-ash-dark-600 backdrop-blur-[25px] px-4 py-3"
                             >
                                 <span className="text-xs font-bold text-white">
-                                    Bug Report
+                                    Support Ticket
                                 </span>
                             </a>
                         </div>

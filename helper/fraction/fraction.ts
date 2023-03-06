@@ -95,7 +95,8 @@ export class Fraction implements FractionObject {
      * @returns 
      */
     static fromBigNumber(number: BigNumber.Value) {
-        const [numerator, denominator] = new BigNumber(number).toFraction();
+        const big = new BigNumber(number);
+        const [numerator, denominator] = big.eq(0) ? [0, 1] : big.toFraction();
         return new Fraction(numerator, denominator);
     }
 

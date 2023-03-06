@@ -228,11 +228,11 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
                                     className="ash-slider pt-4 w-full"
                                     step={1}
                                     marks={{
-                                        0: "",
-                                        25: "",
-                                        50: "",
-                                        75: "",
-                                        100: "",
+                                        0: <></>,
+                                        25: <></>,
+                                        50: <></>,
+                                        75: <></>,
+                                        100: <></>,
                                     }}
                                     handleStyle={{
                                         backgroundColor: "#191629",

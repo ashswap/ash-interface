@@ -1,8 +1,8 @@
 import {
     LoginMethodsEnum,
     TransactionServerStatusesEnum,
-} from "@elrondnetwork/dapp-core/types";
-import { getAccountProviderType } from "@elrondnetwork/dapp-core/utils";
+} from "@multiversx/sdk-dapp/types";
+import { getAccountProviderType } from "@multiversx/sdk-dapp/utils";
 import { TransactionDecoder } from "@elrondnetwork/transaction-decoder";
 import * as Sentry from "@sentry/nextjs";
 import { questIsRegisteredAtom } from "atoms/ashpoint";

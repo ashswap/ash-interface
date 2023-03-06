@@ -1,9 +1,9 @@
 import {
     SendSignedTransactionsReturnType,
     sendSignedTransactions as defaultSendSignedTxs,
-} from "@elrondnetwork/dapp-core/apiCalls/transactions";
+} from "@multiversx/sdk-dapp/apiCalls/transactions";
 
-import { Transaction } from "@elrondnetwork/erdjs/out";
+import { Transaction } from "@multiversx/sdk-core/out";
 import { TransactionDecoder } from "@elrondnetwork/transaction-decoder";
 import { WRAPPED_EGLD } from "const/wrappedEGLD";
 import emitter from "helper/emitter";

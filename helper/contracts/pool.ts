@@ -1,4 +1,4 @@
-import { getAddress } from "@elrondnetwork/dapp-core/utils";
+import { getAddress } from "@multiversx/sdk-dapp/utils";
 import {
     Address,
     BigUIntValue,
@@ -6,7 +6,7 @@ import {
     Query,
     TokenIdentifierValue,
     TokenPayment,
-} from "@elrondnetwork/erdjs";
+} from "@multiversx/sdk-core";
 import poolAbi from "assets/abi/pool.abi.json";
 import BigNumber from "bignumber.js";
 import { queryContractParser } from "helper/serializer";
@@ -160,9 +160,16 @@ class PoolContract extends Contract<typeof poolAbi> {
     }
 
     async estimateAddLiquidity(tokenAmounts: BigNumber[]) {
-        let interaction = this.contract.methods.estimateAddLiquidity([tokenAmounts]);
-        const res = await this.getProxy().queryContract(interaction.check().buildQuery());
-        const {firstValue} = this.resultParser.parseQueryResponse(res, interaction.getEndpoint());
+        let interaction = this.contract.methods.estimateAddLiquidity([
+            tokenAmounts,
+        ]);
+        const res = await this.getProxy().queryContract(
+            interaction.check().buildQuery()
+        );
+        const { firstValue } = this.resultParser.parseQueryResponse(
+            res,
+            interaction.getEndpoint()
+        );
         return firstValue?.valueOf();
     }
 }

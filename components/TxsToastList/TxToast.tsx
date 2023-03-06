@@ -11,20 +11,20 @@ import {
 import {
     useGetSignedTransactions,
     useGetTransactionDisplayInfo,
-} from "@elrondnetwork/dapp-core/hooks";
+} from "@multiversx/sdk-dapp/hooks";
 import {
     AccountInfoSliceNetworkType,
     SignedTransactionType,
     TransactionBatchStatusesEnum,
     TransactionsDisplayInfoType,
     TransactionServerStatusesEnum,
-} from "@elrondnetwork/dapp-core/types";
+} from "@multiversx/sdk-dapp/types";
 import {
     getIsTransactionPending,
     getIsTransactionSuccessful,
     getIsTransactionTimedOut,
     isServerTransactionPending,
-} from "@elrondnetwork/dapp-core/utils";
+} from "@multiversx/sdk-dapp/utils";
 import { Transition } from "@headlessui/react";
 import ICCheck from "assets/svg/check.svg";
 import ICChevronLeft from "assets/svg/chevron-left.svg";
@@ -63,17 +63,18 @@ interface TransactionToastPropsType {
 }
 const StatusIconMap: Record<
     TransactionServerStatusesEnum | "timedOut",
-    JSX.Element
+    () => JSX.Element
 > = {
-    pending: (
-        <div className="w-4 h-4 rounded-full border-2 border-ash-purple-500 border-t-transparent animate-spin"></div>
-    ),
-    "not executed": <></>,
-    success: <ICCheck className="w-4 h-4 text-stake-green-500" />,
-    fail: <IClose className="w-4 h-4 text-ash-purple-500" />,
-    invalid: <IClose className="w-4 h-4 text-ash-purple-500" />,
-    executed: <></>,
-    timedOut: <IClose className="w-4 h-4 text-ash-purple-500" />,
+    pending: 
+        () => <div className="w-4 h-4 rounded-full border-2 border-ash-purple-500 border-t-transparent animate-spin"></div>
+    ,
+    "not executed": () => <></>,
+    success: () => <ICCheck className="w-4 h-4 text-stake-green-500" />,
+    fail: () => <IClose className="w-4 h-4 text-ash-purple-500" />,
+    invalid: () => <IClose className="w-4 h-4 text-ash-purple-500" />,
+    executed: () => <></>,
+    timedOut: () => <IClose className="w-4 h-4 text-ash-purple-500" />,
+    "reward-reverted": () => <IClose className="w-4 h-4 text-ash-purple-500" />,
 };
 const TxRecord = ({
     tx,
@@ -110,7 +111,7 @@ const TxRecord = ({
                 status: status,
             });
         }
-    }, [status]);
+    }, [hash, isClickedCollapse, status]);
     useEffect(() => {
         if (
             window &&
@@ -125,7 +126,7 @@ const TxRecord = ({
                 status: status,
             });
         }
-    }, [status]);
+    }, [hash, isClickedCollapse, status]);
     useEffect(() => {
         if (
             window &&
@@ -142,7 +143,7 @@ const TxRecord = ({
             });
             setIsClickedStakeButton(false);
         }
-    }, [status, isClickedStakeButton]);
+    }, [status, isClickedStakeButton, isClickedCollapse, hash, setIsClickedStakeButton]);
     useEffect(() => {
         if (
             window &&
@@ -159,7 +160,7 @@ const TxRecord = ({
             });
             setIsClickedHarvestButton(false);
         }
-    }, [status, isClickedHarvestButton]);
+    }, [status, isClickedHarvestButton, isClickedCollapse, hash, setIsClickedHarvestButton]);
     useEffect(() => {
         if (
             window &&
@@ -176,7 +177,7 @@ const TxRecord = ({
             });
             setIsClickedUnstake(false);
         }
-    }, [status, isClickedUnstake]);
+    }, [status, isClickedUnstake, isClickedCollapse, hash, setIsClickedUnstake]);
     useEffect(() => {
         if (
             window &&
@@ -193,16 +194,16 @@ const TxRecord = ({
             });
             setIsClickedGovStakeButton(false);
         }
-    }, [status, isClickedGovStakeButton]);
+    }, [status, isClickedGovStakeButton, isClickedCollapse, hash, setIsClickedGovStakeButton]);
     const network: AccountInfoSliceNetworkType =
         useRecoilValue(networkConfigState).network;
-    const iconEl = useMemo(() => {
+    const IconEl = useMemo(() => {
         return StatusIconMap[status];
     }, [status]);
     return (
         <>
             <div className="flex items-center text-stake-gray-500">
-                <div>{iconEl}</div>
+                <div><IconEl/></div>
                 {!collapse && (
                     <>
                         <div className="ml-2 mr-4 leading-tight text-xs sm:text-sm w-28 sm:w-32">
@@ -296,7 +297,7 @@ export const TxToast = ({
             endTimeProgress ||
             moment().add(Number(transactionDuration), "milliseconds").unix();
         return [startTime, endTime];
-    }, []);
+    }, [endTimeProgress, startTimeProgress, transactionDuration]);
 
     const progress = { startTime, endTime };
 

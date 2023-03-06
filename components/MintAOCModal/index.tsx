@@ -115,11 +115,11 @@ function MintAOCModal({ open, onClose }: props) {
                                                 className="ash-slider ash-slider-green my-0"
                                                 step={5}
                                                 marks={{
-                                                    0: "",
-                                                    25: "",
-                                                    50: "",
-                                                    75: "",
-                                                    100: "",
+                                                    0: <></>,
+                                                    25: <></>,
+                                                    50: <></>,
+                                                    75: <></>,
+                                                    100: <></>,
                                                 }}
                                                 handleStyle={{
                                                     backgroundColor:

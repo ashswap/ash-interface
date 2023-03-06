@@ -6,10 +6,10 @@ import {
 } from "atoms/dappState";
 import { clickedGovStakeModalState } from "atoms/govstakeStake";
 import {
-    govLockedAmtState,
-    govTotalSupplyVeASH,
-    govUnlockTSState,
-    govVeASHAmtState
+    govLockedAmtSelector,
+    govTotalSupplyVeASHSelector,
+    govUnlockTSSelector,
+    govVeASHAmtSelector,
 } from "atoms/govState";
 import { tokenMapState } from "atoms/tokensState";
 import BigNumber from "bignumber.js";
@@ -87,14 +87,17 @@ const EXTEND_CONFIGS = {
         ],
         maxLock: 4 * 365 * 24 * 60 * 60,
         minLock: 7 * 24 * 60 * 60,
-    }
-}
-const EXTEND_CONFIG = ENVIRONMENT.NETWORK === "devnet" ? EXTEND_CONFIGS[ENVIRONMENT.ENV] : EXTEND_CONFIGS.mainnet;
+    },
+};
+const EXTEND_CONFIG =
+    ENVIRONMENT.NETWORK === "devnet"
+        ? EXTEND_CONFIGS[ENVIRONMENT.ENV]
+        : EXTEND_CONFIGS.mainnet;
 const StakeMoreContent = ({ open, onClose }: props) => {
-    const lockedAmt = useRecoilValue(govLockedAmtState);
-    const unlockTS = useRecoilValue(govUnlockTSState);
-    const totalSupplyVeASH = useRecoilValue(govTotalSupplyVeASH);
-    const veASH = useRecoilValue(govVeASHAmtState);
+    const lockedAmt = useRecoilValue(govLockedAmtSelector);
+    const unlockTS = useRecoilValue(govUnlockTSSelector);
+    const totalSupplyVeASH = useRecoilValue(govTotalSupplyVeASHSelector);
+    const veASH = useRecoilValue(govVeASHAmtSelector);
     const { lockMoreASH } = useGovLockMore();
 
     const tokenMap = useRecoilValue(tokenMapState);
@@ -115,7 +118,7 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                 amount: deboundRawLockAmt,
             });
         }
-    }, [deboundRawLockAmt]);
+    }, [deboundRawLockAmt, loggedIn]);
     const [currentLockSeconds, setCurrentLockSeconds] = useState(0);
 
     const [isExtend, setIsExtend] = useState(false);
@@ -170,12 +173,7 @@ const StakeMoreContent = ({ open, onClose }: props) => {
             !insufficientASH &&
             (lockAmt.gt(0) || canExtendLockPeriod)
         );
-    }, [
-        insufficientEGLD,
-        insufficientASH,
-        lockAmt,
-        canExtendLockPeriod,
-    ]);
+    }, [insufficientEGLD, insufficientASH, lockAmt, canExtendLockPeriod]);
 
     const lockMore = useCallback(async () => {
         const { sessionId } = await lockMoreASH({

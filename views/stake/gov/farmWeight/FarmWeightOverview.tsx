@@ -5,9 +5,9 @@ import { ashswapBaseState } from "atoms/ashswap";
 import { fbHasBribe, fbTotalRewardsUSD } from "atoms/farmBribeState";
 import {
     fcFarmWeightChartRecordsAtom,
-    fcNextFarmWeightChartRecordsAtom
+    fcNextFarmWeightChartRecordsAtom,
 } from "atoms/farmControllerState";
-import { govTotalSupplyVeASH } from "atoms/govState";
+import { govTotalSupplyVeASHSelector } from "atoms/govState";
 import BigNumber from "bignumber.js";
 import Avatar from "components/Avatar";
 import Countdown from "components/Coundown";
@@ -79,7 +79,7 @@ const BribeSymbol = ({ farmAddress }: { farmAddress: string }) => {
 function FarmWeightOverview() {
     const screens = useScreenSize();
     const ashBase = useRecoilValue(ashswapBaseState);
-    const veSupply = useRecoilValue(govTotalSupplyVeASH);
+    const veSupply = useRecoilValue(govTotalSupplyVeASHSelector);
     const farmWeightChartRecords = useRecoilValue(fcFarmWeightChartRecordsAtom);
     const nextFarmWeightChartRecords = useRecoilValue(
         fcNextFarmWeightChartRecordsAtom
@@ -87,7 +87,10 @@ function FarmWeightOverview() {
     const router = useRouter();
     const hash = useRouteHash();
     const votingRef = useRef<HTMLElement>(null);
-    const defaultFarmAddress = useMemo(() => router.query.farmAddress as string || "", [router]);
+    const defaultFarmAddress = useMemo(
+        () => (router.query.farmAddress as string) || "",
+        [router]
+    );
     const radius = useMemo(() => {
         return screens.md ? 130 : screens.sm ? 90 : 120;
     }, [screens]);
@@ -121,11 +124,15 @@ function FarmWeightOverview() {
     }, [ashBase]);
 
     useEffect(() => {
-        if(hash === "voting") {
-            setTimeout(() => votingRef.current?.scrollIntoView({
-                behavior: "smooth",
-                block: "start"
-            }), 0);
+        if (hash === "voting") {
+            setTimeout(
+                () =>
+                    votingRef.current?.scrollIntoView({
+                        behavior: "smooth",
+                        block: "start",
+                    }),
+                0
+            );
         }
     }, [hash]);
     return (
@@ -209,15 +216,19 @@ function FarmWeightOverview() {
                                 hash: "voting",
                             }}
                             shallow
+                            onClick={(e) => {
+                                e.preventDefault();
+                                votingRef.current?.scrollIntoView({
+                                    behavior: "smooth",
+                                });
+                            }}
                         >
-                            <a onClick={e => {e.preventDefault(); votingRef.current?.scrollIntoView({behavior: "smooth"})}}>
-                                <GlowingButton
-                                    theme="pink"
-                                    className="w-full sm:w-64 h-[3.375rem] sm:h-18 font-bold text-sm sm:text-lg"
-                                >
-                                    Vote now!
-                                </GlowingButton>
-                            </a>
+                            <GlowingButton
+                                theme="pink"
+                                className="w-full sm:w-64 h-[3.375rem] sm:h-18 font-bold text-sm sm:text-lg"
+                            >
+                                Vote now!
+                            </GlowingButton>
                         </Link>
                     </div>
                     <div className="w-full py-11">
@@ -230,7 +241,11 @@ function FarmWeightOverview() {
                                     Total veash voted
                                 </div>
                                 <div className="flex items-center">
-                                    <Avatar src={ImgVEASH} alt="veASH" className="w-4.5 h-4.5 mr-2"/>
+                                    <Avatar
+                                        src={ImgVEASH}
+                                        alt="veASH"
+                                        className="w-4.5 h-4.5 mr-2"
+                                    />
                                     <TextAmt
                                         number={totalUsedVe}
                                         className="font-bold text-lg text-white"
@@ -242,7 +257,11 @@ function FarmWeightOverview() {
                                     veash unused
                                 </div>
                                 <div className="flex items-center">
-                                    <Avatar src={ImgVEASH} alt="veASH" className="w-4.5 h-4.5 mr-2"/>
+                                    <Avatar
+                                        src={ImgVEASH}
+                                        alt="veASH"
+                                        className="w-4.5 h-4.5 mr-2"
+                                    />
                                     <TextAmt
                                         number={totalUnusedVe}
                                         className="font-bold text-lg text-white"
@@ -268,9 +287,12 @@ function FarmWeightOverview() {
                     </div>
                 </div>
             </div>
-            <section id="voting" ref={votingRef} className="[overflow-anchor:none]">
-
-            <FarmWeightVoting defaultFarmAddress={defaultFarmAddress}/>
+            <section
+                id="voting"
+                ref={votingRef}
+                className="[overflow-anchor:none]"
+            >
+                <FarmWeightVoting defaultFarmAddress={defaultFarmAddress} />
             </section>
         </>
     );

@@ -1,5 +1,5 @@
-import { CustomNetworkType } from "@elrondnetwork/dapp-core/types";
-import { fallbackNetworkConfigurations } from "@elrondnetwork/dapp-core/constants";
+import { CustomNetworkType } from "@multiversx/sdk-dapp/types";
+import { fallbackNetworkConfigurations } from "@multiversx/sdk-dapp/constants";
 import { ENVIRONMENT } from "./env";
 import { ChainId } from "helper/token/token";
 export const gasPrice = 1000000000;
@@ -13,10 +13,8 @@ export const blockTimeMs = 6000;
 
 let defaultDevnet: CustomNetworkType = {
     ...fallbackNetworkConfigurations.devnet,
-    walletAddress: "https://devnet-wallet.multiversx.com",
+    apiTimeout: '10000'
 };
-// defaultDevnet.apiAddress = "https://api-elrond-devnet.ashswap.io";
-defaultDevnet.apiTimeout = "10000";
 
 const _DAPP_CONFIG: CustomNetworkType =
     ENVIRONMENT.NETWORK === "devnet"

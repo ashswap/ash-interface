@@ -1,4 +1,4 @@
-import { useTrackTransactionStatus } from "@elrondnetwork/dapp-core/hooks";
+import { useTrackTransactionStatus } from "@multiversx/sdk-dapp/hooks";
 import { collapseModalState } from "atoms/collapseState";
 import { sendTransactions } from "helper/transactionMethods";
 import { DappSendTransactionsPropsType } from "interface/dappCore";
