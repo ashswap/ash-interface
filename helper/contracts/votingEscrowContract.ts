@@ -2,6 +2,8 @@ import Contract from "./contract";
 import votingEscowAbi from "assets/abi/voting_escrow.abi.json";
 import { TokenPayment } from "@multiversx/sdk-core/out";
 import BigNumber from "bignumber.js";
+import { ENVIRONMENT } from "const/env";
+const gas = ENVIRONMENT.NETWORK === "mainnet" ? 10_000_000 : 100_000_000;
 class VotingEscrowContract extends Contract<typeof votingEscowAbi> {
     constructor(address: string) {
         super(address, votingEscowAbi);
@@ -11,7 +13,7 @@ class VotingEscrowContract extends Contract<typeof votingEscowAbi> {
         let interaction = this.contract.methods.create_lock([unlockTS]);
         interaction
             .withSingleESDTTransfer(tokenPayment)
-            .withGasLimit(100_000_000); // 7m
+            .withGasLimit(gas); // 7m
         return this.interceptInteraction(interaction)
             .check()
             .buildTransaction();
@@ -21,7 +23,7 @@ class VotingEscrowContract extends Contract<typeof votingEscowAbi> {
         let interaction = this.contract.methods.increase_amount([]);
         interaction
             .withSingleESDTTransfer(tokenPayment)
-            .withGasLimit(100_000_000); //7m
+            .withGasLimit(gas); //7m
         return this.interceptInteraction(interaction)
             .check()
             .buildTransaction();
@@ -31,7 +33,7 @@ class VotingEscrowContract extends Contract<typeof votingEscowAbi> {
         let interaction = this.contract.methods.increase_unlock_time([
             unlockTS,
         ]);
-        interaction.withGasLimit(100_000_000); //7m
+        interaction.withGasLimit(gas); //7m
         return this.interceptInteraction(interaction)
             .check()
             .buildTransaction();
@@ -39,7 +41,7 @@ class VotingEscrowContract extends Contract<typeof votingEscowAbi> {
 
     async withdraw() {
         let interaction = this.contract.methods.withdraw([]);
-        interaction.withGasLimit(100_000_000); //7m
+        interaction.withGasLimit(gas); //7m
         return this.interceptInteraction(interaction)
             .check()
             .buildTransaction();
