@@ -185,7 +185,7 @@ const QuestOverview = () => {
     );
 
     useEffect(() => {
-        if (code && userAddress && platform && ashpointSignature) {
+        if (code && userAddress && platform && (!ENVIRONMENT.ENABLE_ASHPOINT_SIGN || ashpointSignature)) {
             initGeetest4({ product: "bind", riskType: "slide" }, (obj) => {
                 captchaObjRef.current?.destroy();
                 captchaObjRef.current = obj
