@@ -100,6 +100,7 @@ function BribeOverview() {
             <FarmBribeModal
                 isOpen={isOpenBribe}
                 onRequestClose={() => setIsOpenBribe(false)}
+                onCreateBribe={() => setIsOpenBribe(false)}
             />
         </>
     );

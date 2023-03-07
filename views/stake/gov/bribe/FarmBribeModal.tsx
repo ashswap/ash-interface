@@ -21,8 +21,10 @@ import useInputNumberString from "hooks/useInputNumberString";
 import BigNumber from "bignumber.js";
 import { Address, TokenPayment } from "@multiversx/sdk-core/out";
 
-type FarmBribeModalProps = {};
-const FarmBribeContent = ({}: FarmBribeModalProps) => {
+type FarmBribeModalProps = {
+    onCreateBribe?: (farmAddress: string, tokenPayments: TokenPayment[]) => void;
+};
+const FarmBribeContent = ({onCreateBribe}: FarmBribeModalProps) => {
     const ashBase = useRecoilValue(ashswapBaseState);
     const [selectedFarmAddress, setSelectedFarm] = useState("");
     const [selectedTokenId, setSelectedTokenId] = useState("");
@@ -66,12 +68,14 @@ const FarmBribeContent = ({}: FarmBribeModalProps) => {
             TOKENS_MAP[selectedTokenId].decimals
         );
         await addRewardAmount(new Address(selectedFarmAddress), [tokenPayment]);
+        onCreateBribe?.(selectedFarmAddress, [tokenPayment]);
     }, [
         canCreateBribe,
         selectedTokenId,
         selectedFarmAddress,
         inputValue,
         addRewardAmount,
+        onCreateBribe
     ]);
 
     return (
@@ -297,6 +301,7 @@ const FarmBribeContent = ({}: FarmBribeModalProps) => {
 };
 
 function FarmBribeModal({
+    onCreateBribe,
     ...modalProps
 }: BaseModalType & FarmBribeModalProps) {
     const screenSize = useScreenSize();
@@ -311,7 +316,7 @@ function FarmBribeModal({
                     <BaseModal.CloseBtn />
                 </div>
                 <div className="flex-grow overflow-auto">
-                    <FarmBribeContent />
+                    <FarmBribeContent onCreateBribe={onCreateBribe} />
                 </div>
             </BaseModal>
         </>

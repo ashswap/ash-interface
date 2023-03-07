@@ -57,9 +57,10 @@ function BribeCard({ fbFarm }: Props) {
             fcFarm.votedPoint.slope === "0"
         )
             return 0;
-        return new BigNumber(fcAccountFarm.voteUserSlope.slope)
+        const nextWeek = Math.floor(moment().unix() / WEEK) * WEEK + WEEK;
+        return new BigNumber(fcAccountFarm.voteUserSlope.slope).multipliedBy(fcAccountFarm.voteUserSlope.end - nextWeek)
             .multipliedBy(100)
-            .div(fcFarm.votedPoint.slope)
+            .div(fcFarm.nextVotedPoint.bias)
             .toNumber();
     }, [fcFarm, fcAccountFarm]);
     const { encode } = useRouteModal("farm_weight_voting");
