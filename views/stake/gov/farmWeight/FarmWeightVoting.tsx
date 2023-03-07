@@ -353,11 +353,9 @@ const VoteEditor = memo(function VoteEditor({ farmAddress }: VoteEditorProps) {
                             <div className="mt-2 font-bold text-2xs text-stake-gray-500">
                                 Stake ASH{" "}
                                 <Link href="/stake/gov">
-                                    <a>
                                         <span className="text-pink-600 underline">
                                             here
                                         </span>
-                                    </a>
                                 </Link>{" "}
                                 to get veASH
                             </div>
