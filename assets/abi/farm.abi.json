@@ -2,15 +2,15 @@
     "buildInfo": {
         "rustc": {
             "version": "1.69.0-nightly",
-            "commitHash": "dc1d9d50fba2f6a1ccab8748a0050cde38253f60",
-            "commitDate": "2023-01-31",
+            "commitHash": "d962ea57899d64dc8a57040142c6b498a57c8064",
+            "commitDate": "2023-02-26",
             "channel": "Nightly",
-            "short": "rustc 1.69.0-nightly (dc1d9d50f 2023-01-31)"
+            "short": "rustc 1.69.0-nightly (d962ea578 2023-02-26)"
         },
         "contractCrate": {
             "name": "farm",
             "version": "0.0.0",
-            "git_version": "da57eb6"
+            "git_version": "510fe23-modified"
         },
         "framework": {
             "name": "elrond-wasm",
@@ -121,6 +121,16 @@
             "mutability": "mutable",
             "inputs": [],
             "outputs": []
+        },
+        {
+            "name": "getRewardPerSec",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
         },
         {
             "name": "startProduceRewards",
@@ -235,16 +245,6 @@
             ]
         },
         {
-            "name": "getRewardPerSec",
-            "mutability": "readonly",
-            "inputs": [],
-            "outputs": [
-                {
-                    "type": "BigUint"
-                }
-            ]
-        },
-        {
             "name": "getProduceRewardEnabled",
             "mutability": "readonly",
             "inputs": [],
@@ -341,6 +341,17 @@
         },
         {
             "name": "getAdditionalRewards",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "variadic<multi<TokenIdentifier,FarmAdditionalRewards>>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "getAdditionalReward",
             "mutability": "readonly",
             "inputs": [
                 {

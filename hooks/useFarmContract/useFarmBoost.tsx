@@ -1,5 +1,5 @@
 import { TokenPayment } from "@multiversx/sdk-core/out";
-import { farmQuery, FarmToken } from "atoms/farmsState";
+import { farmNumberOfAdditionalRewards, farmQuery, FarmToken } from "atoms/farmsState";
 import { ContractManager } from "helper/contracts/contractManager";
 import { sendTransactions } from "helper/transactionMethods";
 import { IFarm } from "interface/farm";
@@ -16,6 +16,9 @@ const useFarmBoost = () => {
                 const farmRecord = await snapshot.getPromise(
                     farmQuery(farm.farm_address)
                 );
+                const numberOfAdditionalRewards = await snapshot.getPromise(
+                    farmNumberOfAdditionalRewards(farm.farm_address)
+                );
                 const tokenPayments = tokens.map((t) =>
                     TokenPayment.metaEsdtFromBigInteger(
                         t.collection,
@@ -27,7 +30,7 @@ const useFarmBoost = () => {
                     transactions: await ContractManager.getFarmContract(
                         farm.farm_address
                     )
-                        .withLastRewardBlockTs(farmRecord.lastRewardBlockTs)
+                        .withContext({lastRewardBlockTs: farmRecord.lastRewardBlockTs, numberOfAdditionalRewards})
                         .claimRewards(tokenPayments, selfBoost),
                     transactionsDisplayInfo: {
                         successMessage: "Success to boost",

@@ -188,7 +188,6 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
     const addLP = useRecoilCallback(
         ({ snapshot }) =>
             async () => {
-                setAdding(true);
                 let mintAmt = new BigNumber(0);
                 if (pool.type === EPoolType.PoolV2) {
                     const rawPoolV2 = await snapshot.getPromise(
@@ -211,7 +210,7 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
                     const poolFee = await snapshot.getPromise(
                         poolV1FeesQuery(pool.address)
                     );
-                    if (!loggedIn || adding || !poolData) return;
+                    if (!loggedIn || !poolData) return;
                     const { ampFactor, reserves, totalSupply } = poolData;
                     if (!ampFactor || !reserves || !totalSupply) return;
 
@@ -227,6 +226,7 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
                     mintAmt = mintAmount.raw;
                 }
                 try {
+                    setAdding(true);
                     const { sessionId } = await addPoolLP(
                         pool,
                         pool.tokens.map((_t, i) => {
@@ -249,7 +249,6 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
             inputWeiValues,
             pool,
             onClose,
-            adding,
             loggedIn,
             addPoolLP,
             setAddLPSessionId,

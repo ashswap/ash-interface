@@ -69,11 +69,19 @@ export abstract class IQuery {
 
     abstract ashSupply(): string | Promise<string>;
 
+    abstract summaries(limit?: Nullable<number>, offset?: Nullable<number>): Nullable<Nullable<Summary>[]> | Promise<Nullable<Nullable<Summary>[]>>;
+
+    abstract adminFee(): Nullable<number> | Promise<Nullable<number>>;
+
+    abstract votingPower(): Nullable<Nullable<Nullable<string>[]>[]> | Promise<Nullable<Nullable<Nullable<string>[]>[]>>;
+
+    abstract volume(): Nullable<Nullable<number[]>[]> | Promise<Nullable<Nullable<number[]>[]>>;
+
+    abstract defillama(): Nullable<Defillama> | Promise<Nullable<Defillama>>;
+
     abstract tokens(token_ids?: Nullable<string>): Nullable<Token[]> | Promise<Nullable<Token[]>>;
 
     abstract tokenTransactions(token_id?: Nullable<string>, limit?: Nullable<number>, offset?: Nullable<number>): Nullable<Nullable<TokenTransacion>[]> | Promise<Nullable<Nullable<TokenTransacion>[]>>;
-
-    abstract volume(): Nullable<Nullable<number[]>[]> | Promise<Nullable<Nullable<number[]>[]>>;
 
     abstract votingEscrows(address: string): Nullable<VotingEscrow[]> | Promise<Nullable<VotingEscrow[]>>;
 }
@@ -245,7 +253,16 @@ export class Farm {
     farmingTokenBalance?: Nullable<string>;
     produceRewardEnabled?: Nullable<boolean>;
     shard?: Nullable<string>;
+    additionalRewards: AdditionalReward[];
     account?: Nullable<FarmAccount>;
+}
+
+export class AdditionalReward {
+    __typename?: 'AdditionalReward';
+    rewardPerSec: string;
+    rewardPerShare: string;
+    periodRewardEnd: number;
+    tokenId: string;
 }
 
 export class FarmAccount {
@@ -394,6 +411,23 @@ export class Rewarder {
     lastRewardPerSecTime: number;
     futureRewardPerSec: number;
     futureRewardPerSecTime: number;
+}
+
+export class Defillama {
+    __typename?: 'Defillama';
+    totalValueLockedUSD?: Nullable<number>;
+    totalValueStakedUSD?: Nullable<number>;
+    totalVolumeUSD24h?: Nullable<number>;
+    pools?: Nullable<Nullable<DefillamaPool>[]>;
+}
+
+export class DefillamaPool {
+    __typename?: 'DefillamaPool';
+    address?: Nullable<string>;
+    tokens?: Nullable<Nullable<string>[]>;
+    tvlUsd?: Nullable<number>;
+    apyBase?: Nullable<number>;
+    apyReward?: Nullable<number>;
 }
 
 export class Token {

@@ -16,10 +16,11 @@ import { farmTokenMapState, tokenMapState } from "atoms/tokensState";
 import BigNumber from "bignumber.js";
 import { FARMS, FARMS_MAP } from "const/farms";
 import pools from "const/pool";
-import { ASH_TOKEN } from "const/tokens";
+import { ASH_TOKEN, TOKENS_MAP } from "const/tokens";
 import { toEGLDD } from "helper/balance";
 import { ContractManager } from "helper/contracts/contractManager";
 import { calcYieldBoostFromFarmToken } from "helper/farmBooster";
+import { TokenAmount } from "helper/token/tokenAmount";
 import { FarmTokenAttrs, IFarm } from "interface/farm";
 import IPool from "interface/pool";
 import moment from "moment";
@@ -254,7 +255,14 @@ const useFarmsState = () => {
                       .toNumber()
                 : 0;
             const tradingAPR = poolState?.poolStats?.apr || 0;
-            const tokensAPR: FarmRecord["tokensAPR"] = [];
+            const currentTs = moment().unix();
+            const tokensAPR: FarmRecord["tokensAPR"] = rawFarm?.additionalRewards.map(r => {
+                const t = TOKENS_MAP[r.tokenId];
+                if(!t || totalLiquidityValue.eq(0) || currentTs > r.periodRewardEnd) return {apr: 0, tokenId: r.tokenId};
+                const tokenPerYear = new BigNumber(r.rewardPerSec).multipliedBy(365 * 24 * 60 * 60);
+                const valueUsd = toEGLDD(t.decimals, tokenPerYear).multipliedBy(tokenMap[t.identifier].price);
+                return {apr: valueUsd.multipliedBy(100).div(totalLiquidityValue).toNumber(), tokenId: t.identifier};
+            }).filter(val => val.apr > 0) || [];
 
             const record: FarmRecord = {
                 pool: p,
@@ -355,6 +363,34 @@ const useFarmsState = () => {
                     2,
                     BigNumber.ROUND_DOWN
                 );
+                const divisionSafetyConstant = new BigNumber(rawFarm?.divisionSafetyConstant || 0);
+                const rewardMap: Record<string, BigNumber> = {};
+                const rewardMapRaw = Object.fromEntries(rawFarm?.additionalRewards.map(t => [t.tokenId, t]) || []);
+                if(rawFarm && record.lpLockedAmt.gt(0) && divisionSafetyConstant.gt(0)){
+                    farmTokens.map(ft => {
+                        const rewardTokensFromAttrs = Object.fromEntries(ft.attributes.reward_tokens.map(t => [t.token, t]));
+                        rawFarm.additionalRewards.map(r => {
+                            const t = rewardTokensFromAttrs[r.tokenId] || {token: r.tokenId, reward_per_share: new BigNumber(0)};
+                            if(TOKENS_MAP[t.token]){
+                                if(!rewardMap[t.token]) rewardMap[t.token] = new BigNumber(0);
+                                const rawData = rewardMapRaw[t.token];
+                                const lp = ft.balance.idiv(ft.perLP);
+                                const amt = new BigNumber(rawData ? new BigNumber(rawData.rewardPerShare).minus(t.reward_per_share) : 0).multipliedBy(lp).idiv(divisionSafetyConstant.multipliedBy(divisionSafetyConstant));
+                                
+                                const time = Math.max(Math.min(currentTs, rawData.periodRewardEnd) - record.lastRewardBlockTs, 0);
+                                const rewardIncrease = new BigNumber(rawData.rewardPerSec).multipliedBy(time);
+                                const increaseAmt = rewardIncrease.multipliedBy(lp).idiv(record.lpLockedAmt);
+                                rewardMap[t.token] = rewardMap[t.token].plus(amt).plus(increaseAmt);
+                            }
+                        })
+                    });
+                }
+                const rewards: TokenAmount[] = Object.entries(rewardMap).map(([tokenId, r]) => {
+                    return new TokenAmount(TOKENS_MAP[tokenId], r);
+                }).filter(r => r.greaterThan(0));
+                if(estimatedReward.gt(0)){
+                    rewards.unshift(new TokenAmount(ASH_TOKEN, estimatedReward));
+                }
                 record.stakedData = {
                     farmTokens,
                     totalStakedLP,
@@ -368,6 +404,7 @@ const useFarmsState = () => {
                         ashBaseAPR * yieldBoost +
                         tradingAPR +
                         tokensAPR.reduce((sum, t) => (sum += t.apr), 0),
+                    rewards,
                 };
             }
             return record;

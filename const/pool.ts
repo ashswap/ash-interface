@@ -13,9 +13,9 @@ const devnet: PoolConfig = {
     alpha: [
         {
             address:
-                "erd1qqqqqqqqqqqqqpgqaauymxe3ackhfej7ptyxld2j80zrygsqrmcqsx7tsw",
+                "erd1qqqqqqqqqqqqqpgq9ppe9hk2pqrtwqc2k5zll8v8hmgmfcwsrmcqhxxwxm",
             lpToken: {
-                identifier: "ALP-5fe768",
+                identifier: "ALP-4f7776",
                 chainId: ChainId.Devnet,
                 symbol: "LPT-3pool",
                 name: "Ashswap LP",
@@ -30,9 +30,9 @@ const devnet: PoolConfig = {
         },
         {
             address:
-                "erd1qqqqqqqqqqqqqpgqct3hqmz7svh7pf58fprzd2cvf6whw3p5rmcqav2pay",
+                "erd1qqqqqqqqqqqqqpgqwn0yqfmp4yztzmxl8pm8tv59cdls7dfwrmcq6v6rr9",
             lpToken: {
-                identifier: "ALP-ffdf38",
+                identifier: "ALP-37d247",
                 chainId: ChainId.Devnet,
                 symbol: "LPT-BUSD-wEGLD",
                 name: "Ashswap LP",
@@ -43,9 +43,9 @@ const devnet: PoolConfig = {
         },
         {
             address:
-                "erd1qqqqqqqqqqqqqpgqxw4nc0hnzeru4qx5q8d8ycphr2nl435rrmcqwt9rnx",
+                "erd1qqqqqqqqqqqqqpgqthmzhtmuyym9fh44nmwwswyn7qnc5v73rmcqh6xrhy",
             lpToken: {
-                identifier: "ALP-d8382e",
+                identifier: "ALP-524be5",
                 chainId: ChainId.Devnet,
                 symbol: "LPT-ASH-USDT",
                 name: "Ashswap LP",
