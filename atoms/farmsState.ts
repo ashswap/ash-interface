@@ -1,4 +1,5 @@
 import BigNumber from "bignumber.js";
+import { TokenAmount } from "helper/token/tokenAmount";
 import { FarmTokenAttrs, IFarm } from "interface/farm";
 import IPool from "interface/pool";
 import { PoolStatsRecord } from "interface/poolStats";
@@ -29,6 +30,7 @@ export type FarmRecord = {
         farmTokens: FarmToken[];
         totalStakedLP: BigNumber;
         totalRewardAmt: BigNumber;
+        rewards: TokenAmount[];
         totalStakedLPValue: BigNumber;
         weightBoost: BigNumber;
         yieldBoost: number;
@@ -263,3 +265,10 @@ export const farmTokensRefresherAtom = atom<KeyedMutator<IMetaESDT[]>>({
     key: "refresh_farm_tokens_balance",
     default: () => Promise.resolve(undefined),
 });
+
+export const farmNumberOfAdditionalRewards = selectorFamily<number, string>({
+    key: "farm_number_of_additional_rewards",
+    get: (address: string) => ({get}) => {
+        return get(ashRawFarmQuery(address))?.additionalRewards.length || 0;
+    }
+})

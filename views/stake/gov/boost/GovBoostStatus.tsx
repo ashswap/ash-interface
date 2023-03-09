@@ -10,6 +10,7 @@ import ICEqualSquare from "assets/svg/equal-square.svg";
 import ICHexagonDuo from "assets/svg/hexagon-duo.svg";
 import { accAddressState } from "atoms/dappState";
 import {
+    farmNumberOfAdditionalRewards,
     farmOwnerTokensQuery,
     FarmRecord,
     farmRecordsState,
@@ -312,7 +313,7 @@ function GovBoostStatus() {
                         };
                     })
                     .filter(({ ownerTokens }) => ownerTokens.length > 0)
-                    .map(({ ownerTokens, farm, lastRewardBlockTs }) => {
+                    .map(async ({ ownerTokens, farm, lastRewardBlockTs }) => {
                         const tokenPayments: TokenPayment[] = ownerTokens.map(
                             (t) =>
                                 TokenPayment.metaEsdtFromBigInteger(
@@ -321,11 +322,14 @@ function GovBoostStatus() {
                                     t.balance
                                 )
                         );
+                        const numberOfAdditionalRewards = await snapshot.getPromise(
+                            farmNumberOfAdditionalRewards(farm.farm_address)
+                        );
                         farmsAddress.push(farm.farm_address);
-                        return ContractManager.getFarmContract(
+                        return await ContractManager.getFarmContract(
                             farm.farm_address
                         )
-                            .withLastRewardBlockTs(lastRewardBlockTs)
+                            .withContext({lastRewardBlockTs, numberOfAdditionalRewards})
                             .claimRewards(tokenPayments);
                     });
                 const { sessionId, error } = await sendTransactions({

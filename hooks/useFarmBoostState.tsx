@@ -1,23 +1,23 @@
-import { useTrackTransactionStatus } from "@multiversx/sdk-dapp/hooks";
 import { TokenPayment } from "@multiversx/sdk-core/out";
+import { useTrackTransactionStatus } from "@multiversx/sdk-dapp/hooks";
 import { accAddressState } from "atoms/dappState";
 import {
     ashRawFarmQuery,
-    farmOwnerTokensQuery,
-    FarmRecord,
-    FarmToken,
+    farmNumberOfAdditionalRewards,
+    farmOwnerTokensQuery, FarmRecord,
+    FarmToken
 } from "atoms/farmsState";
 import {
     govLockedAmtSelector,
     govTotalSupplyVeASHSelector,
-    govUnlockTSSelector,
+    govUnlockTSSelector
 } from "atoms/govState";
 import BigNumber from "bignumber.js";
 import { ASHSWAP_CONFIG, VE_CONFIG } from "const/ashswapConfig";
 import { ContractManager } from "helper/contracts/contractManager";
 import {
     calcYieldBoost,
-    calcYieldBoostFromFarmToken,
+    calcYieldBoostFromFarmToken
 } from "helper/farmBooster";
 import { sendTransactions } from "helper/transactionMethods";
 import { FarmBoostInfo } from "interface/farm";
@@ -93,6 +93,9 @@ export const useFarmBoostTransferState = (
                 const ownerTokens = await snapshot.getPromise(
                     farmOwnerTokensQuery(farmData.farm.farm_address)
                 );
+                const numberOfAdditionalRewards = await snapshot.getPromise(
+                    farmNumberOfAdditionalRewards(farmData.farm.farm_address)
+                );
                 const tokens = [...ownerTokens, farmToken];
                 const tokenPayments = tokens.map((t) =>
                     TokenPayment.metaEsdtFromBigInteger(
@@ -104,7 +107,10 @@ export const useFarmBoostTransferState = (
                 const txs = await ContractManager.getFarmContract(
                     farmData.farm.farm_address
                 )
-                    .withLastRewardBlockTs(farmData.lastRewardBlockTs)
+                    .withContext({
+                        lastRewardBlockTs: farmData.lastRewardBlockTs,
+                        numberOfAdditionalRewards,
+                    })
                     .claimRewards(tokenPayments, true);
                 const result = await sendTransactions({
                     transactions: txs,

@@ -7,22 +7,30 @@ import { FarmTokenAttrs } from "interface/farm";
 import chunk from "lodash.chunk";
 import moment from "moment";
 import { WEEK } from "const/ve";
+type FarmContractContext = {
+    lastRewardBlockTs?: number;
+    numberOfAdditionalRewards?: number;
+};
 class FarmContract extends Contract<typeof farmAbi> {
     private readonly MAX_TOKEN_PROCESS = 5;
-    lastRewardBlockTs = 0;
+    context: FarmContractContext = {};
     constructor(address: string) {
         super(address, farmAbi);
     }
 
     private _getBaseGasLimit() {
+        const {
+            lastRewardBlockTs = 0,
+            numberOfAdditionalRewards = 0,
+        } = this.context || {};
         // fallback to 5 weeks
         const week =
-            this.lastRewardBlockTs === 0
+            lastRewardBlockTs === 0
                 ? 5
                 : Math.floor(moment().unix() / WEEK) -
-                  Math.floor(this.lastRewardBlockTs / WEEK);
-        // each interation by week of checkpoint cost 12_000_000 (farm contract) + checkpoint farm (farm controller) cost 10_000_000
-        return week * 12_000_000 + 10_000_000;
+                  Math.floor(lastRewardBlockTs / WEEK);
+        // each interation by week of checkpoint cost 8_000_000 (farm contract) + checkpoint farm (farm controller) cost 20_000_000
+        return week * 8_000_000 + 20_000_000 + numberOfAdditionalRewards * 4_000_000;
     }
 
     private async _enterFarm(tokenPayments: TokenPayment[], selfBoost = false) {
@@ -121,8 +129,8 @@ class FarmContract extends Contract<typeof farmAbi> {
         return (firstValue?.valueOf() as BigNumber) || new BigNumber(0);
     }
 
-    withLastRewardBlockTs(ts: number) {
-        this.lastRewardBlockTs = ts;
+    withContext(context: FarmContractContext) {
+        this.context = context;
         return this;
     }
 }

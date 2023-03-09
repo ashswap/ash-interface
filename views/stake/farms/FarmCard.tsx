@@ -338,17 +338,32 @@ function FarmCard({ farmData, viewType }: props) {
             });
         }
     }, [openUnstakeLP]);
-    const rewardValue = useMemo(() => {
-        return toEGLDD(ASH_TOKEN.decimals, totalRewardAmt).multipliedBy(
-            tokenMap[ASH_TOKEN.identifier].price || 0
+    const totalRewardsValue = useMemo(() => {
+        return (
+            stakedData?.rewards.reduce(
+                (s, r) =>
+                    s.plus(
+                        r.egld.multipliedBy(
+                            tokenMap[r.token.identifier]?.price || 0
+                        )
+                    ),
+                new BigNumber(0)
+            ) || new BigNumber(0)
         );
-    }, [totalRewardAmt, tokenMap]);
+    }, [tokenMap, stakedData]);
 
     const stakedLPValue = useMemo(() => {
         return new BigNumber(farmData.stakedData?.totalStakedLP || 0)
             .multipliedBy(farmData.totalLiquidityValue)
             .div(farmData.lpLockedAmt);
     }, [farmData]);
+
+    const canHarvest = useMemo(() => {
+        return (
+            stakedData?.totalRewardAmt.gt(0) ||
+            stakedData?.rewards.some((r) => r.greaterThan(0))
+        );
+    }, [stakedData]);
 
     const cardElement = (
         <div className="relative">
@@ -557,47 +572,81 @@ function FarmCard({ farmData, viewType }: props) {
                         <div>
                             <CardTooltip
                                 content={
-                                    <div>Total ASH available to harvest.</div>
+                                    <div>
+                                        <div>
+                                            Total rewards available to harvest.
+                                        </div>
+                                        <div
+                                            className={`space-y-2 ${
+                                                !stakedData?.rewards.length
+                                                    ? ""
+                                                    : "mt-4"
+                                            }`}
+                                        >
+                                            {stakedData?.rewards.map((r) => {
+                                                return (
+                                                    <div
+                                                        key={r.token.identifier}
+                                                        className="flex justify-between items-center"
+                                                    >
+                                                        <div className="flex items-center">
+                                                            <Avatar
+                                                                src={
+                                                                    r.token
+                                                                        .logoURI
+                                                                }
+                                                                alt={
+                                                                    r.token.name
+                                                                }
+                                                                className="w-4 h-4 mr-2"
+                                                            />
+                                                            <span>
+                                                                {r.token.symbol}
+                                                            </span>
+                                                        </div>
+                                                        <TextAmt
+                                                            number={r.egld}
+                                                        />
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
                                 }
                             >
                                 <div className="inline-block text-xs text-stake-gray-500 font-bold underline mb-2">
-                                    {ASH_TOKEN.symbol} Farmed
+                                    Rewards
                                 </div>
                             </CardTooltip>
                             <div
                                 className={`text-lg font-bold ${
-                                    stakedData?.totalRewardAmt.gt(0)
+                                    canHarvest
                                         ? "text-white"
                                         : "text-stake-gray-500"
                                 }`}
                             >
                                 <TextAmt
-                                    number={toEGLDD(
-                                        ASH_TOKEN.decimals,
-                                        totalRewardAmt
-                                    )}
+                                    number={totalRewardsValue}
+                                    prefix="$"
                                     decimalClassName={`${
-                                        totalRewardAmt.gt(0)
-                                            ? "text-stake-gray-500"
-                                            : ""
+                                        canHarvest ? "text-stake-gray-500" : ""
                                     }`}
                                 />
                             </div>
-                            {isExpand && (
+                            {/* {isExpand && (
                                 <div className="mt-3">
                                     <EstimateInUSD number={rewardValue} />
                                 </div>
-                            )}
+                            )} */}
                         </div>
                         <GlowingButton
                             theme="cyan"
                             className={`clip-corner-1 clip-corner-br w-[7.25rem] h-14 text-sm font-bold`}
-                            disabled={!stakedData?.totalRewardAmt.gt(0)}
+                            disabled={!canHarvest}
                             onClick={() => {
-                                stakedData?.totalRewardAmt.gt(0) &&
-                                    claimReward(farm).then(() =>
-                                        setMOpenFarm(false)
-                                    );
+                                claimReward(farm).then(() =>
+                                    setMOpenFarm(false)
+                                );
                                 setIsClickedHarvestButton(true);
                             }}
                         >
@@ -711,10 +760,8 @@ function FarmCard({ farmData, viewType }: props) {
         <GlowingButton
             theme="cyan"
             className={`clip-corner-1 clip-corner-br h-10 lg:h-12 w-full font-bold text-xs`}
-            disabled={!stakedData?.totalRewardAmt.gt(0)}
-            onClick={() =>
-                stakedData?.totalRewardAmt.gt(0) && claimReward(farm)
-            }
+            disabled={!canHarvest}
+            onClick={() => claimReward(farm)}
         >
             Harvest
         </GlowingButton>
@@ -867,7 +914,7 @@ function FarmCard({ farmData, viewType }: props) {
                                 {isExpand && (
                                     <div className="mt-1 lg:mt-2.5 block text-xs lg:text-sm font-semibold text-stake-gray-500">
                                         <span className="font-normal">$</span>
-                                        <TextAmt number={rewardValue} />
+                                        <TextAmt number={totalRewardsValue} />
                                     </div>
                                 )}
                             </div>

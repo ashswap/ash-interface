@@ -1,24 +1,26 @@
 import { accIsLoggedInState } from "atoms/dappState";
 import {
-    FarmRecord,
     farmRecordsState,
-    farmStakedOnlyState,
+    farmStakedOnlyState
 } from "atoms/farmsState";
 import { clickedHarvestModalState } from "atoms/harvestState";
+import { tokenMapState } from "atoms/tokensState";
 import BigNumber from "bignumber.js";
 import Avatar from "components/Avatar";
 import GlowingButton from "components/GlowingButton";
 import TextAmt from "components/TextAmt";
 import CardTooltip from "components/Tooltip/CardTooltip";
-import { ASH_TOKEN } from "const/tokens";
-import { toEGLDD } from "helper/balance";
+import { TokenAmount } from "helper/token/tokenAmount";
 import useFarmClaimAll from "hooks/useFarmContract/useFarmClaimAll";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 function FarmStats({ onClickAll }: { onClickAll?: () => void }) {
-    const [harvesting, setHarvesting] = useState(false);
     const farmRecords = useRecoilValue(farmRecordsState);
-    const { claimAllFarmsReward: claimAllReward } = useFarmClaimAll();
+    const tokenMap = useRecoilValue(tokenMapState);
+    const {
+        claimAllFarmsReward: claimAllReward,
+        trackingData: { isPending },
+    } = useFarmClaimAll(true);
     const setStakedOnly = useSetRecoilState(farmStakedOnlyState);
     const TVL = useMemo(() => {
         return farmRecords.reduce(
@@ -26,22 +28,32 @@ function FarmStats({ onClickAll }: { onClickAll?: () => void }) {
             new BigNumber(0)
         );
     }, [farmRecords]);
-    const totalReward = useMemo(() => {
-        return farmRecords.reduce(
-            (total, val) => total.plus(val?.stakedData?.totalRewardAmt || 0),
+    const rewards = useMemo(() => {
+        if(isPending) return [];
+        const map: Record<string, TokenAmount> = {};
+        farmRecords.map((f) => {
+            f.stakedData?.rewards.map((r) => {
+                if (!map[r.token.identifier])
+                    map[r.token.identifier] = new TokenAmount(r.token, 0);
+                map[r.token.identifier] = map[r.token.identifier].add(r);
+            });
+        });
+        return Object.values(map);
+    }, [farmRecords, isPending]);
+    const canHarvest = useMemo(() => {
+        return rewards.some((r) => r.greaterThan(0));
+    }, [rewards]);
+    const totalRewardValue = useMemo(() => {
+        return rewards.reduce(
+            (sum, r) =>
+                sum.plus(
+                    r.egld.multipliedBy(
+                        tokenMap[r.token.identifier]?.price || 0
+                    )
+                ),
             new BigNumber(0)
         );
-    }, [farmRecords]);
-    const harvestAll = useCallback(async () => {
-        if (harvesting || totalReward.eq(0)) return;
-        setHarvesting(true);
-        try {
-            await claimAllReward();
-            setHarvesting(false);
-        } catch (error) {
-            setHarvesting(false);
-        }
-    }, [harvesting, totalReward, claimAllReward]);
+    }, [rewards, tokenMap]);
     const [isClickedHarvestButton, setIsClickedHarvestButton] = useRecoilState(
         clickedHarvestModalState
     );
@@ -76,8 +88,38 @@ function FarmStats({ onClickAll }: { onClickAll?: () => void }) {
                         <CardTooltip
                             content={
                                 <div>
-                                    Your rewards every by staking LP-Tokens, you
-                                    can claim them whenever you want.
+                                    <div>
+                                        Your rewards by staking LP-Tokens,
+                                        you can claim them whenever you want.
+                                    </div>
+                                    <div
+                                        className={`space-y-2 ${
+                                            !rewards.length ? "" : "mt-4"
+                                        }`}
+                                    >
+                                        {rewards.map((r) => {
+                                            return (
+                                                <div
+                                                    key={r.token.identifier}
+                                                    className="flex justify-between items-center"
+                                                >
+                                                    <div className="flex items-center">
+                                                        <Avatar
+                                                            src={
+                                                                r.token.logoURI
+                                                            }
+                                                            alt={r.token.name}
+                                                            className="w-4 h-4 mr-2"
+                                                        />
+                                                        <span>
+                                                            {r.token.symbol}
+                                                        </span>
+                                                    </div>
+                                                    <TextAmt number={r.egld} />
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
                                 </div>
                             }
                         >
@@ -86,29 +128,21 @@ function FarmStats({ onClickAll }: { onClickAll?: () => void }) {
                             </div>
                         </CardTooltip>
                         <div className="flex items-center">
-                            <Avatar
-                                src={ASH_TOKEN.logoURI}
-                                alt={ASH_TOKEN.symbol}
-                                className="w-4.5 h-4.5 mr-2"
-                            />
                             <div className="text-white text-lg font-bold">
                                 <TextAmt
-                                    number={toEGLDD(
-                                        ASH_TOKEN.decimals,
-                                        totalReward
-                                    )}
+                                    prefix="$"
+                                    number={totalRewardValue}
                                     decimalClassName="text-stake-gray-500"
                                 />{" "}
-                                ASH
                             </div>
                         </div>
                     </div>
                     <GlowingButton
                         theme="cyan"
                         className={`w-full h-[3.375rem] text-sm font-bold`}
-                        disabled={harvesting || totalReward.eq(0)}
+                        disabled={isPending || !canHarvest}
                         onClick={() => {
-                            harvestAll();
+                            claimAllReward();
                             setIsClickedHarvestButton(true);
                         }}
                     >

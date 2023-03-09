@@ -122,6 +122,12 @@ const useAshBaseStateQuery = (config?: SWRConfiguration) => {
                             slopeBoosted
                         }
                         shard
+                        additionalRewards{
+                            rewardPerSec
+                            rewardPerShare
+                            periodRewardEnd
+                            tokenId
+                        }
                     }
                     pools {
                         address
