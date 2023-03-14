@@ -6,6 +6,7 @@ import ICGovBoost from "assets/svg/gov-boost.svg";
 import ICMinus from "assets/svg/minus.svg";
 import ICPlus from "assets/svg/plus.svg";
 import ICArrowRight from "assets/svg/arrow-right.svg";
+import ICFarmAshFire from "assets/svg/farm-ash-fire.svg";
 import { accIsLoggedInState } from "atoms/dappState";
 import { farmLoadingMapState, FarmRecord } from "atoms/farmsState";
 import { clickedHarvestModalState } from "atoms/harvestState";
@@ -33,6 +34,8 @@ import FarmBoostInfoModal from "./FarmBoostInfoModal";
 import { ViewType } from "./FarmFilter";
 import FarmListLayoutContainer from "./FarmListLayoutContainer";
 import BaseTooltip from "components/BaseTooltip";
+import FarmMultiRewardsTooltip from "./FarmMultiRewardsTooltip";
+import FarmConfirmHarvestModal from "./FarmConfirmHarvestModal";
 
 type props = {
     farmData: FarmRecord;
@@ -40,21 +43,22 @@ type props = {
 };
 const Card = ({ children }: any) => {
     return (
-        <div
-            className="clip-corner-tr-[0.875rem] clip-corner-bevel relative mx-auto p-[1px] w-full"
-            style={{
-                backgroundImage:
-                    "linear-gradient(to bottom, #5E6480 9.65%, #171A26 91.8%)",
-            }}
-        >
+        <div className="relative">
             <div
-                className="absolute clip-corner-tr-[0.875rem] clip-corner-bevel inset-[1px] z-[-1] bg-stake-dark-400"
-                // style={{
-                //     backgroundImage:
-                //         "linear-gradient(180deg, #31314E 0%, #1F2131 100%)",
-                // }}
-            ></div>
-
+                className="clip-corner-tr-[0.875rem] clip-corner-bevel absolute inset-0 mx-auto p-[1px] w-full"
+                style={{
+                    backgroundImage:
+                        "linear-gradient(to bottom, #5E6480 9.65%, #171A26 91.8%)",
+                }}
+            >
+                <div
+                    className="absolute clip-corner-tr-[0.875rem] clip-corner-bevel inset-[1px] z-[-1] bg-stake-dark-400"
+                    // style={{
+                    //     backgroundImage:
+                    //         "linear-gradient(180deg, #31314E 0%, #1F2131 100%)",
+                    // }}
+                ></div>
+            </div>
             {children}
         </div>
     );
@@ -286,10 +290,14 @@ function FarmCard({ farmData, viewType }: props) {
     const [openStakeLP, setOpenStakeLP] = useState<boolean>(false);
     const [openUnstakeLP, setOpenUnstakeLP] = useState<boolean>(false);
     const [openBoostInfo, setOpenBoostInfo] = useState(false);
+    const [openHarvestInfo, setOpenHarvestInfo] = useState(false);
     const [mOpenFarm, setMOpenFarm] = useState(false);
     const screenSize = useScreenSize();
     const loadingMap = useRecoilValue(farmLoadingMapState);
-    const { claimReward } = useFarmClaimReward();
+    const {
+        claimReward,
+        trackingData: { isSigned: isSignedHarvest },
+    } = useFarmClaimReward(true);
     const [isExpand, setIsExpand] = useState(false);
     const [isOpenAPRBreakdown, setIsOpenAPRBreakdown] = useState(false);
     const tokenMap = useRecoilValue(tokenMapState);
@@ -338,6 +346,13 @@ function FarmCard({ farmData, viewType }: props) {
             });
         }
     }, [openUnstakeLP]);
+
+    useEffect(() => {
+        if (isSignedHarvest) {
+            setOpenHarvestInfo(false);
+        }
+    }, [isSignedHarvest]);
+
     const totalRewardsValue = useMemo(() => {
         return (
             stakedData?.rewards.reduce(
@@ -365,10 +380,23 @@ function FarmCard({ farmData, viewType }: props) {
         );
     }, [stakedData]);
 
+    const isFarmASH = useMemo(() => {
+        return farmData.ashPerSec.gt(0);
+    }, [farmData.ashPerSec]);
+
     const cardElement = (
         <div className="relative">
+            {isFarmASH && (
+                <ICFarmAshFire
+                    className={`absolute -top-8 right-4 sm:right-6 md:right-7 w-18 h-auto text-pink-600 colored-drop-shadow-[0px_4px_50px] colored-drop-shadow-pink-600/50 transition ${
+                        !loadingMap[farmData.farm.farm_address]
+                            ? "opacity-100"
+                            : "opacity-0"
+                    }`}
+                />
+            )}
             <div
-                className="absolute inset-[1px] bg-no-repeat z-[-1]"
+                className="absolute inset-[1px] bg-no-repeat"
                 style={{
                     backgroundImage: `url(${ImgMetalCardBg.src})`,
                     backgroundSize: "54px",
@@ -377,7 +405,8 @@ function FarmCard({ farmData, viewType }: props) {
                     }px) 70px`,
                 }}
             ></div>
-            <div className="text-white border border-transparent">
+
+            <div className="relative text-white border border-transparent">
                 <div className="px-6 sm:px-10 py-8">
                     <div className="flex items-start justify-between mt-0.5 -mr-3 mb-11">
                         <div className="overflow-hidden">
@@ -570,54 +599,13 @@ function FarmCard({ farmData, viewType }: props) {
                     </div>
                     <div className="flex justify-between mb-9">
                         <div>
-                            <CardTooltip
-                                content={
-                                    <div>
-                                        <div>
-                                            Total rewards available to harvest.
-                                        </div>
-                                        <div
-                                            className={`space-y-2 ${
-                                                !stakedData?.rewards.length
-                                                    ? ""
-                                                    : "mt-4"
-                                            }`}
-                                        >
-                                            {stakedData?.rewards.map((r) => {
-                                                return (
-                                                    <div
-                                                        key={r.token.identifier}
-                                                        className="flex justify-between items-center"
-                                                    >
-                                                        <div className="flex items-center">
-                                                            <Avatar
-                                                                src={
-                                                                    r.token
-                                                                        .logoURI
-                                                                }
-                                                                alt={
-                                                                    r.token.name
-                                                                }
-                                                                className="w-4 h-4 mr-2"
-                                                            />
-                                                            <span>
-                                                                {r.token.symbol}
-                                                            </span>
-                                                        </div>
-                                                        <TextAmt
-                                                            number={r.egld}
-                                                        />
-                                                    </div>
-                                                );
-                                            })}
-                                        </div>
-                                    </div>
-                                }
+                            <FarmMultiRewardsTooltip
+                                rewards={stakedData?.rewards}
                             >
                                 <div className="inline-block text-xs text-stake-gray-500 font-bold underline mb-2">
                                     Rewards
                                 </div>
-                            </CardTooltip>
+                            </FarmMultiRewardsTooltip>
                             <div
                                 className={`text-lg font-bold ${
                                     canHarvest
@@ -644,6 +632,7 @@ function FarmCard({ farmData, viewType }: props) {
                             className={`clip-corner-1 clip-corner-br w-[7.25rem] h-14 text-sm font-bold`}
                             disabled={!canHarvest}
                             onClick={() => {
+                                setOpenHarvestInfo(true);
                                 claimReward(farm).then(() =>
                                     setMOpenFarm(false)
                                 );
@@ -1043,6 +1032,13 @@ function FarmCard({ farmData, viewType }: props) {
                 onRequestClose={() => setOpenBoostInfo(false)}
                 farmData={farmData}
             />
+            {stakedData?.rewards && (
+                <FarmConfirmHarvestModal
+                    isOpen={openHarvestInfo}
+                    onRequestClose={() => setOpenHarvestInfo(false)}
+                    rewards={stakedData.rewards}
+                />
+            )}
         </>
     );
 }
