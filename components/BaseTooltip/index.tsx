@@ -92,7 +92,7 @@ const BaseTooltip = (props: BaseTooltipProps) => {
         offset: offsetParam = 20,
     } = props;
     const [_open, _setOpen] = useState(false);
-    const arrowRef = useRef(null);
+    const arrowRef = useRef<HTMLDivElement>(null);
     const [sizeState, setSizeState] = useState<Dimensions & ElementRects>();
     const [isOverflow, setIsOverflow] = useState(false);
     const [open, setOpen] = useState(false);
@@ -135,7 +135,6 @@ const BaseTooltip = (props: BaseTooltipProps) => {
         onOpenChange,
         middleware: [
             offset(offsetParam),
-            arrow({ element: arrowRef }),
             size({
                 apply(args) {
                     setSizeState({
@@ -149,6 +148,7 @@ const BaseTooltip = (props: BaseTooltipProps) => {
                 ? autoPlacement()
                 : flip({ fallbackStrategy: "initialPlacement" }),
             shift({ padding: 8 }),
+            arrow({ element: arrowRef }),
             hide(),
         ],
         strategy: strategyProp,
@@ -186,6 +186,14 @@ const BaseTooltip = (props: BaseTooltipProps) => {
             left: "right",
         }[realPlacement.split("-")[0]]!;
     }, [realPlacement]);
+    const transformArrow = useMemo(() => {
+        return {
+            top: "translate(0,50%)",
+            right: "translate(-50%,0)",
+            bottom: "translate(0,-50%)",
+            left: "translate(50%,0)",
+        }[staticSide]
+    }, [staticSide]);
 
     return (
         <>
@@ -230,6 +238,8 @@ const BaseTooltip = (props: BaseTooltipProps) => {
                                 top: arrowY != null ? `${arrowY}px` : "",
                                 right: "",
                                 bottom: "",
+                                [staticSide]: `${-(arrowRef.current?.offsetWidth || '')}px`,
+                                transform: transformArrow,
                                 ...(typeof arrowStyle === "function" &&
                                 middlewareData.arrow
                                     ? arrowStyle(
