@@ -3,6 +3,7 @@ import { farmRecordsState, farmStakedOnlyState } from "atoms/farmsState";
 import { clickedHarvestModalState } from "atoms/harvestState";
 import { tokenMapState } from "atoms/tokensState";
 import BigNumber from "bignumber.js";
+import Avatar from "components/Avatar";
 import GlowingButton from "components/GlowingButton";
 import TextAmt from "components/TextAmt";
 import CardTooltip from "components/Tooltip/CardTooltip";
@@ -92,8 +93,13 @@ function FarmStats({ onClickAll }: { onClickAll?: () => void }) {
                     <div className="bg-ash-dark-400/30 py-5 px-4.5">
                         <div className="px-5 py-2 mb-5">
                             <FarmMultiRewardsTooltip rewards={rewards}>
-                                <div className="text-stake-gray-500 text-sm font-bold underline mb-6">
-                                    TOTAL FARM REWARD
+                                <div className="inline-flex items-center text-stake-gray-500 text-sm font-bold underline mb-6">
+                                    <span>REWARDS</span>
+                                    <div className="-mt-0.5 ml-2 flex items-center">
+                                        {rewards.map(r => {
+                                            return <Avatar key={r.token.identifier} src={r.token.logoURI} alt={r.token.name} className="w-4 h-4 -ml-0.5 first:ml-0"/>
+                                        })}
+                                    </div>
                                 </div>
                             </FarmMultiRewardsTooltip>
                             <div className="flex items-center">

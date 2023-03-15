@@ -36,19 +36,20 @@ import FarmListLayoutContainer from "./FarmListLayoutContainer";
 import BaseTooltip from "components/BaseTooltip";
 import FarmMultiRewardsTooltip from "./FarmMultiRewardsTooltip";
 import FarmConfirmHarvestModal from "./FarmConfirmHarvestModal";
+import { theme } from "tailwind.config";
 
 type props = {
     farmData: FarmRecord;
     viewType: ViewType;
 };
-const Card = ({ children }: any) => {
+const Card = ({ children, isASHFarm }: {children: React.ReactNode, isASHFarm?: boolean}) => {
     return (
         <div className="relative">
             <div
-                className="clip-corner-tr-[0.875rem] clip-corner-bevel absolute inset-0 mx-auto p-[1px] w-full"
+                className="transition-all clip-corner-tr-[0.875rem] clip-corner-bevel absolute inset-0 mx-auto p-[1px] w-full"
                 style={{
                     backgroundImage:
-                        "linear-gradient(to bottom, #5E6480 9.65%, #171A26 91.8%)",
+                        isASHFarm ? `linear-gradient(to bottom, ${theme.extend.colors.pink[600]} 0%, #171A26 40%)` : "linear-gradient(to bottom, #5E6480 9.65%, #171A26 91.8%)",
                 }}
             >
                 <div
@@ -380,15 +381,15 @@ function FarmCard({ farmData, viewType }: props) {
         );
     }, [stakedData]);
 
-    const isFarmASH = useMemo(() => {
+    const isASHFarm = useMemo(() => {
         return farmData.ashPerSec.gt(0);
     }, [farmData.ashPerSec]);
 
     const cardElement = (
         <div className="relative">
-            {isFarmASH && (
+            {isASHFarm && (
                 <ICFarmAshFire
-                    className={`absolute -top-8 right-4 sm:right-6 md:right-7 w-18 h-auto text-pink-600 colored-drop-shadow-[0px_4px_50px] colored-drop-shadow-pink-600/50 transition ${
+                    className={`absolute -top-3.5 right-0 h-auto text-pink-600 colored-drop-shadow-sm colored-drop-shadow-pink-600 transition ${
                         !loadingMap[farmData.farm.farm_address]
                             ? "opacity-100"
                             : "opacity-0"
@@ -410,8 +411,8 @@ function FarmCard({ farmData, viewType }: props) {
                 <div className="px-6 sm:px-10 py-8">
                     <div className="flex items-start justify-between mt-0.5 -mr-3 mb-11">
                         <div className="overflow-hidden">
-                            <div className="text-stake-gray-500 text-xs mb-2.5">
-                                Stake LP
+                            <div className="text-stake-gray-500 font-medium text-xs mb-2.5">
+                                {isASHFarm ? <span className="text-pink-600">ASH Farm</span> : <span>Stake LP</span>}
                             </div>
                             <div
                                 className={`font-bold text-white truncate ${
@@ -602,8 +603,14 @@ function FarmCard({ farmData, viewType }: props) {
                             <FarmMultiRewardsTooltip
                                 rewards={stakedData?.rewards}
                             >
-                                <div className="inline-block text-xs text-stake-gray-500 font-bold underline mb-2">
-                                    Rewards
+                                <div className="inline-flex text-xs text-stake-gray-500 font-bold underline mb-2">
+                                    <span>Rewards</span>
+                                    <div className="ml-1 flex items-center">
+                                        {farmData.tokensAPR.map(_t => {
+                                            const t = TOKENS_MAP[_t.tokenId];
+                                            return <Avatar key={_t.tokenId} src={t?.logoURI} alt={t.name} className="w-3 h-3 -ml-0.5 first:ml-0"/>
+                                        })}
+                                    </div>
                                 </div>
                             </FarmMultiRewardsTooltip>
                             <div
@@ -790,7 +797,7 @@ function FarmCard({ farmData, viewType }: props) {
         <>
             {viewType === ViewType.Card && (
                 <div className="relative">
-                    <Card>{cardElement}</Card>
+                    <Card isASHFarm={isASHFarm}>{cardElement}</Card>
                     <Transition
                         show={!!loadingMap[farmData.farm.farm_address]}
                         {...TRANSITIONS.fadeIn}
