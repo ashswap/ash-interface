@@ -606,6 +606,7 @@ function FarmCard({ farmData, viewType }: props) {
                                 <div className="inline-flex text-xs text-stake-gray-500 font-bold underline mb-2">
                                     <span>Rewards</span>
                                     <div className="ml-1 flex items-center">
+                                        {isASHFarm && <Avatar src={ASH_TOKEN.logoURI} alt={ASH_TOKEN.name} className="w-3 h-3 -ml-0.5 first:ml-0"/>}
                                         {farmData.tokensAPR.map(_t => {
                                             const t = TOKENS_MAP[_t.tokenId];
                                             return <Avatar key={_t.tokenId} src={t?.logoURI} alt={t.name} className="w-3 h-3 -ml-0.5 first:ml-0"/>

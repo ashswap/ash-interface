@@ -256,7 +256,7 @@ const useFarmsState = () => {
                 : 0;
             const tradingAPR = poolState?.poolStats?.apr || 0;
             const currentTs = moment().unix();
-            const tokensAPR: FarmRecord["tokensAPR"] = rawFarm?.additionalRewards.filter(r => r.periodRewardEnd < currentTs && new BigNumber(r.rewardPerSec).gt(0)).map(r => {
+            const tokensAPR: FarmRecord["tokensAPR"] = rawFarm?.additionalRewards.filter(r => r.periodRewardEnd > currentTs && new BigNumber(r.rewardPerSec).gt(0)).map(r => {
                 const t = TOKENS_MAP[r.tokenId];
                 if(!t || totalLiquidityValue.eq(0) || currentTs > r.periodRewardEnd) return {apr: 0, tokenId: r.tokenId};
                 const tokenPerYear = new BigNumber(r.rewardPerSec).multipliedBy(365 * 24 * 60 * 60);
