@@ -202,11 +202,11 @@ const TxRecord = ({
     }, [status]);
     return (
         <>
-            <div className="flex items-center text-stake-gray-500">
+            <div className="flex items-center flex-wrap gap-2 text-stake-gray-500">
                 <div><IconEl/></div>
                 {!collapse && (
                     <>
-                        <div className="ml-2 mr-4 leading-tight text-xs sm:text-sm w-28 sm:w-32">
+                        <div className="mr-2 sm:mr-4 leading-tight text-xs sm:text-sm w-28 sm:w-32">
                             {hash.slice(0, 6)} ... {hash.slice(-6)}
                         </div>
                         <CopyBtn text={hash}>
@@ -217,7 +217,6 @@ const TxRecord = ({
                                 href={`${network.explorerAddress}/transactions/${hash}`}
                                 target="_blank"
                                 rel="noreferrer"
-                                className="ml-2"
                             >
                                 <ICNewTabRound className="w-5 h-5 text-stake-gray-500" />
                             </a>
@@ -393,8 +392,8 @@ export const TxToast = ({
                 <div className="clip-corner-4 clip-corner-br p-4 bg-ash-dark-600/80 backdrop-blur-[30px]">
                     <div className="flex justify-between">
                         {!collapsed && (
-                            <div className="flex items-center space-x-4 sm:space-x-10 sm:mr-5 sm:py-4 overflow-hidden">
-                                <div className="px-4 sm:px-5">
+                            <div className="flex items-center space-x-2 xs:space-x-4 sm:space-x-10 sm:mr-5 sm:py-4 overflow-hidden">
+                                <div className="hidden xs:block px-4 sm:px-5">
                                     <ICHourGlass className="w-8 sm:w-16 h-auto text-stake-gray-500" />
                                 </div>
                                 <div>
