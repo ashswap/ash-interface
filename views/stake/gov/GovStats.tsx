@@ -182,9 +182,7 @@ function GovStats() {
                                         </span>
                                         <span className="text-white font-bold">
                                             <TextAmt
-                                                number={rewardTokenAmount.toFixed(
-                                                    0
-                                                )}
+                                                number={rewardTokenAmount}
                                                 decimalClassName="text-stake-gray-500"
                                             />
                                         </span>

@@ -1,11 +1,10 @@
 import BigNumber from "bignumber.js";
 import pools from "const/pool";
 import { VE_MAX_TIME, WEEK } from "const/ve";
-import { Fraction } from "helper/fraction/fraction";
 import { TokenAmount } from "helper/token/tokenAmount";
 import { estimateVeASH } from "helper/voteEscrow";
 import moment from "moment";
-import { atom, selector } from "recoil";
+import { selector } from "recoil";
 import { ashswapBaseState } from "./ashswap";
 
 export const govLockedAmtSelector = selector<BigNumber>({
@@ -75,12 +74,12 @@ export const govRewardLPValueSelector = selector({
     get: ({ get }) => {
         const base = get(ashswapBaseState);
         const rewardToken = get(govRewardLPTokenSelector)?.lpToken;
-        if (!rewardToken) return new Fraction(0);
+        if (!rewardToken) return new BigNumber(0);
         const tokenAmount = new TokenAmount(
             rewardToken,
             base.feeDistributor?.account?.reward || 0
-        ).multiply(
-            Fraction.fromBigNumber(base.feeDistributor?.rewardToken.price || 0)
+        ).egld.multipliedBy(
+            base.feeDistributor?.rewardToken.price || 0
         );
         return tokenAmount;
     },
