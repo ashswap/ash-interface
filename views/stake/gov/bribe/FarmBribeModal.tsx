@@ -22,9 +22,12 @@ import BigNumber from "bignumber.js";
 import { Address, TokenPayment } from "@multiversx/sdk-core/out";
 
 type FarmBribeModalProps = {
-    onCreateBribe?: (farmAddress: string, tokenPayments: TokenPayment[]) => void;
+    onCreateBribe?: (
+        farmAddress: string,
+        tokenPayments: TokenPayment[]
+    ) => void;
 };
-const FarmBribeContent = ({onCreateBribe}: FarmBribeModalProps) => {
+const FarmBribeContent = ({ onCreateBribe }: FarmBribeModalProps) => {
     const ashBase = useRecoilValue(ashswapBaseState);
     const [selectedFarmAddress, setSelectedFarm] = useState("");
     const [selectedTokenId, setSelectedTokenId] = useState("");
@@ -75,7 +78,7 @@ const FarmBribeContent = ({onCreateBribe}: FarmBribeModalProps) => {
         selectedFarmAddress,
         inputValue,
         addRewardAmount,
-        onCreateBribe
+        onCreateBribe,
     ]);
 
     return (
@@ -129,13 +132,15 @@ const FarmBribeContent = ({onCreateBribe}: FarmBribeModalProps) => {
                         return (
                             <ul className="py-6 max-h-52">
                                 {farms.map((f) => {
+                                    const tokens =
+                                        POOLS_MAP_LP[f.farming_token_id].tokens;
                                     return (
                                         <li
                                             key={f.farm_address}
                                             className="relative"
                                         >
                                             <button
-                                                className="w-full py-3 text-left px-6 text-xs font-bold"
+                                                className="flex items-center w-full py-3 text-left px-6 text-xs font-bold"
                                                 onClick={() => {
                                                     setSelectedFarm(
                                                         f.farm_address
@@ -143,9 +148,17 @@ const FarmBribeContent = ({onCreateBribe}: FarmBribeModalProps) => {
                                                     close();
                                                 }}
                                             >
-                                                {POOLS_MAP_LP[
-                                                    f.farming_token_id
-                                                ].tokens
+                                                <div className="flex mr-2">
+                                                    {tokens.map((t) => (
+                                                        <Avatar
+                                                            key={t.identifier}
+                                                            src={t.logoURI}
+                                                            alt={t.name}
+                                                            className="w-4 h-4 -ml-1 first:ml-0"
+                                                        />
+                                                    ))}
+                                                </div>
+                                                {tokens
                                                     .map((t) => t.symbol)
                                                     .join("-")}
                                             </button>
@@ -212,13 +225,14 @@ const FarmBribeContent = ({onCreateBribe}: FarmBribeModalProps) => {
                                         {ashBase.farmBribe?.whitelistTokens.map(
                                             (t) => {
                                                 if (!t.id) return;
+                                                const token = TOKENS_MAP[t.id];
                                                 return (
                                                     <li
                                                         key={t.id}
                                                         className="relative"
                                                     >
                                                         <button
-                                                            className="w-full py-3 text-left px-6 text-xs font-bold"
+                                                            className="flex items-center w-full py-3 text-left px-6 text-xs font-bold"
                                                             onClick={() => {
                                                                 setSelectedTokenId(
                                                                     t.id as string
@@ -231,8 +245,9 @@ const FarmBribeContent = ({onCreateBribe}: FarmBribeModalProps) => {
                                                                 close();
                                                             }}
                                                         >
+                                                            <Avatar src={token.logoURI} alt={token.name} className="w-4 h-4 mr-2"/>
                                                             {
-                                                                TOKENS_MAP[t.id]
+                                                                token
                                                                     .symbol
                                                             }
                                                         </button>
