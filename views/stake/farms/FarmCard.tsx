@@ -37,19 +37,27 @@ import BaseTooltip from "components/BaseTooltip";
 import FarmMultiRewardsTooltip from "./FarmMultiRewardsTooltip";
 import FarmConfirmHarvestModal from "./FarmConfirmHarvestModal";
 import { theme } from "tailwind.config";
+import { TokenAmount } from "helper/token/tokenAmount";
 
 type props = {
     farmData: FarmRecord;
     viewType: ViewType;
 };
-const Card = ({ children, isASHFarm }: {children: React.ReactNode, isASHFarm?: boolean}) => {
+const Card = ({
+    children,
+    isASHFarm,
+}: {
+    children: React.ReactNode;
+    isASHFarm?: boolean;
+}) => {
     return (
         <div className="relative">
             <div
                 className="transition-all clip-corner-tr-[0.875rem] clip-corner-bevel absolute inset-0 mx-auto p-[1px] w-full"
                 style={{
-                    backgroundImage:
-                        isASHFarm ? `linear-gradient(to bottom, ${theme.extend.colors.pink[600]} 0%, #171A26 40%)` : "linear-gradient(to bottom, #5E6480 9.65%, #171A26 91.8%)",
+                    backgroundImage: isASHFarm
+                        ? `linear-gradient(to bottom, ${theme.extend.colors.pink[600]} 0%, #171A26 40%)`
+                        : "linear-gradient(to bottom, #5E6480 9.65%, #171A26 91.8%)",
                 }}
             >
                 <div
@@ -385,6 +393,24 @@ function FarmCard({ farmData, viewType }: props) {
         return farmData.ashPerSec.gt(0);
     }, [farmData.ashPerSec]);
 
+    const rewards = useMemo(() => {
+        const map = Object.fromEntries(
+            farmData?.tokensAPR?.map((t) => [t.tokenId, true]) || []
+        );
+        if (isASHFarm) {
+            map[ASH_TOKEN.identifier] = true;
+        }
+        const rewards =
+            stakedData?.rewards ||
+            Object.keys(map).map((t) => new TokenAmount(TOKENS_MAP[t], 0));
+        return rewards.map((r) => {
+            return {
+                amount: r,
+                active: map[r.token.identifier],
+            };
+        });
+    }, [farmData, isASHFarm, stakedData]);
+
     const cardElement = (
         <div className="relative">
             {isASHFarm && (
@@ -412,7 +438,13 @@ function FarmCard({ farmData, viewType }: props) {
                     <div className="flex items-start justify-between mt-0.5 -mr-3 mb-11">
                         <div className="overflow-hidden">
                             <div className="text-stake-gray-500 font-medium text-xs mb-2.5">
-                                {isASHFarm ? <span className="text-pink-600">ASH Farm</span> : <span>Stake LP</span>}
+                                {isASHFarm ? (
+                                    <span className="text-pink-600">
+                                        ASH Farm
+                                    </span>
+                                ) : (
+                                    <span>Stake LP</span>
+                                )}
                             </div>
                             <div
                                 className={`font-bold text-white truncate ${
@@ -599,42 +631,58 @@ function FarmCard({ farmData, viewType }: props) {
                         </div>
                     </div>
                     <div className="flex justify-between mb-9">
-                        <div>
-                            <FarmMultiRewardsTooltip
-                                rewards={stakedData?.rewards}
-                            >
+                        <FarmMultiRewardsTooltip
+                            rewards={rewards}
+                            showBalance={canHarvest}
+                        >
+                            <div>
                                 <div className="inline-flex text-xs text-stake-gray-500 font-bold underline mb-2">
                                     <span>Rewards</span>
                                     <div className="ml-1 flex items-center">
-                                        {isASHFarm && <Avatar src={ASH_TOKEN.logoURI} alt={ASH_TOKEN.name} className="w-3 h-3 -ml-0.5 first:ml-0"/>}
-                                        {farmData.tokensAPR.map(_t => {
+                                        {isASHFarm && (
+                                            <Avatar
+                                                src={ASH_TOKEN.logoURI}
+                                                alt={ASH_TOKEN.name}
+                                                className="w-3 h-3 -ml-0.5 first:ml-0"
+                                            />
+                                        )}
+                                        {farmData.tokensAPR.map((_t) => {
                                             const t = TOKENS_MAP[_t.tokenId];
-                                            return <Avatar key={_t.tokenId} src={t?.logoURI} alt={t.name} className="w-3 h-3 -ml-0.5 first:ml-0"/>
+                                            return (
+                                                <Avatar
+                                                    key={_t.tokenId}
+                                                    src={t?.logoURI}
+                                                    alt={t.name}
+                                                    className="w-3 h-3 -ml-0.5 first:ml-0"
+                                                />
+                                            );
                                         })}
                                     </div>
                                 </div>
-                            </FarmMultiRewardsTooltip>
-                            <div
-                                className={`text-lg font-bold ${
-                                    canHarvest
-                                        ? "text-white"
-                                        : "text-stake-gray-500"
-                                }`}
-                            >
-                                <TextAmt
-                                    number={totalRewardsValue}
-                                    prefix="$"
-                                    decimalClassName={`${
-                                        canHarvest ? "text-stake-gray-500" : ""
+                                <div
+                                    className={`text-lg font-bold ${
+                                        canHarvest
+                                            ? "text-white"
+                                            : "text-stake-gray-500"
                                     }`}
-                                />
-                            </div>
-                            {/* {isExpand && (
+                                >
+                                    <TextAmt
+                                        number={totalRewardsValue}
+                                        prefix="$"
+                                        decimalClassName={`${
+                                            canHarvest
+                                                ? "text-stake-gray-500"
+                                                : ""
+                                        }`}
+                                    />
+                                </div>
+                                {/* {isExpand && (
                                 <div className="mt-3">
                                     <EstimateInUSD number={rewardValue} />
                                 </div>
                             )} */}
-                        </div>
+                            </div>
+                        </FarmMultiRewardsTooltip>
                         <GlowingButton
                             theme="cyan"
                             className={`clip-corner-1 clip-corner-br w-[7.25rem] h-14 text-sm font-bold`}

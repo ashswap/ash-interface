@@ -186,7 +186,7 @@ function BribeCard({ fbFarm }: Props) {
                                         }
                                     >
                                         <span className="text-2xs font-bold underline">
-                                            Available util
+                                            Available Until
                                         </span>
                                     </CardTooltip>
                                 </div>
