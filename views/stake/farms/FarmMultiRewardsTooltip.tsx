@@ -1,3 +1,4 @@
+import ICPickaxe from "assets/svg/pickaxe.svg";
 import { tokenMapState } from "atoms/tokensState";
 import BigNumber from "bignumber.js";
 import Avatar from "components/Avatar";
@@ -9,27 +10,42 @@ import { useRecoilValue } from "recoil";
 
 const FarmMultiRewardsTooltip: React.FC<
     {
-        rewards?: TokenAmount[];
+        rewards?: { amount: TokenAmount; active: boolean }[];
+        showBalance?: boolean;
     } & Omit<Parameters<typeof CardTooltip>[0], "content">
-> = ({ children, rewards = [], ...tooltipProps }) => {
+> = ({ children, rewards = [], showBalance, ...tooltipProps }) => {
     const tokenMap = useRecoilValue(tokenMapState);
     const totalRewardsValue = useMemo(() => {
         return (
             rewards.reduce(
                 (s, r) =>
                     s.plus(
-                        r.egld.multipliedBy(
-                            tokenMap[r.token.identifier]?.price || 0
+                        r.amount.egld.multipliedBy(
+                            tokenMap[r.amount.token.identifier]?.price || 0
                         )
                     ),
                 new BigNumber(0)
             ) || new BigNumber(0)
         );
     }, [tokenMap, rewards]);
+    const sortedRewards = useMemo(() => {
+        return [...rewards].sort((r1, r2) => {
+            const r1Active = r1.active;
+            const r2Active = r2.active;
+            return r1Active === r2Active ? 0 : r1Active === true ? -1 : 1;
+        });
+    }, [rewards]);
+    const isRewardActive = useMemo(() => {
+        return rewards.some((r) => !!r.active);
+    }, [rewards]);
     return (
         <CardTooltip
             content={
-                <div className="min-w-[14rem]">
+                <div
+                    className={`${
+                        isRewardActive && showBalance ? "min-w-[20rem]" : "min-w-[14rem]"
+                    }`}
+                >
                     <div className="mb-2 font-bold text-xs text-white">
                         Rewards
                     </div>
@@ -49,29 +65,44 @@ const FarmMultiRewardsTooltip: React.FC<
                     </div>
                     <div
                         className={`space-y-2 ${
-                            !rewards.length ? "" : "mt-10"
+                            !sortedRewards.length ? "" : "mt-10"
                         }`}
                     >
-                        {rewards.map((r) => {
+                        {sortedRewards.map((r) => {
                             return (
                                 <div
-                                    key={r.token.identifier}
-                                    className="flex justify-between items-center"
+                                    key={r.amount.token.identifier}
+                                    className="flex items-center"
                                 >
-                                    <div className="flex items-center">
-                                        <Avatar
-                                            src={r.token.logoURI}
-                                            alt={r.token.name}
-                                            className="w-4 h-4 mr-2"
-                                        />
-                                        <span className="font-bold text-xs text-white">
-                                            {r.token.symbol}
-                                        </span>
+                                    <div className="grow flex justify-between items-center">
+                                        <div className="flex items-center">
+                                            <Avatar
+                                                src={r.amount.token.logoURI}
+                                                alt={r.amount.token.name}
+                                                className="w-4 h-4 mr-2"
+                                            />
+                                            <span className="font-bold text-xs text-white">
+                                                {r.amount.token.symbol}
+                                            </span>
+                                        </div>
+                                        
+                                        {showBalance && <TextAmt
+                                            number={r.amount.egld}
+                                            className="font-medium text-xs"
+                                        />}
                                     </div>
-                                    <TextAmt
-                                        number={r.egld}
-                                        className="font-medium text-xs"
-                                    />
+                                    {isRewardActive && (
+                                        <div
+                                            className={`ml-4 px-2 py-1 flex items-center bg-ash-dark-600 border border-black font-bold text-2xs leading-tight text-stake-gray-500 ${
+                                                r.active
+                                                    ? "opacity-100"
+                                                    : "opacity-0"
+                                            }`}
+                                        >
+                                            <ICPickaxe className="w-3.5 h-auto mr-2" />
+                                            <span>Producing...</span>
+                                        </div>
+                                    )}
                                 </div>
                             );
                         })}

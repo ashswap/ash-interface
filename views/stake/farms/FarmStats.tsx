@@ -7,6 +7,7 @@ import Avatar from "components/Avatar";
 import GlowingButton from "components/GlowingButton";
 import TextAmt from "components/TextAmt";
 import CardTooltip from "components/Tooltip/CardTooltip";
+import { ASH_TOKEN, TOKENS_MAP } from "const/tokens";
 import { TokenAmount } from "helper/token/tokenAmount";
 import useFarmClaimAll from "hooks/useFarmContract/useFarmClaimAll";
 import { useEffect, useMemo, useState } from "react";
@@ -40,6 +41,31 @@ function FarmStats({ onClickAll }: { onClickAll?: () => void }) {
         });
         return Object.values(map);
     }, [farmRecords, isPending]);
+    const rewardsWithActiveStatus = useMemo(() => {
+        if (isPending) return [];
+        const map: Record<string, boolean> = farmRecords.reduce((sum, f) => {
+            const map = Object.fromEntries(
+                f?.tokensAPR?.map((t) => [t.tokenId, true]) || []
+            );
+            if (f.ashPerSec.gt(0)) {
+                map[ASH_TOKEN.identifier] = true;
+            }
+            return { ...sum, ...map };
+        }, {});
+        const _rewards =
+            rewards.length > 0
+                ? rewards
+                : Object.keys(map).map(
+                      (t) => new TokenAmount(TOKENS_MAP[t], 0)
+                  );
+        const x = _rewards.map((r) => {
+            return {
+                amount: r,
+                active: map[r.token.identifier],
+            };
+        });
+        return x;
+    }, [farmRecords, isPending, rewards]);
     const canHarvest = useMemo(() => {
         return rewards.some((r) => r.greaterThan(0));
     }, [rewards]);
@@ -68,7 +94,7 @@ function FarmStats({ onClickAll }: { onClickAll?: () => void }) {
     }, [isClickedHarvestButton]);
 
     useEffect(() => {
-        if(isSigned) {
+        if (isSigned) {
             setOpenHarvestInfo(false);
         }
     }, [isSigned]);
@@ -91,27 +117,37 @@ function FarmStats({ onClickAll }: { onClickAll?: () => void }) {
                         </span>
                     </div>
                     <div className="bg-ash-dark-400/30 py-5 px-4.5">
-                        <div className="px-5 py-2 mb-5">
-                            <FarmMultiRewardsTooltip rewards={rewards}>
+                        <FarmMultiRewardsTooltip
+                            rewards={rewardsWithActiveStatus}
+                            showBalance={canHarvest}
+                        >
+                            <div className="px-5 py-2 mb-5">
                                 <div className="inline-flex items-center text-stake-gray-500 text-sm font-bold underline mb-6">
                                     <span>REWARDS</span>
                                     <div className="-mt-0.5 ml-2 flex items-center">
-                                        {rewards.map(r => {
-                                            return <Avatar key={r.token.identifier} src={r.token.logoURI} alt={r.token.name} className="w-4 h-4 -ml-0.5 first:ml-0"/>
+                                        {rewards.map((r) => {
+                                            return (
+                                                <Avatar
+                                                    key={r.token.identifier}
+                                                    src={r.token.logoURI}
+                                                    alt={r.token.name}
+                                                    className="w-4 h-4 -ml-0.5 first:ml-0"
+                                                />
+                                            );
                                         })}
                                     </div>
                                 </div>
-                            </FarmMultiRewardsTooltip>
-                            <div className="flex items-center">
-                                <div className="text-white text-lg font-bold">
-                                    <TextAmt
-                                        prefix="$"
-                                        number={totalRewardValue}
-                                        decimalClassName="text-stake-gray-500"
-                                    />{" "}
+                                <div className="flex items-center">
+                                    <div className="text-white text-lg font-bold">
+                                        <TextAmt
+                                            prefix="$"
+                                            number={totalRewardValue}
+                                            decimalClassName="text-stake-gray-500"
+                                        />{" "}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </FarmMultiRewardsTooltip>
                         <GlowingButton
                             theme="cyan"
                             className={`w-full h-[3.375rem] text-sm font-bold`}
