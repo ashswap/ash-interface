@@ -16,7 +16,7 @@ const dappContractDevnet: DappContractConfig = {
         feeDistributor:
             "erd1qqqqqqqqqqqqqpgqqxxm63jzwrwyyzc0qaawcxv8zfrpe4je2geshjzzwf",
         farmController: "erd1qqqqqqqqqqqqqpgq89qwwl0rw5vr9ej9uu76ycladefeg8d72ges7l09uv",
-        farmBribe: "erd1qqqqqqqqqqqqqpgqug6hxflvk0yglgcvdhe40hv45tzzaxf42geslxp3gp",
+        farmBribe: "erd1qqqqqqqqqqqqqpgqqy409d9r8g0m3fx44pu0533wwzne8pnxrmcqrpec8e",
     },
     alpha: {
         voteEscrowedContract:
