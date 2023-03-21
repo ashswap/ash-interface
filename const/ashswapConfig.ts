@@ -20,13 +20,13 @@ const dappContractDevnet: DappContractConfig = {
     },
     alpha: {
         voteEscrowedContract:
-            "erd1qqqqqqqqqqqqqpgqsa5zpwjthqqq24v62lq7uuv9ex44fxdrrmcqd0nf0c",
+            "erd1qqqqqqqqqqqqqpgqwj9l857wjzlg3rzq3mjw924pstzwxat3rmcq74wcdr",
         feeDistributor:
-            "erd1qqqqqqqqqqqqqpgqcr8xthnutlnx75rrjl32243xwn5exnpmrmcqegj70z",
+            "erd1qqqqqqqqqqqqqpgqnc8n6c2mu2ndvl72ctmsjjdllgdrqgssrmcq2dmt3p",
         farmController:
-            "erd1qqqqqqqqqqqqqpgqzs3msdeag5qredsyjm0jw9t6gued2n3armcqql9x0q",
+            "erd1qqqqqqqqqqqqqpgq9yyf4p6rga59hzpfzvgm0y8zz3e3fcarrmcq4vjhpz",
         farmBribe:
-            "erd1qqqqqqqqqqqqqpgqhxh8vhw5hq3qqrsa9yfsjkf9ya0qqqxprmcqrqu9zs",
+            "erd1qqqqqqqqqqqqqpgqgy9lkq5470d4xlrf50d2nscpwelt4jsfrmcq96zrhv",
     },
 };
 
@@ -55,7 +55,7 @@ export const VE_CONFIG = ENVIRONMENT.NETWORK === "mainnet" ? {
 } : ENVIRONMENT.ENV === "alpha" ? {
     // for alpha test
     maxLock: 4 * 365 * 24 * 3600,
-    minLock: 30 * 60,
+    minLock: 60 * 60,
 } : {
     // beta
     maxLock: 4 * 365 * 24 * 3600,
@@ -65,5 +65,5 @@ export const VE_CONFIG = ENVIRONMENT.NETWORK === "mainnet" ? {
 export const ASHSWAP_CONFIG = {
     ashApiBaseUrl: ENVIRONMENT.ASH_API,
     dappContract,
-    farmWeightVoteDelay: 10 * 24 * 3600,
+    farmWeightVoteDelay: ENVIRONMENT.NETWORK === "devnet" && ENVIRONMENT.ENV === "alpha" ? 3600 : 10 * 24 * 3600,
 } as const;

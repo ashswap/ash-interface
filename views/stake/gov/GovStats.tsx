@@ -182,9 +182,7 @@ function GovStats() {
                                         </span>
                                         <span className="text-white font-bold">
                                             <TextAmt
-                                                number={rewardTokenAmount.toFixed(
-                                                    0
-                                                )}
+                                                number={rewardTokenAmount}
                                                 decimalClassName="text-stake-gray-500"
                                             />
                                         </span>
@@ -563,9 +561,8 @@ function GovStats() {
                                     })}
                                 </div>
                                 <div className="text-center text-ash-gray-500 text-lg font-bold">
-                                    <TextAmt
-                                        number={rewardTokenAmount.toFixed(0)}
-                                    />
+                                    <span className="text-ash-gray-500">$</span>
+                                    <TextAmt number={rewardTokenAmount} />
                                     &nbsp; {rewardLPToken.lpToken.symbol} has
                                     been sent to your wallet
                                 </div>

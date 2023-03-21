@@ -244,7 +244,7 @@ const VoteEditor = memo(function VoteEditor({ farmAddress }: VoteEditorProps) {
     const nextVoteDate = useMemo(() => {
         return moment
             .unix(moment().unix() + ASHSWAP_CONFIG.farmWeightVoteDelay)
-            .format("HH:mm DD MMM, YYYY");
+            .format("HH:mm - DD MMM");
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isOpenModal]);
 
@@ -353,11 +353,9 @@ const VoteEditor = memo(function VoteEditor({ farmAddress }: VoteEditorProps) {
                             <div className="mt-2 font-bold text-2xs text-stake-gray-500">
                                 Stake ASH{" "}
                                 <Link href="/stake/gov">
-                                    <a>
-                                        <span className="text-pink-600 underline">
-                                            here
-                                        </span>
-                                    </a>
+                                    <span className="text-pink-600 underline">
+                                        here
+                                    </span>
                                 </Link>{" "}
                                 to get veASH
                             </div>
@@ -384,10 +382,7 @@ const VoteEditor = memo(function VoteEditor({ farmAddress }: VoteEditorProps) {
                 <div className="grow overflow-auto">
                     <div className="flex flex-col items-center text-center px-20 pb-16">
                         <div className="mb-5 font-bold text-2xl sm:text-5xl text-white leading-tight">
-                            You cannot change your vote
-                        </div>
-                        <div className="mb-16 font-bold text-sm sm:text-2xl text-stake-gray-500">
-                            for this farm until
+                            Your vote for this farm can not be changed before
                         </div>
                         <div>
                             <div className="h-18 px-5 flex justify-between items-center bg-ash-dark-600">
@@ -419,7 +414,7 @@ const VoteEditor = memo(function VoteEditor({ farmAddress }: VoteEditorProps) {
                                         setIsOpenModal(false);
                                     }}
                                 >
-                                    <span className="mr-3">vote</span>
+                                    <span className="mr-3">Vote</span>
                                     <ICChevronRight className="w-auto h-2.5" />
                                 </GlowingButton>
                             </div>

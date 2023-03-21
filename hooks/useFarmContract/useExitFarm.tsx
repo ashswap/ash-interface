@@ -1,6 +1,8 @@
 import { TokenPayment } from "@multiversx/sdk-core/out";
 import { accIsLoggedInState } from "atoms/dappState";
 import {
+    ashRawFarmQuery,
+    farmNumberOfAdditionalRewards,
     farmQuery,
     farmRecordsState,
     farmSessionIdMapState,
@@ -84,11 +86,17 @@ const useExitFarm = (trackStatus = false) => {
                 const farmRecord = await snapshot.getPromise(
                     farmQuery(farm.farm_address)
                 );
+                const numberOfAdditionalRewards = await snapshot.getPromise(
+                    farmNumberOfAdditionalRewards(farm.farm_address)
+                );
 
                 if (!loggedIn) return { sessionId: "" };
                 const farmContract = ContractManager.getFarmContract(
                     farm.farm_address
-                ).withLastRewardBlockTs(farmRecord.lastRewardBlockTs);
+                ).withContext({
+                    lastRewardBlockTs: farmRecord.lastRewardBlockTs,
+                    numberOfAdditionalRewards,
+                });
                 if (!farmRecord || !farmRecord.stakedData)
                     return { sessionId: "" };
                 const { stakedData } = farmRecord;

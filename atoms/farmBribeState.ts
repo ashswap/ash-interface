@@ -5,7 +5,9 @@ import { FBAccountFarm, FBFarm } from "graphql/type.graphql";
 import { TokenAmount } from "helper/token/tokenAmount";
 import { selectorFamily } from "recoil";
 import { ashswapBaseState } from "./ashswap";
+import { fcFarmSelector } from "./farmControllerState";
 import { tokenMapState } from "./tokensState";
+const PRECISION = new BigNumber(1e18);
 
 export const fbFarmSelector = selectorFamily<FBFarm | undefined, string>({
     key: 'farm_bribe_farm_selector',
@@ -29,8 +31,12 @@ export const fbTreasuresSelector = selectorFamily<TokenAmount[], string>({
     key: "farm_bribe_total_availabel_treasures_selector",
     get: (farmAddress) => ({get}) => {
         const fbFarm = get(fbFarmSelector(farmAddress));
+        const fcFarm = get(fcFarmSelector(farmAddress));
         return fbFarm?.rewards.map(r => {
-            return new TokenAmount(TOKENS_MAP[r.tokenId], new BigNumber(r.total).minus(r.claimed));
+            const currentAlloc = new BigNumber(r.rewardPerVote).multipliedBy(fcFarm?.votedPoint.bias || 0).idiv(PRECISION);
+            const available = new BigNumber(r.total).minus(r.claimed);
+            const nextWeek = available.minus(currentAlloc);
+            return new TokenAmount(TOKENS_MAP[r.tokenId], nextWeek.gt(10) ? nextWeek : 0);
         }) || [];
     }
 })

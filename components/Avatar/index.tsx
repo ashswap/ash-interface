@@ -1,7 +1,7 @@
 import Image from "components/Image";
 import customTwMerge from "helper/customTwMerge";
 import { ImageProps } from "next/image";
-import { useMemo } from "react";
+import { memo, useMemo } from "react";
 type Props = JSX.IntrinsicElements["span"] &
     Partial<Pick<ImageProps, "src" | "alt">>;
 function Avatar({ src, alt, ...props }: Props) {
@@ -20,4 +20,4 @@ function Avatar({ src, alt, ...props }: Props) {
     );
 }
 
-export default Avatar;
+export default memo(Avatar);
