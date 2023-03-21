@@ -36,7 +36,7 @@ const config = {
                 ? ["/stake/gov/bribe"]
                 : process.env.NEXT_PUBLIC_ASH_ENV === "alpha"
                 ? []
-                : ["/stake/gov/bribe", "/ashpoint"];
+                : ["/ashpoint"];
         const entries = Object.entries(defaultPathMap)
             .map(([path, pageObj]) => {
                 return [
