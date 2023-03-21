@@ -48,7 +48,7 @@ function GovMenu() {
                     </div>
                 )}
             </ActiveLink>
-            {ENVIRONMENT.ENV === "alpha" && ENVIRONMENT.NETWORK === "devnet" && (
+            {ENVIRONMENT.NETWORK === "devnet" && (
                 <ActiveLink href="/stake/gov/bribe" exact className="shrink-0">
                     {({ active }) => (
                         <div
