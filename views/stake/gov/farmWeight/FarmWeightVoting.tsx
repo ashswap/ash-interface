@@ -166,8 +166,7 @@ const FarmRecord = memo(function FarmRecord({
                         </>
                     ) : (
                         <>
-                            {ENVIRONMENT.ENV === "alpha" &&
-                            ENVIRONMENT.NETWORK === "devnet" ? (
+                            {ENVIRONMENT.NETWORK === "devnet" ? (
                                 <div className="font-bold text-lg text-ash-gray-600">
                                     No
                                 </div>
