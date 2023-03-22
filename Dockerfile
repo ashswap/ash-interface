@@ -16,4 +16,4 @@ COPY --from=builder /app/out ./out
 
 EXPOSE 3000
 
-CMD ["serve", "-l", "0.0.0.0:3000", "/app/out"]
+CMD ["serve", "-l", "tcp://0.0.0.0:3000", "/app/out"]
