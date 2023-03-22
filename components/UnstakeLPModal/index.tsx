@@ -2,7 +2,7 @@ import { Slider } from "antd";
 import ICChevronRight from "assets/svg/chevron-right.svg";
 import {
     accIsInsufficientEGLDState,
-    accIsLoggedInState,
+    accIsLoggedInState
 } from "atoms/dappState";
 import { FarmRecord } from "atoms/farmsState";
 import { clickedUnstakeModalState } from "atoms/unstakeState";
@@ -13,10 +13,8 @@ import GlowingButton from "components/GlowingButton";
 import InputCurrency from "components/InputCurrency";
 import TextAmt from "components/TextAmt";
 import CardTooltip from "components/Tooltip/CardTooltip";
-import { blockTimeMs } from "const/dappConfig";
-import { ASH_TOKEN } from "const/tokens";
 import { toEGLDD, toWei } from "helper/balance";
-import { formatAmount } from "helper/number";
+import { TokenAmount } from "helper/token/tokenAmount";
 import useExitFarm from "hooks/useFarmContract/useExitFarm";
 import { useScreenSize } from "hooks/useScreenSize";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -29,8 +27,7 @@ type props = {
     farmData: FarmRecord;
 };
 const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
-    const { pool, farm, stakedData, ashPerSec, farmTokenSupply } =
-        farmData;
+    const { pool, farm, stakedData, ashPerSec, farmTokenSupply } = farmData;
     const loggedIn = useRecoilValue(accIsLoggedInState);
     const [isClickedUnstake, setIsClickedUnstake] = useRecoilState(
         clickedUnstakeModalState
@@ -39,7 +36,7 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
     const [deboundedUnstakeAmt] = useDebounce(unStakeAmt, 500);
     const [rawStakeAmt, setRawStakeAmt] = useState("");
     const [unstakePct, setUnstakePct] = useState(0);
-    const [rewardOnExit, setRewardOnExit] = useState(new BigNumber(0));
+    const [rewardsOnExit, setRewardsOnExit] = useState<TokenAmount[]>([]);
     const insufficientEGLD = useRecoilValue(accIsInsufficientEGLDState);
     const { exitFarm, estimateRewardOnExit } = useExitFarm();
     const setMaxStakeAmt = useCallback(() => {
@@ -61,26 +58,34 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
             });
         }
     }, [deboundedUnstakeAmt, loggedIn, pool]);
-    const ashPerDay = useMemo(() => {
-        if (!stakedData) return new BigNumber(0);
-        const totalAshPerDay = ashPerSec.multipliedBy(24 * 60 * 60);
-        const shareOfFarm = stakedData.farmTokens.reduce((sum, t) => sum.plus(t.balance), new BigNumber(0))
-            .div(farmTokenSupply);
-        return totalAshPerDay.multipliedBy(shareOfFarm);
-    }, [stakedData, farmTokenSupply, ashPerSec]);
+    // const ashPerDay = useMemo(() => {
+    //     if (!stakedData) return new BigNumber(0);
+    //     const totalAshPerDay = ashPerSec.multipliedBy(24 * 60 * 60);
+    //     const shareOfFarm = stakedData.farmTokens
+    //         .reduce((sum, t) => sum.plus(t.balance), new BigNumber(0))
+    //         .div(farmTokenSupply);
+    //     return totalAshPerDay.multipliedBy(shareOfFarm);
+    // }, [stakedData, farmTokenSupply, ashPerSec]);
 
-    const afterUnstakeAshPerDay = useMemo(() => {
-        if (!stakedData) return new BigNumber(0);
-        const totalAshPerDay = ashPerSec.multipliedBy(24 * 60 * 60);
-        const oldTotalLP = stakedData.totalStakedLP;
-        const oldFarmAmt = stakedData.farmTokens.reduce((sum, t) => sum.plus(t.balance), new BigNumber(0));
-        const unstakeFarmAmt = unStakeAmt.multipliedBy(oldFarmAmt).idiv(oldTotalLP);
-        const newFarmAmt = oldFarmAmt.minus(unstakeFarmAmt);
+    // const afterUnstakeAshPerDay = useMemo(() => {
+    //     if (!stakedData) return new BigNumber(0);
+    //     const totalAshPerDay = ashPerSec.multipliedBy(24 * 60 * 60);
+    //     const oldTotalLP = stakedData.totalStakedLP;
+    //     const oldFarmAmt = stakedData.farmTokens.reduce(
+    //         (sum, t) => sum.plus(t.balance),
+    //         new BigNumber(0)
+    //     );
+    //     const unstakeFarmAmt = unStakeAmt
+    //         .multipliedBy(oldFarmAmt)
+    //         .idiv(oldTotalLP);
+    //     const newFarmAmt = oldFarmAmt.minus(unstakeFarmAmt);
 
-        if (newFarmAmt.lte(0)) return new BigNumber(0);
-        const shareOfFarm = newFarmAmt.div(farmTokenSupply.minus(unstakeFarmAmt));
-        return totalAshPerDay.multipliedBy(shareOfFarm);
-    }, [stakedData, farmTokenSupply, ashPerSec, unStakeAmt]);
+    //     if (newFarmAmt.lte(0)) return new BigNumber(0);
+    //     const shareOfFarm = newFarmAmt.div(
+    //         farmTokenSupply.minus(unstakeFarmAmt)
+    //     );
+    //     return totalAshPerDay.multipliedBy(shareOfFarm);
+    // }, [stakedData, farmTokenSupply, ashPerSec, unStakeAmt]);
 
     const insufficientFarmToken = useMemo(() => {
         if (!stakedData?.totalStakedLP) return true;
@@ -127,7 +132,7 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
 
     useEffect(() => {
         estimateRewardOnExit(deboundedUnstakeAmt, farm).then((val) =>
-            setRewardOnExit(val)
+            setRewardsOnExit(val)
         );
     }, [deboundedUnstakeAmt, farm, estimateRewardOnExit]);
 
@@ -230,7 +235,9 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
                             <div className="text-yellow-600">100%</div>
                         </div>
                     </div>
-                    <div>
+                </div>
+                <div className="w-full sm:w-1/2 md:w-1/3 lg:w-[17.8125rem] shrink-0 flex flex-col gap-[1px]">
+                    <div className="px-7 h-16 flex items-center bg-ash-dark-400/30">
                         <CardTooltip
                             content={
                                 <div>
@@ -240,82 +247,37 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
                                 </div>
                             }
                         >
-                            <div className="inline-block text-stake-gray-500 font-bold text-xs lg:text-sm mb-2 lg:mb-4 underline">
-                                You also harvest your farm by Unstaking
+                            <div className="inline-block font-bold text-xs lg:text-lg text-white underline">
+                                You also harvest
                             </div>
                         </CardTooltip>
-                        <div className="h-14 lg:h-18 pl-7 pr-4.5 flex items-center justify-between bg-ash-dark-400/30 text-ash-gray-600">
-                            <div className="flex items-center">
-                                <div className="bg-pink-600 w-4 h-4 rounded-full mr-2"></div>
-                                <div className="text-sm lg:text-lg font-bold">
-                                    ASH
-                                </div>
-                            </div>
-                            <div className="text-sm lg:text-lg font-bold">
-                                <TextAmt
-                                    number={toEGLDD(
-                                        ASH_TOKEN.decimals,
-                                        rewardOnExit
-                                    )}
-                                    options={{ notation: "standard" }}
-                                />
-                            </div>
-                        </div>
                     </div>
-                </div>
-                <div className="w-full sm:w-1/3 lg:w-[17.8125rem] shrink-0 bg-stake-dark-500 py-[2.375rem] px-10">
-                    <div className="text-white text-lg font-bold mb-16">
-                        Estimated Decrease
-                    </div>
-                    <div className="flex flex-col space-y-11">
-                        <div>
-                            <div className="text-ash-gray-500 text-xs mb-2">
-                                ASH earn per day
-                            </div>
+                    {rewardsOnExit.map((r) => {
+                        return (
                             <div
-                                className={`text-lg font-bold ${
-                                    unStakeAmt.gt(0)
-                                        ? "text-ash-gray-500 line-through"
-                                        : "text-white"
-                                }`}
+                                key={r.token.identifier}
+                                className="px-7 h-14 lg:h-16 flex items-center justify-between bg-ash-dark-400/30 text-ash-gray-600"
                             >
-                                <TextAmt
-                                    number={toEGLDD(
-                                        ASH_TOKEN.decimals,
-                                        ashPerDay
-                                    )}
-                                    options={{ notation: "standard" }}
-                                    decimalClassName={`${
-                                        unStakeAmt.gt(0)
-                                            ? ""
-                                            : "text-stake-gray-500"
-                                    }`}
-                                />
-                            </div>
-                            {unStakeAmt.gt(0) && (
-                                <div className="text-white text-lg font-bold">
+                                <div className="flex items-center">
+                                    <Avatar
+                                        src={r.token.logoURI}
+                                        alt={r.token.name}
+                                        className="w-4 h-4 mr-2"
+                                    />
+                                    <div className="mt-0.5 text-sm lg:text-lg font-bold">
+                                        {r.token.symbol}
+                                    </div>
+                                </div>
+                                <div className="text-sm lg:text-lg font-bold">
                                     <TextAmt
-                                        number={toEGLDD(
-                                            ASH_TOKEN.decimals,
-                                            afterUnstakeAshPerDay
-                                        )}
+                                        number={r.egld}
                                         options={{ notation: "standard" }}
+                                        className="text-white"
                                     />
                                 </div>
-                            )}
-                        </div>
-                        {/* <div>
-                            <div className="text-ash-gray-500 text-xs mb-2">
-                                Emission APR
                             </div>
-                            <div className="text-white text-lg font-bold">
-                                {formatAmount(emissionAPR?.toNumber() || 0, {
-                                    notation: "standard",
-                                })}
-                                %
-                            </div>
-                        </div> */}
-                    </div>
+                        );
+                    })}
                 </div>
             </div>
             <div className="sm:flex sm:space-x-8 lg:space-x-24">
@@ -334,7 +296,7 @@ const UnstakeLPContent = ({ open, onClose, farmData }: props) => {
                         and understood the associated risks.
                     </span>
                 </div>
-                <div className="w-full sm:w-1/3 lg:w-[17.8125rem] shrink-0">
+                <div className="w-full sm:w-1/2 md:w-1/3 lg:w-[17.8125rem] shrink-0">
                     <div className="border-notch-x border-notch-white/50">
                         <GlowingButton
                             theme="yellow"
