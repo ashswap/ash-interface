@@ -135,7 +135,7 @@ deploy_ipfs_beta:
   image: node:16.16.0
   <<: *job_template_beta
   dependencies:
-    - build_alpha
+    - build_beta
   <<: *deploy_ipfs_script_template
 
 ######################### Mainnet #########################
@@ -184,5 +184,5 @@ deploy_ipfs_prod:
   image: node:16.16.0
   <<: *job_template_prod
   dependencies:
-    - build_alpha
+    - build_prod
   <<: *deploy_ipfs_script_template
