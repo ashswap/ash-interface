@@ -9,8 +9,11 @@ import {
     FarmToken,
 } from "atoms/farmsState";
 import BigNumber from "bignumber.js";
+import { ASH_TOKEN, TOKENS_MAP } from "const/tokens";
 import { toEGLDD } from "helper/balance";
 import { ContractManager } from "helper/contracts/contractManager";
+import FarmContract from "helper/contracts/farmContract";
+import { TokenAmount } from "helper/token/tokenAmount";
 import useSendTxsWithTrackStatus from "hooks/useSendTxsWithTrackStatus";
 import { DappSendTransactionsPropsType } from "interface/dappCore";
 import { IFarm } from "interface/farm";
@@ -141,8 +144,18 @@ const useExitFarm = (trackStatus = false) => {
                 const farmRecord = farmRecords.find(
                     (val) => val.farm.farm_address === farm.farm_address
                 );
-                if (!farmRecord?.stakedData?.farmTokens.length)
-                    return new BigNumber(0);
+                const rawFarm = await snapshot.getPromise(
+                    ashRawFarmQuery(farm.farm_address)
+                );
+                if (!farmRecord?.stakedData?.farmTokens.length || lpAmt.eq(0)) {
+                    const rewards = farmRecord?.tokensAPR?.map(
+                        (r) => new TokenAmount(TOKENS_MAP[r.tokenId], 0)
+                    ) || [];
+                    if(farmRecord?.ashPerSec.gt(0)){
+                        rewards.unshift(new TokenAmount(ASH_TOKEN, 0));
+                    }
+                    return rewards;
+                }
                 const entries = calcUnstakeEntries(
                     lpAmt,
                     farmRecord.stakedData.farmTokens
@@ -150,17 +163,40 @@ const useExitFarm = (trackStatus = false) => {
                 const farmContract = ContractManager.getFarmContract(
                     farm.farm_address
                 );
-                const rewards = entries.map(({ unstakeAmt, farmToken }) =>
+
+                const ashRewards = entries.map(({ unstakeAmt, farmToken }) =>
                     farmContract.calculateRewardsForGivenPosition(
                         unstakeAmt,
                         farmToken.attributes
                     )
                 );
-                const totalRewards = await Promise.all(rewards);
-                return totalRewards.reduce(
+
+                const rewards = FarmContract.estimateAdditionalRewards(
+                    entries.map((e) => ({
+                        ...e.farmToken,
+                        balance: e.unstakeAmt,
+                    })),
+                    new BigNumber(rawFarm?.divisionSafetyConstant || 0),
+                    farmRecord.lpLockedAmt,
+                    farmRecord.lastRewardBlockTs,
+                    rawFarm?.additionalRewards.map((r) => ({
+                        token: TOKENS_MAP[r.tokenId],
+                        rewardPerShare: new BigNumber(r.rewardPerShare),
+                        rewardPerSec: new BigNumber(r.rewardPerSec),
+                        periodRewardEnd: r.periodRewardEnd,
+                    })) || []
+                ).filter((r) => r.greaterThan(0));
+
+                const totalRewards = await Promise.all(ashRewards);
+                const totalASH = totalRewards.reduce(
                     (total, val) => total.plus(val),
                     new BigNumber(0)
                 );
+                if (totalASH.gt(0)) {
+                    rewards.unshift(new TokenAmount(ASH_TOKEN, totalASH));
+                }
+
+                return rewards;
             },
         []
     );
