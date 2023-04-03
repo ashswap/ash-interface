@@ -39,7 +39,7 @@ function Countdown({ timestamp, small = false }: { timestamp: number, small?: bo
         return () => clearInterval(interval);
     }, [timestamp]);
     return (
-        <div>
+        <div className="inline-block">
             <div className={`flex ${small ? "mb-1" : "mb-1.5 sm:mb-4"}`}>
             {remainArr.map(([n1, n2], i) => {
                 return (
