@@ -2,15 +2,15 @@
     "buildInfo": {
         "rustc": {
             "version": "1.69.0-nightly",
-            "commitHash": "dc1d9d50fba2f6a1ccab8748a0050cde38253f60",
-            "commitDate": "2023-01-31",
+            "commitHash": "d962ea57899d64dc8a57040142c6b498a57c8064",
+            "commitDate": "2023-02-26",
             "channel": "Nightly",
-            "short": "rustc 1.69.0-nightly (dc1d9d50f 2023-01-31)"
+            "short": "rustc 1.69.0-nightly (d962ea578 2023-02-26)"
         },
         "contractCrate": {
             "name": "farm_controller",
             "version": "0.0.0",
-            "git_version": "36212f0"
+            "git_version": "1f0a299"
         },
         "framework": {
             "name": "elrond-wasm",
@@ -22,6 +22,10 @@
         "inputs": [
             {
                 "name": "_voting_escrow",
+                "type": "Address"
+            },
+            {
+                "name": "dao_address",
                 "type": "Address"
             }
         ],
@@ -56,10 +60,6 @@
                 {
                     "name": "farm_type",
                     "type": "u64"
-                },
-                {
-                    "name": "weight",
-                    "type": "BigUint"
                 }
             ],
             "outputs": []
@@ -126,21 +126,6 @@
                 {
                     "name": "farm_type",
                     "type": "u64"
-                },
-                {
-                    "name": "weight",
-                    "type": "BigUint"
-                }
-            ],
-            "outputs": []
-        },
-        {
-            "name": "changeFarmWeight",
-            "mutability": "mutable",
-            "inputs": [
-                {
-                    "name": "farm_address",
-                    "type": "Address"
                 },
                 {
                     "name": "weight",

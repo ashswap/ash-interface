@@ -1,9 +1,12 @@
+import DAOContract from "./dao";
 import FarmBribeContract from "./farmBribeContract";
 import FarmContract from "./farmContract";
 import FarmControllerContract from "./farmControllerContract";
+import FarmRouterContract from "./farmRouter";
 import FeeDistributorContract from "./feeDistributorContract";
 import PoolContract from "./pool";
 import PoolV2Contract from "./poolV2Contract";
+import RouterContract from "./routerContract";
 import VotingEscrowContract from "./votingEscrowContract";
 import WrappedEGLDContract from "./wrappedEGLD";
 
@@ -15,6 +18,9 @@ const feeDistributorContracts: Record<string, FeeDistributorContract> = {};
 const farmControllerContracts: Record<string, FarmControllerContract> = {};
 const farmBribeContracts: Record<string, FarmBribeContract> = {};
 const wrappedEGLDContracts: Record<string, WrappedEGLDContract> = {};
+const daoContracts: Record<string, DAOContract> = {};
+const routerContracts: Record<string, RouterContract> = {};
+const farmRouterContracts: Record<string, FarmRouterContract> = {};
 const getPoolContract = (address: string) => {
     return (
         poolContracts[address] ??
@@ -66,6 +72,24 @@ const getWrappedEGLDContract = (address: string) => {
         (wrappedEGLDContracts[address] = new WrappedEGLDContract(address))
     );
 };
+const getDAOContract = (address: string) => {
+    return (
+        daoContracts[address] ??
+        (daoContracts[address] = new DAOContract(address))
+    );
+};
+const getRouterContract = (address: string) => {
+    return (
+        routerContracts[address] ??
+        (routerContracts[address] = new RouterContract(address))
+    );
+};
+const getFarmRouterContract = (address: string) => {
+    return (
+        farmRouterContracts[address] ??
+        (farmRouterContracts[address] = new FarmRouterContract(address))
+    );
+};
 
 export const ContractManager = {
     getPoolContract,
@@ -76,4 +100,7 @@ export const ContractManager = {
     getFarmBribeContract,
     getPoolV2Contract,
     getWrappedEGLDContract,
+    getDAOContract,
+    getRouterContract,
+    getFarmRouterContract,
 };

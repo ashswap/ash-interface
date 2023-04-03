@@ -66,6 +66,9 @@ input[type="number"] {
 .ash-slider-green {
     --ash-slider-theme: theme("colors.stake-green.500");
 }
+.ash-slider-purple {
+    --ash-slider-theme: theme("colors.ash-purple.500");
+}
 .ash-slider-pink {
     --ash-slider-theme: theme("colors.pink.600");
 }
