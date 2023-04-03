@@ -53,6 +53,7 @@ stages:
   NEXT_PUBLIC_ASH_SOCKET: https://socket-elrond-devnet.ashswap.io
   NEXT_PUBLIC_ASH_SOCKET_EXTRA: 
   NEXT_PUBLIC_ASH_LOG_API: https://api-tracking-devnet-alpha.ashswap.io
+  NEXT_PUBLIC_IPFS_API: https://ipfs-cluster-api-internal.bicarus.io
 
 .job_template_alpha: &job_template_alpha
   environment:
@@ -102,6 +103,7 @@ deploy_ipfs_alpha:
   NEXT_PUBLIC_ASH_SOCKET: https://socket-elrond-devnet.ashswap.io
   NEXT_PUBLIC_ASH_SOCKET_EXTRA: 
   NEXT_PUBLIC_ASH_LOG_API: https://api-tracking.ashswap.io
+  NEXT_PUBLIC_IPFS_API: https://ipfs-cluster-api-internal.bicarus.io
 
 .job_template_beta: &job_template_beta
   environment:

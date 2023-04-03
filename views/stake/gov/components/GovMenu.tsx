@@ -9,61 +9,93 @@ import ICGovFarmWeightSquare from "assets/svg/gov-farm-weight-square.svg";
 import ICGovBribeSquare from "assets/svg/gov-bribe-square.svg";
 import ActiveLink from "components/Link/ActiveLink";
 import { ENVIRONMENT } from "const/env";
+import Scrollable from "components/Scrollable";
 function GovMenu() {
     return (
-        <div className="-mx-6 px-6 sm:px-0 sm:mx-0 scrollbar-hide flex space-x-2 overflow-auto">
-            <ActiveLink href="/stake/gov" className="shrink-0">
-                {({ active }) => (
-                    <div
-                        className={`flex items-center h-8 sm:h-12 px-6 bg-ash-dark-600 text-xs sm:text-sm font-bold ${
-                            active ? "text-pink-600" : "text-stake-gray-500"
-                        }`}
-                    >
-                        <ICGovStatsSquare className="w-3 h-3 mr-2" />
-                        Stake Stats
-                    </div>
-                )}
-            </ActiveLink>
-            <ActiveLink href="/stake/gov/boost" exact className="shrink-0">
-                {({ active }) => (
-                    <div
-                        className={`flex items-center h-8 sm:h-12 px-6 bg-ash-dark-600 text-xs sm:text-sm font-bold ${
-                            active ? "text-pink-600" : "text-stake-gray-500"
-                        }`}
-                    >
-                        <ICGovBoostSquare className="w-3 h-3 mr-2" />
-                        Farm boost
-                    </div>
-                )}
-            </ActiveLink>
-            <ActiveLink href="/stake/gov/farmweight" exact className="shrink-0">
-                {({ active }) => (
-                    <div
-                        className={`flex items-center h-8 sm:h-12 px-6 bg-ash-dark-600 text-xs sm:text-sm font-bold ${
-                            active ? "text-pink-600" : "text-stake-gray-500"
-                        }`}
-                    >
-                        <ICGovFarmWeightSquare className="w-3 h-3 mr-2" />
-                        Farm Weight Voting
-                    </div>
-                )}
-            </ActiveLink>
-            {ENVIRONMENT.NETWORK === "devnet" && (
-                <ActiveLink href="/stake/gov/bribe" exact className="shrink-0">
+        <Scrollable
+            className="-mx-6 px-6 sm:px-0 sm:mx-0 scrollbar-hide"
+            direction="horizontal"
+        >
+            <div className="flex space-x-2">
+                <ActiveLink href="/stake/gov" exact className="shrink-0">
                     {({ active }) => (
                         <div
                             className={`flex items-center h-8 sm:h-12 px-6 bg-ash-dark-600 text-xs sm:text-sm font-bold ${
                                 active ? "text-pink-600" : "text-stake-gray-500"
                             }`}
                         >
-                            <ICGovBribeSquare className="w-3 h-3 mr-2" />
-                            Bribe
+                            <ICGovStatsSquare className="w-3 h-3 mr-2" />
+                            Stake Stats
                         </div>
                     )}
                 </ActiveLink>
-            )}
+                <ActiveLink href="/stake/gov/boost" exact className="shrink-0">
+                    {({ active }) => (
+                        <div
+                            className={`flex items-center h-8 sm:h-12 px-6 bg-ash-dark-600 text-xs sm:text-sm font-bold ${
+                                active ? "text-pink-600" : "text-stake-gray-500"
+                            }`}
+                        >
+                            <ICGovBoostSquare className="w-3 h-3 mr-2" />
+                            Farm boost
+                        </div>
+                    )}
+                </ActiveLink>
+                <ActiveLink
+                    href="/stake/gov/farmweight"
+                    exact
+                    className="shrink-0"
+                >
+                    {({ active }) => (
+                        <div
+                            className={`flex items-center h-8 sm:h-12 px-6 bg-ash-dark-600 text-xs sm:text-sm font-bold ${
+                                active ? "text-pink-600" : "text-stake-gray-500"
+                            }`}
+                        >
+                            <ICGovFarmWeightSquare className="w-3 h-3 mr-2" />
+                            Farm Weight Voting
+                        </div>
+                    )}
+                </ActiveLink>
+                {ENVIRONMENT.ENV === "alpha" &&
+                    ENVIRONMENT.NETWORK === "devnet" && (
+                        <ActiveLink href="/stake/gov/dao" className="shrink-0">
+                            {({ active }) => (
+                                <div
+                                    className={`flex items-center h-8 sm:h-12 px-6 bg-ash-dark-600 text-xs sm:text-sm font-bold ${
+                                        active
+                                            ? "text-pink-600"
+                                            : "text-stake-gray-500"
+                                    }`}
+                                >
+                                    <ICGovVoteSquare className="w-3 h-3 mr-2" />
+                                    Proposal Voting
+                                </div>
+                            )}
+                        </ActiveLink>
+                    )}
+                {ENVIRONMENT.NETWORK === "devnet" && (
+                    <ActiveLink
+                        href="/stake/gov/bribe"
+                        exact
+                        className="shrink-0"
+                    >
+                        {({ active }) => (
+                            <div
+                                className={`flex items-center h-8 sm:h-12 px-6 bg-ash-dark-600 text-xs sm:text-sm font-bold ${
+                                    active
+                                        ? "text-pink-600"
+                                        : "text-stake-gray-500"
+                                }`}
+                            >
+                                <ICGovBribeSquare className="w-3 h-3 mr-2" />
+                                Bribe
+                            </div>
+                        )}
+                    </ActiveLink>
+                )}
 
-            {/* <ActiveLink href="/stake/gov/farm" exact className="shrink-0">
+                {/* <ActiveLink href="/stake/gov/farm" exact className="shrink-0">
                 {({ active }) => (
                     <div
                         className={`flex items-center h-8 sm:h-12 px-6 bg-ash-dark-600 text-xs sm:text-sm font-bold ${
@@ -87,7 +119,8 @@ function GovMenu() {
                     </div>
                 )}
             </ActiveLink> */}
-        </div>
+            </div>
+        </Scrollable>
     );
 }
 

@@ -46,10 +46,10 @@ function Switch({checked, onChange, children, className, ref}: Props) {
                     <path d="M7.9245 0H25.0755L33 8L25.0755 16H7.9245L0 8L7.9245 0Z" />
                 </svg>
                 <div
-                    className={`transition-all duration-200 ease-in absolute w-[12.54px] h-[12.54px] rotate-45 top-[50%] translate-y-[-50%] ${
+                    className={`transition-all duration-200 ease-in absolute w-[12.54px] h-[12.54px] rotate-45 top-[9px] translate-y-[-50%] ${
                         _checked
-                            ? "left-[15px] bg-pink-600 " + styles.active
-                            : "left-[5px] bg-ash-gray-500"
+                            ? "left-[18px] bg-pink-600 " + styles.active
+                            : "left-[3px] bg-ash-gray-500"
                     }`}
                 ></div>
             </div>

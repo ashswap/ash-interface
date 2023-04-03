@@ -24,7 +24,7 @@ function BribePage() {
                 </ul>
                 <div className="mb-7">
                     <h1 className="text-pink-600 text-2xl md:text-5xl font-bold mb-7 md:mb-11">
-                        Bribe
+                        <span className="text-white">Ashswap </span>Bribe
                     </h1>
                     <GovMenu />
                 </div>
