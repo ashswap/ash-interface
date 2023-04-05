@@ -1,18 +1,24 @@
 import BigNumber from "bignumber.js";
 import TextAmt from "components/TextAmt";
+import { DAPP_CONFIG } from "const/dappConfig";
 import { shortenString } from "helper/string";
+import Link from "next/link";
 import React, { memo } from "react";
 
 type Props = {
-    items?: Array<{address: string, power: BigNumber.Value, isSupport: boolean}>;
-}
-function DAOVoterTable({items = []}: Props) {
+    items?: Array<{
+        address: string;
+        power: BigNumber.Value;
+        isSupport: boolean;
+    }>;
+};
+function DAOVoterTable({ items = [] }: Props) {
     return (
         <table className="w-full border border-collapse border-black">
             <thead>
                 <tr>
                     <th className="w-5/12 px-6 py-3 border border-black font-bold text-sm text-stake-gray-500 text-left">
-                        Voters
+                        Voter
                     </th>
                     <th className="w-4/12 px-6 py-3 border border-black font-bold text-sm text-stake-gray-500 text-left">
                         Voting Type
@@ -27,12 +33,23 @@ function DAOVoterTable({items = []}: Props) {
                     return (
                         <tr key={i} className="">
                             <td className="px-6 py-3 border border-black font-bold text-xs text-white text-left">
-                                {shortenString(v.address)}
+                                <Link
+                                    href={`${DAPP_CONFIG.explorerAddress}/accounts/${v.address}`}
+                                    target="_blank"
+                                >
+                                    <span className="font-bold text-xs text-white">
+                                        {shortenString(v.address)}
+                                    </span>
+                                </Link>
                             </td>
                             <td
-                                className={`px-6 py-3 border border-black font-bold text-xs text-left ${v.isSupport ? "text-stake-green-500" : "text-ash-purple-500"}`}
+                                className={`px-6 py-3 border border-black font-bold text-xs text-left ${
+                                    v.isSupport
+                                        ? "text-stake-green-500"
+                                        : "text-ash-purple-500"
+                                }`}
                             >
-                                {v.isSupport ? "Support": "Against"}
+                                {v.isSupport ? "Support" : "Against"}
                             </td>
                             <td
                                 className={`px-6 py-3 border border-black font-bold text-xs text-white text-right`}

@@ -1,12 +1,15 @@
 import BigNumber from "bignumber.js";
 import { GetTransactionsByHashesReturnType } from "components/DappCoreCustom/getTransactionsByHashes";
 import Scrollable from "components/Scrollable";
+import StyledMarkdown from "components/StyledMarkdown";
 import TextAmt from "components/TextAmt";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
+import { DAPP_CONFIG } from "const/dappConfig";
+import { PROPOSALS_ALIAS, PROPOSALS_CONFIG } from "const/proposal";
 import { gql } from "graphql-request";
 import {
     DAOProposal,
-    DAOProposalDetail as GqlDAOProposalDetail
+    DAOProposalDetail as GqlDAOProposalDetail,
 } from "graphql/type.graphql";
 import { graphqlFetcher } from "helper/common";
 import emitter from "helper/emitter";
@@ -15,7 +18,6 @@ import useRouteHash from "hooks/useRouteHash";
 import { DAOStatus } from "interface/dao";
 import Link from "next/link";
 import { useEffect, useMemo, useRef } from "react";
-import ReactMarkdown from "react-markdown";
 import useSWR from "swr";
 import DAOCardBg from "../components/DAOCardBg";
 import DAOResultBar from "../components/DAOResultBar";
@@ -24,12 +26,15 @@ import DAOVoteChart from "../components/DAOVoteChart";
 import DAOVoterTable from "../components/DAOVoterTable";
 import useDAOProposalComputedState from "../hooks/useDAOProposalComputedState";
 import useDAOProposalMeta from "../hooks/useDAOProposalMeta";
+import ICChevronDown from "assets/svg/chevron-down.svg";
+import ICChevronUp from "assets/svg/chevron-up.svg";
+import { Disclosure, Transition } from "@headlessui/react";
 
 const HashAnchors = [
     { hash: "description", label: "Description" },
     { hash: "voting", label: "Voting Results" },
     { hash: "voters", label: "Voters Table" },
-    { hash: "chart", label: "Distribution Charts" },
+    { hash: "chart", label: "Distribution Chart" },
 ];
 type NonNullDAOProposalDetail = {
     proposal: DAOProposal;
@@ -62,6 +67,15 @@ function DAODetail({
         yesVote,
         noVote,
     } = useDAOProposalComputedState(proposal);
+    const proposalLabel = useMemo(() => {
+        return (
+            PROPOSALS_CONFIG[
+                `${PROPOSALS_ALIAS[proposal.dest_address]}:${
+                    proposal.function_name
+                }`
+            ] || ""
+        );
+    }, [proposal.dest_address, proposal.function_name]);
 
     const params = useMemo(() => {
         if (proposal?.arguments) {
@@ -107,10 +121,10 @@ function DAODetail({
 
     return (
         <div className="lg:flex gap-7.5">
-            <div className="mb-7.5 lg:mb-0 lg:w-1/3">
+            <div className="mb-7.5 lg:mb-0 shrink-0 lg:w-1/3">
                 <DAOUserVote proposal={proposal} />
             </div>
-            <div className="lg:w-2/3">
+            <div className="shrink-0 lg:w-2/3">
                 <div className="relative p-9 sm:p-12">
                     <DAOCardBg
                         status={proposal.state as DAOStatus}
@@ -145,35 +159,69 @@ function DAODetail({
                                 ))}
                             </div>
                         </Scrollable>
-                        <section ref={descriptionRef} className="mb-12">
-                            <div
-                                className="mb-4 font-bold text-[3.5rem] text-ash-gray-600 uppercase"
-                                style={{
-                                    WebkitTextFillColor: "transparent",
-                                    WebkitTextStroke: "1px currentColor",
-                                }}
-                            >
-                                {proposal.state}
+                        <div className="mb-12 border-t border-dashed border-t-ash-gray-600"></div>
+                        {proposalLabel && (
+                            <div className="mb-3 inline-block p-3 bg-ash-dark-400 font-bold text-xs text-stake-gray-500">
+                                {proposalLabel}
                             </div>
+                        )}
+                        <section ref={descriptionRef} className="mb-12">
                             <h3 className="mb-4 font-bold text-2xl text-white">
                                 {meta.title}
                             </h3>
-                            <ReactMarkdown className="font-bold text-sm text-stake-gray-500">
-                                {meta.description}
-                            </ReactMarkdown>
+                            <StyledMarkdown>{meta.description}</StyledMarkdown>
                             {params && (
-                                <>
-                                    <h4 className="mt-4 mb-2 font-bold text-base text-white">
-                                        Parameters
-                                    </h4>
-                                    <pre className="p-6 bg-ash-dark-400/30">
-                                        {params}
-                                    </pre>
-                                </>
+                                <Disclosure>
+                                    {({ open, close }) => (
+                                        <>
+                                            <Disclosure.Button className="mt-6 w-full px-6 py-4 flex items-center justify-between bg-[#2A2A42] font-bold text-sm text-stake-gray-500">
+                                                <span>Parameters</span>
+                                                <ICChevronDown
+                                                    className={`w-3 h-auto text-white transition duration-200 ${
+                                                        open
+                                                            ? "opacity-0"
+                                                            : "delay-200"
+                                                    }`}
+                                                />
+                                            </Disclosure.Button>
+                                            <Transition
+                                                show={open}
+                                                enterFrom="max-h-0 opacity-0"
+                                                enterTo="max-h-screen opacity-100"
+                                                leaveFrom="max-h-screen opacity-100"
+                                                leaveTo="max-h-0 opacity-0"
+                                                className="transition-all duration-300 ease-in-out"
+                                            >
+                                                <Disclosure.Panel
+                                                    static
+                                                    className="px-6 pb-4 bg-[#2A2A42]"
+                                                >
+                                                    <pre>{params}</pre>
+                                                    <div className="mt-6 flex justify-end">
+                                                        <button
+                                                            onClick={() =>
+                                                                close()
+                                                            }
+                                                            className="-m-2 p-2"
+                                                        >
+                                                            <ICChevronUp className="w-3 h-auto text-white" />
+                                                        </button>
+                                                    </div>
+                                                </Disclosure.Panel>
+                                            </Transition>
+                                        </>
+                                    )}
+                                </Disclosure>
                             )}
-                            <div className="mt-4 font-bold text-xs text-white">
-                                by: {shortenString(proposal.proposer)}
-                            </div>
+                            <Link
+                                href={`${DAPP_CONFIG.explorerAddress}/accounts/${proposal.proposer}`}
+                                target="_blank"
+                                className="mt-6 inline-block"
+                            >
+                                <span className="font-bold text-xs text-white">
+                                    by: {shortenString(proposal.proposer)}
+                                </span>
+                            </Link>
                         </section>
                         <section ref={votingRef} className="mb-12">
                             <h2 className="mb-12 font-bold text-2xl text-white">
@@ -191,7 +239,13 @@ function DAODetail({
                                         Support
                                     </div>
                                     <div className="font-bold text-sm">
-                                        <span className="text-stake-green-500">
+                                        <span
+                                            className={`${
+                                                supportPct >= minSupportPct
+                                                    ? "text-stake-green-500"
+                                                    : "text-ash-purple-500"
+                                            }`}
+                                        >
                                             <TextAmt number={supportPct} />
                                             %&nbsp;
                                         </span>
@@ -207,7 +261,13 @@ function DAODetail({
                                         Quorum
                                     </div>
                                     <div className="font-bold text-sm">
-                                        <span className="text-stake-green-500">
+                                        <span
+                                            className={`${
+                                                quorumPct >= minQuorumPct
+                                                    ? "text-stake-green-500"
+                                                    : "text-ash-purple-500"
+                                            }`}
+                                        >
                                             <TextAmt number={quorumPct} />
                                             %&nbsp;
                                         </span>
@@ -298,13 +358,19 @@ function DAODetailWrapper({ proposalID }: Props) {
               ]
             : null;
     }, [proposalID]);
-    const { data, mutate } = useSWR<{
+    const { data, mutate, isValidating } = useSWR<{
         proposalDetail: GqlDAOProposalDetail;
     }>(query, graphqlFetcher);
 
     useEffect(() => {
         const onVoteSuccess = (txs: GetTransactionsByHashesReturnType) => {
-            if(txs.some(tx => tx.meta?.receiver === ASHSWAP_CONFIG.dappContract.dao && tx.meta?.functionName === 'vote')){
+            if (
+                txs.some(
+                    (tx) =>
+                        tx.meta?.receiver === ASHSWAP_CONFIG.dappContract.dao &&
+                        tx.meta?.functionName === "vote"
+                )
+            ) {
                 mutate();
             }
         };
@@ -313,17 +379,18 @@ function DAODetailWrapper({ proposalID }: Props) {
             emitter.off("onCheckBatchResult", onVoteSuccess);
         };
     }, [mutate]);
-
     if (!data?.proposalDetail || !data?.proposalDetail.proposal) return null;
     const { proposal, top_supporters, top_againsters, top_voters } =
         data.proposalDetail;
     return (
-        <DAODetail
-            proposal={proposal}
-            topSupporters={top_supporters}
-            topAgainsters={top_againsters}
-            topVoters={top_voters}
-        />
+        <div className={`${isValidating && "pointer-events-none"}`}>
+            <DAODetail
+                proposal={proposal}
+                topSupporters={top_supporters}
+                topAgainsters={top_againsters}
+                topVoters={top_voters}
+            />
+        </div>
     );
 }
 

@@ -158,6 +158,37 @@ input[type="number"] {
     .ash-container {
         @apply w-full max-w-[72.375rem] px-6 mx-auto;
     }
+    .markdown-body ol {
+        list-style-type: decimal;
+    }
+    .markdown-body ul {
+        list-style-type: disc;
+    }
+    .markdown-body ol ul {
+        list-style-type: circle;
+    }
+    .markdown-body ol ol {
+        list-style-type: lower-roman;
+    }
+    .markdown-body ul ul {
+        list-style-type: circle;
+    }
+    .markdown-body ul ul ul {
+        list-style-type: square;
+    }
+    .markdown-body ul ol ul {
+        list-style-type: square;
+    }
+    .markdown-body ol ol ul {
+        list-style-type: square;
+    }
+    .markdown-body ol ul ul {
+        list-style-type: square;
+    }
+    .markdown-body img{
+        display: inline;
+        vertical-align: unset;
+    }
 }
 
 @media (pointer: fine) and (hover: hover) {

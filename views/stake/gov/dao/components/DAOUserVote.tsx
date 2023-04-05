@@ -78,7 +78,7 @@ const DAOUserVoteActive = memo(function DAOUserVoteActive({
                     <>
                         <div className="px-9 py-7 bg-ash-dark-400/30">
                             <div className="mb-6 font-bold text-sm text-stake-gray-500">
-                                Your veash voting power
+                                Your Voting Power
                             </div>
                             <div className="flex items-center">
                                 <Avatar
@@ -131,7 +131,7 @@ const DAOUserVotePending = memo(function DAOUserVotePending({
     const startVoteTSFmt = useMemo(() => {
         return moment
             .unix(startVoteTS)
-            .format("HH:mm [(UTC]Z[)] DD, MMM, YYYY");
+            .format("HH:mm [(UTC]Z[)] MMM Do, YYYY");
     }, [startVoteTS]);
     return (
         <>
@@ -160,7 +160,7 @@ const DAOUserVoteResult = memo(function DAOUserVoteResult({
         <div className="flex flex-col gap-2">
             <div className="p-6 bg-[#2A2A42] border border-black flex items-center justify-between">
                 <div className="font-bold text-sm text-stake-gray-500 uppercase">
-                    You&apos;ve vote
+                    You&apos;ve voted
                 </div>
                 <div className="flex items-center gap-2">
                     <TextAmt

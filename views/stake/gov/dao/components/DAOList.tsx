@@ -111,7 +111,7 @@ function DAOList({ proposals }: DAOListProps) {
                             {label}
                         </div>
                         <div className="font-bold text-lg text-white text-left">
-                            {displayProposals.length} proposals
+                            {displayProposals.length} {displayProposals.length > 1 ? "proposals" : "proposal"}
                         </div>
                     </div>
                     <div className="mt-12 md:mt-40 md:w-48">

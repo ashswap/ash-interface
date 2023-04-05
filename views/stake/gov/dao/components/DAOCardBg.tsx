@@ -2,7 +2,6 @@ import ICGovVote from "assets/svg/gov-vote.svg";
 import customTwMerge from "helper/customTwMerge";
 import { DAOStatus } from "interface/dao";
 import { memo, useMemo } from "react";
-import { theme } from "tailwind.config";
 import { DAOThemeTextClassName } from "../const/theme";
 
 function DAOCardBg({
@@ -18,18 +17,19 @@ function DAOCardBg({
     }, [status]);
     const bgStyle: React.CSSProperties = useMemo(() => {
         return {
-            backgroundImage: `radial-gradient(circle 250px at 100% 0%, currentColor, ${theme.extend.colors["stake-dark"][400]})`,
+            backgroundImage: `radial-gradient(circle 250px at 100% 0%, currentColor, transparent)`,
         };
     }, []);
     return (
         <div className={`absolute inset-0 ${govClassName}`}>
             <div
-                className={`absolute inset-0 ${clipClassName}`}
-                style={bgStyle}
-            ></div>
+                className={`overflow-hidden absolute inset-0 ${clipClassName}`}
+            >
+                <div className="absolute inset-0" style={bgStyle}></div>
+            </div>
             <div
                 className={customTwMerge(
-                    "absolute inset-[1px] bg-stake-dark-400",
+                    "overflow-hidden transition-all duration-300 absolute inset-[1px] bg-stake-dark-400",
                     clipClassName
                 )}
             ></div>

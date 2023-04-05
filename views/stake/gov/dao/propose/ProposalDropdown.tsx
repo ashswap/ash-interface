@@ -1,12 +1,9 @@
 import BasePopover from 'components/BasePopover';
-import React, { useMemo } from 'react'
+import React, { memo, useMemo } from 'react'
 import ICChevronDown from "assets/svg/chevron-down.svg";
-export type ProposalType = "fc:add_farm" | "fr:endProduceRewards" | "fr:startProduceRewards";
-export const ProposalTypeOptions: Array<{label: string, value: ProposalType}> = [
-    {label: "Whitelist farm to be received ASH reward", value: "fc:add_farm"},
-    {label: "Kill ASH reward for a farm", value: "fr:endProduceRewards"},
-    {label: "Start ASH reward for a farm", value: "fr:startProduceRewards"},
-]
+import { PROPOSALS_CONFIG, ProposalType } from 'const/proposal';
+
+export const ProposalTypeOptions: Array<{label: string, value: ProposalType}> = Object.entries(PROPOSALS_CONFIG).map(([k, v]) => ({label: v as string, value: k as ProposalType}))
 type Props = {
     value: ProposalType;
     onSelect: (proposal: ProposalType) => void;
@@ -73,4 +70,4 @@ function ProposalDropdown({value, onSelect}: Props) {
   )
 }
 
-export default ProposalDropdown
+export default memo(ProposalDropdown)
