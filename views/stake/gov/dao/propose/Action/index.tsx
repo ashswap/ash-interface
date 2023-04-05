@@ -1,10 +1,10 @@
 import { Interaction } from "@multiversx/sdk-core/out";
+import { ProposalType } from "const/proposal";
 import dynamic from "next/dynamic";
 import {
-    forwardRef, useImperativeHandle,
+    forwardRef, memo, useImperativeHandle,
     useRef
 } from "react";
-import { ProposalType } from "../ProposalDropdown";
 import { DAOFormRefMethods } from "./type";
 type Props = {
     type: ProposalType;
@@ -46,4 +46,4 @@ const DAOActionGenerator = forwardRef<DAOFormRefMethods, Props>(function DAOActi
     );
 });
 
-export default DAOActionGenerator;
+export default memo(DAOActionGenerator);

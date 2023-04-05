@@ -23,7 +23,13 @@ import { useRecoilValue } from "recoil";
 import useSWR from "swr";
 import DAOCardBg from "../components/DAOCardBg";
 import DAOActionGenerator from "./Action";
-import ProposalDropdown, { ProposalType } from "./ProposalDropdown";
+import ProposalDropdown from "./ProposalDropdown";
+import ICGovVote from "assets/svg/gov-vote.svg";
+import { formatDuration } from "helper/time";
+import { accIsLoggedInState } from "atoms/dappState";
+import { useConnectWallet } from "hooks/useConnectWallet";
+import { ProposalType } from "const/proposal";
+import Link from "next/link";
 
 function DAOPropose() {
     const [title, setTitle] = useState("");
@@ -32,6 +38,8 @@ function DAOPropose() {
     const [isClickedSubmit, setIsClickedSubmit] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
     const veASHAmt = useRecoilValue(govVeASHAmtSelector);
+    const isLoggedIn = useRecoilValue(accIsLoggedInState);
+    const connectWallet = useConnectWallet();
     const [proposalType, setProposalType] =
         useState<ProposalType>("fc:add_farm");
     const address = useMemo(() => {
@@ -99,8 +107,11 @@ function DAOPropose() {
         return !description || description.length > 520;
     }, [description]);
     const isInvalidDiscussionLink = useMemo(() => {
-        return !discussionLink;
+        return !discussionLink || !discussionLink.startsWith("https://github.com/ashswap/ash-proposals/issues");
     }, [discussionLink]);
+    const isInsufficientVE = useMemo(() => {
+        return veASHAmt.eq(0);
+    }, [veASHAmt]);
     const onProposalChange = useCallback((proposal: ProposalType) => {
         setProposalType(proposal);
     }, []);
@@ -133,7 +144,7 @@ function DAOPropose() {
                 const file = new Blob([bytes], {
                     type: "application/json;charset=utf-8",
                 });
-                const res = await ipfsCluster.add(file, {name: "Proposal"});
+                const res = await ipfsCluster.add(file, { name: "Proposal" });
                 await propose(res.cid, interaction);
             } catch (error) {
                 setIsUploading(false);
@@ -183,8 +194,7 @@ function DAOPropose() {
                                     <div className="text-white">
                                         {formatAmount(
                                             veASHAmt.div(10 ** VE_ASH_DECIMALS)
-                                        )}{" "}
-                                        veASH
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -201,21 +211,22 @@ function DAOPropose() {
                         <div>
                             <label
                                 htmlFor="propose-title"
-                                className="mb-2 text-sm"
+                                className="inline-block mb-2 text-sm"
                             >
-                                <span className="font-medium text-stake-gray-500">
+                                <span className="font-bold text-stake-gray-500">
                                     Title{" "}
                                 </span>{" "}
-                                <span className="font-bold text-ash-gray-600">
+                                <span className="font-medium text-ash-gray-600">
                                     (max 120 characters)
                                 </span>
                             </label>
+                            <div className="bg-ash-dark-400">
                             <input
                                 type="text"
                                 name="title"
                                 id="propose-title"
                                 placeholder="A short summary of your proposal"
-                                className={`px-6 py-4 w-full bg-ash-dark-400 font-bold text-xs leading-normal outline-none placeholder:text-ash-gray-600 border ${
+                                className={`p-4 w-full bg-ash-dark-400 font-bold text-xs leading-normal outline-none placeholder:text-ash-gray-600 border ${
                                     isClickedSubmit && isInvalidTitle
                                         ? "border-ash-purple-500"
                                         : "border-transparent"
@@ -224,25 +235,29 @@ function DAOPropose() {
                                 value={title}
                                 onChange={(e) => setTitle(e.target.value)}
                             />
+                            <div className="p-4 pt-0 font-medium text-2xs text-ash-gray-600 text-right">{title.length}/120</div>
+                            </div>
+                            
                         </div>
                         <div>
                             <label
                                 htmlFor="propose-description"
-                                className="mb-2 text-sm"
+                                className="inline-block mb-2 text-sm"
                             >
-                                <span className="font-medium text-stake-gray-500">
+                                <span className="font-bold text-stake-gray-500">
                                     Description{" "}
                                 </span>{" "}
-                                <span className="font-bold text-ash-gray-600">
+                                <span className="font-medium text-ash-gray-600">
                                     (max 520 characters)
                                 </span>
                             </label>
+                            <div className="bg-ash-dark-400">
                             <textarea
                                 name="description"
                                 id="propose-description"
                                 rows={5}
                                 placeholder={`## Summary\n\nYour proposal will be formatted using Markdown.`}
-                                className={`px-6 py-4 w-full bg-ash-dark-400 font-bold text-xs leading-normal outline-none placeholder:text-ash-gray-600 resize-none overflow-auto border ${
+                                className={`p-4 w-full bg-ash-dark-400 font-bold text-xs leading-normal outline-none placeholder:text-ash-gray-600 resize-none overflow-auto border ${
                                     isClickedSubmit && isInvalidDesc
                                         ? "border-ash-purple-500"
                                         : "border-transparent"
@@ -251,25 +266,32 @@ function DAOPropose() {
                                 value={description}
                                 onChange={(e) => setDescription(e.target.value)}
                             />
+                            <div className="p-4 pt-0 font-medium text-2xs text-ash-gray-600 text-right">{description.length}/520</div>
+                            </div>
                         </div>
                         <div>
                             <label
                                 htmlFor="propose-discussion-link"
-                                className="mb-2 text-sm"
+                                className="inline-block mb-2 text-sm"
                             >
                                 <span className="font-bold text-ash-gray-600">
                                     Link to&nbsp;
                                 </span>
-                                <span className="font-medium text-stake-gray-500 underline">
-                                    discussion
-                                </span>
+                                <Link
+                                    href="https://github.com/ashswap/ash-proposals/issues/new?assignees=&labels=proposal&template=governance-proposal.md&title=%5BPROPOSAL%5D"
+                                    target="_blank"
+                                >
+                                    <span className="font-medium text-stake-gray-500 underline">
+                                        discussion
+                                    </span>
+                                </Link>
                             </label>
                             <textarea
                                 name="discussionLink"
                                 id="propose-discussion-link"
-                                placeholder="To create a proposal on Dapp, you must first initiate a discussion on our forum."
+                                placeholder={"To create a proposal on Dapp, you must first initiate a discussion on our forum.\n\nURL must start with https://github.com/ashswap/ash-proposals/issues"}
                                 rows={3}
-                                className={`px-6 py-4 w-full bg-ash-dark-400 font-bold text-xs leading-normal outline-none placeholder:text-ash-gray-600 resize-none overflow-auto border ${
+                                className={`p-4 w-full bg-ash-dark-400 font-bold text-xs leading-normal outline-none placeholder:text-ash-gray-600 resize-none overflow-auto border ${
                                     isClickedSubmit && isInvalidDiscussionLink
                                         ? "border-ash-purple-500"
                                         : "border-transparent"
@@ -293,8 +315,8 @@ function DAOPropose() {
                         <div className="mb-5 font-bold text-2xl text-white">
                             Proposal Action
                         </div>
-                        <div className="mb-14">
-                            <div className="font-bold text-sm text-stake-gray-500">
+                        <div>
+                            <div className="mb-2 font-bold text-sm text-stake-gray-500">
                                 Proposal Type
                             </div>
                             <ProposalDropdown
@@ -302,21 +324,56 @@ function DAOPropose() {
                                 onSelect={onProposalChange}
                             />
                         </div>
+                        <div className="my-7 relative flex items-center justify-center">
+                            <div className="absolute inset-x-0 border-t border-dashed border-ash-dark-400"></div>
+                            <ICGovVote className="relative w-8 h-auto text-stake-dark-450" />
+                        </div>
                         <DAOActionGenerator
                             ref={actionGeneratorRef}
                             type={proposalType}
                         />
+                        <div className="mt-6 p-6 bg-stake-dark-400 font-medium text-xs text-stake-gray-500">
+                            You cannot create consecutive proposals within{" "}
+                            <span className="font-bold text-white">
+                                {formatDuration(
+                                    proposalConfig.min_time_for_propose,
+                                    "DAYS"
+                                )}
+                            </span>
+                        </div>
                     </div>
                 </div>
-                <GlowingButton
-                    theme="pink"
-                    type="submit"
-                    disabled={isPending || isUploading}
-                    onClick={onCreateProposal}
-                    className="mt-4 w-full h-18 font-bold text-sm text-white disabled:bg-stake-dark-300"
-                >
-                    Done & Create
-                </GlowingButton>
+                {isLoggedIn ? (
+                    <GlowingButton
+                        theme="pink"
+                        type="submit"
+                        disabled={isInsufficientVE || isPending || isUploading}
+                        loading={isPending || isUploading}
+                        className="mt-4 w-full h-18 font-bold text-sm text-white uppercase disabled:bg-stake-dark-300"
+                    >
+                        {isInsufficientVE ? (
+                            <span className="uppercase">
+                                Insufficient{" "}
+                                <span className="text-ash-purple-500">
+                                    veash
+                                </span>
+                            </span>
+                        ) : isPending || isUploading ? (
+                            "Creating..."
+                        ) : (
+                            "Done & Create"
+                        )}
+                    </GlowingButton>
+                ) : (
+                    <GlowingButton
+                        theme="pink"
+                        type="button"
+                        onClick={connectWallet}
+                        className="mt-4 w-full h-18 font-bold text-sm text-white disabled:bg-stake-dark-300"
+                    >
+                        Connect Wallet
+                    </GlowingButton>
+                )}
             </div>
         </form>
     );

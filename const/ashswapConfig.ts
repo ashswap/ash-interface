@@ -28,17 +28,17 @@ const dappContractDevnet: DappContractConfig = {
     },
     alpha: {
         voteEscrowedContract:
-            "erd1qqqqqqqqqqqqqpgqq6r337l0pvkueyvwpse4e5spg04pq845rmcqgud55c",
+            "erd1qqqqqqqqqqqqqpgq7jclp49cydmjvxsx5ufurycujzrpwmv0rmcqqvrk7d",
         feeDistributor:
-            "erd1qqqqqqqqqqqqqpgqvx9kzdpcmrr0mars67wgepujdeq2r598rmcq0lpmrx",
+            "erd1qqqqqqqqqqqqqpgqsn7eq3gshrt70snx2fzxltshlg7h4gf6rmcqgsw4l3",
         farmController:
-            "erd1qqqqqqqqqqqqqpgq3749x3fhdm72keje2tursqd3k2esd4crrmcqntaekq",
+            "erd1qqqqqqqqqqqqqpgq420z44g8k8hc9ask4qwgz78dt7kdkk9mrmcqmh967w",
         farmBribe:
-            "erd1qqqqqqqqqqqqqpgq44uafwyxv5ncq9255kxlql9lezd7ca4xrmcqtymttd",
+            "erd1qqqqqqqqqqqqqpgqqf669mq7ndfe9re6ggkvxltnkghfjertrmcqz8sgrg",
         farmRouter:
-            "erd1qqqqqqqqqqqqqpgq22qa7s9lksqq5wey8fp7lyv9qtv9jgn7rmcq9spes3",
-        router: "erd1qqqqqqqqqqqqqpgqqymfgp22r5gxwsnfvukj5fe7ne4r4ht6rmcq52x3sa",
-        dao: "erd1qqqqqqqqqqqqqpgqek6qun6xkvm0n5308vtqe69mhzxxchemrmcqaltmfu"
+            "erd1qqqqqqqqqqqqqpgqh72fp6sat60d9nws64fahluglh22gyk5rmcqslvmnl",
+        router: "erd1qqqqqqqqqqqqqpgq4jhlpam8wyju963p63a2fu9hdlcfqjm6rmcqarsvsx",
+        dao: "erd1qqqqqqqqqqqqqpgqfns0zp9qacd52au5rhdq9e4t0yd0g2j5rmcq2g3gf8"
     },
 };
 

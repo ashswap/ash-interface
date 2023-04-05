@@ -2,7 +2,7 @@ import { Address } from "@multiversx/sdk-core/out";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 import { FARMS } from "const/farms";
 import { ContractManager } from "helper/contracts/contractManager";
-import { forwardRef, useCallback, useImperativeHandle, useState } from "react";
+import { forwardRef, memo, useCallback, useImperativeHandle, useState } from "react";
 import DAOFarmDropdown from "../../components/DAOFarmDropdown";
 import { DAOFormRefMethods, WithDynamicRef } from "./type";
 
@@ -40,7 +40,7 @@ const DAOFRProduceRewardsFormRef = forwardRef<
             <div>
                 <label
                     htmlFor="dao-fc-add-farm_address"
-                    className="mb-2 font-bold text-sm text-stake-gray-500"
+                    className="inline-block mb-2 font-bold text-sm text-stake-gray-500"
                 >
                     Farm Address
                 </label>
@@ -59,4 +59,4 @@ const DAOFRProduceRewardsForm = ({
 }: WithDynamicRef<DAOFormRefMethods, { type: "start" | "stop" }>) => (
     <DAOFRProduceRewardsFormRef ref={dynamicRef} type={type} />
 );
-export default DAOFRProduceRewardsForm;
+export default memo(DAOFRProduceRewardsForm);

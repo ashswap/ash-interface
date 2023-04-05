@@ -7,6 +7,7 @@ import useGraphQLQueryOptions from "graphql/useQueries/useGraphQLQueryOptions";
 import { ContractManager } from "helper/contracts/contractManager";
 import {
     forwardRef,
+    memo,
     useCallback,
     useImperativeHandle, useMemo, useState
 } from "react";
@@ -56,7 +57,7 @@ const DAOFCAddFarmFormForwardRef = forwardRef<DAOFormRefMethods>(
                 <div>
                     <label
                         htmlFor="dao-fc-add-farm_address"
-                        className="mb-2 font-bold text-sm text-stake-gray-500"
+                        className="inline-block mb-2 font-bold text-sm text-stake-gray-500"
                     >
                         Farm Address
                     </label>
@@ -68,7 +69,7 @@ const DAOFCAddFarmFormForwardRef = forwardRef<DAOFormRefMethods>(
                 <div>
                     <label
                         htmlFor="dao-fc-add-farm_address"
-                        className="mb-2 font-bold text-sm text-stake-gray-500"
+                        className="inline-block mb-2 font-bold text-sm text-stake-gray-500"
                     >
                         Type Weight
                     </label>
@@ -89,4 +90,4 @@ const DAOFCAddFarmForm = ({
     <DAOFCAddFarmFormForwardRef ref={dynamicRef} />
 );
 
-export default DAOFCAddFarmForm;
+export default memo(DAOFCAddFarmForm);

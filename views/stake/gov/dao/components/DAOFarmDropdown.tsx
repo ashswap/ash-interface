@@ -2,7 +2,7 @@ import Avatar from "components/Avatar";
 import { FARMS } from "const/farms";
 import { POOLS_MAP_LP } from "const/pool";
 import { getTokenFromId } from "helper/token";
-import React, { useMemo } from "react";
+import React, { memo, useMemo } from "react";
 import DAODropdown from "./DAODropdown";
 
 function DAOFarmDropdown(
@@ -34,4 +34,4 @@ function DAOFarmDropdown(
     return <DAODropdown {...props} options={farmOptions} />;
 }
 
-export default DAOFarmDropdown;
+export default memo(DAOFarmDropdown);
