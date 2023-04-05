@@ -33,7 +33,7 @@ const DAOActionGenerator = forwardRef<DAOFormRefMethods, Props>(function DAOActi
     );
     return (
         <div>
-            {type === "fc:add_farm" && (
+            {type === "fc:addFarm" && (
                 <DAOFCAddFarmForm dynamicRef={formRef} />
             )}
             {type === "fr:endProduceRewards" && (

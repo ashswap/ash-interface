@@ -28,7 +28,7 @@ import ICGovVote from "assets/svg/gov-vote.svg";
 import { formatDuration } from "helper/time";
 import { accIsLoggedInState } from "atoms/dappState";
 import { useConnectWallet } from "hooks/useConnectWallet";
-import { ProposalType } from "const/proposal";
+import { PROPOSALS_UNALIAS, ProposalType, ProposalTypePrefix } from "const/proposal";
 import Link from "next/link";
 
 function DAOPropose() {
@@ -41,21 +41,10 @@ function DAOPropose() {
     const isLoggedIn = useRecoilValue(accIsLoggedInState);
     const connectWallet = useConnectWallet();
     const [proposalType, setProposalType] =
-        useState<ProposalType>("fc:add_farm");
+        useState<ProposalType>("fc:addFarm");
     const address = useMemo(() => {
-        const type = proposalType.split(":")[0];
-        switch (type) {
-            case "fc":
-                return ASHSWAP_CONFIG.dappContract.farmController;
-            case "fr":
-                return ASHSWAP_CONFIG.dappContract.farmRouter;
-            case "fb":
-                return ASHSWAP_CONFIG.dappContract.farmBribe;
-            case "pr":
-                return ASHSWAP_CONFIG.dappContract.router;
-            default:
-                return "";
-        }
+        const type = proposalType.split(":")[0] as ProposalTypePrefix;
+        return PROPOSALS_UNALIAS[type];
     }, [proposalType]);
     const functionName = useMemo(
         () => proposalType.split(":")[1],
