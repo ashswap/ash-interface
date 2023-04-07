@@ -25,7 +25,7 @@ class DAOContract extends Contract<typeof daoAbi> {
 
     async propose(meta: string, action: DAOAction) {
         let interaction = this.contract.methods.propose([meta, action]);
-        interaction.withGasLimit(500_000_000);
+        interaction.withGasLimit(12_000_000);
         return this.interceptInteraction(interaction)
             .check()
             .buildTransaction();
@@ -40,7 +40,7 @@ class DAOContract extends Contract<typeof daoAbi> {
      */
     async vote(proposalID: number, yes: BigNumber, no: BigNumber) {
         let interaction = this.contract.methods.vote([proposalID, yes, no]);
-        interaction.withGasLimit(500_000_000);
+        interaction.withGasLimit(12_000_000);
         return this.interceptInteraction(interaction)
             .check()
             .buildTransaction();

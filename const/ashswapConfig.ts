@@ -7,6 +7,7 @@ type DappContracts = {
     farmRouter: string;
     router: string;
     dao: string;
+    daoBribe: string;
 };
 type DappContractConfig = {
     alpha: DappContracts;
@@ -25,6 +26,7 @@ const dappContractDevnet: DappContractConfig = {
         farmRouter: "",
         router: "",
         dao: "",
+        daoBribe: "",
     },
     alpha: {
         voteEscrowedContract:
@@ -38,7 +40,8 @@ const dappContractDevnet: DappContractConfig = {
         farmRouter:
             "erd1qqqqqqqqqqqqqpgqh72fp6sat60d9nws64fahluglh22gyk5rmcqslvmnl",
         router: "erd1qqqqqqqqqqqqqpgq4jhlpam8wyju963p63a2fu9hdlcfqjm6rmcqarsvsx",
-        dao: "erd1qqqqqqqqqqqqqpgqfns0zp9qacd52au5rhdq9e4t0yd0g2j5rmcq2g3gf8"
+        dao: "erd1qqqqqqqqqqqqqpgqfns0zp9qacd52au5rhdq9e4t0yd0g2j5rmcq2g3gf8",
+        daoBribe: "erd1qqqqqqqqqqqqqpgqyn2tfquw9ca8pfgzrfyuxmv6u0s7fcnlrmcqwyagxt"
     },
 };
 
@@ -53,6 +56,7 @@ const dappContractMainnet: DappContracts = {
     farmRouter: "",
     router: "",
     dao: "",
+    daoBribe: "",
 };
 
 const dappContract =

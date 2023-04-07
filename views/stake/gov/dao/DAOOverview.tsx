@@ -2,8 +2,9 @@ import {
     DAOFilterOpenProposalAtom,
     DAOFilterStatusClosedOptionsAtom
 } from "atoms/daoState";
+import Pagination from "components/Pagination";
 import { gql } from "graphql-request";
-import { DAOProposal } from "graphql/type.graphql";
+import { DAOProposal, PaginationProposals } from "graphql/type.graphql";
 import { graphqlFetcher } from "helper/common";
 import { useEffect, useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
@@ -11,6 +12,8 @@ import useSWR from "swr";
 import DAOFilter from "./components/DAOFilter";
 import DAOList from "./components/DAOList";
 function DAOOverview() {
+    const [index, setIndex] = useState(0);
+    const [size, setSize] = useState(10);
     const [openedDAOProposals, setOpenedDAOProposals] = useState<DAOProposal[]>(
         []
     );
@@ -40,20 +43,27 @@ function DAOOverview() {
                   }
               `
             : gql`
-                  query DAOListQuery($filterDAOStatus: [String!]) {
+                  query DAOListQuery(
+                      $filterDAOStatus: [String!]
+                      $limit: Int!
+                      $offset: Int!
+                  ) {
                       closedDAOProposals(
-                          limit: 5
-                          offset: 0
+                          limit: $limit
+                          offset: $offset
                           states: $filterDAOStatus
                       ) {
-                          ...allProposalProps
+                          total
+                          proposals {
+                              ...allProposalProps
+                          }
                       }
                   }
               `;
     }, [isFilteredOpen]);
     const { data } = useSWR<{
         openedDAOProposals: DAOProposal[];
-        closedDAOProposals: DAOProposal[];
+        closedDAOProposals: PaginationProposals;
     }>(
         [
             gql`
@@ -78,9 +88,13 @@ function DAOOverview() {
                     state
                     total_supply
                     yes_vote
+                    bribes {
+                        token_id
+                        reward_amount
+                    }
                 }
             `,
-            { filterDAOStatus },
+            { filterDAOStatus, limit: size, offset: index * size },
         ],
         graphqlFetcher
     );
@@ -92,9 +106,14 @@ function DAOOverview() {
     useEffect(() => {
         if (data && data.openedDAOProposals)
             setOpenedDAOProposals(data.openedDAOProposals);
-        if (data && data.closedDAOProposals)
-            setClosedDAOProposals(data.closedDAOProposals);
+        if (data && data.closedDAOProposals?.proposals)
+            setClosedDAOProposals(data.closedDAOProposals.proposals);
     }, [data]);
+    useEffect(() => {
+        if(isFilteredOpen){
+            setIndex(0);
+        }
+    }, [isFilteredOpen])
 
     return (
         <>
@@ -102,7 +121,20 @@ function DAOOverview() {
                 <DAOFilter />
             </div>
             <div className="space-y-24">
-                <DAOList proposals={proposals} />
+                <DAOList
+                    proposals={proposals}
+                    pagination={
+                        !isFilteredOpen && (
+                            <Pagination
+                                total={data?.closedDAOProposals?.total}
+                                size={size}
+                                index={index}
+                                onChangeIndex={(i) => setIndex(i)}
+                                className="bg-stake-dark-400"
+                            />
+                        )
+                    }
+                />
             </div>
         </>
     );

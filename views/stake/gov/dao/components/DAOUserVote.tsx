@@ -1,22 +1,22 @@
-import { default as ImgVeash, default as ImgVeASH } from "assets/images/ve-ash.png";
-import { accAddressState } from "atoms/dappState";
+import {
+    default as ImgVeash,
+    default as ImgVeASH
+} from "assets/images/ve-ash.png";
+import { accIsLoggedInState } from "atoms/dappState";
 import { govVeASHAmtSelector } from "atoms/govState";
 import BigNumber from "bignumber.js";
 import Avatar from "components/Avatar";
 import Countdown from "components/Coundown";
-import { GetTransactionsByHashesReturnType } from "components/DappCoreCustom/getTransactionsByHashes";
 import GlowingButton from "components/GlowingButton";
 import TextAmt from "components/TextAmt";
-import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 import { VE_ASH_DECIMALS } from "const/tokens";
 import { DAOProposal } from "graphql/type.graphql";
-import { ContractManager } from "helper/contracts/contractManager";
-import emitter from "helper/emitter";
+import { useConnectWallet } from "hooks/useConnectWallet";
 import useDAOExecute from "hooks/useDAOContract/useDAOExecute";
 import useIsAlready from "hooks/useIsAlready";
 import moment from "moment";
 import dynamic from "next/dynamic";
-import { memo, useCallback, useEffect, useMemo, useState } from "react";
+import { memo, useCallback, useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
 import useDAOProposalComputedState from "../hooks/useDAOProposalComputedState";
 import DAOTag from "./DAOTag";
@@ -26,6 +26,7 @@ const DAOVoteModal = dynamic(
 );
 type Props = {
     proposal: DAOProposal;
+    userVoteInfo: { yes_vote: BigNumber; no_vote: BigNumber };
 };
 const DAOUserVoteActive = memo(function DAOUserVoteActive({
     endVoteTS,
@@ -45,6 +46,8 @@ const DAOUserVoteActive = memo(function DAOUserVoteActive({
     const veASH = useRecoilValue(govVeASHAmtSelector);
     const lazyVoteModal = useIsAlready(isOpenVote, true);
     const isVoted = useMemo(() => votePower > 0, [votePower]);
+    const isLoggedIn = useRecoilValue(accIsLoggedInState);
+    const connectWallet = useConnectWallet();
     const onOpenVoteYes = useCallback(() => {
         setVoteType("yes");
         setIsOpenVote(true);
@@ -55,7 +58,7 @@ const DAOUserVoteActive = memo(function DAOUserVoteActive({
     }, []);
     const onCloseModal = useCallback(() => setIsOpenVote(false), []);
     return (
-        <>
+        <div>
             <div className="px-9 pt-10 pb-14 bg-stake-dark-300">
                 <DAOTag status="active" />
                 <div className="mt-12 mb-9 font-bold text-2xl text-white">
@@ -93,20 +96,32 @@ const DAOUserVoteActive = memo(function DAOUserVoteActive({
                             </div>
                         </div>
                         <div className="mt-7.5 flex flex-col gap-4">
-                            <GlowingButton
-                                theme="green"
-                                className="w-full h-18 font-bold text-sm text-ash-dark-400 uppercase"
-                                onClick={onOpenVoteYes}
-                            >
-                                Support! I&apos;m In
-                            </GlowingButton>
-                            <GlowingButton
-                                theme="purple"
-                                className="w-full h-18 font-bold text-sm text-white uppercase"
-                                onClick={onOpenVoteNo}
-                            >
-                                no, I&apos;m against it!
-                            </GlowingButton>
+                            {isLoggedIn ? (
+                                <>
+                                    <GlowingButton
+                                        theme="green"
+                                        className="w-full h-18 font-bold text-sm text-ash-dark-400 uppercase"
+                                        onClick={onOpenVoteYes}
+                                    >
+                                        Support! I&apos;m In
+                                    </GlowingButton>
+                                    <GlowingButton
+                                        theme="purple"
+                                        className="w-full h-18 font-bold text-sm text-white uppercase"
+                                        onClick={onOpenVoteNo}
+                                    >
+                                        no, I&apos;m against it!
+                                    </GlowingButton>
+                                </>
+                            ) : (
+                                <GlowingButton
+                                    theme="pink"
+                                    className="w-full h-18 font-bold text-sm text-white uppercase"
+                                    onClick={connectWallet}
+                                >
+                                    Connect Wallet
+                                </GlowingButton>
+                            )}
                         </div>
                     </>
                 )}
@@ -120,7 +135,7 @@ const DAOUserVoteActive = memo(function DAOUserVoteActive({
                     proposalID={proposalID}
                 />
             )}
-        </>
+        </div>
     );
 });
 const DAOUserVotePending = memo(function DAOUserVotePending({
@@ -129,9 +144,7 @@ const DAOUserVotePending = memo(function DAOUserVotePending({
     startVoteTS: number;
 }) {
     const startVoteTSFmt = useMemo(() => {
-        return moment
-            .unix(startVoteTS)
-            .format("HH:mm [(UTC]Z[)] MMM Do, YYYY");
+        return moment.unix(startVoteTS).format("HH:mm [(UTC]Z[)] MMM Do, YYYY");
     }, [startVoteTS]);
     return (
         <>
@@ -194,7 +207,9 @@ const DAOUserVoteResult = memo(function DAOUserVoteResult({
     );
 });
 
-function DAOUserVote({ proposal }: Props) {
+function DAOUserVote({ proposal, userVoteInfo }: Props) {
+    const isLoggedIn = useRecoilValue(accIsLoggedInState);
+    const connectWallet = useConnectWallet();
     const {
         endVoteTS,
         startVoteTS,
@@ -203,50 +218,30 @@ function DAOUserVote({ proposal }: Props) {
         status,
         expiredTS,
     } = useDAOProposalComputedState(proposal);
-    const address = useRecoilValue(accAddressState);
-    const [votePower, setVotePower] = useState(0);
-    const [isSupport, setIsSupport] = useState(true);
+    const {
+        execute,
+        trackingData: { isPending },
+    } = useDAOExecute(true);
+    const onExecute = useCallback(() => {
+        execute(proposal.proposal_id);
+    }, [execute, proposal.proposal_id]);
+    const isSupport = useMemo(
+        () => userVoteInfo.yes_vote.gt(userVoteInfo.no_vote),
+        [userVoteInfo]
+    );
+    const votePower = useMemo(
+        () =>
+            BigNumber.max(userVoteInfo.no_vote, userVoteInfo.yes_vote)
+                .div(1e18)
+                .toNumber(),
+        [userVoteInfo]
+    );
     const weightPct = useMemo(() => {
         return new BigNumber(votePower)
             .multipliedBy(1e18)
             .multipliedBy(100)
             .div(proposal.total_supply);
     }, [proposal.total_supply, votePower]);
-    const { execute, trackingData: {isPending} } = useDAOExecute(true);
-    const onExecute = useCallback(() => {
-        execute(proposal.proposal_id);
-    }, [execute, proposal.proposal_id]);
-
-    const getVoteInfo = useCallback((address: string, proposalID: number) => {
-        ContractManager.getDAOContract(ASHSWAP_CONFIG.dappContract.dao)
-            .getProposalVotes(proposalID, address)
-            .then((voting) => {
-                setIsSupport(voting.yes_vote.gte(voting.no_vote));
-                setVotePower(
-                    BigNumber.max(voting.yes_vote, voting.no_vote)
-                        .div(1e18)
-                        .toNumber()
-                );
-            })
-            .catch(() => {
-                setIsSupport(true);
-                setVotePower(0);
-            });
-    }, []);
-
-    useEffect(() => {
-        getVoteInfo(address, proposal.proposal_id);
-        const onVoteSuccess = (txs: GetTransactionsByHashesReturnType) => {
-            if(txs.some(tx => tx.meta?.receiver === ASHSWAP_CONFIG.dappContract.dao && tx.meta?.functionName === 'vote')){
-                getVoteInfo(address, proposal.proposal_id)
-            }
-        };
-        emitter.on("onCheckBatchResult", onVoteSuccess);
-        return () => {
-            emitter.off("onCheckBatchResult", onVoteSuccess);
-        };
-    }, [address, getVoteInfo, proposal.proposal_id]);
-
     if (status === "active") {
         return (
             <DAOUserVoteActive
@@ -301,16 +296,26 @@ function DAOUserVote({ proposal }: Props) {
                     isSupport={isSupport}
                     weightPct={weightPct}
                 />
-                {status === "approved" && (
+                {isLoggedIn ? (
+                    status === "approved" && (
+                        <GlowingButton
+                            theme="green"
+                            disabled={!canExecute || isPending}
+                            className="mt-7 w-full h-18 px-4 font-bold text-sm text-ash-dark-400 uppercase"
+                            onClick={onExecute}
+                        >
+                            {canExecute
+                                ? "Execute this proposal"
+                                : "Can execute after queue "}
+                        </GlowingButton>
+                    )
+                ) : (
                     <GlowingButton
-                        theme="green"
-                        disabled={!canExecute || isPending}
-                        className="mt-7 w-full h-18 px-4 font-bold text-sm text-ash-dark-400 uppercase"
-                        onClick={onExecute}
+                        theme="pink"
+                        className="mt-7 w-full h-18 px-4 font-bold text-sm text-white uppercase"
+                        onClick={connectWallet}
                     >
-                        {canExecute
-                            ? "Execute this proposal"
-                            : "Can execute after queue "}
+                        Connect Wallet
                     </GlowingButton>
                 )}
             </div>
