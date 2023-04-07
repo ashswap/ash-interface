@@ -1,4 +1,5 @@
-import DAOContract from "./dao";
+import DAOBribeContract from "./daoBribeContract";
+import DAOContract from "./daoContract";
 import FarmBribeContract from "./farmBribeContract";
 import FarmContract from "./farmContract";
 import FarmControllerContract from "./farmControllerContract";
@@ -21,6 +22,7 @@ const wrappedEGLDContracts: Record<string, WrappedEGLDContract> = {};
 const daoContracts: Record<string, DAOContract> = {};
 const routerContracts: Record<string, RouterContract> = {};
 const farmRouterContracts: Record<string, FarmRouterContract> = {};
+const daoBribeContracts: Record<string, DAOBribeContract> = {};
 const getPoolContract = (address: string) => {
     return (
         poolContracts[address] ??
@@ -90,6 +92,12 @@ const getFarmRouterContract = (address: string) => {
         (farmRouterContracts[address] = new FarmRouterContract(address))
     );
 };
+const getDAOBribeContract = (address: string) => {
+    return (
+        daoBribeContracts[address] ??
+        (daoBribeContracts[address] = new DAOBribeContract(address))
+    );
+};
 
 export const ContractManager = {
     getPoolContract,
@@ -103,4 +111,5 @@ export const ContractManager = {
     getDAOContract,
     getRouterContract,
     getFarmRouterContract,
+    getDAOBribeContract,
 };

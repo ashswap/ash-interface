@@ -1,23 +1,29 @@
+import { Disclosure, Transition } from "@headlessui/react";
+import ICChevronDown from "assets/svg/chevron-down.svg";
+import ICChevronUp from "assets/svg/chevron-up.svg";
+import { accAddressState } from "atoms/dappState";
 import BigNumber from "bignumber.js";
-import { GetTransactionsByHashesReturnType } from "components/DappCoreCustom/getTransactionsByHashes";
 import Scrollable from "components/Scrollable";
 import StyledMarkdown from "components/StyledMarkdown";
 import TextAmt from "components/TextAmt";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
-import { DAPP_CONFIG } from "const/dappConfig";
+import { blockTimeMs, DAPP_CONFIG } from "const/dappConfig";
 import { PROPOSALS_ALIAS, PROPOSALS_CONFIG } from "const/proposal";
 import { gql } from "graphql-request";
 import {
     DAOProposal,
-    DAOProposalDetail as GqlDAOProposalDetail,
+    DAOProposalDetail as GqlDAOProposalDetail
 } from "graphql/type.graphql";
 import { graphqlFetcher } from "helper/common";
-import emitter from "helper/emitter";
+import { ContractManager } from "helper/contracts/contractManager";
 import { shortenString } from "helper/string";
+import useOnTxCompleted from "hooks/useOnTxCompleted";
 import useRouteHash from "hooks/useRouteHash";
 import { DAOStatus } from "interface/dao";
+import dynamic from "next/dynamic";
 import Link from "next/link";
-import { useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useRecoilValue } from "recoil";
 import useSWR from "swr";
 import DAOCardBg from "../components/DAOCardBg";
 import DAOResultBar from "../components/DAOResultBar";
@@ -26,9 +32,15 @@ import DAOVoteChart from "../components/DAOVoteChart";
 import DAOVoterTable from "../components/DAOVoterTable";
 import useDAOProposalComputedState from "../hooks/useDAOProposalComputedState";
 import useDAOProposalMeta from "../hooks/useDAOProposalMeta";
-import ICChevronDown from "assets/svg/chevron-down.svg";
-import ICChevronUp from "assets/svg/chevron-up.svg";
-import { Disclosure, Transition } from "@headlessui/react";
+import DAOHistory from "./DAOHistory";
+const DAOCreateBribeLazy = dynamic(
+    import("./DAOCreateBribe").then((m) => m.default),
+    { ssr: false }
+);
+const DAOBribeLazy = dynamic(
+    import("./DAOBribe").then((m) => m.default),
+    { ssr: false }
+);
 
 const HashAnchors = [
     { hash: "description", label: "Description" },
@@ -41,12 +53,14 @@ type NonNullDAOProposalDetail = {
     topSupporters: string[][];
     topAgainsters: string[][];
     topVoters: string[][];
+    userVoteInfo: { yes_vote: BigNumber; no_vote: BigNumber };
 };
 function DAODetail({
     proposal,
     topSupporters,
     topAgainsters,
     topVoters,
+    userVoteInfo,
 }: NonNullDAOProposalDetail) {
     const routeHash = useRouteHash();
     const descriptionRef = useRef<HTMLElement>(null);
@@ -66,6 +80,7 @@ function DAODetail({
         endVoteTS,
         yesVote,
         noVote,
+        expiredTS,
     } = useDAOProposalComputedState(proposal);
     const proposalLabel = useMemo(() => {
         return (
@@ -105,6 +120,13 @@ function DAODetail({
             .slice(0, 10);
     }, [topAgainsters, topSupporters]);
 
+    const shareVoteYesPct = useMemo(() => {
+        return userVoteInfo.yes_vote
+            .multipliedBy(100)
+            .div(proposal.yes_vote)
+            .toNumber();
+    }, [proposal.yes_vote, userVoteInfo.yes_vote]);
+
     useEffect(() => {
         const ref = {
             description: descriptionRef,
@@ -121,8 +143,25 @@ function DAODetail({
 
     return (
         <div className="lg:flex gap-7.5">
-            <div className="mb-7.5 lg:mb-0 shrink-0 lg:w-1/3">
-                <DAOUserVote proposal={proposal} />
+            <div className="flex flex-col gap-10 mb-7.5 lg:mb-0 shrink-0 lg:w-1/3">
+                <DAOUserVote userVoteInfo={userVoteInfo} proposal={proposal} />
+                {proposal?.bribes?.length > 0 && (
+                    <DAOBribeLazy
+                        proposal_id={proposal.proposal_id}
+                        bribes={proposal.bribes}
+                        sharePct={shareVoteYesPct}
+                        status={status}
+                    />
+                )}
+                {(status === "pending" || status === "active") && (
+                    <DAOCreateBribeLazy proposalID={proposal.proposal_id} />
+                )}
+                <DAOHistory
+                    {...proposal}
+                    status={status}
+                    endVoteTS={endVoteTS}
+                    expiredTS={expiredTS}
+                />
             </div>
             <div className="shrink-0 lg:w-2/3">
                 <div className="relative p-9 sm:p-12">
@@ -159,13 +198,13 @@ function DAODetail({
                                 ))}
                             </div>
                         </Scrollable>
-                        <div className="mb-12 border-t border-dashed border-t-ash-gray-600"></div>
+                        <hr className="my-12 border-t border-dashed border-t-ash-gray-600"/>
                         {proposalLabel && (
                             <div className="mb-3 inline-block p-3 bg-ash-dark-400 font-bold text-xs text-stake-gray-500">
                                 {proposalLabel}
                             </div>
                         )}
-                        <section ref={descriptionRef} className="mb-12">
+                        <section ref={descriptionRef}>
                             <h3 className="mb-4 font-bold text-2xl text-white">
                                 {meta.title}
                             </h3>
@@ -223,7 +262,8 @@ function DAODetail({
                                 </span>
                             </Link>
                         </section>
-                        <section ref={votingRef} className="mb-12">
+                        <hr className="my-12 border-t border-dashed border-t-ash-gray-600"/>
+                        <section ref={votingRef}>
                             <h2 className="mb-12 font-bold text-2xl text-white">
                                 Voting Results
                             </h2>
@@ -280,7 +320,8 @@ function DAODetail({
                                 </div>
                             </div>
                         </section>
-                        <section ref={votersRef} className="mb-12">
+                        <hr className="my-12 border-t border-dashed border-t-ash-gray-600"/>
+                        <section ref={votersRef}>
                             <h2 className="mb-6 font-bold text-2xl text-white">
                                 Voters Table
                             </h2>
@@ -296,6 +337,7 @@ function DAODetail({
                                 </div>
                             )}
                         </section>
+                        <hr className="my-12 border-t border-dashed border-t-ash-gray-600"/>
                         <section ref={chartRef}>
                             <h2 className="mb-6 font-bold text-2xl text-white">
                                 Vote Distribution Chart
@@ -317,7 +359,19 @@ function DAODetail({
 type Props = {
     proposalID: number;
 };
+const defaultVoteInfo = {
+    yes_vote: new BigNumber(0),
+    no_vote: new BigNumber(0),
+};
+const predicateVoteInfo = {
+    [ASHSWAP_CONFIG.dappContract.dao]: ["vote"],
+};
+const predicateProposalDetail = {
+    [ASHSWAP_CONFIG.dappContract.dao]: ["vote", "execute"],
+    [ASHSWAP_CONFIG.dappContract.daoBribe]: ["withdraw", "addRewardAmount"],
+};
 function DAODetailWrapper({ proposalID }: Props) {
+    const address = useRecoilValue(accAddressState);
     const query = useMemo(() => {
         return proposalID
             ? [
@@ -345,6 +399,7 @@ function DAODetailWrapper({ proposalID }: Props) {
                           execute_time_limit
                           created_at
                           executed_at
+                          executed_by
                           ipfs_hash
                           no_vote
                           proposal_id
@@ -352,43 +407,47 @@ function DAODetailWrapper({ proposalID }: Props) {
                           state
                           total_supply
                           yes_vote
+                          bribes {
+                              token_id
+                              reward_amount
+                          }
                       }
                   `,
                   { proposalID },
               ]
             : null;
     }, [proposalID]);
-    const { data, mutate, isValidating } = useSWR<{
+    const { data, mutate } = useSWR<{
         proposalDetail: GqlDAOProposalDetail;
     }>(query, graphqlFetcher);
 
-    useEffect(() => {
-        const onVoteSuccess = (txs: GetTransactionsByHashesReturnType) => {
-            if (
-                txs.some(
-                    (tx) =>
-                        tx.meta?.receiver === ASHSWAP_CONFIG.dappContract.dao &&
-                        tx.meta?.functionName === "vote"
-                )
-            ) {
-                mutate();
-            }
-        };
-        emitter.on("onCheckBatchResult", onVoteSuccess);
-        return () => {
-            emitter.off("onCheckBatchResult", onVoteSuccess);
-        };
-    }, [mutate]);
+    const { data: accountVotingInfo, mutate: mutateVoteInfo } = useSWR(
+        [proposalID, address],
+        async (proposalID, address) => {
+            return await ContractManager.getDAOContract(
+                ASHSWAP_CONFIG.dappContract.dao
+            ).getProposalVotes(proposalID, address);
+        },
+        { fallbackData: defaultVoteInfo }
+    );
+
+    useOnTxCompleted(mutateVoteInfo, predicateVoteInfo);
+    const mutateProposalDetail = useCallback(() => {setTimeout(() => {
+        mutate()
+    }, blockTimeMs)}, [mutate]);
+
+    useOnTxCompleted(mutateProposalDetail, predicateProposalDetail);
     if (!data?.proposalDetail || !data?.proposalDetail.proposal) return null;
     const { proposal, top_supporters, top_againsters, top_voters } =
         data.proposalDetail;
     return (
-        <div className={`${isValidating && "pointer-events-none"}`}>
+        <div>
             <DAODetail
                 proposal={proposal}
                 topSupporters={top_supporters}
                 topAgainsters={top_againsters}
                 topVoters={top_voters}
+                userVoteInfo={accountVotingInfo || defaultVoteInfo}
             />
         </div>
     );

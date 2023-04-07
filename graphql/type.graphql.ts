@@ -47,7 +47,7 @@ export abstract class IQuery {
 
     abstract openedDAOProposals(): DAOProposal[] | Promise<DAOProposal[]>;
 
-    abstract closedDAOProposals(limit?: Nullable<number>, offset?: Nullable<number>, states?: Nullable<string[]>): DAOProposal[] | Promise<DAOProposal[]>;
+    abstract closedDAOProposals(limit?: Nullable<number>, offset?: Nullable<number>, states?: Nullable<string[]>): PaginationProposals | Promise<PaginationProposals>;
 
     abstract proposalDetail(id: number): Nullable<DAOProposalDetail> | Promise<Nullable<DAOProposalDetail>>;
 
@@ -156,6 +156,12 @@ export class DAOActionArguments {
     argument_length?: Nullable<number>;
 }
 
+export class DAOBribeReward {
+    __typename?: 'DAOBribeReward';
+    token_id: string;
+    reward_amount: string;
+}
+
 export class DAOProposal {
     __typename?: 'DAOProposal';
     dest_address: string;
@@ -178,6 +184,7 @@ export class DAOProposal {
     state: string;
     total_supply: string;
     yes_vote: string;
+    bribes: DAOBribeReward[];
 }
 
 export class DAOProposalConfig {
@@ -197,6 +204,12 @@ export class DAOProposalDetail {
     top_voters: string[][];
     top_supporters: string[][];
     top_againsters: string[][];
+}
+
+export class PaginationProposals {
+    __typename?: 'PaginationProposals';
+    total: number;
+    proposals: DAOProposal[];
 }
 
 export class FarmBribe {

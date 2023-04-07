@@ -12,6 +12,7 @@ import useDAOProposalComputedState from "../hooks/useDAOProposalComputedState";
 import useDAOProposalMeta from "../hooks/useDAOProposalMeta";
 import DAOCardBg from "./DAOCardBg";
 import DAOResultBar from "./DAOResultBar";
+import ICBribe from "assets/svg/bribe.svg";
 
 const STATUS_LABEL: Record<DAOStatus, string> = {
     active: "Active - Can vote",
@@ -48,6 +49,8 @@ function DAOCard({ detail, proposal }: DAOCardProps) {
             .unix(canExecuteTS)
             .format("HH:mm [(UTC]Z[)] MMM Do, YYYY");
     }, [canExecuteTS]);
+    const hasBribe = useMemo(() => proposal?.bribes?.length > 0, [proposal.bribes]);
+    const activeBribe = useMemo(() => status === "pending" || status === "active", [status]);
     return (
         <Link
             href={{
@@ -98,8 +101,12 @@ function DAOCard({ detail, proposal }: DAOCardProps) {
                             )}
                         </div>
 
-                        <div className="mb-6 font-bold text-2xl text-stake-gray-500">
-                            #{proposal.proposal_id}
+                        <div className="mb-6 flex items-center">
+                            <span className="mr-4 font-bold text-2xl text-stake-gray-500">#{proposal.proposal_id}</span>
+                            <div className="px-3 py-1.5 bg-ash-dark-400 border border-black flex items-center gap-2">
+                                <span className="font-bold text-xs text-stake-gray-500 leading-[15px]">{hasBribe ? activeBribe ? "Has Bribe" : "Bribe Ended" : "No Bribe"}</span>
+                                <ICBribe className={`-mt-0.5 w-4 h-auto ${hasBribe ? activeBribe ? "text-pink-600" : "text-yellow-600" : "text-ash-gray-600"} ${hasBribe && "colored-drop-shadow-xs colored-drop-shadow-current"}`}/>
+                            </div>
                         </div>
                         <div className="mb-4 font-bold text-lg text-white">
                             {meta.title}

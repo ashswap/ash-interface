@@ -65,8 +65,9 @@ const DAOFilterStatus = memo(function DAOFilterStatus() {
 });
 type DAOListProps = {
     proposals: DAOProposal[];
+    pagination?: React.ReactNode;
 };
-function DAOList({ proposals }: DAOListProps) {
+function DAOList({ proposals, pagination }: DAOListProps) {
     const isFilterOpen = useRecoilValue(DAOFilterOpenProposalAtom);
     const detailView = useRecoilValue(DAODetailViewAtom);
     const label = useMemo(() => {
@@ -118,7 +119,7 @@ function DAOList({ proposals }: DAOListProps) {
                         <DAOFilterStatus />
                     </div>
                 </div>
-                <div className="grow">
+                <div className="grow flex flex-col gap-10">
                     {displayProposals.length > 0 ? (
                         <div className="transition-all grid lg:grid-cols-2 gap-x-7.5 gap-y-[3.25rem]">
                             {displayProposals.map((p) => {
@@ -127,7 +128,7 @@ function DAOList({ proposals }: DAOListProps) {
                                         key={p.proposal_id}
                                         appear
                                         enter="transition-all duration-300"
-                                        enterFrom="scale-50 opacity-0"
+                                        enterFrom="scale-95 opacity-0"
                                         enterTo="scale-100 opacity-100"
                                     >
                                         <DAOCard
@@ -160,6 +161,7 @@ function DAOList({ proposals }: DAOListProps) {
                             </div>
                         </div>
                     )}
+                    {pagination}
                 </div>
             </div>
         </Transition>
