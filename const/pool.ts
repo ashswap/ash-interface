@@ -54,6 +54,19 @@ const devnet: PoolConfig = {
             tokens: [TOKENS_MAP["USDT-3e3720"], TOKENS_MAP["ASH-84eab0"]],
             type: EPoolType.PoolV2,
         },
+        {
+            address:
+                "erd1qqqqqqqqqqqqqpgqy5kf74ltag6235ksu4h653y53w33ysumrmcq07hjd3",
+            lpToken: {
+                identifier: "ALP-33fc69",
+                chainId: ChainId.Devnet,
+                symbol: "LPT-wEGLD-sEGLD",
+                name: "Ashswap LP",
+                decimals: 18,
+            },
+            tokens: [TOKENS_MAP["WEGLD-578a26"], TOKENS_MAP["SEGLD-b8ba9a"]],
+            type: EPoolType.LendingPool,
+        },
     ],
     beta: [
         {

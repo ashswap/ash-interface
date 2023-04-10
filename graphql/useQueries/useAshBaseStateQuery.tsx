@@ -138,6 +138,7 @@ const useAshBaseStateQuery = (config?: SWRConfiguration) => {
                             ...allTokenProps
                         }
                         reserves
+                        underlyingPrices
                         totalSupply
                         swapFeePercent
                         adminFeePercent

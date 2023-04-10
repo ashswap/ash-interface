@@ -10,12 +10,12 @@ import ICSetting from "assets/svg/setting.svg";
 import IconWallet from "assets/svg/wallet.svg";
 import {
     accIsInsufficientEGLDState,
-    accIsLoggedInState
+    accIsLoggedInState,
 } from "atoms/dappState";
 import {
     ashRawPoolV1ByAddressQuery,
     ashRawPoolV2ByAddressQuery,
-    poolV1FeesQuery
+    poolV1FeesQuery,
 } from "atoms/poolsState";
 import BigNumber from "bignumber.js";
 import Avatar from "components/Avatar";
@@ -32,12 +32,13 @@ import OnboardTooltip from "components/Tooltip/OnboardTooltip";
 import { blockTimeMs } from "const/dappConfig";
 import { useSwap } from "context/swap";
 import { toEGLDD } from "helper/balance";
+import { ContractManager } from "helper/contracts/contractManager";
 import { queryPoolContract } from "helper/contracts/pool";
 import CurveV2 from "helper/curveV2/swap";
 import { Fraction } from "helper/fraction/fraction";
 import { Percent } from "helper/fraction/percent";
 import { formatAmount } from "helper/number";
-import { calculateEstimatedSwapOutputAmount2 } from "helper/stableswap/calculator/amounts";
+import { calculateEstimatedSwapOutputAmount } from "helper/stableswap/calculator/amounts";
 import { calculateSwapPrice } from "helper/stableswap/calculator/price";
 import { getTokenIdFromCoin } from "helper/token";
 import { Price } from "helper/token/price";
@@ -290,12 +291,13 @@ const Swap = () => {
                     const reserves = pool.tokens.map(
                         (t, i) => new TokenAmount(t, rawPool.reserves[i])
                     );
-                    const estimated = calculateEstimatedSwapOutputAmount2(
+                    const estimated = calculateEstimatedSwapOutputAmount(
                         new BigNumber(rawPool?.ampFactor || 0),
                         reserves,
                         tokenAmountFrom,
                         tokenTo,
-                        fees
+                        fees,
+                        rawPool.underlyingPrices.map((p) => new BigNumber(p))
                     );
                     return estimated;
                 }
@@ -306,7 +308,6 @@ const Swap = () => {
     const calcPriceImpact = useRecoilCallback(
         ({ snapshot }) =>
             async () => {
-                
                 if (
                     !pool ||
                     !tokenFrom ||
@@ -361,7 +362,9 @@ const Swap = () => {
                             const amt = new TokenAmount(tokenTo, dy);
                             price = new Price(inputAmount, amt);
                         } catch (error) {
-                            Sentry.captureException(error, {extra: {poolV2: pool.address}})
+                            Sentry.captureException(error, {
+                                extra: { poolV2: pool.address },
+                            });
                         }
                     }
                 } else {
@@ -377,7 +380,8 @@ const Swap = () => {
                         reserves,
                         tokenFrom,
                         tokenTo,
-                        fees
+                        fees,
+                        rawPool.underlyingPrices.map((p) => new BigNumber(p))
                     );
                 }
                 const rate = new Price(tokenAmountTo, tokenAmountFrom);
@@ -484,7 +488,7 @@ const Swap = () => {
                 setSwapFeeAmt(estimated.fee.egld.toNumber());
             }
         });
-    }, [getAmountOut, setValueTo, pool, tokenTo, tokenAmountFrom])
+    }, [getAmountOut, setValueTo, pool, tokenTo, tokenAmountFrom]);
 
     const [calcPriceImpactDebounce] = useDebounce(calcPriceImpact, 750);
     const [calcAmountOutDebounce] = useDebounce(calcAmountOut, 200);

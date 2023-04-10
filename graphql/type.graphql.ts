@@ -387,6 +387,7 @@ export class PoolV2 {
     midFee: string;
     outFee: string;
     feeGamma: string;
+    state: boolean;
 }
 
 export class Pool {
@@ -395,6 +396,7 @@ export class Pool {
     lpToken: Token;
     tokens: Token[];
     reserves: string[];
+    underlyingPrices: string[];
     totalSupply?: Nullable<string>;
     swapFeePercent?: Nullable<string>;
     adminFeePercent?: Nullable<string>;
