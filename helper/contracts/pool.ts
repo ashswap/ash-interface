@@ -151,7 +151,7 @@ class PoolContract extends Contract<typeof poolAbi> {
             .withGasLimit(
                 type === "PlainPool"
                     ? 10_000_000 + tokenPayments.length * 2_000_000
-                    : 20_000_000
+                    : 25_000_000
             ); // 20m gas limit for lendingPool with 2 tokens
         interaction = this.interceptInteraction(interaction);
         return interaction.check().buildTransaction();
@@ -161,7 +161,7 @@ class PoolContract extends Contract<typeof poolAbi> {
         tokenPayment: TokenPayment,
         tokensAmtMin: BigNumber[]
     ) {
-        let interaction = this.contract.methods.removeLiquidity(tokensAmtMin);
+        let interaction = this.contract.methods.removeLiquidity([...tokensAmtMin]);
         interaction
             .withSingleESDTTransfer(tokenPayment)
             .withGasLimit(9_000_000);
@@ -182,7 +182,7 @@ class PoolContract extends Contract<typeof poolAbi> {
         ]);
         interaction
             .withSingleESDTTransfer(tokenPayment)
-            .withGasLimit(type === "PlainPool" ? 8_000_000 : 15_000_000); // 15m gas limit for lendingPool
+            .withGasLimit(type === "PlainPool" ? 8_000_000 : 25_000_000); // 15m gas limit for lendingPool sEGLD 25m gas limit for HsEGLD
         return this.interceptInteraction(interaction)
             .check()
             .buildTransaction();

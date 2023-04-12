@@ -58,6 +58,7 @@ import { useRecoilCallback, useRecoilValue } from "recoil";
 import { useDebounce } from "use-debounce";
 import SwapAmount from "./components/SwapAmount";
 import styles from "./Swap.module.css";
+import { TOKENS_MAP } from "const/tokens";
 
 const MaiarPoolTooltip = ({
     children,
@@ -287,15 +288,17 @@ const Swap = () => {
                     const rawPool = await snapshot.getPromise(
                         ashRawPoolV1ByAddressQuery(pool.address || "")
                     );
-                    if (!rawPool) return;
+                    const tokenFromId = getTokenIdFromCoin(tokenAmountFrom.token.identifier);
+                    const tokenToId = getTokenIdFromCoin(tokenTo.identifier);
+                    if (!rawPool || !tokenFromId || !tokenToId) return;
                     const reserves = pool.tokens.map(
                         (t, i) => new TokenAmount(t, rawPool.reserves[i])
                     );
                     const estimated = calculateEstimatedSwapOutputAmount(
                         new BigNumber(rawPool?.ampFactor || 0),
                         reserves,
-                        tokenAmountFrom,
-                        tokenTo,
+                        new TokenAmount(TOKENS_MAP[tokenFromId], tokenAmountFrom.raw),
+                        TOKENS_MAP[tokenToId],
                         fees,
                         rawPool.underlyingPrices.map((p) => new BigNumber(p))
                     );
@@ -371,15 +374,17 @@ const Swap = () => {
                     const rawPool = await snapshot.getPromise(
                         ashRawPoolV1ByAddressQuery(pool.address)
                     );
-                    if (!rawPool) return;
+                    const tokenFromId = getTokenIdFromCoin(tokenFrom.identifier);
+                    const tokenToId = getTokenIdFromCoin(tokenTo.identifier);
+                    if (!rawPool || !tokenFromId || !tokenToId) return;
                     const reserves = pool.tokens.map(
                         (t, i) => new TokenAmount(t, rawPool.reserves[i])
                     );
                     price = calculateSwapPrice(
                         new BigNumber(rawPool?.ampFactor || 0),
                         reserves,
-                        tokenFrom,
-                        tokenTo,
+                        TOKENS_MAP[tokenFromId],
+                        TOKENS_MAP[tokenToId],
                         fees,
                         rawPool.underlyingPrices.map((p) => new BigNumber(p))
                     );
