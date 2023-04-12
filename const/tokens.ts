@@ -9,6 +9,7 @@ import IconWUSDC from "assets/images/wusdc-icon.png";
 import IconBUSD from "assets/images/busd-icon.png";
 import IconWEGLD from "assets/images/wegld-icon-boy.png";
 import IconSEGLD from "assets/images/segld-icon.png";
+import IconHSEGLD from "assets/images/hsegld-icon.png";
 import IconAEGLD from "assets/images/aegld-icon.png";
 import IconUTK from "assets/images/utk-icon.png";
 import IconHTM from "assets/images/htm-icon.png";
@@ -163,6 +164,14 @@ const DEVNET_TOKENS_BETA: IESDTInfo[] = [
         name: "Liquid Staked EGLD",
         decimals: 18,
         logoURI: IconSEGLD.src,
+    },
+    {
+        identifier: "HSEGLD-8f2360",
+        chainId: ChainId.Devnet,
+        symbol: "HsEGLD",
+        name: "Hatom sEGLD",
+        decimals: 8,
+        logoURI: IconHSEGLD.src,
     },
 ];
 

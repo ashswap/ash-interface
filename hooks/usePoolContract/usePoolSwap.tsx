@@ -76,7 +76,7 @@ const usePoolSwap = (trackStatus = false) => {
                     );
                     tx = await poolContract.exchange(
                         tokenPayment,
-                        tokenOut.identifier,
+                        getTokenIdFromCoin(tokenOut.identifier)!,
                         minWeiOut
                     );
                 }

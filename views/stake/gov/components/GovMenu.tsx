@@ -57,23 +57,22 @@ function GovMenu() {
                         </div>
                     )}
                 </ActiveLink>
-                {ENVIRONMENT.ENV === "alpha" &&
-                    ENVIRONMENT.NETWORK === "devnet" && (
-                        <ActiveLink href="/stake/gov/dao" className="shrink-0">
-                            {({ active }) => (
-                                <div
-                                    className={`flex items-center h-8 sm:h-12 px-6 bg-ash-dark-600 text-xs sm:text-sm font-bold ${
-                                        active
-                                            ? "text-pink-600"
-                                            : "text-stake-gray-500"
-                                    }`}
-                                >
-                                    <ICGovVoteSquare className="w-3 h-3 mr-2" />
-                                    Proposal Voting
-                                </div>
-                            )}
-                        </ActiveLink>
-                    )}
+                {ENVIRONMENT.NETWORK === "devnet" && (
+                    <ActiveLink href="/stake/gov/dao" className="shrink-0">
+                        {({ active }) => (
+                            <div
+                                className={`flex items-center h-8 sm:h-12 px-6 bg-ash-dark-600 text-xs sm:text-sm font-bold ${
+                                    active
+                                        ? "text-pink-600"
+                                        : "text-stake-gray-500"
+                                }`}
+                            >
+                                <ICGovVoteSquare className="w-3 h-3 mr-2" />
+                                Proposal Voting
+                            </div>
+                        )}
+                    </ActiveLink>
+                )}
                 {ENVIRONMENT.NETWORK === "devnet" && (
                     <ActiveLink
                         href="/stake/gov/bribe"

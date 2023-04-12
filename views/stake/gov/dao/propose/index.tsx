@@ -30,6 +30,7 @@ import { accIsLoggedInState } from "atoms/dappState";
 import { useConnectWallet } from "hooks/useConnectWallet";
 import { PROPOSALS_UNALIAS, ProposalType, ProposalTypePrefix } from "const/proposal";
 import Link from "next/link";
+import { ENVIRONMENT } from "const/env";
 
 function DAOPropose() {
     const [title, setTitle] = useState("");
@@ -96,7 +97,9 @@ function DAOPropose() {
         return !description || description.length > 520;
     }, [description]);
     const isInvalidDiscussionLink = useMemo(() => {
+        if(ENVIRONMENT.NETWORK === "mainnet")
         return !discussionLink || !discussionLink.startsWith("https://github.com/ashswap/ash-proposals/issues");
+        return !discussionLink;
     }, [discussionLink]);
     const isInsufficientVE = useMemo(() => {
         return veASHAmt.eq(0);
