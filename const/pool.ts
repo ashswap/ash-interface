@@ -75,7 +75,7 @@ const devnet: PoolConfig = {
             lpToken: {
                 identifier: "ALP-9b7a73",
                 chainId: ChainId.Devnet,
-                symbol: "LPT-3pool",
+                symbol: "ALP-3pool",
                 name: "Ashswap LP",
                 decimals: 18,
             },
@@ -92,7 +92,7 @@ const devnet: PoolConfig = {
             lpToken: {
                 identifier: "ALP-6b7c94",
                 chainId: ChainId.Devnet,
-                symbol: "LPT-BUSD-wEGLD",
+                symbol: "ALP-BUSD-wEGLD",
                 name: "Ashswap LP",
                 decimals: 18,
             },
@@ -105,7 +105,7 @@ const devnet: PoolConfig = {
             lpToken: {
                 identifier: "ALP-0e6b1c",
                 chainId: ChainId.Devnet,
-                symbol: "LPT-ASH-USDT",
+                symbol: "ALP-ASH-USDT",
                 name: "Ashswap LP",
                 decimals: 18,
             },
@@ -118,7 +118,7 @@ const devnet: PoolConfig = {
             lpToken: {
                 identifier: "ALP-3c3066",
                 chainId: ChainId.Devnet,
-                symbol: "LPT-BUSD-UTK",
+                symbol: "ALP-BUSD-UTK",
                 name: "Ashswap LP",
                 decimals: 18,
             },
@@ -131,12 +131,28 @@ const devnet: PoolConfig = {
             lpToken: {
                 identifier: "ALP-b9e453",
                 chainId: ChainId.Devnet,
-                symbol: "LPT-USDT-HTM",
+                symbol: "ALP-USDT-HTM",
                 name: "Ashswap LP",
                 decimals: 18,
             },
             tokens: [TOKENS_MAP["USDT-188935"], TOKENS_MAP["HTM-fe1f69"]],
             type: EPoolType.PoolV2,
+        },
+        {
+            address:
+                "erd1qqqqqqqqqqqqqpgq3sfgh89vurcdet6lwl4cysqddeyk0rqh2gesqpkk4e",
+            lpToken: {
+                identifier: "ALP-bf3d53",
+                chainId: ChainId.Devnet,
+                symbol: "ALP-sEGLD",
+                name: "Ashswap LP",
+                decimals: 18,
+            },
+            tokens: [
+                TOKENS_MAP["WEGLD-d7c6bb"],
+                TOKENS_MAP["SEGLD-90b353"],
+            ],
+            type: EPoolType.LendingPool,
         },
     ],
 };

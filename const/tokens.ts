@@ -155,7 +155,15 @@ const DEVNET_TOKENS_BETA: IESDTInfo[] = [
         name: "Utrust",
         decimals: 18,
         logoURI: IconUTK.src,
-    }
+    },
+    {
+        identifier: "SEGLD-90b353",
+        chainId: ChainId.Devnet,
+        symbol: "sEGLD",
+        name: "Liquid Staked EGLD",
+        decimals: 18,
+        logoURI: IconSEGLD.src,
+    },
 ];
 
 const MAINNET_TOKENS: IESDTInfo[] = [
