@@ -15,7 +15,7 @@ import { QuestUserStatsModel } from "interface/quest";
 import { useRouter } from "next/router";
 import { useCallback, useEffect } from "react";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
-import { useDebouncedCallback } from "use-debounce";
+import { useDebounce } from "use-debounce";
 
 const useAshpoint = () => {
     const router = useRouter();
@@ -32,7 +32,7 @@ const useAshpoint = () => {
 
     const getUserStats = useCallback(() => {
         if (
-            ENVIRONMENT.ENABLE_ASHPOINT &&
+            isLoggedIn && address && ENVIRONMENT.ENABLE_ASHPOINT &&
             (ashpointSignature || !ENVIRONMENT.ENABLE_ASHPOINT_SIGN)
         ) {
             logApi
@@ -40,9 +40,9 @@ const useAshpoint = () => {
                 .then((res) => setUserStats(res.data))
                 .catch((err) => Sentry.captureException(err));
         }
-    }, [ashpointSignature, setUserStats]);
+    }, [ashpointSignature, setUserStats, address, isLoggedIn]);
 
-    const getUserStatsDebounce = useDebouncedCallback(getUserStats, 200);
+    const [getUserStatsDebounce] = useDebounce(getUserStats, 200);
 
     useEffect(() => {
         const provider = getAccountProviderType();
