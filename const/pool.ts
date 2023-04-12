@@ -140,7 +140,7 @@ const devnet: PoolConfig = {
         },
         {
             address:
-                "erd1qqqqqqqqqqqqqpgq3sfgh89vurcdet6lwl4cysqddeyk0rqh2gesqpkk4e",
+                "erd1qqqqqqqqqqqqqpgq6t46575knqqfamnchlfgxvd56x2ymhvf2ges6xpr4s",
             lpToken: {
                 identifier: "ALP-bf3d53",
                 chainId: ChainId.Devnet,
@@ -151,6 +151,22 @@ const devnet: PoolConfig = {
             tokens: [
                 TOKENS_MAP["WEGLD-d7c6bb"],
                 TOKENS_MAP["SEGLD-90b353"],
+            ],
+            type: EPoolType.LendingPool,
+        },
+        {
+            address:
+                "erd1qqqqqqqqqqqqqpgqn4uu4yauhv8pjjvhvgxmhyqk82ftzytq2gesrmrprk",
+            lpToken: {
+                identifier: "ALP-9836b4",
+                chainId: ChainId.Devnet,
+                symbol: "ALP-sEGLD",
+                name: "Ashswap LP",
+                decimals: 18,
+            },
+            tokens: [
+                TOKENS_MAP["WEGLD-d7c6bb"],
+                TOKENS_MAP["HSEGLD-8f2360"],
             ],
             type: EPoolType.LendingPool,
         },
