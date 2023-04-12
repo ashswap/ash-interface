@@ -8,6 +8,7 @@ import IconWBTC from "assets/images/wbtc-icon.png";
 import IconWUSDC from "assets/images/wusdc-icon.png";
 import IconBUSD from "assets/images/busd-icon.png";
 import IconWEGLD from "assets/images/wegld-icon-boy.png";
+import IconSEGLD from "assets/images/segld-icon.png";
 import IconAEGLD from "assets/images/aegld-icon.png";
 import IconUTK from "assets/images/utk-icon.png";
 import IconHTM from "assets/images/htm-icon.png";
@@ -72,6 +73,14 @@ const DEVNET_TOKENS_ALPHA: IESDTInfo[] = [
         name: "Wrapped EGLD",
         decimals: 18,
         logoURI: IconWEGLD.src,
+    },
+    {
+        identifier: "SEGLD-b8ba9a",
+        chainId: ChainId.Devnet,
+        symbol: "sEGLD",
+        name: "Liquid Staked EGLD",
+        decimals: 18,
+        logoURI: IconSEGLD.src,
     },
     {
         identifier: "AEGLD-126d13",
@@ -146,7 +155,15 @@ const DEVNET_TOKENS_BETA: IESDTInfo[] = [
         name: "Utrust",
         decimals: 18,
         logoURI: IconUTK.src,
-    }
+    },
+    {
+        identifier: "SEGLD-90b353",
+        chainId: ChainId.Devnet,
+        symbol: "sEGLD",
+        name: "Liquid Staked EGLD",
+        decimals: 18,
+        logoURI: IconSEGLD.src,
+    },
 ];
 
 const MAINNET_TOKENS: IESDTInfo[] = [

@@ -45,6 +45,16 @@ export abstract class IQuery {
 
     abstract boyStatistic(address?: Nullable<string>): Nullable<BoyStatistic> | Promise<Nullable<BoyStatistic>>;
 
+    abstract openedDAOProposals(): DAOProposal[] | Promise<DAOProposal[]>;
+
+    abstract closedDAOProposals(limit?: Nullable<number>, offset?: Nullable<number>, states?: Nullable<string[]>): PaginationProposals | Promise<PaginationProposals>;
+
+    abstract proposalDetail(id: number): Nullable<DAOProposalDetail> | Promise<Nullable<DAOProposalDetail>>;
+
+    abstract daoWhitelistFunctions(): string | Promise<string>;
+
+    abstract proposalConfig(address: string, functionName: string): Nullable<DAOProposalConfig> | Promise<Nullable<DAOProposalConfig>>;
+
     abstract farmBribe(address?: Nullable<string>): FarmBribe | Promise<FarmBribe>;
 
     abstract farmController(address?: Nullable<string>): FarmController | Promise<FarmController>;
@@ -139,6 +149,67 @@ export class Wallet {
     token_in_usd?: Nullable<Nullable<number>[]>;
     total_value_in_usd?: Nullable<number>;
     wallet_address?: Nullable<string>;
+}
+
+export class DAOActionArguments {
+    __typename?: 'DAOActionArguments';
+    argument_length?: Nullable<number>;
+}
+
+export class DAOBribeReward {
+    __typename?: 'DAOBribeReward';
+    token_id: string;
+    reward_amount: string;
+}
+
+export class DAOProposal {
+    __typename?: 'DAOProposal';
+    dest_address: string;
+    function_name: string;
+    arguments: string;
+    min_power_for_propose: string;
+    min_time_for_propose: number;
+    min_support_pct: string;
+    min_quorum_pct: string;
+    voting_time_limit: number;
+    queue_time_limit: number;
+    execute_time_limit: number;
+    created_at: number;
+    executed_at: number;
+    executed_by: string;
+    ipfs_hash: string;
+    no_vote: string;
+    proposal_id: number;
+    proposer: string;
+    state: string;
+    total_supply: string;
+    yes_vote: string;
+    bribes: DAOBribeReward[];
+}
+
+export class DAOProposalConfig {
+    __typename?: 'DAOProposalConfig';
+    min_power_for_propose: string;
+    min_time_for_propose: number;
+    min_support_pct: string;
+    min_quorum_pct: string;
+    voting_time_limit: number;
+    queue_time_limit: number;
+    execute_time_limit: number;
+}
+
+export class DAOProposalDetail {
+    __typename?: 'DAOProposalDetail';
+    proposal?: Nullable<DAOProposal>;
+    top_voters: string[][];
+    top_supporters: string[][];
+    top_againsters: string[][];
+}
+
+export class PaginationProposals {
+    __typename?: 'PaginationProposals';
+    total: number;
+    proposals: DAOProposal[];
 }
 
 export class FarmBribe {
@@ -316,6 +387,7 @@ export class PoolV2 {
     midFee: string;
     outFee: string;
     feeGamma: string;
+    state: boolean;
 }
 
 export class Pool {
@@ -324,6 +396,7 @@ export class Pool {
     lpToken: Token;
     tokens: Token[];
     reserves: string[];
+    underlyingPrices: string[];
     totalSupply?: Nullable<string>;
     swapFeePercent?: Nullable<string>;
     adminFeePercent?: Nullable<string>;

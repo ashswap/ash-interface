@@ -54,6 +54,12 @@ class VotingEscrowContract extends Contract<typeof votingEscowAbi> {
         const { firstValue } = await this.runQuery(interaction);
         return firstValue?.valueOf();
     }
+
+    async getUserBalanceAtTs(address: string, ts: number){
+        let interaction = this.contract.methods.getUserBalanceAtTs([address, ts]);
+        const { firstValue } = await this.runQuery(interaction);
+        return firstValue?.valueOf();
+    }
 }
 
 export default VotingEscrowContract;

@@ -1,0 +1,220 @@
+{
+    "buildInfo": {
+        "rustc": {
+            "version": "1.70.0-nightly",
+            "commitHash": "2036fdd24f77d607dcfaa24c48fbe85d3f785823",
+            "commitDate": "2023-03-27",
+            "channel": "Nightly",
+            "short": "rustc 1.70.0-nightly (2036fdd24 2023-03-27)"
+        },
+        "contractCrate": {
+            "name": "dao_bribe",
+            "version": "0.0.0",
+            "git_version": "ed9a148"
+        },
+        "framework": {
+            "name": "elrond-wasm",
+            "version": "0.33.1"
+        }
+    },
+    "name": "DAOBribe",
+    "constructor": {
+        "inputs": [
+            {
+                "name": "dao_address",
+                "type": "Address"
+            }
+        ],
+        "outputs": []
+    },
+    "endpoints": [
+        {
+            "name": "addRewardAmount",
+            "mutability": "mutable",
+            "payableInTokens": [
+                "*"
+            ],
+            "inputs": [
+                {
+                    "name": "proposal_id",
+                    "type": "u32"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "withdrawReward",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "proposal_id",
+                    "type": "u32"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "getClaimable",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "proposal_id",
+                    "type": "u32"
+                },
+                {
+                    "name": "token_id",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "address",
+                    "type": "Address"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "claimReward",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "proposal_id",
+                    "type": "u32"
+                },
+                {
+                    "name": "tokens",
+                    "type": "variadic<TokenIdentifier>",
+                    "multi_arg": true
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "getDAOAddress",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "Address"
+                }
+            ]
+        },
+        {
+            "name": "getRewardTokens",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "proposal_id",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "variadic<TokenIdentifier>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "getRewardAmount",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "proposal_id",
+                    "type": "u32"
+                },
+                {
+                    "name": "token_id",
+                    "type": "TokenIdentifier"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getRewardAmounts",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "proposal_id",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "variadic<TokenAmount>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "getGivenRewards",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "proposal_id",
+                    "type": "u32"
+                },
+                {
+                    "name": "token_id",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "address",
+                    "type": "Address"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "isClaimed",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "proposal_id",
+                    "type": "u32"
+                },
+                {
+                    "name": "token_id",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "address",
+                    "type": "Address"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "bool"
+                }
+            ]
+        }
+    ],
+    "events": [],
+    "hasCallback": false,
+    "types": {
+        "TokenAmount": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "token",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "amount",
+                    "type": "BigUint"
+                }
+            ]
+        }
+    }
+}
