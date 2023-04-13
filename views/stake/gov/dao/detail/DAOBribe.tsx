@@ -23,6 +23,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
 import useSWR from "swr";
 import DAOClaimBribeRewardModal from "./DAOClaimBribeRewardModal";
+import { ENVIRONMENT } from "const/env";
 
 const predicateCanClaim = {
     [ASHSWAP_CONFIG.dappContract.daoBribe]: ["claimReward"],
@@ -276,13 +277,16 @@ function DAOBribe({ bribes, proposal_id, sharePct, status }: Props) {
                         }`}
                     />
                 </div>
-                <GlowingButton
-                    theme="pink"
-                    className="p-4"
-                    onClick={() => dbWithdrawReward(proposal_id)}
-                >
-                    Test withdraw all
-                </GlowingButton>
+                {ENVIRONMENT.NETWORK === "devnet" &&
+                    ENVIRONMENT.ENV === "alpha" && (
+                        <GlowingButton
+                            theme="pink"
+                            className="p-4"
+                            onClick={() => dbWithdrawReward(proposal_id)}
+                        >
+                            Test withdraw all
+                        </GlowingButton>
+                    )}
             </div>
             <DAOClaimBribeRewardModal
                 isOpen={isOpenClaim}
