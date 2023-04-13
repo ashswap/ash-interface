@@ -61,7 +61,7 @@ const DAOUserVoteActive = memo(function DAOUserVoteActive({
         <div>
             <div className="px-9 pt-10 pb-14 bg-stake-dark-300">
                 <DAOTag status="active" />
-                <div className="mt-12 mb-9 font-bold text-2xl text-white">
+                <div className="mt-6 lg:mt-12 mb-6 lg:mb-9 font-bold text-2xl text-white">
                     {isVoted
                         ? "You've voted on this proposal"
                         : "You can vote on this proposal"}
@@ -150,7 +150,7 @@ const DAOUserVotePending = memo(function DAOUserVotePending({
         <>
             <div className="px-9 pt-10 pb-14 bg-stake-dark-300">
                 <DAOTag status="pending" />
-                <div className="mt-12 mb-9 font-bold text-2xl text-white">
+                <div className="mt-6 lg:mt-12 mb-6 lg:mb-9 font-bold text-2xl text-white">
                     You can vote on this proposal after
                 </div>
                 <div className="font-bold text-sm text-stake-gray-500">
@@ -270,7 +270,7 @@ function DAOUserVote({ proposal, userVoteInfo }: Props) {
                         />
                     )}
                 </div>
-                <div className="mt-12 mb-9 font-bold text-2xl text-white">
+                <div className="mt-6 lg:mt-12 mb-6 lg:mb-9 font-bold text-2xl text-white">
                     {status === "rejected"
                         ? "This proposal has been rejected"
                         : status === "expired"
