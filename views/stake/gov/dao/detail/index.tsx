@@ -12,7 +12,7 @@ import { PROPOSALS_ALIAS, PROPOSALS_CONFIG } from "const/proposal";
 import { gql } from "graphql-request";
 import {
     DAOProposal,
-    DAOProposalDetail as GqlDAOProposalDetail
+    DAOProposalDetail as GqlDAOProposalDetail,
 } from "graphql/type.graphql";
 import { graphqlFetcher } from "helper/common";
 import { ContractManager } from "helper/contracts/contractManager";
@@ -198,17 +198,29 @@ function DAODetail({
                                 ))}
                             </div>
                         </Scrollable>
-                        <hr className="my-12 border-t border-dashed border-t-ash-gray-600"/>
+                        <hr className="my-12 border-t border-dashed border-t-ash-gray-600" />
                         {proposalLabel && (
-                            <div className="mb-3 inline-block p-3 bg-ash-dark-400 font-bold text-xs text-stake-gray-500">
+                            <div className="mb-6 inline-block p-3 bg-ash-dark-400 font-bold text-xs text-stake-gray-500">
                                 {proposalLabel}
                             </div>
                         )}
                         <section ref={descriptionRef}>
-                            <h3 className="mb-4 font-bold text-2xl text-white">
+                            <h3 className="mb-6 font-bold text-2xl text-white">
                                 {meta.title}
                             </h3>
                             <StyledMarkdown>{meta.description}</StyledMarkdown>
+                            <div className="mt-6 break-words">
+                                <span className="inline-block font-bold text-sm text-stake-gray-500">Discussion:&nbsp;</span>
+                                <Link
+                                    href={meta.discussionLink}
+                                    target="_blank"
+                                    className="inline"
+                                >
+                                    <span className="font-bold text-sm text-yellow-600">
+                                        {meta.discussionLink}
+                                    </span>
+                                </Link>
+                            </div>
                             {params && (
                                 <Disclosure>
                                     {({ open, close }) => (
@@ -262,7 +274,7 @@ function DAODetail({
                                 </span>
                             </Link>
                         </section>
-                        <hr className="my-12 border-t border-dashed border-t-ash-gray-600"/>
+                        <hr className="my-12 border-t border-dashed border-t-ash-gray-600" />
                         <section ref={votingRef}>
                             <h2 className="mb-12 font-bold text-2xl text-white">
                                 Voting Results
@@ -320,7 +332,7 @@ function DAODetail({
                                 </div>
                             </div>
                         </section>
-                        <hr className="my-12 border-t border-dashed border-t-ash-gray-600"/>
+                        <hr className="my-12 border-t border-dashed border-t-ash-gray-600" />
                         <section ref={votersRef}>
                             <h2 className="mb-6 font-bold text-2xl text-white">
                                 Voters Table
@@ -337,7 +349,7 @@ function DAODetail({
                                 </div>
                             )}
                         </section>
-                        <hr className="my-12 border-t border-dashed border-t-ash-gray-600"/>
+                        <hr className="my-12 border-t border-dashed border-t-ash-gray-600" />
                         <section ref={chartRef}>
                             <h2 className="mb-6 font-bold text-2xl text-white">
                                 Vote Distribution Chart
@@ -432,9 +444,11 @@ function DAODetailWrapper({ proposalID }: Props) {
     );
 
     useOnTxCompleted(mutateVoteInfo, predicateVoteInfo);
-    const mutateProposalDetail = useCallback(() => {setTimeout(() => {
-        mutate()
-    }, blockTimeMs)}, [mutate]);
+    const mutateProposalDetail = useCallback(() => {
+        setTimeout(() => {
+            mutate();
+        }, blockTimeMs);
+    }, [mutate]);
 
     useOnTxCompleted(mutateProposalDetail, predicateProposalDetail);
     if (!data?.proposalDetail || !data?.proposalDetail.proposal) return null;
