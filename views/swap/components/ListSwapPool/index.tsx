@@ -1,6 +1,8 @@
 // import Token from "components/Token";
+import { Address } from "@multiversx/sdk-core/out";
 import ICArrowRightRounded from "assets/svg/arrow-right-rounded.svg";
 import Avatar from "components/Avatar";
+import pools from "const/pool";
 import { TOKENS_MAP } from "const/tokens";
 import { WRAPPED_EGLD } from "const/wrappedEGLD";
 import { getTokenIdFromCoin } from "helper/token";
@@ -43,16 +45,15 @@ const Pair = ({
     "onSelect" | "isPivotFirst" | "pivotToken"
 >) => {
     const pairTokens = useMemo(() => {
+        if (pool.address === Address.Zero().bech32()) {
+            return pool.tokens.filter(
+                (t) => t.identifier !== props.pivotToken.identifier
+            );
+        }
         const tokens = pool.tokens.filter(
-            (t) => t.identifier !== getTokenIdFromCoin(props.pivotToken.identifier)
+            (t) =>
+                t.identifier !== getTokenIdFromCoin(props.pivotToken.identifier)
         );
-        const useEgld = tokens.some(t => t.identifier === WRAPPED_EGLD.wegld);
-        if(useEgld || props.pivotToken.identifier === WRAPPED_EGLD.wegld){
-            tokens.push(TOKENS_MAP["EGLD"]);
-        }
-        if(props.pivotToken.identifier === "EGLD"){
-            tokens.push(TOKENS_MAP[WRAPPED_EGLD.wegld]);
-        }
         return tokens;
     }, [pool, props.pivotToken]);
     return (
@@ -80,9 +81,18 @@ const Pair = ({
     );
 };
 
+// dunmmy pool data to display wEGLD-EGLD pairs
+const wrapPool = {
+    ...pools[0],
+    address: Address.Zero().bech32(),
+    tokens: [TOKENS_MAP[WRAPPED_EGLD.wegld], TOKENS_MAP["EGLD"]],
+};
 const ListSwapPool = (props: Props) => {
     return (
         <div className="space-y-4">
+            {wrapPool.tokens.some(
+                (t) => t.identifier === props.pivotToken.identifier
+            ) && <Pair {...props} pool={wrapPool} />}
             {props.items.map((pool) => (
                 <Pair key={pool.address} pool={pool} {...props} />
             ))}
