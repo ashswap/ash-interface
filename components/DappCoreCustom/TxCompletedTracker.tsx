@@ -67,6 +67,15 @@ export const TxCompletedTracker = () => {
                         .catch((err) => {
                             Sentry.captureException(err);
                         });
+                } else {
+                    Sentry.captureMessage("Unsent transaction", {
+                        extra: {
+                            isRegistered,
+                            enableAshpointEnv: ENVIRONMENT.ENABLE_ASHPOINT,
+                            provider,
+                            tx,
+                        },
+                    });
                 }
             });
         };
