@@ -14,8 +14,8 @@ import InputCurrency from "components/InputCurrency";
 import TextAmt from "components/TextAmt";
 import Token from "components/Token";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
-import { useSwap } from "context/swap";
 import { toEGLDD } from "helper/balance";
+import { Percent } from "helper/fraction/percent";
 import { formatAmount } from "helper/number";
 import { getTokenFromId } from "helper/token";
 import { TokenAmount } from "helper/token/tokenAmount";
@@ -34,6 +34,9 @@ interface Props {
     onClose?: () => void;
     poolData: Unarray<PoolsState["poolToDisplay"]>;
 }
+// hard-code slippage for removing LP ~ 5%
+// TODO: use global slippage setting
+const slippage = new Percent(5, 100);
 const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
     const { pool, liquidityData } = poolData;
     const { ownLiquidity } = liquidityData!;
@@ -51,7 +54,6 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
     const screenSize = useScreenSize();
     const insufficientEGLD = useRecoilValue(accIsInsufficientEGLDState);
     const { removeLP, trackingData } = usePoolRemoveLP(true);
-    const { slippage } = useSwap();
     const lpTokenMap = useRecoilValue(lpTokenMapState);
 
     const [onboardingWithdrawInput, setOnboardedWithdrawInput] = useOnboarding(
