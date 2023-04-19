@@ -1,17 +1,30 @@
 import { Interaction } from "@multiversx/sdk-core/out";
 import ImgVeASH from "assets/images/ve-ash.png";
+import ICGovVote from "assets/svg/gov-vote.svg";
+import { accAddressState, accIsLoggedInState } from "atoms/dappState";
 import { govVeASHAmtSelector } from "atoms/govState";
 import BigNumber from "bignumber.js";
 import Avatar from "components/Avatar";
 import GlowingButton from "components/GlowingButton";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
+import { ENVIRONMENT } from "const/env";
+import {
+    PROPOSALS_UNALIAS,
+    ProposalType,
+    ProposalTypePrefix,
+} from "const/proposal";
 import { VE_ASH_DECIMALS } from "const/tokens";
 import { gql } from "graphql-request";
 import { DAOProposalConfig } from "graphql/type.graphql";
 import { graphqlFetcher } from "helper/common";
+import { ContractManager } from "helper/contracts/contractManager";
 import { ipfsCluster } from "helper/ipfs";
 import { formatAmount } from "helper/number";
+import { formatDuration } from "helper/time";
+import { useConnectWallet } from "hooks/useConnectWallet";
 import useDAOPropose from "hooks/useDAOContract/useDAOPropose";
+import moment from "moment";
+import Link from "next/link";
 import React, {
     useCallback,
     useEffect,
@@ -24,13 +37,6 @@ import useSWR from "swr";
 import DAOCardBg from "../components/DAOCardBg";
 import DAOActionGenerator from "./Action";
 import ProposalDropdown from "./ProposalDropdown";
-import ICGovVote from "assets/svg/gov-vote.svg";
-import { formatDuration } from "helper/time";
-import { accIsLoggedInState } from "atoms/dappState";
-import { useConnectWallet } from "hooks/useConnectWallet";
-import { PROPOSALS_UNALIAS, ProposalType, ProposalTypePrefix } from "const/proposal";
-import Link from "next/link";
-import { ENVIRONMENT } from "const/env";
 
 function DAOPropose() {
     const [title, setTitle] = useState("");
@@ -43,6 +49,7 @@ function DAOPropose() {
     const connectWallet = useConnectWallet();
     const [proposalType, setProposalType] =
         useState<ProposalType>("fc:addFarm");
+    const userAddress = useRecoilValue(accAddressState);
     const address = useMemo(() => {
         const type = proposalType.split(":")[0] as ProposalTypePrefix;
         return PROPOSALS_UNALIAS[type];
@@ -50,6 +57,11 @@ function DAOPropose() {
     const functionName = useMemo(
         () => proposalType.split(":")[1],
         [proposalType]
+    );
+    const { data: lastCreateProposalTS } = useSWR(userAddress, (address) =>
+        ContractManager.getDAOContract(ASHSWAP_CONFIG.dappContract.dao)
+            .getLastCreateProposal(address)
+            .then((ts) => ts.toNumber())
     );
     const { data } = useSWR<{ proposalConfig: DAOProposalConfig }>(
         [
@@ -97,13 +109,34 @@ function DAOPropose() {
         return !description || description.length > 520;
     }, [description]);
     const isInvalidDiscussionLink = useMemo(() => {
-        if(ENVIRONMENT.NETWORK === "mainnet")
-        return !discussionLink || !discussionLink.startsWith("https://github.com/ashswap/ash-proposals/issues");
+        if (ENVIRONMENT.NETWORK === "mainnet")
+            return (
+                !discussionLink ||
+                !discussionLink.startsWith(
+                    "https://github.com/ashswap/ash-proposals/issues"
+                )
+            );
         return !discussionLink;
     }, [discussionLink]);
     const isInsufficientVE = useMemo(() => {
         return veASHAmt.eq(0);
     }, [veASHAmt]);
+    const isWaitNextPropose = useMemo(() => {
+        return (
+            lastCreateProposalTS &&
+            moment().unix() - lastCreateProposalTS <
+                proposalConfig.min_time_for_propose
+        );
+    }, [lastCreateProposalTS, proposalConfig.min_time_for_propose]);
+    const minProposeDate = useMemo(() => {
+        return lastCreateProposalTS
+            ? moment
+                  .unix(
+                      proposalConfig.min_time_for_propose + lastCreateProposalTS
+                  )
+                  .format("Do MMM, YYYY")
+            : "";
+    }, [lastCreateProposalTS, proposalConfig.min_time_for_propose]);
     const onProposalChange = useCallback((proposal: ProposalType) => {
         setProposalType(proposal);
     }, []);
@@ -213,23 +246,24 @@ function DAOPropose() {
                                 </span>
                             </label>
                             <div className="bg-ash-dark-400">
-                            <input
-                                type="text"
-                                name="title"
-                                id="propose-title"
-                                placeholder="A short summary of your proposal"
-                                className={`p-4 w-full bg-ash-dark-400 font-bold text-xs leading-normal outline-none placeholder:text-ash-gray-600 border ${
-                                    isClickedSubmit && isInvalidTitle
-                                        ? "border-ash-purple-500"
-                                        : "border-transparent"
-                                }`}
-                                maxLength={120}
-                                value={title}
-                                onChange={(e) => setTitle(e.target.value)}
-                            />
-                            <div className="p-4 pt-0 font-medium text-2xs text-ash-gray-600 text-right">{title.length}/120</div>
+                                <input
+                                    type="text"
+                                    name="title"
+                                    id="propose-title"
+                                    placeholder="A short summary of your proposal"
+                                    className={`p-4 w-full bg-ash-dark-400 font-bold text-xs leading-normal outline-none placeholder:text-ash-gray-600 border ${
+                                        isClickedSubmit && isInvalidTitle
+                                            ? "border-ash-purple-500"
+                                            : "border-transparent"
+                                    }`}
+                                    maxLength={120}
+                                    value={title}
+                                    onChange={(e) => setTitle(e.target.value)}
+                                />
+                                <div className="p-4 pt-0 font-medium text-2xs text-ash-gray-600 text-right">
+                                    {title.length}/120
+                                </div>
                             </div>
-                            
                         </div>
                         <div>
                             <label
@@ -244,21 +278,25 @@ function DAOPropose() {
                                 </span>
                             </label>
                             <div className="bg-ash-dark-400">
-                            <textarea
-                                name="description"
-                                id="propose-description"
-                                rows={5}
-                                placeholder={`## Summary\n\nYour proposal will be formatted using Markdown.`}
-                                className={`p-4 w-full bg-ash-dark-400 font-bold text-xs leading-normal outline-none placeholder:text-ash-gray-600 resize-none overflow-auto border ${
-                                    isClickedSubmit && isInvalidDesc
-                                        ? "border-ash-purple-500"
-                                        : "border-transparent"
-                                }`}
-                                maxLength={520}
-                                value={description}
-                                onChange={(e) => setDescription(e.target.value)}
-                            />
-                            <div className="p-4 pt-0 font-medium text-2xs text-ash-gray-600 text-right">{description.length}/520</div>
+                                <textarea
+                                    name="description"
+                                    id="propose-description"
+                                    rows={5}
+                                    placeholder={`## Summary\n\nYour proposal will be formatted using Markdown.`}
+                                    className={`p-4 w-full bg-ash-dark-400 font-bold text-xs leading-normal outline-none placeholder:text-ash-gray-600 resize-none overflow-auto border ${
+                                        isClickedSubmit && isInvalidDesc
+                                            ? "border-ash-purple-500"
+                                            : "border-transparent"
+                                    }`}
+                                    maxLength={520}
+                                    value={description}
+                                    onChange={(e) =>
+                                        setDescription(e.target.value)
+                                    }
+                                />
+                                <div className="p-4 pt-0 font-medium text-2xs text-ash-gray-600 text-right">
+                                    {description.length}/520
+                                </div>
                             </div>
                         </div>
                         <div>
@@ -281,7 +319,9 @@ function DAOPropose() {
                             <textarea
                                 name="discussionLink"
                                 id="propose-discussion-link"
-                                placeholder={"To create a proposal on Dapp, you must first initiate a discussion on our forum.\n\nURL must start with https://github.com/ashswap/ash-proposals/issues"}
+                                placeholder={
+                                    "To create a proposal on Dapp, you must first initiate a discussion on our forum.\n\nURL must start with https://github.com/ashswap/ash-proposals/issues"
+                                }
                                 rows={3}
                                 className={`p-4 w-full bg-ash-dark-400 font-bold text-xs leading-normal outline-none placeholder:text-ash-gray-600 resize-none overflow-auto border ${
                                     isClickedSubmit && isInvalidDiscussionLink
@@ -339,11 +379,18 @@ function DAOPropose() {
                     <GlowingButton
                         theme="pink"
                         type="submit"
-                        disabled={isInsufficientVE || isPending || isUploading}
+                        disabled={
+                            isWaitNextPropose ||
+                            isInsufficientVE ||
+                            isPending ||
+                            isUploading
+                        }
                         loading={isPending || isUploading}
                         className="mt-4 w-full h-18 font-bold text-sm text-white uppercase disabled:bg-stake-dark-300"
                     >
-                        {isInsufficientVE ? (
+                        {isWaitNextPropose ? (
+                            `YOU CANNOT CREATE PROPOSAL UNTILL: ${minProposeDate}`
+                        ) : isInsufficientVE ? (
                             <span className="uppercase">
                                 Insufficient{" "}
                                 <span className="text-ash-purple-500">
