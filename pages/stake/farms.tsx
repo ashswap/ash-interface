@@ -1,4 +1,5 @@
 import ICArrowRight from "assets/svg/arrow-right.svg";
+import BasicLayout from "components/Layout/Basic";
 import StakeLayout from "components/Layout/stake";
 import { ReactElement, useRef } from "react";
 import FarmLayout from "views/stake/farms/FarmLayout";
@@ -38,6 +39,8 @@ function FarmsPage() {
     );
 }
 FarmsPage.getLayout = function getLayout(page: ReactElement) {
-    return <StakeLayout>{page}</StakeLayout>;
+    return <BasicLayout>
+        <StakeLayout>{page}</StakeLayout>
+    </BasicLayout>;
 };
 export default FarmsPage;

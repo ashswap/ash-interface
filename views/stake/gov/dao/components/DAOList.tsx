@@ -103,7 +103,7 @@ function DAOList({ proposals, pagination }: DAOListProps) {
                 <div className="shrink-0 md:w-48">
                     <div className="md:absolute inset-x-0 z-[-1]">
                         <div
-                            className="mb-3 border-b border-b-ash-gray-600 text-left font-bold text-[3.5rem] text-ash-gray-600 uppercase"
+                            className="mb-3 border-b border-b-ash-gray-600 text-left font-bold text-3xl md:text-[3.5rem] leading-tight text-ash-gray-600 uppercase"
                             style={{
                                 WebkitTextStroke: "1px currentColor",
                                 WebkitTextFillColor: "transparent",

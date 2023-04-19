@@ -1,21 +1,20 @@
-import ICArrowRight from "assets/svg/arrow-right.svg";
+import Breadcrumb from "components/Breadcrumb";
+import BasicLayout from "components/Layout/Basic";
 import GovLayout from "components/Layout/Gov";
+import StakeLayout from "components/Layout/stake";
 import { ReactElement } from "react";
 import VotePowerChart from "views/components/VotePowerChart";
 import WeeklyFeeTable from "views/components/WeeklyFeeTable";
 import GovStats from "views/stake/gov/GovStats";
-
+const breadcrumbLinks = [
+    { label: "Stake" },
+    { label: "Governance Stake" },
+];
 function GovPage() {
     return (
         <>
             <div className="ash-container text-white pt-[1.875rem]">
-                <ul className="flex flex-wrap space-x-1 mb-4 md:mb-[3.25rem] text-sm md:text-lg font-bold">
-                    <li>Stake</li>
-                    <li className="text-ash-gray-500">
-                        <ICArrowRight className="inline mr-1" />
-                        <span>Governance Stake</span>
-                    </li>
-                </ul>
+                <Breadcrumb links={breadcrumbLinks}/>
                 <div className="mb-9">
                     <GovStats />
                 </div>
@@ -33,6 +32,12 @@ function GovPage() {
     );
 }
 GovPage.getLayout = function getLayout(page: ReactElement) {
-    return <GovLayout>{page}</GovLayout>;
+    return (
+        <BasicLayout>
+            <StakeLayout>
+                <GovLayout>{page}</GovLayout>
+            </StakeLayout>
+        </BasicLayout>
+    );
 };
 export default GovPage;

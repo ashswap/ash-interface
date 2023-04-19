@@ -1,33 +1,30 @@
-import ICArrowRight from "assets/svg/arrow-right.svg";
+import Breadcrumb from "components/Breadcrumb";
+import BasicLayout from "components/Layout/Basic";
 import GovLayout from "components/Layout/Gov";
+import StakeLayout from "components/Layout/stake";
+import NavGov from "components/Nav/NavGov";
 import { GraphOptions } from "graphql/type";
 import useGraphQLQueryOptions from "graphql/useQueries/useGraphQLQueryOptions";
 import { ReactElement } from "react";
-import GovMenu from "views/stake/gov/components/GovMenu";
 import FarmWeightOverview from "views/stake/gov/farmWeight/FarmWeightOverview";
-const queryOptions: GraphOptions = {withFC: true, withFB: true};
+const breadcrumbLinks = [
+    { label: "Stake" },
+    { label: "Governance Stake", href: "/stake/gov" },
+    { label: "Farm Weight Voting" },
+];
+const queryOptions: GraphOptions = { withFC: true, withFB: true };
 function FarmWeightPage() {
     useGraphQLQueryOptions(queryOptions);
-    
+
     return (
         <>
             <div className="ash-container text-white pt-[1.875rem]">
-                <ul className="flex flex-wrap space-x-1 mb-4 md:mb-[3.25rem] text-sm md:text-lg font-bold">
-                    <li>Stake</li>
-                    <li>
-                        <ICArrowRight className="inline mr-1" />
-                        <span>Governance Stake</span>
-                    </li>
-                    <li className="text-ash-gray-500">
-                        <ICArrowRight className="inline mr-1" />
-                        <span>Farm Weight Voting</span>
-                    </li>
-                </ul>
+                <Breadcrumb links={breadcrumbLinks} />
                 <div className="mb-7">
                     <h1 className="text-pink-600 text-2xl md:text-5xl font-bold mb-7 md:mb-11">
                         Farm Weight Voting
                     </h1>
-                    <GovMenu />
+                    <NavGov />
                 </div>
                 <FarmWeightOverview />
             </div>
@@ -36,7 +33,13 @@ function FarmWeightPage() {
 }
 
 FarmWeightPage.getLayout = function getLayout(page: ReactElement) {
-    return <GovLayout>{page}</GovLayout>;
+    return (
+        <BasicLayout>
+            <StakeLayout>
+                <GovLayout>{page}</GovLayout>
+            </StakeLayout>
+        </BasicLayout>
+    );
 };
 
 export default FarmWeightPage;
