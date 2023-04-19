@@ -86,6 +86,12 @@ const BaseModal = (props: BaseModalType) => {
     }, [props.isOpen]);
 
     useEffect(() => {
+        return () => {
+            window.document.body.style.overflow = ""
+        }
+    }, []);
+
+    useEffect(() => {
         if (props.isOpen) {
             setInitialized(true);
         }

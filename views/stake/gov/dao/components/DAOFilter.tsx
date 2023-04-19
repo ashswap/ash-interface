@@ -16,9 +16,9 @@ function DAOFilter(props: DAOFilterProps) {
     );
     return (
         <div className="flex flex-wrap justify-between items-center gap-4">
-            <div className="duration-500 flex font-bold text-2xl text-stake-gray-500">
+            <div className="duration-500 flex space-x-4 sm:space-x-8 font-bold text-sm sm:text-2xl text-stake-gray-500">
                 <button
-                    className={`mr-8 ${
+                    className={`${
                         isFilteredOpen && "text-pink-600"
                     }`}
                     onClick={() => setIsFilteredOpen(true)}
@@ -32,24 +32,25 @@ function DAOFilter(props: DAOFilterProps) {
                     Closed
                 </button>
             </div>
-            <div className="flex items-center gap-4">
-                <div className="h-12 px-6 bg-ash-dark-600 flex items-center">
+            <div className="flex items-center justify-between gap-4 overflow-hidden">
+                <div className="h-10 sm:h-12 px-4 sm:px-6 bg-ash-dark-600 flex items-center overflow-hidden">
                     <Switch
                         checked={DAODetailView}
                         onChange={(val) => setDAODetailView(val)}
-                        className="flex items-center"
+                        className="flex items-center py-2 overflow-hidden"
                     >
-                        <span className="inline-block ml-2 mt-1 font-bold text-stake-gray-500">
+                        <span className="inline-block ml-2 sm:mt-1 font-bold text-xs sm:text-sm text-stake-gray-500 truncate">
                             Detail View
                         </span>
                     </Switch>
                 </div>
-                <Link href="/stake/gov/dao/propose">
+                <Link href="/stake/gov/dao/propose" className="inline-block overflow-hidden">
                     <GlowingButton
                         theme="pink"
-                        className="clip-corner-1 clip-corner-br h-12 px-6 font-bold text-sm"
+                        wrapperClassName="overflow-hidden max-w-full"
+                        className="max-w-full clip-corner-1 clip-corner-br h-10 sm:h-12 px-4 sm:px-6 font-bold text-xs sm:text-sm overflow-hidden"
                     >
-                        Create proposal
+                        <span className="inline-block truncate">Create proposal</span>
                     </GlowingButton>
                 </Link>
             </div>

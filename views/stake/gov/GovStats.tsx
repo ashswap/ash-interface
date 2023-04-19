@@ -21,8 +21,8 @@ import {
 import { tokenMapState } from "atoms/tokensState";
 import Avatar from "components/Avatar";
 import BaseModal from "components/BaseModal";
-import GlowingButton from "components/GlowingButton";
 import GOVStakeModal from "components/GOVStakeModal";
+import GlowingButton from "components/GlowingButton";
 import TextAmt from "components/TextAmt";
 import CardTooltip from "components/Tooltip/CardTooltip";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
@@ -42,7 +42,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
 import useSWR from "swr";
-import GovMenu from "./components/GovMenu";
+import NavGov from "components/Nav/NavGov";
 const ExpiredLockTooltip = ({
     children,
     disabled,
@@ -131,7 +131,7 @@ function GovStats() {
                 <h1 className="text-pink-600 text-2xl md:text-5xl font-bold mb-7 md:mb-11">
                     Governance Stake
                 </h1>
-                <GovMenu />
+                <NavGov />
             </div>
             <div className="flex flex-col md:flex-row">
                 <div className="md:w-[21.875rem] shrink-0 flex flex-col px-7 lg:px-9 pb-9 pt-7 lg:pt-14 bg-stake-dark-400 mb-4 md:mb-0 md:mr-4 lg:mr-[1.875rem]">
