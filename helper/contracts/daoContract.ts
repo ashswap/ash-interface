@@ -23,6 +23,12 @@ class DAOContract extends Contract<typeof daoAbi> {
         return firstValue?.valueOf() || {yes_vote: new BigNumber(0), no_vote: new BigNumber(0)} ;
     }
 
+    async getLastCreateProposal(address: string): Promise<BigNumber> {
+        let interaction = this.contract.methods.getLastCreateProposal([address]);
+        const {firstValue} = await this.runQuery(interaction);
+        return firstValue?.valueOf();
+    }
+
     async propose(meta: string, action: DAOAction) {
         let interaction = this.contract.methods.propose([meta, action]);
         interaction.withGasLimit(12_000_000);
