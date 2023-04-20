@@ -101,7 +101,7 @@ function DAOOverview() {
 
     const data = useMemo(() => {
         return {
-            openedDAOProposals: _data?.openedDAOProposals.filter(p => p.proposal_id !== 7),
+            openedDAOProposals: _data?.openedDAOProposals?.filter(p => p.proposal_id !== 7),
             closedDAOProposals: _data?.closedDAOProposals
         }
     }, [_data]);

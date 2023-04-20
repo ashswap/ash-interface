@@ -429,9 +429,13 @@ function DAODetailWrapper({ proposalID }: Props) {
               ]
             : null;
     }, [proposalID]);
-    const { data, mutate } = useSWR<{
+    const { data: _data, mutate } = useSWR<{
         proposalDetail: GqlDAOProposalDetail;
     }>(query, graphqlFetcher);
+
+    const data = useMemo(() => {
+        return _data?.proposalDetail?.proposal?.proposal_id === 7 ? undefined : _data;
+    }, [_data])
 
     const { data: accountVotingInfo, mutate: mutateVoteInfo } = useSWR(
         [proposalID, address],
