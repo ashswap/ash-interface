@@ -8,20 +8,32 @@ import { memo, useMemo } from "react";
 
 type Props = {
     items?: string[][];
+    totalPower: BigNumber.Value;
 };
-function DAOVoteChart({ items = [] }: Props) {
+function DAOVoteChart({ items = [], totalPower }: Props) {
     const screenSize = useScreenSize();
     const data: DounutChartRecord[] = useMemo(() => {
-        return (items || []).map(([address, power], i) => {
+        let otherPowers = new BigNumber(totalPower || 0);
+        const records = (items || []).slice(0, 10).map(([address, power], i) => {
             const record: DounutChartRecord = {
                 id: address,
                 name: shortenString(address),
                 value: new BigNumber(power).div(1e18).toNumber(),
                 theme: HEX_COLORS[i] ?? getHexColor(address),
             };
+            otherPowers = otherPowers.minus(record.value);
             return record;
         });
-    }, [items]);
+        if(otherPowers.gt(0)){
+            records.push({
+                id: "othersProposalVoterPower",
+                name: "Others",
+                value: otherPowers.toNumber(),
+                theme: getHexColor('othersProposalVoterPower'),
+            })
+        }
+        return records;
+    }, [items, totalPower]);
     const radius = useMemo(() => {
         return screenSize.isMobile ? 90 : 130;
     }, [screenSize.isMobile]);
