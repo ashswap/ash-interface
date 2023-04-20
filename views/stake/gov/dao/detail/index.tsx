@@ -81,6 +81,7 @@ function DAODetail({
         yesVote,
         noVote,
         expiredTS,
+        totalVotedPower,
     } = useDAOProposalComputedState(proposal);
     const proposalLabel = useMemo(() => {
         return (
@@ -355,7 +356,7 @@ function DAODetail({
                                 Vote Distribution Chart
                             </h2>
                             {topVoters.length > 0 ? (
-                                <DAOVoteChart items={topVoters} />
+                                <DAOVoteChart items={topVoters} totalPower={totalVotedPower} />
                             ) : (
                                 <div className="py-10 font-bold text-sm text-stake-gray-500 text-center">
                                     No Information

@@ -26,6 +26,9 @@ const useDAOProposalComputedState = (proposal: DAOProposal) => {
                 .toNumber(),
         [proposal.min_quorum_pct]
     );
+    const totalVotedPower = useMemo(() => {
+        return new BigNumber(proposal.yes_vote).plus(proposal.no_vote).div(1e18).toNumber();
+    }, [proposal.no_vote, proposal.yes_vote]);
     const supportPct = useMemo(() => {
         const sum = new BigNumber(proposal.yes_vote).plus(proposal.no_vote);
         if (sum.eq(0)) return 0;
@@ -74,6 +77,7 @@ const useDAOProposalComputedState = (proposal: DAOProposal) => {
         status,
         yesVote,
         noVote,
+        totalVotedPower,
         canExecuteTS,
         canExecute,
         expiredTS,
