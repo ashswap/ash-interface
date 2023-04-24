@@ -84,13 +84,50 @@ const DEVNET_TOKENS_ALPHA: IESDTInfo[] = [
         logoURI: IconSEGLD.src,
     },
     {
-        identifier: "AEGLD-126d13",
+        identifier: "AEGLD-581e63",
         chainId: ChainId.Devnet,
         symbol: "aEGLD",
         name: "A EGLD",
         decimals: 18,
         logoURI: IconAEGLD.src,
     },
+    {
+        identifier: "AUSD-47f281",
+        chainId: ChainId.Devnet,
+        symbol: "aUSD",
+        name: "A USD",
+        decimals: 18,
+        logoURI: "",
+    },
+    // LP Tokens
+    {
+        identifier: "ALP-cc035f",
+        chainId: ChainId.Devnet,
+        symbol: "LPT-3pool",
+        name: "Ashswap LP",
+        decimals: 18,
+    },
+    {
+        identifier: "ALP-543842",
+        chainId: ChainId.Devnet,
+        symbol: "LPT-BUSD-wEGLD",
+        name: "Ashswap LP",
+        decimals: 18,
+    },
+    {
+        identifier: "ALP-6bb819",
+        chainId: ChainId.Devnet,
+        symbol: "LPT-AUSD-3Pool",
+        name: "Ashswap LP",
+        decimals: 18,
+    },
+    {
+        identifier: "ALP-193fb4",
+        chainId: ChainId.Devnet,
+        symbol: "LPT-ASH-USDT",
+        name: "Ashswap LP",
+        decimals: 18,
+    }
 ];
 const DEVNET_TOKENS_BETA: IESDTInfo[] = [
     {
@@ -173,6 +210,56 @@ const DEVNET_TOKENS_BETA: IESDTInfo[] = [
         decimals: 8,
         logoURI: IconHSEGLD.src,
     },
+    // LP tokens
+    {
+        identifier: "ALP-9b7a73",
+        chainId: ChainId.Devnet,
+        symbol: "ALP-3pool",
+        name: "Ashswap LP",
+        decimals: 18,
+    },
+    {
+        identifier: "ALP-6b7c94",
+        chainId: ChainId.Devnet,
+        symbol: "ALP-BUSD-wEGLD",
+        name: "Ashswap LP",
+        decimals: 18,
+    },
+    {
+        identifier: "ALP-0e6b1c",
+        chainId: ChainId.Devnet,
+        symbol: "ALP-ASH-USDT",
+        name: "Ashswap LP",
+        decimals: 18,
+    },
+    {
+        identifier: "ALP-3c3066",
+        chainId: ChainId.Devnet,
+        symbol: "ALP-BUSD-UTK",
+        name: "Ashswap LP",
+        decimals: 18,
+    },
+    {
+        identifier: "ALP-b9e453",
+        chainId: ChainId.Devnet,
+        symbol: "ALP-USDT-HTM",
+        name: "Ashswap LP",
+        decimals: 18,
+    },
+    {
+        identifier: "ALP-bf3d53",
+        chainId: ChainId.Devnet,
+        symbol: "ALP-sEGLD",
+        name: "Ashswap LP",
+        decimals: 18,
+    },
+    {
+        identifier: "ALP-9836b4",
+        chainId: ChainId.Devnet,
+        symbol: "ALP-HsEGLD",
+        name: "Ashswap LP",
+        decimals: 18,
+    }
 ];
 
 const MAINNET_TOKENS: IESDTInfo[] = [
@@ -224,6 +311,28 @@ const MAINNET_TOKENS: IESDTInfo[] = [
         decimals: 18,
         logoURI: IconBUSD.src,
     },
+    // LP Tokens
+    {
+        identifier: "ALP-afc922",
+        chainId: ChainId.Mainnet,
+        symbol: "ALP-3pool",
+        name: "Ashswap LP",
+        decimals: 18,
+    },
+    {
+        identifier: "ALP-5f9191",
+        chainId: ChainId.Mainnet,
+        symbol: "ALP-BUSD-WEGLD",
+        name: "Ashswap LP",
+        decimals: 18,
+    },
+    {
+        identifier: "ALP-2d0cf8",
+        chainId: ChainId.Mainnet,
+        symbol: "ALP-USDT-ASH",
+        name: "Ashswap LP",
+        decimals: 18,
+    }
 ];
 
 export const TOKENS =

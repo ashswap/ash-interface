@@ -280,7 +280,8 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
                         });
                     } else if (
                         p.type === EPoolType.PlainPool ||
-                        p.type === EPoolType.LendingPool
+                        p.type === EPoolType.LendingPool ||
+                        p.type === EPoolType.MetaPool
                     ) {
                         const poolV1 = await snapshot.getPromise(
                             ashRawPoolV1ByAddressQuery(pool.address)

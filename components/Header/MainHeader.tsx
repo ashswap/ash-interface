@@ -15,8 +15,8 @@ const NavLazy = dynamic(import("components/Nav").then((m) => m.default));
 function MainHeader() {
     const { isMobile } = useScreenSize();
     return (
-        <header className="px-6 sm:px-12 py-5">
-            <div className="flex justify-between items-center gap-4 relative z-20">
+        <header className="px-6 sm:px-12 py-5 relative z-20">
+            <div className="flex justify-between items-center gap-4">
                 <Link href="/">
                     <div className="cursor-pointer">
                         <span className="hidden lg:inline-block">

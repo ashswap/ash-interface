@@ -27,7 +27,7 @@ const useGetTokens = (config?: SWRConfiguration) => {
     const tokenIds = useMemo(
         () => [
             ...TOKENS.map((t) => t.identifier).filter(t => t !== "EGLD"),
-            ...pools.map((p) => p.lpToken.identifier),
+            // ...pools.map((p) => p.lpToken.identifier),
         ],
         []
     );
