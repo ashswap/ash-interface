@@ -245,12 +245,21 @@ const useFarmsState = () => {
                 ASH_TOKEN.decimals,
                 ashPerSec.multipliedBy(365 * 24 * 60 * 60)
             );
-            const ashBaseAPR = totalLiquidityValue.gt(0)
+            // APR base on total farm token supply
+            // calc total number of ash value over a year generated from single farm token -> APR_F (1) (base on farm token)
+            // because of the boost mechanism. The real APR base on the underlying LP in farm token
+            // -> minimum APR = APR_F * 0.4; maximum APR = APR_F * 0.4 * 2.5 = APR_F;
+            // woking balance in USD is total farm token supply in USD (with assumption that all farm tokens are boosted which mean 1 farm_token = 1 LP) 
+            const { valueUsd: workingBalanceUsd } = await lpBreak(
+                p.address,
+                farmTokenSupply.toString() // cause farm decimals = LP decimals = 18
+            );
+            const ashBaseAPR = workingBalanceUsd.gt(0)
                 ? totalASHPerYear
-                      .multipliedBy(tokenMap[ASH_TOKEN.identifier]?.price || 0)
-                      .multipliedBy(0.4)
+                      .multipliedBy(tokenMap[ASH_TOKEN.identifier]?.price || 0) // get total value of ASH in USD
+                      .multipliedBy(0.4) // get the base APR in case 0.25 farm_token = 1 LP
                       .multipliedBy(100)
-                      .div(totalLiquidityValue)
+                      .div(workingBalanceUsd)
                       .toNumber()
                 : 0;
             const tradingAPR = poolState?.poolStats?.apr || 0;
@@ -308,7 +317,7 @@ const useFarmsState = () => {
                     balance,
                     attributes,
                     attrsRaw: token.attributes,
-                    weightBoost: perLP.div(0.4),
+                    weightBoost: perLP.div(0.4).toNumber(),
                     yieldBoost: +new BigNumber(yieldBoostRaw).toFixed(
                         2,
                         BigNumber.ROUND_DOWN
@@ -362,7 +371,7 @@ const useFarmsState = () => {
                     totalStakedLPValue: totalStakedLP
                         .multipliedBy(totalLiquidityValue)
                         .div(lpLockedAmt),
-                    weightBoost: farmBalance.div(totalStakedLP).div(0.4),
+                    weightBoost: farmBalance.div(totalStakedLP).div(0.4).toNumber(),
                     yieldBoost,
                     totalAPR:
                         ashBaseAPR * yieldBoost +
