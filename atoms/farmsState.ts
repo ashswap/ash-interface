@@ -16,7 +16,7 @@ export type FarmToken = {
     balance: BigNumber;
     attributes: FarmTokenAttrs;
     attrsRaw: string;
-    weightBoost: BigNumber;
+    weightBoost: number;
     yieldBoost: number;
     perLP: BigNumber;
     lpAmt: BigNumber;
@@ -32,7 +32,7 @@ export type FarmRecord = {
         totalRewardAmt: BigNumber;
         rewards: TokenAmount[];
         totalStakedLPValue: BigNumber;
-        weightBoost: BigNumber;
+        weightBoost: number;
         yieldBoost: number;
         totalAPR: number;
     };

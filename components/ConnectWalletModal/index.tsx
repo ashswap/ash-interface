@@ -54,6 +54,7 @@ function ConnectWalletModal() {
     );
     const [webWalletLogin] = useWebWalletLogin({
         callbackRoute: "",
+        nativeAuth: true,
     });
     const loginMethodName = useConnectMethod();
     useEffect(() => {

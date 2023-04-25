@@ -8,9 +8,11 @@ import { memo, useMemo } from "react";
 import { useRecoilValue } from "recoil";
 const ASHRewardBreakdownTable = memo(function ASHRewardBreakdownTable({
     currentBoost,
+    weightBoost,
     baseAPR,
 }: {
     currentBoost: number;
+    weightBoost: number;
     baseAPR: number;
 }) {
     return (
@@ -22,7 +24,7 @@ const ASHRewardBreakdownTable = memo(function ASHRewardBreakdownTable({
                     </td>
                     <td className="px-4 py-1 border border-ash-gray-600 font-bold text-ash-purple-500">
                         <span className="text-sm sm:text-lg underline">
-                            {formatAmount(currentBoost * baseAPR)}
+                            {formatAmount(weightBoost * baseAPR)}
                         </span>
                         <span className="text-2xs">%</span>
                     </td>
@@ -75,128 +77,130 @@ const FarmAPRBreakdown = ({
     const boost = useMemo(() => farmData.stakedData?.yieldBoost, [farmData]);
     return (
         <>
-                            <div className="mb-6 font-bold text-xs text-stake-gray-500">
-                        Total APR = Token rewards + Trading APR
-                    </div>
-                    <div className="flex flex-col space-y-4">
-                        <div>
-                            <div className="flex justify-between items-center">
-                                {stakedData ? (
-                                    <span className="font-bold text-sm text-ash-purple-500">
-                                        <BaseTooltip
-                                            placement="bottom"
-                                            content={
-                                                <div
-                                                    className={`max-w-[25rem] sm:max-w-[28rem] clip-corner-4 clip-corner-bl bg-clip-border p-[1px] backdrop-blur-[30px] transition-all overflow-hidden`}
-                                                >
-                                                    <div className="clip-corner-4 clip-corner-br p-7 bg-ash-dark-600/50 backdrop-blur-[30px] text-stake-gray-500 font-bold text-xs sm:text-sm break-words">
-                                                        <ASHRewardBreakdownTable
-                                                            baseAPR={ashBaseAPR}
-                                                            currentBoost={
-                                                                stakedData.yieldBoost
-                                                            }
-                                                        />
-                                                    </div>
-                                                </div>
-                                            }
+            <div className="mb-6 font-bold text-xs text-stake-gray-500">
+                Total APR = Token rewards + Trading APR
+            </div>
+            <div className="flex flex-col space-y-4">
+                <div>
+                    <div className="flex justify-between items-center">
+                        {stakedData ? (
+                            <span className="font-bold text-sm text-ash-purple-500">
+                                <BaseTooltip
+                                    placement="bottom"
+                                    content={
+                                        <div
+                                            className={`max-w-[25rem] sm:max-w-[28rem] clip-corner-4 clip-corner-bl bg-clip-border p-[1px] backdrop-blur-[30px] transition-all overflow-hidden`}
                                         >
-                                            <span className="underline">
-                                                {formatAmount(
-                                                    stakedData.yieldBoost *
-                                                        ashBaseAPR
-                                                )}
-                                            </span>
-                                        </BaseTooltip>
-                                        <span className="text-2xs">%</span>
-                                    </span>
-                                ) : (
-                                    <div className="flex items-center space-x-1.5 font-bold text-sm text-ash-purple-500">
-                                        <span>
-                                            <span className="underline">
-                                                {formatAmount(ashBaseAPR)}
-                                            </span>
-                                            <span className="text-2xs">%</span>
-                                        </span>
-                                        <ICArrowRight className="w-3 h-auto" />
-                                        <span>
-                                            <span className="underline">
-                                                {formatAmount(ashBaseAPR * 2.5)}
-                                            </span>
-                                            <span className="text-2xs">%</span>
-                                        </span>
-                                    </div>
-                                )}
-                                <div className="font-bold text-xs text-stake-gray-500 underline">
-                                    ASH incentive
-                                </div>
-                            </div>
-                        </div>
-                        {tokensAPR.map((t) => {
-                            const token = TOKENS_MAP[t.tokenId];
-                            return (
-                                <div
-                                    key={t.tokenId}
-                                    className="flex justify-between items-center"
+                                            <div className="clip-corner-4 clip-corner-br p-7 bg-ash-dark-600/50 backdrop-blur-[30px] text-stake-gray-500 font-bold text-xs sm:text-sm break-words">
+                                                <ASHRewardBreakdownTable
+                                                    baseAPR={ashBaseAPR}
+                                                    currentBoost={
+                                                        stakedData.yieldBoost
+                                                    }
+                                                    weightBoost={
+                                                        stakedData.weightBoost
+                                                    }
+                                                />
+                                            </div>
+                                        </div>
+                                    }
                                 >
-                                    <div className="flex items-center font-bold text-sm text-ash-purple-500">
-                                        <span>
-                                            <span className="underline">
-                                                {formatAmount(t.apr)}
-                                            </span>
-                                            <span className="text-2xs">%</span>
-                                        </span>
-                                    </div>
-                                    <div className="font-bold text-xs text-stake-gray-500 underline">
-                                        {token?.symbol} incentive
-                                    </div>
-                                </div>
-                            );
-                        })}
-                        <div className="flex justify-between items-center">
-                            <div className="flex items-center font-bold text-sm text-yellow-600">
+                                    <span className="underline">
+                                        {formatAmount(
+                                            stakedData.weightBoost * ashBaseAPR
+                                        )}
+                                    </span>
+                                </BaseTooltip>
+                                <span className="text-2xs">%</span>
+                            </span>
+                        ) : (
+                            <div className="flex items-center space-x-1.5 font-bold text-sm text-ash-purple-500">
                                 <span>
                                     <span className="underline">
-                                        {formatAmount(tradingAPR)}
+                                        {formatAmount(ashBaseAPR)}
+                                    </span>
+                                    <span className="text-2xs">%</span>
+                                </span>
+                                <ICArrowRight className="w-3 h-auto" />
+                                <span>
+                                    <span className="underline">
+                                        {formatAmount(ashBaseAPR * 2.5)}
+                                    </span>
+                                    <span className="text-2xs">%</span>
+                                </span>
+                            </div>
+                        )}
+                        <div className="font-bold text-xs text-stake-gray-500 underline">
+                            ASH incentive
+                        </div>
+                    </div>
+                </div>
+                {tokensAPR.map((t) => {
+                    const token = TOKENS_MAP[t.tokenId];
+                    return (
+                        <div
+                            key={t.tokenId}
+                            className="flex justify-between items-center"
+                        >
+                            <div className="flex items-center font-bold text-sm text-ash-purple-500">
+                                <span>
+                                    <span className="underline">
+                                        {formatAmount(t.apr)}
                                     </span>
                                     <span className="text-2xs">%</span>
                                 </span>
                             </div>
                             <div className="font-bold text-xs text-stake-gray-500 underline">
-                                Trading APR
+                                {token?.symbol} incentive
                             </div>
                         </div>
-                        <div className="border-t border-ash-cyan-500"></div>
-                        <div className="flex justify-between items-center">
-                            {stakedData ? (
-                                <span className="font-bold text-sm text-ash-cyan-500">
-                                    <span className="underline">
-                                        {formatAmount(stakedData.totalAPR)}
-                                    </span>
-                                    <span className="text-2xs">%</span>
-                                </span>
-                            ) : (
-                                <div className="flex items-center space-x-1.5 font-bold text-sm text-ash-cyan-500">
-                                    <span>
-                                        <span className="underline">
-                                            {formatAmount(totalAPRMin)}
-                                        </span>
-                                        <span className="text-2xs">%</span>
-                                    </span>
-                                    <ICArrowRight className="w-3 h-auto" />
-                                    <span>
-                                        <span className="underline">
-                                            {formatAmount(totalAPRMax)}
-                                        </span>
-                                        <span className="text-2xs">%</span>
-                                    </span>
-                                </div>
-                            )}
-
-                            <div className="font-bold text-sm text-white underline">
-                                Total APR
-                            </div>
-                        </div>
+                    );
+                })}
+                <div className="flex justify-between items-center">
+                    <div className="flex items-center font-bold text-sm text-yellow-600">
+                        <span>
+                            <span className="underline">
+                                {formatAmount(tradingAPR)}
+                            </span>
+                            <span className="text-2xs">%</span>
+                        </span>
                     </div>
+                    <div className="font-bold text-xs text-stake-gray-500 underline">
+                        Trading APR
+                    </div>
+                </div>
+                <div className="border-t border-ash-cyan-500"></div>
+                <div className="flex justify-between items-center">
+                    {stakedData ? (
+                        <span className="font-bold text-sm text-ash-cyan-500">
+                            <span className="underline">
+                                {formatAmount(stakedData.totalAPR)}
+                            </span>
+                            <span className="text-2xs">%</span>
+                        </span>
+                    ) : (
+                        <div className="flex items-center space-x-1.5 font-bold text-sm text-ash-cyan-500">
+                            <span>
+                                <span className="underline">
+                                    {formatAmount(totalAPRMin)}
+                                </span>
+                                <span className="text-2xs">%</span>
+                            </span>
+                            <ICArrowRight className="w-3 h-auto" />
+                            <span>
+                                <span className="underline">
+                                    {formatAmount(totalAPRMax)}
+                                </span>
+                                <span className="text-2xs">%</span>
+                            </span>
+                        </div>
+                    )}
+
+                    <div className="font-bold text-sm text-white underline">
+                        Total APR
+                    </div>
+                </div>
+            </div>
         </>
     );
 };
