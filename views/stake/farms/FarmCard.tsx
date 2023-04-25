@@ -80,9 +80,11 @@ const EstimateInUSD = ({
 };
 const ASHRewardBreakdownTable = memo(function ASHRewardBreakdownTable({
     currentBoost,
+    weightBoost,
     baseAPR,
 }: {
     currentBoost: number;
+    weightBoost: number;
     baseAPR: number;
 }) {
     return (
@@ -94,7 +96,7 @@ const ASHRewardBreakdownTable = memo(function ASHRewardBreakdownTable({
                     </td>
                     <td className="px-4 py-1 border border-ash-gray-600 font-bold text-ash-purple-500">
                         <span className="text-sm sm:text-lg underline">
-                            {formatAmount(currentBoost * baseAPR)}
+                            {formatAmount(weightBoost * baseAPR)}
                         </span>
                         <span className="text-2xs">%</span>
                     </td>
@@ -168,6 +170,7 @@ const FarmAPRBreakdown = ({
                                                             currentBoost={
                                                                 stakedData.yieldBoost
                                                             }
+                                                            weightBoost={stakedData.weightBoost}
                                                         />
                                                     </div>
                                                 </div>
@@ -175,7 +178,7 @@ const FarmAPRBreakdown = ({
                                         >
                                             <span className="underline">
                                                 {formatAmount(
-                                                    stakedData.yieldBoost *
+                                                    stakedData.weightBoost *
                                                         ashBaseAPR
                                                 )}
                                             </span>
