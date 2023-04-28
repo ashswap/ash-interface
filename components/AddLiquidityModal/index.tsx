@@ -437,7 +437,7 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
                     </div>
                     <div>
                         But if you need to swap to have the correct amounts, it
-                        is better to deposit in unbalanced/single-sided ways.
+                        is better to deposit in unbalanced/single-sided way.
                     </div>
                 </div>
             </div>
