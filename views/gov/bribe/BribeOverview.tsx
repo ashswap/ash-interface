@@ -37,39 +37,42 @@ function BribeOverview() {
 
     return (
         <>
-            <div className="mt-20 lg:flex lg:space-x-7.5">
-                <div className="w-full lg:w-1/3">
-                    <h2 className="font-bold text-3xl text-stake-gray-500 leading-tight mb-6">
+            <div className="mt-20">
+                <div className="mb-14 sm:flex items-center justify-between gap-4">
+                    <h2 className="mb-4 sm:mb-0 font-bold text-2xl text-stake-gray-500 leading-tight">
                         Get more for your votes
                     </h2>
-                    <Input
-                        className="w-full md:max-w-80 h-12 px-5"
-                        backgroundClassName="bg-ash-dark-700"
-                        textColorClassName="text-input-3"
-                        placeholder="Search reward..."
-                        type="text"
-                        textAlign="left"
-                        textClassName="font-normal text-xs md:text-sm"
-                        suffix={<ICSearch />}
-                        value={keyword}
-                        onChange={(e) => {
-                            setKeyword(e.target.value);
-                        }}
-                    />
-                    <div className="font-bold text-2xl text-white my-20">
-                        - or -
+                    <div className="shrink-0 flex gap-4">
+                        <Input
+                            className="grow md:min-w-[16rem] h-12 px-5"
+                            backgroundClassName="bg-ash-dark-700"
+                            textColorClassName="text-input-3"
+                            placeholder="Search reward..."
+                            type="text"
+                            textAlign="left"
+                            textClassName="font-normal text-xs md:text-sm"
+                            suffix={<ICSearch />}
+                            value={keyword}
+                            onChange={(e) => {
+                                setKeyword(e.target.value);
+                            }}
+                        />
+                        <GlowingButton
+                            theme="cyan"
+                            className="shrink-0 lg:min-w-[10rem] h-12 px-4 clip-corner-1 clip-corner-br flex items-center justify-center font-bold text-sm text-ash-dark-400"
+                            onClick={() =>
+                                isLoggedIn
+                                    ? setIsOpenBribe(true)
+                                    : connectWallet()
+                            }
+                        >
+                            Create Bribe
+                        </GlowingButton>
                     </div>
-                    <GlowingButton
-                        theme="cyan"
-                        className="w-full sm:max-w-xs h-20 flex items-center justify-center font-bold text-lg text-ash-dark-400"
-                        onClick={() => isLoggedIn ? setIsOpenBribe(true) : connectWallet()}
-                    >
-                        Create Bribe
-                    </GlowingButton>
                 </div>
                 <Transition
                     show={displayFarms.length > 0}
-                    className="mt-20 lg:mt-0 lg:w-2/3 grid md:grid-cols-2 gap-x-7.5 gap-y-14"
+                    className="grid md:grid-cols-2 lg:grid-cols-3 gap-x-7.5 gap-y-14"
                     {...TRANSITIONS.fadeIn}
                 >
                     {displayFarms.map((f) => (
@@ -81,7 +84,8 @@ function BribeOverview() {
                         </Transition.Child>
                     ))}
                 </Transition>
-                {!displayFarms.length && <div className="lg:w-2/3 flex justify-center">
+                {!displayFarms.length && (
+                    <div className="flex justify-center">
                         <div className="flex items-center justify-center pt-20 pb-28">
                             <div className="w-36">
                                 <Image
@@ -95,7 +99,8 @@ function BribeOverview() {
                                 <div>Bribery does not exist.</div>
                             </div>
                         </div>
-                    </div>}
+                    </div>
+                )}
             </div>
             <FarmBribeModal
                 isOpen={isOpenBribe}
