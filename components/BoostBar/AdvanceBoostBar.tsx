@@ -72,7 +72,7 @@ const AdvanceBoostBar = ({
                                 times, go{" "}
                                 <Link
                                     href={{
-                                        pathname: "/stake/gov/boost",
+                                        pathname: "/gov/boost",
                                         query: {
                                             p: encode({
                                                 farmAddress,

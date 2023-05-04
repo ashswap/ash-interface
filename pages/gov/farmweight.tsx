@@ -5,45 +5,34 @@ import StakeLayout from "components/Layout/stake";
 import NavGov from "components/Nav/NavGov";
 import { GraphOptions } from "graphql/type";
 import useGraphQLQueryOptions from "graphql/useQueries/useGraphQLQueryOptions";
-import { useRouter } from "next/router";
-import { ReactElement, useEffect, useMemo } from "react";
-import DAODetail from "views/stake/gov/dao/detail";
+import { ReactElement } from "react";
+import FarmWeightOverview from "views/gov/farmWeight/FarmWeightOverview";
 const breadcrumbLinks = [
     { label: "Stake" },
-    { label: "Governance Stake", href: "/stake/gov" },
-    { label: "DAO", href: "/stake/gov/dao" },
-    { label: "Detail" },
+    { label: "Governance Stake", href: "/gov/stake" },
+    { label: "Farm Weight Voting" },
 ];
-const queryOptions: GraphOptions = {};
-function DAODetailPage() {
+const queryOptions: GraphOptions = { withFC: true, withFB: true };
+function FarmWeightPage() {
     useGraphQLQueryOptions(queryOptions);
-    const router = useRouter();
-    const proposalID = useMemo(
-        () => +((router.query.proposalID as string) ?? -1),
-        [router]
-    );
-    useEffect(() => {
-        if (proposalID === -1 || Number.isNaN(proposalID)) {
-            router.replace("/stake/gov/dao");
-        }
-    }, [proposalID, router]);
+
     return (
         <>
             <div className="ash-container text-white pt-[1.875rem]">
                 <Breadcrumb links={breadcrumbLinks} />
                 <div className="mb-7">
                     <h1 className="text-pink-600 text-2xl md:text-5xl font-bold mb-7 md:mb-11">
-                        <span className="text-white">Ashswap </span>Proposal
+                        Farm Weight Voting
                     </h1>
                     <NavGov />
                 </div>
-                <DAODetail proposalID={proposalID} />
+                <FarmWeightOverview />
             </div>
         </>
     );
 }
 
-DAODetailPage.getLayout = function getLayout(page: ReactElement) {
+FarmWeightPage.getLayout = function getLayout(page: ReactElement) {
     return (
         <BasicLayout>
             <StakeLayout>
@@ -52,4 +41,5 @@ DAODetailPage.getLayout = function getLayout(page: ReactElement) {
         </BasicLayout>
     );
 };
-export default DAODetailPage;
+
+export default FarmWeightPage;

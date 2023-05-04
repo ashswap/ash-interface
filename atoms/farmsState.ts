@@ -6,7 +6,7 @@ import { PoolStatsRecord } from "interface/poolStats";
 import { IMetaESDT } from "interface/tokens";
 import { atom, selector, selectorFamily } from "recoil";
 import { KeyedMutator } from "swr";
-import { ViewType } from "views/stake/farms/FarmFilter";
+import { ViewType } from "views/farms/FarmFilter";
 import { ashswapBaseState } from "./ashswap";
 import { accAddressState } from "./dappState";
 export type FarmToken = {
@@ -116,7 +116,7 @@ export const farmToDisplayState = selector<FarmRecord[]>({
         }
         switch (sortOption) {
             case "apr":
-                result = result.sort((x, y) => (y.totalAPRMax) - x.totalAPRMax);
+                result = result.sort((x, y) => y.totalAPRMax - x.totalAPRMax);
                 break;
             case "liquidity":
                 result = result.sort((x, y) =>
@@ -268,7 +268,9 @@ export const farmTokensRefresherAtom = atom<KeyedMutator<IMetaESDT[]>>({
 
 export const farmNumberOfAdditionalRewards = selectorFamily<number, string>({
     key: "farm_number_of_additional_rewards",
-    get: (address: string) => ({get}) => {
-        return get(ashRawFarmQuery(address))?.additionalRewards.length || 0;
-    }
-})
+    get:
+        (address: string) =>
+        ({ get }) => {
+            return get(ashRawFarmQuery(address))?.additionalRewards.length || 0;
+        },
+});

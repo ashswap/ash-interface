@@ -24,8 +24,8 @@ import ICGovBoostSquare from "assets/svg/gov-boost-square.svg";
 import ICGovVoteSquare from "assets/svg/gov-vote-square.svg";
 import { useTrackTransactionStatus } from "@multiversx/sdk-dapp/hooks";
 const SOCIALS = [
-    { name: "Liquidity Stake", url: "/stake/farms" },
-    { name: "Governance Stake", url: "/stake/gov" },
+    { name: "Liquidity Stake", url: "/farms" },
+    { name: "Governance Stake", url: "/gov/stake" },
 ];
 function HeadlessLink(
     props: Parameters<typeof Link>[0]
@@ -66,7 +66,7 @@ function StakeMenu() {
                     onOpenChange={(val) => setOpenTooltip(val)}
                     content={
                         <div className="grid grid-cols-3 w-screen max-w-5xl gap-1">
-                            <Link href="/stake/farms">
+                            <Link href="/farms">
 
                                 <div
                                     className={`transition-all bg-stake-dark-400 hover:bg-[#454765] ${styles.stakeMenuItem} p-4 md:p-8 h-full`}
@@ -94,7 +94,7 @@ function StakeMenu() {
                                 </div>
 
                             </Link>
-                            <Link href="/stake/gov">
+                            <Link href="/gov/stake">
 
                                 <div
                                     className={`transition-all bg-stake-dark-400 hover:bg-[#454765] ${styles.stakeMenuItem} p-4 md:p-8 h-full`}

@@ -126,7 +126,7 @@ function BribeCard({ fbFarm }: Props) {
                             </div>
                             <Link
                                 href={{
-                                    pathname: "/stake/gov/farmweight",
+                                    pathname: "/gov/farmweight",
                                     query: {
                                         farmAddress: fbFarm.address,
                                     },

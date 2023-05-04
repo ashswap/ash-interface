@@ -5,16 +5,13 @@ import StakeLayout from "components/Layout/stake";
 import { ReactElement } from "react";
 import VotePowerChart from "views/components/VotePowerChart";
 import WeeklyFeeTable from "views/components/WeeklyFeeTable";
-import GovStats from "views/stake/gov/GovStats";
-const breadcrumbLinks = [
-    { label: "Stake" },
-    { label: "Governance Stake" },
-];
+import GovStats from "views/gov/GovStats";
+const breadcrumbLinks = [{ label: "Stake" }, { label: "Governance Stake" }];
 function GovPage() {
     return (
         <>
             <div className="ash-container text-white pt-[1.875rem]">
-                <Breadcrumb links={breadcrumbLinks}/>
+                <Breadcrumb links={breadcrumbLinks} />
                 <div className="mb-9">
                     <GovStats />
                 </div>

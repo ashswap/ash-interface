@@ -1,6 +1,6 @@
 import GovLayout from "components/Layout/Gov";
 import NavGov from "components/Nav/NavGov";
-import DAODetailWrapper from "views/stake/gov/dao/detail";
+import DAODetailWrapper from "views/gov/dao/detail";
 
 function DAODetailDyn({ proposalID }: { proposalID: number }) {
     return (

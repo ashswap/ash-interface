@@ -28,11 +28,11 @@ function NavMobile() {
                         <ICPool className="w-4 h-auto" />
                         <span>Pool</span>
                     </NavLink>
-                    <NavLink href="/stake/farms">
+                    <NavLink href="/farms">
                         <ICFarm className="w-4 h-auto" />
                         <span>Farm</span>
                     </NavLink>
-                    <NavLink href="/stake/gov" className="overflow-hidden">
+                    <NavLink href="/gov/stake" className="overflow-hidden">
                         <ICStake className="w-4 h-auto" />
                         <span className="w-full inline-block truncate">Governance</span>
                     </NavLink>

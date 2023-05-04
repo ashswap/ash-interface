@@ -13,7 +13,7 @@ function NavGov() {
             direction="horizontal"
         >
             <div className="flex space-x-2">
-                <ActiveLink href="/stake/gov" exact className="shrink-0">
+                <ActiveLink href="/gov/stake" exact className="shrink-0">
                     {({ active }) => (
                         <div
                             className={`flex items-center h-8 sm:h-12 px-6 bg-ash-dark-600 text-xs sm:text-sm font-bold ${
@@ -25,7 +25,7 @@ function NavGov() {
                         </div>
                     )}
                 </ActiveLink>
-                <ActiveLink href="/stake/gov/boost" exact className="shrink-0">
+                <ActiveLink href="/gov/boost" exact className="shrink-0">
                     {({ active }) => (
                         <div
                             className={`flex items-center h-8 sm:h-12 px-6 bg-ash-dark-600 text-xs sm:text-sm font-bold ${
@@ -38,7 +38,7 @@ function NavGov() {
                     )}
                 </ActiveLink>
                 <ActiveLink
-                    href="/stake/gov/farmweight"
+                    href="/gov/farmweight"
                     exact
                     className="shrink-0"
                 >
@@ -54,7 +54,7 @@ function NavGov() {
                     )}
                 </ActiveLink>
                 {ENVIRONMENT.NETWORK === "devnet" && (
-                    <ActiveLink href="/stake/gov/dao" className="shrink-0">
+                    <ActiveLink href="/gov/dao" className="shrink-0">
                         {({ active }) => (
                             <div
                                 className={`flex items-center h-8 sm:h-12 px-6 bg-ash-dark-600 text-xs sm:text-sm font-bold ${
@@ -71,7 +71,7 @@ function NavGov() {
                 )}
                 {ENVIRONMENT.NETWORK === "devnet" && (
                     <ActiveLink
-                        href="/stake/gov/bribe"
+                        href="/gov/bribe"
                         exact
                         className="shrink-0"
                     >
