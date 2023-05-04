@@ -50,7 +50,7 @@ const FarmRecord = memo(function FarmRecord({
         () => +(fcAccFarm?.voteUserSlope?.power || "0"),
         [fcAccFarm]
     );
-    const bribeUrl = useMemo(() => "/stake/gov/bribe", []);
+    const bribeUrl = useMemo(() => "/gov/bribe", []);
 
     const lastUserVote = useMemo(
         () => fcAccFarm?.lastUserVote || 0,
@@ -351,7 +351,7 @@ const VoteEditor = memo(function VoteEditor({ farmAddress }: VoteEditorProps) {
                         {veAmt.eq(0) ? (
                             <div className="mt-2 font-bold text-2xs text-stake-gray-500">
                                 Stake ASH{" "}
-                                <Link href="/stake/gov">
+                                <Link href="/gov/stake">
                                     <span className="text-pink-600 underline">
                                         here
                                     </span>

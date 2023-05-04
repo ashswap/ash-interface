@@ -2,8 +2,8 @@ import ICArrowRight from "assets/svg/arrow-right.svg";
 import BasicLayout from "components/Layout/Basic";
 import StakeLayout from "components/Layout/stake";
 import { ReactElement, useRef } from "react";
-import FarmLayout from "views/stake/farms/FarmLayout";
-import FarmStats from "views/stake/farms/FarmStats";
+import FarmLayout from "views/farms/FarmLayout";
+import FarmStats from "views/farms/FarmStats";
 
 function FarmsPage() {
     const farmLayoutContainerRef = useRef<HTMLDivElement>(null);
@@ -39,8 +39,10 @@ function FarmsPage() {
     );
 }
 FarmsPage.getLayout = function getLayout(page: ReactElement) {
-    return <BasicLayout>
-        <StakeLayout>{page}</StakeLayout>
-    </BasicLayout>;
+    return (
+        <BasicLayout>
+            <StakeLayout>{page}</StakeLayout>
+        </BasicLayout>
+    );
 };
 export default FarmsPage;

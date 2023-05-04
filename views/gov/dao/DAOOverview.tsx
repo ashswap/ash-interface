@@ -124,7 +124,7 @@ function DAOOverview() {
                 <DAOList
                     proposals={proposals}
                     pagination={
-                        !isFilteredOpen && (
+                        !isFilteredOpen && proposals.length > 0 && (
                             <Pagination
                                 total={data?.closedDAOProposals?.total}
                                 size={size}

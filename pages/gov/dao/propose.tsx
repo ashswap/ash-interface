@@ -6,11 +6,11 @@ import NavGov from "components/Nav/NavGov";
 import { GraphOptions } from "graphql/type";
 import useGraphQLQueryOptions from "graphql/useQueries/useGraphQLQueryOptions";
 import { ReactElement } from "react";
-import DAOPropose from "views/stake/gov/dao/propose";
+import DAOPropose from "views/gov/dao/propose";
 const breadcrumbLinks = [
     { label: "Stake" },
-    { label: "Governance Stake", href: "/stake/gov" },
-    { label: "DAO", href: "/stake/gov/dao" },
+    { label: "Governance Stake", href: "/gov/stake" },
+    { label: "DAO", href: "/gov/dao" },
     { label: "Propose" },
 ];
 const queryOptions: GraphOptions = {};

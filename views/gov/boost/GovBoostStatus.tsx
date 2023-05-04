@@ -43,7 +43,7 @@ import { FarmBoostInfo } from "interface/farm";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRecoilCallback, useRecoilValue } from "recoil";
-import FarmBoostTooltip from "views/stake/farms/FarmBoostTooltip";
+import FarmBoostTooltip from "views/farms/FarmBoostTooltip";
 const FarmRecord = ({
     farmData,
     label,
@@ -322,14 +322,18 @@ function GovBoostStatus() {
                                     t.balance
                                 )
                         );
-                        const numberOfAdditionalRewards = await snapshot.getPromise(
-                            farmNumberOfAdditionalRewards(farm.farm_address)
-                        );
+                        const numberOfAdditionalRewards =
+                            await snapshot.getPromise(
+                                farmNumberOfAdditionalRewards(farm.farm_address)
+                            );
                         farmsAddress.push(farm.farm_address);
                         return await ContractManager.getFarmContract(
                             farm.farm_address
                         )
-                            .withContext({lastRewardBlockTs, numberOfAdditionalRewards})
+                            .withContext({
+                                lastRewardBlockTs,
+                                numberOfAdditionalRewards,
+                            })
                             .claimRewards(tokenPayments);
                     });
                 const { sessionId, error } = await sendTransactions({
@@ -406,7 +410,7 @@ function GovBoostStatus() {
                                 <div>You&apos;ve not entered any farms yet</div>
                                 <div>
                                     Go{" "}
-                                    <Link href="/stake/farms">
+                                    <Link href="/farms">
                                         <span className="underline text-ash-cyan-500">
                                             stake LP-Tokens
                                         </span>

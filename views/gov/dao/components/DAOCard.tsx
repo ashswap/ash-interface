@@ -54,7 +54,7 @@ function DAOCard({ detail, proposal }: DAOCardProps) {
     return (
         <Link
             href={{
-                pathname: "/stake/gov/dao/detail",
+                pathname: "/gov/dao/detail",
                 query: { proposalID: proposal.proposal_id },
             }}
         >

@@ -6,33 +6,33 @@ import NavGov from "components/Nav/NavGov";
 import { GraphOptions } from "graphql/type";
 import useGraphQLQueryOptions from "graphql/useQueries/useGraphQLQueryOptions";
 import { ReactElement } from "react";
-import FarmWeightOverview from "views/stake/gov/farmWeight/FarmWeightOverview";
+import DAOOverview from "views/gov/dao/DAOOverview";
 const breadcrumbLinks = [
     { label: "Stake" },
-    { label: "Governance Stake", href: "/stake/gov" },
-    { label: "Farm Weight Voting" },
+    { label: "Governance Stake", href: "/gov/stake" },
+    { label: "DAO" },
 ];
-const queryOptions: GraphOptions = { withFC: true, withFB: true };
-function FarmWeightPage() {
+const queryOptions: GraphOptions = {};
+function DAOPage() {
     useGraphQLQueryOptions(queryOptions);
 
     return (
         <>
             <div className="ash-container text-white pt-[1.875rem]">
                 <Breadcrumb links={breadcrumbLinks} />
-                <div className="mb-7">
+                <div className="mb-7 sm:mb-20">
                     <h1 className="text-pink-600 text-2xl md:text-5xl font-bold mb-7 md:mb-11">
-                        Farm Weight Voting
+                        <span className="text-white">Ashswap </span>Proposal
                     </h1>
                     <NavGov />
                 </div>
-                <FarmWeightOverview />
+                <DAOOverview />
             </div>
         </>
     );
 }
 
-FarmWeightPage.getLayout = function getLayout(page: ReactElement) {
+DAOPage.getLayout = function getLayout(page: ReactElement) {
     return (
         <BasicLayout>
             <StakeLayout>
@@ -42,4 +42,4 @@ FarmWeightPage.getLayout = function getLayout(page: ReactElement) {
     );
 };
 
-export default FarmWeightPage;
+export default DAOPage;

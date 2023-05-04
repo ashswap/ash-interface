@@ -5,33 +5,45 @@ import StakeLayout from "components/Layout/stake";
 import NavGov from "components/Nav/NavGov";
 import { GraphOptions } from "graphql/type";
 import useGraphQLQueryOptions from "graphql/useQueries/useGraphQLQueryOptions";
-import { ReactElement } from "react";
-import BribeOverview from "views/stake/gov/bribe/BribeOverview";
+import { useRouter } from "next/router";
+import { ReactElement, useEffect, useMemo } from "react";
+import DAODetail from "views/gov/dao/detail";
 const breadcrumbLinks = [
     { label: "Stake" },
-    { label: "Governance Stake", href: "/stake/gov" },
-    { label: "Bribe" },
+    { label: "Governance Stake", href: "/gov/stake" },
+    { label: "DAO", href: "/gov/dao" },
+    { label: "Detail" },
 ];
-const queryOptions: GraphOptions = { withFB: true, withFC: true };
-function BribePage() {
+const queryOptions: GraphOptions = {};
+function DAODetailPage() {
     useGraphQLQueryOptions(queryOptions);
+    const router = useRouter();
+    const proposalID = useMemo(
+        () => +((router.query.proposalID as string) ?? -1),
+        [router]
+    );
+    useEffect(() => {
+        if (proposalID === -1 || Number.isNaN(proposalID)) {
+            router.replace("/gov/dao");
+        }
+    }, [proposalID, router]);
     return (
         <>
             <div className="ash-container text-white pt-[1.875rem]">
                 <Breadcrumb links={breadcrumbLinks} />
                 <div className="mb-7">
                     <h1 className="text-pink-600 text-2xl md:text-5xl font-bold mb-7 md:mb-11">
-                        <span className="text-white">Ashswap </span>Bribe
+                        <span className="text-white">Ashswap </span>Proposal
                     </h1>
                     <NavGov />
                 </div>
-                <BribeOverview />
+                <DAODetail proposalID={proposalID} />
             </div>
         </>
     );
 }
 
-BribePage.getLayout = function getLayout(page: ReactElement) {
+DAODetailPage.getLayout = function getLayout(page: ReactElement) {
     return (
         <BasicLayout>
             <StakeLayout>
@@ -40,5 +52,4 @@ BribePage.getLayout = function getLayout(page: ReactElement) {
         </BasicLayout>
     );
 };
-
-export default BribePage;
+export default DAODetailPage;

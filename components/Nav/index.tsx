@@ -24,11 +24,11 @@ const Nav = () => {
                 <ICPool className="w-4 h-auto" />
                 <span>Pool</span>
             </NavLink>
-            <NavLink href="/stake/farms">
+            <NavLink href="/farms">
                 <ICFarm className="w-4 h-auto" />
                 <span>Farm</span>
             </NavLink>
-            <NavLink href="/stake/gov">
+            <NavLink href="/gov/stake">
                 <ICStake className="-mt-0.5 w-4 h-auto" />
                 <span>Governance</span>
             </NavLink>

@@ -428,7 +428,7 @@ const FarmBoostInfo = ({ farmData, onClose }: FarmBoostInfoType) => {
                                         You can boost all of your farms just by
                                         one click, visit{" "}
                                     </span>
-                                    <Link href="/stake/gov/boost">
+                                    <Link href="/gov/boost">
                                         <span className="text-pink-600 font-bold underline">
                                             Governance Yield Boosting
                                         </span>

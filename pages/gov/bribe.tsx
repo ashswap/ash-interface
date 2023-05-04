@@ -3,31 +3,35 @@ import BasicLayout from "components/Layout/Basic";
 import GovLayout from "components/Layout/Gov";
 import StakeLayout from "components/Layout/stake";
 import NavGov from "components/Nav/NavGov";
+import { GraphOptions } from "graphql/type";
+import useGraphQLQueryOptions from "graphql/useQueries/useGraphQLQueryOptions";
 import { ReactElement } from "react";
-import GovBoostStatus from "views/stake/gov/boost/GovBoostStatus";
+import BribeOverview from "views/gov/bribe/BribeOverview";
 const breadcrumbLinks = [
     { label: "Stake" },
-    { label: "Governance Stake", href: "/stake/gov" },
-    { label: "Farm Boost" },
+    { label: "Governance Stake", href: "/gov/stake" },
+    { label: "Bribe" },
 ];
-function BoostPage() {
+const queryOptions: GraphOptions = { withFB: true, withFC: true };
+function BribePage() {
+    useGraphQLQueryOptions(queryOptions);
     return (
         <>
             <div className="ash-container text-white pt-[1.875rem]">
                 <Breadcrumb links={breadcrumbLinks} />
                 <div className="mb-7">
                     <h1 className="text-pink-600 text-2xl md:text-5xl font-bold mb-7 md:mb-11">
-                        Farm Boost
+                        <span className="text-white">Ashswap </span>Bribe
                     </h1>
                     <NavGov />
                 </div>
-                <GovBoostStatus />
+                <BribeOverview />
             </div>
         </>
     );
 }
 
-BoostPage.getLayout = function getLayout(page: ReactElement) {
+BribePage.getLayout = function getLayout(page: ReactElement) {
     return (
         <BasicLayout>
             <StakeLayout>
@@ -37,4 +41,4 @@ BoostPage.getLayout = function getLayout(page: ReactElement) {
     );
 };
 
-export default BoostPage;
+export default BribePage;

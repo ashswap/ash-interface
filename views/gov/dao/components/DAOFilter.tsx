@@ -44,7 +44,7 @@ function DAOFilter(props: DAOFilterProps) {
                         </span>
                     </Switch>
                 </div>
-                <Link href="/stake/gov/dao/propose" className="inline-block overflow-hidden">
+                <Link href="/gov/dao/propose" className="inline-block overflow-hidden">
                     <GlowingButton
                         theme="pink"
                         wrapperClassName="overflow-hidden max-w-full"
