@@ -32,9 +32,9 @@ function NavMobile() {
                         <ICFarm className="w-4 h-auto" />
                         <span>Farm</span>
                     </NavLink>
-                    <NavLink href="/gov/stake" className="overflow-hidden">
+                    <NavLink href="/gov" className="overflow-hidden">
                         <ICStake className="w-4 h-auto" />
-                        <span className="w-full inline-block truncate">Governance</span>
+                        <span className="max-w-full inline-block truncate">Governance</span>
                     </NavLink>
                     <NavLink href="#" onClick={() => setIsOpenDrawer(true)}>
                         <ICSocial className="-mt-0.5 w-4 h-auto" />

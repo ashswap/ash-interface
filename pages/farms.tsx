@@ -10,13 +10,13 @@ function FarmsPage() {
     return (
         <>
             <div className="ash-container text-white pt-[1.875rem]">
-                <ul className="flex space-x-1 mb-4 md:mb-[3.25rem] text-sm md:text-lg font-bold">
+                {/* <ul className="flex space-x-1 mb-4 md:mb-[3.25rem] text-sm md:text-lg font-bold">
                     <li>Stake</li>
                     <li className="text-ash-gray-500">
                         <ICArrowRight className="inline mr-1" />
                         <span>Liquidity Stake</span>
                     </li>
-                </ul>
+                </ul> */}
                 <div className="flex justify-between">
                     <h1 className="text-ash-cyan-500 text-2xl md:text-5xl font-bold mb-7 md:mb-11">
                         Liquidity Stake - Farming

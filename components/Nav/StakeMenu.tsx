@@ -25,7 +25,7 @@ import ICGovVoteSquare from "assets/svg/gov-vote-square.svg";
 import { useTrackTransactionStatus } from "@multiversx/sdk-dapp/hooks";
 const SOCIALS = [
     { name: "Liquidity Stake", url: "/farms" },
-    { name: "Governance Stake", url: "/gov/stake" },
+    { name: "Governance Stake", url: "/gov" },
 ];
 function HeadlessLink(
     props: Parameters<typeof Link>[0]
@@ -94,7 +94,7 @@ function StakeMenu() {
                                 </div>
 
                             </Link>
-                            <Link href="/gov/stake">
+                            <Link href="/gov">
 
                                 <div
                                     className={`transition-all bg-stake-dark-400 hover:bg-[#454765] ${styles.stakeMenuItem} p-4 md:p-8 h-full`}

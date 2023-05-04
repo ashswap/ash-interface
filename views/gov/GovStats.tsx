@@ -127,12 +127,6 @@ function GovStats() {
     }, [unlockTS, lockedAmt]);
     return (
         <>
-            <div className="mb-7">
-                <h1 className="text-pink-600 text-2xl md:text-5xl font-bold mb-7 md:mb-11">
-                    Governance Stake
-                </h1>
-                <NavGov />
-            </div>
             <div className="flex flex-col md:flex-row">
                 <div className="md:w-[21.875rem] shrink-0 flex flex-col px-7 lg:px-9 pb-9 pt-7 lg:pt-14 bg-stake-dark-400 mb-4 md:mb-0 md:mr-4 lg:mr-[1.875rem]">
                     <h2 className="text-lg md:text-2xl mb-11 md:mb-11 font-bold text-white">
