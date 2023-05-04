@@ -28,7 +28,7 @@ const Nav = () => {
                 <ICFarm className="w-4 h-auto" />
                 <span>Farm</span>
             </NavLink>
-            <NavLink href="/gov/stake">
+            <NavLink href="/gov">
                 <ICStake className="-mt-0.5 w-4 h-auto" />
                 <span>Governance</span>
             </NavLink>
