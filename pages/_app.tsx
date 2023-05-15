@@ -151,16 +151,24 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
                 `}
             </Script>
             <NextSeo
-                title="AshSwap Interface"
-                description="Swap or provide liquidity on the AshSwap Protocol."
+                title="AshSwap DEX"
+                description="As the first Stable-swap DEX to become a DeFi Layer on MultiversX, AshSwap provides a new approach to liquidity pool design to enhance yields and reduce slippage."
+                openGraph={{
+                    type: "website",
+                    images: [{url: "/images/og-logo.png"}],
+                }}
+                twitter={{
+                    cardType: "summary",
+                    site: "@ash_swap",
+                }}
             />
-
+            
             <RecoilRoot>
                 <DappProvider
                     environment={ENVIRONMENT.NETWORK}
                     customNetworkConfig={DAPP_CONFIG}
                     customComponents={customComponents}
-                    dappConfig={{shouldUseWebViewProvider: true}}
+                    dappConfig={{ shouldUseWebViewProvider: true }}
                     // completedTransactionsDelay={500}
                 >
                     <TestnetGuard>
