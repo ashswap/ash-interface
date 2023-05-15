@@ -165,6 +165,7 @@ deploy_ipfs_beta:
     <<: *env_prod
   only:
     - /^.*-prod$/
+    - /^.*-prod-alpha$/
   except:
     - branches
   retry: 2
