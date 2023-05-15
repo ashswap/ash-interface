@@ -56,5 +56,12 @@ const POOLS_BETA: IPool[] = [
         tokens: [TOKENS_MAP["WEGLD-d7c6bb"], TOKENS_MAP["HSEGLD-8f2360"]],
         type: EPoolType.LendingPool,
     },
+    {
+        address:
+            "erd1qqqqqqqqqqqqqpgq3du96js0eu7aa43wqpphh3wy969es5ws2gesx49un4",
+        lpToken: TOKENS_MAP["ALP-278df8"],
+        tokens: [TOKENS_MAP["WEGLD-d7c6bb"], TOKENS_MAP["LEGLD-3e7182"]],
+        type: EPoolType.LendingPool,
+    },
 ];
 export default POOLS_BETA;

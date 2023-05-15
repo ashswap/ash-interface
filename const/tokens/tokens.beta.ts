@@ -2,6 +2,7 @@ import ImgAshIcon from "assets/images/ash-icon.png";
 import IconBUSD from "assets/images/busd-icon.png";
 import ImgEgldIcon from "assets/images/egld-icon.png";
 import IconHSEGLD from "assets/images/hsegld-icon.png";
+import IconLEGLD from "assets/images/legld-icon.png";
 import IconHTM from "assets/images/htm-icon.png";
 import IconSEGLD from "assets/images/segld-icon.png";
 import IconUSDC from "assets/images/usdc-icon.png";
@@ -95,6 +96,14 @@ const TOKENS: IESDTInfo[] = [
         name: "Hatom sEGLD",
         decimals: 8,
         logoURI: IconHSEGLD.src,
+    },
+    {
+        identifier: "LEGLD-3e7182",
+        chainId: ChainId.Devnet,
+        symbol: "LEGLD",
+        name: "LiquidEGLD",
+        decimals: 18,
+        logoURI: IconLEGLD.src,
     },
 ];
 
