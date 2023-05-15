@@ -1,19 +1,15 @@
-import ImgEgldIcon from "assets/images/egld-icon.png";
-import { accBalanceState } from "atoms/dappState";
-import { lpTokenMapState, tokenMapState } from "atoms/tokensState";
+import { tokenMapState } from "atoms/tokensState";
 import BigNumber from "bignumber.js";
 import Avatar from "components/Avatar";
 import TextAmt from "components/TextAmt";
-import { CHAIN_ID } from "const/dappConfig";
-import { ENVIRONMENT } from "const/env";
 import pools from "const/pool";
 import { TOKENS } from "const/tokens";
+import { WRAPPED_EGLD } from "const/wrappedEGLD";
 import { toEGLDD } from "helper/balance";
 import { IESDTInfo } from "helper/token/token";
+import Link from "next/link";
 import { useMemo } from "react";
 import { useRecoilValue } from "recoil";
-import Link from "next/link";
-import { WRAPPED_EGLD } from "const/wrappedEGLD";
 type TokenWithBalance = IESDTInfo & {
     balance: BigNumber;
 };
@@ -75,7 +71,6 @@ const TokenBalance = ({ data }: { data: TokenWithBalance }) => {
 };
 function WalletBalance() {
     const tokenMap = useRecoilValue(tokenMapState);
-    const lpTokenMap = useRecoilValue(lpTokenMapState);
     const ashSupportedBalances = useMemo(() => {
         const supportedTokens: TokenWithBalance[] = TOKENS.map((t) => {
             return {
@@ -90,14 +85,14 @@ function WalletBalance() {
                 return {
                     ...t,
                     balance: new BigNumber(
-                        lpTokenMap[t.identifier]?.balance || 0
+                        tokenMap[t.identifier]?.balance || 0
                     ),
                 };
             })
             .filter((t) => t.balance.gt(0));
 
         return [...supportedTokens, ...lpTokens];
-    }, [tokenMap, lpTokenMap]);
+    }, [tokenMap]);
     return (
         <div className="bg-stake-dark-500 py-4">
             <div className="px-6 text-stake-gray-500 text-xs font-bold mb-4">

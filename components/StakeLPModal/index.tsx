@@ -4,7 +4,7 @@ import {
     accIsLoggedInState,
 } from "atoms/dappState";
 import { FarmRecord } from "atoms/farmsState";
-import { lpTokenMapState } from "atoms/tokensState";
+import { tokenMapState } from "atoms/tokensState";
 import BigNumber from "bignumber.js";
 import Avatar from "components/Avatar";
 import BaseModal from "components/BaseModal";
@@ -26,7 +26,7 @@ type props = {
 const StakeLPContent = ({ open, onClose, farmData }: props) => {
     const loggedIn = useRecoilValue(accIsLoggedInState);
     const { pool, farm, farmTokenSupply, ashPerSec, ashBaseAPR } = farmData;
-    const lpTokenMap = useRecoilValue(lpTokenMapState);
+    const tokenMap = useRecoilValue(tokenMapState);
     const insufficientEGLD = useRecoilValue(accIsInsufficientEGLDState);
     const [stakeAmt, setStakeAmt] = useState<BigNumber>(new BigNumber(0));
     const [rawStakeAmt, setRawStakeAmt] = useState("");
@@ -43,8 +43,8 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
     }, [deboundRawStakeAmt, loggedIn, pool]);
     const { enterFarm } = useEnterFarm();
     const LPBalance = useMemo(
-        () => new BigNumber(lpTokenMap[pool.lpToken.identifier]?.balance || 0),
-        [lpTokenMap, pool.lpToken]
+        () => new BigNumber(tokenMap[pool.lpToken.identifier]?.balance || 0),
+        [tokenMap, pool.lpToken]
     );
     const setMaxStakeAmt = useCallback(() => {
         if (!LPBalance) return;

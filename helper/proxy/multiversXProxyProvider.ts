@@ -1,5 +1,6 @@
 import {
     ApiNetworkProvider,
+    DefinitionOfFungibleTokenOnNetwork,
     ProxyNetworkProvider,
 } from "@multiversx/sdk-network-providers/out";
 import BigNumber from "bignumber.js";
@@ -69,5 +70,12 @@ export default class MultiversXProxyProvider {
             }
         });
         return list as any;
+    }
+
+    async getTokens(query?: {
+        identifiers: string[],
+    }) {
+        const res: DefinitionOfFungibleTokenOnNetwork[] = await this.apiProvider.doGetGeneric(`tokens/${buildUrlParams(query || {})}`);
+        return res;
     }
 }

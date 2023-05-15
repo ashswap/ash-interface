@@ -1,14 +1,15 @@
 import BigNumber from "bignumber.js";
 import InputCurrency from "components/InputCurrency";
 import SlippageSelect from "components/SlippageSelect";
-import { useSwap } from "context/swap";
 import { Percent } from "helper/fraction/percent";
 import useInputNumberString from "hooks/useInputNumberString";
+import { useRecoilState } from "recoil";
+import { agSlippageAtom } from "views/swap/Aggregator/atoms/aggregator";
 
 interface Props {}
 
 const Setting = (props: Props) => {
-    const { slippage, setSlippage } = useSwap();
+    const [slippage, setSlippage] = useRecoilState(agSlippageAtom);
     const [displaySlip, setDisplaySlip] = useInputNumberString(slippage.toFixed(2), 2);
     return (
         <div>

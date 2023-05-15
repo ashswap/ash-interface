@@ -203,7 +203,7 @@ const TokenSelect = ({
                 isOpen={open}
                 onRequestClose={() => setOpen(false)}
                 type={screenSize.msm ? "drawer_btt" : "modal"}
-                className="clip-corner-4 clip-corner-tl bg-ash-dark-600 flex flex-col p-4 w-full sm:w-[27.375rem] mx-auto max-h-full"
+                className="clip-corner-4 clip-corner-tl bg-ash-dark-600 flex flex-col p-4 w-full sm:w-[27.375rem] mx-auto max-h-[80vh]"
             >
                 <div className="flex justify-end">
                     <BaseModal.CloseBtn />

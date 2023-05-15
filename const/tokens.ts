@@ -11,15 +11,12 @@ const TOKENS_CONFIG =
             ? TOKENS_ALPHA
             : TOKENS_BETA
         : TOKENS_MAINNET;
-
+export const NON_LP_TOKENS = TOKENS_CONFIG.TOKENS;
 export const TOKENS = [...TOKENS_CONFIG.TOKENS, ...TOKENS_CONFIG.LP_TOKENS];
-/**@deprecate */
 export const TOKENS_MAP = TOKENS_CONFIG.TOKENS_MAP;
 export const LP_TOKENS = TOKENS_CONFIG.LP_TOKENS;
-/**@deprecate */
 export const LP_TOKENS_MAP = Object.fromEntries(
     LP_TOKENS.map((t) => [t.identifier, t])
 );
-/**@deprecate */
 export const ASH_TOKEN: IESDTInfo = TOKENS_MAP.ASH;
 export const ASH_ESDT = new ESDT(TOKENS_MAP.ASH);
