@@ -10,7 +10,7 @@ import {
     ashRawPoolV1ByAddressQuery,
     ashRawPoolV2ByAddressQuery,
 } from "atoms/poolsState";
-import { lpTokenMapState } from "atoms/tokensState";
+import { tokenMapState } from "atoms/tokensState";
 import BigNumber from "bignumber.js";
 import Avatar from "components/Avatar";
 import BaseModal from "components/BaseModal";
@@ -35,7 +35,7 @@ import usePoolRemoveLPOneCoin from "hooks/usePoolContract/usePoolRemoveLPOneCoin
 import { useScreenSize } from "hooks/useScreenSize";
 import IPool, { EPoolType } from "interface/pool";
 import { Unarray } from "interface/utilities";
-import { memo, useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRecoilCallback, useRecoilValue } from "recoil";
 import { theme } from "tailwind.config";
 import { useDebounce } from "use-debounce";
@@ -92,14 +92,13 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
     const { removeLP, trackingData } = usePoolRemoveLP(true);
     const { removeLPOneCoin, trackingData: removeOneCoinTrackingData } =
         usePoolRemoveLPOneCoin(true);
-    const lpTokenMap = useRecoilValue(lpTokenMapState);
+    const tokenMap = useRecoilValue(tokenMapState);
 
     const [onboardingWithdrawInput, setOnboardedWithdrawInput] = useOnboarding(
         "pool_withdraw_input"
     );
-    const [onboardingWithdrawOneCoin, setOnboardedWithdrawOneCoin] = useOnboarding(
-        "pool_withdraw_one_coin"
-    );
+    const [onboardingWithdrawOneCoin, setOnboardedWithdrawOneCoin] =
+        useOnboarding("pool_withdraw_one_coin");
 
     const removing = useMemo(
         () => !!trackingData.isPending || !!removeOneCoinTrackingData.isPending,
@@ -107,8 +106,8 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
     );
 
     const removeUSD = useMemo(
-        () => liquidity.multipliedBy(lpTokenMap[pool.lpToken.identifier].price),
-        [liquidity, lpTokenMap, pool.lpToken.identifier]
+        () => liquidity.multipliedBy(tokenMap[pool.lpToken.identifier].price),
+        [liquidity, pool.lpToken.identifier, tokenMap]
     );
 
     const lpAmount = useMemo(() => {
@@ -565,8 +564,16 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
                                                     <OnboardTooltip
                                                         disabled={i !== 0}
                                                         delayOpen={1000}
-                                                        open={i === 0 && screenSize.md && onboardingWithdrawOneCoin}
-                                                        onArrowClick={() => setOnboardedWithdrawOneCoin(true)}
+                                                        open={
+                                                            i === 0 &&
+                                                            screenSize.md &&
+                                                            onboardingWithdrawOneCoin
+                                                        }
+                                                        onArrowClick={() =>
+                                                            setOnboardedWithdrawOneCoin(
+                                                                true
+                                                            )
+                                                        }
                                                         placement="left"
                                                         content={
                                                             onboardingWithdrawOneCoinTooltipContent
