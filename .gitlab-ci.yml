@@ -44,9 +44,14 @@ stages:
 
 .env_alpha: &env_alpha
   <<: *env_common
+  # NEXT_PUBLIC_NETWORK: devnet
+  # NEXT_PUBLIC_ASH_ENV: alpha
+  # BUILD_ENV: dev
+  
   NEXT_PUBLIC_NETWORK: devnet
-  NEXT_PUBLIC_ASH_ENV: alpha
-  BUILD_ENV: dev
+  NEXT_PUBLIC_ASH_ENV: beta
+  BUILD_ENV: prod
+
   NEXT_PUBLIC_ASH_API: https://api-devnet-alpha.ashswap.io
   NEXT_PUBLIC_ASH_DOMAIN: devnet-alpha.ashswap.io
   NEXT_PUBLIC_ASH_GRAPHQL: https://api-v2-devnet-alpha.ashswap.io
@@ -54,6 +59,7 @@ stages:
   NEXT_PUBLIC_ASH_SOCKET_EXTRA: 
   NEXT_PUBLIC_ASH_LOG_API: https://api-tracking-devnet-alpha.ashswap.io
   NEXT_PUBLIC_IPFS_API: https://ipfs-cluster-api-internal.bicarus.io
+  NEXT_PUBLIC_AG_API: https://aggregator-devnet.ashswap.io
 
 .job_template_alpha: &job_template_alpha
   environment:
@@ -104,6 +110,7 @@ deploy_ipfs_alpha:
   NEXT_PUBLIC_ASH_SOCKET_EXTRA: 
   NEXT_PUBLIC_ASH_LOG_API: https://api-tracking.ashswap.io
   NEXT_PUBLIC_IPFS_API: https://ipfs-cluster-api-internal.bicarus.io
+  NEXT_PUBLIC_AG_API: https://aggregator-devnet.ashswap.io
 
 .job_template_beta: &job_template_beta
   environment:
@@ -153,6 +160,7 @@ deploy_ipfs_beta:
   NEXT_PUBLIC_ASH_SOCKET: https://socket-api-fra-aws.multiversx.com
   NEXT_PUBLIC_ASH_SOCKET_EXTRA: 
   NEXT_PUBLIC_ASH_LOG_API: https://api-tracking.ashswap.io
+  NEXT_PUBLIC_AG_API: https://aggregator.ashswap.io
 
 .job_template_prod: &job_template_prod
   environment:
