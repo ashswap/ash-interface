@@ -8,6 +8,7 @@ type DappContracts = {
     router: string;
     dao: string;
     daoBribe: string;
+    aggregator: string;
 };
 type DappContractConfig = {
     alpha: DappContracts;
@@ -27,6 +28,7 @@ const dappContractDevnet: DappContractConfig = {
         router: "erd1qqqqqqqqqqqqqpgqmj4lt9xd87fvafnyjwut66palhnpdr5v2gesvjepfr",
         dao: "erd1qqqqqqqqqqqqqpgqpdafdulu42f6g8pn9pavufgmdkltnctf2gesh48l44",
         daoBribe: "erd1qqqqqqqqqqqqqpgqqdt2ckhgn3yw6qxskawmywc98dv5jegg2ges40ygkh",
+        aggregator: "erd1qqqqqqqqqqqqqpgqyqsddhthmp7ejpu9z7zwrssa6q4u6cpygeusmeenf7"
     },
     alpha: {
         voteEscrowedContract:
@@ -41,7 +43,8 @@ const dappContractDevnet: DappContractConfig = {
             "erd1qqqqqqqqqqqqqpgqu7ysq4tqhfdmltnfl8fu0jjguwfvy5n8rmcqtt0n36",
         router: "erd1qqqqqqqqqqqqqpgq0u00t004x7mfr7dxj0c7774aktpnc7zurmcqj59q8d",
         dao: "erd1qqqqqqqqqqqqqpgq8ktcklq3qvmwpjchvadp6fm6apnn6crlrmcqegtnt3",
-        daoBribe: "erd1qqqqqqqqqqqqqpgq7qpg3085qdweu3wx9tphq2t5gwz2mf4xrmcqagprme"
+        daoBribe: "erd1qqqqqqqqqqqqqpgq7qpg3085qdweu3wx9tphq2t5gwz2mf4xrmcqagprme",
+        aggregator: "",
     },
 };
 
@@ -57,6 +60,7 @@ const dappContractMainnet: DappContracts = {
     router: "",
     dao: "",
     daoBribe: "",
+    aggregator: "",
 };
 
 const dappContract =

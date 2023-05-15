@@ -7,7 +7,8 @@
         "build": "next build",
         "start": "next start",
         "lint": "next lint",
-        "export": "next export"
+        "export": "next export",
+        "generate": "graphql-codegen"
     },
     "dependencies": {
         "@elrondnetwork/transaction-decoder": "1.0.0",
@@ -58,6 +59,14 @@
         "uuid": "^9.0.0"
     },
     "devDependencies": {
+        "@graphql-codegen/add": "^4.0.1",
+        "@graphql-codegen/cli": "^3.3.0",
+        "@graphql-codegen/client-preset": "^3.0.0",
+        "@graphql-codegen/fragment-matcher": "^4.0.1",
+        "@graphql-codegen/typescript-document-nodes": "^3.0.3",
+        "@graphql-codegen/typescript-graphql-request": "^4.5.9",
+        "@graphql-codegen/typescript-operations": "^3.0.3",
+        "@graphql-codegen/typescript-react-apollo": "^3.3.7",
         "@types/lodash.chunk": "^4.2.7",
         "@types/node": "16.11.6",
         "@types/numeral": "^2.0.2",
