@@ -280,7 +280,8 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
                         });
                     } else if (
                         p.type === EPoolType.PlainPool ||
-                        p.type === EPoolType.LendingPool
+                        p.type === EPoolType.LendingPool ||
+                        p.type === EPoolType.MetaPool
                     ) {
                         const poolV1 = await snapshot.getPromise(
                             ashRawPoolV1ByAddressQuery(pool.address)
@@ -436,7 +437,7 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
                     </div>
                     <div>
                         But if you need to swap to have the correct amounts, it
-                        is better to deposit in unbalanced/single-sided ways.
+                        is better to deposit in unbalanced/single-sided way.
                     </div>
                 </div>
             </div>

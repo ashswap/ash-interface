@@ -36,11 +36,9 @@ export class CurveV2Math {
         let diff = new BigNumber(0);
         for(let i = 0; i<255; i++){
             let D_prev = D;
-            let tmp = new BigNumber(10**18);
-            for(let _x of x){
-                tmp = tmp.multipliedBy(_x).idiv(D);
-            }
-            D = D.multipliedBy(new BigNumber(nCoins - 1).multipliedBy(10**18).plus(tmp)).idiv(nCoins * 10**18);
+            const temp = x.reduce((s, _x) => s.multipliedBy(_x), new BigNumber(1)).idiv(D.pow(nCoins - 1));
+            D = D.multipliedBy(nCoins - 1).plus(temp).idiv(nCoins);
+            // D = D.plus(x[0].multipliedBy(x[1]).idiv(D)).idiv(nCoins); // n = 2
             diff = D.minus(D_prev).abs();
             if(diff.lte(1) || diff.multipliedBy(10**18).lt(D)){
                 return D;
@@ -95,7 +93,7 @@ export class CurveV2Math {
 
             let max_d = BigNumber.max(D, 1e16);
     
-            if(diff.multipliedBy(10**14) < max_d){
+            if(diff.multipliedBy(10**14).lt(max_d)){
                 for (let _x of x){
                     let frac = _x.multipliedBy(PRECISION).idiv(D);
                     assert(frac.gt(1e16 - 1) && frac.lt(new BigNumber(1e18).multipliedBy(1e2).plus(1)), "unsafe value")

@@ -1,16 +1,18 @@
 import BasicLayout from "components/Layout/Basic";
-import { SwapProvider } from 'context/swap';
-import type { NextPage } from 'next';
-import LedgerContainer from 'views/ledger/LedgerContainer';
+import { SwapProvider } from "context/swap";
+import LedgerContainer from "views/ledger/LedgerContainer";
+import { NextPageWithLayout } from "./_app";
 
-const Ledger: NextPage = () => {
+const LedgerPage: NextPageWithLayout = () => {
     return (
-        <BasicLayout>
-            <SwapProvider>
-                <LedgerContainer/>
-            </SwapProvider>
-        </BasicLayout>
-    )
-}
+        <SwapProvider>
+            <LedgerContainer />
+        </SwapProvider>
+    );
+};
 
-export default Ledger
+LedgerPage.getLayout = function getLayout(page) {
+    return <BasicLayout>{page}</BasicLayout>;
+};
+
+export default LedgerPage;

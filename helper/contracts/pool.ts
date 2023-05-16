@@ -39,6 +39,17 @@ type AddLiquidityResultType = {
     mint_amount: BigNumber;
     tokens: AddLiquidityAttributes[];
 };
+type RemoveLiquidityAttributes = {
+    token: string;
+    attribute: TokenAttributes;
+    amount_removed: BigNumber;
+};
+type RemoveLiquidityOneCoinResultType = {
+    burn_amount: BigNumber;
+    total_fee: BigNumber;
+    admin_fee: BigNumber;
+    token_out: RemoveLiquidityAttributes;
+};
 const getAmountOutMaiarPool = async (
     poolAddress: string,
     tokenFromId: string,
@@ -161,7 +172,26 @@ class PoolContract extends Contract<typeof poolAbi> {
         tokenPayment: TokenPayment,
         tokensAmtMin: BigNumber[]
     ) {
-        let interaction = this.contract.methods.removeLiquidity([...tokensAmtMin]);
+        let interaction = this.contract.methods.removeLiquidity([
+            ...tokensAmtMin,
+        ]);
+        interaction
+            .withSingleESDTTransfer(tokenPayment)
+            .withGasLimit(9_000_000);
+        return this.interceptInteraction(interaction)
+            .check()
+            .buildTransaction();
+    }
+
+    async removeLiquidityOneCoin(
+        tokenPayment: TokenPayment,
+        tokenId: string,
+        tokenAmountMin: BigNumber
+    ) {
+        let interaction = this.contract.methods.removeLiquidityOneCoin([
+            tokenId,
+            tokenAmountMin,
+        ]);
         interaction
             .withSingleESDTTransfer(tokenPayment)
             .withGasLimit(9_000_000);
@@ -201,6 +231,18 @@ class PoolContract extends Contract<typeof poolAbi> {
             res,
             interaction.getEndpoint()
         );
+        return firstValue?.valueOf();
+    }
+
+    async estimateRemoveLiquidityOneCoin(
+        lpAmount: BigNumber,
+        tokenOutId: string
+    ): Promise<RemoveLiquidityOneCoinResultType> {
+        let interaction = this.contract.methods.estimateRemoveLiquidityOneCoin([
+            lpAmount,
+            tokenOutId,
+        ]);
+        const { firstValue } = await this.runQuery(interaction);
         return firstValue?.valueOf();
     }
 }

@@ -95,6 +95,12 @@ class PoolV2Contract extends Contract<typeof poolV2Abi> {
             .check()
             .buildTransaction();
     }
+
+    async removeLiquidityOneCoin(tokenPayment: TokenPayment, index: number, minAmountOut: BigNumber){
+        let interaction = this.contract.methods.removeLiquidityOneCoin([index, minAmountOut]);
+        interaction.withSingleESDTTransfer(tokenPayment).withGasLimit(15_000_000);
+        return this.interceptInteraction(interaction).check().buildTransaction();
+    }
 }
 
 export default PoolV2Contract;

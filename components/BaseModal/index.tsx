@@ -1,10 +1,10 @@
 import { Transition, TransitionClasses } from "@headlessui/react";
 import IconClose from "assets/svg/close.svg";
+import customTwMerge from "helper/customTwMerge";
 import { useScreenSize } from "hooks/useScreenSize";
-import moment from "moment";
 import {
-    createContext,
     Fragment,
+    createContext,
     useContext,
     useEffect,
     useMemo,
@@ -38,11 +38,12 @@ const CONTAINER = {
     modal: "",
 };
 Modal.setAppElement("body");
-export type BaseModalType = Props & {
+export type BaseModalType = Omit<Props, "className"> & {
     transition?: "btt" | "center" | "none";
     type?: "modal" | "drawer_btt" | "drawer_ttb" | "drawer_ltr" | "drawer_rtl";
     mobileType?: "modal" | "drawer_btt" | "drawer_ttb" | "drawer_ltr" | "drawer_rtl";
     destroyOnClose?: boolean;
+    className?: string;
 };
 const ModalContext = createContext<BaseModalType>({ isOpen: false });
 
@@ -84,6 +85,12 @@ const BaseModal = (props: BaseModalType) => {
             window.document.body.style.overflow = props.isOpen ? "hidden" : "";
         }
     }, [props.isOpen]);
+
+    useEffect(() => {
+        return () => {
+            window.document.body.style.overflow = ""
+        }
+    }, []);
 
     useEffect(() => {
         if (props.isOpen) {
@@ -147,7 +154,7 @@ const BaseModal = (props: BaseModalType) => {
                         afterLeave={() => setAnimating(false)}
                     >
                         <div
-                            className={`${CONTAINER[type]} ${props.className}`}
+                            className={customTwMerge(CONTAINER[type], props.className)}
                         >
                             {props.children}
                         </div>

@@ -1,10 +1,10 @@
 import ICChevronRight from "assets/svg/chevron-right.svg";
 import {
     accIsInsufficientEGLDState,
-    accIsLoggedInState
+    accIsLoggedInState,
 } from "atoms/dappState";
 import { FarmRecord } from "atoms/farmsState";
-import { lpTokenMapState } from "atoms/tokensState";
+import { tokenMapState } from "atoms/tokensState";
 import BigNumber from "bignumber.js";
 import Avatar from "components/Avatar";
 import BaseModal from "components/BaseModal";
@@ -17,7 +17,7 @@ import { useScreenSize } from "hooks/useScreenSize";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { useDebounce } from "use-debounce";
-import FarmAPRBreakdown from "views/stake/farms/FarmAPRBreakdown";
+import FarmAPRBreakdown from "views/farms/FarmAPRBreakdown";
 type props = {
     open: boolean;
     onClose: () => void;
@@ -26,7 +26,7 @@ type props = {
 const StakeLPContent = ({ open, onClose, farmData }: props) => {
     const loggedIn = useRecoilValue(accIsLoggedInState);
     const { pool, farm, farmTokenSupply, ashPerSec, ashBaseAPR } = farmData;
-    const lpTokenMap = useRecoilValue(lpTokenMapState);
+    const tokenMap = useRecoilValue(tokenMapState);
     const insufficientEGLD = useRecoilValue(accIsInsufficientEGLDState);
     const [stakeAmt, setStakeAmt] = useState<BigNumber>(new BigNumber(0));
     const [rawStakeAmt, setRawStakeAmt] = useState("");
@@ -43,8 +43,8 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
     }, [deboundRawStakeAmt, loggedIn, pool]);
     const { enterFarm } = useEnterFarm();
     const LPBalance = useMemo(
-        () => new BigNumber(lpTokenMap[pool.lpToken.identifier]?.balance || 0),
-        [lpTokenMap, pool.lpToken]
+        () => new BigNumber(tokenMap[pool.lpToken.identifier]?.balance || 0),
+        [tokenMap, pool.lpToken]
     );
     const setMaxStakeAmt = useCallback(() => {
         if (!LPBalance) return;
@@ -53,21 +53,15 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
     }, [LPBalance, pool]);
     const ashPerDayBase = useMemo(() => {
         const baseFarmToken = stakeAmt.multipliedBy(0.4);
-        const totalAshPerDay = ashPerSec
-            .multipliedBy(24 * 60 * 60)
-            ;
+        const totalAshPerDay = ashPerSec.multipliedBy(24 * 60 * 60);
         const shareOfFarm = baseFarmToken.div(
             farmTokenSupply.plus(baseFarmToken)
         );
         return totalAshPerDay.multipliedBy(shareOfFarm);
     }, [stakeAmt, farmTokenSupply, ashPerSec]);
     const ashPerDayMax = useMemo(() => {
-        const totalAshPerDay = ashPerSec
-            .multipliedBy(24 * 60 * 60)
-            ;
-        const shareOfFarm = stakeAmt.div(
-            farmTokenSupply.plus(stakeAmt)
-        );
+        const totalAshPerDay = ashPerSec.multipliedBy(24 * 60 * 60);
+        const shareOfFarm = stakeAmt.div(farmTokenSupply.plus(stakeAmt));
         return totalAshPerDay.multipliedBy(shareOfFarm);
     }, [stakeAmt, farmTokenSupply, ashPerSec]);
     const insufficientLP = useMemo(() => {
@@ -154,7 +148,7 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
                     </div>
                 </div>
                 <div className="w-full sm:w-1/2 lg:w-[18.4375rem] shrink-0 bg-stake-dark-500 py-9 px-7.5">
-                    <FarmAPRBreakdown farmAddress={farm.farm_address}/>
+                    <FarmAPRBreakdown farmAddress={farm.farm_address} />
                 </div>
             </div>
             <div className="sm:flex sm:space-x-8 lg:space-x-24">

@@ -8,6 +8,7 @@ type DappContracts = {
     router: string;
     dao: string;
     daoBribe: string;
+    aggregator: string;
 };
 type DappContractConfig = {
     alpha: DappContracts;
@@ -27,21 +28,23 @@ const dappContractDevnet: DappContractConfig = {
         router: "erd1qqqqqqqqqqqqqpgqmj4lt9xd87fvafnyjwut66palhnpdr5v2gesvjepfr",
         dao: "erd1qqqqqqqqqqqqqpgqpdafdulu42f6g8pn9pavufgmdkltnctf2gesh48l44",
         daoBribe: "erd1qqqqqqqqqqqqqpgqqdt2ckhgn3yw6qxskawmywc98dv5jegg2ges40ygkh",
+        aggregator: "erd1qqqqqqqqqqqqqpgqyqsddhthmp7ejpu9z7zwrssa6q4u6cpygeusmeenf7"
     },
     alpha: {
         voteEscrowedContract:
-            "erd1qqqqqqqqqqqqqpgq7jclp49cydmjvxsx5ufurycujzrpwmv0rmcqqvrk7d",
+            "erd1qqqqqqqqqqqqqpgqpuwncrs3j78vqglvyap6h4ds7e3snmqsrmcqglmses",
         feeDistributor:
-            "erd1qqqqqqqqqqqqqpgqsn7eq3gshrt70snx2fzxltshlg7h4gf6rmcqgsw4l3",
+            "erd1qqqqqqqqqqqqqpgqc20uz6mfwmplrslsddczqy0e8xd7p7awrmcqr7kqy8",
         farmController:
-            "erd1qqqqqqqqqqqqqpgq420z44g8k8hc9ask4qwgz78dt7kdkk9mrmcqmh967w",
+            "erd1qqqqqqqqqqqqqpgqyejz40vrxfk9p2q2dsc5mztxp84z3ylhrmcqqaakpa",
         farmBribe:
-            "erd1qqqqqqqqqqqqqpgqqf669mq7ndfe9re6ggkvxltnkghfjertrmcqz8sgrg",
+            "erd1qqqqqqqqqqqqqpgqlppad3qcy4l6d562m5pr0ahqpkncyp4crmcqxmltg3",
         farmRouter:
-            "erd1qqqqqqqqqqqqqpgqh72fp6sat60d9nws64fahluglh22gyk5rmcqslvmnl",
-        router: "erd1qqqqqqqqqqqqqpgq4jhlpam8wyju963p63a2fu9hdlcfqjm6rmcqarsvsx",
-        dao: "erd1qqqqqqqqqqqqqpgqfns0zp9qacd52au5rhdq9e4t0yd0g2j5rmcq2g3gf8",
-        daoBribe: "erd1qqqqqqqqqqqqqpgqyn2tfquw9ca8pfgzrfyuxmv6u0s7fcnlrmcqwyagxt"
+            "erd1qqqqqqqqqqqqqpgqu7ysq4tqhfdmltnfl8fu0jjguwfvy5n8rmcqtt0n36",
+        router: "erd1qqqqqqqqqqqqqpgq0u00t004x7mfr7dxj0c7774aktpnc7zurmcqj59q8d",
+        dao: "erd1qqqqqqqqqqqqqpgq8ktcklq3qvmwpjchvadp6fm6apnn6crlrmcqegtnt3",
+        daoBribe: "erd1qqqqqqqqqqqqqpgq7qpg3085qdweu3wx9tphq2t5gwz2mf4xrmcqagprme",
+        aggregator: "",
     },
 };
 
@@ -57,6 +60,7 @@ const dappContractMainnet: DappContracts = {
     router: "",
     dao: "",
     daoBribe: "",
+    aggregator: "",
 };
 
 const dappContract =

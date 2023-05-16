@@ -1,34 +1,54 @@
+import { Transition } from "@headlessui/react";
+import * as Sentry from "@sentry/nextjs";
 import { Slider } from "antd";
-import IconRight from "assets/svg/right-yellow.svg";
+import ICChevronRight from "assets/svg/chevron-right.svg";
+import ICHexagonDuo from "assets/svg/hexagon-duo.svg";
 import { accIsInsufficientEGLDState } from "atoms/dappState";
 import {
     LPBreakDownQuery,
-    PoolsState
+    PoolsState,
+    ashRawPoolV1ByAddressQuery,
+    ashRawPoolV2ByAddressQuery,
 } from "atoms/poolsState";
-import { lpTokenMapState } from "atoms/tokensState";
+import { tokenMapState } from "atoms/tokensState";
 import BigNumber from "bignumber.js";
 import Avatar from "components/Avatar";
 import BaseModal from "components/BaseModal";
 import GlowingButton from "components/GlowingButton";
 import InputCurrency from "components/InputCurrency";
+import Switch from "components/Switch";
 import TextAmt from "components/TextAmt";
-import Token from "components/Token";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
-import { toEGLDD } from "helper/balance";
+import { blockTimeMs } from "const/dappConfig";
+import CurveV2 from "helper/curveV2/swap";
+import { Fraction } from "helper/fraction/fraction";
 import { Percent } from "helper/fraction/percent";
 import { formatAmount } from "helper/number";
+import { calculateEstimatedWithdrawOneCoin } from "helper/stableswap/calculator/amounts";
 import { getTokenFromId } from "helper/token";
 import { TokenAmount } from "helper/token/tokenAmount";
 import useInputNumberString from "hooks/useInputNumberString";
+import useInterval from "hooks/useInterval";
 import { useOnboarding } from "hooks/useOnboarding";
 import usePoolRemoveLP from "hooks/usePoolContract/usePoolRemoveLP";
+import usePoolRemoveLPOneCoin from "hooks/usePoolContract/usePoolRemoveLPOneCoin";
 import { useScreenSize } from "hooks/useScreenSize";
+import IPool, { EPoolType } from "interface/pool";
 import { Unarray } from "interface/utilities";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRecoilCallback, useRecoilValue } from "recoil";
 import { theme } from "tailwind.config";
 import { useDebounce } from "use-debounce";
-
+const onboardingWithdrawOneCoinTooltipContent = (
+    <OnboardTooltip.Panel>
+        <div className="p-4 font-bold text-sm text-white">
+            Click on the <span className="text-stake-green-500">checkbox</span>{" "}
+            to <span className="text-stake-green-500">select the token</span>{" "}
+            that you want to{" "}
+            <span className="text-stake-green-500">withdraw</span>.
+        </div>
+    </OnboardTooltip.Panel>
+);
 interface Props {
     open?: boolean;
     onClose?: () => void;
@@ -40,49 +60,64 @@ const slippage = new Percent(5, 100);
 const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
     const { pool, liquidityData } = poolData;
     const { ownLiquidity } = liquidityData!;
-    const [liquidityWei, setLiquidityWei] = useState<BigNumber>(new BigNumber(0));
-    const liquidity = useMemo(() => new TokenAmount(poolData.pool.lpToken, liquidityWei).egld, [liquidityWei, poolData.pool.lpToken]);
-    const [liquidityStr, setLiquidityStr] = useInputNumberString(liquidity, pool.lpToken.decimals);
+    const [liquidityWei, setLiquidityWei] = useState<BigNumber>(
+        new BigNumber(0)
+    );
+    const [isBalanced, setIsBalanced] = useState(true);
+    const [selectedTokenIndex, setSelectedTokenIndex] = useState(-1);
+    const liquidity = useMemo(
+        () => new TokenAmount(poolData.pool.lpToken, liquidityWei).egld,
+        [liquidityWei, poolData.pool.lpToken]
+    );
+    const [liquidityStr, setLiquidityStr] = useInputNumberString(
+        liquidity,
+        pool.lpToken.decimals
+    );
     const [liquidityPercent, setLiquidityPercent] = useState<number>(0);
     const [outputValues, setOutputValues] = useState(
         pool.tokens.map((_t) => {
             const t = getTokenFromId(_t.identifier);
-            return new TokenAmount(t, 0)
+            return new TokenAmount(t, 0);
+        })
+    );
+    const [maxOutputValues, setMaxOutputValues] = useState(
+        pool.tokens.map((_t) => {
+            const t = getTokenFromId(_t.identifier);
+            return new TokenAmount(t, 0);
         })
     );
     const [liquidityDebounce] = useDebounce(liquidityWei, 500);
     const screenSize = useScreenSize();
     const insufficientEGLD = useRecoilValue(accIsInsufficientEGLDState);
     const { removeLP, trackingData } = usePoolRemoveLP(true);
-    const lpTokenMap = useRecoilValue(lpTokenMapState);
+    const { removeLPOneCoin, trackingData: removeOneCoinTrackingData } =
+        usePoolRemoveLPOneCoin(true);
+    const tokenMap = useRecoilValue(tokenMapState);
 
     const [onboardingWithdrawInput, setOnboardedWithdrawInput] = useOnboarding(
         "pool_withdraw_input"
     );
+    const [onboardingWithdrawOneCoin, setOnboardedWithdrawOneCoin] =
+        useOnboarding("pool_withdraw_one_coin");
 
     const removing = useMemo(
-        () => !!trackingData.isPending,
-        [trackingData.isPending]
+        () => !!trackingData.isPending || !!removeOneCoinTrackingData.isPending,
+        [removeOneCoinTrackingData.isPending, trackingData.isPending]
     );
 
-    const pricePerLP = useMemo(() => {
-        return lpTokenMap[poolData.pool.lpToken.identifier].price;
-    }, [lpTokenMap, poolData]);
-
-    const removeUSD = useMemo(() => liquidity.multipliedBy(lpTokenMap[pool.lpToken.identifier].price), [liquidity, lpTokenMap, pool.lpToken.identifier])
+    const removeUSD = useMemo(
+        () => liquidity.multipliedBy(tokenMap[pool.lpToken.identifier].price),
+        [liquidity, pool.lpToken.identifier, tokenMap]
+    );
 
     const lpAmount = useMemo(() => {
         return new TokenAmount(pool.lpToken, ownLiquidity);
     }, [pool.lpToken, ownLiquidity]);
 
     useEffect(() => {
-        const pct =
-            lpAmount.equalTo(0)
-                ? 0
-                : liquidityWei
-                      .div(lpAmount.raw)
-                      .multipliedBy(100)
-                      .toNumber();
+        const pct = lpAmount.equalTo(0)
+            ? 0
+            : liquidityWei.div(lpAmount.raw).multipliedBy(100).toNumber();
         setLiquidityPercent(pct);
     }, [lpAmount, liquidityWei]);
 
@@ -93,10 +128,84 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
         [ownLiquidity]
     );
 
+    const estimateRemoveLPOneCoinV1 = useRecoilCallback(
+        ({ snapshot }) =>
+            async (pool: IPool, lpAmount: BigNumber, tokenIndex: number) => {
+                let output = new BigNumber(0);
+                const poolData = await snapshot.getPromise(
+                    ashRawPoolV1ByAddressQuery(pool.address)
+                );
+                if (poolData) {
+                    try {
+                        const { withdrawAmount, withdrawAmountBeforeFee, fee } =
+                            calculateEstimatedWithdrawOneCoin(
+                                tokenIndex,
+                                new BigNumber(poolData.ampFactor || 0),
+                                new TokenAmount(
+                                    pool.lpToken,
+                                    poolData.totalSupply || 0
+                                ),
+                                new TokenAmount(pool.lpToken, lpAmount),
+                                poolData.reserves.map(
+                                    (r, i) => new TokenAmount(pool.tokens[i], r)
+                                ),
+                                new Fraction(
+                                    poolData.swapFeePercent || 0,
+                                    100_000
+                                )
+                            );
+                        output = withdrawAmount.raw;
+                    } catch (error) {
+                        Sentry.captureException(error);
+                    }
+                }
+                return output;
+            },
+        []
+    );
+
+    const estimateRemoveLPOneCoinV2 = useRecoilCallback(
+        ({ snapshot }) =>
+            async (pool: IPool, lpAmount: BigNumber, tokenIndex: number) => {
+                let output = new BigNumber(0);
+                const poolData = await snapshot.getPromise(
+                    ashRawPoolV2ByAddressQuery(pool.address)
+                );
+                if (poolData) {
+                    try {
+                        output = new CurveV2(pool.tokens, {
+                            ...poolData,
+                            ann: poolData.ampFactor,
+                        }).estimateWithdrawOneCoin(lpAmount, tokenIndex);
+                    } catch (error) {
+                        Sentry.captureException(error);
+                    }
+                }
+                return output;
+            },
+        []
+    );
+
+    const ownLiquidityString = useMemo(() => {
+        return ownLiquidity.toString();
+    }, [ownLiquidity]);
+
+    const canRemoveLP = useMemo(() => {
+        return (
+            !removing &&
+            liquidityWei.gt(0) &&
+            (isBalanced || selectedTokenIndex >= 0)
+        );
+    }, [isBalanced, liquidityWei, removing, selectedTokenIndex]);
+
     const estimateRemoveLP = useRecoilCallback(
         ({ snapshot }) =>
             async () => {
-                if (liquidityDebounce.eq(0) || liquidityDebounce.isNaN()) {
+                if (
+                    liquidityDebounce.eq(0) ||
+                    liquidityDebounce.isNaN() ||
+                    (!isBalanced && selectedTokenIndex === -1)
+                ) {
                     setOutputValues(
                         pool.tokens.map((_t, i) => {
                             const t = getTokenFromId(_t.identifier);
@@ -104,64 +213,187 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
                         })
                     );
                 }
-                const { lpReserves } = await snapshot.getPromise(
-                    LPBreakDownQuery({
-                        poolAddress: pool.address,
-                        wei: liquidityDebounce.toString(10),
-                    })
-                );
-                setOutputValues(
-                    pool.tokens.map((_t, i) => {
-                        const t = getTokenFromId(_t.identifier);
-                        return new TokenAmount(t, lpReserves[i]);
-                    })
-                );
+                if (isBalanced) {
+                    const { lpReserves } = await snapshot.getPromise(
+                        LPBreakDownQuery({
+                            poolAddress: pool.address,
+                            wei: liquidityDebounce.toString(10),
+                        })
+                    );
+                    const { lpReserves: maxReserves } =
+                        await snapshot.getPromise(
+                            LPBreakDownQuery({
+                                poolAddress: pool.address,
+                                wei: ownLiquidityString,
+                            })
+                        );
+                    setOutputValues(
+                        pool.tokens.map((_t, i) => {
+                            const t = getTokenFromId(_t.identifier);
+                            return new TokenAmount(t, lpReserves[i]);
+                        })
+                    );
+                    setMaxOutputValues(
+                        pool.tokens.map((_t, i) => {
+                            const t = getTokenFromId(_t.identifier);
+                            return new TokenAmount(t, maxReserves[i]);
+                        })
+                    );
+                } else if (selectedTokenIndex >= 0) {
+                    let output = new BigNumber(0);
+                    let maxOutput = new BigNumber(0);
+                    if (pool.type === EPoolType.PoolV2) {
+                        output = await estimateRemoveLPOneCoinV2(
+                            pool,
+                            liquidityDebounce,
+                            selectedTokenIndex
+                        );
+                        maxOutput = await estimateRemoveLPOneCoinV2(
+                            pool,
+                            new BigNumber(ownLiquidityString),
+                            selectedTokenIndex
+                        );
+                    } else {
+                        output = await estimateRemoveLPOneCoinV1(
+                            pool,
+                            liquidityDebounce,
+                            selectedTokenIndex
+                        );
+                        maxOutput = await estimateRemoveLPOneCoinV1(
+                            pool,
+                            new BigNumber(ownLiquidityString),
+                            selectedTokenIndex
+                        );
+                    }
+                    setOutputValues(
+                        pool.tokens.map(
+                            (t, i) =>
+                                new TokenAmount(
+                                    t,
+                                    i === selectedTokenIndex ? output : 0
+                                )
+                        )
+                    );
+                    setMaxOutputValues(
+                        pool.tokens.map(
+                            (t, i) =>
+                                new TokenAmount(
+                                    t,
+                                    i === selectedTokenIndex ? maxOutput : 0
+                                )
+                        )
+                    );
+                }
             },
-        [pool.address, pool.tokens, liquidityDebounce]
+        [
+            liquidityDebounce,
+            isBalanced,
+            selectedTokenIndex,
+            pool,
+            ownLiquidityString,
+            estimateRemoveLPOneCoinV2,
+            estimateRemoveLPOneCoinV1,
+        ]
     );
 
     const removeLPHandle = useCallback(async () => {
-        if (removing || liquidityWei.eq(0)) return;
+        if (!canRemoveLP) return;
         try {
-            const { sessionId } = await removeLP(
-                pool,
-                liquidityWei,
-                outputValues,
-                slippage
-            );
-            if (sessionId) onClose?.();
+            if (isBalanced) {
+                const { sessionId } = await removeLP(
+                    pool,
+                    liquidityWei,
+                    outputValues,
+                    slippage
+                );
+                if (sessionId) onClose?.();
+            } else {
+                const { sessionId } = await removeLPOneCoin(
+                    pool,
+                    liquidityWei,
+                    outputValues[selectedTokenIndex],
+                    slippage,
+                    selectedTokenIndex
+                );
+                if (sessionId) onClose?.();
+            }
         } catch (error) {
             // TODO: extension close without response
             console.error(error);
         }
-    }, [outputValues, slippage, pool, onClose, liquidityWei, removing, removeLP]);
+    }, [
+        canRemoveLP,
+        isBalanced,
+        removeLP,
+        pool,
+        liquidityWei,
+        outputValues,
+        onClose,
+        removeLPOneCoin,
+        selectedTokenIndex,
+    ]);
 
-    useEffect(() => {
-        estimateRemoveLP();
-    }, [estimateRemoveLP]);
+    const onChangeIsBalanced = useCallback((val: boolean) => {
+        setIsBalanced(val);
+        setSelectedTokenIndex(-1);
+    }, []);
+
+    useInterval(estimateRemoveLP, blockTimeMs);
 
     return (
         <div className="px-8 pt-6 pb-16 sm:pb-7">
             <div className="flex flex-row items-center mb-3">
                 <div className="mr-3">
                     <div className="text-text-input-3 text-xs">
-                        {pool.tokens.map((t) => getTokenFromId(t.identifier).symbol).join(" & ")}
+                        {pool.tokens
+                            .map((t) => getTokenFromId(t.identifier).symbol)
+                            .join(" & ")}
                     </div>
                 </div>
                 <div className="flex flex-row justify-between items-center">
                     {pool.tokens.map((_t) => {
                         const t = getTokenFromId(_t.identifier);
-                        return <Avatar
-                            key={t.identifier}
-                            src={t.logoURI}
-                            alt={t.symbol}
-                            className="w-3.5 h-3.5 first:-ml-0 -ml-1"
-                        />;
+                        return (
+                            <Avatar
+                                key={t.identifier}
+                                src={t.logoURI}
+                                alt={t.symbol}
+                                className="w-3.5 h-3.5 first:-ml-0 -ml-1"
+                            />
+                        );
                     })}
                 </div>
             </div>
-            <div className="flex items-baseline text-2xl font-bold text-yellow-700">
+            <div className="mb-7 flex items-baseline text-2xl font-bold text-yellow-700">
                 Withdraw Liquidity
+            </div>
+            <div className="px-6 py-7 bg-ash-dark-600 flex flex-col sm:flex-row sm:items-center">
+                <div className="sm:w-1/2 mb-4 sm:mb-0">
+                    <Switch
+                        checked={isBalanced}
+                        onChange={onChangeIsBalanced}
+                        className="inline-flex items-center mb-7"
+                    >
+                        <span className="ml-2 font-bold text-sm text-stake-gray-500 underline">
+                            Balanced Withdraw
+                        </span>
+                    </Switch>
+                    <div className="font-bold text-xs text-white">
+                        We recommend that you make a balanced withdraw if you
+                        can.
+                    </div>
+                </div>
+                <div className="hidden sm:block mx-9 border-l border-ash-gray-600 self-stretch"></div>
+                <div className="sm:w-1/2 font-medium text-2xs text-stake-gray-500">
+                    <div className="mb-4">
+                        i.e. Withdraw with balanced proportions incurs the least
+                        fees.
+                    </div>
+                    <div>
+                        But if you need to swap to have the correct amounts, it
+                        is better to withdraw in unbalanced/single-sided way.
+                    </div>
+                </div>
             </div>
             <div className="mt-8 mb-12 sm:my-10">
                 <div className="relative mb-11 sm:mb-0">
@@ -188,43 +420,56 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
                             )}
                         >
                             <div>
+                                <div className="flex items-center space-x-1 bg-ash-dark-700 sm:bg-transparent pl-4 sm:pl-0">
+                                    <div className="w-[8.25rem] sm:w-48 flex items-center font-bold shrink-0 border-r border-r-ash-gray-500 sm:border-r-0">
+                                        <span>LP-TOKEN</span>
+                                    </div>
+                                    <div className="flex-1 flex items-center overflow-hidden bg-ash-dark-700 text-right text-lg h-[4.5rem] px-5 ">
+                                        <InputCurrency
+                                            className="bg-transparent text-right grow outline-none min-w-0"
+                                            placeholder="0"
+                                            value={liquidityStr}
+                                            onChange={(e) => {
+                                                const value =
+                                                    e.target.value || "";
+                                                const wei = new BigNumber(
+                                                    e.target.value || 0
+                                                ).multipliedBy(
+                                                    10 **
+                                                        poolData.pool.lpToken
+                                                            .decimals
+                                                );
+                                                if (wei.gt(ownLiquidity)) {
+                                                    setLiquidityWei(
+                                                        ownLiquidity
+                                                    );
+                                                } else {
+                                                    setLiquidityWei(wei);
+                                                    setLiquidityStr(value);
+                                                }
 
-                            <div className="flex items-center space-x-1 bg-ash-dark-700 sm:bg-transparent pl-4 sm:pl-0">
-                                <div className="flex items-center font-bold w-24 shrink-0 border-r border-r-ash-gray-500 sm:border-r-0">
-                                    <IconRight className="mr-4" />
-                                    <span>LP</span>
+                                                setOnboardedWithdrawInput(true);
+                                            }}
+                                        />
+                                    </div>
                                 </div>
-                                <div className="flex-1 flex items-center overflow-hidden bg-ash-dark-700 text-right text-lg h-[4.5rem] px-5 ">
-                                    <InputCurrency
-                                        className="bg-transparent text-right grow outline-none min-w-0"
-                                        placeholder="0"
-                                        value={liquidityStr}
-                                        onChange={(e) => {
-                                            const value = e.target.value || "";
-                                            const wei = new BigNumber(e.target.value || 0).multipliedBy(10**poolData.pool.lpToken.decimals);
-                                            if(wei.gt(ownLiquidity)){
-                                                setLiquidityWei(ownLiquidity);
-                                            }else{
-                                                setLiquidityWei(wei);
-                                                setLiquidityStr(value);
-                                            }
-                                            
-                                            setOnboardedWithdrawInput(true);
-                                        }}
-                                    />
+                                <div className="flex justify-end font-medium text-2xs text-ash-gray-600">
+                                    ~$
+                                    {formatAmount(removeUSD, {
+                                        notation: "standard",
+                                    })}
                                 </div>
-                            </div>
-                            <div className="flex justify-end font-medium text-2xs text-ash-gray-600">
-                                ~${formatAmount(removeUSD, {notation: "standard"})}
-                            </div>
                             </div>
                         </OnboardTooltip>
 
-                        <div className="flex flex-row items-center">
-                            <div className="sm:w-24"></div>
+                        <div className="flex flex-row items-center space-x-1">
+                            <div className="sm:w-48"></div>
                             <div className="flex flex-row items-center flex-1 gap-4">
                                 <div className="w-9 shrink-0 font-bold text-sm text-yellow-500">
-                                    {formatAmount(liquidityPercent, {isIntegerAuto: true})}%
+                                    {formatAmount(liquidityPercent, {
+                                        isIntegerAuto: true,
+                                    })}
+                                    %
                                 </div>
                                 <Slider
                                     className="ash-slider pt-4 w-full"
@@ -257,17 +502,130 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
                         </div>
                     </div>
                     <div className="relative">
+                        <div className="absolute top-0 sm:-top-20 bottom-[4.3rem] left-1 w-4 sm:w-10 border-l border-dashed rounded-bl-lg border-ash-gray-600"></div>
                         {pool.tokens.map((_t, i) => {
                             const t = getTokenFromId(_t.identifier);
                             return (
-                                <div key={t.identifier} className="my-1.5">
-                                    <div className="flex items-center flex-row space-x-1 bg-ash-dark-700 sm:bg-transparent pl-4 sm:pl-0">
-                                        <Token
-                                            token={t}
-                                            className="w-24 border-r border-r-ash-gray-500 sm:border-r-0"
-                                        />
+                                <div key={t.identifier} className="py-1.5">
+                                    <div
+                                        className={`absolute top-0 sm:-top-20 left-1 w-4 sm:w-10 border-l border-yellow-500 rounded-bl-lg ${
+                                            i === selectedTokenIndex ||
+                                            isBalanced
+                                                ? "block"
+                                                : "hidden"
+                                        }`}
+                                        style={{
+                                            bottom: `${
+                                                (pool.tokens.length - i) * 6.2 -
+                                                1.9
+                                            }rem`,
+                                        }}
+                                    ></div>
+                                    <div className="flex items-center flex-row space-x-1">
+                                        <div className="shrink-0 w-36 sm:w-48 flex items-center">
+                                            <div className="shrink-0 pr-3 lg:pr-6 relative pl-4 sm:pl-10 w-14 sm:w-[7rem] min-h-[1rem] flex items-center justify-center">
+                                                <div
+                                                    className={`absolute inset-y-0 left-1 border-b -translate-y-1/2 rounded-bl-lg ${
+                                                        isBalanced
+                                                            ? "w-full"
+                                                            : "w-4 sm:w-10"
+                                                    } ${
+                                                        i ===
+                                                            selectedTokenIndex ||
+                                                        isBalanced
+                                                            ? "border-yellow-500"
+                                                            : "border-dashed border-ash-gray-600"
+                                                    }`}
+                                                ></div>
+                                                <Transition
+                                                    show={isBalanced}
+                                                    enter="absolute"
+                                                    enterFrom="opacity-0"
+                                                    enterTo="opacity-100"
+                                                    leave="absolute"
+                                                    leaveFrom="opacity-100"
+                                                    leaveTo="opacity-0"
+                                                    className="transition-all duration-200 ease-in-out"
+                                                >
+                                                    <div className="relative p-1 bg-ash-dark-400">
+                                                        <ICChevronRight className="w-1.5 h-auto text-yellow-500" />
+                                                    </div>
+                                                </Transition>
+                                                <Transition
+                                                    show={!isBalanced}
+                                                    enter="absolute"
+                                                    enterFrom="opacity-0 scale-90"
+                                                    enterTo="opacity-100 scale-100"
+                                                    leave="absolute"
+                                                    leaveFrom="opacity-100"
+                                                    leaveTo="opacity-0"
+                                                    className="transition-all duration-200 ease-in-out"
+                                                >
+                                                    <OnboardTooltip
+                                                        disabled={i !== 0}
+                                                        delayOpen={1000}
+                                                        open={
+                                                            i === 0 &&
+                                                            screenSize.md &&
+                                                            onboardingWithdrawOneCoin
+                                                        }
+                                                        onArrowClick={() =>
+                                                            setOnboardedWithdrawOneCoin(
+                                                                true
+                                                            )
+                                                        }
+                                                        placement="left"
+                                                        content={
+                                                            onboardingWithdrawOneCoinTooltipContent
+                                                        }
+                                                    >
+                                                        <div
+                                                            className="relative z-10 flex items-center justify-center cursor-pointer"
+                                                            onClick={() =>
+                                                                setSelectedTokenIndex(
+                                                                    i
+                                                                )
+                                                            }
+                                                        >
+                                                            <ICHexagonDuo
+                                                                className={`transition-all duration-300 h-6 sm:h-12 w-auto  ${
+                                                                    selectedTokenIndex ===
+                                                                    i
+                                                                        ? "fill-yellow-500/20 stroke-yellow-500"
+                                                                        : "stroke-white group-hover:stroke-yellow-500"
+                                                                }`}
+                                                            />
+                                                            <ICChevronRight
+                                                                className={`transition-all delay-75 absolute w-1.5 sm:w-2.5 h-auto text-yellow-500 ${
+                                                                    selectedTokenIndex ===
+                                                                    i
+                                                                        ? "opacity-100 scale-100"
+                                                                        : "opacity-0 scale-0"
+                                                                }`}
+                                                            />
+                                                        </div>
+                                                    </OnboardTooltip>
+                                                </Transition>
+                                            </div>
+                                            <div className="flex items-center overflow-hidden">
+                                                <Avatar
+                                                    src={t.logoURI}
+                                                    alt={t.name}
+                                                    className="shrink-0 w-5 h-5 mr-2"
+                                                />
+                                                <span className="font-bold text-sm text-white truncate">
+                                                    {t.symbol}
+                                                </span>
+                                            </div>
+                                        </div>
                                         <InputCurrency
-                                            className="flex-1 overflow-hidden bg-ash-dark-700 text-right text-lg h-12 px-5 outline-none"
+                                            className={`transition-all duration-300 flex-1 overflow-hidden text-right text-lg h-12 px-5 outline-none ${
+                                                isBalanced
+                                                    ? "bg-ash-dark-500"
+                                                    : selectedTokenIndex === i
+                                                    ? "bg-ash-dark-700"
+                                                    : "bg-ash-dark-500 opacity-30"
+                                            }`}
                                             placeholder="0"
                                             value={outputValues[i]
                                                 .toBigNumber()
@@ -275,16 +633,18 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
                                             disabled
                                         />
                                     </div>
-                                    <div className="pt-2 text-2xs sm:text-sm text-text-input-3 text-right">
+                                    <div
+                                        className={`pt-2 pb-4 font-medium text-2xs text-text-input-3 text-right ${
+                                            isBalanced ||
+                                            selectedTokenIndex === i
+                                                ? "opacity-100"
+                                                : "opacity-0"
+                                        }`}
+                                    >
                                         <span>Available: </span>
                                         <span className="text-earn">
                                             <TextAmt
-                                                number={toEGLDD(
-                                                    pool.tokens[i].decimals,
-                                                    liquidityData?.lpReserves[
-                                                        i
-                                                    ] || 0
-                                                )}
+                                                number={maxOutputValues[i].egld}
                                                 options={{
                                                     notation: "standard",
                                                 }}
@@ -292,9 +652,6 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
                                             {t.symbol}
                                         </span>
                                     </div>
-                                    {i !== pool.tokens.length - 1 && (
-                                        <div className="text-sm">&</div>
-                                    )}
                                 </div>
                             );
                         })}
@@ -309,7 +666,7 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
                             theme="yellow"
                             className="w-full h-12 font-bold clip-corner-1 clip-corner-tl"
                             onClick={removeLPHandle}
-                            disabled={removing || liquidityWei.eq(0)}
+                            disabled={!canRemoveLP}
                         >
                             {insufficientEGLD
                                 ? "INSUFFICIENT EGLD BALANCE"
@@ -322,15 +679,11 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
     );
 };
 const RemoveLiquidityModal = ({ open, onClose, poolData }: Props) => {
-    const screenSize = useScreenSize();
     return (
         <BaseModal
             isOpen={!!open}
             onRequestClose={() => onClose && onClose()}
-            type={screenSize.msm ? "drawer_btt" : "modal"}
-            className="clip-corner-4 clip-corner-tl bg-ash-dark-600 p-4
-                    sm:mt-28 max-w-4xl mx-auto
-                    fixed sm:relative inset-x-0 bottom-0 max-h-screen overflow-auto text-white flex flex-col"
+            className="clip-corner-4 clip-corner-tl bg-ash-dark-400 text-white p-4 flex flex-col max-h-full max-w-4xl mx-auto"
         >
             <div className="flex justify-end">
                 <BaseModal.CloseBtn />

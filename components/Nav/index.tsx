@@ -1,80 +1,64 @@
-import Link from "next/link";
-import { useRouter } from "next/router";
-import { useCallback } from "react";
-import styles from "./Nav.module.css";
-import SocialMenu from "./SocialMenu";
-import ICPool from "assets/svg/pool.svg";
-import ICSwap from "assets/svg/swap.svg";
 import ICChart from "assets/svg/chart.svg";
+import ICChevronDown from "assets/svg/chevron-down.svg";
+import ICFarm from "assets/svg/farm.svg";
 import ICNewTab from "assets/svg/new-tab.svg";
+import ICPool from "assets/svg/pool.svg";
+import ICSocial from "assets/svg/social.svg";
 import ICStake from "assets/svg/stake.svg";
-import StakeMenu from "./StakeMenu";
-import { ENVIRONMENT } from "const/env";
+import ICSwap from "assets/svg/swap.svg";
+import BaseTooltip from "components/BaseTooltip";
+import { useRouter } from "next/router";
+import NavLink from "./NavLink";
+import { SocialMenuContent } from "./SocialMenu";
 
 const Nav = () => {
     const router = useRouter();
 
-    const isActive = useCallback(
-        (path: string, exact = true) => {
-            return exact
-                ? router.route === path
-                : router.route.startsWith(path);
-        },
-        [router]
-    );
-
     return (
-        <div
-            className={`${styles.container} text-black dark:text-white sm:space-x-[0.375rem]`}
-        >
-            <Link href="/swap">
-                <div
-                    className={`transition ${styles.btn} ${
-                        isActive("/swap") ? styles.active : ""
-                    }`}
-                >
-                    <ICSwap className="inline-block w-4 h-4 md:mr-2 transition-none" />
-                    <span className="inline-block">Swap</span>
-                </div>
-            </Link>
-            <Link href="/pool">
-                <div
-                    className={`transition ${styles.btn} ${
-                        isActive("/pool") ? styles.active : ""
-                    }`}
-                >
-                    <ICPool className="inline-block w-4 h-4 md:mr-2 transition-none" />
-                    <span className="inline-block">Pool</span>
-                </div>
-            </Link>
-            {/* <Link href="/stake/gov" passHref>
-                <div
-                    className={`transition ${styles.btn} ${
-                        isActive("/stake/gov", false) ? styles.active : ""
-                    }`}
-                >
-                    <ICStake className="inline-block w-4 h-4 md:mr-2 transition-none" />
-                    <span className="inline-block">Stake</span>
-                </div>
-            </Link> */}
-            <StakeMenu />
-            <Link href="/info" target="_blank">
-                <div
-                    className={`transition ${styles.btn} ${
-                        isActive("/info") ? styles.active : ""
-                    }`}
-                >
-                    <ICChart className="inline-block w-4 h-4 md:mr-2 transition-none" />
-                    <div className="flex items-center">
-                        <span className="inline-block mr-1 truncate">
-                            Analytic
-                        </span>
-                        <ICNewTab className="inline-block w-2.5 h-2.5 transition-none" />
+        <nav className="flex items-center gap-2">
+            <NavLink href="/swap">
+                <ICSwap className="w-4 h-auto" />
+                <span>Swap</span>
+            </NavLink>
+            <NavLink href="/pool">
+                <ICPool className="w-4 h-auto" />
+                <span>Pool</span>
+            </NavLink>
+            <NavLink href="/farms">
+                <ICFarm className="w-4 h-auto" />
+                <span>Farm</span>
+            </NavLink>
+            <NavLink href="/gov">
+                <ICStake className="-mt-0.5 w-4 h-auto" />
+                <span>Governance</span>
+            </NavLink>
+            <NavLink href="/info" target="_blank">
+                <ICChart className="w-4 h-auto" />
+                <span className="inline-flex items-center gap-1 md:gap-2">
+                    <span>Analytic</span>
+                    <ICNewTab className="w-2 md:w-3 h-auto" />
+                </span>
+            </NavLink>
+            <BaseTooltip
+                strategy="fixed"
+                placement="bottom"
+                content={
+                    <div className="bg-ash-dark-600 p-8 min-w-[22.5rem]">
+                        <SocialMenuContent />
                     </div>
-                </div>
-            </Link>
-            <SocialMenu />
-        </div>
+                }
+            >
+                <button>
+                    <NavLink href="#">
+                        <ICSocial className="-mt-0.5 w-4 h-auto" />
+                        <span className="inline-flex items-center gap-1 md:gap-2">
+                            <span>More</span>
+                            <ICChevronDown className="md:-mt-0.5 w-2 md:w-3 h-auto" />
+                        </span>
+                    </NavLink>
+                </button>
+            </BaseTooltip>
+        </nav>
     );
 };
 

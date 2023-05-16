@@ -2,12 +2,15 @@ import BigNumber from "bignumber.js";
 import { Fraction } from "helper/fraction/fraction";
 import { IESDTInfo } from "helper/token/token";
 import { TokenAmount } from "helper/token/tokenAmount";
-import { computeD, computeY2 } from "./curve";
+import { computeD, computeY2, computeYD } from "./curve";
 
 const PRECISION = new BigNumber(1e18);
 const DOUBLE_PRECISION = PRECISION.multipliedBy(PRECISION);
 export const getTokenRate = (token: IESDTInfo) => {
     return new BigNumber(10).pow(18 * 2 - token.decimals);
+};
+export const getRateMultiplier = (decimals: number) => {
+    return new BigNumber(10).pow(18 - decimals);
 };
 export const computeDNormalizeDecimal = (
     ampFactor: BigNumber,
@@ -441,5 +444,69 @@ export const calculateEstimatedMintAmount = (
         mintAmount,
         mintAmountBeforeFees,
         fees,
+    };
+};
+
+export const calculateEstimatedWithdrawOneCoin = (
+    indexTokenOut: number,
+    amp: BigNumber,
+    totalSupply: TokenAmount,
+    lpAmount: TokenAmount,
+    reserves: TokenAmount[],
+    withdrawFee = new Fraction(0),
+    underlyingPrices?: BigNumber[],
+) => {
+    // if underlying is not provided - plain Pool otherwise the pool is lending or meta pool.
+    const _underlyingPrices = !underlyingPrices?.length ? reserves.map(r => new BigNumber(PRECISION)) : underlyingPrices;
+
+    const nCoins = reserves.length;
+    const baseFee = withdrawFee.numerator
+        .multipliedBy(nCoins)
+        .idiv(4 * (nCoins - 1));
+    const rates = reserves.map((r) => getTokenRate(r.token));
+    const xp = reserves.map((r, i) =>
+        r.raw.multipliedBy(rates[i]).multipliedBy(_underlyingPrices[i]).idiv(DOUBLE_PRECISION)
+    );
+
+    const D0 = computeD(amp, xp);
+    const D1 = D0.minus(lpAmount.raw.multipliedBy(D0).idiv(totalSupply.raw));
+    const new_y = computeYD(amp, indexTokenOut, xp.map((xpi, i) => new TokenAmount(reserves[i].token, xpi)), D1);
+
+    const xp_reduced: BigNumber[] = [];
+    for (let i = 0; i < nCoins; i++) {
+        let dx_expected = new BigNumber(0);
+        const xp_i = xp[i];
+        if (i === indexTokenOut) {
+            dx_expected = xp_i.multipliedBy(D1).idiv(D0).minus(new_y);
+            console.log(xp_i.toString(10), xp_i.multipliedBy(D1).idiv(D0).toString(10))
+        } else {
+            dx_expected = xp_i.minus(xp_i.multipliedBy(D1).idiv(D0));
+        }
+        xp_reduced[i] = xp_i.minus(
+            baseFee.multipliedBy(dx_expected).idiv(withdrawFee.denominator)
+        );
+    }
+
+    let dy = xp_reduced[indexTokenOut].minus(
+        computeYD(
+            amp,
+            indexTokenOut,
+            reserves.map((r, i) => new TokenAmount(r.token, xp_reduced[i])),
+            D1
+        )
+    );
+    const dy_0 = xp[indexTokenOut]
+        .minus(new_y)
+        .multipliedBy(DOUBLE_PRECISION)
+        .idiv(rates[indexTokenOut].multipliedBy(_underlyingPrices[indexTokenOut])); // without fee
+    dy = dy.multipliedBy(DOUBLE_PRECISION).idiv(rates[indexTokenOut].multipliedBy(_underlyingPrices[indexTokenOut]));
+
+    return {
+        withdrawAmountBeforeFee: new TokenAmount(
+            reserves[indexTokenOut].token,
+            dy_0
+        ),
+        withdrawAmount: new TokenAmount(reserves[indexTokenOut].token, dy),
+        fee: new TokenAmount(reserves[indexTokenOut].token, dy_0.minus(dy)),
     };
 };

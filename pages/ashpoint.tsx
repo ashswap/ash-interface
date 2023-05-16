@@ -11,6 +11,7 @@ import { memo, useEffect } from "react";
 import { useRecoilValue } from "recoil";
 import QuestOverview from "views/quest/QuestOverview";
 import Link from "next/link";
+import { ReactElement } from "react-markdown/lib/react-markdown";
 const WebWalletInformModal = memo(function WebWalletInformModal(
     props: Omit<BaseModalType, "children">
 ) {
@@ -44,7 +45,7 @@ const WebWalletInformModal = memo(function WebWalletInformModal(
         </BaseModal>
     );
 });
-function AshPoint() {
+function AshPointPage() {
     const router = useRouter();
     const { loginMethod, isLoggedIn } = useGetLoginInfo();
     const userAddress = useRecoilValue(accAddressState);
@@ -66,11 +67,13 @@ function AshPoint() {
         );
 
     return (
-        <BasicLayout>
-            <div className="ash-container pb-40 pt-8">
-                <QuestOverview />
-            </div>
-        </BasicLayout>
+        <div className="ash-container pb-40 pt-8">
+            <QuestOverview />
+        </div>
     );
 }
-export default AshPoint;
+
+AshPointPage.getLayout = function getLayout(page: ReactElement) {
+    return <BasicLayout>{page}</BasicLayout>;
+};
+export default AshPointPage;
