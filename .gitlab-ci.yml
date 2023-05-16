@@ -114,6 +114,7 @@ deploy_ipfs_alpha:
   variables:
     <<: *env_beta
   only:
+    - /^.*-beta$/
     - /^.*-alpha$/
   except:
     - branches
