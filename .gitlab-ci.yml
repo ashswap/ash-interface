@@ -157,6 +157,7 @@ deploy_ipfs_beta:
   NEXT_PUBLIC_ASH_SOCKET: https://socket-api-fra-aws.multiversx.com
   NEXT_PUBLIC_ASH_SOCKET_EXTRA: 
   NEXT_PUBLIC_ASH_LOG_API: https://api-tracking.ashswap.io
+  NEXT_PUBLIC_IPFS_API: https://ipfs-cluster-api-internal.bicarus.io
   NEXT_PUBLIC_AG_API: https://aggregator.ashswap.io
 
 .job_template_prod: &job_template_prod
