@@ -49,7 +49,8 @@ export function useRecoilAdapter() {
     const { data } = useAshBaseStateQuery({ refreshInterval: 6000 });
     useGraphQLQueryOptions(config);
     useEffect(() => {
-        data && setAshBaseState(data);
+        // data && setAshBaseState(data);
+        data && setAshBaseState({...data, pools: data.pools.map((p: any) => ({...p, underlyingPrices: new Array(p.tokens.length).fill('1e18')})), farms: data.farms.map((f: any) => ({...f, additionalRewards: []}))});
         // if(!data) return;
         // const x = [...data.pools];
         // x[0] = {...data.pools[0], lpToken: fakePrice[4]}
