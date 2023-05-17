@@ -97,7 +97,7 @@ deploy_ipfs_alpha:
   <<: *env_common
   NEXT_PUBLIC_NETWORK: devnet
   NEXT_PUBLIC_ASH_ENV: beta
-  BUILD_ENV: prod
+  BUILD_ENV: dev
   NEXT_PUBLIC_ASH_API: https://api-devnet.ashswap.io
   NEXT_PUBLIC_ASH_DOMAIN: devnet.ashswap.io
   NEXT_PUBLIC_ASH_GRAPHQL: https://api-v2-devnet.ashswap.io
@@ -149,13 +149,15 @@ deploy_ipfs_beta:
   <<: *env_common
   NEXT_PUBLIC_NETWORK: mainnet
   NEXT_PUBLIC_ASH_ENV: beta
-  BUILD_ENV: prod
+  # TODO: prod
+  BUILD_ENV: dev
   NEXT_PUBLIC_ASH_API: https://api.ashswap.io
   NEXT_PUBLIC_ASH_DOMAIN: app.ashswap.io
   NEXT_PUBLIC_ASH_GRAPHQL: https://api-v2.ashswap.io
   NEXT_PUBLIC_ASH_SOCKET: https://socket-api-fra-aws.multiversx.com
   NEXT_PUBLIC_ASH_SOCKET_EXTRA: 
   NEXT_PUBLIC_ASH_LOG_API: https://api-tracking.ashswap.io
+  NEXT_PUBLIC_IPFS_API: https://ipfs-cluster-api-internal.bicarus.io
   NEXT_PUBLIC_AG_API: https://aggregator.ashswap.io
 
 .job_template_prod: &job_template_prod
