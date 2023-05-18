@@ -415,6 +415,7 @@ const useFarmsState = () => {
                         new TokenAmount(ASH_TOKEN, estimatedReward)
                     );
                 }
+                const weightBoost = farmBalance.div(totalStakedLP).div(0.4).toNumber();
                 record.stakedData = {
                     farmTokens,
                     totalStakedLP,
@@ -422,10 +423,10 @@ const useFarmsState = () => {
                     totalStakedLPValue: totalStakedLP
                         .multipliedBy(totalLiquidityValue)
                         .div(lpLockedAmt),
-                    weightBoost: farmBalance.div(totalStakedLP).div(0.4).toNumber(),
+                    weightBoost,
                     yieldBoost,
                     totalAPR:
-                        ashBaseAPR * yieldBoost +
+                        ashBaseAPR * weightBoost +
                         tradingAPR +
                         tokensAPR.reduce((sum, t) => (sum += t.apr), 0),
                     rewards,
