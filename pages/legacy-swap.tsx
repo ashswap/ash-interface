@@ -1,11 +1,11 @@
 import BasicLayout from "components/Layout/Basic";
 import type { NextPage } from "next";
-import Aggregator from "views/swap/Aggregator";
+import Swap from "views/swap/Swap";
 
 const AggregatorPage: NextPage = () => {
     return (
         <BasicLayout>
-            <Aggregator/>
+            <Swap/>
         </BasicLayout>
     );
 };

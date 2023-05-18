@@ -1,4 +1,4 @@
-import { tokenMapState } from "atoms/tokensState";
+import { tokenBalanceSelector, tokenMapState } from "atoms/tokensState";
 import { ASH_TOKEN, TOKENS_MAP } from "const/tokens";
 import { WRAPPED_EGLD } from "const/wrappedEGLD";
 import { Percent } from "helper/fraction/percent";
@@ -50,7 +50,8 @@ export const agSwapsAtom = atom({
 export const agIsInsufficientFundSelector = selector({
     key: "ag_is_insufficient_fund_selector",
     get: ({ get }) => {
-        const balance = get(tokenMapState)[get(agTokenInAtom)?.identifier]?.balance || "0";
-        return balance === "0";
+        const balance = get(tokenBalanceSelector(get(agTokenInAtom)?.identifier));
+        const amountIn = get(agAmountInAtom);
+        return balance?.egld.lt(amountIn);
     },
 });

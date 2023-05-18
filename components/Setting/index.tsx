@@ -1,16 +1,24 @@
+import ICNewTab from "assets/svg/new-tab.svg";
 import BigNumber from "bignumber.js";
+import GlowingButton from "components/GlowingButton";
 import InputCurrency from "components/InputCurrency";
 import SlippageSelect from "components/SlippageSelect";
 import { Percent } from "helper/fraction/percent";
 import useInputNumberString from "hooks/useInputNumberString";
+import Link from "next/link";
 import { useRecoilState } from "recoil";
 import { agSlippageAtom } from "views/swap/Aggregator/atoms/aggregator";
 
-interface Props {}
+interface Props {
+    isAggregator?: boolean;
+}
 
 const Setting = (props: Props) => {
     const [slippage, setSlippage] = useRecoilState(agSlippageAtom);
-    const [displaySlip, setDisplaySlip] = useInputNumberString(slippage.toFixed(2), 2);
+    const [displaySlip, setDisplaySlip] = useInputNumberString(
+        slippage.toFixed(2),
+        2
+    );
     return (
         <div>
             <div className="font-bold text-lg">Settings</div>
@@ -67,8 +75,13 @@ const Setting = (props: Props) => {
                                             .toString(10)
                                     );
                                 }
-                                const [numerator, denominator] = valid === 0 ? [0, 100_000] : new BigNumber(valid).toFraction();
-                                setSlippage(new Percent(numerator, denominator));
+                                const [numerator, denominator] =
+                                    valid === 0
+                                        ? [0, 100_000]
+                                        : new BigNumber(valid).toFraction();
+                                setSlippage(
+                                    new Percent(numerator, denominator)
+                                );
                             }
                         } else {
                             setSlippage(new Percent(1_000, 100_000));
@@ -82,6 +95,28 @@ const Setting = (props: Props) => {
                     Your transactions may fail.
                 </div>
             )}
+            <div className="mt-16">
+                <div className="mb-5 font-semi-bold text-xs text-white">
+                    Change Swap Mode
+                </div>
+                <Link href={props.isAggregator ? "/legacy-swap" : "/swap"} target="_blank">
+                    <GlowingButton
+                        className={`w-full flex items-center justify-between h-12 px-6 text-xs sm:text-sm font-bold text-ash-gray-600 bg-ash-dark-400 hover:bg-ash-dark-300`}
+                        style={
+                            !props.isAggregator
+                                ? {
+                                      borderWidth: "1px",
+                                      borderImageSlice: 1,
+                                      borderImageSource: `radial-gradient(90.48% 86.43% at 89.33% 11.52%, rgba(255, 0, 92, 0.5) 0%, black 100%)`,
+                                  }
+                                : {}
+                        }
+                    >
+                        {props.isAggregator ? "Legacy Swap" : "Aggregator Swap"}
+                        <ICNewTab className="w-2.5 h-auto text-stake-gray-500"/>
+                    </GlowingButton>
+                </Link>
+            </div>
         </div>
     );
 };
