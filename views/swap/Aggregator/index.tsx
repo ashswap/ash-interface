@@ -77,10 +77,9 @@ const Aggregator = memo(function Aggregator() {
         }
         return null;
     }, [amountIn, tokenIn, tokenOut.identifier]);
-    const { data } = useSWR<SorSwapResponse>(
+    const { data, isValidating: loadingAgResult } = useSWR<SorSwapResponse>(
         params,
         async (url, params) => {
-            console.log(params);
             const searchParams = new URLSearchParams(params);
             return fetcher(`${url}?${searchParams}`);
         },
@@ -115,10 +114,14 @@ const Aggregator = memo(function Aggregator() {
     const loggedIn = useRecoilValue(accIsLoggedInState);
     const isInsufficientEGLD = useRecoilValue(accIsInsufficientEGLDState);
 
-    const revertToken = useRecoilCallback(({set, snapshot}) => async () => {
-        set(agTokenInAtom, await snapshot.getPromise(agTokenOutAtom));
-        set(agTokenOutAtom, await snapshot.getPromise(agTokenInAtom));
-    }, []);
+    const revertToken = useRecoilCallback(
+        ({ set, snapshot }) =>
+            async () => {
+                set(agTokenInAtom, await snapshot.getPromise(agTokenOutAtom));
+                set(agTokenOutAtom, await snapshot.getPromise(agTokenInAtom));
+            },
+        []
+    );
 
     const tokenAmountFrom = useMemo(() => {
         if (!amountIn || !tokenIn) {
@@ -246,7 +249,7 @@ const Aggregator = memo(function Aggregator() {
                             </div>
                             <div className="flex flex-row justify-between pl-4 mb-12">
                                 <div className="font-bold text-2xl">
-                                    Aggregator
+                                    Swap
                                 </div>
                                 <div className="flex flex-row gap-2">
                                     <div>
@@ -315,23 +318,46 @@ const Aggregator = memo(function Aggregator() {
                                 >
                                     <div className="mt-10 mb-2 mx-2.5">
                                         <button
-                                            className="px-6 py-4 w-full bg-ash-dark-600 flex items-center justify-between"
-                                            disabled={!data?.routes?.length}
+                                            className={`transition-all group px-6 py-4 w-full bg-ash-dark-600 flex items-center justify-between hover:colored-drop-shadow-md hover:colored-drop-shadow-ash-dark-600 disabled:colored-drop-shadow-none disabled:cursor-not-allowed disabled:text-ash-gray-600 ${
+                                                loadingAgResult
+                                                    ? "disabled:bg-ash-dark-600"
+                                                    : "disabled:bg-stake-dark-500"
+                                            }`}
+                                            disabled={
+                                                !data?.routes?.length ||
+                                                loadingAgResult
+                                            }
                                             onClick={() =>
                                                 setIsOpenAgModal(true)
                                             }
                                         >
                                             <div className="flex items-center mr-4">
-                                                <ICHierarchySquare className="w-5 h-auto text-stake-gray-500 mr-2" />
-                                                <span className="font-bold text-sm text-white">
+                                                <ICHierarchySquare className="w-5 h-auto text-stake-gray-500 group-disabled:text-ash-gray-600 mr-2" />
+                                                <span className="font-bold text-sm text-white group-disabled:text-ash-gray-600">
                                                     Aggregator Route
                                                 </span>
                                             </div>
-                                            <div className="font-bold text-xs text-stake-gray-500">
-                                                {data?.routes?.length || 0}{" "}
-                                                {(data?.routes?.length || 0) > 1
-                                                    ? "Routes"
-                                                    : "Route"}
+                                            <div className="relative flex justify-end items-center">
+                                                <div
+                                                    className={`transition-all font-bold text-xs text-stake-gray-500 ${
+                                                        loadingAgResult
+                                                            ? "opacity-0"
+                                                            : "opacity-100"
+                                                    }`}
+                                                >
+                                                    {data?.routes?.length || 0}{" "}
+                                                    {(data?.routes?.length ||
+                                                        0) > 1
+                                                        ? "Routes"
+                                                        : "Route"}
+                                                </div>
+                                                <div
+                                                    className={`transition-all absolute w-5 h-5 mr-2 rounded-full border-t-transparent border-pink-600 border-4 animate-spin ${
+                                                        loadingAgResult
+                                                            ? "opacity-100"
+                                                            : "opacity-0"
+                                                    }`}
+                                                ></div>
                                             </div>
                                         </button>
                                     </div>
@@ -609,7 +635,7 @@ const Aggregator = memo(function Aggregator() {
                                 onClick={() => setShowSetting(false)}
                             />
                         </div>
-                        <Setting />
+                        <Setting isAggregator />
                     </div>
                 )}
             </div>
@@ -627,14 +653,16 @@ const Aggregator = memo(function Aggregator() {
                     <div className="flex justify-end">
                         <BaseModal.CloseBtn />
                     </div>
-                    <Setting />
-                    <BaseButton
-                        theme="pink"
-                        className="uppercase text-xs font-bold mt-10 h-12 w-full"
-                        onClick={() => setShowSetting(false)}
-                    >
-                        Confirm
-                    </BaseButton>
+                    <div className="p-6">
+                        <Setting isAggregator />
+                        <BaseButton
+                            theme="pink"
+                            className="uppercase text-xs font-bold mt-10 h-12 w-full"
+                            onClick={() => setShowSetting(false)}
+                        >
+                            Confirm
+                        </BaseButton>
+                    </div>
                 </BaseModal>
             )}
             <BaseModal

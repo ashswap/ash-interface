@@ -980,14 +980,16 @@ const Swap = () => {
                     <div className="flex justify-end">
                         <BaseModal.CloseBtn />
                     </div>
-                    <Setting />
-                    <BaseButton
-                        theme="pink"
-                        className="uppercase text-xs font-bold mt-10 h-12 w-full"
-                        onClick={() => setShowSetting(false)}
-                    >
-                        Confirm
-                    </BaseButton>
+                    <div className="p-6">
+                        <Setting />
+                        <BaseButton
+                            theme="pink"
+                            className="uppercase text-xs font-bold mt-10 h-12 w-full"
+                            onClick={() => setShowSetting(false)}
+                        >
+                            Confirm
+                        </BaseButton>
+                    </div>
                 </BaseModal>
             )}
         </div>

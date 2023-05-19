@@ -478,7 +478,6 @@ export const calculateEstimatedWithdrawOneCoin = (
         const xp_i = xp[i];
         if (i === indexTokenOut) {
             dx_expected = xp_i.multipliedBy(D1).idiv(D0).minus(new_y);
-            console.log(xp_i.toString(10), xp_i.multipliedBy(D1).idiv(D0).toString(10))
         } else {
             dx_expected = xp_i.minus(xp_i.multipliedBy(D1).idiv(D0));
         }
