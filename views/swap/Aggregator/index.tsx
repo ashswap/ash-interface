@@ -58,7 +58,7 @@ import {
     useAgCgkPrices,
     useAgSor,
     useAgTokenBalance,
-    useXexchangeRouter
+    useXexchangeRouter,
 } from "./hooks";
 import * as Sentry from "@sentry/nextjs";
 const Aggregator = memo(function Aggregator() {
@@ -112,14 +112,14 @@ const Aggregator = memo(function Aggregator() {
             .div(xexchangeAmtOut)
             .minus(100)
             .toNumber();
-    }, [
-        data,
-        tokenOut.decimals,
-        xexchangeOutput,
-    ]);
+    }, [data, tokenOut.decimals, xexchangeOutput]);
     const isPriceChangeTooHigh = useMemo(() => {
         return cgkPriceChangeP < -30;
     }, [cgkPriceChangeP]);
+
+    const isPriceImpactTooHigh = useMemo(() => {
+        return (data?.priceImpact || 0) * 100 > 30;
+    }, [data]);
 
     const screenSize = useScreenSize();
     const mounted = useMounted();
@@ -271,8 +271,9 @@ const Aggregator = memo(function Aggregator() {
     }, [data, tokenInCgkPrice, tokenOutCgkPrice]);
 
     useEffect(() => {
-        if (isPriceChangeTooHigh) setIsConfirmSwapAnyway(false);
-    }, [isPriceChangeTooHigh]);
+        if (isPriceChangeTooHigh && isPriceImpactTooHigh)
+            setIsConfirmSwapAnyway(false);
+    }, [isPriceChangeTooHigh, isPriceImpactTooHigh]);
 
     useEffect(() => {
         if (!tokenIn) {
@@ -287,15 +288,18 @@ const Aggregator = memo(function Aggregator() {
 
     useEffect(() => {
         // if the rate from xexchange router is better than the rate from SOR 5%
-        if(rateVsXexchange < 0){
-            Sentry.captureMessage("warning: the rate from xexchange router is better than the rate from SOR", {
-                extra: data,
-            });
+        if (rateVsXexchange < 0) {
+            Sentry.captureMessage(
+                "warning: the rate from xexchange router is better than the rate from SOR",
+                {
+                    extra: data,
+                }
+            );
         }
     }, [data, rateVsXexchange]);
 
     useEffect(() => {
-        if(isPriceChangeTooHigh){
+        if (isPriceChangeTooHigh) {
             Sentry.captureMessage("warning: price change is too high", {
                 extra: data,
             });
@@ -412,15 +416,15 @@ const Aggregator = memo(function Aggregator() {
                                                 setIsOpenAgModal(true)
                                             }
                                         >
-                                            <div className="flex items-center mr-4">
-                                                <ICHierarchySquare className="w-5 h-auto text-stake-gray-500 group-disabled:text-ash-gray-600 mr-2" />
-                                                <span className="font-bold text-sm text-white group-disabled:text-ash-gray-600">
+                                            <div className="overflow-hidden flex items-center mr-4">
+                                                <ICHierarchySquare className="shrink-0 w-5 h-auto text-stake-gray-500 group-disabled:text-ash-gray-600 mr-2" />
+                                                <span className="truncate inline-block font-bold text-sm text-white group-disabled:text-ash-gray-600">
                                                     Aggregator Route
                                                 </span>
                                             </div>
                                             <div className="relative flex justify-end items-center">
                                                 <div
-                                                    className={`transition-all font-bold text-xs text-stake-gray-500 ${
+                                                    className={`shrink-0 transition-all font-bold text-xs text-stake-gray-500 ${
                                                         loadingAgResult
                                                             ? "opacity-0"
                                                             : "opacity-100"
@@ -447,8 +451,8 @@ const Aggregator = memo(function Aggregator() {
 
                             {tokenIn && tokenOut && (
                                 <div
-                                    className={`flex flex-row justify-between text-xs my-5 ${
-                                        isPriceChangeTooHigh
+                                    className={`flex flex-row justify-between gap-2 text-xs my-5 ${
+                                        isPriceChangeTooHigh || isPriceImpactTooHigh
                                             ? "text-ash-purple-500"
                                             : "text-ash-green-500"
                                     }`}
@@ -462,8 +466,9 @@ const Aggregator = memo(function Aggregator() {
                                         }}
                                     >
                                         <div>
-                                            {isPriceChangeTooHigh
-                                                ? "Price impact is too high"
+                                            {isPriceImpactTooHigh ? "Price impact is too high" :
+                                                isPriceChangeTooHigh
+                                                ? "Price change is too high"
                                                 : "Fair Price"}
                                         </div>
                                         <div>
@@ -477,7 +482,8 @@ const Aggregator = memo(function Aggregator() {
                                     <div>
                                         {data?.effectivePriceReversed ? (
                                             <>
-                                                1 {tokenIn?.symbol} ={" "}
+                                                <span className="inline-block">1 {tokenIn?.symbol}</span><span className="inline-block">&nbsp;=&nbsp;</span>
+                                                <span className="inline-block">
                                                 {formatAmount(
                                                     data.effectivePriceReversed,
                                                     {
@@ -486,6 +492,7 @@ const Aggregator = memo(function Aggregator() {
                                                     }
                                                 )}{" "}
                                                 {tokenOut?.symbol}
+                                                </span>
                                             </>
                                         ) : null}
                                     </div>
@@ -517,7 +524,7 @@ const Aggregator = memo(function Aggregator() {
                                             </CardTooltip>
                                             <div
                                                 className={`${
-                                                    isPriceChangeTooHigh
+                                                    isPriceImpactTooHigh
                                                         ? "text-ash-purple-500"
                                                         : "text-ash-green-500"
                                                 }`}
@@ -663,7 +670,7 @@ const Aggregator = memo(function Aggregator() {
                                     </>
                                 )}
 
-                            {isPriceChangeTooHigh && (
+                            {(isPriceChangeTooHigh || isPriceImpactTooHigh) && (
                                 <div className="relative border border-ash-purple-500 bg-black px-6 py-4 font-bold text-xs text-white text-center">
                                     <svg
                                         width="18"
@@ -684,13 +691,36 @@ const Aggregator = memo(function Aggregator() {
                                     </svg>
 
                                     <div>
-                                        The price change is{" "}
-                                        <span className="text-ash-purple-500">
-                                            {formatAmount(cgkPriceChangeP, {
-                                                displayThreshold: 0,
-                                            })}
-                                            %
-                                        </span>
+                                        {isPriceImpactTooHigh ? (
+                                            <>
+                                                The price impact is{" "}
+                                                <span className="text-ash-purple-500">
+                                                    {formatAmount(
+                                                        (data?.priceImpact ||
+                                                            0) * 100,
+                                                        {
+                                                            notation:
+                                                                "standard",
+                                                            displayThreshold: 0,
+                                                        }
+                                                    )}
+                                                    %
+                                                </span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                The price change is{" "}
+                                                <span className="text-ash-purple-500">
+                                                    {formatAmount(
+                                                        cgkPriceChangeP,
+                                                        {
+                                                            displayThreshold: 0,
+                                                        }
+                                                    )}
+                                                    %
+                                                </span>
+                                            </>
+                                        )}
                                     </div>
                                     <div>Swap may incur significant losses</div>
                                 </div>
@@ -701,7 +731,8 @@ const Aggregator = memo(function Aggregator() {
                                     {loggedIn ? (
                                         isInsufficentFund ||
                                         isInsufficientEGLD ||
-                                        !isPriceChangeTooHigh ? (
+                                        (!isPriceChangeTooHigh &&
+                                            !isPriceImpactTooHigh) ? (
                                             <GlowingButton
                                                 theme="pink"
                                                 className="w-full clip-corner-1 clip-corner-tl uppercase h-12 text-xs sm:text-sm font-bold"
