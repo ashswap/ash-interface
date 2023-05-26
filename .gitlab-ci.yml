@@ -55,6 +55,7 @@ stages:
   NEXT_PUBLIC_ASH_LOG_API: https://api-tracking-devnet-alpha.ashswap.io
   NEXT_PUBLIC_IPFS_API: https://ipfs-cluster-api-internal.bicarus.io
   NEXT_PUBLIC_AG_API: https://aggregator-devnet.ashswap.io
+  NEXT_PUBLIC_XEXCHANGE_GRAPH_API: https://devnet-graph.xexchange.com
 
 .job_template_alpha: &job_template_alpha
   environment:
@@ -106,6 +107,7 @@ deploy_ipfs_alpha:
   NEXT_PUBLIC_ASH_LOG_API: https://api-tracking.ashswap.io
   NEXT_PUBLIC_IPFS_API: https://ipfs-cluster-api-internal.bicarus.io
   NEXT_PUBLIC_AG_API: https://aggregator-devnet.ashswap.io
+  NEXT_PUBLIC_XEXCHANGE_GRAPH_API: https://devnet-graph.xexchange.com
 
 .job_template_beta: &job_template_beta
   environment:
@@ -159,6 +161,7 @@ deploy_ipfs_beta:
   NEXT_PUBLIC_ASH_LOG_API: https://api-tracking.ashswap.io
   NEXT_PUBLIC_IPFS_API: https://ipfs-cluster-api-internal.bicarus.io
   NEXT_PUBLIC_AG_API: https://aggregator.ashswap.io
+  NEXT_PUBLIC_XEXCHANGE_GRAPH_API: https://graph.xexchange.com
 
 .job_template_prod: &job_template_prod
   environment:
