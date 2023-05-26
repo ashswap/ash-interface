@@ -1,16 +1,14 @@
-import { tokenBalanceSelector, tokenMapState } from "atoms/tokensState";
 import BigNumber from "bignumber.js";
 import InputCurrency from "components/InputCurrency";
 import { TOKENS } from "const/tokens";
 import { MINIMUM_EGLD_AMT } from "const/wrappedEGLD";
 import { formatAmount, formatToSignificant } from "helper/number";
 import { IESDTInfo } from "helper/token/token";
-import { memo, useRef } from "react";
-import { useRecoilValue } from "recoil";
+import { memo, useMemo, useRef } from "react";
 import { theme } from "tailwind.config";
 
+import { TokenAmount } from "helper/token/tokenAmount";
 import QuickSelect from "views/swap/components/QuickSelect";
-import { agIsInsufficientFundSelector } from "../atoms/aggregator";
 import TokenSelect from "./TokenSelect";
 
 interface Props {
@@ -21,26 +19,24 @@ interface Props {
     token: IESDTInfo;
     pivotToken?: IESDTInfo;
     value?: string;
+    cgkPrice?: number;
+    tokenBalance?: TokenAmount;
     onValueChange?: (value: string) => void;
     onTokenChange?: (token: IESDTInfo) => void;
+
 }
 
 const SwapAmount = (props: Props) => {
     const inputRef = useRef<HTMLInputElement>(null);
-    const tokenBalance = useRecoilValue(
-        tokenBalanceSelector(props.token.identifier)
-    );
-    const isInsufficentFundTokenIn = useRecoilValue(
-        agIsInsufficientFundSelector
-    );
-    const tokenMap = useRecoilValue(tokenMapState);
-
+    const isInsufficientFund = useMemo(() => {
+        return props.tokenBalance?.egld.lt(props.value || 0);
+    }, [props.tokenBalance, props.value]);
     return (
         <div
             className={`clip-corner-[10px] p-[1px] ${
                 props.type === "from" ? "clip-corner-tl" : "clip-corner-br"
             } ${
-                isInsufficentFundTokenIn && props.type === "from"
+                isInsufficientFund && props.type === "from"
                     ? "bg-ash-purple-500"
                     : "bg-transparent"
             }`}
@@ -76,7 +72,7 @@ const SwapAmount = (props: Props) => {
                         style={{
                             color:
                                 props.type === "from" &&
-                                isInsufficentFundTokenIn
+                                isInsufficientFund
                                     ? theme.extend.colors["insufficent-fund"]
                                     : undefined,
                         }}
@@ -108,29 +104,28 @@ const SwapAmount = (props: Props) => {
                             <span>Balance: </span>
                             <span
                                 className={`${
-                                    tokenMap[props.token.identifier] &&
                                     props.type === "from"
                                         ? "select-none cursor-pointer text-earn"
                                         : ""
                                 }`}
                                 onClick={() => {
                                     props.type === "from" &&
-                                        tokenBalance &&
+                                        props.tokenBalance &&
                                         props.onValueChange?.(
                                             props.token.identifier === "EGLD"
                                                 ? BigNumber.max(
-                                                      tokenBalance.raw
+                                                      props.tokenBalance.raw
                                                           .minus(
                                                               MINIMUM_EGLD_AMT
                                                           )
                                                           .div(10 ** 18),
                                                       0
                                                   ).toString()
-                                                : tokenBalance.egld.toString()
+                                                : props.tokenBalance.egld.toString()
                                         );
                                 }}
                             >
-                                {formatAmount(tokenBalance?.egld.toNumber(), {
+                                {formatAmount(props.tokenBalance?.egld.toNumber(), {
                                     notation: "standard",
                                 })}{" "}
                                 {props.token.symbol}
@@ -145,9 +140,7 @@ const SwapAmount = (props: Props) => {
                                     <span>
                                         {formatAmount(
                                             +(props.value || 0) *
-                                                (tokenMap[
-                                                    props.token.identifier
-                                                ]?.price || 0),
+                                                (props.cgkPrice || 0),
                                             { notation: "standard" }
                                         )}
                                     </span>

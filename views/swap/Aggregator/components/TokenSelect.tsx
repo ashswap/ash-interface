@@ -1,20 +1,19 @@
 import ICChevronDown from "assets/svg/chevron-down.svg";
 import Search from "assets/svg/search.svg";
-import { tokenMapState } from "atoms/tokensState";
-import BigNumber from "bignumber.js";
+import { accBalanceState } from "atoms/dappState";
 import Avatar from "components/Avatar";
 import BaseModal from "components/BaseModal";
 import Input from "components/Input";
-import { IN_POOL_TOKENS_MAP } from "const/pool";
-import { NON_LP_TOKENS, TOKENS } from "const/tokens";
+import { TOKENS_MAP } from "const/tokens";
 import { IESDTInfo } from "helper/token/token";
+import { TokenAmount } from "helper/token/tokenAmount";
 import { useScreenSize } from "hooks/useScreenSize";
 import IPool from "interface/pool";
-import { TokenBalance } from "interface/tokenBalance";
 import { memo, useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { useDebounce } from "use-debounce";
-import ListToken from "views/swap/components/ListToken";
+import ListToken from "../components/ListToken";
+import { useAgTokensBalance } from "../hooks";
 
 interface Props {
     onChange?: (t: IESDTInfo) => void;
@@ -25,22 +24,26 @@ interface Props {
     type: "from" | "to";
 }
 
-const TokenSelect = ({ value, onChange, modalTitle, type, pivotToken }: Props) => {
+const TokenSelect = ({
+    value,
+    onChange,
+    modalTitle,
+    type,
+    pivotToken,
+}: Props) => {
     const [open, setOpen] = useState<boolean>(false);
     const [keyword, setKeyword] = useState<string>("");
     const [debounceKeyword] = useDebounce(keyword, 100);
-    const tokenMap = useRecoilValue(tokenMapState);
     const screenSize = useScreenSize();
+    const tokenList = useAgTokensBalance();
+    const egldBalance = useRecoilValue(accBalanceState);
 
     const tokenBalances = useMemo(() => {
-        return NON_LP_TOKENS.filter(t => t.identifier !== pivotToken?.identifier).map(t => {
-            const tokenBalance: TokenBalance = {
-                token: t,
-                balance: new BigNumber(tokenMap[t.identifier]?.balance || 0),
-            };
-            return tokenBalance;
-        })
-    }, [pivotToken?.identifier, tokenMap]);
+        return [
+            new TokenAmount(TOKENS_MAP.EGLD, egldBalance),
+            ...tokenList,
+        ].filter((t) => t.token.identifier !== pivotToken?.identifier);
+    }, [egldBalance, pivotToken?.identifier, tokenList]);
 
     const onSelectToken = (t: IESDTInfo) => {
         setOpen(false);
@@ -51,7 +54,9 @@ const TokenSelect = ({ value, onChange, modalTitle, type, pivotToken }: Props) =
 
     const filteredTokenBalances = useMemo(() => {
         return tokenBalances.filter((t) =>
-            t.token.symbol.toLowerCase().includes(debounceKeyword.toLowerCase())
+            t.token.identifier
+                .toLowerCase()
+                .includes(debounceKeyword.toLowerCase())
         );
     }, [tokenBalances, debounceKeyword]);
 
