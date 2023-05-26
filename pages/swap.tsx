@@ -1,12 +1,12 @@
 import BasicLayout from "components/Layout/Basic";
 import { SwapProvider } from "context/swap";
-import Swap from "views/swap/Swap";
 import { NextPageWithLayout } from "./_app";
+import Aggregator from "views/swap/Aggregator";
 
 const SwapPage: NextPageWithLayout = () => {
     return (
         <SwapProvider>
-            <Swap />
+            <Aggregator />
         </SwapProvider>
     );
 };

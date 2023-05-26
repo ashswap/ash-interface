@@ -1,3 +1,4 @@
+import ImgCgkIcon from "assets/images/coingecko-icon.webp";
 import Fire from "assets/images/fire.png";
 import ICArrowDownRounded from "assets/svg/arrow-down-rounded.svg";
 import ICArrowRight from "assets/svg/arrow-right.svg";
@@ -23,7 +24,6 @@ import Image from "components/Image";
 import Setting from "components/Setting";
 import TextAmt from "components/TextAmt";
 import CardTooltip from "components/Tooltip/CardTooltip";
-import { blockTimeMs } from "const/dappConfig";
 import { Fraction } from "helper/fraction/fraction";
 import { Percent } from "helper/fraction/percent";
 import { formatAmount } from "helper/number";
@@ -36,11 +36,9 @@ import useWrapEGLD from "hooks/useWrappedEGLDContract/useWrapEGLD";
 import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import { useRecoilCallback, useRecoilState, useRecoilValue } from "recoil";
 
-import useSWR from "swr";
 import styles from "../Swap.module.css";
 import {
     agAmountInAtom,
-    agIsInsufficientFundSelector,
     agIsUnwrapSelector,
     agIsWrapSelector,
     agSlippageAtom,
@@ -49,50 +47,89 @@ import {
 } from "./atoms/aggregator";
 import SwapAmount from "./components/SwapAmount";
 
-import { ENVIRONMENT } from "const/env";
-import { toWei } from "helper/balance";
-import { fetcher } from "helper/common";
-import { getTokenIdFromCoin } from "helper/token";
+import { toEGLDD, toWei } from "helper/balance";
 import useAGAggregate from "hooks/useAggregator/useAGAggregate";
 import BatchSwapSorRoute from "./components/BatchSwap/BatchSwapSorRoute";
-import { SorSwapResponse } from "./interfaces/swapInfo";
+
+import Avatar from "components/Avatar";
+import Checkbox from "components/Checkbox";
+import { blockTimeMs } from "const/dappConfig";
+import {
+    useAgCgkPrices,
+    useAgSor,
+    useAgTokenBalance,
+    useXexchangeRouter,
+} from "./hooks";
+import * as Sentry from "@sentry/nextjs";
 const Aggregator = memo(function Aggregator() {
     const [tokenIn, setTokenIn] = useRecoilState(agTokenInAtom);
     const [tokenOut, setTokenOut] = useRecoilState(agTokenOutAtom);
     const [amountIn, setAmountIn] = useRecoilState(agAmountInAtom);
-    const params = useMemo(() => {
-        const amtIn = toWei(tokenIn, amountIn).idiv(1);
-        const params = {
-            from: getTokenIdFromCoin(tokenIn.identifier),
-            to: getTokenIdFromCoin(tokenOut.identifier),
-            amount: amtIn.toString(),
-        };
-        if (
-            params.from &&
-            params.to &&
-            amtIn.gt(0) &&
-            params.from !== params.to
-        ) {
-            return [`${ENVIRONMENT.AG_API}/aggregate`, params];
-        }
-        return null;
-    }, [amountIn, tokenIn, tokenOut.identifier]);
-    const { data } = useSWR<SorSwapResponse>(
-        params,
-        async (url, params) => {
-            console.log(params);
-            const searchParams = new URLSearchParams(params);
-            return fetcher(`${url}?${searchParams}`);
-        },
+    const [cgkPriceChangeP, setCgkPriceChangeP] = useState(0);
+    const amtIn = useMemo(
+        () => toWei(tokenIn, amountIn).idiv(1).toString(),
+        [tokenIn, amountIn]
+    );
+    // sor routing
+    const { data, isValidating: loadingAgResult } = useAgSor(
+        tokenIn.identifier,
+        tokenOut.identifier,
+        amtIn
+    );
+    // xexchange routing
+    const { data: xexchangeOutput } = useXexchangeRouter(
+        tokenIn.identifier,
+        tokenOut.identifier,
+        amtIn,
+        0.01,
         { refreshInterval: blockTimeMs }
     );
+    const tokenInBalance = useAgTokenBalance(tokenIn.identifier);
+    const tokenOutBalance = useAgTokenBalance(tokenOut.identifier);
+    // coingecko prices
+    const ids = useMemo(
+        () => [tokenIn.identifier, tokenOut.identifier],
+        [tokenIn.identifier, tokenOut.identifier]
+    );
+    const cgkPrices = useAgCgkPrices(ids, { refreshInterval: 30_000 });
+    const tokenInCgkPrice = useMemo(
+        () => cgkPrices[tokenIn.identifier],
+        [cgkPrices, tokenIn.identifier]
+    );
+    const tokenOutCgkPrice = useMemo(
+        () => cgkPrices[tokenOut.identifier],
+        [cgkPrices, tokenOut.identifier]
+    );
+
+    const rateVsXexchange = useMemo(() => {
+        const xexchangeAmtOut = new BigNumber(
+            xexchangeOutput?.swap.amountOut || 0
+        );
+        if (xexchangeAmtOut.eq(0)) return 0;
+        return new BigNumber(data?.returnAmount || 0)
+            .multipliedBy(`1e${tokenOut.decimals}`)
+            .multipliedBy(100)
+            .div(xexchangeAmtOut)
+            .minus(100)
+            .toNumber();
+    }, [data, tokenOut.decimals, xexchangeOutput]);
+    const isPriceChangeTooHigh = useMemo(() => {
+        return cgkPriceChangeP < -30;
+    }, [cgkPriceChangeP]);
+
+    const isPriceImpactTooHigh = useMemo(() => {
+        return (data?.priceImpact || 0) * 100 > 30;
+    }, [data]);
+
     const screenSize = useScreenSize();
     const mounted = useMounted();
 
     const isWrap = useRecoilValue(agIsWrapSelector);
     const isUnwrap = useRecoilValue(agIsUnwrapSelector);
     const slippage = useRecoilValue(agSlippageAtom);
-    const isInsufficentFund = useRecoilValue(agIsInsufficientFundSelector);
+    const isInsufficentFund = useMemo(() => {
+        return tokenInBalance?.raw.lt(amtIn);
+    }, [amtIn, tokenInBalance]);
     const {
         wrapEGLD,
         trackingData: { isPending: isWrapPending },
@@ -101,11 +138,11 @@ const Aggregator = memo(function Aggregator() {
         unwrapWEGLD,
         trackingData: { isPending: isUnwrapPending },
     } = useUnwrapWEGLD(true);
-    const [swapFeeAmt, setSwapFeeAmt] = useState(0);
     const [showSetting, setShowSetting] = useState<boolean>(false);
     const [isOpenHistoryModal, openHistoryModal] = useState<boolean>(false);
     const [isOpenFairPrice, setIsOpenFairPrice] = useState(false);
     const [isOpenAgModal, setIsOpenAgModal] = useState(false);
+    const [isConfirmSwapAnyway, setIsConfirmSwapAnyway] = useState(false);
     const {
         aggregate,
         trackingData: { isPending: swapping },
@@ -115,10 +152,14 @@ const Aggregator = memo(function Aggregator() {
     const loggedIn = useRecoilValue(accIsLoggedInState);
     const isInsufficientEGLD = useRecoilValue(accIsInsufficientEGLDState);
 
-    const revertToken = useRecoilCallback(({set, snapshot}) => async () => {
-        set(agTokenInAtom, await snapshot.getPromise(agTokenOutAtom));
-        set(agTokenOutAtom, await snapshot.getPromise(agTokenInAtom));
-    }, []);
+    const revertToken = useRecoilCallback(
+        ({ set, snapshot }) =>
+            async () => {
+                set(agTokenInAtom, await snapshot.getPromise(agTokenOutAtom));
+                set(agTokenOutAtom, await snapshot.getPromise(agTokenInAtom));
+            },
+        []
+    );
 
     const tokenAmountFrom = useMemo(() => {
         if (!amountIn || !tokenIn) {
@@ -214,9 +255,29 @@ const Aggregator = memo(function Aggregator() {
     }, [canSwap, isUnwrap, isWrap, swapHandle, unwrapHandle, wrapHandle]);
 
     useEffect(() => {
+        const usdIn = new BigNumber(data?.swapAmount || 0).multipliedBy(
+            tokenInCgkPrice
+        );
+        const usdOut = new BigNumber(data?.returnAmount || 0).multipliedBy(
+            tokenOutCgkPrice
+        );
+        if (usdIn.eq(0) || usdOut.eq(0)) {
+            setCgkPriceChangeP(0);
+        } else {
+            setCgkPriceChangeP(
+                usdOut.multipliedBy(100).div(usdIn).plus(-100).toNumber()
+            );
+        }
+    }, [data, tokenInCgkPrice, tokenOutCgkPrice]);
+
+    useEffect(() => {
+        if (isPriceChangeTooHigh && isPriceImpactTooHigh)
+            setIsConfirmSwapAnyway(false);
+    }, [isPriceChangeTooHigh, isPriceImpactTooHigh]);
+
+    useEffect(() => {
         if (!tokenIn) {
             setAmountIn("");
-            setSwapFeeAmt(0);
         }
     }, [tokenIn, setAmountIn]);
 
@@ -224,6 +285,26 @@ const Aggregator = memo(function Aggregator() {
         setShowSetting(false);
         openHistoryModal(false);
     }, [screenSize.isMobile]);
+
+    useEffect(() => {
+        // if the rate from xexchange router is better than the rate from SOR 5%
+        if (rateVsXexchange < 0) {
+            Sentry.captureMessage(
+                "warning: the rate from xexchange router is better than the rate from SOR",
+                {
+                    extra: data,
+                }
+            );
+        }
+    }, [data, rateVsXexchange]);
+
+    useEffect(() => {
+        if (isPriceChangeTooHigh) {
+            Sentry.captureMessage("warning: price change is too high", {
+                extra: data,
+            });
+        }
+    }, [data, isPriceChangeTooHigh]);
 
     return (
         <div className="flex flex-col items-center pt-3.5 pb-12 px-6">
@@ -245,9 +326,7 @@ const Aggregator = memo(function Aggregator() {
                                 />
                             </div>
                             <div className="flex flex-row justify-between pl-4 mb-12">
-                                <div className="font-bold text-2xl">
-                                    Aggregator
-                                </div>
+                                <div className="font-bold text-2xl">Swap</div>
                                 <div className="flex flex-row gap-2">
                                     <div>
                                         <BaseButton
@@ -286,6 +365,8 @@ const Aggregator = memo(function Aggregator() {
                                     token={tokenIn}
                                     value={amountIn}
                                     pivotToken={tokenOut}
+                                    cgkPrice={tokenInCgkPrice}
+                                    tokenBalance={tokenInBalance}
                                     onTokenChange={(token) => setTokenIn(token)}
                                     onValueChange={(val) => setAmountIn(val)}
                                 />
@@ -312,26 +393,56 @@ const Aggregator = memo(function Aggregator() {
                                     onTokenChange={(token) =>
                                         setTokenOut(token)
                                     }
+                                    cgkPrice={tokenOutCgkPrice}
+                                    tokenBalance={tokenOutBalance}
                                 >
                                     <div className="mt-10 mb-2 mx-2.5">
                                         <button
-                                            className="px-6 py-4 w-full bg-ash-dark-600 flex items-center justify-between"
-                                            disabled={!data?.routes?.length}
+                                            className={`transition-all group px-6 py-4 w-full bg-ash-dark-600 flex items-center justify-between hover:colored-drop-shadow-md hover:colored-drop-shadow-ash-dark-600 disabled:colored-drop-shadow-none disabled:cursor-not-allowed disabled:text-ash-gray-600 ${
+                                                loadingAgResult
+                                                    ? "disabled:bg-ash-dark-600"
+                                                    : "disabled:bg-stake-dark-500"
+                                            }`}
+                                            style={{
+                                                borderWidth: "1px",
+                                                borderImageSlice: 1,
+                                                borderImageSource: `radial-gradient(90.48% 86.43% at 89.33% 11.52%, rgba(255, 0, 92, 0.5) 0%, black 100%)`,
+                                            }}
+                                            disabled={
+                                                !data?.routes?.length ||
+                                                loadingAgResult
+                                            }
                                             onClick={() =>
                                                 setIsOpenAgModal(true)
                                             }
                                         >
-                                            <div className="flex items-center mr-4">
-                                                <ICHierarchySquare className="w-5 h-auto text-stake-gray-500 mr-2" />
-                                                <span className="font-bold text-sm text-white">
+                                            <div className="overflow-hidden flex items-center mr-4">
+                                                <ICHierarchySquare className="shrink-0 w-5 h-auto text-stake-gray-500 group-disabled:text-ash-gray-600 mr-2" />
+                                                <span className="truncate inline-block font-bold text-sm text-white group-disabled:text-ash-gray-600">
                                                     Aggregator Route
                                                 </span>
                                             </div>
-                                            <div className="font-bold text-xs text-stake-gray-500">
-                                                {data?.routes?.length || 0}{" "}
-                                                {(data?.routes?.length || 0) > 1
-                                                    ? "Routes"
-                                                    : "Route"}
+                                            <div className="relative flex justify-end items-center">
+                                                <div
+                                                    className={`shrink-0 transition-all font-bold text-xs text-stake-gray-500 ${
+                                                        loadingAgResult
+                                                            ? "opacity-0"
+                                                            : "opacity-100"
+                                                    }`}
+                                                >
+                                                    {data?.routes?.length || 0}{" "}
+                                                    {(data?.routes?.length ||
+                                                        0) > 1
+                                                        ? "Routes"
+                                                        : "Route"}
+                                                </div>
+                                                <div
+                                                    className={`transition-all absolute w-5 h-5 mr-2 rounded-full border-t-transparent border-pink-600 border-4 animate-spin ${
+                                                        loadingAgResult
+                                                            ? "opacity-100"
+                                                            : "opacity-0"
+                                                    }`}
+                                                ></div>
                                             </div>
                                         </button>
                                     </div>
@@ -340,8 +451,11 @@ const Aggregator = memo(function Aggregator() {
 
                             {tokenIn && tokenOut && (
                                 <div
-                                    className="flex flex-row justify-between text-xs text-white my-5"
-                                    style={{ color: "#00FF75" }}
+                                    className={`flex flex-row justify-between gap-2 text-xs my-5 ${
+                                        isPriceChangeTooHigh || isPriceImpactTooHigh
+                                            ? "text-ash-purple-500"
+                                            : "text-ash-green-500"
+                                    }`}
                                 >
                                     <div
                                         className="opacity-50 font-bold flex flex-row items-center gap-2 select-none cursor-pointer"
@@ -351,7 +465,12 @@ const Aggregator = memo(function Aggregator() {
                                             );
                                         }}
                                     >
-                                        <div>Fair price</div>
+                                        <div>
+                                            {isPriceImpactTooHigh ? "Price impact is too high" :
+                                                isPriceChangeTooHigh
+                                                ? "Price change is too high"
+                                                : "Fair Price"}
+                                        </div>
                                         <div>
                                             {isOpenFairPrice ? (
                                                 <ICChevronUp />
@@ -363,7 +482,8 @@ const Aggregator = memo(function Aggregator() {
                                     <div>
                                         {data?.effectivePriceReversed ? (
                                             <>
-                                                1 {tokenIn?.symbol} ={" "}
+                                                <span className="inline-block">1 {tokenIn?.symbol}</span><span className="inline-block">&nbsp;=&nbsp;</span>
+                                                <span className="inline-block">
                                                 {formatAmount(
                                                     data.effectivePriceReversed,
                                                     {
@@ -372,6 +492,7 @@ const Aggregator = memo(function Aggregator() {
                                                     }
                                                 )}{" "}
                                                 {tokenOut?.symbol}
+                                                </span>
                                             </>
                                         ) : null}
                                     </div>
@@ -402,10 +523,11 @@ const Aggregator = memo(function Aggregator() {
                                                 </div>
                                             </CardTooltip>
                                             <div
-                                                className={
-                                                    styles.swapResultValue
-                                                }
-                                                style={{ color: "#00FF75" }}
+                                                className={`${
+                                                    isPriceImpactTooHigh
+                                                        ? "text-ash-purple-500"
+                                                        : "text-ash-green-500"
+                                                }`}
                                             >
                                                 {formatAmount(
                                                     (data?.priceImpact || 0) *
@@ -415,6 +537,31 @@ const Aggregator = memo(function Aggregator() {
                                                         displayThreshold: 0,
                                                     }
                                                 )}
+                                                %
+                                            </div>
+                                        </div>
+                                        <div className="bg-black flex flex-row items-center justify-between h-10 pl-5 pr-6">
+                                            <div
+                                                className={`${styles.swapResultLabel} flex items-center`}
+                                            >
+                                                Price change{" "}
+                                                <Avatar
+                                                    src={ImgCgkIcon}
+                                                    alt="coingecko"
+                                                    className="ml-2 inline-block w-4 h-4"
+                                                />
+                                            </div>
+                                            <div
+                                                className={`text-sm ${
+                                                    isPriceChangeTooHigh
+                                                        ? "text-ash-purple-500"
+                                                        : "text-ash-green-500"
+                                                }`}
+                                            >
+                                                {formatAmount(cgkPriceChangeP, {
+                                                    notation: "standard",
+                                                    displayThreshold: 0,
+                                                })}
                                                 %
                                             </div>
                                         </div>
@@ -438,11 +585,7 @@ const Aggregator = memo(function Aggregator() {
                                                     Minimum received
                                                 </div>
                                             </CardTooltip>
-                                            <div
-                                                className={
-                                                    styles.swapResultValue
-                                                }
-                                            >
+                                            <div className="text-sm">
                                                 <TextAmt
                                                     number={minimumReceive.toBigNumber()}
                                                     options={{
@@ -475,11 +618,7 @@ const Aggregator = memo(function Aggregator() {
                                                     Slippage
                                                 </div>
                                             </CardTooltip>
-                                            <div
-                                                className={
-                                                    styles.swapResultValue
-                                                }
-                                            >
+                                            <div className="text-sm">
                                                 {formatAmount(
                                                     slippage
                                                         .multiply(100)
@@ -492,7 +631,7 @@ const Aggregator = memo(function Aggregator() {
                                                 %
                                             </div>
                                         </div>
-                                        <div className="bg-black flex flex-row items-center justify-between h-10 pl-5 pr-6">
+                                        {/* <div className="bg-black flex flex-row items-center justify-between h-10 pl-5 pr-6">
                                             <CardTooltip
                                                 content={
                                                     <div>
@@ -512,11 +651,7 @@ const Aggregator = memo(function Aggregator() {
                                                     Swap fees
                                                 </div>
                                             </CardTooltip>
-                                            <div
-                                                className={
-                                                    styles.swapResultValue
-                                                }
-                                            >
+                                            <div className="text-sm">
                                                 {tokenAmountTo ? (
                                                     <TextAmt
                                                         number={swapFeeAmt}
@@ -531,39 +666,137 @@ const Aggregator = memo(function Aggregator() {
                                                 )}{" "}
                                                 {tokenOut?.symbol}
                                             </div>
-                                        </div>
+                                        </div> */}
                                     </>
                                 )}
+
+                            {(isPriceChangeTooHigh || isPriceImpactTooHigh) && (
+                                <div className="relative border border-ash-purple-500 bg-black px-6 py-4 font-bold text-xs text-white text-center">
+                                    <svg
+                                        width="18"
+                                        height="61"
+                                        viewBox="0 0 18 61"
+                                        fill="none"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        className="absolute -top-2 left-0 -translate-x-1/2 colored-drop-shadow-xs colored-drop-shadow-ash-purple-500"
+                                    >
+                                        <path
+                                            d="M5.05569 0L17.3985 7.75758V15.5152V46.6667L0.941406 31.0303V0H5.05569Z"
+                                            fill="#7B61FF"
+                                        />
+                                        <path
+                                            d="M13.2842 60.4125H0.333334V42L17.3984 50.7155L13.2842 60.4125Z"
+                                            fill="#7B61FF"
+                                        />
+                                    </svg>
+
+                                    <div>
+                                        {isPriceImpactTooHigh ? (
+                                            <>
+                                                The price impact is{" "}
+                                                <span className="text-ash-purple-500">
+                                                    {formatAmount(
+                                                        (data?.priceImpact ||
+                                                            0) * 100,
+                                                        {
+                                                            notation:
+                                                                "standard",
+                                                            displayThreshold: 0,
+                                                        }
+                                                    )}
+                                                    %
+                                                </span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                The price change is{" "}
+                                                <span className="text-ash-purple-500">
+                                                    {formatAmount(
+                                                        cgkPriceChangeP,
+                                                        {
+                                                            displayThreshold: 0,
+                                                        }
+                                                    )}
+                                                    %
+                                                </span>
+                                            </>
+                                        )}
+                                    </div>
+                                    <div>Swap may incur significant losses</div>
+                                </div>
+                            )}
 
                             {mounted && (
                                 <div className="border-notch-x border-notch-white/50 mt-12">
                                     {loggedIn ? (
-                                        <GlowingButton
-                                            theme="pink"
-                                            className="w-full clip-corner-1 clip-corner-tl uppercase h-12 text-xs sm:text-sm font-bold"
-                                            disabled={!canSwap}
-                                            onClick={onClickSwapBtn}
-                                        >
-                                            <div className="flex items-center space-x-2.5">
-                                                {isInsufficentFund ||
-                                                isInsufficientEGLD ? (
-                                                    <span className="text-text-input-3">
-                                                        INSUFFICIENT{" "}
-                                                        <span className="text-insufficent-fund">
-                                                            {isInsufficientEGLD
-                                                                ? "EGLD"
-                                                                : tokenIn?.symbol}
-                                                        </span>{" "}
-                                                        BALANCE
-                                                    </span>
-                                                ) : (
+                                        isInsufficentFund ||
+                                        isInsufficientEGLD ||
+                                        (!isPriceChangeTooHigh &&
+                                            !isPriceImpactTooHigh) ? (
+                                            <GlowingButton
+                                                theme="pink"
+                                                className="w-full clip-corner-1 clip-corner-tl uppercase h-12 text-xs sm:text-sm font-bold"
+                                                disabled={!canSwap}
+                                                onClick={onClickSwapBtn}
+                                            >
+                                                <div className="flex items-center space-x-2.5">
+                                                    {isInsufficentFund ||
+                                                    isInsufficientEGLD ? (
+                                                        <span className="text-text-input-3">
+                                                            INSUFFICIENT{" "}
+                                                            <span className="text-insufficent-fund">
+                                                                {isInsufficientEGLD
+                                                                    ? "EGLD"
+                                                                    : tokenIn?.symbol}
+                                                            </span>{" "}
+                                                            BALANCE
+                                                        </span>
+                                                    ) : (
+                                                        <span className="mt-0.5">
+                                                            SWAP
+                                                        </span>
+                                                    )}
+                                                    <IconRight />
+                                                </div>
+                                            </GlowingButton>
+                                        ) : (
+                                            <GlowingButton
+                                                theme="purple"
+                                                className="w-full clip-corner-1 clip-corner-tl uppercase h-12 text-xs sm:text-sm font-bold"
+                                                disabled={
+                                                    !canSwap ||
+                                                    !isConfirmSwapAnyway
+                                                }
+                                                onClick={onClickSwapBtn}
+                                            >
+                                                <div className="flex items-center space-x-2.5">
+                                                    <div
+                                                        onClick={(e) =>
+                                                            e.stopPropagation()
+                                                        }
+                                                    >
+                                                        <Checkbox
+                                                            checked={
+                                                                isConfirmSwapAnyway
+                                                            }
+                                                            onChange={(
+                                                                checked
+                                                            ) =>
+                                                                setIsConfirmSwapAnyway(
+                                                                    checked
+                                                                )
+                                                            }
+                                                            className="h-4 pl-4 pr-1.5"
+                                                        />
+                                                    </div>
                                                     <span className="mt-0.5">
-                                                        SWAP
+                                                        Yes, I Still want to
+                                                        Swap
                                                     </span>
-                                                )}
-                                                <IconRight />
-                                            </div>
-                                        </GlowingButton>
+                                                    <IconRight />
+                                                </div>
+                                            </GlowingButton>
+                                        )
                                     ) : (
                                         <GlowingButton
                                             theme="pink"
@@ -609,7 +842,7 @@ const Aggregator = memo(function Aggregator() {
                                 onClick={() => setShowSetting(false)}
                             />
                         </div>
-                        <Setting />
+                        <Setting isAggregator />
                     </div>
                 )}
             </div>
@@ -627,14 +860,16 @@ const Aggregator = memo(function Aggregator() {
                     <div className="flex justify-end">
                         <BaseModal.CloseBtn />
                     </div>
-                    <Setting />
-                    <BaseButton
-                        theme="pink"
-                        className="uppercase text-xs font-bold mt-10 h-12 w-full"
-                        onClick={() => setShowSetting(false)}
-                    >
-                        Confirm
-                    </BaseButton>
+                    <div className="p-6">
+                        <Setting isAggregator />
+                        <BaseButton
+                            theme="pink"
+                            className="uppercase text-xs font-bold mt-10 h-12 w-full"
+                            onClick={() => setShowSetting(false)}
+                        >
+                            Confirm
+                        </BaseButton>
+                    </div>
                 </BaseModal>
             )}
             <BaseModal
@@ -664,6 +899,32 @@ const Aggregator = memo(function Aggregator() {
                         </span>
                     </div>
                     {data && <BatchSwapSorRoute swapInfo={data} />}
+                    <div className="mt-12 grid sm:grid-cols-2 lg:grid-cols-3">
+                        {xexchangeOutput && rateVsXexchange > 0 && (
+                            <div className="bg-ash-dark-400 p-1">
+                                <div className="mb-3 pt-1.5 px-4 font-bold text-sm text-white">
+                                    xExchange
+                                </div>
+                                <div className="bg-ash-dark-600 px-4 py-3 font-semi-bold text-xs text-stake-gray-500">
+                                    <span>
+                                        <TextAmt number={amountIn || 0} />{" "}
+                                        {tokenIn.symbol}
+                                    </span>
+                                    <span>&nbsp;=&nbsp;</span>
+                                    <span>
+                                        <TextAmt
+                                            number={toEGLDD(
+                                                tokenOut.decimals,
+                                                xexchangeOutput.swap
+                                                    .amountOut || 0
+                                            )}
+                                        />{" "}
+                                        {tokenOut.symbol}
+                                    </span>
+                                </div>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </BaseModal>
         </div>
