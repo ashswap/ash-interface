@@ -110,11 +110,11 @@ function GovStats() {
         if (!adminFee24h) return 0;
         return (
             (adminFee24h * 365 * 100) /
-            toEGLDD(ASH_TOKEN.decimals, totalLockedAmt)
+            toEGLDD(VE_ASH_DECIMALS, totalSupplyVeASH)// calculates the maximum APR if all ASH is locked in for 4 years.
                 .multipliedBy(tokenMap[ASH_TOKEN.identifier]?.price)
                 .toNumber()
         );
-    }, [adminFee24h, totalLockedAmt, tokenMap]);
+    }, [adminFee24h, totalSupplyVeASH, tokenMap]);
     const canClaim = useMemo(() => {
         return rewardLPAmt && rewardLPAmt.gt(0);
     }, [rewardLPAmt]);
