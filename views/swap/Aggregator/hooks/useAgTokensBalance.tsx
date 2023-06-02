@@ -27,6 +27,7 @@ const useAgTokensBalance = (swrConfig: SWRConfiguration = {}) => {
     const list = useMemo(() => {
         const map = Object.fromEntries((balances || []).map(b => [b.identifier, b]));
         const tokensAmount: TokenAmount[] = (tokens || []).map((t: any) => {
+            const staticESDT = TOKENS_MAP[t.identifier];
             const esdt: IESDTInfo = {
                 chainId:
                     ENVIRONMENT.NETWORK === "mainnet"
@@ -34,9 +35,9 @@ const useAgTokensBalance = (swrConfig: SWRConfiguration = {}) => {
                         : ChainId.Devnet,
                 decimals: t.decimals,
                 identifier: t.identifier,
-                name: t.name,
-                symbol: t.ticker,
-                logoURI: TOKENS_MAP[t.identifier]?.logoURI || t.assets?.svgUrl || t.assets?.pngUrl,
+                name: staticESDT?.name || t.name,
+                symbol: staticESDT?.symbol || t.ticker,
+                logoURI: staticESDT?.logoURI || t.assets?.pngUrl || t.assets?.svgUrl,
                 projectLink: t.assets?.website,
             };
             return new TokenAmount(esdt, map[esdt.identifier]?.balance || "0");
