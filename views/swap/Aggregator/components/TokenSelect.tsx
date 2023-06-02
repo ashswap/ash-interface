@@ -57,7 +57,7 @@ const TokenSelect = ({
             t.token.identifier
                 .toLowerCase()
                 .includes(debounceKeyword.toLowerCase())
-        );
+        ).sort((a, b) => a.egld.gt(b.egld) ? -1 : 1);
     }, [tokenBalances, debounceKeyword]);
 
     return (

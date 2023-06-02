@@ -13,6 +13,7 @@ const config = {
     transpilePackages: ["@multiversx/sdk-dapp"],
     images: {
         loader: "custom",
+        minimumCacheTTL: 1800,
     },
     trailingSlash: true,
     async redirects() {
