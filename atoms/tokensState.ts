@@ -1,9 +1,10 @@
 import { FARMS } from "const/farms";
 import pools from "const/pool";
 import { TOKENS, TOKENS_MAP } from "const/tokens";
+import { IESDTInfo } from "helper/token/token";
 import { TokenAmount } from "helper/token/tokenAmount";
 import { IMetaESDT } from "interface/tokens";
-import { atom, selectorFamily } from "recoil";
+import { atom, atomFamily, selectorFamily } from "recoil";
 import { KeyedMutator } from "swr";
 type Token = {
     identifier: string;
@@ -84,4 +85,9 @@ export const tokenBalanceSelector = selectorFamily<TokenAmount | undefined, stri
         if (!TOKENS_MAP[tokenId] || !tokenMap[tokenId]) return undefined;
         return new TokenAmount(TOKENS_MAP[tokenId], tokenMap[tokenId].balance);
     }
+});
+
+export const tokenInfoOnNetworkAtom = atomFamily<IESDTInfo, string>({
+    key: "token_info_on_network_atom_family",
+    default: undefined,
 });

@@ -8,6 +8,8 @@ import { IESDTInfo } from "helper/token/token";
 import IPool from "interface/pool";
 import { useRouter } from "next/router";
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { useRecoilValue } from "recoil";
+import { agSlippageAtom } from "views/swap/Aggregator/atoms/aggregator";
 
 export interface State {
     tokenFrom?: IESDTInfo;
@@ -19,7 +21,6 @@ export interface State {
     slippage: Percent;
     isWrap: boolean;
     isUnwrap: boolean;
-    setSlippage: (slippage: Percent) => void;
     setInsufficentFund: (v: boolean) => void;
     setValueFrom: (v: string) => void;
     setValueTo: (v: string) => void;
@@ -32,7 +33,6 @@ export const initState: State = {
     isInsufficentFund: false,
     isWrap: false,
     isUnwrap: false,
-    setSlippage: emptyFunc,
     setInsufficentFund: emptyFunc,
     setValueFrom: emptyFunc,
     setValueTo: emptyFunc,
@@ -54,7 +54,7 @@ export function SwapProvider({ children }: Props) {
         undefined
     );
     const [valueFrom, setValueFrom] = useState<string>("");
-    const [slippage, setSlippage] = useState<Percent>(initState.slippage);
+    const slippage = useRecoilValue(agSlippageAtom);
     const [tokenTo, setTokenTo] = useState<IESDTInfo | undefined>(undefined);
     const [_valueTo, setValueTo] = useState<string>("");
 
@@ -119,7 +119,6 @@ export function SwapProvider({ children }: Props) {
         slippage,
         isWrap,
         isUnwrap,
-        setSlippage,
         setValueFrom,
         setValueTo,
         setTokenFrom,

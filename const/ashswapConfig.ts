@@ -4,6 +4,7 @@ type DappContracts = {
     feeDistributor: string;
     farmController: string;
     farmBribe: string;
+    aggregator: string;
 };
 type DappContractConfig = {
     alpha: DappContracts;
@@ -17,6 +18,7 @@ const dappContractDevnet: DappContractConfig = {
             "erd1qqqqqqqqqqqqqpgqx94lrsf0psrql406m58xtuf2zj2pt8ht2ges8zkm95",
         farmController: "erd1qqqqqqqqqqqqqpgqdqn69j46a98gc4s9f8ckzp2nhswhyggq2gesptr8l8",
         farmBribe: "erd1qqqqqqqqqqqqqpgqjjldc9dwrx970l4mvlv2v9kfcj0k2w7p2gesphc4cd",
+        aggregator: "erd1qqqqqqqqqqqqqpgqyqsddhthmp7ejpu9z7zwrssa6q4u6cpygeusmeenf7",
     },
     alpha: {
         voteEscrowedContract:
@@ -27,6 +29,7 @@ const dappContractDevnet: DappContractConfig = {
             "erd1qqqqqqqqqqqqqpgqzs3msdeag5qredsyjm0jw9t6gued2n3armcqql9x0q",
         farmBribe:
             "erd1qqqqqqqqqqqqqpgqhxh8vhw5hq3qqrsa9yfsjkf9ya0qqqxprmcqrqu9zs",
+        aggregator: "",
     },
 };
 
@@ -37,6 +40,7 @@ const dappContractMainnet: DappContracts = {
         "erd1qqqqqqqqqqqqqpgqjrlge5rgml6d48tjgu3afqvems88lqzw4fvs9f7lhs",
     farmController: "erd1qqqqqqqqqqqqqpgqzhm689ehkacadr7elzkc3z70h6cqmz0q4fvsftax5t",
     farmBribe: "erd1qqqqqqqqqqqqqpgqgulmfcu8prrv2pmx3nqn5stqu3c42fsz4fvsa9rwdl",
+    aggregator: "erd1qqqqqqqqqqqqqpgqa0aayq3y9dgfer36jt570w6nvxrmwp3a4fvsrf80zn",
 };
 
 const dappContract =

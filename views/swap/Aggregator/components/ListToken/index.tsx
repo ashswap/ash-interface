@@ -1,12 +1,11 @@
 import Avatar from "components/Avatar";
-import { toEGLDD } from "helper/balance";
 import { formatAmount } from "helper/number";
-import { TokenBalance } from "interface/tokenBalance";
+import { TokenAmount } from "helper/token/tokenAmount";
 
 interface Props {
-    items: TokenBalance[];
+    items: TokenAmount[];
     className?: string | undefined;
-    onSelect?: (t: TokenBalance) => void;
+    onSelect?: (t: TokenAmount) => void;
 }
 
 const ListToken = (props: Props) => {
@@ -34,7 +33,7 @@ const ListToken = (props: Props) => {
                         </div>
                     </div>
                     <div className="shrink-0 flex items-center text-ash-gray-600 font-normal text-xs">
-                        {formatAmount(toEGLDD(token.token.decimals, token.balance), {notation: "standard", displayThreshold: 0.000001})}
+                        {formatAmount(token.egld, {notation: "standard", displayThreshold: 0.000001})}
                         &nbsp;<span className="inline-block max-w-[4rem] truncate">{token.token.symbol}</span>
                     </div>
                 </div>

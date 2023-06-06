@@ -57,7 +57,6 @@ import { useRecoilCallback, useRecoilValue } from "recoil";
 import { useDebounce } from "use-debounce";
 import SwapAmount from "./components/SwapAmount";
 import styles from "./Swap.module.css";
-import { TOKENS_MAP } from "const/tokens";
 
 const MaiarPoolTooltip = ({
     children,
@@ -287,18 +286,16 @@ const Swap = () => {
                     const rawPool = await snapshot.getPromise(
                         ashRawPoolV1ByAddressQuery(pool.address || "")
                     );
-                    const tokenFromId = getTokenIdFromCoin(tokenAmountFrom.token.identifier);
-                    const tokenToId = getTokenIdFromCoin(tokenTo.identifier);
-                    if (!rawPool || !tokenFromId || !tokenToId) return;
+                    if (!rawPool) return;
                     const reserves = pool.tokens.map(
                         (t, i) => new TokenAmount(t, rawPool.reserves[i])
                     );
                     const estimated = calculateEstimatedSwapOutputAmount2(
                         new BigNumber(rawPool?.ampFactor || 0),
                         reserves,
-                        new TokenAmount(TOKENS_MAP[tokenFromId], tokenAmountFrom.raw),
-                        TOKENS_MAP[tokenToId],
-                        fees,
+                        tokenAmountFrom,
+                        tokenTo,
+                        fees
                     );
                     return estimated;
                 }
@@ -309,6 +306,7 @@ const Swap = () => {
     const calcPriceImpact = useRecoilCallback(
         ({ snapshot }) =>
             async () => {
+                
                 if (
                     !pool ||
                     !tokenFrom ||
@@ -370,18 +368,16 @@ const Swap = () => {
                     const rawPool = await snapshot.getPromise(
                         ashRawPoolV1ByAddressQuery(pool.address)
                     );
-                    const tokenFromId = getTokenIdFromCoin(tokenFrom.identifier);
-                    const tokenToId = getTokenIdFromCoin(tokenTo.identifier);
-                    if (!rawPool || !tokenFromId || !tokenToId) return;
+                    if (!rawPool) return;
                     const reserves = pool.tokens.map(
                         (t, i) => new TokenAmount(t, rawPool.reserves[i])
                     );
                     price = calculateSwapPrice(
                         new BigNumber(rawPool?.ampFactor || 0),
                         reserves,
-                        TOKENS_MAP[tokenFromId],
-                        TOKENS_MAP[tokenToId],
-                        fees,
+                        tokenFrom,
+                        tokenTo,
+                        fees
                     );
                 }
                 const rate = new Price(tokenAmountTo, tokenAmountFrom);
@@ -488,7 +484,7 @@ const Swap = () => {
                 setSwapFeeAmt(estimated.fee.egld.toNumber());
             }
         });
-    }, [getAmountOut, setValueTo, pool, tokenTo, tokenAmountFrom]);
+    }, [getAmountOut, setValueTo, pool, tokenTo, tokenAmountFrom])
 
     const [calcPriceImpactDebounce] = useDebounce(calcPriceImpact, 750);
     const [calcAmountOutDebounce] = useDebounce(calcAmountOut, 200);
@@ -975,16 +971,14 @@ const Swap = () => {
                     <div className="flex justify-end">
                         <BaseModal.CloseBtn />
                     </div>
-                    <div className="p-6">
-                        <Setting />
-                        <BaseButton
-                            theme="pink"
-                            className="uppercase text-xs font-bold mt-10 h-12 w-full"
-                            onClick={() => setShowSetting(false)}
-                        >
-                            Confirm
-                        </BaseButton>
-                    </div>
+                    <Setting />
+                    <BaseButton
+                        theme="pink"
+                        className="uppercase text-xs font-bold mt-10 h-12 w-full"
+                        onClick={() => setShowSetting(false)}
+                    >
+                        Confirm
+                    </BaseButton>
                 </BaseModal>
             )}
         </div>

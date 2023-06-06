@@ -34,7 +34,7 @@ import GlobalModals from "views/components/GlobalModal";
 import * as gtag from "../helper/gtag";
 import "../styles/globals.css";
 
-type NextPageWithLayout = NextPage & {
+export type NextPageWithLayout = NextPage & {
     getLayout?: (page: ReactElement) => ReactNode;
 };
 
