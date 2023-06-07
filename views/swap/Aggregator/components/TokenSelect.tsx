@@ -4,7 +4,7 @@ import { accBalanceState } from "atoms/dappState";
 import Avatar from "components/Avatar";
 import BaseModal from "components/BaseModal";
 import Input from "components/Input";
-import { TOKENS_MAP } from "const/tokens";
+import { TOKENS, TOKENS_MAP } from "const/tokens";
 import { IESDTInfo } from "helper/token/token";
 import { TokenAmount } from "helper/token/tokenAmount";
 import { useScreenSize } from "hooks/useScreenSize";
@@ -39,9 +39,16 @@ const TokenSelect = ({
     const egldBalance = useRecoilValue(accBalanceState);
 
     const tokenBalances = useMemo(() => {
+        const staticTokens: TokenAmount[] = [];
+        const nonStaticTokens = tokenList.filter((t) => {
+            const staticToken = TOKENS_MAP[t.token.identifier];
+            if (staticToken) staticTokens.push(t);
+            return !staticToken;
+        });
         return [
             new TokenAmount(TOKENS_MAP.EGLD, egldBalance),
-            ...tokenList,
+            ...staticTokens,
+            ...nonStaticTokens.sort((a, b) => (a.egld.gt(b.egld) ? -1 : 1)),
         ].filter((t) => t.token.identifier !== pivotToken?.identifier);
     }, [egldBalance, pivotToken?.identifier, tokenList]);
 
@@ -57,7 +64,7 @@ const TokenSelect = ({
             t.token.identifier
                 .toLowerCase()
                 .includes(debounceKeyword.toLowerCase())
-        ).sort((a, b) => a.egld.gt(b.egld) ? -1 : 1);
+        );
     }, [tokenBalances, debounceKeyword]);
 
     return (

@@ -6,7 +6,7 @@ import { atom, selector } from "recoil";
 
 export const agTokenInAtom = atom({
     key: "ag_token_in_atom",
-    default: TOKENS_MAP[WRAPPED_EGLD.wegld],
+    default: TOKENS_MAP.EGLD,
 });
 
 export const agTokenOutAtom = atom({
@@ -29,7 +29,10 @@ export const agIsWrapSelector = selector({
     get: ({ get }) => {
         const tokenIn = get(agTokenInAtom);
         const tokenOut = get(agTokenOutAtom);
-        return tokenOut.identifier === WRAPPED_EGLD.wegld && tokenIn.identifier === "EGLD";
+        return (
+            tokenOut.identifier === WRAPPED_EGLD.wegld &&
+            tokenIn.identifier === "EGLD"
+        );
     },
 });
 
@@ -38,7 +41,10 @@ export const agIsUnwrapSelector = selector({
     get: ({ get }) => {
         const tokenIn = get(agTokenInAtom);
         const tokenOut = get(agTokenOutAtom);
-        return tokenIn.identifier === WRAPPED_EGLD.wegld && tokenOut.identifier === "EGLD";
+        return (
+            tokenIn.identifier === WRAPPED_EGLD.wegld &&
+            tokenOut.identifier === "EGLD"
+        );
     },
 });
 
@@ -50,7 +56,9 @@ export const agSwapsAtom = atom({
 export const agIsInsufficientFundSelector = selector({
     key: "ag_is_insufficient_fund_selector",
     get: ({ get }) => {
-        const balance = get(tokenBalanceSelector(get(agTokenInAtom)?.identifier));
+        const balance = get(
+            tokenBalanceSelector(get(agTokenInAtom)?.identifier)
+        );
         const amountIn = get(agAmountInAtom);
         return balance?.egld.lt(amountIn);
     },
