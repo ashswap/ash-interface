@@ -28,7 +28,7 @@ const dappContractDevnet: DappContractConfig = {
         router: "erd1qqqqqqqqqqqqqpgqmj4lt9xd87fvafnyjwut66palhnpdr5v2gesvjepfr",
         dao: "erd1qqqqqqqqqqqqqpgqpdafdulu42f6g8pn9pavufgmdkltnctf2gesh48l44",
         daoBribe: "erd1qqqqqqqqqqqqqpgqqdt2ckhgn3yw6qxskawmywc98dv5jegg2ges40ygkh",
-        aggregator: "erd1qqqqqqqqqqqqqpgqyqsddhthmp7ejpu9z7zwrssa6q4u6cpygeusmeenf7"
+        aggregator: "erd1qqqqqqqqqqqqqpgqqtaru570tfcq4fwer9nlnzl6n4afp4yzh2uswv2vkh"
     },
     alpha: {
         voteEscrowedContract:
