@@ -6,7 +6,7 @@ import {
     TokenPayment,
     Transaction,
 } from "@multiversx/sdk-core/out";
-import { accInfoState } from "atoms/dappState";
+import { accAddressState, accInfoState } from "atoms/dappState";
 import BigNumber from "bignumber.js";
 import { TOKENS_MAP } from "const/tokens";
 import { WRAPPED_EGLD } from "const/wrappedEGLD";
@@ -54,6 +54,7 @@ const usePoolSwap = (trackStatus = false) => {
                             ),
                             new BigUIntValue(minWeiOut),
                         ],
+                        caller: new Address(await snapshot.getPromise(accAddressState))
                     });
                 } else if (pool.type === EPoolType.PoolV2) {
                     const poolContract = ContractManager.getPoolV2Contract(
