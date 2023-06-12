@@ -40,7 +40,7 @@ const dappContractMainnet: DappContracts = {
         "erd1qqqqqqqqqqqqqpgqjrlge5rgml6d48tjgu3afqvems88lqzw4fvs9f7lhs",
     farmController: "erd1qqqqqqqqqqqqqpgqzhm689ehkacadr7elzkc3z70h6cqmz0q4fvsftax5t",
     farmBribe: "erd1qqqqqqqqqqqqqpgqgulmfcu8prrv2pmx3nqn5stqu3c42fsz4fvsa9rwdl",
-    aggregator: "erd1qqqqqqqqqqqqqpgqa0aayq3y9dgfer36jt570w6nvxrmwp3a4fvsrf80zn",
+    aggregator: "erd1qqqqqqqqqqqqqpgqjm9xl2s2v5r6lvranfaa84pkmqcz43e04fvs7h8ljn",
 };
 
 const dappContract =
