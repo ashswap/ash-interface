@@ -2,6 +2,7 @@ import { useGetAccountInfo, useGetLoginInfo } from "@multiversx/sdk-dapp/hooks";
 import ICBambooShootXL from "assets/svg/bamboo-shoot-xl.svg";
 import ICSkewStep from "assets/svg/skew-step.svg";
 import { LedgerLogin } from "components/Ledger/LedgerLogin";
+import useMounted from "hooks/useMounted";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useRef, useState } from "react";
 function LedgerContainer() {
@@ -13,6 +14,7 @@ function LedgerContainer() {
     const callbackUrl = useMemo(() => {
         return (router.query.callbackUrl as string) || "/";
     }, [router.query]);
+    const isMounted = useMounted();
     useEffect(() => {
         setIsConfirm(!!ledgerAccount);
     }, [ledgerAccount]);
@@ -61,7 +63,7 @@ function LedgerContainer() {
                     )}
                 </div>
                 <div className="sm:w-7/12 mt-10 sm:mt-0 -mx-6 md:mx-0">
-                    <LedgerLogin />
+                    {isMounted && <LedgerLogin />}
                 </div>
             </div>
         </div>
