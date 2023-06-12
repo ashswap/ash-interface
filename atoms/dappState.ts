@@ -36,7 +36,8 @@ export const dappCoreState = atom<DappCoreState>({
             publicKey: "",
             walletConnectAccount: null,
             shard: 0,
-            websocketEvent: null
+            websocketEvent: null,
+            websocketBatchEvent: null,
         },
         dappModal: {},
         loginInfo: {
