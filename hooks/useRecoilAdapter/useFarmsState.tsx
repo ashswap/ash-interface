@@ -32,6 +32,7 @@ import {
     useState,
 } from "react";
 import { useRecoilCallback, useRecoilValue, useSetRecoilState } from "recoil";
+import useSWR from "swr";
 import { useDebounce } from "use-debounce";
 type RewardSnapshot = {
     ts: number;
@@ -249,7 +250,7 @@ const useFarmsState = () => {
             // calc total number of ash value over a year generated from single farm token -> APR_F (1) (base on farm token)
             // because of the boost mechanism. The real APR base on the underlying LP in farm token
             // -> minimum APR = APR_F * 0.4; maximum APR = APR_F * 0.4 * 2.5 = APR_F;
-            // woking balance in USD is total farm token supply in USD (with assumption that all farm tokens are boosted which mean 1 farm_token = 1 LP) 
+            // woking balance in USD is total farm token supply in USD (with assumption that all farm tokens are boosted which mean 1 farm_token = 1 LP)
             const { valueUsd: workingBalanceUsd } = await lpBreak(
                 p.address,
                 farmTokenSupply.toString() // cause farm decimals = LP decimals = 18
@@ -364,7 +365,10 @@ const useFarmsState = () => {
                     2,
                     BigNumber.ROUND_DOWN
                 );
-                const weightBoost = farmBalance.div(totalStakedLP).div(0.4).toNumber();
+                const weightBoost = farmBalance
+                    .div(totalStakedLP)
+                    .div(0.4)
+                    .toNumber();
                 record.stakedData = {
                     farmTokens,
                     totalStakedLP,
@@ -421,9 +425,7 @@ const useFarmsState = () => {
 
     const [debounceQueryRewards] = useDebounce(queryRewards, 500);
 
-    useEffect(() => {
-        debounceQueryRewards();
-    }, [debounceQueryRewards]);
+    useSWR([debounceQueryRewards], (query) => query());
 
     useEffect(() => {
         if (Object.keys(sessionIdsMap).length > 0) {
