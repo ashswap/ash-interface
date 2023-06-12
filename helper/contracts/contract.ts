@@ -9,7 +9,6 @@ import {
     Interaction,
     ResultsParser,
     SmartContract,
-    SmartContractAbi,
 } from "@multiversx/sdk-core/out";
 import { gasLimitBuffer, maxGasLimit } from "const/dappConfig";
 import { getProxyNetworkProvider } from "../proxy/util";
@@ -26,7 +25,7 @@ export default class Contract<T extends AbiType = any> {
         this.abiRegistry = AbiRegistry.create(abi as any);
         this.contract = new SmartContract({
             address: this.address,
-            abi: new SmartContractAbi(this.abiRegistry),
+            abi: this.abiRegistry,
         });
     }
     protected getProxy() {
