@@ -23,7 +23,8 @@ const useAGAggregate = (trackStatus = false) => {
             async (
                 tokensAmount: TokenAmount[],
                 swaps: SorSwap[],
-                minTokensAmountOut: TokenAmount[]
+                minTokensAmountOut: TokenAmount[],
+                hopTokenIds: string[],
             ) => {
                 const egldIn = tokensAmount.find(
                     (t) => t.token.identifier === "EGLD"
@@ -56,16 +57,20 @@ const useAGAggregate = (trackStatus = false) => {
                 });
                 const slippage = await snapshot.getPromise(agSlippageAtom);
                 const pct = new Percent(100, 100).subtract(slippage);
+                const normalizeTokenIds = minTokensAmountOut.map(t => getTokenIdFromCoin(t.token.identifier));
+                const hopLimits = hopTokenIds.filter(id => !normalizeTokenIds.includes(id)).map(id => ({token: id, amount: new BigNumber(0)}));
+                const outputLimits = minTokensAmountOut.map((m) => ({
+                    token: getTokenIdFromCoin(m.token.identifier)!,
+                    amount: m.raw.multipliedBy(pct.numerator).idiv(pct.denominator),
+                }));
                 const tx = await ContractManager.getAggregatorContract(
                     ASHSWAP_CONFIG.dappContract.aggregator
                 ).aggregate(
                     payments,
                     steps,
-                    minTokensAmountOut.map((m) => ({
-                        token: getTokenIdFromCoin(m.token.identifier)!,
-                        amount: m.raw.multipliedBy(pct.numerator).idiv(pct.denominator),
-                    }))
+                    [...hopLimits, ...outputLimits]
                 );
+                console.log([...hopLimits, ...outputLimits]);
                 const txs: Transaction[] = [tx];
                 if (egldIn) {
                     const wrapTx = await ContractManager.getWrappedEGLDContract(
