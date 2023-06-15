@@ -28,6 +28,7 @@ stages:
 
 .build_script_template: &build_script_template
   before_script:
+    - printenv
     - printenv > .env
   script:
     - ls -lah
