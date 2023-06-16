@@ -11,13 +11,14 @@ import { useMemo } from "react";
 import { useRecoilValue } from "recoil";
 import useSWR, { SWRConfiguration } from "swr";
 import { useDebounce } from "use-debounce";
+import useAgTokenList from "./useAgTokenList";
 
 const useAgTokensBalance = (swrConfig: SWRConfiguration = {}) => {
     const networkConfig: AccountInfoSliceNetworkType = useGetNetworkConfig().network;
     const address = useRecoilValue(accAddressState);
     const lastCompletedTxHash = useRecoilValue(lastCompletedTxHashAtom);
     const [debounceLastTxHash] = useDebounce(lastCompletedTxHash, 750);
-    const {data} = useSWR<Array<{id: string, decimal?: number; coingeckoId?: string}>>(`${ENVIRONMENT.AG_API}/tokens`, fetcher);
+    const {data} = useAgTokenList();
     const ids = useMemo(() => (data || []).map(t => t.id).join(','), [data]);
     const balanceFetchKey = useMemo(() => {
         return address ? [`${networkConfig.apiAddress}/accounts/${address}/tokens?identifiers=${ids}`, debounceLastTxHash]: null
