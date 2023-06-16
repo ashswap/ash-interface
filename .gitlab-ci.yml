@@ -153,14 +153,14 @@ deploy_ipfs_beta:
   NEXT_PUBLIC_ASH_ENV: beta
   # TODO: prod
   BUILD_ENV: dev
-  NEXT_PUBLIC_ASH_API: https://api.ashswap.io
+  NEXT_PUBLIC_ASH_API: https://api-alpha.ashswap.io
   NEXT_PUBLIC_ASH_DOMAIN: app.ashswap.io
-  NEXT_PUBLIC_ASH_GRAPHQL: https://api-v2.ashswap.io
+  NEXT_PUBLIC_ASH_GRAPHQL: https://api-v2-alpha.ashswap.io
   NEXT_PUBLIC_ASH_SOCKET: https://socket-api-fra-aws.multiversx.com
   NEXT_PUBLIC_ASH_SOCKET_EXTRA: 
   NEXT_PUBLIC_ASH_LOG_API: https://api-tracking.ashswap.io
   NEXT_PUBLIC_IPFS_API: https://ipfs-cluster-api-internal.bicarus.io
-  NEXT_PUBLIC_AG_API: https://aggregator-internal.ashswap.io
+  NEXT_PUBLIC_AG_API: https://aggregator-alpha.ashswap.io
   NEXT_PUBLIC_XEXCHANGE_GRAPH_API: https://graph.xexchange.com
 
 .job_template_prod_gamma: &job_template_prod_gamma
@@ -206,14 +206,14 @@ deploy_ipfs_prod_gamma:
   NEXT_PUBLIC_ASH_ENV: beta
   # TODO: prod
   BUILD_ENV: dev
-  NEXT_PUBLIC_ASH_API: https://api-alpha.ashswap.io
+  NEXT_PUBLIC_ASH_API: https://api.ashswap.io
   NEXT_PUBLIC_ASH_DOMAIN: app.ashswap.io
-  NEXT_PUBLIC_ASH_GRAPHQL: https://api-v2-alpha.ashswap.io
+  NEXT_PUBLIC_ASH_GRAPHQL: https://api-v2.ashswap.io
   NEXT_PUBLIC_ASH_SOCKET: https://socket-api-fra-aws.multiversx.com
   NEXT_PUBLIC_ASH_SOCKET_EXTRA: 
   NEXT_PUBLIC_ASH_LOG_API: https://api-tracking.ashswap.io
   NEXT_PUBLIC_IPFS_API: https://ipfs-cluster-api-internal.bicarus.io
-  NEXT_PUBLIC_AG_API: https://aggregator-alpha.ashswap.io
+  NEXT_PUBLIC_AG_API: https://aggregator-internal.ashswap.io
   NEXT_PUBLIC_XEXCHANGE_GRAPH_API: https://graph.xexchange.com
 
 .job_template_prod: &job_template_prod
