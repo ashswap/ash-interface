@@ -34,7 +34,7 @@ const useAgSor = (
         async (url, params) => {
             const searchParams = new URLSearchParams(params);
             return fetcher(`${url}?${searchParams}`, {
-                headers: { "Authen-Token": ENVIRONMENT.AG_TOKEN_SECRET },
+                headers: { "authen-token": ENVIRONMENT.AG_TOKEN_SECRET },
             });
         },
         { refreshInterval: blockTimeMs, ...swrConfig }
