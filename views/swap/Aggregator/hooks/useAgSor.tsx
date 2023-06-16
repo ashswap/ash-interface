@@ -7,7 +7,12 @@ import { useMemo } from "react";
 import useSWR, { SWRConfiguration } from "swr";
 import { SorSwapResponse } from "../interfaces/swapInfo";
 
-const useAgSor = (tokenIn: string, tokenOut: string, amtIn: string, swrConfig: SWRConfiguration = {}) => {
+const useAgSor = (
+    tokenIn: string,
+    tokenOut: string,
+    amtIn: string,
+    swrConfig: SWRConfiguration = {}
+) => {
     const params = useMemo(() => {
         const params = {
             from: getTokenIdFromCoin(tokenIn),
@@ -28,11 +33,13 @@ const useAgSor = (tokenIn: string, tokenOut: string, amtIn: string, swrConfig: S
         params,
         async (url, params) => {
             const searchParams = new URLSearchParams(params);
-            return fetcher(`${url}?${searchParams}`);
+            return fetcher(`${url}?${searchParams}`, {
+                headers: { "Authen-Token": ENVIRONMENT.AG_TOKEN_SECRET },
+            });
         },
         { refreshInterval: blockTimeMs, ...swrConfig }
     );
     return res;
-}
+};
 
 export default useAgSor;
