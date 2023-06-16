@@ -23,8 +23,8 @@ const useAgTokensBalance = (swrConfig: SWRConfiguration = {}) => {
     const balanceFetchKey = useMemo(() => {
         return address ? [`${networkConfig.apiAddress}/accounts/${address}/tokens?identifiers=${ids}`, debounceLastTxHash]: null
     }, [address, debounceLastTxHash, ids, networkConfig.apiAddress]);
-    const {data: balances} = useSWR<Array<{balance: string, identifier: string}>>(balanceFetchKey, (url) => fetcher(url), {dedupingInterval: 6000, ...swrConfig}); 
-    const {data: tokens} = useSWR(`${networkConfig.apiAddress}/tokens?identifiers=${ids}&size=50`, fetcher);
+    const {data: balances} = useSWR<Array<{balance: string, identifier: string}>>(balanceFetchKey, (url) => fetcher(url), {dedupingInterval: 6000, ...swrConfig, fallbackData: []}); 
+    const {data: tokens} = useSWR(`${networkConfig.apiAddress}/tokens?identifiers=${ids}&size=50`, fetcher, {fallbackData: []});
     const list = useMemo(() => {
         const map = Object.fromEntries((balances || []).map(b => [b.identifier, b]));
         const tokensAmount: TokenAmount[] = (tokens || []).map((t: any) => {
