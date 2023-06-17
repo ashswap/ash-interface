@@ -59,6 +59,7 @@ const actionLabelMap: { [key in QuestActionType]: string } = {
     increase_amount: "Increase amount of ASH in governance pool",
     increase_unlock_time: "Extend lock period in governance pool",
     withdraw: "Withdraw ASH from governance pool",
+    aggregate: "Use the aggregator"
 };
 function QuestItem({
     questData,
