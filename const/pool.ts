@@ -175,50 +175,50 @@ const mainnet: IPool[] = [
     // },
     {
         address:
-            "erd1qqqqqqqqqqqqqpgqs8p2v9wr8j48vqrmudcj94wu47kqra3r4fvshfyd9c",
+            "erd1qqqqqqqqqqqqqpgqdngq580ceg8fsrmk5fad8cckzr2m6d2t2ges46gedp",
         lpToken: {
-            identifier: "ALP-afc922",
+            identifier: "ALP-c12752",
             chainId: ChainId.Mainnet,
             symbol: "ALP-3pool",
             name: "Ashswap LP",
             decimals: 18,
         },
         tokens: [
-            TOKENS_MAP["USDC-c76f1f"],
-            TOKENS_MAP["USDT-f8c08c"],
-            TOKENS_MAP["BUSD-40b57e"],
+            TOKENS_MAP["USDC-bb1e62"],
+            TOKENS_MAP["USDT-821a84"],
+            TOKENS_MAP["BUSD-2cbb2d"],
         ],
         type: EPoolType.PlainPool,
     },
     {
         address:
-            "erd1qqqqqqqqqqqqqpgq5l05l0ts4lphdktx33apl0ss9rzf4r244fvsva6j53",
+            "erd1qqqqqqqqqqqqqpgq5tyhky2cgatakmjwpdpx5p5zh9keqqm32gesnukatu",
         lpToken: {
-            identifier: "ALP-5f9191",
+            identifier: "ALP-d935a5",
             chainId: ChainId.Mainnet,
             symbol: "ALP-BUSD-WEGLD",
             name: "Ashswap LP",
             decimals: 18,
         },
         tokens: [
-            TOKENS_MAP["BUSD-40b57e"],
-            TOKENS_MAP["WEGLD-bd4d79"],
+            TOKENS_MAP["BUSD-2cbb2d"],
+            TOKENS_MAP["WEGLD-795247"],
         ],
         type: EPoolType.PoolV2,
     },
     {
         address:
-            "erd1qqqqqqqqqqqqqpgqn7969pvzaatp8p9yu6u5h2ce2gyw0x9j4fvsplvthl",
+            "erd1qqqqqqqqqqqqqpgqn5at779he2gp3tuj4vsmlq7wntdqjq6d2gesftjyd0",
         lpToken: {
-            identifier: "ALP-2d0cf8",
+            identifier: "ALP-c0b453",
             chainId: ChainId.Mainnet,
             symbol: "ALP-USDT-ASH",
             name: "Ashswap LP",
             decimals: 18,
         },
         tokens: [
-            TOKENS_MAP["USDT-f8c08c"],
-            TOKENS_MAP["ASH-a642d1"],
+            TOKENS_MAP["USDT-821a84"],
+            TOKENS_MAP["ASH-a85626"],
         ],
         type: EPoolType.PoolV2,
     },

@@ -159,7 +159,7 @@ const MAINNET_TOKENS: IESDTInfo[] = [
         logoURI: ImgEgldIcon.src,
     },
     {
-        identifier: "WEGLD-bd4d79",
+        identifier: "WEGLD-795247",
         chainId: ChainId.Mainnet,
         symbol: "wEGLD",
         name: "Wrapped EGLD",
@@ -167,7 +167,7 @@ const MAINNET_TOKENS: IESDTInfo[] = [
         logoURI: ImgWEGLDIcon.src,
     },
     {
-        identifier: "ASH-a642d1",
+        identifier: "ASH-a85626",
         chainId: ChainId.Mainnet,
         symbol: "ASH",
         name: "Ashswap Token",
@@ -175,7 +175,7 @@ const MAINNET_TOKENS: IESDTInfo[] = [
         logoURI: ImgAshIcon.src,
     },
     {
-        identifier: "USDT-f8c08c",
+        identifier: "USDT-821a84",
         chainId: ChainId.Mainnet,
         symbol: "USDT",
         name: "Tether",
@@ -183,7 +183,7 @@ const MAINNET_TOKENS: IESDTInfo[] = [
         logoURI: IconUSDT.src,
     },
     {
-        identifier: "USDC-c76f1f",
+        identifier: "USDC-bb1e62",
         chainId: ChainId.Mainnet,
         symbol: "USDC",
         name: "USD Coin",
@@ -191,7 +191,7 @@ const MAINNET_TOKENS: IESDTInfo[] = [
         logoURI: IconUSDC.src,
     },
     {
-        identifier: "BUSD-40b57e",
+        identifier: "BUSD-2cbb2d",
         chainId: ChainId.Mainnet,
         symbol: "BUSD",
         name: "Binance USD",
@@ -217,7 +217,7 @@ export const ASH_TOKEN: IESDTInfo =
             ? ENVIRONMENT.ENV === "alpha"
                 ? "ASH-84eab0"
                 : "ASH-4ce444"
-            : "ASH-a642d1"
+            : "ASH-a85626"
     ];
 export const ESDT_MAP = Object.fromEntries(
     TOKENS.map((t) => [t.identifier, new ESDT(t)])
@@ -228,5 +228,5 @@ export const ASH_ESDT =
             ? ENVIRONMENT.ENV === "alpha"
                 ? "ASH-84eab0"
                 : "ASH-4ce444"
-            : "ASH-a642d1"
+            : "ASH-a85626"
     ];

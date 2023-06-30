@@ -35,11 +35,11 @@ const dappContractDevnet: DappContractConfig = {
 
 const dappContractMainnet: DappContracts = {
     voteEscrowedContract:
-        "erd1qqqqqqqqqqqqqpgq58elfqng8edp0z83pywy3825vzhawfqp4fvsaldek8",
+        "erd1qqqqqqqqqqqqqpgqgtf40adcdntc9p4hu2tjt03y4kmhyp7l2gesk22gmt",
     feeDistributor:
-        "erd1qqqqqqqqqqqqqpgqjrlge5rgml6d48tjgu3afqvems88lqzw4fvs9f7lhs",
-    farmController: "erd1qqqqqqqqqqqqqpgqzhm689ehkacadr7elzkc3z70h6cqmz0q4fvsftax5t",
-    farmBribe: "erd1qqqqqqqqqqqqqpgqgulmfcu8prrv2pmx3nqn5stqu3c42fsz4fvsa9rwdl",
+        "erd1qqqqqqqqqqqqqpgqga57dwpazjwh0jd3msrd7s98h48wmd7d2gesulkknh",
+    farmController: "erd1qqqqqqqqqqqqqpgqa2f6tv4eyta2q0qtrdcfkaew02m993u82ges437skh",
+    farmBribe: "erd1qqqqqqqqqqqqqpgq4qgt6f9n82zdfwahdpnesjadwvy5ldnk2geskxx4h0",
     aggregator: "erd1qqqqqqqqqqqqqpgqglgkaxm73j7mhw5u940fsmmncnayxj884fvs54lnr6",
 };
 
@@ -51,7 +51,7 @@ const dappContract =
 export const VE_CONFIG = ENVIRONMENT.NETWORK === "mainnet" ? {
     // main config
     maxLock: 4 * 365 * 24 * 3600,
-    minLock: 7 * 24 * 3600,
+    minLock: 30 * 60,
     // for BoY
     // maxLock: 2 * 7 * 24 * 3600,
     // minLock: 12 * 60 * 60,
