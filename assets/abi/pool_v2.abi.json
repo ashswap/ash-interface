@@ -1,15 +1,16 @@
 {
     "buildInfo": {
         "rustc": {
-            "version": "1.70.0-nightly",
-            "commitHash": "2036fdd24f77d607dcfaa24c48fbe85d3f785823",
-            "commitDate": "2023-03-27",
+            "version": "1.72.0-nightly",
+            "commitHash": "2d0aa57684e10f7b3d3fe740ee18d431181583ad",
+            "commitDate": "2023-06-18",
             "channel": "Nightly",
-            "short": "rustc 1.70.0-nightly (2036fdd24 2023-03-27)"
+            "short": "rustc 1.72.0-nightly (2d0aa5768 2023-06-18)"
         },
         "contractCrate": {
             "name": "pool_v2",
-            "version": "0.0.0"
+            "version": "0.0.0",
+            "gitVersion": "mainnet-230217-38-gbfa04a7"
         },
         "framework": {
             "name": "multiversx-sc",
@@ -21,7 +22,7 @@
         "inputs": [
             {
                 "name": "pool_type",
-                "type": "PoolType"
+                "type": "u8"
             },
             {
                 "name": "factory",
@@ -171,6 +172,56 @@
             ]
         },
         {
+            "name": "safeRemoveLiquidity",
+            "mutability": "mutable",
+            "payableInTokens": [
+                "*"
+            ],
+            "inputs": [
+                {
+                    "name": "min_amounts",
+                    "type": "List<TokenAmount>"
+                },
+                {
+                    "name": "opt_receiver",
+                    "type": "optional<Address>",
+                    "multi_arg": true
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "List<BigUint>"
+                }
+            ]
+        },
+        {
+            "name": "safeRemoveLiquidityOneCoin",
+            "mutability": "mutable",
+            "payableInTokens": [
+                "*"
+            ],
+            "inputs": [
+                {
+                    "name": "token_out",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "min_amount",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "opt_receiver",
+                    "type": "optional<Address>",
+                    "multi_arg": true
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
             "name": "removeLiquidityOneCoin",
             "mutability": "mutable",
             "payableInTokens": [
@@ -265,6 +316,28 @@
                 }
             ],
             "outputs": []
+        },
+        {
+            "name": "safeEstimateAmountOut",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "token_out",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "dx",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                },
+                {
+                    "type": "BigUint"
+                }
+            ]
         },
         {
             "name": "estimateAmountOut",
@@ -383,6 +456,21 @@
             "outputs": [
                 {
                     "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getTokenIndex",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "token_id",
+                    "type": "TokenIdentifier"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "u32"
                 }
             ]
         },
@@ -951,6 +1039,19 @@
                 {
                     "name": "time",
                     "type": "u64"
+                }
+            ]
+        },
+        "TokenAmount": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "token",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "amount",
+                    "type": "BigUint"
                 }
             ]
         },

@@ -1,15 +1,16 @@
 {
     "buildInfo": {
         "rustc": {
-            "version": "1.70.0-nightly",
-            "commitHash": "2036fdd24f77d607dcfaa24c48fbe85d3f785823",
-            "commitDate": "2023-03-27",
+            "version": "1.72.0-nightly",
+            "commitHash": "2d0aa57684e10f7b3d3fe740ee18d431181583ad",
+            "commitDate": "2023-06-18",
             "channel": "Nightly",
-            "short": "rustc 1.70.0-nightly (2036fdd24 2023-03-27)"
+            "short": "rustc 1.72.0-nightly (2d0aa5768 2023-06-18)"
         },
         "contractCrate": {
             "name": "pool",
-            "version": "0.0.0"
+            "version": "0.0.0",
+            "gitVersion": "mainnet-230217-38-gbfa04a7"
         },
         "framework": {
             "name": "multiversx-sc",
@@ -21,7 +22,7 @@
         "inputs": [
             {
                 "name": "pool_type",
-                "type": "PoolType"
+                "type": "u8"
             },
             {
                 "name": "initial_amp_factor",
@@ -67,6 +68,29 @@
             ]
         },
         {
+            "name": "safeAddLiquidity",
+            "mutability": "mutable",
+            "payableInTokens": [
+                "*"
+            ],
+            "inputs": [
+                {
+                    "name": "mint_amount_min",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "opt_receiver",
+                    "type": "optional<Address>",
+                    "multi_arg": true
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "List<EsdtTokenPayment>"
+                }
+            ]
+        },
+        {
             "name": "removeLiquidity",
             "mutability": "mutable",
             "payableInTokens": [
@@ -76,6 +100,25 @@
                 {
                     "name": "token_amount_min",
                     "type": "variadic<BigUint>",
+                    "multi_arg": true
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "List<EsdtTokenPayment>"
+                }
+            ]
+        },
+        {
+            "name": "safeRemoveLiquidity",
+            "mutability": "mutable",
+            "payableInTokens": [
+                "*"
+            ],
+            "inputs": [
+                {
+                    "name": "token_amount_min",
+                    "type": "variadic<TokenAmount>",
                     "multi_arg": true
                 }
             ],
@@ -587,6 +630,19 @@
     ],
     "hasCallback": false,
     "types": {
+        "TokenAttributes": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "reserve",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "rate",
+                    "type": "BigUint"
+                }
+            ]
+        },
         "AddLiquidityAttributes": {
             "type": "struct",
             "fields": [
@@ -879,15 +935,15 @@
                 }
             ]
         },
-        "TokenAttributes": {
+        "TokenAmount": {
             "type": "struct",
             "fields": [
                 {
-                    "name": "reserve",
-                    "type": "BigUint"
+                    "name": "token",
+                    "type": "TokenIdentifier"
                 },
                 {
-                    "name": "rate",
+                    "name": "amount",
                     "type": "BigUint"
                 }
             ]

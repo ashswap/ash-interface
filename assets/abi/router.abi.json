@@ -1,20 +1,20 @@
 {
     "buildInfo": {
         "rustc": {
-            "version": "1.70.0-nightly",
-            "commitHash": "44f5180584404d18058cbbf224c55255db4fdcbb",
-            "commitDate": "2023-03-20",
+            "version": "1.72.0-nightly",
+            "commitHash": "2d0aa57684e10f7b3d3fe740ee18d431181583ad",
+            "commitDate": "2023-06-18",
             "channel": "Nightly",
-            "short": "rustc 1.70.0-nightly (44f518058 2023-03-20)"
+            "short": "rustc 1.72.0-nightly (2d0aa5768 2023-06-18)"
         },
         "contractCrate": {
             "name": "router",
             "version": "0.0.0",
-            "git_version": "233f2a3-modified"
+            "gitVersion": "mainnet-230217-38-gbfa04a7"
         },
         "framework": {
-            "name": "elrond-wasm",
-            "version": "0.33.1"
+            "name": "multiversx-sc",
+            "version": "0.39.8"
         }
     },
     "name": "Router",
@@ -35,10 +35,25 @@
         {
             "name": "createPool",
             "mutability": "mutable",
+            "payableInTokens": [
+                "EGLD"
+            ],
             "inputs": [
                 {
+                    "name": "lp_token_name",
+                    "type": "bytes"
+                },
+                {
+                    "name": "lp_token_ticker",
+                    "type": "bytes"
+                },
+                {
+                    "name": "protocols",
+                    "type": "List<PoolWithProtocol>"
+                },
+                {
                     "name": "pool_type",
-                    "type": "u64"
+                    "type": "u8"
                 },
                 {
                     "name": "initial_amp_factor",
@@ -58,35 +73,19 @@
                     "multi_arg": true
                 }
             ],
-            "outputs": [
-                {
-                    "type": "Address"
-                }
-            ]
+            "outputs": []
         },
         {
             "name": "upgradePool",
             "mutability": "mutable",
             "inputs": [
                 {
-                    "name": "pool_type",
-                    "type": "PoolType"
+                    "name": "pool_address",
+                    "type": "Address"
                 },
                 {
-                    "name": "initial_amp_factor",
-                    "type": "u64"
-                },
-                {
-                    "name": "swap_fee_percent",
-                    "type": "u64"
-                },
-                {
-                    "name": "admin_fee_percent",
-                    "type": "u64"
-                },
-                {
-                    "name": "tokens",
-                    "type": "variadic<PoolInitAttributes>",
+                    "name": "arguments",
+                    "type": "variadic<bytes>",
                     "multi_arg": true
                 }
             ],
@@ -95,130 +94,10 @@
         {
             "name": "createPoolV2",
             "mutability": "mutable",
-            "inputs": [
-                {
-                    "name": "pool_type",
-                    "type": "PoolType"
-                },
-                {
-                    "name": "a",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "gamma",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "mid_fee",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "out_fee",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "allowed_extra_profit",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "fee_gamma",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "adjustment_step",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "admin_fee",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "ma_half_time",
-                    "type": "u64"
-                },
-                {
-                    "name": "initial_price",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "tokens",
-                    "type": "variadic<PoolInitAttributes>",
-                    "multi_arg": true
-                }
-            ],
-            "outputs": [
-                {
-                    "type": "Address"
-                }
-            ]
-        },
-        {
-            "name": "upgradePoolV2",
-            "mutability": "mutable",
-            "inputs": [
-                {
-                    "name": "pool_type",
-                    "type": "PoolType"
-                },
-                {
-                    "name": "a",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "gamma",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "mid_fee",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "out_fee",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "allowed_extra_profit",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "fee_gamma",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "adjustment_step",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "admin_fee",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "ma_half_time",
-                    "type": "u64"
-                },
-                {
-                    "name": "initial_price",
-                    "type": "BigUint"
-                },
-                {
-                    "name": "tokens",
-                    "type": "variadic<PoolInitAttributes>",
-                    "multi_arg": true
-                }
-            ],
-            "outputs": []
-        },
-        {
-            "name": "issueLpToken",
-            "mutability": "mutable",
             "payableInTokens": [
                 "EGLD"
             ],
             "inputs": [
-                {
-                    "name": "pool_address",
-                    "type": "Address"
-                },
                 {
                     "name": "lp_token_name",
                     "type": "bytes"
@@ -226,6 +105,55 @@
                 {
                     "name": "lp_token_ticker",
                     "type": "bytes"
+                },
+                {
+                    "name": "pool_type",
+                    "type": "u8"
+                },
+                {
+                    "name": "a",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "gamma",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "mid_fee",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "out_fee",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "allowed_extra_profit",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "fee_gamma",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "adjustment_step",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "admin_fee",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "ma_half_time",
+                    "type": "u64"
+                },
+                {
+                    "name": "initial_price",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "tokens",
+                    "type": "variadic<PoolInitAttributes>",
+                    "multi_arg": true
                 }
             ],
             "outputs": []
@@ -235,16 +163,8 @@
             "mutability": "mutable",
             "inputs": [
                 {
-                    "name": "token",
-                    "type": "TokenIdentifier"
-                },
-                {
-                    "name": "address",
-                    "type": "Address"
-                },
-                {
-                    "name": "roles",
-                    "type": "variadic<EsdtLocalRole>",
+                    "name": "tokens",
+                    "type": "variadic<TokenIdentifier>",
                     "multi_arg": true
                 }
             ],
@@ -367,12 +287,11 @@
         },
         {
             "name": "setPoolTemplateAddress",
-            "onlyOwner": true,
             "mutability": "mutable",
             "inputs": [
                 {
                     "name": "pool_type",
-                    "type": "PoolType"
+                    "type": "u8"
                 },
                 {
                     "name": "address",
@@ -387,7 +306,7 @@
             "inputs": [
                 {
                     "name": "pool_type",
-                    "type": "PoolType"
+                    "type": "u8"
                 }
             ],
             "outputs": [
@@ -449,28 +368,6 @@
             "outputs": []
         },
         {
-            "name": "applyNewFee",
-            "mutability": "mutable",
-            "inputs": [
-                {
-                    "name": "address",
-                    "type": "Address"
-                }
-            ],
-            "outputs": []
-        },
-        {
-            "name": "revertNewFee",
-            "mutability": "mutable",
-            "inputs": [
-                {
-                    "name": "address",
-                    "type": "Address"
-                }
-            ],
-            "outputs": []
-        },
-        {
             "name": "rampAmpFactor",
             "mutability": "mutable",
             "inputs": [
@@ -496,63 +393,6 @@
                 {
                     "name": "address",
                     "type": "Address"
-                }
-            ],
-            "outputs": []
-        },
-        {
-            "name": "setUnderlyingToken",
-            "mutability": "mutable",
-            "inputs": [
-                {
-                    "name": "address",
-                    "type": "Address"
-                },
-                {
-                    "name": "token",
-                    "type": "TokenIdentifier"
-                },
-                {
-                    "name": "underlying",
-                    "type": "TokenIdentifier"
-                }
-            ],
-            "outputs": []
-        },
-        {
-            "name": "setBaseAddress",
-            "mutability": "mutable",
-            "inputs": [
-                {
-                    "name": "address",
-                    "type": "Address"
-                },
-                {
-                    "name": "token",
-                    "type": "TokenIdentifier"
-                },
-                {
-                    "name": "base_address",
-                    "type": "Address"
-                }
-            ],
-            "outputs": []
-        },
-        {
-            "name": "setProtocolMap",
-            "mutability": "mutable",
-            "inputs": [
-                {
-                    "name": "address",
-                    "type": "Address"
-                },
-                {
-                    "name": "protocol_address",
-                    "type": "Address"
-                },
-                {
-                    "name": "protocol_type",
-                    "type": "ProtocolType"
                 }
             ],
             "outputs": []
@@ -592,28 +432,6 @@
                 {
                     "name": "new_ma_half_time",
                     "type": "u64"
-                }
-            ],
-            "outputs": []
-        },
-        {
-            "name": "applyNewParameters",
-            "mutability": "mutable",
-            "inputs": [
-                {
-                    "name": "address",
-                    "type": "Address"
-                }
-            ],
-            "outputs": []
-        },
-        {
-            "name": "revertNewParameters",
-            "mutability": "mutable",
-            "inputs": [
-                {
-                    "name": "address",
-                    "type": "Address"
                 }
             ],
             "outputs": []
@@ -695,7 +513,6 @@
         },
         {
             "name": "setFeePoolAddress",
-            "onlyOwner": true,
             "mutability": "mutable",
             "inputs": [
                 {
@@ -707,7 +524,6 @@
         },
         {
             "name": "setBurner",
-            "onlyOwner": true,
             "mutability": "mutable",
             "inputs": [
                 {
@@ -734,7 +550,6 @@
         },
         {
             "name": "setFeeDistributorAddress",
-            "onlyOwner": true,
             "mutability": "mutable",
             "inputs": [
                 {
@@ -812,47 +627,6 @@
                 }
             ]
         },
-        "EsdtLocalRole": {
-            "type": "enum",
-            "variants": [
-                {
-                    "name": "None",
-                    "discriminant": 0
-                },
-                {
-                    "name": "Mint",
-                    "discriminant": 1
-                },
-                {
-                    "name": "Burn",
-                    "discriminant": 2
-                },
-                {
-                    "name": "NftCreate",
-                    "discriminant": 3
-                },
-                {
-                    "name": "NftAddQuantity",
-                    "discriminant": 4
-                },
-                {
-                    "name": "NftBurn",
-                    "discriminant": 5
-                },
-                {
-                    "name": "NftAddUri",
-                    "discriminant": 6
-                },
-                {
-                    "name": "NftUpdateAttributes",
-                    "discriminant": 7
-                },
-                {
-                    "name": "Transfer",
-                    "discriminant": 8
-                }
-            ]
-        },
         "PoolInitAttributes": {
             "type": "struct",
             "fields": [
@@ -896,16 +670,28 @@
                 }
             ]
         },
-        "ProtocolType": {
-            "type": "enum",
-            "variants": [
+        "PoolWithProtocol": {
+            "type": "struct",
+            "fields": [
                 {
-                    "name": "Empty",
-                    "discriminant": 0
+                    "name": "token",
+                    "type": "TokenIdentifier"
                 },
                 {
-                    "name": "MvxLS",
-                    "discriminant": 1
+                    "name": "underlying",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "address",
+                    "type": "Address"
+                },
+                {
+                    "name": "function",
+                    "type": "bytes"
+                },
+                {
+                    "name": "arguments",
+                    "type": "List<bytes>"
                 }
             ]
         }

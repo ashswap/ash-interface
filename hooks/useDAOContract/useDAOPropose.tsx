@@ -1,4 +1,4 @@
-import { Address, ArgSerializer, Interaction, TokenPayment } from "@multiversx/sdk-core/out";
+import { Address, ArgSerializer, Interaction } from "@multiversx/sdk-core/out";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 import { ContractManager } from "helper/contracts/contractManager";
 import useSendTxsWithTrackStatus from "hooks/useSendTxsWithTrackStatus";
@@ -9,15 +9,15 @@ const useDAOPropose = (trackStatus = false) => {
         useSendTxsWithTrackStatus(trackStatus);
     const propose = useRecoilCallback(
         ({ snapshot, set }) =>
-            async (meta: string, interaction: Interaction) => {
+            async (meta: string, interactions: Interaction[]) => {
                 const argSerializer = new ArgSerializer();
                 const tx = await ContractManager.getDAOContract(
                     ASHSWAP_CONFIG.dappContract.dao
-                ).propose(meta, {
+                ).propose(meta, interactions.map(interaction => ({
                     dest_address: new Address(interaction.getContractAddress().bech32()),
                     function_name: interaction.getFunction().toString(),
                     arguments: argSerializer.valuesToBuffers(interaction.getArguments()),
-                });
+                })));
                 await sendTransactions({
                     transactions: [tx],
                     transactionsDisplayInfo: {

@@ -8,6 +8,7 @@
 /* tslint:disable */
 /* eslint-disable */
 // @ts-nocheck
+
 export class Blockchain {
     __typename?: 'Blockchain';
     blockShards?: Nullable<BlockShard[]>;
@@ -162,29 +163,18 @@ export class DAOBribeReward {
     reward_amount: string;
 }
 
-export class DAOProposal {
-    __typename?: 'DAOProposal';
+export class DAOExecuted {
+    __typename?: 'DAOExecuted';
+    executed_at: number;
+    executed_by: string;
+}
+
+export class DAOAction {
+    __typename?: 'DAOAction';
     dest_address: string;
     function_name: string;
     arguments: string;
-    min_power_for_propose: string;
-    min_time_for_propose: number;
-    min_support_pct: string;
-    min_quorum_pct: string;
-    voting_time_limit: number;
-    queue_time_limit: number;
-    execute_time_limit: number;
-    created_at: number;
-    executed_at: number;
-    executed_by: string;
-    ipfs_hash: string;
-    no_vote: string;
-    proposal_id: number;
-    proposer: string;
-    state: string;
-    total_supply: string;
-    yes_vote: string;
-    bribes: DAOBribeReward[];
+    cost?: Nullable<string>;
 }
 
 export class DAOProposalConfig {
@@ -196,6 +186,24 @@ export class DAOProposalConfig {
     voting_time_limit: number;
     queue_time_limit: number;
     execute_time_limit: number;
+    max_action_allowed: number;
+    action_required: string[];
+}
+
+export class DAOProposal {
+    __typename?: 'DAOProposal';
+    proposer: string;
+    metadata: string;
+    actions: DAOAction[];
+    config: DAOProposalConfig;
+    created_at: number;
+    total_supply: string;
+    yes_vote: string;
+    no_vote: string;
+    executed: DAOExecuted[];
+    proposal_id: number;
+    state: string;
+    bribes: DAOBribeReward[];
 }
 
 export class DAOProposalDetail {
@@ -373,6 +381,7 @@ export class PoolV2 {
     lpToken: Token;
     tokens: Token[];
     reserves: string[];
+    realReserves: string[];
     totalSupply: string;
     lpPrice: string;
     ampFactor: string;
@@ -388,6 +397,16 @@ export class PoolV2 {
     outFee: string;
     feeGamma: string;
     state: boolean;
+    allowedExtraProfit: string;
+    adjustmentStep: string;
+    adminFee: string;
+    lastPrices: string;
+    lastPriceTs: number;
+    maHalfTime: number;
+    xcpProfit: string;
+    xcpProfitA: string;
+    isNotAdjusted: boolean;
+    initialAGammaTime: number;
 }
 
 export class Pool {
