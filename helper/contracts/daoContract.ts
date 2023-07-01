@@ -1,5 +1,5 @@
 import {
-    Address
+    Address, TokenTransfer
 } from "@multiversx/sdk-core/out";
 import daoAbi from "assets/abi/dao.abi.json";
 import BigNumber from "bignumber.js";
@@ -29,8 +29,8 @@ class DAOContract extends Contract<typeof daoAbi> {
         return firstValue?.valueOf();
     }
 
-    async propose(meta: string, action: DAOAction) {
-        let interaction = this.contract.methods.propose([meta, action]);
+    async propose(meta: string, actions: DAOAction[]) {
+        let interaction = this.contract.methods.propose([meta, actions]);
         interaction.withGasLimit(12_000_000);
         return this.interceptInteraction(interaction)
             .check()
@@ -52,9 +52,12 @@ class DAOContract extends Contract<typeof daoAbi> {
             .buildTransaction();
     }
 
-    async execute(proposalID: number) {
+    async execute(proposalID: number, egldPayment?: TokenTransfer) {
         let interaction = this.contract.methods.execute([proposalID]);
         interaction.withGasLimit(500_000_000);
+        if (egldPayment?.amountAsBigInteger.gt(0) && egldPayment.isEgld()) {
+            interaction.withValue(egldPayment);
+        }
         return this.interceptInteraction(interaction)
             .check()
             .buildTransaction();

@@ -27,7 +27,7 @@ type DAOCardProps = {
     detail?: boolean;
 };
 function DAOCard({ detail, proposal }: DAOCardProps) {
-    const meta = useDAOProposalMeta(proposal.ipfs_hash || "");
+    const meta = useDAOProposalMeta(proposal.metadata || "");
     const {
         status,
         minQuorumPct,

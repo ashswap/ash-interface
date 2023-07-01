@@ -1,20 +1,20 @@
 {
     "buildInfo": {
         "rustc": {
-            "version": "1.69.0-nightly",
-            "commitHash": "d962ea57899d64dc8a57040142c6b498a57c8064",
-            "commitDate": "2023-02-26",
+            "version": "1.72.0-nightly",
+            "commitHash": "2d0aa57684e10f7b3d3fe740ee18d431181583ad",
+            "commitDate": "2023-06-18",
             "channel": "Nightly",
-            "short": "rustc 1.69.0-nightly (d962ea578 2023-02-26)"
+            "short": "rustc 1.72.0-nightly (2d0aa5768 2023-06-18)"
         },
         "contractCrate": {
             "name": "farm_router",
             "version": "0.0.0",
-            "git_version": "a80f309"
+            "gitVersion": "mainnet-230217-38-gbfa04a7"
         },
         "framework": {
-            "name": "elrond-wasm",
-            "version": "0.33.1"
+            "name": "multiversx-sc",
+            "version": "0.39.8"
         }
     },
     "name": "FarmRouter",
@@ -43,7 +43,18 @@
         {
             "name": "createFarm",
             "mutability": "mutable",
+            "payableInTokens": [
+                "EGLD"
+            ],
             "inputs": [
+                {
+                    "name": "token_name",
+                    "type": "bytes"
+                },
+                {
+                    "name": "token_ticker",
+                    "type": "bytes"
+                },
                 {
                     "name": "reward_token_id",
                     "type": "TokenIdentifier"
@@ -57,11 +68,7 @@
                     "type": "BigUint"
                 }
             ],
-            "outputs": [
-                {
-                    "type": "Address"
-                }
-            ]
+            "outputs": []
         },
         {
             "name": "upgradeFarm",
@@ -83,43 +90,12 @@
             "outputs": []
         },
         {
-            "name": "registerFarmToken",
-            "mutability": "mutable",
-            "payableInTokens": [
-                "EGLD"
-            ],
-            "inputs": [
-                {
-                    "name": "farm_address",
-                    "type": "Address"
-                },
-                {
-                    "name": "token_name",
-                    "type": "bytes"
-                },
-                {
-                    "name": "token_ticker",
-                    "type": "bytes"
-                }
-            ],
-            "outputs": []
-        },
-        {
             "name": "setLocalRoles",
             "mutability": "mutable",
             "inputs": [
                 {
-                    "name": "token",
+                    "name": "farming_token_id",
                     "type": "TokenIdentifier"
-                },
-                {
-                    "name": "address",
-                    "type": "Address"
-                },
-                {
-                    "name": "roles",
-                    "type": "variadic<EsdtLocalRole>",
-                    "multi_arg": true
                 }
             ],
             "outputs": []
@@ -238,8 +214,18 @@
             ]
         },
         {
+            "name": "isFarmInRouter",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "farm_address",
+                    "type": "Address"
+                }
+            ],
+            "outputs": []
+        },
+        {
             "name": "setFarmTemplateAddress",
-            "onlyOwner": true,
             "mutability": "mutable",
             "inputs": [
                 {
@@ -381,47 +367,5 @@
     ],
     "events": [],
     "hasCallback": true,
-    "types": {
-        "EsdtLocalRole": {
-            "type": "enum",
-            "variants": [
-                {
-                    "name": "None",
-                    "discriminant": 0
-                },
-                {
-                    "name": "Mint",
-                    "discriminant": 1
-                },
-                {
-                    "name": "Burn",
-                    "discriminant": 2
-                },
-                {
-                    "name": "NftCreate",
-                    "discriminant": 3
-                },
-                {
-                    "name": "NftAddQuantity",
-                    "discriminant": 4
-                },
-                {
-                    "name": "NftBurn",
-                    "discriminant": 5
-                },
-                {
-                    "name": "NftAddUri",
-                    "discriminant": 6
-                },
-                {
-                    "name": "NftUpdateAttributes",
-                    "discriminant": 7
-                },
-                {
-                    "name": "Transfer",
-                    "discriminant": 8
-                }
-            ]
-        }
-    }
+    "types": {}
 }

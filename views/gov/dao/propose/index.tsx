@@ -170,7 +170,7 @@ function DAOPropose() {
                     type: "application/json;charset=utf-8",
                 });
                 const res = await ipfsCluster.add(file, { name: "Proposal" });
-                await propose(res.cid, interaction);
+                await propose(res.cid, [interaction]);
             } catch (error) {
                 setIsUploading(false);
             }

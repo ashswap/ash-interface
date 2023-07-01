@@ -1,20 +1,20 @@
 {
     "buildInfo": {
         "rustc": {
-            "version": "1.70.0-nightly",
-            "commitHash": "2036fdd24f77d607dcfaa24c48fbe85d3f785823",
-            "commitDate": "2023-03-27",
+            "version": "1.72.0-nightly",
+            "commitHash": "2d0aa57684e10f7b3d3fe740ee18d431181583ad",
+            "commitDate": "2023-06-18",
             "channel": "Nightly",
-            "short": "rustc 1.70.0-nightly (2036fdd24 2023-03-27)"
+            "short": "rustc 1.72.0-nightly (2d0aa5768 2023-06-18)"
         },
         "contractCrate": {
             "name": "dao_bribe",
             "version": "0.0.0",
-            "git_version": "ed9a148"
+            "gitVersion": "mainnet-230217-38-gbfa04a7"
         },
         "framework": {
-            "name": "elrond-wasm",
-            "version": "0.33.1"
+            "name": "multiversx-sc",
+            "version": "0.39.8"
         }
     },
     "name": "DAOBribe",

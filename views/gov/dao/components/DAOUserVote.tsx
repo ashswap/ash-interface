@@ -20,6 +20,7 @@ import { memo, useCallback, useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
 import useDAOProposalComputedState from "../hooks/useDAOProposalComputedState";
 import DAOTag from "./DAOTag";
+import { TokenTransfer } from "@multiversx/sdk-core/out";
 const DAOVoteModal = dynamic(
     import("./DAOVoteModal").then((m) => m.default),
     { ssr: false }
@@ -223,8 +224,9 @@ function DAOUserVote({ proposal, userVoteInfo }: Props) {
         trackingData: { isPending },
     } = useDAOExecute(true);
     const onExecute = useCallback(() => {
-        execute(proposal.proposal_id);
-    }, [execute, proposal.proposal_id]);
+        const action = proposal.actions[proposal.executed.length];
+        execute(proposal.proposal_id, TokenTransfer.egldFromBigInteger(action.cost || "0"));
+    }, [execute, proposal]);
     const isSupport = useMemo(
         () => userVoteInfo.yes_vote.gt(userVoteInfo.no_vote),
         [userVoteInfo]
