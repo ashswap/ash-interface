@@ -3,7 +3,7 @@ import votingEscowAbi from "assets/abi/voting_escrow.abi.json";
 import { TokenTransfer } from "@multiversx/sdk-core/out";
 import BigNumber from "bignumber.js";
 import { ENVIRONMENT } from "const/env";
-const gas = ENVIRONMENT.NETWORK === "mainnet" ? 10_000_000 : 100_000_000;
+const gas = ENVIRONMENT.NETWORK === "mainnet" ? 100_000_000 : 100_000_000;
 class VotingEscrowContract extends Contract<typeof votingEscowAbi> {
     constructor(address: string) {
         super(address, votingEscowAbi);
