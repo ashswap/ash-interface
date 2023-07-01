@@ -159,7 +159,7 @@ const mainnet: IFarm[] = [
     {
         farm_address:
             "erd1qqqqqqqqqqqqqpgqe9hhqvvw9ssj6y388pf6gznwhuavhkzc4fvs0ra2fe",
-        reward_token_id: "ASH-a642d1",
+        reward_token_id: "ASH-a85626",
         reward_token_decimal: 18,
         farming_token_id: "ALP-afc922",
         farming_token_decimal: 18,
@@ -170,7 +170,7 @@ const mainnet: IFarm[] = [
     {
         farm_address:
             "erd1qqqqqqqqqqqqqpgqf5awrqh68fra8rc7dnfrradadwsecrmc4fvsm6c2n7",
-        reward_token_id: "ASH-a642d1",
+        reward_token_id: "ASH-a85626",
         reward_token_decimal: 18,
         farming_token_id: "ALP-5f9191",
         farming_token_decimal: 18,
@@ -181,7 +181,7 @@ const mainnet: IFarm[] = [
     {
         farm_address:
             "erd1qqqqqqqqqqqqqpgqq0ltmf7h456h5jlm8zn3utz0ap027wyk4fvs3yz9z0",
-        reward_token_id: "ASH-a642d1",
+        reward_token_id: "ASH-a85626",
         reward_token_decimal: 18,
         farming_token_id: "ALP-2d0cf8",
         farming_token_decimal: 18,
