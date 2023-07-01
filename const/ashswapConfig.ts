@@ -54,16 +54,16 @@ const dappContractDevnet: DappContractConfig = {
 
 const dappContractMainnet: DappContracts = {
     voteEscrowedContract:
-        "erd1qqqqqqqqqqqqqpgq58elfqng8edp0z83pywy3825vzhawfqp4fvsaldek8",
+        "erd1qqqqqqqqqqqqqpgqgtf40adcdntc9p4hu2tjt03y4kmhyp7l2gesk22gmt",
     feeDistributor:
-        "erd1qqqqqqqqqqqqqpgqjrlge5rgml6d48tjgu3afqvems88lqzw4fvs9f7lhs",
+        "erd1qqqqqqqqqqqqqpgqga57dwpazjwh0jd3msrd7s98h48wmd7d2gesulkknh",
     farmController:
-        "erd1qqqqqqqqqqqqqpgqzhm689ehkacadr7elzkc3z70h6cqmz0q4fvsftax5t",
-    farmBribe: "erd1qqqqqqqqqqqqqpgqgulmfcu8prrv2pmx3nqn5stqu3c42fsz4fvsa9rwdl",
-    farmRouter: "",
-    router: "",
-    dao: "",
-    daoBribe: "",
+        "erd1qqqqqqqqqqqqqpgqa2f6tv4eyta2q0qtrdcfkaew02m993u82ges437skh",
+    farmBribe: "erd1qqqqqqqqqqqqqpgq4qgt6f9n82zdfwahdpnesjadwvy5ldnk2geskxx4h0",
+    farmRouter: "erd1qqqqqqqqqqqqqpgqfacdu4ehev8cyy3lgprvrwg7dfs4xmn32geszgzdku",
+    router: "erd1qqqqqqqqqqqqqpgqd9pyk4yc9c5dldkcahud4mwx4hyt9ep82ges6slwq4",
+    dao: "erd1qqqqqqqqqqqqqpgqtwj4j5l0f8uh7ldzvq2wdhfu6vztkc0a2geskkkd0g",
+    daoBribe: "erd1qqqqqqqqqqqqqpgqwxdqzcgl0q6n0547l3c6qjwygkmrwvgl2geszr8qw9",
     aggregator:
         "erd1qqqqqqqqqqqqqpgqjm9xl2s2v5r6lvranfaa84pkmqcz43e04fvs7h8ljn",
 };
@@ -78,7 +78,7 @@ export const VE_CONFIG =
         ? {
               // main config
               maxLock: 4 * 365 * 24 * 3600,
-              minLock: 7 * 24 * 3600,
+              minLock: 30 * 60,
               // for BoY
               // maxLock: 2 * 7 * 24 * 3600,
               // minLock: 12 * 60 * 60,
@@ -101,5 +101,5 @@ export const ASHSWAP_CONFIG = {
     farmWeightVoteDelay:
         ENVIRONMENT.NETWORK === "devnet" && ENVIRONMENT.ENV === "alpha"
             ? 3600
-            : 10 * 24 * 3600,
+            : 3600,
 } as const;
