@@ -15,7 +15,7 @@ const TOKENS_ALIAS: Record<"EGLD" | "ASH" | "wEGLD", IESDTInfo> = {
         logoURI: ImgEgldIcon.src,
     },
     wEGLD: {
-        identifier: "WEGLD-bd4d79",
+        identifier: "WEGLD-795247",
         chainId: ChainId.Mainnet,
         symbol: "wEGLD",
         name: "Wrapped EGLD",
@@ -23,7 +23,7 @@ const TOKENS_ALIAS: Record<"EGLD" | "ASH" | "wEGLD", IESDTInfo> = {
         logoURI: ImgWEGLDIcon.src,
     },
     ASH: {
-        identifier: "ASH-a642d1",
+        identifier: "ASH-a85626",
         chainId: ChainId.Mainnet,
         symbol: "ASH",
         name: "Ashswap Token",
@@ -36,7 +36,7 @@ const TOKENS: IESDTInfo[] = [
     TOKENS_ALIAS.wEGLD,
     TOKENS_ALIAS.ASH,
     {
-        identifier: "USDT-f8c08c",
+        identifier: "USDT-821a84",
         chainId: ChainId.Mainnet,
         symbol: "USDT",
         name: "Tether",
@@ -44,7 +44,7 @@ const TOKENS: IESDTInfo[] = [
         logoURI: IconUSDT.src,
     },
     {
-        identifier: "USDC-c76f1f",
+        identifier: "USDC-bb1e62",
         chainId: ChainId.Mainnet,
         symbol: "USDC",
         name: "USD Coin",
@@ -52,7 +52,7 @@ const TOKENS: IESDTInfo[] = [
         logoURI: IconUSDC.src,
     },
     {
-        identifier: "BUSD-40b57e",
+        identifier: "BUSD-2cbb2d",
         chainId: ChainId.Mainnet,
         symbol: "BUSD",
         name: "Binance USD",
@@ -64,21 +64,21 @@ const TOKENS: IESDTInfo[] = [
 const LP_TOKENS: IESDTInfo[] = [
     // LP Tokens
     {
-        identifier: "ALP-afc922",
+        identifier: "ALP-c12752",
         chainId: ChainId.Mainnet,
         symbol: "ALP-3pool",
         name: "Ashswap LP",
         decimals: 18,
     },
     {
-        identifier: "ALP-5f9191",
+        identifier: "ALP-d935a5",
         chainId: ChainId.Mainnet,
         symbol: "ALP-BUSD-WEGLD",
         name: "Ashswap LP",
         decimals: 18,
     },
     {
-        identifier: "ALP-2d0cf8",
+        identifier: "ALP-c0b453",
         chainId: ChainId.Mainnet,
         symbol: "ALP-USDT-ASH",
         name: "Ashswap LP",
