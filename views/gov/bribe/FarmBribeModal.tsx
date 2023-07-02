@@ -1,25 +1,24 @@
-import BaseModal, { BaseModalType } from "components/BaseModal";
-import { useScreenSize } from "hooks/useScreenSize";
-import React, { useCallback, useMemo, useState } from "react";
+import { Address, TokenTransfer } from "@multiversx/sdk-core/out";
 import ICChevronDown from "assets/svg/chevron-down.svg";
 import ICChevronRight from "assets/svg/chevron-right.svg";
-import BasePopover from "components/BasePopover";
-import { FARMS, FARMS_MAP } from "const/farms";
-import { POOLS_MAP_LP } from "const/pool";
-import Avatar from "components/Avatar";
-import { TOKENS, TOKENS_MAP } from "const/tokens";
-import { IESDTInfo } from "helper/token/token";
-import InputCurrency from "components/InputCurrency";
-import GlowingButton from "components/GlowingButton";
-import { useRecoilValue } from "recoil";
 import { ashswapBaseState } from "atoms/ashswap";
 import { tokenBalanceSelector, tokenMapState } from "atoms/tokensState";
+import BigNumber from "bignumber.js";
+import Avatar from "components/Avatar";
+import BaseModal, { BaseModalType } from "components/BaseModal";
+import BasePopover from "components/BasePopover";
+import GlowingButton from "components/GlowingButton";
+import InputCurrency from "components/InputCurrency";
+import { FARMS, FARMS_MAP } from "const/farms";
+import { IN_POOL_TOKENS, POOLS_MAP_LP } from "const/pool";
+import { TOKENS_MAP } from "const/tokens";
 import { formatAmount } from "helper/number";
-import { TokenAmount } from "helper/token/tokenAmount";
+import { isEGLD } from "helper/token";
 import useAddRewardAmount from "hooks/useFarmBribeContract/useAddRewardAmount";
 import useInputNumberString from "hooks/useInputNumberString";
-import BigNumber from "bignumber.js";
-import { Address, TokenTransfer } from "@multiversx/sdk-core/out";
+import { useScreenSize } from "hooks/useScreenSize";
+import { useCallback, useMemo, useState } from "react";
+import { useRecoilValue } from "recoil";
 
 type FarmBribeModalProps = {
     onCreateBribe?: (
@@ -222,21 +221,18 @@ const FarmBribeContent = ({ onCreateBribe }: FarmBribeModalProps) => {
                             {({ close }) => {
                                 return (
                                     <ul className="py-6 max-h-52">
-                                        {ashBase.farmBribe?.whitelistTokens.map(
-                                            (t) => {
-                                                if (!t.id) return;
-                                                const token = TOKENS_MAP[t.id];
+                                        {IN_POOL_TOKENS.map(
+                                            (token) => {
+                                                if (isEGLD(token.identifier)) return;
                                                 return (
                                                     <li
-                                                        key={t.id}
+                                                        key={token.identifier}
                                                         className="relative"
                                                     >
                                                         <button
                                                             className="flex items-center w-full py-3 text-left px-6 text-xs font-bold"
                                                             onClick={() => {
-                                                                setSelectedTokenId(
-                                                                    t.id as string
-                                                                );
+                                                                setSelectedTokenId(token.identifier);
                                                                 setInputValue(
                                                                     new BigNumber(
                                                                         ""
@@ -247,11 +243,10 @@ const FarmBribeContent = ({ onCreateBribe }: FarmBribeModalProps) => {
                                                         >
                                                             <Avatar src={token.logoURI} alt={token.name} className="w-4 h-4 mr-2"/>
                                                             {
-                                                                token
-                                                                    .symbol
+                                                                token.symbol
                                                             }
                                                         </button>
-                                                        {t.id ===
+                                                        {token.identifier ===
                                                             selectedTokenId && (
                                                             <span className="absolute w-[3px] h-5 bg-ash-cyan-500 top-1/2 -translate-y-1/2 left-0"></span>
                                                         )}
