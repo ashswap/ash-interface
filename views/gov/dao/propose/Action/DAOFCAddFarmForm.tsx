@@ -41,13 +41,13 @@ const DAOFCAddFarmFormForwardRef = forwardRef<DAOFormRefMethods>(
         useImperativeHandle(
             ref,
             () => ({
-                generateInteraction() {
+                generateInteractions() {
                     setIsClickSubmit(true);
-                    if(typeof farmType !== "number") return;
+                    if(typeof farmType !== "number") return [];
                     const address = new Address(farmAddress);
-                    return ContractManager.getFarmControllerContract(
+                    return [ContractManager.getFarmControllerContract(
                         ASHSWAP_CONFIG.dappContract.farmController
-                    ).contract.methods.addFarm([address, farmType]);
+                    ).contract.methods.addFarm([address, farmType])];
                 },
             }),
             [farmAddress, farmType]
