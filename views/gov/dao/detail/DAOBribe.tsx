@@ -229,7 +229,7 @@ function DAOBribe({ bribes, proposal_id, sharePct, status }: Props) {
                                     </CardTooltip>
                                 </div>
                                 <div className="text-xs font-bold">
-                                    Unavaliable
+                                    Unavailable
                                 </div>
                             </div>
                             <div className="bg-ash-dark-400 text-stake-gray-500 px-3 py-2 h-[3.375rem] overflow-hidden">

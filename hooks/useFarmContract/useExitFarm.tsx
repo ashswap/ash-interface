@@ -179,7 +179,7 @@ const useExitFarm = (trackStatus = false) => {
                     new BigNumber(rawFarm?.divisionSafetyConstant || 0),
                     farmRecord.lpLockedAmt,
                     farmRecord.lastRewardBlockTs,
-                    rawFarm?.additionalRewards.map((r) => ({
+                    rawFarm?.additionalRewards.filter(t => !!TOKENS_MAP[t.tokenId]).map((r) => ({
                         token: TOKENS_MAP[r.tokenId],
                         rewardPerShare: new BigNumber(r.rewardPerShare),
                         rewardPerSec: new BigNumber(r.rewardPerSec),
