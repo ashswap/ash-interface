@@ -5,6 +5,8 @@ import IconUSDC from "assets/images/usdc-icon.png";
 import IconUSDT from "assets/images/usdt-icon.png";
 import ImgWEGLDIcon from "assets/images/wegld-icon.png";
 import IconHTM from "assets/images/htm-icon.png";
+import IconHSEGLD from "assets/images/hsegld-icon.png";
+import IconSEGLD from "assets/images/segld-icon.png";
 import { ChainId, IESDTInfo } from "helper/token/token";
 const TOKENS_ALIAS: Record<"EGLD" | "ASH" | "wEGLD", IESDTInfo> = {
     EGLD: {
@@ -68,6 +70,22 @@ const TOKENS: IESDTInfo[] = [
         decimals: 18,
         logoURI: IconHTM.src,
     },
+    {
+        identifier: "SEGLD-71d86c",
+        chainId: ChainId.Devnet,
+        symbol: "sEGLD",
+        name: "Liquid Staked EGLD",
+        decimals: 18,
+        logoURI: IconSEGLD.src,
+    },
+    {
+        identifier: "HSEGLD-111ad8",
+        chainId: ChainId.Devnet,
+        symbol: "HsEGLD",
+        name: "Hatom sEGLD",
+        decimals: 8,
+        logoURI: IconHSEGLD.src,
+    },
 ];
 
 const LP_TOKENS: IESDTInfo[] = [
@@ -90,6 +108,20 @@ const LP_TOKENS: IESDTInfo[] = [
         identifier: "ALP-c0b453",
         chainId: ChainId.Mainnet,
         symbol: "ALP-USDT-ASH",
+        name: "Ashswap LP",
+        decimals: 18,
+    },
+    {
+        identifier: "ALP-41fc41",
+        chainId: ChainId.Mainnet,
+        symbol: "ALP-EGLD-SEGLD",
+        name: "Ashswap LP",
+        decimals: 18,
+    },
+    {
+        identifier: "ALP-fda8dc",
+        chainId: ChainId.Mainnet,
+        symbol: "ALP-SEGLD-HSEGLD",
         name: "Ashswap LP",
         decimals: 18,
     },
