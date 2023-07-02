@@ -1,4 +1,4 @@
-import { TokenPayment } from "@multiversx/sdk-core/out";
+import { TokenTransfer } from "@multiversx/sdk-core/out";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 import { ContractManager } from "helper/contracts/contractManager";
 import useSendTxsWithTrackStatus from "hooks/useSendTxsWithTrackStatus";
@@ -9,7 +9,7 @@ const useDBCreateBribe = (trackStatus = false) => {
         useSendTxsWithTrackStatus(trackStatus);
     const dbCreateBribe = useRecoilCallback(
         ({ snapshot, set }) =>
-            async (proposalID: number, payments: TokenPayment[]) => {
+            async (proposalID: number, payments: TokenTransfer[]) => {
                 const tx = await ContractManager.getDAOBribeContract(
                     ASHSWAP_CONFIG.dappContract.daoBribe
                 ).addRewardAmount(proposalID, payments);

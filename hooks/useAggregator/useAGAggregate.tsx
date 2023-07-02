@@ -1,4 +1,4 @@
-import { TokenPayment, Transaction } from "@multiversx/sdk-core/out";
+import { TokenTransfer, Transaction } from "@multiversx/sdk-core/out";
 import { accInfoState } from "atoms/dappState";
 import BigNumber from "bignumber.js";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
@@ -36,7 +36,7 @@ const useAGAggregate = (trackStatus = false) => {
                 const wegld = TOKENS_MAP[WRAPPED_EGLD.wegld];
                 const wegldContract = WRAPPED_EGLD.wegldContracts[shard || 0];
                 const payments = tokensAmount.map((t) =>
-                    TokenPayment.fungibleFromBigInteger(
+                    TokenTransfer.fungibleFromBigInteger(
                         getTokenIdFromCoin(t.token.identifier)!,
                         t.raw,
                         t.token.decimals
@@ -70,7 +70,6 @@ const useAGAggregate = (trackStatus = false) => {
                     steps,
                     [...hopLimits, ...outputLimits]
                 );
-                console.log([...hopLimits, ...outputLimits]);
                 const txs: Transaction[] = [tx];
                 if (egldIn) {
                     const wrapTx = await ContractManager.getWrappedEGLDContract(
@@ -83,7 +82,7 @@ const useAGAggregate = (trackStatus = false) => {
                         await ContractManager.getWrappedEGLDContract(
                             wegldContract
                         ).unwrapEgld(
-                            TokenPayment.fungibleFromBigInteger(
+                            TokenTransfer.fungibleFromBigInteger(
                                 wegld.identifier,
                                 egldOut.raw,
                                 wegld.decimals

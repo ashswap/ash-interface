@@ -1,6 +1,6 @@
 import Contract from "./contract";
 import votingEscowAbi from "assets/abi/voting_escrow.abi.json";
-import { TokenPayment } from "@multiversx/sdk-core/out";
+import { TokenTransfer } from "@multiversx/sdk-core/out";
 import BigNumber from "bignumber.js";
 import { ENVIRONMENT } from "const/env";
 const gas = ENVIRONMENT.NETWORK === "mainnet" ? 10_000_000 : 100_000_000;
@@ -9,7 +9,7 @@ class VotingEscrowContract extends Contract<typeof votingEscowAbi> {
         super(address, votingEscowAbi);
     }
 
-    async createLock(tokenPayment: TokenPayment, unlockTS: number) {
+    async createLock(tokenPayment: TokenTransfer, unlockTS: number) {
         let interaction = this.contract.methods.create_lock([unlockTS]);
         interaction
             .withSingleESDTTransfer(tokenPayment)
@@ -19,7 +19,7 @@ class VotingEscrowContract extends Contract<typeof votingEscowAbi> {
             .buildTransaction();
     }
 
-    async increaseAmount(tokenPayment: TokenPayment) {
+    async increaseAmount(tokenPayment: TokenTransfer) {
         let interaction = this.contract.methods.increase_amount([]);
         interaction
             .withSingleESDTTransfer(tokenPayment)

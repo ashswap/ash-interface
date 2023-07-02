@@ -1,4 +1,4 @@
-import { TokenPayment } from "@multiversx/sdk-core/out";
+import { TokenTransfer } from "@multiversx/sdk-core/out";
 import ICBribe from "assets/svg/bribe.svg";
 import ICChevronRight from "assets/svg/chevron-right.svg";
 import { accIsLoggedInState } from "atoms/dappState";
@@ -47,7 +47,7 @@ function DAOCreateBribe({ proposalID }: Props) {
         const token = TOKENS_MAP[selectedTokenId];
         if (!token) return;
         await dbCreateBribe(proposalID, [
-            TokenPayment.fungibleFromAmount(
+            TokenTransfer.fungibleFromAmount(
                 token.identifier,
                 inputValue,
                 token.decimals

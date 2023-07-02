@@ -1,4 +1,4 @@
-import { TokenPayment } from "@multiversx/sdk-core/out";
+import { TokenTransfer } from "@multiversx/sdk-core/out";
 import { accInfoState } from "atoms/dappState";
 import BigNumber from "bignumber.js";
 import { WRAPPED_EGLD } from "const/wrappedEGLD";
@@ -31,7 +31,7 @@ const usePoolAddLP = (trackStatus = false) => {
                 );
                 const payments = pool.tokens
                     .map((t, i) =>
-                        TokenPayment.fungibleFromBigInteger(
+                        TokenTransfer.fungibleFromBigInteger(
                             t.identifier,
                             tokensWei[i],
                             t.decimals

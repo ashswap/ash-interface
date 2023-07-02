@@ -19,12 +19,12 @@ import { TokenAmount } from "helper/token/tokenAmount";
 import useAddRewardAmount from "hooks/useFarmBribeContract/useAddRewardAmount";
 import useInputNumberString from "hooks/useInputNumberString";
 import BigNumber from "bignumber.js";
-import { Address, TokenPayment } from "@multiversx/sdk-core/out";
+import { Address, TokenTransfer } from "@multiversx/sdk-core/out";
 
 type FarmBribeModalProps = {
     onCreateBribe?: (
         farmAddress: string,
-        tokenPayments: TokenPayment[]
+        tokenPayments: TokenTransfer[]
     ) => void;
 };
 const FarmBribeContent = ({ onCreateBribe }: FarmBribeModalProps) => {
@@ -65,7 +65,7 @@ const FarmBribeContent = ({ onCreateBribe }: FarmBribeModalProps) => {
     }, [selectedTokenId, selectedFarmAddress, inputValue, isInsufficient]);
     const createBribe = useCallback(async () => {
         if (!canCreateBribe) return;
-        const tokenPayment = TokenPayment.fungibleFromAmount(
+        const tokenPayment = TokenTransfer.fungibleFromAmount(
             selectedTokenId,
             inputValue,
             TOKENS_MAP[selectedTokenId].decimals

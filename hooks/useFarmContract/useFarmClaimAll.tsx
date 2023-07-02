@@ -1,4 +1,4 @@
-import { TokenPayment, Transaction } from "@multiversx/sdk-core/out";
+import { TokenTransfer, Transaction } from "@multiversx/sdk-core/out";
 import {
     farmLoadingMapState,
     farmNumberOfAdditionalRewards,
@@ -34,7 +34,7 @@ const useFarmClaimAll = (trackStatus = false) => {
                     ) {
                         const tokenPayments = val.stakedData.farmTokens.map(
                             (t) =>
-                                TokenPayment.metaEsdtFromBigInteger(
+                                TokenTransfer.metaEsdtFromBigInteger(
                                     t.collection,
                                     t.nonce.toNumber(),
                                     t.balance,

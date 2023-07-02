@@ -25,9 +25,9 @@ const dappContractDevnet: DappContractConfig = {
         farmBribe:
             "erd1qqqqqqqqqqqqqpgqug6hxflvk0yglgcvdhe40hv45tzzaxf42geslxp3gp",
         farmRouter:
-            "erd1qqqqqqqqqqqqqpgqgnk6usl4ekqnlqv4aeh3fvsxddz64tfg2ges4tlpax",
-        router: "erd1qqqqqqqqqqqqqpgqmj4lt9xd87fvafnyjwut66palhnpdr5v2gesvjepfr",
-        dao: "erd1qqqqqqqqqqqqqpgqpdafdulu42f6g8pn9pavufgmdkltnctf2gesh48l44",
+            "erd1qqqqqqqqqqqqqpgqrdscsjqran2pvvcndv2596ld3gmymy4ph2usqsvsa8",
+        router: "erd1qqqqqqqqqqqqqpgqmu9dcjpt3mtnx3d2fkerjg357j7csl8ph2us3eyppg",
+        dao: "erd1qqqqqqqqqqqqqpgqjz2e6z9qgtwm6mav5dg3q96l99e3va4vh2ussnuvhw",
         daoBribe:
             "erd1qqqqqqqqqqqqqpgqqdt2ckhgn3yw6qxskawmywc98dv5jegg2ges40ygkh",
         aggregator:

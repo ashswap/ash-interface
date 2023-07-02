@@ -1,4 +1,4 @@
-import { TokenPayment } from "@multiversx/sdk-core/out";
+import { TokenTransfer } from "@multiversx/sdk-core/out";
 import { useTrackTransactionStatus } from "@multiversx/sdk-dapp/hooks";
 import { accAddressState } from "atoms/dappState";
 import {
@@ -98,7 +98,7 @@ export const useFarmBoostTransferState = (
                 );
                 const tokens = [...ownerTokens, farmToken];
                 const tokenPayments = tokens.map((t) =>
-                    TokenPayment.metaEsdtFromBigInteger(
+                    TokenTransfer.metaEsdtFromBigInteger(
                         t.collection,
                         t.nonce.toNumber(),
                         t.balance
