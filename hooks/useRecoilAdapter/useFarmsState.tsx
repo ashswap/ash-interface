@@ -271,6 +271,7 @@ const useFarmsState = () => {
                 rawFarm?.additionalRewards
                     .filter(
                         (r) =>
+                            !!TOKENS_MAP[r.tokenId] &&
                             r.periodRewardEnd > currentTs &&
                             new BigNumber(r.rewardPerSec).gt(0)
                     )
@@ -405,10 +406,12 @@ const useFarmsState = () => {
                     divisionSafetyConstant,
                     record.lpLockedAmt,
                     record.lastRewardBlockTs,
-                    rawFarm?.additionalRewards.map((r) => ({
-                        ...r,
-                        token: TOKENS_MAP[r.tokenId],
-                    })) || []
+                    rawFarm?.additionalRewards
+                        .filter((t) => !!TOKENS_MAP[t.tokenId])
+                        .map((r) => ({
+                            ...r,
+                            token: TOKENS_MAP[r.tokenId],
+                        })) || []
                 ).filter((r) => r.greaterThan(0));
 
                 if (estimatedReward.gt(0)) {
