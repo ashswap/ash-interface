@@ -1,4 +1,4 @@
-import { Address, TokenPayment } from "@multiversx/sdk-core/out";
+import { Address, TokenTransfer } from "@multiversx/sdk-core/out";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 import { ContractManager } from "helper/contracts/contractManager";
 import useSendTxsWithTrackStatus from "hooks/useSendTxsWithTrackStatus";
@@ -9,7 +9,7 @@ const useAddRewardAmount = (trackStatus = false) => {
         useSendTxsWithTrackStatus(trackStatus);
     const addRewardAmount = useRecoilCallback(
         ({ snapshot, set }) =>
-            async (farmAddress: Address, tokenPayments: TokenPayment[]) => {
+            async (farmAddress: Address, tokenPayments: TokenTransfer[]) => {
                 const tx = await ContractManager.getFarmBribeContract(
                     ASHSWAP_CONFIG.dappContract.farmBribe
                 ).addRewardAmount(farmAddress, tokenPayments);

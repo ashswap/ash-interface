@@ -5,7 +5,7 @@ import {
     ContractFunction,
     Query,
     TokenIdentifierValue,
-    TokenPayment,
+    TokenTransfer,
 } from "@multiversx/sdk-core";
 import poolAbi from "assets/abi/pool.abi.json";
 import BigNumber from "bignumber.js";
@@ -147,7 +147,7 @@ class PoolContract extends Contract<typeof poolAbi> {
     }
 
     async addLiquidity(
-        tokenPayments: TokenPayment[],
+        tokenPayments: TokenTransfer[],
         mintAmtMin: BigNumber,
         receiver = Address.Zero()
     ) {
@@ -158,7 +158,7 @@ class PoolContract extends Contract<typeof poolAbi> {
             receiver,
         ]);
         interaction
-            .withMultiESDTNFTTransfer(tokenPayments, new Address(sender))
+            .withMultiESDTNFTTransfer(tokenPayments).withSender(new Address(sender))
             .withGasLimit(
                 type === "PlainPool"
                     ? 10_000_000 + tokenPayments.length * 2_000_000
@@ -169,7 +169,7 @@ class PoolContract extends Contract<typeof poolAbi> {
     }
 
     async removeLiquidity(
-        tokenPayment: TokenPayment,
+        tokenPayment: TokenTransfer,
         tokensAmtMin: BigNumber[]
     ) {
         let interaction = this.contract.methods.removeLiquidity([
@@ -184,7 +184,7 @@ class PoolContract extends Contract<typeof poolAbi> {
     }
 
     async removeLiquidityOneCoin(
-        tokenPayment: TokenPayment,
+        tokenPayment: TokenTransfer,
         tokenId: string,
         tokenAmountMin: BigNumber
     ) {
@@ -201,7 +201,7 @@ class PoolContract extends Contract<typeof poolAbi> {
     }
 
     async exchange(
-        tokenPayment: TokenPayment,
+        tokenPayment: TokenTransfer,
         tokenToId: string,
         minWeiOut: BigNumber
     ) {

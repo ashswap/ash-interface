@@ -1,4 +1,4 @@
-import { TokenPayment } from "@multiversx/sdk-core/out";
+import { TokenTransfer } from "@multiversx/sdk-core/out";
 import { accInfoState } from "atoms/dappState";
 import BigNumber from "bignumber.js";
 import { TOKENS_MAP } from "const/tokens";
@@ -23,7 +23,7 @@ const usePoolRemoveLPOneCoin = (trackStatus = false) => {
                 slippage: Percent,
                 tokenIndex: number
             ) => {
-                const tokenPayment = TokenPayment.fungibleFromBigInteger(
+                const tokenPayment = TokenTransfer.fungibleFromBigInteger(
                     pool.lpToken.identifier,
                     liquidity,
                     pool.lpToken.decimals
@@ -62,7 +62,7 @@ const usePoolRemoveLPOneCoin = (trackStatus = false) => {
                         await ContractManager.getWrappedEGLDContract(
                             WRAPPED_EGLD.wegldContracts[shard]
                         ).unwrapEgld(
-                            TokenPayment.fungibleFromBigInteger(
+                            TokenTransfer.fungibleFromBigInteger(
                                 WRAPPED_EGLD.wegld,
                                 tokenAmtMin,
                                 TOKENS_MAP[WRAPPED_EGLD.wegld].decimals
