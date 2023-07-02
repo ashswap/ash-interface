@@ -4,6 +4,7 @@ import ImgEgldIcon from "assets/images/egld-icon.png";
 import IconUSDC from "assets/images/usdc-icon.png";
 import IconUSDT from "assets/images/usdt-icon.png";
 import ImgWEGLDIcon from "assets/images/wegld-icon.png";
+import IconHTM from "assets/images/htm-icon.png";
 import { ChainId, IESDTInfo } from "helper/token/token";
 const TOKENS_ALIAS: Record<"EGLD" | "ASH" | "wEGLD", IESDTInfo> = {
     EGLD: {
@@ -58,6 +59,14 @@ const TOKENS: IESDTInfo[] = [
         name: "Binance USD",
         decimals: 18,
         logoURI: IconBUSD.src,
+    },
+    {
+        identifier: "AHTM-27a91c",
+        chainId: ChainId.Devnet,
+        symbol: "HTM",
+        name: "Hatom Protocol",
+        decimals: 18,
+        logoURI: IconHTM.src,
     },
 ];
 
