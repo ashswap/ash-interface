@@ -20,20 +20,16 @@ const GOV_LINKS: NavGovLinkProps[] = [
         label: "Farm Weight Voting",
         Icon: ICGovFarmWeightSquare,
     },
-    ...(ENVIRONMENT.NETWORK === "devnet"
-        ? [
-              {
-                  url: "/gov/dao",
-                  label: "Proposal Voting",
-                  Icon: ICGovVoteSquare,
-              },
-              {
-                  url: "/gov/bribe",
-                  label: "Bribe",
-                  Icon: ICGovBribeSquare,
-              },
-          ]
-        : []),
+    {
+        url: "/gov/dao",
+        label: "Proposal Voting",
+        Icon: ICGovVoteSquare,
+    },
+    {
+        url: "/gov/bribe",
+        label: "Bribe",
+        Icon: ICGovBribeSquare,
+    },
 ];
 
 const NavGovLink = memo(function NavGovLink(props: NavGovLinkProps) {

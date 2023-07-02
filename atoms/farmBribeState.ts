@@ -1,5 +1,4 @@
 import BigNumber from "bignumber.js";
-import { ENVIRONMENT } from "const/env";
 import { TOKENS_MAP } from "const/tokens";
 import { FBAccountFarm, FBFarm } from "graphql/type.graphql";
 import { TokenAmount } from "helper/token/tokenAmount";
@@ -80,6 +79,6 @@ export const fbHasBribe = selectorFamily<boolean, string>({
     get: (farmAddress) => ({get}) => {
         const treasures = get(fbTreasuresSelector(farmAddress));
         // if total treasures in wei units is less than 10 -> should be ignored
-        return !!treasures?.some((r) => r.raw.gt(10)) && ENVIRONMENT.NETWORK !== "mainnet";
+        return !!treasures?.some((r) => r.raw.gt(10));
     }
 })
