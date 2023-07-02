@@ -17,16 +17,24 @@ const DAOFREndProduceRewardsForm = dynamic(
     import("./DAOFRProduceRewardForm").then((m) => m.default),
     { ssr: false }
 );
+const DAOFRCreateFarmForm = dynamic(
+    import("./DAOFRCreateFarmForm").then((m) => m.default),
+    { ssr: false }
+);
+const DAORouterCreatePoolForm = dynamic(
+    import("./DAORouterCreatePoolForm").then((m) => m.default),
+    { ssr: false }
+);
 const DAOActionGenerator = forwardRef<DAOFormRefMethods, Props>(function DAOActionGenerator(
     { type }: Props,
     ref
 ) {
-    const formRef = useRef<{ generateInteraction: () => Interaction }>(null);
+    const formRef = useRef<{ generateInteractions: () => Interaction[] }>(null);
     useImperativeHandle(
         ref,
         () => ({
-            generateInteraction() {
-                return formRef.current?.generateInteraction();
+            generateInteractions() {
+                return formRef.current?.generateInteractions() || [];
             },
         }),
         []
@@ -41,6 +49,12 @@ const DAOActionGenerator = forwardRef<DAOFormRefMethods, Props>(function DAOActi
             )}
             {type === "fr:startProduceRewards" && (
                 <DAOFREndProduceRewardsForm dynamicRef={formRef} type="start" />
+            )}
+            {type === "fr:createFarm" && (
+                <DAOFRCreateFarmForm dynamicRef={formRef}/>
+            )}
+            {type === "router:createPool" && (
+                <DAORouterCreatePoolForm dynamicRef={formRef}/>
             )}
         </div>
     );

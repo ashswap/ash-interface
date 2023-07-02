@@ -141,7 +141,7 @@ function DAOPropose() {
         setProposalType(proposal);
     }, []);
     const actionGeneratorRef =
-        useRef<{ generateInteraction: () => Interaction }>(null);
+        useRef<{ generateInteractions: () => Interaction[] }>(null);
     const {
         propose,
         trackingData: { isPending, isSigned },
@@ -152,13 +152,13 @@ function DAOPropose() {
             e.preventDefault();
             setIsClickedSubmit(true);
 
-            const interaction =
-                actionGeneratorRef.current?.generateInteraction();
+            const interactions =
+                actionGeneratorRef.current?.generateInteractions();
             if (
                 isInvalidTitle ||
                 isInvalidDesc ||
                 isInvalidDiscussionLink ||
-                !interaction
+                !interactions
             )
                 return;
             setIsUploading(true);
@@ -170,7 +170,7 @@ function DAOPropose() {
                     type: "application/json;charset=utf-8",
                 });
                 const res = await ipfsCluster.add(file, { name: "Proposal" });
-                await propose(res.cid, [interaction]);
+                await propose(res.cid, interactions);
             } catch (error) {
                 setIsUploading(false);
             }

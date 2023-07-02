@@ -18,19 +18,19 @@ const DAOFRProduceRewardsFormRef = forwardRef<
     useImperativeHandle(
         ref,
         () => ({
-            generateInteraction() {
+            generateInteractions() {
                 const address = new Address(farmAddress);
                 if (!address.isContractAddress()) {
-                    return;
+                    return [];
                 }
                 if (type === "stop") {
-                    return ContractManager.getFarmRouterContract(
+                    return [ContractManager.getFarmRouterContract(
                         ASHSWAP_CONFIG.dappContract.farmRouter
-                    ).contract.methods.endProduceRewards([address]);
+                    ).contract.methods.endProduceRewards([address])];
                 }
-                return ContractManager.getFarmRouterContract(
+                return [ContractManager.getFarmRouterContract(
                     ASHSWAP_CONFIG.dappContract.farmRouter
-                ).contract.methods.startProduceRewards([address]);
+                ).contract.methods.startProduceRewards([address])];
             },
         }),
         [farmAddress, type]
