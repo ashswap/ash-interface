@@ -101,5 +101,5 @@ export const ASHSWAP_CONFIG = {
     farmWeightVoteDelay:
         ENVIRONMENT.NETWORK === "devnet" && ENVIRONMENT.ENV === "alpha"
             ? 3600
-            : 10 * 24 * 3600,
+            : 3600,
 } as const;
