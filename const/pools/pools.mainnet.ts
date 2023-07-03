@@ -37,9 +37,9 @@ const POOLS_MAINNET: IPool[] = [
     },
     {
         address:
-            "erd1qqqqqqqqqqqqqpgq7c55afdzw9ms6lgfm3txcers5c83w2nv2gesfn5akl",
-        lpToken: TOKENS_MAP["ALP-fda8dc"],
-        tokens: [TOKENS_MAP["SEGLD-71d86c"], TOKENS_MAP["HSEGLD-111ad8"]],
+            "erd1qqqqqqqqqqqqqpgqe2e53xuw7g8mwx46x3p5sn29ry0xtzru2gesx76d6t",
+        lpToken: TOKENS_MAP["ALP-f47d16"],
+        tokens: [TOKENS_MAP["SEGLD-71d86c"], TOKENS_MAP["HSEGLD-0abbe5"]],
         type: EPoolType.LendingPool,
     },
 ];

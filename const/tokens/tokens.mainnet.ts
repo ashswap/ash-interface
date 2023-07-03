@@ -79,7 +79,7 @@ const TOKENS: IESDTInfo[] = [
         logoURI: IconSEGLD.src,
     },
     {
-        identifier: "HSEGLD-111ad8",
+        identifier: "HSEGLD-0abbe5",
         chainId: ChainId.Devnet,
         symbol: "HsEGLD",
         name: "Hatom sEGLD",
