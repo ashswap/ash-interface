@@ -1,6 +1,9 @@
 import ICBribe from "assets/svg/bribe.svg";
 import ICChevronRight from "assets/svg/chevron-right.svg";
-import { fbClaimableRewardsSelector, fbTotalClaimableUSDSelector } from "atoms/farmBribeState";
+import {
+    fbClaimableRewardsSelector,
+    fbTotalClaimableUSDSelector,
+} from "atoms/farmBribeState";
 import Avatar from "components/Avatar";
 import BaseModal, { BaseModalType } from "components/BaseModal";
 import GlowingButton from "components/GlowingButton";
@@ -13,15 +16,25 @@ type ClaimBribeRewardProps = {
     farmAddress: string;
     onClose?: () => void;
 };
-const ClaimBribeRewardContent = ({farmAddress, onClose}: ClaimBribeRewardProps) => {
-    const {fbClaimAllRewards, trackingData: {isPending, isSuccessful}} = useFBAllClaimRewards(true);
+const ClaimBribeRewardContent = ({
+    farmAddress,
+    onClose,
+}: ClaimBribeRewardProps) => {
+    const {
+        fbClaimAllRewards,
+        sessionId,
+        trackingData: { isSuccessful, isSending },
+    } = useFBAllClaimRewards(true);
     const rewards = useRecoilValue(fbClaimableRewardsSelector(farmAddress));
-    const totalRewardUSD = useRecoilValue(fbTotalClaimableUSDSelector(farmAddress));
+    const totalRewardUSD = useRecoilValue(
+        fbTotalClaimableUSDSelector(farmAddress)
+    );
+
     useEffect(() => {
-        if(isSuccessful){
+        if (sessionId && isSuccessful) {
             onClose?.();
         }
-    }, [isSuccessful, onClose]);
+    }, [isSuccessful, onClose, sessionId]);
     return (
         <div className="px-6 lg:px-12 pb-12 overflow-auto relative">
             <div className="font-bold text-2xl text-white">
@@ -68,12 +81,13 @@ const ClaimBribeRewardContent = ({farmAddress, onClose}: ClaimBribeRewardProps) 
             <div className="border-notch-x border-notch-white/50">
                 <GlowingButton
                     theme="yellow"
-                    className="w-full clip-corner-1 clip-corner-tl uppercase h-12 text-xs sm:text-sm font-bold text-stake-dark-400"
-                    disabled={isPending}
+                    className="w-full clip-corner-1 clip-corner-tl uppercase h-12 text-xs sm:text-sm font-bold text-stake-dark-400 leading-none"
+                    disabled={isSending}
+                    loading={isSending}
                     onClick={() => fbClaimAllRewards(farmAddress)}
                 >
                     <div className="flex items-center space-x-2.5">
-                        <span>Claim</span>
+                        <span className="mt-0.5">Claim</span>
                         <ICChevronRight className="w-3 h-3" />
                     </div>
                 </GlowingButton>
@@ -91,7 +105,10 @@ function ClaimBribeRewardModal({
         <>
             <BaseModal
                 {...modalProps}
-                onRequestClose={(e) => {onClose?.(); modalProps.onRequestClose?.(e);}}
+                onRequestClose={(e) => {
+                    onClose?.();
+                    modalProps.onRequestClose?.(e);
+                }}
                 type={screenSize.isMobile ? "drawer_btt" : "modal"}
                 className={`clip-corner-4 clip-corner-tl bg-stake-dark-400 text-white p-4 flex flex-col overflow-hidden max-h-full w-screen sm:max-w-[30rem] mx-auto`}
             >
@@ -99,7 +116,12 @@ function ClaimBribeRewardModal({
                     <BaseModal.CloseBtn />
                 </div>
                 <div className="flex-grow overflow-auto">
-                    <ClaimBribeRewardContent farmAddress={farmAddress} onClose={onClose} />
+                    {modalProps.isOpen && (
+                        <ClaimBribeRewardContent
+                            farmAddress={farmAddress}
+                            onClose={onClose}
+                        />
+                    )}
                 </div>
             </BaseModal>
         </>
