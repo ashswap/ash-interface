@@ -253,10 +253,10 @@ function DAODetail({
                                             >
                                                 <Disclosure.Panel
                                                     static
-                                                    className="px-6 pb-4 bg-[#2A2A42]"
+                                                    className="px-6 pb-4 bg-[#2A2A42] max-h-screen overflow-auto"
                                                 >
                                                     <pre>{params}</pre>
-                                                    <div className="mt-6 flex justify-end">
+                                                    <div className="sticky bottom-0 inset-x-0 mt-6 flex justify-end">
                                                         <button
                                                             onClick={() =>
                                                                 close()

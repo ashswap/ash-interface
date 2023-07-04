@@ -2,6 +2,7 @@ import { Address } from "@multiversx/sdk-core/out";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 import { FARMS } from "const/farms";
 import { ContractManager } from "helper/contracts/contractManager";
+import useFRGetAllFarms from "hooks/useFarmRouter/useFRGetAllFarms";
 import { forwardRef, memo, useCallback, useImperativeHandle, useState } from "react";
 import DAOFarmDropdown from "../../components/DAOFarmDropdown";
 import { DAOFormRefMethods, WithDynamicRef } from "./type";
@@ -11,6 +12,7 @@ const DAOFRProduceRewardsFormRef = forwardRef<
     { type: "start" | "stop" }
 >(function DAOFRProduceRewardsForm({ type }, ref) {
     const [farmAddress, setFarmAddress] = useState(FARMS[0].farm_address);
+    const { data: farmList } = useFRGetAllFarms();
     const onFarmAddressChange = useCallback(
         (val: number | string) => setFarmAddress(val as string),
         []
@@ -45,6 +47,7 @@ const DAOFRProduceRewardsFormRef = forwardRef<
                     Farm Address
                 </label>
                 <DAOFarmDropdown
+                options={farmList || []}
                     value={farmAddress}
                     onSelect={onFarmAddressChange}
                 />

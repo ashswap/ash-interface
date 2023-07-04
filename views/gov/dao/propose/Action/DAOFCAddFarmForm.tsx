@@ -5,6 +5,7 @@ import { FARMS } from "const/farms";
 import { GraphOptions } from "graphql/type";
 import useGraphQLQueryOptions from "graphql/useQueries/useGraphQLQueryOptions";
 import { ContractManager } from "helper/contracts/contractManager";
+import useFRGetAllFarms from "hooks/useFarmRouter/useFRGetAllFarms";
 import {
     forwardRef,
     memo,
@@ -17,7 +18,6 @@ import { useRecoilValue } from "recoil";
 import DAODropdown from "../../components/DAODropdown";
 import DAOFarmDropdown from "../../components/DAOFarmDropdown";
 import { DAOFormRefMethods, WithDynamicRef } from "./type";
-import useSWR from "swr";
 const queryOptions: GraphOptions = { withFC: true };
 const emptyArray: any = [];
 const DAOFCAddFarmFormForwardRef = forwardRef<DAOFormRefMethods>(
@@ -27,21 +27,7 @@ const DAOFCAddFarmFormForwardRef = forwardRef<DAOFormRefMethods>(
         const [farmType, setFarmType] = useState<number>();
         const [isClickSubmit, setIsClickSubmit] = useState(false);
         const fcTypes = useRecoilValue(fcTypesSelector);
-        const { data: farmList } = useSWR<string[]>(
-            ASHSWAP_CONFIG.dappContract.farmRouter,
-            async (farmRouter) => {
-                const addresses = await ContractManager.getFarmRouterContract(
-                    farmRouter
-                )
-                    .getAllFarmAddresses()
-                    .then((addresses) => addresses.map((addr) => addr.bech32()))
-                    .catch(() => []);
-                return addresses;
-            },
-            {
-                fallbackData: emptyArray,
-            }
-        );
+        const { data: farmList } = useFRGetAllFarms();
         const farmTypeOptions = useMemo(() => {
             return fcTypes.map((t) => ({ label: t.name, value: t.farmType }));
         }, [fcTypes]);
