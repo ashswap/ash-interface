@@ -26,7 +26,7 @@ const ActiveLink = ({ exact, onClick, ...props }: ActiveLinkProps) => {
         if (exact) {
             return router.pathname === href;
         }
-        return href.startsWith(router.pathname);
+        return router.pathname.startsWith(href);
     }, [href, router.pathname, exact]);
 
     return (

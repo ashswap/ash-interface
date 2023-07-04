@@ -1,12 +1,40 @@
 import { ashBaseStateRefresherAtom, gqlQueryOptionsSelector } from "atoms/ashswap";
 import { accAddressState } from "atoms/dappState";
-import { gql } from "graphql-request";
-import { GraphOptions } from "graphql/type";
-import { graphqlFetcher } from "helper/common";
+import { ENVIRONMENT } from "const/env";
+import { FARMS_MAP } from "const/farms";
+import { POOLS_MAP_ADDRESS } from "const/pool";
+import request, { Variables, gql } from "graphql-request";
+import { AshBaseState, GraphOptions } from "graphql/type";
+import produce from "immer";
 import { useEffect } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import useSWR from "swr";
 import { SWRConfiguration } from "swr/dist/types";
+export const graphqlFetcher = (query: string, variables?: Variables) => request<AshBaseState>(`${ENVIRONMENT.ASH_GRAPHQL}/graphql`, query, variables).then(data => {
+    return produce(data, draft => {
+        if (draft.farmController) {
+            draft.farmController.farms = draft.farmController.farms?.filter(f => !!FARMS_MAP[f.address]) || [];
+            if (draft.farmController.account) {
+                draft.farmController.account.farms = draft.farmController.account.farms?.filter(f => !!FARMS_MAP[f.address]) || [];
+            }
+        }
+        if (draft.farmBribe) {
+            draft.farmBribe.farms = draft.farmBribe.farms?.filter(f => !!FARMS_MAP[f.address]) || [];
+            if (draft.farmBribe.account) {
+                draft.farmBribe.account.farms = draft.farmBribe.account.farms?.filter(f => !!FARMS_MAP[f.address]) || [];
+            }
+        }
+        if (draft.farms) {
+            draft.farms = draft.farms?.filter(f => !!FARMS_MAP[f.address]) || [];
+        }
+        if (draft.pools) {
+            draft.pools = draft.pools?.filter(p => !!POOLS_MAP_ADDRESS[p.address]) || [];
+        }
+        if (draft.poolsV2) {
+            draft.poolsV2 = draft.poolsV2?.filter(p => !!POOLS_MAP_ADDRESS[p.address]) || [];
+        }
+    })
+})
 const queryOptions: { [key in keyof GraphOptions]: string } = {
     withFC: gql`
         farmController(address: $accAddress) {
@@ -51,10 +79,6 @@ const queryOptions: { [key in keyof GraphOptions]: string } = {
     withFB: gql`
         farmBribe(address: $accAddress){
             address
-            whitelistTokens{
-                id
-                price
-            }
             farms{
                 address
                 rewards{
@@ -95,7 +119,7 @@ const useAshBaseStateQuery = (config?: SWRConfiguration) => {
     );
     const options = useRecoilValue(gqlQueryOptionsSelector);
 
-    const swr = useSWR(
+    const swr = useSWR<AshBaseState>(
         [
             gql`
                 query ashBaseStateQuery($accAddress: String = "") {
@@ -122,6 +146,12 @@ const useAshBaseStateQuery = (config?: SWRConfiguration) => {
                             slopeBoosted
                         }
                         shard
+                        additionalRewards{
+                            rewardPerSec
+                            rewardPerShare
+                            periodRewardEnd
+                            tokenId
+                        }
                     }
                     pools {
                         address
@@ -132,6 +162,7 @@ const useAshBaseStateQuery = (config?: SWRConfiguration) => {
                             ...allTokenProps
                         }
                         reserves
+                        underlyingPrices
                         totalSupply
                         swapFeePercent
                         adminFeePercent

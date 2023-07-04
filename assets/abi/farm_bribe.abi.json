@@ -1,20 +1,20 @@
 {
     "buildInfo": {
         "rustc": {
-            "version": "1.69.0-nightly",
-            "commitHash": "dc1d9d50fba2f6a1ccab8748a0050cde38253f60",
-            "commitDate": "2023-01-31",
+            "version": "1.72.0-nightly",
+            "commitHash": "2d0aa57684e10f7b3d3fe740ee18d431181583ad",
+            "commitDate": "2023-06-18",
             "channel": "Nightly",
-            "short": "rustc 1.69.0-nightly (dc1d9d50f 2023-01-31)"
+            "short": "rustc 1.72.0-nightly (2d0aa5768 2023-06-18)"
         },
         "contractCrate": {
             "name": "farm_bribe",
             "version": "0.0.0",
-            "git_version": "936cd89"
+            "gitVersion": "mainnet-230217-38-gbfa04a7"
         },
         "framework": {
-            "name": "elrond-wasm",
-            "version": "0.33.1"
+            "name": "multiversx-sc",
+            "version": "0.39.8"
         }
     },
     "name": "FarmBribeContract",
@@ -28,45 +28,6 @@
         "outputs": []
     },
     "endpoints": [
-        {
-            "name": "commitTransferOwnership",
-            "mutability": "mutable",
-            "inputs": [
-                {
-                    "name": "_address",
-                    "type": "Address"
-                }
-            ],
-            "outputs": []
-        },
-        {
-            "name": "applyTransferOwnership",
-            "mutability": "mutable",
-            "inputs": [],
-            "outputs": []
-        },
-        {
-            "name": "addWhitelistToken",
-            "mutability": "mutable",
-            "inputs": [
-                {
-                    "name": "token_id",
-                    "type": "TokenIdentifier"
-                }
-            ],
-            "outputs": []
-        },
-        {
-            "name": "removeWhitelistToken",
-            "mutability": "mutable",
-            "inputs": [
-                {
-                    "name": "token_id",
-                    "type": "TokenIdentifier"
-                }
-            ],
-            "outputs": []
-        },
         {
             "name": "addRewardAmount",
             "mutability": "mutable",
@@ -132,35 +93,12 @@
                     "type": "Address"
                 },
                 {
-                    "name": "reward_token_id",
-                    "type": "TokenIdentifier"
+                    "name": "reward_tokens",
+                    "type": "variadic<TokenIdentifier>",
+                    "multi_arg": true
                 }
             ],
-            "outputs": [
-                {
-                    "type": "BigUint"
-                }
-            ]
-        },
-        {
-            "name": "getAdmin",
-            "mutability": "readonly",
-            "inputs": [],
-            "outputs": [
-                {
-                    "type": "Address"
-                }
-            ]
-        },
-        {
-            "name": "getFutureAdmin",
-            "mutability": "readonly",
-            "inputs": [],
-            "outputs": [
-                {
-                    "type": "Address"
-                }
-            ]
+            "outputs": []
         },
         {
             "name": "getFarmControllerAddress",
@@ -280,17 +218,6 @@
             "outputs": [
                 {
                     "type": "variadic<Address>",
-                    "multi_result": true
-                }
-            ]
-        },
-        {
-            "name": "getWhitelistTokens",
-            "mutability": "readonly",
-            "inputs": [],
-            "outputs": [
-                {
-                    "type": "variadic<TokenIdentifier>",
                     "multi_result": true
                 }
             ]

@@ -1,22 +1,22 @@
-import { useEffect } from 'react';
-import type { NextPage } from 'next'
-import { useRouter } from 'next/router'
+import { useEffect } from "react";
+import { useRouter } from "next/router";
 import BasicLayout from "components/Layout/Basic";
+import { NextPageWithLayout } from "./_app";
 
-const Home: NextPage = () => {
-    const router = useRouter()
+const HomePage: NextPageWithLayout = () => {
+    const router = useRouter();
 
     useEffect(() => {
         if (router.route === "/") {
-            router.replace("/swap")
+            router.replace("/swap");
         }
-    }, [router])
+    }, [router]);
 
-    return (
-        <BasicLayout>
-            
-        </BasicLayout>
-    )
-}
+    return <></>;
+};
 
-export default Home
+HomePage.getLayout = function getLayout(page) {
+    return <BasicLayout>{page}</BasicLayout>;
+};
+
+export default HomePage;

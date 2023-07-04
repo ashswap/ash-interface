@@ -1,11 +1,12 @@
 import BigNumber from "bignumber.js";
-import { ENVIRONMENT } from "const/env";
 import { TOKENS_MAP } from "const/tokens";
 import { FBAccountFarm, FBFarm } from "graphql/type.graphql";
 import { TokenAmount } from "helper/token/tokenAmount";
 import { selectorFamily } from "recoil";
 import { ashswapBaseState } from "./ashswap";
+import { fcFarmSelector } from "./farmControllerState";
 import { tokenMapState } from "./tokensState";
+const PRECISION = new BigNumber(1e18);
 
 export const fbFarmSelector = selectorFamily<FBFarm | undefined, string>({
     key: 'farm_bribe_farm_selector',
@@ -29,8 +30,12 @@ export const fbTreasuresSelector = selectorFamily<TokenAmount[], string>({
     key: "farm_bribe_total_availabel_treasures_selector",
     get: (farmAddress) => ({get}) => {
         const fbFarm = get(fbFarmSelector(farmAddress));
-        return fbFarm?.rewards.map(r => {
-            return new TokenAmount(TOKENS_MAP[r.tokenId], new BigNumber(r.total).minus(r.claimed));
+        const fcFarm = get(fcFarmSelector(farmAddress));
+        return fbFarm?.rewards.filter(r => !!TOKENS_MAP[r.tokenId]).map(r => {
+            const currentAlloc = new BigNumber(r.rewardPerVote).multipliedBy(fcFarm?.votedPoint.bias || 0).idiv(PRECISION);
+            const available = new BigNumber(r.total).minus(r.claimed);
+            const nextWeek = available.minus(currentAlloc);
+            return new TokenAmount(TOKENS_MAP[r.tokenId], nextWeek.gt(10) ? nextWeek : 0);
         }) || [];
     }
 })
@@ -74,6 +79,6 @@ export const fbHasBribe = selectorFamily<boolean, string>({
     get: (farmAddress) => ({get}) => {
         const treasures = get(fbTreasuresSelector(farmAddress));
         // if total treasures in wei units is less than 10 -> should be ignored
-        return !!treasures?.some((r) => r.raw.gt(10)) && ENVIRONMENT.ENV === "alpha" && ENVIRONMENT.NETWORK !== "mainnet";
+        return !!treasures?.some((r) => r.raw.gt(10));
     }
 })

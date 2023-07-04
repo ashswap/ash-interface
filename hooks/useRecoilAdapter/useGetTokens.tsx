@@ -1,15 +1,12 @@
 import { ashswapBaseState } from "atoms/ashswap";
 import { accAddressState, accBalanceState } from "atoms/dappState";
 import {
-    lpTokenMapState,
     tokenMapState,
-    tokensRefresherAtom,
+    tokensRefresherAtom
 } from "atoms/tokensState";
 import { DAPP_CONFIG } from "const/dappConfig";
-import pools from "const/pool";
 import { TOKENS } from "const/tokens";
 import { WRAPPED_EGLD } from "const/wrappedEGLD";
-import { Pool, PoolV2 } from "graphql/type.graphql";
 import { toEGLDD } from "helper/balance";
 import { fetcher } from "helper/common";
 import produce from "immer";
@@ -22,12 +19,11 @@ const useGetTokens = (config?: SWRConfiguration) => {
     const { tokens, pools: rawPoolsV1, poolsV2: rawPoolsV2 } = useRecoilValue(ashswapBaseState);
     const egldBalance = useRecoilValue(accBalanceState);
     const setTokenMap = useSetRecoilState(tokenMapState);
-    const setLPTokenMap = useSetRecoilState(lpTokenMapState);
     const setTokenRefresher = useSetRecoilState(tokensRefresherAtom);
     const tokenIds = useMemo(
         () => [
             ...TOKENS.map((t) => t.identifier).filter(t => t !== "EGLD"),
-            ...pools.map((p) => p.lpToken.identifier),
+            // ...pools.map((p) => p.lpToken.identifier),
         ],
         []
     );
@@ -62,31 +58,6 @@ const useGetTokens = (config?: SWRConfiguration) => {
             return { ...map };
         });
     }, [data, tokens, setTokenMap, egldBalance]);
-    useEffect(() => {
-        setLPTokenMap((state) => {
-            const map = produce(state, (draft) => {
-                const entriesV1 = rawPoolsV1.map((p) => [p.lpToken.id, p]);
-                const entriesV2 = rawPoolsV2.map((p) => [p.lpToken.id, p]);
-                const rawPoolMap: Record<string, Pool | PoolV2> = Object.fromEntries(
-                    [...entriesV1, ...entriesV2]
-                );
-                const dataMap = Object.fromEntries(
-                    data?.map((t) => [t.identifier, t]) || []
-                );
-                Object.keys(draft).map((id) => {
-                    draft[id].balance = dataMap[id]?.balance || "0";
-                    draft[id].price = rawPoolMap[id]?.lpToken?.price || 0;
-                    draft[id].valueUsd = toEGLDD(
-                        draft[id].decimals,
-                        draft[id].balance
-                    )
-                        .multipliedBy(draft[id].price)
-                        .toNumber();
-                });
-            });
-            return { ...map };
-        });
-    }, [data, rawPoolsV1, rawPoolsV2, setLPTokenMap]);
 
     useEffect(() => {
         setTokenRefresher(() => mutate);

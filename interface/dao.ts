@@ -1,0 +1,1 @@
+export type DAOStatus = "pending" | "active" | "rejected" | "approved" | "executed" | "expired";

@@ -1,4 +1,4 @@
-import { TokenPayment } from "@multiversx/sdk-core/out";
+import { TokenTransfer } from "@multiversx/sdk-core/out";
 import BigNumber from "bignumber.js";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 import { ASH_TOKEN } from "const/tokens";
@@ -16,7 +16,7 @@ const useGovLockASH = (trackStatus = false) => {
             const veContract = new VotingEscrowContract(
                 ASHSWAP_CONFIG.dappContract.voteEscrowedContract
             );
-            const tokenPayment = TokenPayment.fungibleFromBigInteger(
+            const tokenPayment = TokenTransfer.fungibleFromBigInteger(
                 ASH_TOKEN.identifier,
                 weiAmt,
                 ASH_TOKEN.decimals

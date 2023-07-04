@@ -13,6 +13,9 @@ interface Environment {
     LOGIN_TWITTER_LINK: string;
     LOGIN_DISCORD_LINK: string;
     WALLET_CONNECT_V2_PROJECT_ID: string;
+    AG_API: string;
+    XEXCHANGE_GRAPH_API?: string;
+    AG_TOKEN_SECRET: string;
 }
 
 const _ENVIRONMENT: Environment = {
@@ -26,11 +29,17 @@ const _ENVIRONMENT: Environment = {
     ENV: (process.env.NEXT_PUBLIC_ASH_ENV as Env) || "beta",
     LOGIN_TWITTER_LINK: process.env.NEXT_PUBLIC_ASH_LOGIN_TWITTER_LINK!,
     LOGIN_DISCORD_LINK: process.env.NEXT_PUBLIC_ASH_LOGIN_DISCORD_LINK!,
-    WALLET_CONNECT_V2_PROJECT_ID: process.env.NEXT_PUBLIC_ASH_WALLET_CONNECT_V2_PROJECT_ID!,
+    WALLET_CONNECT_V2_PROJECT_ID:
+        process.env.NEXT_PUBLIC_ASH_WALLET_CONNECT_V2_PROJECT_ID!,
+    AG_API: process.env.NEXT_PUBLIC_AG_API!,
+    XEXCHANGE_GRAPH_API: process.env.NEXT_PUBLIC_XEXCHANGE_GRAPH_API,
+    AG_TOKEN_SECRET: process.env.NEXT_PUBLIC_AG_TOKEN_SECRET || "",
 };
 
 export const ENVIRONMENT = {
     ..._ENVIRONMENT,
-    ENABLE_ASHPOINT: _ENVIRONMENT.NETWORK == "mainnet" || (_ENVIRONMENT.NETWORK === "devnet" && _ENVIRONMENT.ENV === "alpha"),
+    ENABLE_ASHPOINT:
+        _ENVIRONMENT.NETWORK == "mainnet" ||
+        (_ENVIRONMENT.NETWORK === "devnet" && _ENVIRONMENT.ENV === "alpha"),
     ENABLE_ASHPOINT_SIGN: false,
-}
+};

@@ -26,7 +26,7 @@ const useFarmControllerState = () => {
         if (!ashBase.farmController?.farms) return;
         const records: FarmWeightChartRecord[] = [];
         const nextRecords: FarmWeightChartRecord[] = [];
-        ashBase.farmController.farms.map((f, i) => {
+        ashBase.farmController.farms.filter(f => !!FARMS_MAP[f.address]).map((f, i) => {
             const lp = FARMS_MAP[f.address].farming_token_id;
             const pool = POOLS_MAP_LP[lp];
             const name = pool.tokens.map((t) => getTokenFromId(t.identifier).symbol).join("-");

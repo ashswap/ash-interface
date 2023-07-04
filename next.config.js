@@ -13,6 +13,7 @@ const config = {
     transpilePackages: ["@multiversx/sdk-dapp"],
     images: {
         loader: "custom",
+        minimumCacheTTL: 1800,
     },
     trailingSlash: true,
     async redirects() {
@@ -33,10 +34,10 @@ const config = {
         const ignorePathsBase = ["/stake", "/stake/mint"];
         const ignorePaths =
             process.env.NEXT_PUBLIC_NETWORK === "mainnet"
-                ? ["/stake/gov/bribe"]
+                ? ["/gov/dao", "/gov/dao/propose", "/gov/dao/detail", "/gov/bribe"]
                 : process.env.NEXT_PUBLIC_ASH_ENV === "alpha"
                 ? []
-                : ["/stake/gov/bribe", "/ashpoint"];
+                : ["/ashpoint"];
         const entries = Object.entries(defaultPathMap)
             .map(([path, pageObj]) => {
                 return [

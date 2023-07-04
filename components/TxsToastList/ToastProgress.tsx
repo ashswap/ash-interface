@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from "react";
 import moment from "moment";
-import { logarithmicRest, storage } from "@multiversx/sdk-dapp/utils";
+import { storage } from "@multiversx/sdk-dapp/utils";
 
 interface Props {
     id: string;
@@ -96,8 +96,8 @@ const ToastProgress = ({
                         const decrement =
                             existing > 100 - maxPercent
                                 ? 1
-                                : logarithmicRest(existing);
-                        const value = existing - decrement;
+                                : 0.01;
+                        const value = Math.max(existing - decrement, 0);
                         saveToSession({ value });
                         return value;
                     });

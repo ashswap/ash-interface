@@ -8,6 +8,7 @@
 /* tslint:disable */
 /* eslint-disable */
 // @ts-nocheck
+
 export class Blockchain {
     __typename?: 'Blockchain';
     blockShards?: Nullable<BlockShard[]>;
@@ -45,6 +46,16 @@ export abstract class IQuery {
 
     abstract boyStatistic(address?: Nullable<string>): Nullable<BoyStatistic> | Promise<Nullable<BoyStatistic>>;
 
+    abstract openedDAOProposals(): DAOProposal[] | Promise<DAOProposal[]>;
+
+    abstract closedDAOProposals(limit?: Nullable<number>, offset?: Nullable<number>, states?: Nullable<string[]>): PaginationProposals | Promise<PaginationProposals>;
+
+    abstract proposalDetail(id: number): Nullable<DAOProposalDetail> | Promise<Nullable<DAOProposalDetail>>;
+
+    abstract daoWhitelistFunctions(): string | Promise<string>;
+
+    abstract proposalConfig(address: string, functionName: string): Nullable<DAOProposalConfig> | Promise<Nullable<DAOProposalConfig>>;
+
     abstract farmBribe(address?: Nullable<string>): FarmBribe | Promise<FarmBribe>;
 
     abstract farmController(address?: Nullable<string>): FarmController | Promise<FarmController>;
@@ -69,11 +80,19 @@ export abstract class IQuery {
 
     abstract ashSupply(): string | Promise<string>;
 
+    abstract summaries(limit?: Nullable<number>, offset?: Nullable<number>): Nullable<Nullable<Summary>[]> | Promise<Nullable<Nullable<Summary>[]>>;
+
+    abstract adminFee(): Nullable<number> | Promise<Nullable<number>>;
+
+    abstract votingPower(): Nullable<Nullable<Nullable<string>[]>[]> | Promise<Nullable<Nullable<Nullable<string>[]>[]>>;
+
+    abstract volume(): Nullable<Nullable<number[]>[]> | Promise<Nullable<Nullable<number[]>[]>>;
+
+    abstract defillama(): Nullable<Defillama> | Promise<Nullable<Defillama>>;
+
     abstract tokens(token_ids?: Nullable<string>): Nullable<Token[]> | Promise<Nullable<Token[]>>;
 
     abstract tokenTransactions(token_id?: Nullable<string>, limit?: Nullable<number>, offset?: Nullable<number>): Nullable<Nullable<TokenTransacion>[]> | Promise<Nullable<Nullable<TokenTransacion>[]>>;
-
-    abstract volume(): Nullable<Nullable<number[]>[]> | Promise<Nullable<Nullable<number[]>[]>>;
 
     abstract votingEscrows(address: string): Nullable<VotingEscrow[]> | Promise<Nullable<VotingEscrow[]>>;
 }
@@ -133,10 +152,77 @@ export class Wallet {
     wallet_address?: Nullable<string>;
 }
 
+export class DAOActionArguments {
+    __typename?: 'DAOActionArguments';
+    argument_length?: Nullable<number>;
+}
+
+export class DAOBribeReward {
+    __typename?: 'DAOBribeReward';
+    token_id: string;
+    reward_amount: string;
+}
+
+export class DAOExecuted {
+    __typename?: 'DAOExecuted';
+    executed_at: number;
+    executed_by: string;
+}
+
+export class DAOAction {
+    __typename?: 'DAOAction';
+    dest_address: string;
+    function_name: string;
+    arguments: string;
+    cost?: Nullable<string>;
+}
+
+export class DAOProposalConfig {
+    __typename?: 'DAOProposalConfig';
+    min_power_for_propose: string;
+    min_time_for_propose: number;
+    min_support_pct: string;
+    min_quorum_pct: string;
+    voting_time_limit: number;
+    queue_time_limit: number;
+    execute_time_limit: number;
+    max_action_allowed: number;
+    action_required: string[];
+}
+
+export class DAOProposal {
+    __typename?: 'DAOProposal';
+    proposer: string;
+    metadata: string;
+    actions: DAOAction[];
+    config: DAOProposalConfig;
+    created_at: number;
+    total_supply: string;
+    yes_vote: string;
+    no_vote: string;
+    executed: DAOExecuted[];
+    proposal_id: number;
+    state: string;
+    bribes: DAOBribeReward[];
+}
+
+export class DAOProposalDetail {
+    __typename?: 'DAOProposalDetail';
+    proposal?: Nullable<DAOProposal>;
+    top_voters: string[][];
+    top_supporters: string[][];
+    top_againsters: string[][];
+}
+
+export class PaginationProposals {
+    __typename?: 'PaginationProposals';
+    total: number;
+    proposals: DAOProposal[];
+}
+
 export class FarmBribe {
     __typename?: 'FarmBribe';
     address: string;
-    whitelistTokens: Token[];
     farms: FBFarm[];
     account?: Nullable<FBAccount>;
 }
@@ -245,7 +331,16 @@ export class Farm {
     farmingTokenBalance?: Nullable<string>;
     produceRewardEnabled?: Nullable<boolean>;
     shard?: Nullable<string>;
+    additionalRewards: AdditionalReward[];
     account?: Nullable<FarmAccount>;
+}
+
+export class AdditionalReward {
+    __typename?: 'AdditionalReward';
+    rewardPerSec: string;
+    rewardPerShare: string;
+    periodRewardEnd: number;
+    tokenId: string;
 }
 
 export class FarmAccount {
@@ -285,6 +380,7 @@ export class PoolV2 {
     lpToken: Token;
     tokens: Token[];
     reserves: string[];
+    realReserves: string[];
     totalSupply: string;
     lpPrice: string;
     ampFactor: string;
@@ -299,6 +395,17 @@ export class PoolV2 {
     midFee: string;
     outFee: string;
     feeGamma: string;
+    state: boolean;
+    allowedExtraProfit: string;
+    adjustmentStep: string;
+    adminFee: string;
+    lastPrices: string;
+    lastPriceTs: number;
+    maHalfTime: number;
+    xcpProfit: string;
+    xcpProfitA: string;
+    isNotAdjusted: boolean;
+    initialAGammaTime: number;
 }
 
 export class Pool {
@@ -307,6 +414,7 @@ export class Pool {
     lpToken: Token;
     tokens: Token[];
     reserves: string[];
+    underlyingPrices: string[];
     totalSupply?: Nullable<string>;
     swapFeePercent?: Nullable<string>;
     adminFeePercent?: Nullable<string>;
@@ -394,6 +502,23 @@ export class Rewarder {
     lastRewardPerSecTime: number;
     futureRewardPerSec: number;
     futureRewardPerSecTime: number;
+}
+
+export class Defillama {
+    __typename?: 'Defillama';
+    totalValueLockedUSD?: Nullable<number>;
+    totalValueStakedUSD?: Nullable<number>;
+    totalVolumeUSD24h?: Nullable<number>;
+    pools?: Nullable<Nullable<DefillamaPool>[]>;
+}
+
+export class DefillamaPool {
+    __typename?: 'DefillamaPool';
+    address?: Nullable<string>;
+    tokens?: Nullable<Nullable<string>[]>;
+    tvlUsd?: Nullable<number>;
+    apyBase?: Nullable<number>;
+    apyReward?: Nullable<number>;
 }
 
 export class Token {

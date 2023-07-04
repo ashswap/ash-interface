@@ -7,7 +7,7 @@ import {
     poolRecordsState,
     poolStatsRefresherAtom
 } from "atoms/poolsState";
-import { lpTokenMapState } from "atoms/tokensState";
+import { tokenMapState } from "atoms/tokensState";
 import BigNumber from "bignumber.js";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 import pools from "const/pool";
@@ -22,7 +22,7 @@ import { useDebounce } from "use-debounce";
 const usePoolsState = () => {
     const keyword = useRecoilValue(poolKeywordState);
     const ashBase = useRecoilValue(ashswapBaseState);
-    const lpTokenMap = useRecoilValue(lpTokenMapState);
+    const tokenMap = useRecoilValue(tokenMapState);
     // const setPoolRecords = useSetRecoilState(poolRecordsState);
     const setPoolRecordsRefresher = useSetRecoilState(poolStatsRefresherAtom);
     const setDeboundKeyword = useSetRecoilState(poolDeboundKeywordState);
@@ -60,9 +60,10 @@ const usePoolsState = () => {
                     (stats) => stats.address === p.address
                 ),
                 totalSupply,
+                state: !!rawPool?.state,
             };
             const ownLP = new BigNumber(
-                lpTokenMap[p.lpToken.identifier]?.balance || 0
+                tokenMap[p.lpToken.identifier]?.balance || 0
             );
 
             if (ownLP.gt(0)) {
@@ -80,7 +81,7 @@ const usePoolsState = () => {
             }
             return record;
         },
-        [poolStatsRecords, ashBase, lpBreak, lpTokenMap]
+        [poolStatsRecords, ashBase, lpBreak, tokenMap]
     );
 
     const getPoolRecords = useRecoilCallback(

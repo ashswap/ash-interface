@@ -5,7 +5,7 @@ import BaseTooltip from "components/BaseTooltip";
 import Image from "components/Image";
 import { LEGAL_LINKS, SOCIALS } from "const/link";
 import { useScreenSize } from "hooks/useScreenSize";
-import React, { useState } from "react";
+import React, { memo, useState } from "react";
 import LegalLinkItem from "./LegalLinkItem";
 import styles from "./Nav.module.css";
 
@@ -108,5 +108,5 @@ function SocialMenu() {
         </div>
     );
 }
-
+export const SocialMenuContent = memo(MenuContent);
 export default SocialMenu;

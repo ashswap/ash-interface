@@ -1,0 +1,525 @@
+{
+    "buildInfo": {
+        "rustc": {
+            "version": "1.72.0-nightly",
+            "commitHash": "2d0aa57684e10f7b3d3fe740ee18d431181583ad",
+            "commitDate": "2023-06-18",
+            "channel": "Nightly",
+            "short": "rustc 1.72.0-nightly (2d0aa5768 2023-06-18)"
+        },
+        "contractCrate": {
+            "name": "dao",
+            "version": "0.0.0",
+            "gitVersion": "mainnet-230217-38-gbfa04a7"
+        },
+        "framework": {
+            "name": "multiversx-sc",
+            "version": "0.39.8"
+        }
+    },
+    "name": "DAOContract",
+    "constructor": {
+        "inputs": [
+            {
+                "name": "voting_escrow_address",
+                "type": "Address"
+            },
+            {
+                "name": "proposal_default",
+                "type": "DAOConfig"
+            }
+        ],
+        "outputs": []
+    },
+    "endpoints": [
+        {
+            "name": "getProposalState",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "proposal_id",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "State"
+                }
+            ]
+        },
+        {
+            "name": "propose",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "metadata",
+                    "type": "bytes"
+                },
+                {
+                    "name": "actions",
+                    "type": "List<DAOAction>"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "vote",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "proposal_id",
+                    "type": "u32"
+                },
+                {
+                    "name": "yes_pct",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "no_pct",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "execute",
+            "mutability": "mutable",
+            "payableInTokens": [
+                "EGLD"
+            ],
+            "inputs": [
+                {
+                    "name": "proposal_id",
+                    "type": "u32"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "getOwnershipAdmin",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "Address"
+                }
+            ]
+        },
+        {
+            "name": "getEmergencyAdmin",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "Address"
+                }
+            ]
+        },
+        {
+            "name": "getFutureOwnershipAdmin",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "Address"
+                }
+            ]
+        },
+        {
+            "name": "getFutureEmergencyAdmin",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "Address"
+                }
+            ]
+        },
+        {
+            "name": "commitSetAdmins",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "ownership",
+                    "type": "Address"
+                },
+                {
+                    "name": "emergency",
+                    "type": "Address"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "applySetAdmins",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "getProposalDefault",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "DAOConfig"
+                }
+            ]
+        },
+        {
+            "name": "setProposalDefault",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "config",
+                    "type": "DAOConfig"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "getProposalConfig",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "address",
+                    "type": "Address"
+                },
+                {
+                    "name": "function",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "DAOConfig"
+                }
+            ]
+        },
+        {
+            "name": "setProposalConfig",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "address",
+                    "type": "Address"
+                },
+                {
+                    "name": "function",
+                    "type": "bytes"
+                },
+                {
+                    "name": "config",
+                    "type": "DAOConfig"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "removeProposalConfig",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "address",
+                    "type": "Address"
+                },
+                {
+                    "name": "function",
+                    "type": "bytes"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "getVotingEscrowAddress",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "Address"
+                }
+            ]
+        },
+        {
+            "name": "getTotalProposal",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u32"
+                }
+            ]
+        },
+        {
+            "name": "getProposal",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "proposal_id",
+                    "type": "u32"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "DAOProposal"
+                }
+            ]
+        },
+        {
+            "name": "getLastCreateProposal",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "address",
+                    "type": "Address"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "getProposalVotes",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "proposal_id",
+                    "type": "u32"
+                },
+                {
+                    "name": "address",
+                    "type": "Address"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "DAOVoting"
+                }
+            ]
+        },
+        {
+            "name": "getDAORouterAddress",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "Address"
+                }
+            ]
+        },
+        {
+            "name": "setDAORouterAddress",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "address",
+                    "type": "Address"
+                }
+            ],
+            "outputs": []
+        }
+    ],
+    "events": [
+        {
+            "identifier": "propose_event",
+            "inputs": [
+                {
+                    "name": "proposal_id",
+                    "type": "u32",
+                    "indexed": true
+                },
+                {
+                    "name": "caller",
+                    "type": "Address",
+                    "indexed": true
+                },
+                {
+                    "name": "proposal",
+                    "type": "DAOProposal"
+                }
+            ]
+        },
+        {
+            "identifier": "vote_event",
+            "inputs": [
+                {
+                    "name": "proposal_id",
+                    "type": "u32",
+                    "indexed": true
+                },
+                {
+                    "name": "caller",
+                    "type": "Address",
+                    "indexed": true
+                },
+                {
+                    "name": "voting",
+                    "type": "DAOVoting"
+                }
+            ]
+        }
+    ],
+    "hasCallback": false,
+    "types": {
+        "DAOAction": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "dest_address",
+                    "type": "Address"
+                },
+                {
+                    "name": "function_name",
+                    "type": "bytes"
+                },
+                {
+                    "name": "arguments",
+                    "type": "List<bytes>"
+                }
+            ]
+        },
+        "DAOConfig": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "min_power_for_propose",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "min_time_for_propose",
+                    "type": "u64"
+                },
+                {
+                    "name": "min_support_pct",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "min_quorum_pct",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "voting_time_limit",
+                    "type": "u64"
+                },
+                {
+                    "name": "queue_time_limit",
+                    "type": "u64"
+                },
+                {
+                    "name": "execute_time_limit",
+                    "type": "u64"
+                },
+                {
+                    "name": "max_action_allowed",
+                    "type": "u32"
+                },
+                {
+                    "name": "action_required",
+                    "type": "List<bytes>"
+                }
+            ]
+        },
+        "DAOExecuted": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "executed_at",
+                    "type": "u64"
+                },
+                {
+                    "name": "executed_by",
+                    "type": "Address"
+                }
+            ]
+        },
+        "DAOProposal": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "proposer",
+                    "type": "Address"
+                },
+                {
+                    "name": "metadata",
+                    "type": "bytes"
+                },
+                {
+                    "name": "actions",
+                    "type": "List<DAOAction>"
+                },
+                {
+                    "name": "config",
+                    "type": "DAOConfig"
+                },
+                {
+                    "name": "created_at",
+                    "type": "u64"
+                },
+                {
+                    "name": "total_supply",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "yes_vote",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "no_vote",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "executed",
+                    "type": "List<DAOExecuted>"
+                }
+            ]
+        },
+        "DAOVoting": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "yes_vote",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "no_vote",
+                    "type": "BigUint"
+                }
+            ]
+        },
+        "State": {
+            "type": "enum",
+            "variants": [
+                {
+                    "name": "Pending",
+                    "discriminant": 0
+                },
+                {
+                    "name": "Active",
+                    "discriminant": 1
+                },
+                {
+                    "name": "Rejected",
+                    "discriminant": 2
+                },
+                {
+                    "name": "Approved",
+                    "discriminant": 3
+                },
+                {
+                    "name": "Executed",
+                    "discriminant": 4
+                },
+                {
+                    "name": "Expired",
+                    "discriminant": 5
+                }
+            ]
+        }
+    }
+}

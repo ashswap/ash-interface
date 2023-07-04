@@ -56,7 +56,7 @@ const EXTEND_CONFIGS = {
             // test purpose
             // { value: 7 * 24 * 60 * 60, label: "+ 1 week" },
             // { value: 4 * 7 * 24 * 60 * 60, label: "+ 4 weeks" },
-            { value: 1 * 10 * 60, label: "+ 30 minutes" },
+            { value: 1 * 60 * 60, label: "+ 1 hour" },
             { value: 1 * 24 * 60 * 60, label: "+ 1 day" },
             { value: 2 * 24 * 60 * 60, label: "+ 2 days" },
         ],

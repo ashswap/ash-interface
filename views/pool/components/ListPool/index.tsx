@@ -58,7 +58,7 @@ const ListPool = (props: Props) => {
                         <span>
                             If you staked your LP tokens in a LP-Stake Farm,{" "}
                         </span>
-                        <Link href="/stake/farms">
+                        <Link href="/farms">
                             <span className="underline text-yellow-500">
                                 unstake
                             </span>

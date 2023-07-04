@@ -3,7 +3,7 @@ import { Fraction } from "helper/fraction/fraction";
 import { Price } from "helper/token/price";
 import { IESDTInfo } from "helper/token/token";
 import { TokenAmount } from "helper/token/tokenAmount";
-import { calculateEstimatedSwapOutputAmount2 } from "./amounts";
+import { calculateEstimatedSwapOutputAmount } from "./amounts";
 
 /**
  * Gets the price of the second token in the swap, i.e. "Token 1", with respect to "Token 0".
@@ -16,7 +16,8 @@ export const calculateSwapPrice = (
     reserves: TokenAmount[],
     fromToken: IESDTInfo,
     toToken: IESDTInfo,
-    fees: { swap: Fraction; admin: Fraction }
+    fees: { swap: Fraction; admin: Fraction },
+    underlyingPrices: BigNumber[]
 ): Price => {
     const fromReserves = reserves.find(
         (r) => r.token.identifier === fromToken.identifier
@@ -44,12 +45,13 @@ export const calculateSwapPrice = (
     );
 
     const inputAmount = new TokenAmount(fromToken, inputAmountNum);
-    const outputAmount = calculateEstimatedSwapOutputAmount2(
+    const outputAmount = calculateEstimatedSwapOutputAmount(
         amp,
         reserves,
         inputAmount,
         toReserves.token,
-        fees
+        fees,
+        underlyingPrices
     ).outputAmount;
     return new Price(inputAmount, outputAmount);
 };

@@ -10,6 +10,7 @@ export type PoolRecord = {
     pool: IPool;
     poolStats?: PoolStatsRecord;
     totalSupply: BigNumber;
+    state: boolean;
     /** if LP balance > 0 -> staked pool*/
     liquidityData?: {
         /** number of own LP token*/
