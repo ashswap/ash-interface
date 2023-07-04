@@ -1,4 +1,4 @@
-import { TokenPayment } from "@multiversx/sdk-core/out";
+import { TokenTransfer } from "@multiversx/sdk-core/out";
 import wegldAbi from "assets/abi/multiversx-wegld-swap-sc.abi.json";
 import BigNumber from "bignumber.js";
 import Contract from "./contract";
@@ -17,7 +17,7 @@ class WrappedEGLDContract extends Contract<typeof wegldAbi> {
             .buildTransaction();
     }
 
-    async unwrapEgld(tokenPayment: TokenPayment) {
+    async unwrapEgld(tokenPayment: TokenTransfer) {
         let interaction = this.contract.methods.unwrapEgld([]);
         interaction.withSingleESDTTransfer(tokenPayment);
         interaction.withGasLimit(3_000_000);

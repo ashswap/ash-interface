@@ -1,5 +1,5 @@
 import { useTrackTransactionStatus } from "@multiversx/sdk-dapp/hooks";
-import { TokenPayment } from "@multiversx/sdk-core/out";
+import { TokenTransfer } from "@multiversx/sdk-core/out";
 import { Transition } from "@headlessui/react";
 import ImgASHSleep from "assets/images/ash-sleep.png";
 import ICArrowBarRight from "assets/svg/arrow-bar-right.svg";
@@ -314,9 +314,9 @@ function GovBoostStatus() {
                     })
                     .filter(({ ownerTokens }) => ownerTokens.length > 0)
                     .map(async ({ ownerTokens, farm, lastRewardBlockTs }) => {
-                        const tokenPayments: TokenPayment[] = ownerTokens.map(
+                        const tokenPayments: TokenTransfer[] = ownerTokens.map(
                             (t) =>
-                                TokenPayment.metaEsdtFromBigInteger(
+                                TokenTransfer.metaEsdtFromBigInteger(
                                     t.collection,
                                     t.nonce.toNumber(),
                                     t.balance

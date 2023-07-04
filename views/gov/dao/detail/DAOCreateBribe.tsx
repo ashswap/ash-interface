@@ -1,4 +1,4 @@
-import { TokenPayment } from "@multiversx/sdk-core/out";
+import { TokenTransfer } from "@multiversx/sdk-core/out";
 import ICBribe from "assets/svg/bribe.svg";
 import ICChevronRight from "assets/svg/chevron-right.svg";
 import { accIsLoggedInState } from "atoms/dappState";
@@ -8,7 +8,7 @@ import Avatar from "components/Avatar";
 import BaseModal from "components/BaseModal";
 import GlowingButton from "components/GlowingButton";
 import InputCurrency from "components/InputCurrency";
-import { TOKENS, TOKENS_MAP } from "const/tokens";
+import { TOKENS_MAP } from "const/tokens";
 import { formatAmount } from "helper/number";
 import { useConnectWallet } from "hooks/useConnectWallet";
 import useDBCreateBribe from "hooks/useDAOBribeContract/useDBCreateBribe";
@@ -16,6 +16,7 @@ import useInputNumberString from "hooks/useInputNumberString";
 import { useCallback, useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
 import DAODropdown from "../components/DAODropdown";
+import { IN_POOL_TOKENS } from "const/pool";
 
 type Props = {
     proposalID: number;
@@ -42,12 +43,11 @@ function DAOCreateBribe({ proposalID }: Props) {
         return !!selectedTokenId && inputValue.gt(0) && !isInsufficient;
     }, [selectedTokenId, inputValue, isInsufficient]);
 
-    const displayTokens = useMemo(() => TOKENS.slice(1), []);
     const onCreateBribe = useCallback(async () => {
         const token = TOKENS_MAP[selectedTokenId];
         if (!token) return;
         await dbCreateBribe(proposalID, [
-            TokenPayment.fungibleFromAmount(
+            TokenTransfer.fungibleFromAmount(
                 token.identifier,
                 inputValue,
                 token.decimals
@@ -111,7 +111,7 @@ function DAOCreateBribe({ proposalID }: Props) {
                                             setSelectedTokenId(id as string);
                                             setInputValue(new BigNumber(""));
                                         }}
-                                        options={displayTokens.map((t) => ({
+                                        options={IN_POOL_TOKENS.map((t) => ({
                                             value: t.identifier,
                                             label: (
                                                 <div className="flex items-center">

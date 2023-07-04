@@ -68,7 +68,7 @@ function DAODetail({
     const votersRef = useRef<HTMLElement>(null);
     const chartRef = useRef<HTMLElement>(null);
 
-    const ipfsHash = useMemo(() => proposal?.ipfs_hash || "", [proposal]);
+    const ipfsHash = useMemo(() => proposal?.metadata || "", [proposal]);
     const meta = useDAOProposalMeta(ipfsHash);
     const {
         status,
@@ -86,22 +86,29 @@ function DAODetail({
     const proposalLabel = useMemo(() => {
         return (
             PROPOSALS_CONFIG[
-                `${PROPOSALS_ALIAS[proposal.dest_address]}:${
-                    proposal.function_name
+                `${PROPOSALS_ALIAS[proposal.actions[0].dest_address]}:${
+                    proposal.actions[0].function_name
                 }`
             ] || ""
         );
-    }, [proposal.dest_address, proposal.function_name]);
+    }, [proposal.actions]);
 
     const params = useMemo(() => {
-        if (proposal?.arguments) {
-            const args = JSON.parse(proposal.arguments);
-            delete args["argument_length"];
-            return Object.entries(args)
-                .map(([k, v]) => `${k}: ${v}`)
-                .join("\n");
-        }
-        return "";
+        const entries = proposal.actions.map((action, i) => {
+            let args: any = [];
+            if (action?.arguments) {
+                try {
+                    args = JSON.parse(action.arguments);
+                    delete args["argument_length"];
+                } catch (error) {
+                    args = action.arguments;
+                }
+            }
+            return `${i + 1}. ${action.function_name}: ${JSON.stringify(args, null, 4)}`;
+        });
+
+        
+        return entries.join("\n\n");
     }, [proposal]);
 
     const topRecords = useMemo(() => {
@@ -246,10 +253,10 @@ function DAODetail({
                                             >
                                                 <Disclosure.Panel
                                                     static
-                                                    className="px-6 pb-4 bg-[#2A2A42]"
+                                                    className="px-6 pb-4 bg-[#2A2A42] max-h-screen overflow-auto"
                                                 >
                                                     <pre>{params}</pre>
-                                                    <div className="mt-6 flex justify-end">
+                                                    <div className="sticky bottom-0 inset-x-0 mt-6 flex justify-end">
                                                         <button
                                                             onClick={() =>
                                                                 close()
@@ -388,46 +395,56 @@ function DAODetailWrapper({ proposalID }: Props) {
     const query = useMemo(() => {
         return proposalID
             ? [
-                  gql`
-                      query DAOProposalQuery($proposalID: Int!) {
-                          proposalDetail(id: $proposalID) {
-                              proposal {
-                                  ...allProposalProps
-                              }
-                              top_supporters
-                              top_againsters
-                              top_voters
-                          }
-                      }
-                      fragment allProposalProps on DAOProposal {
-                          dest_address
-                          function_name
-                          arguments
-                          min_power_for_propose
-                          min_time_for_propose
-                          min_support_pct
-                          min_quorum_pct
-                          voting_time_limit
-                          queue_time_limit
-                          execute_time_limit
-                          created_at
-                          executed_at
-                          executed_by
-                          ipfs_hash
-                          no_vote
-                          proposal_id
-                          proposer
-                          state
-                          total_supply
-                          yes_vote
-                          bribes {
-                              token_id
-                              reward_amount
-                          }
-                      }
-                  `,
-                  { proposalID },
-              ]
+                gql`
+                    query DAOProposalQuery($proposalID: Int!) {
+                        proposalDetail(id: $proposalID) {
+                            proposal {
+                                ...allProposalProps
+                            }
+                            top_supporters
+                            top_againsters
+                            top_voters
+                        }
+                    }
+                    fragment allProposalProps on DAOProposal {
+                        proposer,
+                        metadata,
+                        actions {
+                            dest_address,
+                            function_name,
+                            arguments
+                            cost
+                        }
+                        config {
+                            min_power_for_propose,
+                        min_time_for_propose,
+                        min_support_pct,
+                        min_quorum_pct,
+                        voting_time_limit,
+                        queue_time_limit,
+                        execute_time_limit,
+                        max_action_allowed,
+                        action_required
+                        }
+                        created_at,
+                        total_supply,
+                        yes_vote,
+                        no_vote,
+                        executed {
+                            executed_at,
+                            executed_by
+                        }
+
+                        proposal_id,
+                        state
+                        bribes {
+                            token_id,
+                            reward_amount
+                        }
+                    }  
+                `,
+                { proposalID },
+            ]
             : null;
     }, [proposalID]);
     const { data: _data, mutate } = useSWR<{

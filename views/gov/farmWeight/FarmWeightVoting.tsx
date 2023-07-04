@@ -1,33 +1,32 @@
 import { Slider } from "antd";
 import ICBribe from "assets/svg/bribe.svg";
 import ICChevronRight from "assets/svg/chevron-right.svg";
+import ICLock from "assets/svg/lock.svg";
 import ICNewTab from "assets/svg/new-tab.svg";
 import ICTickCircle from "assets/svg/tick-circle.svg";
-import ICLock from "assets/svg/lock.svg";
 import { ashswapBaseState } from "atoms/ashswap";
+import { accIsLoggedInState } from "atoms/dappState";
 import { fbHasBribe, fbTotalRewardsUSD } from "atoms/farmBribeState";
 import { fcAccountFarmSelector } from "atoms/farmControllerState";
 import { govVeASHAmtSelector } from "atoms/govState";
 import BigNumber from "bignumber.js";
 import Avatar from "components/Avatar";
+import BaseModal from "components/BaseModal";
 import GlowingButton from "components/GlowingButton";
 import InputCurrency from "components/InputCurrency";
 import TextAmt from "components/TextAmt";
+import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 import { FARMS_MAP } from "const/farms";
 import { POOLS_MAP_LP } from "const/pool";
+import { getTokenFromId } from "helper/token";
 import useVoteForFarm from "hooks/useFarmControllerContract/useVoteForFarm";
 import useInputNumberString from "hooks/useInputNumberString";
+import { useScreenSize } from "hooks/useScreenSize";
+import moment from "moment";
+import Link from "next/link";
 import { memo, useEffect, useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { theme } from "tailwind.config";
-import Link from "next/link";
-import { accIsLoggedInState } from "atoms/dappState";
-import { ENVIRONMENT } from "const/env";
-import { getTokenFromId } from "helper/token";
-import moment from "moment";
-import { ASHSWAP_CONFIG } from "const/ashswapConfig";
-import BaseModal from "components/BaseModal";
-import { useScreenSize } from "hooks/useScreenSize";
 type FarmRecordProps = {
     farmAddress: string;
     selected?: boolean;
@@ -165,17 +164,9 @@ const FarmRecord = memo(function FarmRecord({
                             </a>
                         </>
                     ) : (
-                        <>
-                            {ENVIRONMENT.NETWORK === "devnet" ? (
-                                <div className="font-bold text-lg text-ash-gray-600">
-                                    No
-                                </div>
-                            ) : (
-                                <div className="font-bold text-sm text-ash-gray-600">
-                                    Coming soon
-                                </div>
-                            )}
-                        </>
+                        <div className="font-bold text-lg text-ash-gray-600">
+                            No
+                        </div>
                     )}
                 </div>
             </td>

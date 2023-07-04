@@ -17,7 +17,7 @@ type ClaimBribeRewardProps = {
     onClose?: () => void;
 };
 const DAOClaimBribeRewardContent = ({proposalID, rewards, onClose}: ClaimBribeRewardProps) => {
-    const {dbClaimReward, trackingData: {isPending, isSuccessful}} = useDBClaimReward(true);
+    const {dbClaimReward, trackingData: {isSuccessful, isSending}} = useDBClaimReward(true);
     const tokenPriceMap = useRecoilValue(tokenMapState);
     const totalRewardUSD = useMemo(() => {
         return rewards.reduce(
@@ -80,7 +80,7 @@ const DAOClaimBribeRewardContent = ({proposalID, rewards, onClose}: ClaimBribeRe
                 <GlowingButton
                     theme="yellow"
                     className="w-full clip-corner-1 clip-corner-tl uppercase h-12 text-xs sm:text-sm font-bold text-stake-dark-400"
-                    disabled={isPending}
+                    disabled={isSending}
                     onClick={() => dbClaimReward(proposalID, rewards.map(r => r.token.identifier))}
                 >
                     <div className="flex items-center space-x-2.5">

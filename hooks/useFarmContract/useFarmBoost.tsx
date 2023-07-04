@@ -1,4 +1,4 @@
-import { TokenPayment } from "@multiversx/sdk-core/out";
+import { TokenTransfer } from "@multiversx/sdk-core/out";
 import { farmNumberOfAdditionalRewards, farmQuery, FarmToken } from "atoms/farmsState";
 import { ContractManager } from "helper/contracts/contractManager";
 import { sendTransactions } from "helper/transactionMethods";
@@ -20,7 +20,7 @@ const useFarmBoost = () => {
                     farmNumberOfAdditionalRewards(farm.farm_address)
                 );
                 const tokenPayments = tokens.map((t) =>
-                    TokenPayment.metaEsdtFromBigInteger(
+                    TokenTransfer.metaEsdtFromBigInteger(
                         t.collection,
                         t.nonce.toNumber(),
                         t.balance

@@ -1,20 +1,20 @@
 {
     "buildInfo": {
         "rustc": {
-            "version": "1.70.0-nightly",
-            "commitHash": "2036fdd24f77d607dcfaa24c48fbe85d3f785823",
-            "commitDate": "2023-03-27",
+            "version": "1.72.0-nightly",
+            "commitHash": "2d0aa57684e10f7b3d3fe740ee18d431181583ad",
+            "commitDate": "2023-06-18",
             "channel": "Nightly",
-            "short": "rustc 1.70.0-nightly (2036fdd24 2023-03-27)"
+            "short": "rustc 1.72.0-nightly (2d0aa5768 2023-06-18)"
         },
         "contractCrate": {
             "name": "dao",
             "version": "0.0.0",
-            "git_version": "f32527e"
+            "gitVersion": "mainnet-230217-38-gbfa04a7"
         },
         "framework": {
-            "name": "elrond-wasm",
-            "version": "0.33.1"
+            "name": "multiversx-sc",
+            "version": "0.39.8"
         }
     },
     "name": "DAOContract",
@@ -56,8 +56,8 @@
                     "type": "bytes"
                 },
                 {
-                    "name": "action",
-                    "type": "DAOAction"
+                    "name": "actions",
+                    "type": "List<DAOAction>"
                 }
             ],
             "outputs": [
@@ -414,6 +414,27 @@
                 {
                     "name": "execute_time_limit",
                     "type": "u64"
+                },
+                {
+                    "name": "max_action_allowed",
+                    "type": "u32"
+                },
+                {
+                    "name": "action_required",
+                    "type": "List<bytes>"
+                }
+            ]
+        },
+        "DAOExecuted": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "executed_at",
+                    "type": "u64"
+                },
+                {
+                    "name": "executed_by",
+                    "type": "Address"
                 }
             ]
         },
@@ -429,8 +450,8 @@
                     "type": "bytes"
                 },
                 {
-                    "name": "action",
-                    "type": "DAOAction"
+                    "name": "actions",
+                    "type": "List<DAOAction>"
                 },
                 {
                     "name": "config",
@@ -453,12 +474,8 @@
                     "type": "BigUint"
                 },
                 {
-                    "name": "executed_at",
-                    "type": "u64"
-                },
-                {
-                    "name": "executed_by",
-                    "type": "Address"
+                    "name": "executed",
+                    "type": "List<DAOExecuted>"
                 }
             ]
         },

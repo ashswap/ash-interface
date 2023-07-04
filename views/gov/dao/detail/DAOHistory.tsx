@@ -18,16 +18,16 @@ const DAOHistoryTimeFormatter = memo(function DAOHistoryTimeFormatter({
         </span>
     );
 });
-type Props = Pick<
-    DAOProposal,
-    "created_at" | "proposer" | "executed_at" | "executed_by"
-> & { status: DAOStatus; expiredTS: number; endVoteTS: number };
+type Props = Pick<DAOProposal, "created_at" | "proposer" | "executed"> & {
+    status: DAOStatus;
+    expiredTS: number;
+    endVoteTS: number;
+};
 function DAOHistory({
     created_at,
     proposer,
     status,
-    executed_at,
-    executed_by,
+    executed,
     expiredTS,
     endVoteTS,
 }: Props) {
@@ -35,26 +35,31 @@ function DAOHistory({
         <div className="px-9 py-10 bg-stake-dark-300">
             <div className="mb-7.5 font-bold text-2xl text-white">History</div>
             <div className="flex flex-col gap-6">
-                {executed_at > 0 && (
-                    <div>
-                        <div className="mb-2 font-medium text-sm text-stake-gray-500">
-                            <DAOHistoryTimeFormatter timestamp={executed_at} />
-                        </div>
-                        <div className="px-6 py-4 bg-[#2A2A42] border border-black flex items-center justify-between gap-4">
-                            <div className="font-bold text-sm text-stake-gray-500 uppercase">
-                                Executed by
+                {executed.map((ex) => {
+                    return (
+                        <div key={ex.executed_by}>
+                            <div className="mb-2 font-medium text-sm text-stake-gray-500">
+                                <DAOHistoryTimeFormatter
+                                    timestamp={ex.executed_at}
+                                />
                             </div>
-                            <Link
-                                href={`${DAPP_CONFIG.explorerAddress}/accounts/${executed_by}`}
-                                target="_blank"
-                            >
-                                <span className="font-bold text-xs text-white underline">
-                                    {shortenString(executed_by)}
-                                </span>
-                            </Link>
+                            <div className="px-6 py-4 bg-[#2A2A42] border border-black flex items-center justify-between gap-4">
+                                <div className="font-bold text-sm text-stake-gray-500 uppercase">
+                                    Executed by
+                                </div>
+                                <Link
+                                    href={`${DAPP_CONFIG.explorerAddress}/accounts/${ex.executed_by}`}
+                                    target="_blank"
+                                >
+                                    <span className="font-bold text-xs text-white underline">
+                                        {shortenString(ex.executed_by)}
+                                    </span>
+                                </Link>
+                            </div>
                         </div>
-                    </div>
-                )}
+                    );
+                })}
+
                 {status === "expired" && (
                     <div>
                         <div className="mb-2 font-medium text-sm text-stake-gray-500">

@@ -1,4 +1,4 @@
-import { TokenPayment } from "@multiversx/sdk-core/out";
+import { TokenTransfer } from "@multiversx/sdk-core/out";
 import { accIsLoggedInState } from "atoms/dappState";
 import {
     ashRawFarmQuery,
@@ -55,7 +55,7 @@ const calcUnstakeEntries2 = (weiAmt: BigNumber, farmTokens: FarmToken[]) => {
                 .integerValue(BigNumber.ROUND_FLOOR);
             const amt = lpBalance.lte(remain) ? lpBalance : remain;
             sum = sum.plus(amt);
-            return TokenPayment.metaEsdtFromBigInteger(
+            return TokenTransfer.metaEsdtFromBigInteger(
                 ft.collection,
                 ft.nonce.toNumber(),
                 amt.eq(remain)
@@ -73,7 +73,7 @@ const calcUnstakeEntries2 = (weiAmt: BigNumber, farmTokens: FarmToken[]) => {
             //     farmToken: ft,
             // };
         })
-        .filter((tp) => typeof tp !== "undefined") as TokenPayment[];
+        .filter((tp) => typeof tp !== "undefined") as TokenTransfer[];
 };
 const useExitFarm = (trackStatus = false) => {
     const { sendTransactions, trackingData, sessionId } =
@@ -106,7 +106,7 @@ const useExitFarm = (trackStatus = false) => {
                 const farmTokens = stakedData.farmTokens || [];
                 const entries = unstakeMax
                     ? farmTokens.map((t) =>
-                          TokenPayment.metaEsdtFromBigInteger(
+                          TokenTransfer.metaEsdtFromBigInteger(
                               t.collection,
                               t.nonce.toNumber(),
                               t.balance
@@ -179,7 +179,7 @@ const useExitFarm = (trackStatus = false) => {
                     new BigNumber(rawFarm?.divisionSafetyConstant || 0),
                     farmRecord.lpLockedAmt,
                     farmRecord.lastRewardBlockTs,
-                    rawFarm?.additionalRewards.map((r) => ({
+                    rawFarm?.additionalRewards.filter(t => !!TOKENS_MAP[t.tokenId]).map((r) => ({
                         token: TOKENS_MAP[r.tokenId],
                         rewardPerShare: new BigNumber(r.rewardPerShare),
                         rewardPerSec: new BigNumber(r.rewardPerSec),

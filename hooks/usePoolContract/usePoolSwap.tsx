@@ -3,7 +3,7 @@ import {
     BigUIntValue,
     ContractFunction,
     TokenIdentifierValue,
-    TokenPayment,
+    TokenTransfer,
     Transaction,
 } from "@multiversx/sdk-core/out";
 import { accAddressState, accInfoState } from "atoms/dappState";
@@ -60,7 +60,7 @@ const usePoolSwap = (trackStatus = false) => {
                     const poolContract = ContractManager.getPoolV2Contract(
                         pool.address
                     );
-                    const tokenPayment = TokenPayment.fungibleFromBigInteger(
+                    const tokenPayment = TokenTransfer.fungibleFromBigInteger(
                         getTokenIdFromCoin(tokenIn.identifier)!,
                         weiIn,
                         tokenIn.decimals
@@ -70,7 +70,7 @@ const usePoolSwap = (trackStatus = false) => {
                     const poolContract = ContractManager.getPoolContract(
                         pool.address
                     );
-                    const tokenPayment = TokenPayment.fungibleFromBigInteger(
+                    const tokenPayment = TokenTransfer.fungibleFromBigInteger(
                         getTokenIdFromCoin(tokenIn.identifier)!,
                         weiIn,
                         tokenIn.decimals
@@ -94,7 +94,7 @@ const usePoolSwap = (trackStatus = false) => {
                         await ContractManager.getWrappedEGLDContract(
                             wegldContract
                         ).unwrapEgld(
-                            TokenPayment.fungibleFromBigInteger(
+                            TokenTransfer.fungibleFromBigInteger(
                                 wegld.identifier,
                                 minWeiOut,
                                 wegld.decimals

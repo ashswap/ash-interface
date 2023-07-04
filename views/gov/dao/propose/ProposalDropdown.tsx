@@ -38,7 +38,7 @@ function ProposalDropdown({value, onSelect}: Props) {
 >
     {({ close }) => {
         return (
-            <ul className="py-6 max-h-52">
+            <ul className="my-6 max-h-52">
                 {ProposalTypeOptions.map((p) => {
                     return (
                         <li

@@ -1,4 +1,4 @@
-import { TokenPayment } from "@multiversx/sdk-core/out";
+import { TokenTransfer } from "@multiversx/sdk-core/out";
 import { farmNumberOfAdditionalRewards, farmQuery, farmSessionIdMapState } from "atoms/farmsState";
 import { ASH_TOKEN } from "const/tokens";
 
@@ -28,7 +28,7 @@ const useFarmClaimReward = (trackStatus = false) => {
 
                 const { stakedData } = farmRecord;
                 const tokenPayments = stakedData.farmTokens.map((t) =>
-                    TokenPayment.metaEsdtFromBigInteger(
+                    TokenTransfer.metaEsdtFromBigInteger(
                         t.collection,
                         t.nonce.toNumber(),
                         t.balance,

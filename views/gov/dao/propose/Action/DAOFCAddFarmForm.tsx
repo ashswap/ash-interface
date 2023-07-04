@@ -5,18 +5,21 @@ import { FARMS } from "const/farms";
 import { GraphOptions } from "graphql/type";
 import useGraphQLQueryOptions from "graphql/useQueries/useGraphQLQueryOptions";
 import { ContractManager } from "helper/contracts/contractManager";
+import useFRGetAllFarms from "hooks/useFarmRouter/useFRGetAllFarms";
 import {
     forwardRef,
     memo,
     useCallback,
-    useImperativeHandle, useMemo, useState
+    useImperativeHandle,
+    useMemo,
+    useState,
 } from "react";
 import { useRecoilValue } from "recoil";
 import DAODropdown from "../../components/DAODropdown";
 import DAOFarmDropdown from "../../components/DAOFarmDropdown";
 import { DAOFormRefMethods, WithDynamicRef } from "./type";
-const queryOptions: GraphOptions = {withFC: true};
-
+const queryOptions: GraphOptions = { withFC: true };
+const emptyArray: any = [];
 const DAOFCAddFarmFormForwardRef = forwardRef<DAOFormRefMethods>(
     function DAOFCAddFarmForm(props, ref) {
         useGraphQLQueryOptions(queryOptions);
@@ -24,10 +27,10 @@ const DAOFCAddFarmFormForwardRef = forwardRef<DAOFormRefMethods>(
         const [farmType, setFarmType] = useState<number>();
         const [isClickSubmit, setIsClickSubmit] = useState(false);
         const fcTypes = useRecoilValue(fcTypesSelector);
+        const { data: farmList } = useFRGetAllFarms();
         const farmTypeOptions = useMemo(() => {
-            return fcTypes.map(t => ({label: t.name, value: t.farmType}))
+            return fcTypes.map((t) => ({ label: t.name, value: t.farmType }));
         }, [fcTypes]);
-
 
         const onFarmTypeChange = useCallback(
             (val: number | string) => setFarmType(val as number),
@@ -41,13 +44,18 @@ const DAOFCAddFarmFormForwardRef = forwardRef<DAOFormRefMethods>(
         useImperativeHandle(
             ref,
             () => ({
-                generateInteraction() {
+                generateInteractions() {
                     setIsClickSubmit(true);
-                    if(typeof farmType !== "number") return;
+                    if (typeof farmType !== "number") return [];
                     const address = new Address(farmAddress);
-                    return ContractManager.getFarmControllerContract(
-                        ASHSWAP_CONFIG.dappContract.farmController
-                    ).contract.methods.addFarm([address, farmType]);
+                    return [
+                        ContractManager.getFarmControllerContract(
+                            ASHSWAP_CONFIG.dappContract.farmController
+                        ).contract.methods.addFarm([address, farmType]),
+                        ContractManager.getFarmRouterContract(
+                            ASHSWAP_CONFIG.dappContract.farmRouter
+                        ).contract.methods.startProduceRewards([address]),
+                    ];
                 },
             }),
             [farmAddress, farmType]
@@ -62,6 +70,7 @@ const DAOFCAddFarmFormForwardRef = forwardRef<DAOFormRefMethods>(
                         Farm Address
                     </label>
                     <DAOFarmDropdown
+                        options={farmList || []}
                         value={farmAddress}
                         onSelect={onFarmAddressChange}
                     />

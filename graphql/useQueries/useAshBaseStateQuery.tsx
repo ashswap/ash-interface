@@ -51,10 +51,6 @@ const queryOptions: { [key in keyof GraphOptions]: string } = {
     withFB: gql`
         farmBribe(address: $accAddress){
             address
-            whitelistTokens{
-                id
-                price
-            }
             farms{
                 address
                 rewards{

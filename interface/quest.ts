@@ -19,7 +19,8 @@ export type QuestActionType =
     | "increase_amount"
     | "increase_unlock_time"
     | "withdraw"
-    | "prize";
+    | "prize"
+    | "aggregate";
 
 export type QuestAction = {
     duration: number;

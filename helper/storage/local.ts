@@ -11,6 +11,7 @@ type LocalStorageKey =
     | "invitationCode"
     | "acceptedLegal"
     | "ashpointOwners"
+    | "agTokens"
 export const setItem = ({
     key,
     data,

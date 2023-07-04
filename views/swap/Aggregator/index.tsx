@@ -276,10 +276,10 @@ const Aggregator = memo(function Aggregator() {
     }, [isPriceChangeTooHigh, isPriceImpactTooHigh]);
 
     useEffect(() => {
-        if (!tokenIn) {
+        if (tokenIn.identifier) {
             setAmountIn("");
         }
-    }, [tokenIn, setAmountIn]);
+    }, [tokenIn.identifier, setAmountIn]);
 
     useEffect(() => {
         setShowSetting(false);

@@ -69,30 +69,41 @@ function DAOOverview() {
             gql`
                 ${query}
                 fragment allProposalProps on DAOProposal {
-                    dest_address
-                    function_name
-                    arguments
-                    min_power_for_propose
-                    min_time_for_propose
-                    min_support_pct
-                    min_quorum_pct
-                    voting_time_limit
-                    queue_time_limit
-                    execute_time_limit
-                    created_at
-                    executed_at
-                    ipfs_hash
-                    no_vote
-                    proposal_id
-                    proposer
+                    proposer,
+                    metadata,
+                    actions {
+                        dest_address,
+                        function_name,
+                        arguments
+                        cost
+                    }
+                    config {
+                        min_power_for_propose,
+                    min_time_for_propose,
+                    min_support_pct,
+                    min_quorum_pct,
+                    voting_time_limit,
+                    queue_time_limit,
+                    execute_time_limit,
+                    max_action_allowed,
+                    action_required
+                    }
+                    created_at,
+                    total_supply,
+                    yes_vote,
+                    no_vote,
+                    executed {
+                        executed_at,
+                        executed_by
+                    }
+
+                    proposal_id,
                     state
-                    total_supply
-                    yes_vote
                     bribes {
-                        token_id
+                        token_id,
                         reward_amount
                     }
-                }
+                }                
             `,
             { filterDAOStatus, limit: size, offset: index * size },
         ],

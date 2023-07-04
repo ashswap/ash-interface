@@ -12,19 +12,19 @@ const useDAOProposalComputedState = (proposal: DAOProposal) => {
     );
     const minSupportPct = useMemo(
         () =>
-            new BigNumber(proposal.min_support_pct)
+            new BigNumber(proposal.config.min_support_pct)
                 .multipliedBy(100)
                 .div(1e18)
                 .toNumber(),
-        [proposal.min_support_pct]
+        [proposal.config.min_support_pct]
     );
     const minQuorumPct = useMemo(
         () =>
-            new BigNumber(proposal.min_quorum_pct)
+            new BigNumber(proposal.config.min_quorum_pct)
                 .multipliedBy(100)
                 .div(1e18)
                 .toNumber(),
-        [proposal.min_quorum_pct]
+        [proposal.config.min_quorum_pct]
     );
     const totalVotedPower = useMemo(() => {
         return new BigNumber(proposal.yes_vote).plus(proposal.no_vote).div(1e18).toNumber();
@@ -47,14 +47,14 @@ const useDAOProposalComputedState = (proposal: DAOProposal) => {
         return Math.floor(proposal.created_at / WEEK) * WEEK + WEEK;
     }, [proposal.created_at]);
     const endVoteTS = useMemo(() => {
-        return startVoteTS + proposal.voting_time_limit;
-    }, [startVoteTS, proposal.voting_time_limit]);
+        return startVoteTS + proposal.config.voting_time_limit;
+    }, [startVoteTS, proposal.config.voting_time_limit]);
     const canExecuteTS = useMemo(() => {
-        return endVoteTS + proposal.queue_time_limit;
-    }, [endVoteTS, proposal.queue_time_limit]);
+        return endVoteTS + proposal.config.queue_time_limit;
+    }, [endVoteTS, proposal.config.queue_time_limit]);
     const expiredTS = useMemo(() => {
-        return canExecuteTS + proposal.execute_time_limit;
-    }, [canExecuteTS, proposal.execute_time_limit]);
+        return canExecuteTS + proposal.config.execute_time_limit;
+    }, [canExecuteTS, proposal.config.execute_time_limit]);
     const yesVote = useMemo(
         () => new BigNumber(proposal.yes_vote).div(1e18).toNumber(),
         [proposal.yes_vote]

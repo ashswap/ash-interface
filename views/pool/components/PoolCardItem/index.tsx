@@ -157,6 +157,7 @@ function PoolCardItem({
                         theme="pink"
                         className="w-full clip-corner-1 clip-corner-br h-14 text-sm font-bold text-white underline"
                         wrapperClassName="hover:colored-drop-shadow-xs"
+                        disabled={!poolData.state}
                         onClick={() => {
                             setOpenAddLiquidity(true);
                             setOnboardedPoolDeposit(true);

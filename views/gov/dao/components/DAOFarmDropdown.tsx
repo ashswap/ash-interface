@@ -1,19 +1,19 @@
 import Avatar from "components/Avatar";
-import { FARMS } from "const/farms";
 import { POOLS_MAP_LP } from "const/pool";
 import { getTokenFromId } from "helper/token";
-import React, { memo, useMemo } from "react";
+import { memo, useMemo } from "react";
 import DAODropdown from "./DAODropdown";
+import { FARMS_MAP } from "const/farms";
 
 function DAOFarmDropdown(
-    props: Omit<Parameters<typeof DAODropdown>[0], "options">
+    {options, ...props}: Omit<Parameters<typeof DAODropdown>[0], "options"> & {options: string[]}
 ) {
     const farmOptions = useMemo(() => {
-        return FARMS.map((f) => ({
+        return options.sort(f => POOLS_MAP_LP[FARMS_MAP[f]?.farming_token_id] ? -1 : 1).map((f) => ({
             label: (
-                <div className="flex items-center">
-                    <div className="mr-2 flex items-center">
-                        {POOLS_MAP_LP[f.farming_token_id]?.tokens?.map((_t) => {
+                <div className="flex items-center gap-2">
+                    <div className="flex items-center">
+                        {POOLS_MAP_LP[FARMS_MAP[f]?.farming_token_id]?.tokens?.map((_t) => {
                             const t = getTokenFromId(_t.identifier);
                             return (
                                 <Avatar
@@ -25,12 +25,12 @@ function DAOFarmDropdown(
                             );
                         })}
                     </div>
-                    <div className="truncate">{f.farm_address}</div>
+                    <div className="truncate">{f}</div>
                 </div>
             ),
-            value: f.farm_address,
+            value: f,
         }));
-    }, []);
+    }, [options]);
     return <DAODropdown {...props} options={farmOptions} />;
 }
 

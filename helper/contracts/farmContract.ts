@@ -1,6 +1,6 @@
 import Contract from "./contract";
 import farmAbi from "assets/abi/farm.abi.json";
-import { Address, TokenPayment } from "@multiversx/sdk-core/out";
+import { Address, TokenTransfer } from "@multiversx/sdk-core/out";
 import { getAddress } from "@multiversx/sdk-dapp/utils";
 import BigNumber from "bignumber.js";
 import { FarmTokenAttrs } from "interface/farm";
@@ -40,13 +40,15 @@ class FarmContract extends Contract<typeof farmAbi> {
         );
     }
 
-    private async _enterFarm(tokenPayments: TokenPayment[], selfBoost = false) {
+    private async _enterFarm(
+        tokenPayments: TokenTransfer[],
+        selfBoost = false
+    ) {
         const sender = await getAddress();
         let interaction = this.contract.methods.enterFarm([selfBoost]);
-        interaction.withMultiESDTNFTTransfer(
-            tokenPayments,
-            new Address(sender)
-        );
+        interaction
+            .withMultiESDTNFTTransfer(tokenPayments)
+            .withSender(new Address(sender));
         interaction.withGasLimit(
             20_000_000 +
                 tokenPayments.length * 2_000_000 +
@@ -57,13 +59,12 @@ class FarmContract extends Contract<typeof farmAbi> {
             .buildTransaction();
     }
 
-    private async _exitFarm(tokenPayments: TokenPayment[]) {
+    private async _exitFarm(tokenPayments: TokenTransfer[]) {
         const sender = await getAddress();
         let interaction = this.contract.methods.exitFarm([]);
-        interaction.withMultiESDTNFTTransfer(
-            tokenPayments,
-            new Address(sender)
-        );
+        interaction
+            .withMultiESDTNFTTransfer(tokenPayments)
+            .withSender(new Address(sender));
         interaction.withGasLimit(
             20_000_000 +
                 tokenPayments.length * 2_000_000 +
@@ -75,15 +76,14 @@ class FarmContract extends Contract<typeof farmAbi> {
     }
 
     private async _claimRewards(
-        tokenPayments: TokenPayment[],
+        tokenPayments: TokenTransfer[],
         selfBoost = false
     ) {
         const sender = await getAddress();
         let interaction = this.contract.methods.claimRewards([selfBoost]);
-        interaction.withMultiESDTNFTTransfer(
-            tokenPayments,
-            new Address(sender)
-        );
+        interaction
+            .withMultiESDTNFTTransfer(tokenPayments)
+            .withSender(new Address(sender));
         interaction.withGasLimit(
             20_000_000 +
                 tokenPayments.length * 2_500_000 +
@@ -94,14 +94,14 @@ class FarmContract extends Contract<typeof farmAbi> {
             .buildTransaction();
     }
 
-    async enterFarm(tokenPayments: TokenPayment[], selfBoost = false) {
+    async enterFarm(tokenPayments: TokenTransfer[], selfBoost = false) {
         return await this._enterFarm(
             tokenPayments.slice(0, this.MAX_TOKEN_PROCESS),
             selfBoost
         );
     }
 
-    async exitFarm(tokenPayments: TokenPayment[]) {
+    async exitFarm(tokenPayments: TokenTransfer[]) {
         return Promise.all(
             chunk(tokenPayments, this.MAX_TOKEN_PROCESS).map((payments) =>
                 this._exitFarm(payments)
@@ -109,7 +109,7 @@ class FarmContract extends Contract<typeof farmAbi> {
         );
     }
 
-    async claimRewards(tokenPayments: TokenPayment[], selfBoost = false) {
+    async claimRewards(tokenPayments: TokenTransfer[], selfBoost = false) {
         return Promise.all(
             chunk(tokenPayments, this.MAX_TOKEN_PROCESS).map((payments) =>
                 this._claimRewards(payments, selfBoost)

@@ -1,20 +1,20 @@
 {
     "buildInfo": {
         "rustc": {
-            "version": "1.69.0-nightly",
-            "commitHash": "d962ea57899d64dc8a57040142c6b498a57c8064",
-            "commitDate": "2023-02-26",
+            "version": "1.72.0-nightly",
+            "commitHash": "2d0aa57684e10f7b3d3fe740ee18d431181583ad",
+            "commitDate": "2023-06-18",
             "channel": "Nightly",
-            "short": "rustc 1.69.0-nightly (d962ea578 2023-02-26)"
+            "short": "rustc 1.72.0-nightly (2d0aa5768 2023-06-18)"
         },
         "contractCrate": {
             "name": "farm_controller",
             "version": "0.0.0",
-            "git_version": "1f0a299"
+            "gitVersion": "mainnet-230217-38-gbfa04a7"
         },
         "framework": {
-            "name": "elrond-wasm",
-            "version": "0.33.1"
+            "name": "multiversx-sc",
+            "version": "0.39.8"
         }
     },
     "name": "FarmControllerContract",
@@ -187,6 +187,21 @@
             ]
         },
         {
+            "name": "isFarmInController",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "_farm_address",
+                    "type": "Address"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "bool"
+                }
+            ]
+        },
+        {
             "name": "getPointsSum",
             "mutability": "readonly",
             "inputs": [
@@ -337,6 +352,28 @@
                     "type": "Address"
                 }
             ]
+        },
+        {
+            "name": "getFarmRouterAddress",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "Address"
+                }
+            ]
+        },
+        {
+            "name": "setFarmRouterAddress",
+            "onlyOwner": true,
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "address",
+                    "type": "Address"
+                }
+            ],
+            "outputs": []
         },
         {
             "name": "getNFarmTypes",

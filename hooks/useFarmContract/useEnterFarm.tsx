@@ -1,4 +1,4 @@
-import { TokenPayment } from "@multiversx/sdk-core/out";
+import { TokenTransfer } from "@multiversx/sdk-core/out";
 import { accAddressState, accIsLoggedInState } from "atoms/dappState";
 import {
     farmNumberOfAdditionalRewards,
@@ -48,7 +48,7 @@ const useEnterFarm = (trackStatus = false) => {
                     ) || [];
 
                 const tokenPayments = farmTokenInWallet.map((t) =>
-                    TokenPayment.metaEsdtFromBigInteger(
+                    TokenTransfer.metaEsdtFromBigInteger(
                         t.collection,
                         t.nonce.toNumber(),
                         t.balance,
@@ -56,7 +56,7 @@ const useEnterFarm = (trackStatus = false) => {
                     )
                 );
                 tokenPayments.unshift(
-                    TokenPayment.fungibleFromBigInteger(
+                    TokenTransfer.fungibleFromBigInteger(
                         farm.farming_token_id,
                         amtWei,
                         farm.farming_token_decimal
