@@ -20,16 +20,20 @@ const GOV_LINKS: NavGovLinkProps[] = [
         label: "Farm Weight Voting",
         Icon: ICGovFarmWeightSquare,
     },
-    {
-        url: "/gov/dao",
-        label: "Proposal Voting",
-        Icon: ICGovVoteSquare,
-    },
-    {
-        url: "/gov/bribe",
-        label: "Bribe",
-        Icon: ICGovBribeSquare,
-    },
+    ...(ENVIRONMENT.NETWORK !== "mainnet"
+        ? [
+              {
+                  url: "/gov/dao",
+                  label: "Proposal Voting",
+                  Icon: ICGovVoteSquare,
+              },
+              {
+                  url: "/gov/bribe",
+                  label: "Bribe",
+                  Icon: ICGovBribeSquare,
+              },
+          ]
+        : []),
 ];
 
 const NavGovLink = memo(function NavGovLink(props: NavGovLinkProps) {
@@ -42,7 +46,9 @@ const NavGovLink = memo(function NavGovLink(props: NavGovLinkProps) {
                     }`}
                     style={{
                         borderImageSlice: 1,
-                        borderImageSource: `radial-gradient(90.48% 86.43% at 89.33% 11.52%, ${active ? "rgba(255, 0, 92, 0.5) 0%" : "black"}, black 100%)`
+                        borderImageSource: `radial-gradient(90.48% 86.43% at 89.33% 11.52%, ${
+                            active ? "rgba(255, 0, 92, 0.5) 0%" : "black"
+                        }, black 100%)`,
                     }}
                 >
                     <props.Icon className="w-3 h-3 mr-2" />

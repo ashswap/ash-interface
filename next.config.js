@@ -34,7 +34,7 @@ const config = {
         const ignorePathsBase = ["/stake", "/stake/mint"];
         const ignorePaths =
             process.env.NEXT_PUBLIC_NETWORK === "mainnet"
-                ? []
+                ? ["/gov/dao", "/gov/dao/propose", "/gov/dao/detail", "/gov/bribe"]
                 : process.env.NEXT_PUBLIC_ASH_ENV === "alpha"
                 ? []
                 : ["/ashpoint"];

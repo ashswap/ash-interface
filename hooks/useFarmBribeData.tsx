@@ -9,8 +9,8 @@ import { useRecoilValue } from "recoil";
 const useFarmBribeData = (farmAddress: string) => {
     const fbAccountFarm = useRecoilValue(fbAccountFarmSelector(farmAddress));
     const pool = useMemo(() => {
-        const lp = FARMS_MAP[farmAddress].farming_token_id;
-        return POOLS_MAP_LP[lp];
+        const lp = FARMS_MAP[farmAddress]?.farming_token_id;
+        return lp ? POOLS_MAP_LP[lp] : undefined;
     }, [farmAddress]);
 
     const claimableRewards = useMemo(() => {
