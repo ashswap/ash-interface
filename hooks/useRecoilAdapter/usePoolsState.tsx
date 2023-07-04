@@ -60,6 +60,7 @@ const usePoolsState = () => {
                     (stats) => stats.address === p.address
                 ),
                 totalSupply,
+                state: !!rawPool?.state,
             };
             const ownLP = new BigNumber(
                 tokenMap[p.lpToken.identifier]?.balance || 0
