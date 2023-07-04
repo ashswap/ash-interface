@@ -223,7 +223,6 @@ export class PaginationProposals {
 export class FarmBribe {
     __typename?: 'FarmBribe';
     address: string;
-    whitelistTokens: Token[];
     farms: FBFarm[];
     account?: Nullable<FBAccount>;
 }

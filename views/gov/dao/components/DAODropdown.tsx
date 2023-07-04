@@ -54,7 +54,7 @@ function DAODropdown({
         >
             {({ close }) => {
                 return (
-                    <ul className="w-full py-6 max-h-52 overflow-auto">
+                    <ul className="w-full my-6 max-h-52 overflow-auto">
                         {options.map((p) => {
                             return (
                                 <li key={p.value} className="w-full min-w-fit relative">
