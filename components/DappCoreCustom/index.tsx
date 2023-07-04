@@ -13,6 +13,7 @@ import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useRecoilValue } from "recoil";
 import { getTransactionsByHashes } from "./getTransactionsByHashes";
 import { sendSignedTransactionsAsync } from "./sendSignedTransactionAsync";
+import { delay } from "helper/common";
 const CustomTransactionsTracker = () => {
     const { pendingTransactionsArray } = useGetPendingTransactions();
     const lastCompletedTxHash = useRecoilValue(lastCompletedTxHashAtom);
@@ -41,6 +42,7 @@ const CustomTransactionsTracker = () => {
             const completedTxs = serverTransactions.filter(
                 (tx) => tx.raw && tx.status !== "pending"
             );
+            await delay(2_000);
             emitter.emit("onCheckBatchResult", completedTxs);
             return serverTransactions;
         },

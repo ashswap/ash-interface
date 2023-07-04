@@ -66,6 +66,9 @@ const DAOFCAddFarmFormForwardRef = forwardRef<DAOFormRefMethods>(
                         ContractManager.getFarmControllerContract(
                             ASHSWAP_CONFIG.dappContract.farmController
                         ).contract.methods.addFarm([address, farmType]),
+                        ContractManager.getFarmRouterContract(
+                            ASHSWAP_CONFIG.dappContract.farmRouter
+                        ).contract.methods.startProduceRewards([address]),
                     ];
                 },
             }),
