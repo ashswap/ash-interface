@@ -185,6 +185,7 @@ const useAshBaseStateQuery = (config?: SWRConfiguration) => {
                         midFee
                         outFee
                         feeGamma
+                        state
                     }
                     tokens {
                         ...allTokenProps
