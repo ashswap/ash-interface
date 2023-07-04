@@ -31,7 +31,7 @@ export const fbTreasuresSelector = selectorFamily<TokenAmount[], string>({
     get: (farmAddress) => ({get}) => {
         const fbFarm = get(fbFarmSelector(farmAddress));
         const fcFarm = get(fcFarmSelector(farmAddress));
-        return fbFarm?.rewards.map(r => {
+        return fbFarm?.rewards.filter(r => !!TOKENS_MAP[r.tokenId]).map(r => {
             const currentAlloc = new BigNumber(r.rewardPerVote).multipliedBy(fcFarm?.votedPoint.bias || 0).idiv(PRECISION);
             const available = new BigNumber(r.total).minus(r.claimed);
             const nextWeek = available.minus(currentAlloc);
