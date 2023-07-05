@@ -10,12 +10,12 @@ import ICSetting from "assets/svg/setting.svg";
 import IconWallet from "assets/svg/wallet.svg";
 import {
     accIsInsufficientEGLDState,
-    accIsLoggedInState
+    accIsLoggedInState,
 } from "atoms/dappState";
 import {
     ashRawPoolV1ByAddressQuery,
     ashRawPoolV2ByAddressQuery,
-    poolV1FeesQuery
+    poolV1FeesQuery,
 } from "atoms/poolsState";
 import BigNumber from "bignumber.js";
 import Avatar from "components/Avatar";
@@ -32,12 +32,13 @@ import OnboardTooltip from "components/Tooltip/OnboardTooltip";
 import { blockTimeMs } from "const/dappConfig";
 import { useSwap } from "context/swap";
 import { toEGLDD } from "helper/balance";
+import { ContractManager } from "helper/contracts/contractManager";
 import { queryPoolContract } from "helper/contracts/pool";
 import CurveV2 from "helper/curveV2/swap";
 import { Fraction } from "helper/fraction/fraction";
 import { Percent } from "helper/fraction/percent";
 import { formatAmount } from "helper/number";
-import { calculateEstimatedSwapOutputAmount2 } from "helper/stableswap/calculator/amounts";
+import { calculateEstimatedSwapOutputAmount } from "helper/stableswap/calculator/amounts";
 import { calculateSwapPrice } from "helper/stableswap/calculator/price";
 import { getTokenIdFromCoin } from "helper/token";
 import { Price } from "helper/token/price";
@@ -57,6 +58,7 @@ import { useRecoilCallback, useRecoilValue } from "recoil";
 import { useDebounce } from "use-debounce";
 import SwapAmount from "./components/SwapAmount";
 import styles from "./Swap.module.css";
+import { TOKENS_MAP } from "const/tokens";
 
 const MaiarPoolTooltip = ({
     children,
@@ -286,16 +288,19 @@ const Swap = () => {
                     const rawPool = await snapshot.getPromise(
                         ashRawPoolV1ByAddressQuery(pool.address || "")
                     );
-                    if (!rawPool) return;
+                    const tokenFromId = getTokenIdFromCoin(tokenAmountFrom.token.identifier);
+                    const tokenToId = getTokenIdFromCoin(tokenTo.identifier);
+                    if (!rawPool || !tokenFromId || !tokenToId) return;
                     const reserves = pool.tokens.map(
                         (t, i) => new TokenAmount(t, rawPool.reserves[i])
                     );
-                    const estimated = calculateEstimatedSwapOutputAmount2(
+                    const estimated = calculateEstimatedSwapOutputAmount(
                         new BigNumber(rawPool?.ampFactor || 0),
                         reserves,
-                        tokenAmountFrom,
-                        tokenTo,
-                        fees
+                        new TokenAmount(TOKENS_MAP[tokenFromId], tokenAmountFrom.raw),
+                        TOKENS_MAP[tokenToId],
+                        fees,
+                        rawPool.underlyingPrices.map((p) => new BigNumber(p))
                     );
                     return estimated;
                 }
@@ -306,7 +311,6 @@ const Swap = () => {
     const calcPriceImpact = useRecoilCallback(
         ({ snapshot }) =>
             async () => {
-                
                 if (
                     !pool ||
                     !tokenFrom ||
@@ -361,23 +365,28 @@ const Swap = () => {
                             const amt = new TokenAmount(tokenTo, dy);
                             price = new Price(inputAmount, amt);
                         } catch (error) {
-                            Sentry.captureException(error, {extra: {poolV2: pool.address}})
+                            Sentry.captureException(error, {
+                                extra: { poolV2: pool.address },
+                            });
                         }
                     }
                 } else {
                     const rawPool = await snapshot.getPromise(
                         ashRawPoolV1ByAddressQuery(pool.address)
                     );
-                    if (!rawPool) return;
+                    const tokenFromId = getTokenIdFromCoin(tokenFrom.identifier);
+                    const tokenToId = getTokenIdFromCoin(tokenTo.identifier);
+                    if (!rawPool || !tokenFromId || !tokenToId) return;
                     const reserves = pool.tokens.map(
                         (t, i) => new TokenAmount(t, rawPool.reserves[i])
                     );
                     price = calculateSwapPrice(
                         new BigNumber(rawPool?.ampFactor || 0),
                         reserves,
-                        tokenFrom,
-                        tokenTo,
-                        fees
+                        TOKENS_MAP[tokenFromId],
+                        TOKENS_MAP[tokenToId],
+                        fees,
+                        rawPool.underlyingPrices.map((p) => new BigNumber(p))
                     );
                 }
                 const rate = new Price(tokenAmountTo, tokenAmountFrom);
@@ -484,7 +493,7 @@ const Swap = () => {
                 setSwapFeeAmt(estimated.fee.egld.toNumber());
             }
         });
-    }, [getAmountOut, setValueTo, pool, tokenTo, tokenAmountFrom])
+    }, [getAmountOut, setValueTo, pool, tokenTo, tokenAmountFrom]);
 
     const [calcPriceImpactDebounce] = useDebounce(calcPriceImpact, 750);
     const [calcAmountOutDebounce] = useDebounce(calcAmountOut, 200);
@@ -971,14 +980,16 @@ const Swap = () => {
                     <div className="flex justify-end">
                         <BaseModal.CloseBtn />
                     </div>
-                    <Setting />
-                    <BaseButton
-                        theme="pink"
-                        className="uppercase text-xs font-bold mt-10 h-12 w-full"
-                        onClick={() => setShowSetting(false)}
-                    >
-                        Confirm
-                    </BaseButton>
+                    <div className="p-6">
+                        <Setting />
+                        <BaseButton
+                            theme="pink"
+                            className="uppercase text-xs font-bold mt-10 h-12 w-full"
+                            onClick={() => setShowSetting(false)}
+                        >
+                            Confirm
+                        </BaseButton>
+                    </div>
                 </BaseModal>
             )}
         </div>

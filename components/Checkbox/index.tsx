@@ -1,10 +1,11 @@
+import customTwMerge from "helper/customTwMerge";
 import { ChangeEvent } from "react";
 import styles from "./Checkbox.module.css";
 
 interface Props {
     className?: string | undefined;
     onChange?: (checked: boolean) => void;
-    text: any;
+    text?: any;
     checked?: boolean;
 }
 
@@ -19,7 +20,7 @@ const Checkbox = (props: Props) => {
     };
 
     return (
-        <label className={`${styles.container} ${props.className || ""}`}>
+        <label className={customTwMerge(styles.container, "pl-7 font-normal text-xs", props.className)}>
             {props.text}
             <input
                 className={styles.input}

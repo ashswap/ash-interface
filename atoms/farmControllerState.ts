@@ -4,7 +4,7 @@ import {
     FarmType,
 } from "graphql/type.graphql";
 import { FarmWeightChartRecord } from "interface/chart";
-import { atom, selectorFamily } from "recoil";
+import { atom, selector, selectorFamily } from "recoil";
 import { ashswapBaseState } from "./ashswap";
 
 export const fcFarmWeightChartRecordsAtom = atom<FarmWeightChartRecord[]>({
@@ -15,6 +15,7 @@ export const fcNextFarmWeightChartRecordsAtom = atom<FarmWeightChartRecord[]>({
     key: "next_farm_weight_allocation_chart_records_atom",
     default: [],
 });
+
 export const fcFarmSelector = selectorFamily<
     FarmInController | undefined,
     string | undefined
@@ -30,6 +31,13 @@ export const fcFarmSelector = selectorFamily<
             );
         },
 });
+export const fcTypesSelector = selector({
+    key: "fc_types_selector",
+    get: ({get}) => {
+        const base = get(ashswapBaseState);
+        return base.farmController?.farmTypes || [] as FarmType[];
+    }
+})
 export const fcTypeSelector = selectorFamily<
     FarmType | undefined,
     number | undefined

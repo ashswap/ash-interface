@@ -1,5 +1,5 @@
-import { TokenPayment } from "@multiversx/sdk-core/out";
-import { farmQuery, farmSessionIdMapState } from "atoms/farmsState";
+import { TokenTransfer } from "@multiversx/sdk-core/out";
+import { farmNumberOfAdditionalRewards, farmQuery, farmSessionIdMapState } from "atoms/farmsState";
 import { ASH_TOKEN } from "const/tokens";
 
 import { toEGLDD } from "helper/balance";
@@ -19,13 +19,16 @@ const useFarmClaimReward = (trackStatus = false) => {
                 const farmRecord = await snapshot.getPromise(
                     farmQuery(farm.farm_address)
                 );
+                const numberOfAdditionalRewards = await snapshot.getPromise(
+                    farmNumberOfAdditionalRewards(farm.farm_address)
+                );
 
                 if (!farmRecord || !farmRecord.stakedData)
                     return { sessionId: "" };
 
                 const { stakedData } = farmRecord;
                 const tokenPayments = stakedData.farmTokens.map((t) =>
-                    TokenPayment.metaEsdtFromBigInteger(
+                    TokenTransfer.metaEsdtFromBigInteger(
                         t.collection,
                         t.nonce.toNumber(),
                         t.balance,
@@ -35,15 +38,12 @@ const useFarmClaimReward = (trackStatus = false) => {
                 const txs = await ContractManager.getFarmContract(
                     farm.farm_address
                 )
-                    .withLastRewardBlockTs(farmRecord.lastRewardBlockTs)
+                    .withContext({lastRewardBlockTs: farmRecord.lastRewardBlockTs, numberOfAdditionalRewards})
                     .claimRewards(tokenPayments, false);
                 const payload: DappSendTransactionsPropsType = {
                     transactions: txs,
                     transactionsDisplayInfo: {
-                        successMessage: `Claim succeed ${toEGLDD(
-                            ASH_TOKEN.decimals,
-                            stakedData.totalRewardAmt
-                        )} ${ASH_TOKEN.symbol}`,
+                        successMessage: `Claim rewards succeed`,
                     },
                 };
                 const result = await sendTransactions(payload);

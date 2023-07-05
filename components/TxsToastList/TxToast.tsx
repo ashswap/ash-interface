@@ -344,6 +344,7 @@ export const TxToast = ({
             cancelled: errorMessage,
             fail: errorMessage,
             timedOut: timedOutMessage,
+            invalid: errorMessage,
         };
         return map[status!];
     }, [

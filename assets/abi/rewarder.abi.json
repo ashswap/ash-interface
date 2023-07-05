@@ -1,0 +1,380 @@
+{
+    "buildInfo": {
+        "rustc": {
+            "version": "1.72.0-nightly",
+            "commitHash": "2d0aa57684e10f7b3d3fe740ee18d431181583ad",
+            "commitDate": "2023-06-18",
+            "channel": "Nightly",
+            "short": "rustc 1.72.0-nightly (2d0aa5768 2023-06-18)"
+        },
+        "contractCrate": {
+            "name": "rewarder",
+            "version": "0.0.0",
+            "gitVersion": "mainnet-230217-38-gbfa04a7"
+        },
+        "framework": {
+            "name": "multiversx-sc",
+            "version": "0.39.8"
+        }
+    },
+    "name": "Rewarder",
+    "constructor": {
+        "inputs": [
+            {
+                "name": "ash_token_id",
+                "type": "TokenIdentifier"
+            },
+            {
+                "name": "reward_per_sec",
+                "type": "BigUint"
+            }
+        ],
+        "outputs": []
+    },
+    "endpoints": [
+        {
+            "name": "mintToken",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "amount",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "getAshTokenId",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "TokenIdentifier"
+                }
+            ]
+        },
+        {
+            "name": "getLastRewardPerSecTime",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "getFutureRewardPerSec",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "getFutureRewardPerSecTime",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "checkpointRewardPerSec",
+            "mutability": "mutable",
+            "inputs": [],
+            "outputs": []
+        },
+        {
+            "name": "getRewardPerSec",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "ts",
+                    "type": "u64"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "setRewardPerSec",
+            "onlyOwner": true,
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "reward_per_sec",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "getFarmContractWhitelist",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "variadic<Address>",
+                    "multi_result": true
+                }
+            ]
+        },
+        {
+            "name": "addFarmContractWhitelist",
+            "onlyOwner": true,
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "address",
+                    "type": "Address"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "removeFarmContractWhitelist",
+            "onlyOwner": true,
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "address",
+                    "type": "Address"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "sendToken",
+            "mutability": "mutable",
+            "payableInTokens": [
+                "*"
+            ],
+            "inputs": [
+                {
+                    "name": "token_id",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "amount",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "BigUint"
+                }
+            ]
+        },
+        {
+            "name": "depositRewards",
+            "mutability": "mutable",
+            "payableInTokens": [
+                "*"
+            ],
+            "inputs": [
+                {
+                    "name": "farm_address",
+                    "type": "Address"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "withdrawRewards",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "farm_address",
+                    "type": "Address"
+                },
+                {
+                    "name": "token_id",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "amount",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "startProduceRewards",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "farm_address",
+                    "type": "Address"
+                },
+                {
+                    "name": "token_id",
+                    "type": "TokenIdentifier"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "endProduceRewards",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "farm_address",
+                    "type": "Address"
+                },
+                {
+                    "name": "token_id",
+                    "type": "TokenIdentifier"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "setAdditionalRewards",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "farm_address",
+                    "type": "Address"
+                },
+                {
+                    "name": "token_id",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "reward_per_sec",
+                    "type": "BigUint"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "getFarmRouterAddress",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "Address"
+                }
+            ]
+        },
+        {
+            "name": "setFarmRouterAddress",
+            "onlyOwner": true,
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "address",
+                    "type": "Address"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "getPartnerAddressWhitelist",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "farm_address",
+                    "type": "Address"
+                },
+                {
+                    "name": "token_id",
+                    "type": "TokenIdentifier"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "Address"
+                }
+            ]
+        },
+        {
+            "name": "addPartnerAddressWhitelist",
+            "onlyOwner": true,
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "farm_address",
+                    "type": "Address"
+                },
+                {
+                    "name": "token_id",
+                    "type": "TokenIdentifier"
+                },
+                {
+                    "name": "partner_address",
+                    "type": "Address"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "removePartnerAddressWhitelist",
+            "onlyOwner": true,
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "farm_address",
+                    "type": "Address"
+                },
+                {
+                    "name": "token_id",
+                    "type": "TokenIdentifier"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "getPartnerTokenAttributes",
+            "mutability": "readonly",
+            "inputs": [
+                {
+                    "name": "farm_address",
+                    "type": "Address"
+                },
+                {
+                    "name": "token_id",
+                    "type": "TokenIdentifier"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "RewarderAttributes"
+                }
+            ]
+        }
+    ],
+    "events": [],
+    "hasCallback": false,
+    "types": {
+        "RewarderAttributes": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "reward_per_sec",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "reward_enabled",
+                    "type": "bool"
+                },
+                {
+                    "name": "partner_balances",
+                    "type": "BigUint"
+                },
+                {
+                    "name": "community_balances",
+                    "type": "BigUint"
+                }
+            ]
+        }
+    }
+}

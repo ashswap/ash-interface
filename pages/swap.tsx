@@ -1,16 +1,13 @@
 import BasicLayout from "components/Layout/Basic";
-import { SwapProvider } from "context/swap";
-import type { NextPage } from "next";
-import Swap from "views/swap/Swap";
+import { NextPageWithLayout } from "./_app";
+import Aggregator from "views/swap/Aggregator";
 
-const Home: NextPage = () => {
+const SwapPage: NextPageWithLayout = () => {
     return (
-        <BasicLayout>
-            <SwapProvider>
-                <Swap />
-            </SwapProvider>
-        </BasicLayout>
+        <Aggregator />
     );
 };
-
-export default Home;
+SwapPage.getLayout = function getLayout(page) {
+    return <BasicLayout>{page}</BasicLayout>;
+};
+export default SwapPage;

@@ -1,4 +1,4 @@
-import { TokenPayment } from "@multiversx/sdk-core/out";
+import { TokenTransfer } from "@multiversx/sdk-core/out";
 import { accInfoState } from "atoms/dappState";
 import BigNumber from "bignumber.js";
 import { WRAPPED_EGLD } from "const/wrappedEGLD";
@@ -18,7 +18,7 @@ const useUnwrapWEGLD = (trackStatus = false) => {
                 const tx = await ContractManager.getWrappedEGLDContract(
                     WRAPPED_EGLD.wegldContracts[shard || 0]
                 ).unwrapEgld(
-                    TokenPayment.fungibleFromBigInteger(
+                    TokenTransfer.fungibleFromBigInteger(
                         tokenAmount.token.identifier,
                         tokenAmount.raw,
                         tokenAmount.token.decimals

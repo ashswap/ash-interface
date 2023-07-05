@@ -1,27 +1,23 @@
-import { useDebounce } from "use-debounce";
 import ICChevronRight from "assets/svg/chevron-right.svg";
-import ICArrowRight from "assets/svg/arrow-right.svg";
 import {
     accIsInsufficientEGLDState,
     accIsLoggedInState,
 } from "atoms/dappState";
 import { FarmRecord } from "atoms/farmsState";
-import { lpTokenMapState } from "atoms/tokensState";
+import { tokenMapState } from "atoms/tokensState";
 import BigNumber from "bignumber.js";
 import Avatar from "components/Avatar";
 import BaseModal from "components/BaseModal";
-import Checkbox from "components/Checkbox";
 import GlowingButton from "components/GlowingButton";
 import InputCurrency from "components/InputCurrency";
 import TextAmt from "components/TextAmt";
-import { blockTimeMs } from "const/dappConfig";
-import { ASH_TOKEN } from "const/tokens";
 import { toEGLDD, toWei } from "helper/balance";
-import { formatAmount } from "helper/number";
 import useEnterFarm from "hooks/useFarmContract/useEnterFarm";
 import { useScreenSize } from "hooks/useScreenSize";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
+import { useDebounce } from "use-debounce";
+import FarmAPRBreakdown from "views/farms/FarmAPRBreakdown";
 type props = {
     open: boolean;
     onClose: () => void;
@@ -30,7 +26,7 @@ type props = {
 const StakeLPContent = ({ open, onClose, farmData }: props) => {
     const loggedIn = useRecoilValue(accIsLoggedInState);
     const { pool, farm, farmTokenSupply, ashPerSec, ashBaseAPR } = farmData;
-    const lpTokenMap = useRecoilValue(lpTokenMapState);
+    const tokenMap = useRecoilValue(tokenMapState);
     const insufficientEGLD = useRecoilValue(accIsInsufficientEGLDState);
     const [stakeAmt, setStakeAmt] = useState<BigNumber>(new BigNumber(0));
     const [rawStakeAmt, setRawStakeAmt] = useState("");
@@ -47,8 +43,8 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
     }, [deboundRawStakeAmt, loggedIn, pool]);
     const { enterFarm } = useEnterFarm();
     const LPBalance = useMemo(
-        () => new BigNumber(lpTokenMap[pool.lpToken.identifier]?.balance || 0),
-        [lpTokenMap, pool.lpToken]
+        () => new BigNumber(tokenMap[pool.lpToken.identifier]?.balance || 0),
+        [tokenMap, pool.lpToken]
     );
     const setMaxStakeAmt = useCallback(() => {
         if (!LPBalance) return;
@@ -57,21 +53,15 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
     }, [LPBalance, pool]);
     const ashPerDayBase = useMemo(() => {
         const baseFarmToken = stakeAmt.multipliedBy(0.4);
-        const totalAshPerDay = ashPerSec
-            .multipliedBy(24 * 60 * 60)
-            ;
+        const totalAshPerDay = ashPerSec.multipliedBy(24 * 60 * 60);
         const shareOfFarm = baseFarmToken.div(
             farmTokenSupply.plus(baseFarmToken)
         );
         return totalAshPerDay.multipliedBy(shareOfFarm);
     }, [stakeAmt, farmTokenSupply, ashPerSec]);
     const ashPerDayMax = useMemo(() => {
-        const totalAshPerDay = ashPerSec
-            .multipliedBy(24 * 60 * 60)
-            ;
-        const shareOfFarm = stakeAmt.div(
-            farmTokenSupply.plus(stakeAmt)
-        );
+        const totalAshPerDay = ashPerSec.multipliedBy(24 * 60 * 60);
+        const shareOfFarm = stakeAmt.div(farmTokenSupply.plus(stakeAmt));
         return totalAshPerDay.multipliedBy(shareOfFarm);
     }, [stakeAmt, farmTokenSupply, ashPerSec]);
     const insufficientLP = useMemo(() => {
@@ -93,7 +83,7 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
             </div>
             <div className="sm:flex sm:space-x-8 lg:space-x-24 mb-18">
                 <div className="flex flex-col grow mb-16 lg:mb-0">
-                    <div className="w-full grid md:grid-cols-2 gap-y-6 gap-x-4 lg:gap-x-7.5">
+                    <div className="w-full grid lg:grid-cols-2 gap-y-6 gap-x-4 lg:gap-x-7.5">
                         <div>
                             <div className="text-ash-gray-500 text-xs lg:text-sm font-bold mb-2 lg:mb-4">
                                 Token
@@ -157,59 +147,12 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
                         </div>
                     </div>
                 </div>
-                <div className="w-full sm:w-1/3 lg:w-[17.8125rem] shrink-0 bg-stake-dark-500 py-[2.375rem] px-10">
-                    <div className="text-white text-lg font-bold mb-16">
-                        Estimate Farming
-                    </div>
-                    <div className="flex flex-col space-y-11">
-                        <div>
-                            <div className="text-ash-gray-500 text-xs mb-2">
-                                ASH earn per day
-                            </div>
-                            <div className="text-white text-lg font-bold">
-                                <TextAmt
-                                    number={toEGLDD(
-                                        ASH_TOKEN.decimals,
-                                        ashPerDayBase
-                                    )}
-                                    decimalClassName="text-stake-gray-500"
-                                />
-                                <ICArrowRight/>
-                                <TextAmt
-                                    number={toEGLDD(
-                                        ASH_TOKEN.decimals,
-                                        ashPerDayMax
-                                    )}
-                                    decimalClassName="text-stake-gray-500"
-                                />
-                            </div>
-                        </div>
-                        <div>
-                            <div className="text-ash-gray-500 text-xs mb-2">
-                                ASH rewards
-                            </div>
-                            <div className="text-white text-lg font-bold">
-                                <span>
-
-                                {formatAmount(ashBaseAPR || 0, {
-                                    notation: "standard",
-                                })}
-                                %
-                                </span>
-                                <ICArrowRight/>
-                                <span>
-                                {formatAmount(ashBaseAPR * 2.5 || 0, {
-                                    notation: "standard",
-                                })}
-                                %
-                                </span>
-                            </div>
-                        </div>
-                    </div>
+                <div className="w-full sm:w-1/2 lg:w-[18.4375rem] shrink-0 bg-stake-dark-500 py-9 px-7.5">
+                    <FarmAPRBreakdown farmAddress={farm.farm_address} />
                 </div>
             </div>
             <div className="sm:flex sm:space-x-8 lg:space-x-24">
-                <div className="w-full mb-12 sm:mb-0 sm:grow">
+                <div className="w-full mb-12 sm:mb-0 md:grow">
                     <span className="text-xs text-ash-gray-500">
                         Make sure you have read the{" "}
                         <a
@@ -224,7 +167,7 @@ const StakeLPContent = ({ open, onClose, farmData }: props) => {
                         and understood the associated risks.
                     </span>
                 </div>
-                <div className="w-full sm:w-1/3 lg:w-[17.8125rem] shrink-0">
+                <div className="w-full sm:w-1/2 lg:w-[18.4375rem] shrink-0">
                     <div className="border-notch-x border-notch-white/50">
                         <GlowingButton
                             theme="cyan"

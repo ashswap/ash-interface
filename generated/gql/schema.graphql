@@ -1,0 +1,531 @@
+type AdditionalReward {
+  periodRewardEnd: Int!
+  rewardPerSec: String!
+  rewardPerShare: String!
+  tokenId: String!
+}
+
+type BlockShard {
+  epoch: String!
+  gasConsumed: Int!
+  gasPenalized: Int!
+  gasRefunded: Int!
+  hash: String!
+  maxGasLimit: String!
+  nonce: String!
+  prevHash: String!
+  proposer: String!
+  pubKeyBitmap: String!
+  round: Int!
+  shard: String!
+  size: Int!
+  sizeTxs: Int!
+  stateRootHash: String!
+  timestamp: Int!
+  txCount: Int!
+}
+
+type Blockchain {
+  blockShards: [BlockShard!]
+}
+
+type BoyStatistic {
+  cheating_level: Int
+  claim_value: Float
+  rank: Int
+  wallet: Wallet
+}
+
+type Cheating {
+  cheating_level: Int
+  evidence: String
+  wallet_address: String
+}
+
+type DAOActionArguments {
+  argument_length: Int
+}
+
+type DAOBribeReward {
+  reward_amount: String!
+  token_id: String!
+}
+
+type DAOProposal {
+  arguments: String!
+  bribes: [DAOBribeReward!]!
+  created_at: Int!
+  dest_address: String!
+  execute_time_limit: Int!
+  executed_at: Int!
+  executed_by: String!
+  function_name: String!
+  ipfs_hash: String!
+  min_power_for_propose: String!
+  min_quorum_pct: String!
+  min_support_pct: String!
+  min_time_for_propose: Int!
+  no_vote: String!
+  proposal_id: Int!
+  proposer: String!
+  queue_time_limit: Int!
+  state: String!
+  total_supply: String!
+  voting_time_limit: Int!
+  yes_vote: String!
+}
+
+type DAOProposalConfig {
+  execute_time_limit: Int!
+  min_power_for_propose: String!
+  min_quorum_pct: String!
+  min_support_pct: String!
+  min_time_for_propose: Int!
+  queue_time_limit: Int!
+  voting_time_limit: Int!
+}
+
+type DAOProposalDetail {
+  proposal: DAOProposal
+  top_againsters: [[String!]!]!
+  top_supporters: [[String!]!]!
+  top_voters: [[String!]!]!
+}
+
+type Defillama {
+  pools: [DefillamaPool]
+  totalValueLockedUSD: Float
+  totalValueStakedUSD: Float
+  totalVolumeUSD24h: Float
+}
+
+type DefillamaPool {
+  address: String
+  apyBase: Float
+  apyReward: Float
+  tokens: [String]
+  tvlUsd: Float
+}
+
+type FBAccount {
+  farms: [FBAccountFarm!]!
+}
+
+type FBAccountFarm {
+  address: String!
+  rewards: [FBAccountReward!]!
+}
+
+type FBAccountReward {
+  claimable: String!
+  lastUserClaim: Int!
+  tokenId: String!
+}
+
+type FBFarm {
+  address: String!
+  rewards: [FBReward!]!
+}
+
+type FBReward {
+  activePeriod: Int!
+  claimed: String!
+  reserve: String!
+  rewardPerVote: String!
+  tokenId: String!
+  total: String!
+}
+
+type Farm {
+  account: FarmAccount
+  additionalRewards: [AdditionalReward!]!
+  address: String!
+  divisionSafetyConstant: String
+  farmToken: Token!
+  farmTokenSupply: String
+  farmingToken: Token!
+  farmingTokenBalance: String
+  lastRewardBlockTs: Int
+  produceRewardEnabled: Boolean
+  rewardPerSec: String
+  rewardPerShare: String
+  rewardToken: Token!
+  shard: String
+  state: Boolean
+}
+
+type FarmAccount {
+  slopeBoosted: String
+}
+
+type FarmBribe {
+  account: FBAccount
+  address: String!
+  farms: [FBFarm!]!
+  whitelistTokens: [Token!]!
+}
+
+type FarmController {
+  account: FcAccount
+  address: String!
+  farmTypes: [FarmType!]
+  farms: [FarmInController!]
+  nextTotalWeight: String!
+  timeTotal: Int!
+  totalWeight: String!
+}
+
+type FarmInController {
+  address: String!
+  farmType: Int!
+  nextRelativeWeight: String!
+  nextVotedPoint: VotedPoint!
+  relativeWeight: String!
+  votedPoint: VotedPoint!
+}
+
+type FarmInControllerAccount {
+  address: String!
+  lastUserVote: Int!
+  voteUserSlope: VotedSlope
+}
+
+type FarmType {
+  farmType: Int!
+  name: String!
+  nextWeight: String!
+  weight: String!
+}
+
+type FcAccount {
+  farms: [FarmInControllerAccount!]
+  voteUserPower: String!
+}
+
+type FdAccount {
+  reward: String
+}
+
+type FeeDistributor {
+  account: FdAccount
+  address: String!
+  rewardToken: Token!
+}
+
+type Governance {
+  adminFee: Float
+  summaries(limit: Int, offset: Int): [Summary]
+  votingPower: [[String]]
+}
+
+type LeaderBoard {
+  ash_farming_reward_amount: [Float]
+  ash_farming_reward_in_usd: [Float]
+  cheating_level: Int
+  gov_claimable_token_amount: Float
+  gov_claimable_token_in_usd: Float
+  gov_staked_amount: Float
+  gov_staked_in_usd: Float
+  lp_token_amount: [Float]
+  lp_token_in_usd: [Float]
+  lp_token_staked_amount: [Float]
+  lp_token_staked_in_usd: [Float]
+  record_id: Int
+  timestamp: Int
+  token_amount: [Float]
+  token_in_usd: [Float]
+  total_value_in_usd: Float
+  wallet_address: String
+}
+
+type LiquidityDistribution {
+  liquidity: Float
+  token: String
+}
+
+type Locked {
+  amount: String
+  end: String
+}
+
+type PaginationProposals {
+  proposals: [DAOProposal!]!
+  total: Int!
+}
+
+type Pool {
+  address: ID!
+  adminFeePercent: String
+  ampFactor: String
+  apr: PoolApr
+  graphStatistic: [[Float]]
+  lpToken: Token!
+  reserves: [String!]!
+  state: Boolean
+  statistic: PoolStatistic
+  swapFeePercent: String
+  tokens: [Token!]!
+  totalSupply: String
+  underlyingPrices: [String!]!
+}
+
+type PoolApr {
+  address: String
+  apr: [[Float]]
+}
+
+type PoolStatistic {
+  address: String
+  apr: Float
+  timestamp: Int
+  token_1_admin_fee_usd: Float
+  token_1_amount: Float
+  token_1_amount_usd: Float
+  token_1_total_fee_usd: Float
+  token_2_admin_fee_usd: Float
+  token_2_amount: Float
+  token_2_amount_usd: Float
+  token_2_total_fee_usd: Float
+  token_3_admin_fee_usd: Float
+  token_3_amount: Float
+  token_3_amount_usd: Float
+  token_3_total_fee_usd: Float
+  transaction_count: Int
+  tvl: Float
+  unique_traders: Float
+  volume_usd: Float
+}
+
+type PoolTransaction {
+  action: String
+  admin_fee_1: String
+  admin_fee_1_usd: Float
+  admin_fee_2: String
+  admin_fee_2_usd: Float
+  admin_fee_3: String
+  admin_fee_3_usd: Float
+  amount_1: String
+  amount_1_usd: Float
+  amount_2: String
+  amount_2_usd: Float
+  amount_3: String
+  amount_3_usd: Float
+  caller: String
+  lp_token_amount: String
+  lp_token_supply: String
+  receiver: String
+  reserve_1: String
+  reserve_2: String
+  reserve_3: String
+  timestamp: Int
+  token_id_1: String
+  token_id_2: String
+  token_id_3: String
+  total_fee_1: String
+  total_fee_1_usd: Float
+  total_fee_2: String
+  total_fee_2_usd: Float
+  total_fee_3: String
+  total_fee_3_usd: Float
+  transaction_hash: String
+}
+
+type PoolV2 {
+  address: String!
+  adjustmentStep: String!
+  adminFee: String!
+  allowedExtraProfit: String!
+  ampFactor: String!
+  d: String!
+  fee: String!
+  feeGamma: String!
+  futureAGammaTime: Int!
+  gamma: String!
+  initialAGammaTime: Int!
+  isNotAdjusted: Boolean!
+  lastPriceTs: Int!
+  lastPrices: String!
+  lpPrice: String!
+  lpToken: Token!
+  maHalfTime: Int!
+  midFee: String!
+  outFee: String!
+  priceOracle: String!
+  priceScale: String!
+  realReserves: [String!]!
+  reserves: [String!]!
+  state: Boolean!
+  tokens: [Token!]!
+  totalSupply: String!
+  virtualPrice: String!
+  xcpProfit: String!
+  xcpProfitA: String!
+  xp: [String!]!
+}
+
+type Query {
+  adminFee: Float
+  ashSupply: String!
+  blockchain: Blockchain!
+  boyStatistic(address: String): BoyStatistic
+  cheating: [Cheating]
+  closedDAOProposals(limit: Int, offset: Int, states: [String!]): PaginationProposals!
+  daoWhitelistFunctions: String!
+  defillama: Defillama
+  farmBribe(address: String): FarmBribe!
+  farmController(address: String): FarmController!
+  farms(address: String!): [Farm!]
+  feeDistributor(address: String!): FeeDistributor!
+  governance: Governance!
+  leaderboard: [LeaderBoard]
+  liquidity: [[Float!]]
+  liquidityDistribution(pool_addresses: String): [LiquidityDistribution]
+  openedDAOProposals: [DAOProposal!]!
+  poolTransaction(limit: Int, offset: Int, pool_address: String): [PoolTransaction]
+  pools(pool_address: String): [Pool]
+  poolsV2: [PoolV2!]!
+  proposalConfig(address: String!, functionName: String!): DAOProposalConfig
+  proposalDetail(id: Int!): DAOProposalDetail
+  rewarder: Rewarder!
+  summaries(limit: Int, offset: Int): [Summary]
+  tokenTransactions(limit: Int, offset: Int, token_id: String): [TokenTransacion]
+  tokens(token_ids: String): [Token!]
+  volume: [[Float!]]
+  votingEscrows(address: String!): [VotingEscrow!]
+  votingPower: [[String]]
+}
+
+type Rewarder {
+  address: String!
+  futureRewardPerSec: Int!
+  futureRewardPerSecTime: Int!
+  lastRewardPerSecTime: Int!
+  rewardPerSec: String!
+}
+
+type Summary {
+  from_timestamp: String
+  to_timestamp: String
+  total_admin_fee_in_usd: Float
+}
+
+type Token {
+  graphStatistic: [[Float]]
+  id: String
+  price: Float
+  statistic: TokenStatistic
+  tokenFee: TokenFee
+  tokenPool: [TokenPool]
+}
+
+type TokenFee {
+  fee: [[Float]]
+  token: String
+}
+
+type TokenPool {
+  address: String
+  apr: Float
+  timestamp: String
+  token_1_admin_fee_usd: Float
+  token_1_amount: String
+  token_1_amount_usd: Float
+  token_1_total_fee_usd: Float
+  token_2_admin_fee_usd: Float
+  token_2_amount: String
+  token_2_amount_usd: Float
+  token_2_total_fee_usd: Float
+  token_3_admin_fee_usd: String
+  token_3_amount: String
+  token_3_amount_usd: Float
+  token_3_total_fee_usd: Float
+  transaction_count: Int
+  tvl: Float
+  unique_traders: String
+  volume_usd: Float
+}
+
+type TokenStatistic {
+  change_percentage_day: Float!
+  change_percentage_hour: Float!
+  change_percentage_week: Float!
+  liquidity: Float!
+  price: Float!
+  transaction_count: Float!
+  volume: Float!
+}
+
+type TokenTransacion {
+  action: String
+  admin_fee_1: String
+  admin_fee_1_usd: Float
+  admin_fee_2: String
+  admin_fee_2_usd: Float
+  admin_fee_3: String
+  admin_fee_3_usd: Float
+  amount_1: String
+  amount_1_usd: Float
+  amount_2: String
+  amount_2_usd: Float
+  amount_3: String
+  amount_3_usd: Float
+  caller: String
+  lp_token_amount: String
+  lp_token_supply: String
+  receiver: String
+  reserve_1: String
+  reserve_2: String
+  reserve_3: String
+  timestamp: Int
+  token_id_1: String
+  token_id_2: String
+  token_id_3: String
+  total_fee_1: String
+  total_fee_1_usd: Float
+  total_fee_2: String
+  total_fee_2_usd: Float
+  total_fee_3: String
+  total_fee_3_usd: Float
+  transaction_hash: String
+}
+
+type VeAccount {
+  locked: Locked
+}
+
+type VotedPoint {
+  bias: String!
+  slope: String!
+}
+
+type VotedSlope {
+  end: Int!
+  power: String!
+  slope: String!
+}
+
+type VotingEscrow {
+  account: VeAccount
+  address: String!
+  lockedToken: Token!
+  totalLock: String
+  veSupply: String
+}
+
+type Wallet {
+  ash_farming_reward_amount: [Float]
+  ash_farming_reward_in_usd: [Float]
+  gov_claimable_token_amount: Float
+  gov_claimable_token_in_usd: Float
+  gov_staked_amount: Float
+  gov_staked_in_usd: Float
+  lp_token_amount: [Float]
+  lp_token_in_usd: [Float]
+  lp_token_staked_amount: [Float]
+  lp_token_staked_in_usd: [Float]
+  timestamp: Int
+  token_amount: [Float]
+  token_in_usd: [Float]
+  total_value_in_usd: Float
+  wallet_address: String
+}

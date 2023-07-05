@@ -1,12 +1,12 @@
+import ICChevronLeft from "assets/svg/chevron-left.svg";
+import ICChevronRight from "assets/svg/chevron-right.svg";
 import BasicLayout from "components/Layout/Basic";
 import StakeLayout from "components/Layout/stake";
-import React, { ReactElement, useState } from "react";
+import { useScreenSize } from "hooks/useScreenSize";
+import { ReactElement, useState } from "react";
 import LPStakeCard from "views/stake/LPStakeCard";
 import MintStakeCard from "views/stake/MintStakeCard";
 import VoteStakeCard from "views/stake/VoteStakeCard";
-import ICChevronLeft from "assets/svg/chevron-left.svg";
-import ICChevronRight from "assets/svg/chevron-right.svg";
-import { useScreenSize } from "hooks/useScreenSize";
 
 const Slide = ({
     children,
@@ -135,7 +135,11 @@ function StakePage() {
 }
 
 StakePage.getLayout = function getLayout(page: ReactElement) {
-    return <StakeLayout>{page}</StakeLayout>;
+    return (
+        <BasicLayout>
+            <StakeLayout>{page}</StakeLayout>
+        </BasicLayout>
+    );
 };
 
 export default StakePage;

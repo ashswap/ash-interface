@@ -20,6 +20,7 @@ stages:
   NEXT_PUBLIC_ASH_WALLET_CONNECT_V2_PROJECT_ID: $WALLET_CONNECT_V2_PROJECT_ID
   NEXT_PUBLIC_TESTNET_PASS: $TESTNET_PASS
   NEXT_PUBLIC_SENTRY_DSN: $SENTRY_DSN
+  NEXT_PUBLIC_AG_TOKEN_SECRET: $AG_TOKEN_SECRET
   SENTRY_LOG_LEVEL: debug
   SENTRY_ORG: $SENTRY_ORG
   SENTRY_PROJECT: $SENTRY_PROJECT
@@ -160,7 +161,7 @@ deploy_ipfs_beta:
   NEXT_PUBLIC_ASH_SOCKET_EXTRA: 
   NEXT_PUBLIC_ASH_LOG_API: https://api-tracking.ashswap.io
   NEXT_PUBLIC_IPFS_API: https://ipfs-cluster-api-internal.bicarus.io
-  NEXT_PUBLIC_AG_API: https://aggregator.ashswap.io
+  NEXT_PUBLIC_AG_API: https://aggregator-internal.ashswap.io
   NEXT_PUBLIC_XEXCHANGE_GRAPH_API: https://graph.xexchange.com
 
 .job_template_prod: &job_template_prod
