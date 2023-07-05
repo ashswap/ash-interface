@@ -13,6 +13,7 @@ import CardTooltip from "components/Tooltip/CardTooltip";
 import { toEGLDD } from "helper/balance";
 import { formatAmount } from "helper/number";
 import { getTokenFromId } from "helper/token";
+import { EPoolState } from "interface/pool";
 import { Unarray } from "interface/utilities";
 import { useEffect, useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
@@ -99,13 +100,15 @@ function StakedPoolCardItem({
                     <div className="flex">
                         <button
                             className="clip-corner-1 clip-corner-br bg-ash-dark-400 hover:bg-ash-dark-300 active:bg-ash-dark-600 transition-all w-14 h-14 flex items-center justify-center text-yellow-600 mr-0.5"
-                            onClick={() => setOpenRemoveLiquidity(true)}
+                            disabled={poolData.state === EPoolState.Inactive}
+                            onClick={() => setOpenRemoveLiquidity(poolData.state !== EPoolState.Inactive)}
                         >
                             <ICMinus />
                         </button>
                         <button
                             className="clip-corner-1 clip-corner-bl bg-ash-dark-400 hover:bg-ash-dark-300 active:bg-ash-dark-600 transition-all w-14 h-14 flex items-center justify-center text-pink-600"
-                            onClick={() => setOpenAddLiquidity(true)}
+                            disabled={poolData.state === EPoolState.Inactive}
+                            onClick={() => setOpenAddLiquidity(poolData.state !== EPoolState.Inactive)}
                         >
                             <ICPlus />
                         </button>
