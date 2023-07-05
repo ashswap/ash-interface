@@ -5,10 +5,10 @@ import {
     accIsLoggedInState,
 } from "atoms/dappState";
 import {
-    ashRawPoolV1ByAddressQuery,
-    poolV1FeesQuery,
     PoolsState,
+    ashRawPoolV1ByAddressQuery,
     ashRawPoolV2ByAddressQuery,
+    poolV1FeesQuery,
 } from "atoms/poolsState";
 import { tokenMapState } from "atoms/tokensState";
 import BigNumber from "bignumber.js";
@@ -23,7 +23,6 @@ import { POOLS_MAP_ADDRESS } from "const/pool";
 import { MINIMUM_EGLD_AMT } from "const/wrappedEGLD";
 import { toEGLDD, toWei } from "helper/balance";
 import { ContractManager } from "helper/contracts/contractManager";
-import { Fraction } from "helper/fraction/fraction";
 import { calculateEstimatedMintAmount } from "helper/stableswap/calculator/amounts";
 import { getTokenFromId } from "helper/token";
 import { IESDTInfo } from "helper/token/token";
@@ -188,7 +187,6 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
     const addLP = useRecoilCallback(
         ({ snapshot }) =>
             async () => {
-                setAdding(true);
                 let mintAmt = new BigNumber(0);
                 if (pool.type === EPoolType.PoolV2) {
                     const rawPoolV2 = await snapshot.getPromise(
@@ -211,7 +209,7 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
                     const poolFee = await snapshot.getPromise(
                         poolV1FeesQuery(pool.address)
                     );
-                    if (!loggedIn || adding || !poolData) return;
+                    if (!loggedIn || !poolData) return;
                     const { ampFactor, reserves, totalSupply } = poolData;
                     if (!ampFactor || !reserves || !totalSupply) return;
 
@@ -222,11 +220,13 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
                         ),
                         poolFee.swap,
                         new TokenAmount(pool.lpToken, totalSupply),
-                        pool.tokens.map((t, i) => inputWeiValues[i])
+                        pool.tokens.map((t, i) => inputWeiValues[i]),
+                        poolData.underlyingPrices.map((p) => new BigNumber(p))
                     );
                     mintAmt = mintAmount.raw;
                 }
                 try {
+                    setAdding(true);
                     const { sessionId } = await addPoolLP(
                         pool,
                         pool.tokens.map((_t, i) => {
@@ -245,15 +245,7 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
                     setAdding(false);
                 }
             },
-        [
-            inputWeiValues,
-            pool,
-            onClose,
-            adding,
-            loggedIn,
-            addPoolLP,
-            setAddLPSessionId,
-        ]
+        [inputWeiValues, pool, onClose, loggedIn, addPoolLP, setAddLPSessionId]
     );
 
     const onChangeInputValue = useRecoilCallback(
@@ -286,13 +278,11 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
                                     .idiv(precisions[j].multipliedBy(scale))
                             );
                         });
-
-                        const inputValuesX = p.tokens.map((t, j) => {
-                            return inputWei
-                                .multipliedBy(poolV2.reserves[j])
-                                .idiv(poolV2.reserves[i]);
-                        });
-                    } else if (p.type === EPoolType.PlainPool) {
+                    } else if (
+                        p.type === EPoolType.PlainPool ||
+                        p.type === EPoolType.LendingPool ||
+                        p.type === EPoolType.MetaPool
+                    ) {
                         const poolV1 = await snapshot.getPromise(
                             ashRawPoolV1ByAddressQuery(pool.address)
                         );
@@ -447,7 +437,7 @@ const AddLiquidityContent = ({ onClose, poolData }: Props) => {
                     </div>
                     <div>
                         But if you need to swap to have the correct amounts, it
-                        is better to deposit in unbalanced/single-sided ways.
+                        is better to deposit in unbalanced/single-sided way.
                     </div>
                 </div>
             </div>

@@ -1,4 +1,4 @@
-import { TokenPayment, Transaction } from "@multiversx/sdk-core/out";
+import { TokenTransfer, Transaction } from "@multiversx/sdk-core/out";
 import { accIsLoggedInState } from "atoms/dappState";
 import { govUnlockTSSelector } from "atoms/govState";
 import BigNumber from "bignumber.js";
@@ -30,7 +30,7 @@ const useGovLockMore = (trackStatus = false) => {
                 );
 
                 if (weiAmt && weiAmt.gt(0)) {
-                    const tokenPayment = TokenPayment.fungibleFromBigInteger(
+                    const tokenPayment = TokenTransfer.fungibleFromBigInteger(
                         ASH_TOKEN.identifier,
                         weiAmt,
                         ASH_TOKEN.decimals

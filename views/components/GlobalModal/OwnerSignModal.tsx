@@ -21,7 +21,7 @@ const Content = ({ onRequestClose }: Pick<BaseModalType, "onRequestClose">) => {
                     new SignableMessage({ message: Buffer.from(msg) }),
                     { callbackUrl: window?.location?.href }
                 );
-                const signature = result.signature.hex();
+                const signature = result.signature.toString("hex");
                 set(questOwnerSignatureSelector, { signature });
             },
         [provider]

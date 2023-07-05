@@ -34,7 +34,7 @@ import GlobalModals from "views/components/GlobalModal";
 import * as gtag from "../helper/gtag";
 import "../styles/globals.css";
 
-type NextPageWithLayout = NextPage & {
+export type NextPageWithLayout = NextPage & {
     getLayout?: (page: ReactElement) => ReactNode;
 };
 
@@ -190,7 +190,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
                             <TxCompletedTracker />
                         </SocketProvider>
                         <GlobalModals />
-                        <div className="flex sm:flex-col fixed bottom-20 left-6 gap-4 text-center z-10">
+                        <div className="hidden sm:flex sm:flex-col fixed bottom-20 left-6 gap-4 text-center z-10">
                             <a
                                 href="https://event.ashswap.io"
                                 rel="noreferrer"

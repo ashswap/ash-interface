@@ -21,6 +21,7 @@ export type UserOnboardingStatus = {
     pool_deposit_checkbox?: boolean;
     pool_withdraw_input?: boolean;
     pool_withdraw_estimate?: boolean;
+    pool_withdraw_one_coin?: boolean;
     pool_farm_from_added_lp?: boolean;
     farm_zero_available_ve?: boolean;
     farm_expected_ve?: boolean;

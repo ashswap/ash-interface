@@ -6,13 +6,15 @@ import {
     PendingTransactionsType,
 } from "@multiversx/sdk-dapp/types/transactions.types";
 import { Unarray } from "interface/utilities";
+import { TransactionDecoder, TransactionMetadata } from "@elrondnetwork/transaction-decoder";
 
 export type GetTransactionsByHashesReturnType = Array<
-    Unarray<_> & { raw: any }
+    Unarray<_> & { raw: any, meta?: TransactionMetadata }
 >;
 export async function getTransactionsByHashes(
     pendingTransactions: PendingTransactionsType
 ): Promise<GetTransactionsByHashesReturnType> {
+    const decoder = new TransactionDecoder();
     const apiAddress = apiAddressSelector(store.getState());
     const hashes = pendingTransactions.map((tx) => tx.hash);
     const { data: responseData } = await axios.get(
@@ -43,6 +45,13 @@ export async function getTransactionsByHashes(
                 txOnNetwork && txOnNetwork.status !== previousStatus,
 
             raw: txOnNetwork,
+            meta: txOnNetwork ? decoder.getTransactionMetadata({
+                data: txOnNetwork.data,
+                receiver: txOnNetwork.receiver,
+                sender: txOnNetwork.sender,
+                value: "0",
+                type: "",
+            }) : undefined,
         };
     });
 }

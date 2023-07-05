@@ -20,8 +20,9 @@ const THEME = {
 };
 export type BaseButtonProps = JSX.IntrinsicElements["button"] & {
     theme?: keyof typeof THEME;
+    loading?: boolean;
 };
-function BaseButton({ theme, ...props }: BaseButtonProps) {
+function BaseButton({ theme, loading, ...props }: BaseButtonProps) {
     const className = useMemo(() => {
         const baseClassName =
             "inline-flex justify-center items-center text-center relative transition-all disabled:cursor-not-allowed disabled:opacity-50";
@@ -30,6 +31,7 @@ function BaseButton({ theme, ...props }: BaseButtonProps) {
     }, [theme, props.className]);
     return (
         <button {...props} className={className}>
+            {loading && <div className="w-5 h-5 mr-2 rounded-full border-t-transparent border-current border-4 animate-spin"></div>}
             {props.children}
         </button>
     );

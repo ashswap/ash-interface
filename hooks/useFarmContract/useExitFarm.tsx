@@ -1,14 +1,19 @@
-import { TokenPayment } from "@multiversx/sdk-core/out";
+import { TokenTransfer } from "@multiversx/sdk-core/out";
 import { accIsLoggedInState } from "atoms/dappState";
 import {
+    ashRawFarmQuery,
+    farmNumberOfAdditionalRewards,
     farmQuery,
     farmRecordsState,
     farmSessionIdMapState,
     FarmToken,
 } from "atoms/farmsState";
 import BigNumber from "bignumber.js";
+import { ASH_TOKEN, TOKENS_MAP } from "const/tokens";
 import { toEGLDD } from "helper/balance";
 import { ContractManager } from "helper/contracts/contractManager";
+import FarmContract from "helper/contracts/farmContract";
+import { TokenAmount } from "helper/token/tokenAmount";
 import useSendTxsWithTrackStatus from "hooks/useSendTxsWithTrackStatus";
 import { DappSendTransactionsPropsType } from "interface/dappCore";
 import { IFarm } from "interface/farm";
@@ -50,7 +55,7 @@ const calcUnstakeEntries2 = (weiAmt: BigNumber, farmTokens: FarmToken[]) => {
                 .integerValue(BigNumber.ROUND_FLOOR);
             const amt = lpBalance.lte(remain) ? lpBalance : remain;
             sum = sum.plus(amt);
-            return TokenPayment.metaEsdtFromBigInteger(
+            return TokenTransfer.metaEsdtFromBigInteger(
                 ft.collection,
                 ft.nonce.toNumber(),
                 amt.eq(remain)
@@ -68,7 +73,7 @@ const calcUnstakeEntries2 = (weiAmt: BigNumber, farmTokens: FarmToken[]) => {
             //     farmToken: ft,
             // };
         })
-        .filter((tp) => typeof tp !== "undefined") as TokenPayment[];
+        .filter((tp) => typeof tp !== "undefined") as TokenTransfer[];
 };
 const useExitFarm = (trackStatus = false) => {
     const { sendTransactions, trackingData, sessionId } =
@@ -84,18 +89,24 @@ const useExitFarm = (trackStatus = false) => {
                 const farmRecord = await snapshot.getPromise(
                     farmQuery(farm.farm_address)
                 );
+                const numberOfAdditionalRewards = await snapshot.getPromise(
+                    farmNumberOfAdditionalRewards(farm.farm_address)
+                );
 
                 if (!loggedIn) return { sessionId: "" };
                 const farmContract = ContractManager.getFarmContract(
                     farm.farm_address
-                ).withLastRewardBlockTs(farmRecord.lastRewardBlockTs);
+                ).withContext({
+                    lastRewardBlockTs: farmRecord.lastRewardBlockTs,
+                    numberOfAdditionalRewards,
+                });
                 if (!farmRecord || !farmRecord.stakedData)
                     return { sessionId: "" };
                 const { stakedData } = farmRecord;
                 const farmTokens = stakedData.farmTokens || [];
                 const entries = unstakeMax
                     ? farmTokens.map((t) =>
-                          TokenPayment.metaEsdtFromBigInteger(
+                          TokenTransfer.metaEsdtFromBigInteger(
                               t.collection,
                               t.nonce.toNumber(),
                               t.balance
@@ -133,8 +144,18 @@ const useExitFarm = (trackStatus = false) => {
                 const farmRecord = farmRecords.find(
                     (val) => val.farm.farm_address === farm.farm_address
                 );
-                if (!farmRecord?.stakedData?.farmTokens.length)
-                    return new BigNumber(0);
+                const rawFarm = await snapshot.getPromise(
+                    ashRawFarmQuery(farm.farm_address)
+                );
+                if (!farmRecord?.stakedData?.farmTokens.length || lpAmt.eq(0)) {
+                    const rewards = farmRecord?.tokensAPR?.map(
+                        (r) => new TokenAmount(TOKENS_MAP[r.tokenId], 0)
+                    ) || [];
+                    if(farmRecord?.ashPerSec.gt(0)){
+                        rewards.unshift(new TokenAmount(ASH_TOKEN, 0));
+                    }
+                    return rewards;
+                }
                 const entries = calcUnstakeEntries(
                     lpAmt,
                     farmRecord.stakedData.farmTokens
@@ -142,17 +163,40 @@ const useExitFarm = (trackStatus = false) => {
                 const farmContract = ContractManager.getFarmContract(
                     farm.farm_address
                 );
-                const rewards = entries.map(({ unstakeAmt, farmToken }) =>
+
+                const ashRewards = entries.map(({ unstakeAmt, farmToken }) =>
                     farmContract.calculateRewardsForGivenPosition(
                         unstakeAmt,
                         farmToken.attributes
                     )
                 );
-                const totalRewards = await Promise.all(rewards);
-                return totalRewards.reduce(
+
+                const rewards = FarmContract.estimateAdditionalRewards(
+                    entries.map((e) => ({
+                        ...e.farmToken,
+                        balance: e.unstakeAmt,
+                    })),
+                    new BigNumber(rawFarm?.divisionSafetyConstant || 0),
+                    farmRecord.lpLockedAmt,
+                    farmRecord.lastRewardBlockTs,
+                    rawFarm?.additionalRewards.filter(t => !!TOKENS_MAP[t.tokenId]).map((r) => ({
+                        token: TOKENS_MAP[r.tokenId],
+                        rewardPerShare: new BigNumber(r.rewardPerShare),
+                        rewardPerSec: new BigNumber(r.rewardPerSec),
+                        periodRewardEnd: r.periodRewardEnd,
+                    })) || []
+                ).filter((r) => r.greaterThan(0));
+
+                const totalRewards = await Promise.all(ashRewards);
+                const totalASH = totalRewards.reduce(
                     (total, val) => total.plus(val),
                     new BigNumber(0)
                 );
+                if (totalASH.gt(0)) {
+                    rewards.unshift(new TokenAmount(ASH_TOKEN, totalASH));
+                }
+
+                return rewards;
             },
         []
     );

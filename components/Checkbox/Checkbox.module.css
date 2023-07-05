@@ -1,6 +1,5 @@
 .container {
-    @apply relative block select-none cursor-pointer font-normal text-xs;
-    padding-left: 28px;
+    @apply relative block select-none cursor-pointer;
 }
 
 .container input {

@@ -1,4 +1,4 @@
-import { Address, TokenPayment } from "@multiversx/sdk-core/out";
+import { Address, TokenTransfer } from "@multiversx/sdk-core/out";
 import { getAddress } from "@multiversx/sdk-dapp/utils";
 import farmBribeAbi from "assets/abi/farm_bribe.abi.json";
 import Contract from "./contract";
@@ -8,11 +8,15 @@ class FarmBribeContract extends Contract<typeof farmBribeAbi> {
         super(address, farmBribeAbi);
     }
 
-    async addRewardAmount(farmAddress: Address, tokenPayments: TokenPayment[]) {
+    async addRewardAmount(
+        farmAddress: Address,
+        tokenPayments: TokenTransfer[]
+    ) {
         const sender = await getAddress();
         const interaction = this.contract.methods
             .addRewardAmount([farmAddress])
-            .withMultiESDTNFTTransfer(tokenPayments, new Address(sender))
+            .withMultiESDTNFTTransfer(tokenPayments)
+            .withSender(new Address(sender))
             .withGasLimit(50_000_000 + tokenPayments.length * 2_000_000);
         return this.interceptInteraction(interaction)
             .check()

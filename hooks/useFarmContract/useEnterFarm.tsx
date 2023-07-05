@@ -1,6 +1,10 @@
-import { TokenPayment } from "@multiversx/sdk-core/out";
+import { TokenTransfer } from "@multiversx/sdk-core/out";
 import { accAddressState, accIsLoggedInState } from "atoms/dappState";
-import { farmQuery, farmSessionIdMapState } from "atoms/farmsState";
+import {
+    farmNumberOfAdditionalRewards,
+    farmQuery,
+    farmSessionIdMapState
+} from "atoms/farmsState";
 import BigNumber from "bignumber.js";
 import { toEGLDD } from "helper/balance";
 import { ContractManager } from "helper/contracts/contractManager";
@@ -25,12 +29,18 @@ const useEnterFarm = (trackStatus = false) => {
                 const farmData = await snapshot.getPromise(
                     farmQuery(farm.farm_address)
                 );
+                const numberOfAdditionalRewards = await snapshot.getPromise(
+                    farmNumberOfAdditionalRewards(farmData.farm.farm_address)
+                );
 
                 if (!amtWei || amtWei.eq(0) || !loggedIn || !address)
                     return { sessionId: "" };
                 const farmContract = ContractManager.getFarmContract(
                     farm.farm_address
-                ).withLastRewardBlockTs(farmData.lastRewardBlockTs);
+                ).withContext({
+                    lastRewardBlockTs: farmData.lastRewardBlockTs,
+                    numberOfAdditionalRewards,
+                });
 
                 const farmTokenInWallet =
                     farmData.stakedData?.farmTokens.filter(
@@ -38,7 +48,7 @@ const useEnterFarm = (trackStatus = false) => {
                     ) || [];
 
                 const tokenPayments = farmTokenInWallet.map((t) =>
-                    TokenPayment.metaEsdtFromBigInteger(
+                    TokenTransfer.metaEsdtFromBigInteger(
                         t.collection,
                         t.nonce.toNumber(),
                         t.balance,
@@ -46,7 +56,7 @@ const useEnterFarm = (trackStatus = false) => {
                     )
                 );
                 tokenPayments.unshift(
-                    TokenPayment.fungibleFromBigInteger(
+                    TokenTransfer.fungibleFromBigInteger(
                         farm.farming_token_id,
                         amtWei,
                         farm.farming_token_decimal

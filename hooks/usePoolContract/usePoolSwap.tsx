@@ -3,10 +3,10 @@ import {
     BigUIntValue,
     ContractFunction,
     TokenIdentifierValue,
-    TokenPayment,
+    TokenTransfer,
     Transaction,
 } from "@multiversx/sdk-core/out";
-import { accInfoState } from "atoms/dappState";
+import { accAddressState, accInfoState } from "atoms/dappState";
 import BigNumber from "bignumber.js";
 import { TOKENS_MAP } from "const/tokens";
 import { WRAPPED_EGLD } from "const/wrappedEGLD";
@@ -54,12 +54,13 @@ const usePoolSwap = (trackStatus = false) => {
                             ),
                             new BigUIntValue(minWeiOut),
                         ],
+                        caller: new Address(await snapshot.getPromise(accAddressState))
                     });
                 } else if (pool.type === EPoolType.PoolV2) {
                     const poolContract = ContractManager.getPoolV2Contract(
                         pool.address
                     );
-                    const tokenPayment = TokenPayment.fungibleFromBigInteger(
+                    const tokenPayment = TokenTransfer.fungibleFromBigInteger(
                         getTokenIdFromCoin(tokenIn.identifier)!,
                         weiIn,
                         tokenIn.decimals
@@ -69,14 +70,14 @@ const usePoolSwap = (trackStatus = false) => {
                     const poolContract = ContractManager.getPoolContract(
                         pool.address
                     );
-                    const tokenPayment = TokenPayment.fungibleFromBigInteger(
+                    const tokenPayment = TokenTransfer.fungibleFromBigInteger(
                         getTokenIdFromCoin(tokenIn.identifier)!,
                         weiIn,
                         tokenIn.decimals
                     );
                     tx = await poolContract.exchange(
                         tokenPayment,
-                        tokenOut.identifier,
+                        getTokenIdFromCoin(tokenOut.identifier)!,
                         minWeiOut
                     );
                 }
@@ -93,7 +94,7 @@ const usePoolSwap = (trackStatus = false) => {
                         await ContractManager.getWrappedEGLDContract(
                             wegldContract
                         ).unwrapEgld(
-                            TokenPayment.fungibleFromBigInteger(
+                            TokenTransfer.fungibleFromBigInteger(
                                 wegld.identifier,
                                 minWeiOut,
                                 wegld.decimals

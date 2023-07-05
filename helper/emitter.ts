@@ -1,9 +1,9 @@
-import { TokenPayment } from "@multiversx/sdk-core/out";
+import { TokenTransfer } from "@multiversx/sdk-core/out";
 import { GetTransactionsByHashesReturnType } from "components/DappCoreCustom/getTransactionsByHashes";
 import mitt from "mitt";
 
 type Events = {
-    onTokenPaymentsSent: TokenPayment[];
+    onTokenPaymentsSent: TokenTransfer[];
     onCheckBatchResult: GetTransactionsByHashesReturnType;
 };
 

@@ -1,11 +1,12 @@
 import BigNumber from "bignumber.js";
+import { TokenAmount } from "helper/token/tokenAmount";
 import { FarmTokenAttrs, IFarm } from "interface/farm";
 import IPool from "interface/pool";
 import { PoolStatsRecord } from "interface/poolStats";
 import { IMetaESDT } from "interface/tokens";
 import { atom, selector, selectorFamily } from "recoil";
 import { KeyedMutator } from "swr";
-import { ViewType } from "views/stake/farms/FarmFilter";
+import { ViewType } from "views/farms/FarmFilter";
 import { ashswapBaseState } from "./ashswap";
 import { accAddressState } from "./dappState";
 export type FarmToken = {
@@ -29,6 +30,7 @@ export type FarmRecord = {
         farmTokens: FarmToken[];
         totalStakedLP: BigNumber;
         totalRewardAmt: BigNumber;
+        rewards: TokenAmount[];
         totalStakedLPValue: BigNumber;
         weightBoost: number;
         yieldBoost: number;
@@ -114,7 +116,7 @@ export const farmToDisplayState = selector<FarmRecord[]>({
         }
         switch (sortOption) {
             case "apr":
-                result = result.sort((x, y) => (y.totalAPRMax) - x.totalAPRMax);
+                result = result.sort((x, y) => y.totalAPRMax - x.totalAPRMax);
                 break;
             case "liquidity":
                 result = result.sort((x, y) =>
@@ -262,4 +264,13 @@ export const ashRawFarmQuery = selectorFamily({
 export const farmTokensRefresherAtom = atom<KeyedMutator<IMetaESDT[]>>({
     key: "refresh_farm_tokens_balance",
     default: () => Promise.resolve(undefined),
+});
+
+export const farmNumberOfAdditionalRewards = selectorFamily<number, string>({
+    key: "farm_number_of_additional_rewards",
+    get:
+        (address: string) =>
+        ({ get }) => {
+            return get(ashRawFarmQuery(address))?.additionalRewards.length || 0;
+        },
 });
