@@ -1,4 +1,3 @@
-
 /*
  * -------------------------------------------------------
  * THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
@@ -12,9 +11,9 @@
 export class Blockchain {
     __typename?: 'Blockchain';
     blockShards?: Nullable<BlockShard[]>;
-}
-
-export class BlockShard {
+  }
+  
+  export class BlockShard {
     __typename?: 'BlockShard';
     hash: string;
     epoch: string;
@@ -33,71 +32,127 @@ export class BlockShard {
     gasRefunded: number;
     gasPenalized: number;
     maxGasLimit: string;
-}
-
-export abstract class IQuery {
+  }
+  
+  export abstract class IQuery {
     __typename?: 'IQuery';
-
+  
     abstract blockchain(): Blockchain | Promise<Blockchain>;
-
-    abstract leaderboard(): Nullable<Nullable<LeaderBoard>[]> | Promise<Nullable<Nullable<LeaderBoard>[]>>;
-
-    abstract cheating(): Nullable<Nullable<Cheating>[]> | Promise<Nullable<Nullable<Cheating>[]>>;
-
-    abstract boyStatistic(address?: Nullable<string>): Nullable<BoyStatistic> | Promise<Nullable<BoyStatistic>>;
-
+  
+    abstract leaderboard():
+      | Nullable<Nullable<LeaderBoard>[]>
+      | Promise<Nullable<Nullable<LeaderBoard>[]>>;
+  
+    abstract cheating():
+      | Nullable<Nullable<Cheating>[]>
+      | Promise<Nullable<Nullable<Cheating>[]>>;
+  
+    abstract boyStatistic(
+      address?: Nullable<string>,
+    ): Nullable<BoyStatistic> | Promise<Nullable<BoyStatistic>>;
+  
     abstract openedDAOProposals(): DAOProposal[] | Promise<DAOProposal[]>;
-
-    abstract closedDAOProposals(limit?: Nullable<number>, offset?: Nullable<number>, states?: Nullable<string[]>): PaginationProposals | Promise<PaginationProposals>;
-
-    abstract proposalDetail(id: number): Nullable<DAOProposalDetail> | Promise<Nullable<DAOProposalDetail>>;
-
+  
+    abstract closedDAOProposals(
+      limit?: Nullable<number>,
+      offset?: Nullable<number>,
+      states?: Nullable<string[]>,
+    ): PaginationProposals | Promise<PaginationProposals>;
+  
+    abstract proposalDetail(
+      id: number,
+    ): Nullable<DAOProposalDetail> | Promise<Nullable<DAOProposalDetail>>;
+  
     abstract daoWhitelistFunctions(): string | Promise<string>;
-
-    abstract proposalConfig(address: string, functionName: string): Nullable<DAOProposalConfig> | Promise<Nullable<DAOProposalConfig>>;
-
-    abstract farmBribe(address?: Nullable<string>): FarmBribe | Promise<FarmBribe>;
-
-    abstract farmController(address?: Nullable<string>): FarmController | Promise<FarmController>;
-
+  
+    abstract proposalConfig(
+      address: string,
+      functionName: string,
+    ): Nullable<DAOProposalConfig> | Promise<Nullable<DAOProposalConfig>>;
+  
+    abstract farmBribe(
+      address?: Nullable<string>,
+    ): FarmBribe | Promise<FarmBribe>;
+  
+    abstract farmController(
+      address?: Nullable<string>,
+    ): FarmController | Promise<FarmController>;
+  
+    abstract farmRouter(): FarmRouter | Promise<FarmRouter>;
+  
     abstract farms(address: string): Nullable<Farm[]> | Promise<Nullable<Farm[]>>;
-
-    abstract feeDistributor(address: string): FeeDistributor | Promise<FeeDistributor>;
-
+  
+    abstract feeDistributor(
+      address: string,
+    ): FeeDistributor | Promise<FeeDistributor>;
+  
     abstract governance(): Governance | Promise<Governance>;
-
-    abstract liquidity(): Nullable<Nullable<number[]>[]> | Promise<Nullable<Nullable<number[]>[]>>;
-
+  
+    abstract liquidity():
+      | Nullable<Nullable<number[]>[]>
+      | Promise<Nullable<Nullable<number[]>[]>>;
+  
     abstract poolsV2(): PoolV2[] | Promise<PoolV2[]>;
-
-    abstract pools(pool_address?: Nullable<string>): Nullable<Nullable<Pool>[]> | Promise<Nullable<Nullable<Pool>[]>>;
-
-    abstract liquidityDistribution(pool_addresses?: Nullable<string>): Nullable<Nullable<LiquidityDistribution>[]> | Promise<Nullable<Nullable<LiquidityDistribution>[]>>;
-
-    abstract poolTransaction(pool_address?: Nullable<string>, limit?: Nullable<number>, offset?: Nullable<number>): Nullable<Nullable<PoolTransaction>[]> | Promise<Nullable<Nullable<PoolTransaction>[]>>;
-
+  
+    abstract pools(
+      pool_address?: Nullable<string>,
+    ): Nullable<Nullable<Pool>[]> | Promise<Nullable<Nullable<Pool>[]>>;
+  
+    abstract liquidityDistribution(
+      pool_addresses?: Nullable<string>,
+    ):
+      | Nullable<Nullable<LiquidityDistribution>[]>
+      | Promise<Nullable<Nullable<LiquidityDistribution>[]>>;
+  
+    abstract poolTransaction(
+      pool_address?: Nullable<string>,
+      limit?: Nullable<number>,
+      offset?: Nullable<number>,
+    ):
+      | Nullable<Nullable<PoolTransaction>[]>
+      | Promise<Nullable<Nullable<PoolTransaction>[]>>;
+  
     abstract rewarder(): Rewarder | Promise<Rewarder>;
-
+  
+    abstract router(): Router | Promise<Router>;
+  
     abstract ashSupply(): string | Promise<string>;
-
-    abstract summaries(limit?: Nullable<number>, offset?: Nullable<number>): Nullable<Nullable<Summary>[]> | Promise<Nullable<Nullable<Summary>[]>>;
-
+  
+    abstract summaries(
+      limit?: Nullable<number>,
+      offset?: Nullable<number>,
+    ): Nullable<Nullable<Summary>[]> | Promise<Nullable<Nullable<Summary>[]>>;
+  
     abstract adminFee(): Nullable<number> | Promise<Nullable<number>>;
-
-    abstract votingPower(): Nullable<Nullable<Nullable<string>[]>[]> | Promise<Nullable<Nullable<Nullable<string>[]>[]>>;
-
-    abstract volume(): Nullable<Nullable<number[]>[]> | Promise<Nullable<Nullable<number[]>[]>>;
-
+  
+    abstract votingPower():
+      | Nullable<Nullable<Nullable<string>[]>[]>
+      | Promise<Nullable<Nullable<Nullable<string>[]>[]>>;
+  
+    abstract volume():
+      | Nullable<Nullable<number[]>[]>
+      | Promise<Nullable<Nullable<number[]>[]>>;
+  
     abstract defillama(): Nullable<Defillama> | Promise<Nullable<Defillama>>;
-
-    abstract tokens(token_ids?: Nullable<string>): Nullable<Token[]> | Promise<Nullable<Token[]>>;
-
-    abstract tokenTransactions(token_id?: Nullable<string>, limit?: Nullable<number>, offset?: Nullable<number>): Nullable<Nullable<TokenTransacion>[]> | Promise<Nullable<Nullable<TokenTransacion>[]>>;
-
-    abstract votingEscrows(address: string): Nullable<VotingEscrow[]> | Promise<Nullable<VotingEscrow[]>>;
-}
-
-export class LeaderBoard {
+  
+    abstract tokens(
+      token_ids?: Nullable<string>,
+    ): Nullable<Token[]> | Promise<Nullable<Token[]>>;
+  
+    abstract tokenTransactions(
+      token_id?: Nullable<string>,
+      limit?: Nullable<number>,
+      offset?: Nullable<number>,
+    ):
+      | Nullable<Nullable<TokenTransacion>[]>
+      | Promise<Nullable<Nullable<TokenTransacion>[]>>;
+  
+    abstract votingEscrows(
+      address: string,
+    ): Nullable<VotingEscrow[]> | Promise<Nullable<VotingEscrow[]>>;
+  }
+  
+  export class LeaderBoard {
     __typename?: 'LeaderBoard';
     ash_farming_reward_amount?: Nullable<Nullable<number>[]>;
     ash_farming_reward_in_usd?: Nullable<Nullable<number>[]>;
@@ -116,24 +171,24 @@ export class LeaderBoard {
     token_in_usd?: Nullable<Nullable<number>[]>;
     total_value_in_usd?: Nullable<number>;
     wallet_address?: Nullable<string>;
-}
-
-export class Cheating {
+  }
+  
+  export class Cheating {
     __typename?: 'Cheating';
     cheating_level?: Nullable<number>;
     evidence?: Nullable<string>;
     wallet_address?: Nullable<string>;
-}
-
-export class BoyStatistic {
+  }
+  
+  export class BoyStatistic {
     __typename?: 'BoyStatistic';
     cheating_level?: Nullable<number>;
     claim_value?: Nullable<number>;
     rank?: Nullable<number>;
     wallet?: Nullable<Wallet>;
-}
-
-export class Wallet {
+  }
+  
+  export class Wallet {
     __typename?: 'Wallet';
     ash_farming_reward_amount?: Nullable<Nullable<number>[]>;
     ash_farming_reward_in_usd?: Nullable<Nullable<number>[]>;
@@ -150,34 +205,34 @@ export class Wallet {
     token_in_usd?: Nullable<Nullable<number>[]>;
     total_value_in_usd?: Nullable<number>;
     wallet_address?: Nullable<string>;
-}
-
-export class DAOActionArguments {
+  }
+  
+  export class DAOActionArguments {
     __typename?: 'DAOActionArguments';
     argument_length?: Nullable<number>;
-}
-
-export class DAOBribeReward {
+  }
+  
+  export class DAOBribeReward {
     __typename?: 'DAOBribeReward';
     token_id: string;
     reward_amount: string;
-}
-
-export class DAOExecuted {
+  }
+  
+  export class DAOExecuted {
     __typename?: 'DAOExecuted';
     executed_at: number;
     executed_by: string;
-}
-
-export class DAOAction {
+  }
+  
+  export class DAOAction {
     __typename?: 'DAOAction';
     dest_address: string;
     function_name: string;
     arguments: string;
     cost?: Nullable<string>;
-}
-
-export class DAOProposalConfig {
+  }
+  
+  export class DAOProposalConfig {
     __typename?: 'DAOProposalConfig';
     min_power_for_propose: string;
     min_time_for_propose: number;
@@ -188,9 +243,9 @@ export class DAOProposalConfig {
     execute_time_limit: number;
     max_action_allowed: number;
     action_required: string[];
-}
-
-export class DAOProposal {
+  }
+  
+  export class DAOProposal {
     __typename?: 'DAOProposal';
     proposer: string;
     metadata: string;
@@ -204,36 +259,36 @@ export class DAOProposal {
     proposal_id: number;
     state: string;
     bribes: DAOBribeReward[];
-}
-
-export class DAOProposalDetail {
+  }
+  
+  export class DAOProposalDetail {
     __typename?: 'DAOProposalDetail';
     proposal?: Nullable<DAOProposal>;
     top_voters: string[][];
     top_supporters: string[][];
     top_againsters: string[][];
-}
-
-export class PaginationProposals {
+  }
+  
+  export class PaginationProposals {
     __typename?: 'PaginationProposals';
     total: number;
     proposals: DAOProposal[];
-}
-
-export class FarmBribe {
+  }
+  
+  export class FarmBribe {
     __typename?: 'FarmBribe';
     address: string;
     farms: FBFarm[];
     account?: Nullable<FBAccount>;
-}
-
-export class FBFarm {
+  }
+  
+  export class FBFarm {
     __typename?: 'FBFarm';
     address: string;
     rewards: FBReward[];
-}
-
-export class FBReward {
+  }
+  
+  export class FBReward {
     __typename?: 'FBReward';
     tokenId: string;
     rewardPerVote: string;
@@ -241,27 +296,27 @@ export class FBReward {
     reserve: string;
     claimed: string;
     total: string;
-}
-
-export class FBAccount {
+  }
+  
+  export class FBAccount {
     __typename?: 'FBAccount';
     farms: FBAccountFarm[];
-}
-
-export class FBAccountFarm {
+  }
+  
+  export class FBAccountFarm {
     __typename?: 'FBAccountFarm';
     address: string;
     rewards: FBAccountReward[];
-}
-
-export class FBAccountReward {
+  }
+  
+  export class FBAccountReward {
     __typename?: 'FBAccountReward';
     tokenId: string;
     lastUserClaim: number;
     claimable: string;
-}
-
-export class FarmController {
+  }
+  
+  export class FarmController {
     __typename?: 'FarmController';
     address: string;
     timeTotal: number;
@@ -270,17 +325,17 @@ export class FarmController {
     farmTypes?: Nullable<FarmType[]>;
     farms?: Nullable<FarmInController[]>;
     account?: Nullable<FcAccount>;
-}
-
-export class FarmType {
+  }
+  
+  export class FarmType {
     __typename?: 'FarmType';
     farmType: number;
     name: string;
     weight: string;
     nextWeight: string;
-}
-
-export class FarmInController {
+  }
+  
+  export class FarmInController {
     __typename?: 'FarmInController';
     address: string;
     relativeWeight: string;
@@ -288,42 +343,48 @@ export class FarmInController {
     farmType: number;
     votedPoint: VotedPoint;
     nextVotedPoint: VotedPoint;
-}
-
-export class FarmInControllerAccount {
+  }
+  
+  export class FarmInControllerAccount {
     __typename?: 'FarmInControllerAccount';
     address: string;
     voteUserSlope?: Nullable<VotedSlope>;
     lastUserVote: number;
-}
-
-export class VotedSlope {
+  }
+  
+  export class VotedSlope {
     __typename?: 'VotedSlope';
     slope: string;
     power: string;
     end: number;
-}
-
-export class VotedPoint {
+  }
+  
+  export class VotedPoint {
     __typename?: 'VotedPoint';
     bias: string;
     slope: string;
-}
-
-export class FcAccount {
+  }
+  
+  export class FcAccount {
     __typename?: 'FcAccount';
     voteUserPower: string;
     farms?: Nullable<FarmInControllerAccount[]>;
-}
-
-export class Farm {
+  }
+  
+  export class FarmRouter {
+    __typename?: 'FarmRouter';
+    address: string;
+    farms: string[];
+  }
+  
+  export class Farm {
     __typename?: 'Farm';
     address: string;
     farmToken: Token;
     rewardToken: Token;
     farmingToken: Token;
     farmTokenSupply?: Nullable<string>;
-    state?: Nullable<boolean>;
+    state: string;
     rewardPerSec?: Nullable<string>;
     rewardPerShare?: Nullable<string>;
     lastRewardBlockTs?: Nullable<number>;
@@ -333,48 +394,48 @@ export class Farm {
     shard?: Nullable<string>;
     additionalRewards: AdditionalReward[];
     account?: Nullable<FarmAccount>;
-}
-
-export class AdditionalReward {
+  }
+  
+  export class AdditionalReward {
     __typename?: 'AdditionalReward';
     rewardPerSec: string;
     rewardPerShare: string;
     periodRewardEnd: number;
     tokenId: string;
-}
-
-export class FarmAccount {
+  }
+  
+  export class FarmAccount {
     __typename?: 'FarmAccount';
     slopeBoosted?: Nullable<string>;
-}
-
-export class FeeDistributor {
+  }
+  
+  export class FeeDistributor {
     __typename?: 'FeeDistributor';
     address: string;
     rewardToken: Token;
     account?: Nullable<FdAccount>;
-}
-
-export class FdAccount {
+  }
+  
+  export class FdAccount {
     __typename?: 'FdAccount';
     reward?: Nullable<string>;
-}
-
-export class Governance {
+  }
+  
+  export class Governance {
     __typename?: 'Governance';
     summaries?: Nullable<Nullable<Summary>[]>;
     adminFee?: Nullable<number>;
     votingPower?: Nullable<Nullable<Nullable<string>[]>[]>;
-}
-
-export class Summary {
+  }
+  
+  export class Summary {
     __typename?: 'Summary';
     from_timestamp?: Nullable<string>;
     to_timestamp?: Nullable<string>;
     total_admin_fee_in_usd?: Nullable<number>;
-}
-
-export class PoolV2 {
+  }
+  
+  export class PoolV2 {
     __typename?: 'PoolV2';
     address: string;
     lpToken: Token;
@@ -395,7 +456,7 @@ export class PoolV2 {
     midFee: string;
     outFee: string;
     feeGamma: string;
-    state: boolean;
+    state: string;
     allowedExtraProfit: string;
     adjustmentStep: string;
     adminFee: string;
@@ -406,26 +467,26 @@ export class PoolV2 {
     xcpProfitA: string;
     isNotAdjusted: boolean;
     initialAGammaTime: number;
-}
-
-export class Pool {
+  }
+  
+  export class Pool {
     __typename?: 'Pool';
     address: string;
     lpToken: Token;
     tokens: Token[];
     reserves: string[];
     underlyingPrices: string[];
-    totalSupply?: Nullable<string>;
-    swapFeePercent?: Nullable<string>;
-    adminFeePercent?: Nullable<string>;
-    ampFactor?: Nullable<string>;
-    state?: Nullable<boolean>;
+    totalSupply: string;
+    swapFeePercent: string;
+    adminFeePercent: string;
+    ampFactor: string;
+    state: string;
     statistic?: Nullable<PoolStatistic>;
     graphStatistic?: Nullable<Nullable<Nullable<number>[]>[]>;
     apr?: Nullable<PoolApr>;
-}
-
-export class PoolTransaction {
+  }
+  
+  export class PoolTransaction {
     __typename?: 'PoolTransaction';
     action?: Nullable<string>;
     admin_fee_1?: Nullable<string>;
@@ -458,9 +519,9 @@ export class PoolTransaction {
     total_fee_3?: Nullable<string>;
     total_fee_3_usd?: Nullable<number>;
     transaction_hash?: Nullable<string>;
-}
-
-export class PoolStatistic {
+  }
+  
+  export class PoolStatistic {
     __typename?: 'PoolStatistic';
     token_2_admin_fee_usd?: Nullable<number>;
     timestamp?: Nullable<number>;
@@ -481,47 +542,54 @@ export class PoolStatistic {
     transaction_count?: Nullable<number>;
     token_1_amount?: Nullable<number>;
     token_2_amount_usd?: Nullable<number>;
-}
-
-export class LiquidityDistribution {
+  }
+  
+  export class LiquidityDistribution {
     __typename?: 'LiquidityDistribution';
     liquidity?: Nullable<number>;
     token?: Nullable<string>;
-}
-
-export class PoolApr {
+  }
+  
+  export class PoolApr {
     __typename?: 'PoolApr';
     address?: Nullable<string>;
     apr?: Nullable<Nullable<Nullable<number>[]>[]>;
-}
-
-export class Rewarder {
+  }
+  
+  export class Rewarder {
     __typename?: 'Rewarder';
     address: string;
     rewardPerSec: string;
     lastRewardPerSecTime: number;
     futureRewardPerSec: number;
     futureRewardPerSecTime: number;
-}
-
-export class Defillama {
+  }
+  
+  export class Router {
+    __typename?: 'Router';
+    address: string;
+    pools: string[];
+    poolsV2: string[];
+  }
+  
+  export class Defillama {
     __typename?: 'Defillama';
     totalValueLockedUSD?: Nullable<number>;
     totalValueStakedUSD?: Nullable<number>;
     totalVolumeUSD24h?: Nullable<number>;
     pools?: Nullable<Nullable<DefillamaPool>[]>;
-}
-
-export class DefillamaPool {
+  }
+  
+  export class DefillamaPool {
     __typename?: 'DefillamaPool';
     address?: Nullable<string>;
     tokens?: Nullable<Nullable<string>[]>;
     tvlUsd?: Nullable<number>;
     apyBase?: Nullable<number>;
     apyReward?: Nullable<number>;
-}
-
-export class Token {
+  }
+  
+  export class Token {
     __typename?: 'Token';
     id?: Nullable<string>;
     price?: Nullable<number>;
@@ -529,9 +597,9 @@ export class Token {
     graphStatistic?: Nullable<Nullable<Nullable<number>[]>[]>;
     tokenFee?: Nullable<TokenFee>;
     tokenPool?: Nullable<Nullable<TokenPool>[]>;
-}
-
-export class TokenStatistic {
+  }
+  
+  export class TokenStatistic {
     __typename?: 'TokenStatistic';
     change_percentage_day: number;
     change_percentage_hour: number;
@@ -540,15 +608,15 @@ export class TokenStatistic {
     price: number;
     transaction_count: number;
     volume: number;
-}
-
-export class TokenFee {
+  }
+  
+  export class TokenFee {
     __typename?: 'TokenFee';
     fee?: Nullable<Nullable<Nullable<number>[]>[]>;
     token?: Nullable<string>;
-}
-
-export class TokenTransacion {
+  }
+  
+  export class TokenTransacion {
     __typename?: 'TokenTransacion';
     action?: Nullable<string>;
     admin_fee_1?: Nullable<string>;
@@ -581,9 +649,9 @@ export class TokenTransacion {
     total_fee_3?: Nullable<string>;
     total_fee_3_usd?: Nullable<number>;
     transaction_hash?: Nullable<string>;
-}
-
-export class TokenPool {
+  }
+  
+  export class TokenPool {
     __typename?: 'TokenPool';
     address?: Nullable<string>;
     apr?: Nullable<number>;
@@ -604,26 +672,27 @@ export class TokenPool {
     tvl?: Nullable<number>;
     unique_traders?: Nullable<string>;
     volume_usd?: Nullable<number>;
-}
-
-export class VotingEscrow {
+  }
+  
+  export class VotingEscrow {
     __typename?: 'VotingEscrow';
     address: string;
     lockedToken: Token;
     totalLock?: Nullable<string>;
     veSupply?: Nullable<string>;
     account?: Nullable<VeAccount>;
-}
-
-export class Locked {
+  }
+  
+  export class Locked {
     __typename?: 'Locked';
     amount?: Nullable<string>;
     end?: Nullable<string>;
-}
-
-export class VeAccount {
+  }
+  
+  export class VeAccount {
     __typename?: 'VeAccount';
     locked?: Nullable<Locked>;
-}
-
-type Nullable<T> = T | null;
+  }
+  
+  type Nullable<T> = T | null;
+  
