@@ -88,6 +88,10 @@ const QuestOverview = () => {
     const [platform, setPlatform] = useState<PlatformType>();
 
     const twitterLink = useMemo(() => {
+        if (typeof window === "undefined") {
+            return "";
+        }
+
         const [path, search] = ENVIRONMENT.LOGIN_TWITTER_LINK.split("?");
         const { nextUrlParams } = buildUrlParams(search, {
             state: `twitter:${userAddress}`,
@@ -99,6 +103,10 @@ const QuestOverview = () => {
     }, [userAddress]);
 
     const discordLink = useMemo(() => {
+        if (typeof window === "undefined") {
+            return "";
+        }
+
         const [path, search] = ENVIRONMENT.LOGIN_DISCORD_LINK.split("?");
         const { nextUrlParams } = buildUrlParams(search, {
             state: `discord:${userAddress}`,
@@ -108,6 +116,10 @@ const QuestOverview = () => {
     }, [userAddress]);
 
     const inviteLink = useMemo(() => {
+        if (typeof window === "undefined") {
+            return "";
+        }
+
         const search = new URLSearchParams({
             invitationCode:
                 userStats?.wallet.invitation_code ||
