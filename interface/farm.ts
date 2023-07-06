@@ -32,3 +32,7 @@ export interface FarmBoostInfo {
     boost: number;
     veForBoost: BigNumber;
 }
+
+export enum EFarmState {
+    Inactive, Active
+}

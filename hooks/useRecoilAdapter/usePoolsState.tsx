@@ -5,14 +5,14 @@ import {
     poolKeywordState,
     PoolRecord,
     poolRecordsState,
-    poolStatsRefresherAtom
+    poolStatsRefresherAtom,
 } from "atoms/poolsState";
 import { tokenMapState } from "atoms/tokensState";
 import BigNumber from "bignumber.js";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 import pools from "const/pool";
 import { fetcher } from "helper/common";
-import IPool, { EPoolType } from "interface/pool";
+import IPool, { EPoolState, EPoolType } from "interface/pool";
 import { PoolStatsRecord } from "interface/poolStats";
 import { useCallback, useEffect } from "react";
 import { useRecoilCallback, useRecoilValue, useSetRecoilState } from "recoil";
@@ -33,10 +33,9 @@ const usePoolsState = () => {
     }, [deboundKeyword, setDeboundKeyword]);
 
     // fetch pool stats
-    const { data: poolStatsRecords, mutate: poolStatsRefresher } = useSWR<PoolStatsRecord[]>(
-        `${ASHSWAP_CONFIG.ashApiBaseUrl}/pool`,
-        fetcher
-    );
+    const { data: poolStatsRecords, mutate: poolStatsRefresher } = useSWR<
+        PoolStatsRecord[]
+    >(`${ASHSWAP_CONFIG.ashApiBaseUrl}/pool`, fetcher);
 
     const lpBreak = useRecoilCallback(
         ({ snapshot }) =>
@@ -50,9 +49,10 @@ const usePoolsState = () => {
 
     const getPoolRecord = useCallback(
         async (p: IPool) => {
-            const rawPool = p.type === EPoolType.PoolV2 ? ashBase.poolsV2.find(_p => _p.address === p.address) : ashBase.pools.find(
-                (_p) => _p.address === p.address
-            );
+            const rawPool =
+                p.type === EPoolType.PoolV2
+                    ? ashBase.poolsV2.find((_p) => _p.address === p.address)
+                    : ashBase.pools.find((_p) => _p.address === p.address);
             const totalSupply = new BigNumber(rawPool?.totalSupply || 0);
             let record: PoolRecord = {
                 pool: p,
@@ -60,7 +60,11 @@ const usePoolsState = () => {
                     (stats) => stats.address === p.address
                 ),
                 totalSupply,
-                state: !!rawPool?.state,
+                state: rawPool?.state
+                    ? (EPoolState[
+                          rawPool.state as any
+                      ] as unknown as EPoolState) ?? EPoolState.Inactive
+                    : EPoolState.Inactive,
             };
             const ownLP = new BigNumber(
                 tokenMap[p.lpToken.identifier]?.balance || 0
@@ -74,7 +78,12 @@ const usePoolsState = () => {
 
                 record.liquidityData = {
                     ownLiquidity: ownLP,
-                    capacityPercent: BigNumber.min(totalSupply.eq(0) ? new BigNumber(0) : ownLP.multipliedBy(100).div(totalSupply), 100),
+                    capacityPercent: BigNumber.min(
+                        totalSupply.eq(0)
+                            ? new BigNumber(0)
+                            : ownLP.multipliedBy(100).div(totalSupply),
+                        100
+                    ),
                     lpReserves,
                     lpValueUsd,
                 };
@@ -106,7 +115,7 @@ const usePoolsState = () => {
 
     useEffect(() => {
         setPoolRecordsRefresher(() => poolStatsRefresher);
-    }, [setPoolRecordsRefresher, poolStatsRefresher])
+    }, [setPoolRecordsRefresher, poolStatsRefresher]);
 };
 
 export default usePoolsState;

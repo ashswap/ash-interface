@@ -1,7 +1,7 @@
 import BigNumber from "bignumber.js";
 import { POOLS_MAP_ADDRESS } from "const/pool";
 import { Percent } from "helper/fraction/percent";
-import IPool, { EPoolType } from "interface/pool";
+import IPool, { EPoolState, EPoolType } from "interface/pool";
 import { PoolStatsRecord } from "interface/poolStats";
 import { atom, selector, selectorFamily } from "recoil";
 import { KeyedMutator } from "swr";
@@ -10,7 +10,7 @@ export type PoolRecord = {
     pool: IPool;
     poolStats?: PoolStatsRecord;
     totalSupply: BigNumber;
-    state: boolean;
+    state: EPoolState;
     /** if LP balance > 0 -> staked pool*/
     liquidityData?: {
         /** number of own LP token*/

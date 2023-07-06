@@ -49,7 +49,7 @@ const Nav = () => {
                 }
             >
                 <button>
-                    <NavLink href="#">
+                    <NavLink href="." onClick={e => e.preventDefault()}>
                         <ICSocial className="-mt-0.5 w-4 h-auto" />
                         <span className="inline-flex items-center gap-1 md:gap-2">
                             <span>More</span>

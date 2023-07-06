@@ -1,6 +1,7 @@
 import ImgAshIcon from "assets/images/ash-icon.png";
 import IconBUSD from "assets/images/busd-icon.png";
 import ImgEgldIcon from "assets/images/egld-icon.png";
+import IconSEGLD from "assets/images/segld-icon.png";
 import IconUSDC from "assets/images/usdc-icon.png";
 import IconUSDT from "assets/images/usdt-icon.png";
 import ImgWEGLDIcon from "assets/images/wegld-icon.png";
@@ -59,6 +60,14 @@ const TOKENS: IESDTInfo[] = [
         decimals: 18,
         logoURI: IconBUSD.src,
     },
+    {
+        identifier: "SEGLD-3ad2d0",
+        chainId: ChainId.Mainnet,
+        symbol: "sEGLD",
+        name: "Liquid Staked EGLD",
+        decimals: 18,
+        logoURI: IconSEGLD.src,
+    },
 ];
 
 const LP_TOKENS: IESDTInfo[] = [
@@ -81,6 +90,13 @@ const LP_TOKENS: IESDTInfo[] = [
         identifier: "ALP-2d0cf8",
         chainId: ChainId.Mainnet,
         symbol: "ALP-USDT-ASH",
+        name: "Ashswap LP",
+        decimals: 18,
+    },
+    {
+        identifier: "ALP-0fe50a",
+        chainId: ChainId.Mainnet,
+        symbol: "ALP-WEGLD-SEGLD",
         name: "Ashswap LP",
         decimals: 18,
     },

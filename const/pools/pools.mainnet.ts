@@ -28,6 +28,13 @@ const POOLS_MAINNET: IPool[] = [
         tokens: [TOKENS_MAP["USDT-f8c08c"], TOKENS_MAP["ASH-a642d1"]],
         type: EPoolType.PoolV2,
     },
+    {
+        address:
+            "erd1qqqqqqqqqqqqqpgqaf8fzwmas77xxr7qwnxd6j3qsctv55e74fvsmvq675",
+        lpToken: TOKENS_MAP["ALP-0fe50a"],
+        tokens: [TOKENS_MAP["SEGLD-3ad2d0"], TOKENS_MAP["WEGLD-bd4d79"]],
+        type: EPoolType.LendingPool,
+    },
 ];
 
 export default POOLS_MAINNET;
