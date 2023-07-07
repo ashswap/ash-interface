@@ -1,10 +1,3 @@
-import { sendTransactions as _sendTxs } from "@multiversx/sdk-dapp/services";
-import {
-    AccountInfoSliceNetworkType,
-    LoginMethodsEnum,
-} from "@multiversx/sdk-dapp/types";
-import { getAccountProviderType, getAddress } from "@multiversx/sdk-dapp/utils";
-import { ExtensionProvider } from "@multiversx/sdk-extension-provider/out";
 import {
     Address,
     CallArguments,
@@ -12,12 +5,14 @@ import {
     Transaction,
 } from "@multiversx/sdk-core/out";
 import {
+    AccountInfoSliceNetworkType
+} from "@multiversx/sdk-dapp/types";
+import {
     accAddressState,
     accIsLoggedInState,
     networkConfigState,
 } from "atoms/dappState";
 import { gasLimitBuffer, gasPrice, maxGasLimit } from "const/dappConfig";
-import { DappSendTransactionsPropsType } from "interface/dappCore";
 import { useRecoilValue } from "recoil";
 const emptyTx = new Transaction({
     nonce: 0,

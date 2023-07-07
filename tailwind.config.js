@@ -107,7 +107,6 @@ module.exports = {
         },
     },
     plugins: [
-        require('@tailwindcss/line-clamp'),
         require('tailwind-scrollbar-hide'),
         require('./tailwindPlugins/clip-corner'),
         require('./tailwindPlugins/colored-drop-shadow'),
