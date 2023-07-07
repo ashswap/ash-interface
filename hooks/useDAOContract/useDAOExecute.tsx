@@ -14,7 +14,7 @@ const useDAOExecute = (trackStatus = false) => {
                     ASHSWAP_CONFIG.dappContract.dao
                 ).execute(proposalID, egld);
                 await sendTransactions({
-                    transactions: [tx],
+                    interactions: [tx],
                     transactionsDisplayInfo: {
                         successMessage: "Execute proposal success!",
                     },

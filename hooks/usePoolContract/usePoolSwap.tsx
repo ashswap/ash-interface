@@ -2,6 +2,7 @@ import {
     Address,
     BigUIntValue,
     ContractFunction,
+    Interaction,
     TokenIdentifierValue,
     TokenTransfer,
     Transaction,
@@ -38,25 +39,8 @@ const usePoolSwap = (trackStatus = false) => {
                 const shard = (await snapshot.getPromise(accInfoState)).shard;
                 const wegld = TOKENS_MAP[WRAPPED_EGLD.wegld];
                 const wegldContract = WRAPPED_EGLD.wegldContracts[shard || 0];
-                let tx: Transaction;
-                if (pool.isMaiarPool) {
-                    tx = await createTx(new Address(pool.address), {
-                        func: new ContractFunction("ESDTTransfer"),
-                        gasLimit: 8_000_000,
-                        args: [
-                            new TokenIdentifierValue(
-                                getTokenIdFromCoin(tokenIn.identifier)!
-                            ),
-                            new BigUIntValue(weiIn),
-                            new TokenIdentifierValue("swapTokensFixedInput"),
-                            new TokenIdentifierValue(
-                                getTokenIdFromCoin(tokenOut.identifier)!
-                            ),
-                            new BigUIntValue(minWeiOut),
-                        ],
-                        caller: new Address(await snapshot.getPromise(accAddressState))
-                    });
-                } else if (pool.type === EPoolType.PoolV2) {
+                let tx: Interaction;
+                if (pool.type === EPoolType.PoolV2) {
                     const poolContract = ContractManager.getPoolV2Contract(
                         pool.address
                     );
@@ -104,7 +88,7 @@ const usePoolSwap = (trackStatus = false) => {
                 }
 
                 return await sendTransactions({
-                    transactions: txs,
+                    interactions: txs,
                     transactionsDisplayInfo: {
                         successMessage: `Swap succeed ${formatAmount(
                             toEGLDD(tokenIn.decimals, weiIn).toNumber(),
@@ -116,7 +100,7 @@ const usePoolSwap = (trackStatus = false) => {
                     },
                 });
             },
-        [createTx, sendTransactions]
+        [sendTransactions]
     );
 
     return { swap, trackingData, sessionId };

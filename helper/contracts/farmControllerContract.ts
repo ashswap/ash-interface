@@ -17,9 +17,7 @@ class FarmControllerContract extends Contract<typeof farmControllerAbi> {
         interaction.withGasLimit(
             ENVIRONMENT.NETWORK === "mainnet" ? 50_000_000 : 500_000_000
         );
-        return this.interceptInteraction(interaction)
-            .check()
-            .buildTransaction();
+        return this.interceptInteraction(interaction);
     }
 
     async getFarmTypes(farmAddress: string) {

@@ -75,7 +75,7 @@ const usePoolRemoveLPOneCoin = (trackStatus = false) => {
                     notation: "standard",
                 })} ${tokenAmountOut.token.symbol}`;
                 return await sendTransactions({
-                    transactions: txs,
+                    interactions: txs,
                     transactionsDisplayInfo: {
                         successMessage: `Remove Liquidity Success ${receipt}`,
                     },

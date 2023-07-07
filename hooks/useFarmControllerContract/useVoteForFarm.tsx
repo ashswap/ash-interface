@@ -19,7 +19,7 @@ const useVoteForFarm = (trackStatus: boolean) => {
                     new BigNumber(weight)
                 );
                 sendTransactions({
-                    transactions: [tx],
+                    interactions: [tx],
                     transactionsDisplayInfo: {
                         successMessage: `Success to vote for the farm`,
                     },

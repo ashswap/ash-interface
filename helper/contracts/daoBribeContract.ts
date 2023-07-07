@@ -16,16 +16,12 @@ class DAOBribeContract extends Contract<typeof daoBribeAbi> {
             .withMultiESDTNFTTransfer(tokenPayments)
             .withSender(new Address(address));
         interaction.withGasLimit(10_000_000);
-        return this.interceptInteraction(interaction)
-            .check()
-            .buildTransaction();
+        return this.interceptInteraction(interaction);
     }
     async withdrawReward(proposalID: number) {
         let interaction = this.contract.methods.withdrawReward([proposalID]);
         interaction.withGasLimit(50_000_000);
-        return this.interceptInteraction(interaction)
-            .check()
-            .buildTransaction();
+        return this.interceptInteraction(interaction);
     }
     async claimReward(proposalID: number, tokenIDs: string[]) {
         let interaction = this.contract.methods.claimReward([
@@ -33,9 +29,7 @@ class DAOBribeContract extends Contract<typeof daoBribeAbi> {
             ...tokenIDs,
         ]);
         interaction.withGasLimit(10_000_000 + tokenIDs.length * 7_000_000);
-        return this.interceptInteraction(interaction)
-            .check()
-            .buildTransaction();
+        return this.interceptInteraction(interaction);
     }
     async getClaimable(
         proposalID: number,
