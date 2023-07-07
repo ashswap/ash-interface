@@ -73,8 +73,7 @@ const ListPool = (props: Props) => {
                             <Image
                                 src={ImgAshSleep}
                                 alt="ash sleep"
-                                layout="responsive"
-                                className="mix-blend-luminosity"
+                                className="w-full h-auto mix-blend-luminosity"
                             />
                         </div>
                         <button

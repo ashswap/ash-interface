@@ -192,8 +192,7 @@ function InfoLayout({ children }: any) {
                                 <Image
                                     src={ImgLogo}
                                     alt="ashswap logo"
-                                    layout="fill"
-                                    objectFit="contain"
+                                    className="absolute inset-0 w-full h-full object-contain"
                                 ></Image>
                             </div>
 
