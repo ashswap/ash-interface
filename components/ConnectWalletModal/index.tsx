@@ -268,7 +268,7 @@ function ConnectWalletModal() {
                                     <Image
                                         src={downloadPlayStore}
                                         alt="download from play store"
-                                        layout="fill"
+                                        className="absolute inset-0 w-full h-full"
                                     />
                                 </div>
                                 <div className="absolute right-[-1px] h-3 border-r border-r-ash-dark-400"></div>
@@ -284,7 +284,7 @@ function ConnectWalletModal() {
                                     <Image
                                         src={downloadAppStore}
                                         alt="download from play store"
-                                        layout="fill"
+                                        className="absolute inset-0 w-full h-full"
                                     />
                                 </div>
                                 <div className="absolute right-[-1px] h-3 border-r border-r-ash-dark-400"></div>
@@ -300,7 +300,7 @@ function ConnectWalletModal() {
                                     <Image
                                         src={downloadAppGallery}
                                         alt="download from play store"
-                                        layout="fill"
+                                        className="absolute inset-0 w-full h-full"
                                     />
                                 </div>
                                 <div className="absolute right-[-1px] h-3 border-r border-r-ash-dark-400"></div>

@@ -18,18 +18,14 @@ class FarmBribeContract extends Contract<typeof farmBribeAbi> {
             .withMultiESDTNFTTransfer(tokenPayments)
             .withSender(new Address(sender))
             .withGasLimit(50_000_000 + tokenPayments.length * 2_000_000);
-        return this.interceptInteraction(interaction)
-            .check()
-            .buildTransaction();
+        return this.interceptInteraction(interaction);
     }
 
     async claimReward(farmAddress: Address, tokenId: string) {
         const interaction = this.contract.methods
             .claimReward([farmAddress, tokenId])
             .withGasLimit(50_000_000);
-        return this.interceptInteraction(interaction)
-            .check()
-            .buildTransaction();
+        return this.interceptInteraction(interaction);
     }
 }
 

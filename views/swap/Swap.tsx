@@ -60,79 +60,6 @@ import SwapAmount from "./components/SwapAmount";
 import styles from "./Swap.module.css";
 import { TOKENS_MAP } from "const/tokens";
 
-const MaiarPoolTooltip = ({
-    children,
-    pool,
-}: {
-    children: JSX.Element;
-    pool?: IPool;
-}) => {
-    const [openMaiarPoolTooltip, setOpenMaiarPoolTooltip] = useState(false);
-    const screenSize = useScreenSize();
-    useEffect(() => {
-        setOpenMaiarPoolTooltip(!!pool?.isMaiarPool && screenSize.md);
-    }, [pool, screenSize.md]);
-    if (!pool?.isMaiarPool) {
-        return <>{children}</>;
-    }
-    return (
-        <OnboardTooltip
-            open={openMaiarPoolTooltip}
-            onArrowClick={() => {
-                setOpenMaiarPoolTooltip(false);
-            }}
-            strategy={screenSize.isMobile ? "absolute" : "fixed"}
-            placement="left"
-            zIndex={10}
-            arrowStyle={() => ({})}
-            content={({ size }) => {
-                return (
-                    <>
-                        {pool && (
-                            <div
-                                style={{
-                                    filter: screenSize.isMobile
-                                        ? ""
-                                        : "drop-shadow(0px 4px 50px rgba(0, 0, 0, 0.5))",
-                                    maxWidth: size?.width,
-                                }}
-                            >
-                                <div className="clip-corner-4 clip-corner-bl bg-ash-dark-600 p-[1px] max-w-full sm:max-w-[23rem] backdrop-blur-[30px]">
-                                    <div className="clip-corner-4 clip-corner-bl bg-ash-dark-400 px-12 py-6">
-                                        <div className="font-bold text-sm leading-tight">
-                                            <Avatar
-                                                src={pool.tokens[0].logoURI}
-                                                alt={pool.tokens[0].symbol}
-                                                className="w-4 h-4"
-                                            />
-                                            &nbsp;
-                                            {pool.tokens[0].symbol}
-                                            <span> - </span>
-                                            <Avatar
-                                                src={pool.tokens[1].logoURI}
-                                                alt={pool.tokens[1].symbol}
-                                                className="w-4 h-4"
-                                            />
-                                            &nbsp;
-                                            {pool.tokens[1].symbol}
-                                            <span>
-                                                {" "}
-                                                only available in Battle of
-                                                Yields
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-                    </>
-                );
-            }}
-        >
-            {children}
-        </OnboardTooltip>
-    );
-};
 const Swap = () => {
     const screenSize = useScreenSize();
     const mounted = useMounted();
@@ -288,7 +215,9 @@ const Swap = () => {
                     const rawPool = await snapshot.getPromise(
                         ashRawPoolV1ByAddressQuery(pool.address || "")
                     );
-                    const tokenFromId = getTokenIdFromCoin(tokenAmountFrom.token.identifier);
+                    const tokenFromId = getTokenIdFromCoin(
+                        tokenAmountFrom.token.identifier
+                    );
                     const tokenToId = getTokenIdFromCoin(tokenTo.identifier);
                     if (!rawPool || !tokenFromId || !tokenToId) return;
                     const reserves = pool.tokens.map(
@@ -297,7 +226,10 @@ const Swap = () => {
                     const estimated = calculateEstimatedSwapOutputAmount(
                         new BigNumber(rawPool?.ampFactor || 0),
                         reserves,
-                        new TokenAmount(TOKENS_MAP[tokenFromId], tokenAmountFrom.raw),
+                        new TokenAmount(
+                            TOKENS_MAP[tokenFromId],
+                            tokenAmountFrom.raw
+                        ),
                         TOKENS_MAP[tokenToId],
                         fees,
                         rawPool.underlyingPrices.map((p) => new BigNumber(p))
@@ -374,7 +306,9 @@ const Swap = () => {
                     const rawPool = await snapshot.getPromise(
                         ashRawPoolV1ByAddressQuery(pool.address)
                     );
-                    const tokenFromId = getTokenIdFromCoin(tokenFrom.identifier);
+                    const tokenFromId = getTokenIdFromCoin(
+                        tokenFrom.identifier
+                    );
                     const tokenToId = getTokenIdFromCoin(tokenTo.identifier);
                     if (!rawPool || !tokenFromId || !tokenToId) return;
                     const reserves = pool.tokens.map(
@@ -611,44 +545,38 @@ const Swap = () => {
                                     </BaseButton>
                                 </div>
                             </div>
-                            <MaiarPoolTooltip pool={pool}>
-                                <div className="relative">
-                                    <SwapAmount
-                                        topLeftCorner
-                                        showQuickSelect={
-                                            !tokenFrom && !!tokenTo
-                                        }
-                                        type="from"
-                                        resetPivotToken={() =>
-                                            setTokenTo(undefined)
-                                        }
-                                    />
-                                    <div
-                                        style={{
-                                            height: 4,
-                                            position: "relative",
-                                        }}
+                            <div className="relative">
+                                <SwapAmount
+                                    topLeftCorner
+                                    showQuickSelect={!tokenFrom && !!tokenTo}
+                                    type="from"
+                                    resetPivotToken={() =>
+                                        setTokenTo(undefined)
+                                    }
+                                />
+                                <div
+                                    style={{
+                                        height: 4,
+                                        position: "relative",
+                                    }}
+                                >
+                                    <BaseButton
+                                        className="w-7 h-7 rounded-lg bg-ash-dark-600 hover:bg-ash-dark-300 active:bg-ash-dark-600 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[1]"
+                                        onClick={revertToken}
                                     >
-                                        <BaseButton
-                                            className="w-7 h-7 rounded-lg bg-ash-dark-600 hover:bg-ash-dark-300 active:bg-ash-dark-600 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[1]"
-                                            onClick={revertToken}
-                                        >
-                                            <ICArrowDownRounded />
-                                        </BaseButton>
-                                    </div>
-                                    <SwapAmount
-                                        bottomRightCorner
-                                        showQuickSelect={
-                                            !!tokenFrom && !tokenTo
-                                        }
-                                        type="to"
-                                        resetPivotToken={() =>
-                                            setTokenFrom(undefined)
-                                        }
-                                        disableInput
-                                    />
+                                        <ICArrowDownRounded />
+                                    </BaseButton>
                                 </div>
-                            </MaiarPoolTooltip>
+                                <SwapAmount
+                                    bottomRightCorner
+                                    showQuickSelect={!!tokenFrom && !tokenTo}
+                                    type="to"
+                                    resetPivotToken={() =>
+                                        setTokenFrom(undefined)
+                                    }
+                                    disableInput
+                                />
+                            </div>
 
                             {tokenFrom && tokenTo && (
                                 <OnboardTooltip

@@ -54,9 +54,7 @@ class FarmContract extends Contract<typeof farmAbi> {
                 tokenPayments.length * 2_000_000 +
                 this._getBaseGasLimit()
         );
-        return this.interceptInteraction(interaction)
-            .check()
-            .buildTransaction();
+        return this.interceptInteraction(interaction);
     }
 
     private async _exitFarm(tokenPayments: TokenTransfer[]) {
@@ -70,9 +68,7 @@ class FarmContract extends Contract<typeof farmAbi> {
                 tokenPayments.length * 2_000_000 +
                 this._getBaseGasLimit()
         );
-        return this.interceptInteraction(interaction)
-            .check()
-            .buildTransaction();
+        return this.interceptInteraction(interaction);
     }
 
     private async _claimRewards(
@@ -89,9 +85,7 @@ class FarmContract extends Contract<typeof farmAbi> {
                 tokenPayments.length * 2_500_000 +
                 this._getBaseGasLimit()
         );
-        return this.interceptInteraction(interaction)
-            .check()
-            .buildTransaction();
+        return this.interceptInteraction(interaction);
     }
 
     async enterFarm(tokenPayments: TokenTransfer[], selfBoost = false) {

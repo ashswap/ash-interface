@@ -3,7 +3,7 @@ import { accAddressState, accIsLoggedInState } from "atoms/dappState";
 import {
     farmNumberOfAdditionalRewards,
     farmQuery,
-    farmSessionIdMapState
+    farmSessionIdMapState,
 } from "atoms/farmsState";
 import BigNumber from "bignumber.js";
 import { toEGLDD } from "helper/balance";
@@ -67,7 +67,7 @@ const useEnterFarm = (trackStatus = false) => {
                     selfBoost
                 );
                 const payload: DappSendTransactionsPropsType = {
-                    transactions: tx,
+                    interactions: [tx],
                     transactionsDisplayInfo: {
                         successMessage: `Stake succeed ${toEGLDD(
                             farm.farming_token_decimal,

@@ -88,7 +88,7 @@ const usePoolRemoveLP = (trackStatus = false) => {
                     .join(", ")
                     .replace(/\,$/, "");
                 return await sendTransactions({
-                    transactions: txs,
+                    interactions: txs,
                     transactionsDisplayInfo: {
                         successMessage: `Remove Liquidity Success ${receipt}`,
                     },

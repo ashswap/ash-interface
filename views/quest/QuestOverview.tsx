@@ -666,8 +666,7 @@ const QuestOverview = () => {
                                     <Image
                                         src={ImgTwitter}
                                         alt="twitter"
-                                        objectFit="contain"
-                                        layout="responsive"
+                                        className="w-full h-auto object-contain"
                                     />
                                 </div>
                             </a>
@@ -681,8 +680,7 @@ const QuestOverview = () => {
                                     <Image
                                         src={ImgDiscord}
                                         alt="discord"
-                                        objectFit="contain"
-                                        layout="responsive"
+                                        className="w-full h-auto object-contain"
                                     />
                                 </div>
                             </a>

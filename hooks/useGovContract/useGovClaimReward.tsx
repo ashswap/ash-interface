@@ -23,7 +23,7 @@ const useGovClaimReward = (trackStatus = false) => {
                         );
                     const tx = await fdContract.claim(new Address(address));
                     const payload: DappSendTransactionsPropsType = {
-                        transactions: tx,
+                        interactions: [tx],
                         transactionsDisplayInfo: {
                             successMessage: `Reward was sent to your wallet`,
                         },

@@ -14,9 +14,7 @@ class VotingEscrowContract extends Contract<typeof votingEscowAbi> {
         interaction
             .withSingleESDTTransfer(tokenPayment)
             .withGasLimit(gas); // 7m
-        return this.interceptInteraction(interaction)
-            .check()
-            .buildTransaction();
+        return this.interceptInteraction(interaction);
     }
 
     async increaseAmount(tokenPayment: TokenTransfer) {
@@ -24,9 +22,7 @@ class VotingEscrowContract extends Contract<typeof votingEscowAbi> {
         interaction
             .withSingleESDTTransfer(tokenPayment)
             .withGasLimit(gas); //7m
-        return this.interceptInteraction(interaction)
-            .check()
-            .buildTransaction();
+        return this.interceptInteraction(interaction);
     }
 
     async increaseUnlockTime(unlockTS: number) {
@@ -34,17 +30,13 @@ class VotingEscrowContract extends Contract<typeof votingEscowAbi> {
             unlockTS,
         ]);
         interaction.withGasLimit(gas); //7m
-        return this.interceptInteraction(interaction)
-            .check()
-            .buildTransaction();
+        return this.interceptInteraction(interaction);
     }
 
     async withdraw() {
         let interaction = this.contract.methods.withdraw([]);
         interaction.withGasLimit(gas); //7m
-        return this.interceptInteraction(interaction)
-            .check()
-            .buildTransaction();
+        return this.interceptInteraction(interaction);
     }
 
     async getUserLocked(

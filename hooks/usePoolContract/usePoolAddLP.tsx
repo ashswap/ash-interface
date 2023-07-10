@@ -64,7 +64,7 @@ const usePoolAddLP = (trackStatus = false) => {
                     .join(", ")
                     .replace(/\,$/, "");
                 return await sendTransactions({
-                    transactions: txs,
+                    interactions: txs,
                     transactionsDisplayInfo: {
                         successMessage: `Add liquidity Success ${receipt}`,
                     },

@@ -1,4 +1,4 @@
-import { TokenTransfer, Transaction } from "@multiversx/sdk-core/out";
+import { Interaction, TokenTransfer } from "@multiversx/sdk-core/out";
 import { accIsLoggedInState } from "atoms/dappState";
 import { govUnlockTSSelector } from "atoms/govState";
 import BigNumber from "bignumber.js";
@@ -24,7 +24,7 @@ const useGovLockMore = (trackStatus = false) => {
                 const unlockTS = await snapshot.getPromise(govUnlockTSSelector);
 
                 if (!loggedIn) return { sessionId: "" };
-                let txs: Transaction[] = [];
+                let txs: Interaction[] = [];
                 const veContract = new VotingEscrowContract(
                     ASHSWAP_CONFIG.dappContract.voteEscrowedContract
                 );
@@ -50,7 +50,7 @@ const useGovLockMore = (trackStatus = false) => {
                 if (!txs.length) return { sessionId: "" };
 
                 const payload: DappSendTransactionsPropsType = {
-                    transactions: txs,
+                    interactions: txs,
                     transactionsDisplayInfo: {
                         successMessage: `Lock succeed ${toEGLD(
                             ASH_TOKEN,

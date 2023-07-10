@@ -500,8 +500,7 @@ const FarmBoostInfo = ({ farmData, onClose }: FarmBoostInfoType) => {
                                     <Image
                                         src={ImgASHSleep}
                                         alt="ash sleep"
-                                        layout="responsive"
-                                        className="mix-blend-luminosity"
+                                        className="w-full h-auto mix-blend-luminosity"
                                     />
                                 </div>
                                 <div className="text-sm lg:text-lg font-bold text-stake-gray-500">

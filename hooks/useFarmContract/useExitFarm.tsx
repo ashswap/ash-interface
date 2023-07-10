@@ -115,7 +115,7 @@ const useExitFarm = (trackStatus = false) => {
                     : calcUnstakeEntries2(lpAmt, farmTokens);
                 const txs = await farmContract.exitFarm(entries);
                 const payload: DappSendTransactionsPropsType = {
-                    transactions: txs,
+                    interactions: txs,
                     transactionsDisplayInfo: {
                         successMessage: `Unstake succeed ${toEGLDD(
                             farm.farming_token_decimal,
@@ -148,10 +148,11 @@ const useExitFarm = (trackStatus = false) => {
                     ashRawFarmQuery(farm.farm_address)
                 );
                 if (!farmRecord?.stakedData?.farmTokens.length || lpAmt.eq(0)) {
-                    const rewards = farmRecord?.tokensAPR?.map(
-                        (r) => new TokenAmount(TOKENS_MAP[r.tokenId], 0)
-                    ) || [];
-                    if(farmRecord?.ashPerSec.gt(0)){
+                    const rewards =
+                        farmRecord?.tokensAPR?.map(
+                            (r) => new TokenAmount(TOKENS_MAP[r.tokenId], 0)
+                        ) || [];
+                    if (farmRecord?.ashPerSec.gt(0)) {
                         rewards.unshift(new TokenAmount(ASH_TOKEN, 0));
                     }
                     return rewards;
@@ -179,12 +180,14 @@ const useExitFarm = (trackStatus = false) => {
                     new BigNumber(rawFarm?.divisionSafetyConstant || 0),
                     farmRecord.lpLockedAmt,
                     farmRecord.lastRewardBlockTs,
-                    rawFarm?.additionalRewards.filter(t => !!TOKENS_MAP[t.tokenId]).map((r) => ({
-                        token: TOKENS_MAP[r.tokenId],
-                        rewardPerShare: new BigNumber(r.rewardPerShare),
-                        rewardPerSec: new BigNumber(r.rewardPerSec),
-                        periodRewardEnd: r.periodRewardEnd,
-                    })) || []
+                    rawFarm?.additionalRewards
+                        .filter((t) => !!TOKENS_MAP[t.tokenId])
+                        .map((r) => ({
+                            token: TOKENS_MAP[r.tokenId],
+                            rewardPerShare: new BigNumber(r.rewardPerShare),
+                            rewardPerSec: new BigNumber(r.rewardPerSec),
+                            periodRewardEnd: r.periodRewardEnd,
+                        })) || []
                 ).filter((r) => r.greaterThan(0));
 
                 const totalRewards = await Promise.all(ashRewards);
