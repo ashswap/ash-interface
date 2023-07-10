@@ -1,11 +1,16 @@
 import { TokenTransfer } from "@multiversx/sdk-core/out";
-import { farmNumberOfAdditionalRewards, farmQuery, FarmToken } from "atoms/farmsState";
+import {
+    farmNumberOfAdditionalRewards,
+    farmQuery,
+    FarmToken,
+} from "atoms/farmsState";
 import { ContractManager } from "helper/contracts/contractManager";
-import { sendTransactions } from "helper/transactionMethods";
+import useSendTxsWithTrackStatus from "hooks/useSendTxsWithTrackStatus";
 import { IFarm } from "interface/farm";
 import { useRecoilCallback } from "recoil";
 
 const useFarmBoost = () => {
+    const { sendTransactions } = useSendTxsWithTrackStatus();
     const func = useRecoilCallback(
         ({ snapshot }) =>
             async (
@@ -27,17 +32,20 @@ const useFarmBoost = () => {
                     )
                 );
                 return sendTransactions({
-                    transactions: await ContractManager.getFarmContract(
+                    interactions: await ContractManager.getFarmContract(
                         farm.farm_address
                     )
-                        .withContext({lastRewardBlockTs: farmRecord.lastRewardBlockTs, numberOfAdditionalRewards})
+                        .withContext({
+                            lastRewardBlockTs: farmRecord.lastRewardBlockTs,
+                            numberOfAdditionalRewards,
+                        })
                         .claimRewards(tokenPayments, selfBoost),
                     transactionsDisplayInfo: {
                         successMessage: "Success to boost",
                     },
                 });
             },
-        []
+        [sendTransactions]
     );
 
     return func;
