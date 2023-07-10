@@ -1,7 +1,5 @@
 import { useGetPendingTransactions } from "@multiversx/sdk-dapp/hooks";
-import { useSelector } from "@multiversx/sdk-dapp/reduxStore/DappProviderContext";
 import { ashswapBaseState } from "atoms/ashswap";
-import { dappCoreState } from "atoms/dappState";
 import { GraphOptions } from "graphql/type";
 import useGraphQLQueryOptions from "graphql/useQueries/useGraphQLQueryOptions";
 import { useEffect } from "react";
@@ -34,12 +32,7 @@ const fakePrice = [
     { id: "ALP-8dcaa8", price: 40 },
 ];
 export function useRecoilAdapter() {
-    // copy whole dappContext to recoil
-    const store = useSelector((state) => state);
-    // end
-
     // recoil
-    const setDappState = useSetRecoilState(dappCoreState);
     const setAshBaseState = useSetRecoilState(ashswapBaseState);
     // end recoil
 
@@ -70,8 +63,4 @@ export function useRecoilAdapter() {
     usePoolsState();
     useFarmsState();
     useFarmControllerState();
-    // connect re}coil state to dapp-core
-    useEffect(() => {
-        setDappState(store as any);
-    }, [setDappState, store]);
 }

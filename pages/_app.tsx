@@ -13,6 +13,7 @@ import { ENVIRONMENT } from "const/env";
 import { SocketProvider } from "context/socket";
 import useAshpoint from "hooks/useAshpoint";
 import { useRecoilAdapter } from "hooks/useRecoilAdapter/useRecoilAdapter";
+import useSDKAdapter from "hooks/useRecoilAdapter/useSDKAdapter";
 import { useRefreshAfterTxCompleted } from "hooks/useRefreshAfterTxCompleted";
 import useSentryUser from "hooks/useSentryUser";
 import { NextPage } from "next";
@@ -53,6 +54,10 @@ const GlobalHooks = () => {
     useAshpoint();
     return null;
 };
+const SdkDappAdapter = () => {
+    useSDKAdapter();
+    return null;
+}
 const TestnetGuard = ({ children }: any) => {
     const [pass, setPass] = useState("");
     const [inputPass, setInputPass] = useState("");
@@ -172,6 +177,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
                     dappConfig={{ shouldUseWebViewProvider: true }}
                     // completedTransactionsDelay={500}
                 >
+                    <SdkDappAdapter/>
                     <div className="fixed bottom-14 left-6 right-6 sm:bottom-12 sm:left-auto sm:right-12 z-toast flex flex-col items-end sm:max-w-[480px] space-y-2 sm:space-y-4">
                         <SignTxNotification />
                         <SignTxsModal />
