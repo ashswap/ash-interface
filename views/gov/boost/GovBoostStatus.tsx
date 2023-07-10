@@ -32,7 +32,6 @@ import { TRANSITIONS } from "const/transitions";
 import { toEGLDD } from "helper/balance";
 import { ContractManager } from "helper/contracts/contractManager";
 import { formatAmount } from "helper/number";
-import { sendTransactions } from "helper/transactionMethods";
 import {
     useFarmBoostOwnerState,
     useFarmBoostTransferState,
@@ -44,6 +43,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRecoilCallback, useRecoilValue } from "recoil";
 import FarmBoostTooltip from "views/farms/FarmBoostTooltip";
+import useSendTxsWithTrackStatus from "hooks/useSendTxsWithTrackStatus";
 const FarmRecord = ({
     farmData,
     label,
@@ -288,6 +288,7 @@ function GovBoostStatus() {
     const accAddress = useRecoilValue(accAddressState);
     const farmRecords = useRecoilValue(farmRecordsState);
     const farmTransferedTokens = useRecoilValue(farmTransferedTokensState);
+    const { sendTransactions } = useSendTxsWithTrackStatus();
     const boostOwnerFarmTokens = useRecoilCallback(
         ({ snapshot, set }) =>
             async () => {
@@ -337,7 +338,7 @@ function GovBoostStatus() {
                             .claimRewards(tokenPayments);
                     });
                 const { sessionId, error } = await sendTransactions({
-                    transactions: (
+                    interactions: (
                         await Promise.all(txsPromises)
                     ).reduce((total, txs) => [...total, ...txs], []),
                     transactionsDisplayInfo: {
@@ -356,7 +357,7 @@ function GovBoostStatus() {
                 });
                 setBoostId(sessionId);
             },
-        [canBoostMap]
+        [canBoostMap, sendTransactions]
     );
     const farmRecordsWithOwnerTokens = useMemo(() => {
         return farmRecords.filter(
