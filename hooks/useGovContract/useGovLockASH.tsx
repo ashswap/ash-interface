@@ -26,7 +26,7 @@ const useGovLockASH = (trackStatus = false) => {
                 unlockTimestamp.toNumber()
             );
             return await sendTransactions({
-                transactions: tx,
+                interactions: [tx],
                 transactionsDisplayInfo: {
                     successMessage: `Lock succeed ${toEGLD(
                         ASH_TOKEN,

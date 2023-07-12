@@ -1,5 +1,9 @@
 import { TokenTransfer } from "@multiversx/sdk-core/out";
-import { farmNumberOfAdditionalRewards, farmQuery, farmSessionIdMapState } from "atoms/farmsState";
+import {
+    farmNumberOfAdditionalRewards,
+    farmQuery,
+    farmSessionIdMapState,
+} from "atoms/farmsState";
 import { ASH_TOKEN } from "const/tokens";
 
 import { toEGLDD } from "helper/balance";
@@ -38,10 +42,13 @@ const useFarmClaimReward = (trackStatus = false) => {
                 const txs = await ContractManager.getFarmContract(
                     farm.farm_address
                 )
-                    .withContext({lastRewardBlockTs: farmRecord.lastRewardBlockTs, numberOfAdditionalRewards})
+                    .withContext({
+                        lastRewardBlockTs: farmRecord.lastRewardBlockTs,
+                        numberOfAdditionalRewards,
+                    })
                     .claimRewards(tokenPayments, false);
                 const payload: DappSendTransactionsPropsType = {
-                    transactions: txs,
+                    interactions: txs,
                     transactionsDisplayInfo: {
                         successMessage: `Claim rewards succeed`,
                     },

@@ -78,7 +78,7 @@ function StakeMenu() {
                                                 <Image
                                                     src={ImgLPGem}
                                                     alt="farming icon"
-                                                    layout="responsive"
+                                                    className="w-full h-auto"
                                                 />
                                             </div>
 
@@ -162,7 +162,7 @@ function StakeMenu() {
                                             <Image
                                                 src={ImgMintGem}
                                                 alt="farming icon"
-                                                layout="responsive"
+                                                className="w-full h-auto"
                                             />
                                         </div>
 

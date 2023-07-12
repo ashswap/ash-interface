@@ -12,9 +12,13 @@ const useDAOVote = (trackStatus = false) => {
             async (proposalID: number, yesPct: Percent, noPct: Percent) => {
                 const tx = await ContractManager.getDAOContract(
                     ASHSWAP_CONFIG.dappContract.dao
-                ).vote(proposalID, yesPct.multiply(1e18).quotient, noPct.multiply(1e18).quotient);
+                ).vote(
+                    proposalID,
+                    yesPct.multiply(1e18).quotient,
+                    noPct.multiply(1e18).quotient
+                );
                 await sendTransactions({
-                    transactions: [tx],
+                    interactions: [tx],
                     transactionsDisplayInfo: {
                         successMessage: "Vote for proposal success!",
                     },

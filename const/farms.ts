@@ -152,6 +152,17 @@ const devnet: FarmConfig = {
             farm_token_decimal: 18,
             active: true,
         },
+        {
+            farm_address:
+                "erd1qqqqqqqqqqqqqpgqk0mgg8s6ute3e4vyxhmy0jj60lyp552q2gesmemxaj",
+            reward_token_id: "ASH-4ce444",
+            reward_token_decimal: 18,
+            farming_token_id: "ALP-f881e3",
+            farming_token_decimal: 18,
+            farm_token_id: "FARM-831730",
+            farm_token_decimal: 18,
+            active: true,
+        },
     ],
 };
 

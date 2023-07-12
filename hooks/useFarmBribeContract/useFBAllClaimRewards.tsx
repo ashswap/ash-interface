@@ -17,7 +17,7 @@ const useFBAllClaimRewards = (trackStatus = false) => {
                 if (!fbAccountFarm) return;
                 const farm = new Address(farmAddress);
                 sendTransactions({
-                    transactions: await Promise.all(
+                    interactions: await Promise.all(
                         fbAccountFarm.rewards.map((r) =>
                             ContractManager.getFarmBribeContract(
                                 ASHSWAP_CONFIG.dappContract.farmBribe

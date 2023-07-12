@@ -1,6 +1,3 @@
-import { GAS_PRICE } from "@multiversx/sdk-dapp/constants";
-import { AccountInfoSliceNetworkType } from "@multiversx/sdk-dapp/types";
-import { getNetworkConfig } from "@multiversx/sdk-dapp/utils";
 import {
     AbiRegistry,
     Address,
@@ -8,8 +5,11 @@ import {
     EndpointParameterDefinition,
     Interaction,
     ResultsParser,
-    SmartContract,
+    SmartContract
 } from "@multiversx/sdk-core/out";
+import { GAS_PRICE } from "@multiversx/sdk-dapp/constants";
+import { AccountInfoSliceNetworkType } from "@multiversx/sdk-dapp/types";
+import { addressIsValid, getNetworkConfig } from "@multiversx/sdk-dapp/utils";
 import { gasLimitBuffer, maxGasLimit } from "const/dappConfig";
 import { getProxyNetworkProvider } from "../proxy/util";
 type AbiType = {
@@ -28,6 +28,7 @@ export default class Contract<T extends AbiType = any> {
             abi: this.abiRegistry,
         });
     }
+
     protected getProxy() {
         return getProxyNetworkProvider();
     }

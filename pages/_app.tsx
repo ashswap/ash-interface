@@ -7,11 +7,13 @@ import GlowingButton from "components/GlowingButton";
 import SignTxNotification from "components/SignTxNotification";
 import SignTxsModal from "components/SignTxsModal";
 import TxsToastList from "components/TxsToastList";
+import ClientOnly from "components/Utils/ClientOnly";
 import { DAPP_CONFIG } from "const/dappConfig";
 import { ENVIRONMENT } from "const/env";
 import { SocketProvider } from "context/socket";
 import useAshpoint from "hooks/useAshpoint";
 import { useRecoilAdapter } from "hooks/useRecoilAdapter/useRecoilAdapter";
+import useSDKAdapter from "hooks/useRecoilAdapter/useSDKAdapter";
 import { useRefreshAfterTxCompleted } from "hooks/useRefreshAfterTxCompleted";
 import useSentryUser from "hooks/useSentryUser";
 import { NextPage } from "next";
@@ -52,6 +54,10 @@ const GlobalHooks = () => {
     useAshpoint();
     return null;
 };
+const SdkDappAdapter = () => {
+    useSDKAdapter();
+    return null;
+}
 const TestnetGuard = ({ children }: any) => {
     const [pass, setPass] = useState("");
     const [inputPass, setInputPass] = useState("");
@@ -155,14 +161,14 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
                 description="As the first Stable-swap DEX to become a DeFi Layer on MultiversX, AshSwap provides a new approach to liquidity pool design to enhance yields and reduce slippage."
                 openGraph={{
                     type: "website",
-                    images: [{url: "/images/og-logo.png"}],
+                    images: [{ url: "/images/og-logo.png" }],
                 }}
                 twitter={{
                     cardType: "summary",
                     site: "@ash_swap",
                 }}
             />
-            
+
             <RecoilRoot>
                 <DappProvider
                     environment={ENVIRONMENT.NETWORK}
@@ -171,54 +177,55 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
                     dappConfig={{ shouldUseWebViewProvider: true }}
                     // completedTransactionsDelay={500}
                 >
-                    <TestnetGuard>
-                        <GlobalHooks />
-                        <ProductionErrorBoundary>
-                            {/* <Component {...pageProps} /> */}
-                            {getLayout(<Component {...pageProps} />)}
-                            <ConnectWalletModal />
-                        </ProductionErrorBoundary>
-
-                        <div className="fixed bottom-14 left-6 right-6 sm:bottom-12 sm:left-auto sm:right-12 z-toast flex flex-col items-end sm:max-w-[480px] space-y-2 sm:space-y-4">
-                            <SignTxNotification />
-                            <SignTxsModal />
-                            <div className="absolute top-0 right-0 -translate-y-full pb-4 sm:pb-8">
-                                <TxsToastList />
-                            </div>
+                    <SdkDappAdapter/>
+                    <div className="fixed bottom-14 left-6 right-6 sm:bottom-12 sm:left-auto sm:right-12 z-toast flex flex-col items-end sm:max-w-[480px] space-y-2 sm:space-y-4">
+                        <SignTxNotification />
+                        <SignTxsModal />
+                        <div className="absolute top-0 right-0 -translate-y-full pb-4 sm:pb-8">
+                            <TxsToastList />
                         </div>
+                    </div>
+                </DappProvider>
+                <TestnetGuard>
+                    <ProductionErrorBoundary>
+                        {getLayout(<Component {...pageProps} />)}
+                        <ConnectWalletModal />
+                    </ProductionErrorBoundary>
+                    <ClientOnly>
+                        <GlobalHooks />
                         <SocketProvider>
                             <TxCompletedTracker />
                         </SocketProvider>
                         <GlobalModals />
-                        <div className="hidden sm:flex sm:flex-col fixed bottom-20 left-6 gap-4 text-center z-10">
-                            <a
-                                href="https://event.ashswap.io"
-                                rel="noreferrer"
-                                target="_blank"
-                                className="block"
+                    </ClientOnly>
+                    <div className="hidden sm:flex sm:flex-col fixed bottom-20 left-6 gap-4 text-center z-10">
+                        <a
+                            href="https://event.ashswap.io"
+                            rel="noreferrer"
+                            target="_blank"
+                            className="block"
+                        >
+                            <GlowingButton
+                                theme="green"
+                                className="w-full bg-stake-green-500 backdrop-blur-[25px] px-4 py-3"
                             >
-                                <GlowingButton
-                                    theme="green"
-                                    className="w-full bg-stake-green-500 backdrop-blur-[25px] px-4 py-3"
-                                >
-                                    <span className="text-xs font-bold text-ash-dark-400">
-                                        Event
-                                    </span>
-                                </GlowingButton>
-                            </a>
-                            <a
-                                href="https://forms.gle/VfEEfzTG3LnJPPxC9"
-                                rel="noreferrer"
-                                target="_blank"
-                                className="bg-ash-dark-600 backdrop-blur-[25px] px-4 py-3"
-                            >
-                                <span className="text-xs font-bold text-white">
-                                    Support Ticket
+                                <span className="text-xs font-bold text-ash-dark-400">
+                                    Event
                                 </span>
-                            </a>
-                        </div>
-                    </TestnetGuard>
-                </DappProvider>
+                            </GlowingButton>
+                        </a>
+                        <a
+                            href="https://forms.gle/VfEEfzTG3LnJPPxC9"
+                            rel="noreferrer"
+                            target="_blank"
+                            className="bg-ash-dark-600 backdrop-blur-[25px] px-4 py-3"
+                        >
+                            <span className="text-xs font-bold text-white">
+                                Support Ticket
+                            </span>
+                        </a>
+                    </div>
+                </TestnetGuard>
             </RecoilRoot>
         </>
     );

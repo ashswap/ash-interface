@@ -13,7 +13,7 @@ const useDBClaimReward = (trackStatus = false) => {
                     ASHSWAP_CONFIG.dappContract.daoBribe
                 ).claimReward(proposalID, tokenIDs);
                 await sendTransactions({
-                    transactions: [tx],
+                    interactions: [tx],
                     transactionsDisplayInfo: {
                         successMessage: `Claim rewards from proposal #${proposalID} success!`,
                     },

@@ -27,7 +27,7 @@ const useGovUnlockASH = (trackStatus = false) => {
                     ASHSWAP_CONFIG.dappContract.voteEscrowedContract
                 );
                 const payload: DappSendTransactionsPropsType = {
-                    transactions: await veContract.withdraw(),
+                    interactions: [await veContract.withdraw()],
                     transactionsDisplayInfo: {
                         successMessage: `Unlock success ${toEGLDD(
                             ASH_TOKEN.decimals,

@@ -25,7 +25,7 @@ const useUnwrapWEGLD = (trackStatus = false) => {
                     )
                 );
                 return await sendTransactions({
-                    transactions: tx,
+                    interactions: [tx],
                     transactionsDisplayInfo: {
                         successMessage: `Unwrap ${formatAmount(
                             tokenAmount.egld

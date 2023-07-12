@@ -13,7 +13,7 @@ const useDBWithdrawAll = (trackStatus = false) => {
                     ASHSWAP_CONFIG.dappContract.daoBribe
                 ).withdrawReward(proposalID);
                 await sendTransactions({
-                    transactions: [tx],
+                    interactions: [tx],
                     transactionsDisplayInfo: {
                         successMessage: `Withdraw from proposal #${proposalID} success!`,
                     },
