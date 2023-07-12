@@ -74,7 +74,7 @@ const POOLS_BETA: IPool[] = [
         address:
             "erd1qqqqqqqqqqqqqpgqxdktu7qkd2ers90vtd9k6xlyysvvmuwh2gessch83r",
         lpToken: TOKENS_MAP["ALP-f881e3"],
-        tokens: [TOKENS_MAP["ASH-4ce444"], TOKENS_MAP["JWLEGLD-761a4f"]],
+        tokens: [TOKENS_MAP["WEGLD-d7c6bb"], TOKENS_MAP["JWLEGLD-761a4f"]],
         type: EPoolType.PlainPool,
     },
 ];
