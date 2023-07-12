@@ -5,7 +5,7 @@ const _PROPOSALS_CONFIG = {
     "fr:endProduceRewards": "Stop ASH reward for a farm",
     "fr:startProduceRewards": "Start ASH reward for a farm",
     "fr:createFarm": "Create a new farm",
-    "router:createPool": "Create a new pool",
+    "pr:createPool": "Create a new pool",
 } as const;
 
 export const PROPOSALS_UNALIAS = {
