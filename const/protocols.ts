@@ -1,5 +1,6 @@
 import ImgXexchange from "assets/images/protocols/xexchange.png";
 import ImgAshswap from "assets/images/protocols/ashswap.png";
+import ImgOnedex from "assets/images/protocols/onedex.png";
 export const DEX_PROTOCOLS_MAP: Record<string, {name: string, url?: string, logoUrl?: string}> = {
     xexchange: {
         name: "xExchange",
@@ -13,4 +14,8 @@ export const DEX_PROTOCOLS_MAP: Record<string, {name: string, url?: string, logo
         name: "Ashswap Crypto Pool",
         logoUrl: ImgAshswap.src
     },
+    onedex: {
+        name: "OneDex",
+        logoUrl: ImgOnedex.src
+    }
 };
