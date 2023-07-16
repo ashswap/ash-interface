@@ -172,7 +172,7 @@ deploy_ipfs_beta:
     <<: *env_prod
   only:
     - /^.*-prod$/
-    - /^.*-prod-alpha$/
+    - /^.*-prod-gamma$/
   except:
     - branches
   retry: 2
