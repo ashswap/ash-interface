@@ -373,6 +373,7 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
                         checked={isBalanced}
                         onChange={onChangeIsBalanced}
                         className="inline-flex items-center mb-7"
+                        theme="yellow"
                     >
                         <span className="ml-2 font-bold text-sm text-stake-gray-500 underline">
                             Balanced Withdraw
@@ -453,11 +454,24 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
                                         />
                                     </div>
                                 </div>
-                                <div className="flex justify-end font-medium text-2xs text-ash-gray-600">
-                                    ~$
-                                    {formatAmount(removeUSD, {
-                                        notation: "standard",
-                                    })}
+                                <div
+                                    className={`pt-2 pb-4 font-medium text-2xs text-text-input-3 text-right`}
+                                >
+                                    <span>Available: </span>
+                                    <span
+                                        className="text-earn cursor-pointer"
+                                        onClick={() =>
+                                            onChangeLiquidityPercent(100)
+                                        }
+                                    >
+                                        <TextAmt
+                                            number={lpAmount.egld}
+                                            options={{
+                                                notation: "standard",
+                                            }}
+                                        />{" "}
+                                        {lpAmount.token.symbol}
+                                    </span>
                                 </div>
                             </div>
                         </OnboardTooltip>
@@ -502,13 +516,13 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
                         </div>
                     </div>
                     <div className="relative">
-                        <div className="absolute top-0 sm:-top-20 bottom-[4.3rem] left-1 w-4 sm:w-10 border-l border-dashed rounded-bl-lg border-ash-gray-600"></div>
+                        <div className="absolute top-0 sm:-top-28 bottom-[3.3rem] left-1 w-4 sm:w-10 border-l border-dashed rounded-bl-lg border-ash-gray-600"></div>
                         {pool.tokens.map((_t, i) => {
                             const t = getTokenFromId(_t.identifier);
                             return (
                                 <div key={t.identifier} className="py-1.5">
                                     <div
-                                        className={`absolute top-0 sm:-top-20 left-1 w-4 sm:w-10 border-l border-yellow-500 rounded-bl-lg ${
+                                        className={`absolute top-0 sm:-top-28 left-1 w-4 sm:w-10 border-l border-yellow-500 rounded-bl-lg ${
                                             i === selectedTokenIndex ||
                                             isBalanced
                                                 ? "block"
@@ -516,12 +530,12 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
                                         }`}
                                         style={{
                                             bottom: `${
-                                                (pool.tokens.length - i) * 6.2 -
-                                                1.9
+                                                (pool.tokens.length - i) * 5.3 -
+                                                2
                                             }rem`,
                                         }}
                                     ></div>
-                                    <div className="flex items-center flex-row space-x-1">
+                                    <div className="flex items-center flex-row space-x-1 pb-6">
                                         <div className="shrink-0 w-36 sm:w-48 flex items-center">
                                             <div className="shrink-0 pr-3 lg:pr-6 relative pl-4 sm:pl-10 w-14 sm:w-[7rem] min-h-[1rem] flex items-center justify-center">
                                                 <div
@@ -592,11 +606,11 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
                                                                     selectedTokenIndex ===
                                                                     i
                                                                         ? "fill-yellow-500/20 stroke-yellow-500"
-                                                                        : "stroke-white group-hover:stroke-yellow-500"
+                                                                        : "fill-[#353248] stroke-ash-gray-600 group-hover:stroke-yellow-500"
                                                                 }`}
                                                             />
                                                             <ICChevronRight
-                                                                className={`transition-all delay-75 absolute w-1.5 sm:w-2.5 h-auto text-yellow-500 ${
+                                                                className={`transition-all delay-75 absolute w-1.5 sm:w-2 h-auto text-yellow-500 ${
                                                                     selectedTokenIndex ===
                                                                     i
                                                                         ? "opacity-100 scale-100"
@@ -619,12 +633,12 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
                                             </div>
                                         </div>
                                         <InputCurrency
-                                            className={`transition-all duration-300 flex-1 overflow-hidden text-right text-lg h-12 px-5 outline-none ${
+                                            className={`transition-all duration-300 flex-1 overflow-hidden text-right text-lg h-12 px-5 outline-none border ${
                                                 isBalanced
-                                                    ? "bg-ash-dark-500"
+                                                    ? "bg-ash-dark-500 border-transparent"
                                                     : selectedTokenIndex === i
-                                                    ? "bg-ash-dark-700"
-                                                    : "bg-ash-dark-500 opacity-30"
+                                                    ? "bg-[#1B192D] border-black"
+                                                    : "bg-ash-dark-300 border-transparent"
                                             }`}
                                             placeholder="0"
                                             value={outputValues[i]
@@ -632,25 +646,6 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
                                                 .toNumber()}
                                             disabled
                                         />
-                                    </div>
-                                    <div
-                                        className={`pt-2 pb-4 font-medium text-2xs text-text-input-3 text-right ${
-                                            isBalanced ||
-                                            selectedTokenIndex === i
-                                                ? "opacity-100"
-                                                : "opacity-0"
-                                        }`}
-                                    >
-                                        <span>Available: </span>
-                                        <span className="text-earn">
-                                            <TextAmt
-                                                number={maxOutputValues[i].egld}
-                                                options={{
-                                                    notation: "standard",
-                                                }}
-                                            />{" "}
-                                            {t.symbol}
-                                        </span>
                                     </div>
                                 </div>
                             );
