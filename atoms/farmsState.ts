@@ -1,6 +1,6 @@
 import BigNumber from "bignumber.js";
 import { TokenAmount } from "helper/token/tokenAmount";
-import { FarmTokenAttrs, IFarm } from "interface/farm";
+import { EFarmState, FarmTokenAttrs, IFarm } from "interface/farm";
 import IPool from "interface/pool";
 import { PoolStatsRecord } from "interface/poolStats";
 import { IMetaESDT } from "interface/tokens";
@@ -49,6 +49,7 @@ export type FarmRecord = {
     tradingAPR: number;
     totalAPRMin: number;
     totalAPRMax: number;
+    state: EFarmState;
 };
 
 export type FarmSortOption = "apr" | "liquidity" | "volume";
