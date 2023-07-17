@@ -1,6 +1,7 @@
 import ICArrowLeft from "assets/svg/arrow-left.svg";
 import ICArrowRight from "assets/svg/arrow-right.svg";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
+import { WEEK } from "const/ve";
 import { fetcher } from "helper/common";
 import { formatAmount } from "helper/number";
 import moment from "moment";
@@ -37,25 +38,25 @@ const Row = ({ order, feeData }: { order: number; feeData: FeeRecord }) => {
         </div>
     );
 };
+const emptyArray: FeeRecord[] = [];
 function WeeklyFeeTable() {
     // testing/BoY purpose: currently calculate fee every 10 minutes -> should get x*7*24*60/10 records from server
     const { data } = useSWR<FeeRecord[]>(
         `${
             ASHSWAP_CONFIG.ashApiBaseUrl
         }/stake/governance/summary?offset=0&limit=${(10 * 7 * 24 * 60) / 10}`,
-        fetcher
+        (url) =>
+            fetcher(url).then((data) =>
+                Array.isArray(data) ? data : emptyArray
+            ),
+        { fallback: emptyArray }
     );
     const [pageIndex, setPageIndex] = useState(0);
     const [pageSize, setPageSize] = useState(10);
     const records = useMemo(() => {
         const map: Record<number, FeeRecord[]> = {};
         (data || []).map((val) => {
-            const key = moment
-                .unix(val.from_timestamp)
-                .utc()
-                .weekday(0)
-                // .endOf("days")
-                .unix();
+            const key = Math.floor(val.from_timestamp / WEEK) * WEEK;
             map[key] = [...(map[key] || []), val];
         });
         return Object.entries(map)
