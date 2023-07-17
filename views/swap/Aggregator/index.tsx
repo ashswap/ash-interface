@@ -226,7 +226,7 @@ const Aggregator = memo(function Aggregator() {
 
     const swapHandle = useCallback(async () => {
         if (tokenAmountFrom && tokenAmountTo && data?.swaps)
-            aggregate([tokenAmountFrom], data.swaps, [tokenAmountTo], data.tokenAddresses || []);
+            aggregate([tokenAmountFrom], data.swaps, [tokenAmountTo], data?.tokenAddresses || []);
     }, [aggregate, data, tokenAmountFrom, tokenAmountTo]);
 
     const wrapHandle = useCallback(async () => {
