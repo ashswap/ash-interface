@@ -22,7 +22,7 @@ import { ContractManager } from "helper/contracts/contractManager";
 import FarmContract from "helper/contracts/farmContract";
 import { calcYieldBoostFromFarmToken } from "helper/farmBooster";
 import { TokenAmount } from "helper/token/tokenAmount";
-import { FarmTokenAttrs, IFarm } from "interface/farm";
+import { EFarmState, FarmTokenAttrs, IFarm } from "interface/farm";
 import IPool from "interface/pool";
 import moment from "moment";
 import {
@@ -311,6 +311,11 @@ const useFarmsState = () => {
                 ashBaseAPR,
                 tokensAPR,
                 tradingAPR,
+                state: rawFarm?.state
+                    ? (EFarmState[
+                          rawFarm.state as any
+                      ] as unknown as EFarmState) ?? EFarmState.Inactive
+                    : EFarmState.Inactive,
                 totalAPRMin:
                     ashBaseAPR +
                     tradingAPR +
