@@ -10,8 +10,11 @@ const useAgTokenList = (swrConfig: SWRConfiguration = {}) => {
         (url) =>
             fetcher(url, {
                 headers: { "authen-token": ENVIRONMENT.AG_TOKEN_SECRET },
-            }),
-        swrConfig
+            }).then(data => Array.isArray(data) ? data : []),
+        {
+            fallback: [],
+            ...swrConfig,
+        }
     );
     return res;
 };
