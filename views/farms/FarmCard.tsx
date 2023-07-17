@@ -38,6 +38,7 @@ import FarmConfirmHarvestModal from "./FarmConfirmHarvestModal";
 import { ViewType } from "./FarmFilter";
 import FarmListLayoutContainer from "./FarmListLayoutContainer";
 import FarmMultiRewardsTooltip from "./FarmMultiRewardsTooltip";
+import { EFarmState } from "interface/farm";
 
 type props = {
     farmData: FarmRecord;
@@ -572,7 +573,15 @@ function FarmCard({ farmData, viewType }: props) {
                                 <GlowingButton
                                     theme="cyan"
                                     className={`clip-corner-1 clip-corner-br w-[7.25rem] h-14 text-sm font-bold underline`}
+                                    disabled={
+                                        farmData?.state === EFarmState.Inactive
+                                    }
                                     onClick={() => {
+                                        if (
+                                            farmData?.state ===
+                                            EFarmState.Inactive
+                                        )
+                                            return;
                                         setOpenStakeLP(true);
                                         setIsClickedStakeButton(true);
                                     }}
@@ -649,7 +658,9 @@ function FarmCard({ farmData, viewType }: props) {
         <GlowingButton
             theme="cyan"
             className={`clip-corner-1 clip-corner-br h-10 lg:h-12 w-full font-bold underline text-xs`}
+            disabled={farmData?.state === EFarmState.Inactive}
             onClick={() => {
+                if (farmData?.state === EFarmState.Inactive) return;
                 setOpenStakeLP(true);
                 setIsClickedStakeButton(true);
             }}
