@@ -102,7 +102,7 @@ class PoolV2Contract extends Contract<typeof poolV2Abi> {
         ]);
         interaction
             .withSingleESDTTransfer(tokenPayment)
-            .withGasLimit(15_000_000);
+            .withGasLimit(18_000_000);
         return this.interceptInteraction(interaction);
     }
 }

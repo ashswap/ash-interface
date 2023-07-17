@@ -1,13 +1,14 @@
 import { useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
-import styles from "./Switch.module.css";
+
 interface Props {
     checked?: boolean;
     onChange?: (val: boolean) => void;
     children?: any;
     className?: string;
     ref?: any
+    theme?: "pink" | "yellow"
 }
-function Switch({checked, onChange, children, className, ref}: Props) {
+function Switch({checked, onChange, children, className, ref, theme = "pink"}: Props) {
     const [_checked, set_checked] = useState(checked ?? false);
     const toggle = useCallback(() => {
         set_checked(val => !val);
@@ -40,15 +41,15 @@ function Switch({checked, onChange, children, className, ref}: Props) {
                     fill="currentColor"
                     xmlns="http://www.w3.org/2000/svg"
                     className={
-                        _checked ? "text-pink-600/20" : "text-ash-gray-500/30"
+                        _checked ? theme === "pink" ? "text-pink-600/20" : "text-yellow-500/20" : "text-ash-gray-500/30"
                     }
                 >
                     <path d="M7.9245 0H25.0755L33 8L25.0755 16H7.9245L0 8L7.9245 0Z" />
                 </svg>
                 <div
-                    className={`transition-all duration-200 ease-in absolute w-[12.54px] h-[12.54px] rotate-45 top-[9px] translate-y-[-50%] ${
+                    className={`transition-all duration-200 ease-in absolute w-[12px] h-[12px] rotate-45 top-[8px] translate-y-[-50%] ${
                         _checked
-                            ? "left-[18px] bg-pink-600 " + styles.active
+                            ? `left-[18px] colored-drop-shadow-md ${theme === "pink" ? "bg-pink-600 colored-drop-shadow-pink-600/75" : "bg-yellow-500 colored-drop-shadow-yellow-500/75"}`
                             : "left-[3px] bg-ash-gray-500"
                     }`}
                 ></div>

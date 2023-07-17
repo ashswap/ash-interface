@@ -191,7 +191,7 @@ class PoolContract extends Contract<typeof poolAbi> {
         ]);
         interaction
             .withSingleESDTTransfer(tokenPayment)
-            .withGasLimit(9_000_000);
+            .withGasLimit(15_000_000);
         return this.interceptInteraction(interaction);
     }
 
