@@ -6,6 +6,8 @@ import IconHSEGLD from "assets/images/hsegld-icon.png";
 import IconUSDC from "assets/images/usdc-icon.png";
 import IconUSDT from "assets/images/usdt-icon.png";
 import ImgWEGLDIcon from "assets/images/wegld-icon.png";
+import IconJWLASH from "assets/images/jwlash-icon.png";
+import IconJWLEGLD from "assets/images/jwlegld-icon.png";
 import { ChainId, IESDTInfo } from "helper/token/token";
 const TOKENS_ALIAS: Record<"EGLD" | "ASH" | "wEGLD", IESDTInfo> = {
     EGLD: {
@@ -77,6 +79,22 @@ const TOKENS: IESDTInfo[] = [
         decimals: 8,
         logoURI: IconHSEGLD.src,
     },
+    {
+        identifier: "JWLASH-f362b9",
+        chainId: ChainId.Mainnet,
+        symbol: "JWLASH",
+        name: "JewelLockedASH",
+        decimals: 18,
+        logoURI: IconJWLASH.src,
+    },
+    {
+        identifier: "JWLEGLD-023462",
+        chainId: ChainId.Mainnet,
+        symbol: "JWLEGLD",
+        name: "JewelLockedEGLD",
+        decimals: 18,
+        logoURI: IconJWLEGLD.src,
+    },
 ];
 
 const LP_TOKENS: IESDTInfo[] = [
@@ -113,6 +131,20 @@ const LP_TOKENS: IESDTInfo[] = [
         identifier: "ALP-796121",
         chainId: ChainId.Mainnet,
         symbol: "ALP-HSEGLD-SEGLD",
+        name: "Ashswap LP",
+        decimals: 18,
+    },
+    {
+        identifier: "ALP-f7dee1",
+        chainId: ChainId.Mainnet,
+        symbol: "ALP-ASH-JWLASH",
+        name: "Ashswap LP",
+        decimals: 18,
+    },
+    {
+        identifier: "ALP-713ae8",
+        chainId: ChainId.Mainnet,
+        symbol: "ALP-WEGLD-JWLEGLD",
         name: "Ashswap LP",
         decimals: 18,
     },
