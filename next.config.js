@@ -33,11 +33,9 @@ const config = {
     ) {
         const ignorePathsBase = ["/stake", "/stake/mint"];
         const ignorePaths =
-            process.env.NEXT_PUBLIC_NETWORK === "mainnet"
-                ? ["/gov/dao", "/gov/dao/propose", "/gov/dao/detail"]
-                : process.env.NEXT_PUBLIC_ASH_ENV === "alpha"
-                ? []
-                : ["/ashpoint"];
+            process.env.NEXT_PUBLIC_ASH_ENV === "beta"
+                ? ["/ashpoint"]
+                : [];
         const entries = Object.entries(defaultPathMap)
             .map(([path, pageObj]) => {
                 return [
