@@ -6,7 +6,7 @@ WORKDIR /app
 COPY package.json yarn.lock ./
 RUN yarn install --frozen-lockfile
 COPY . .
-RUN cat .env yarn build && yarn export && cp ./out/404.html ./out/ipfs-404.html
+RUN yarn build && yarn export && cp ./out/404.html ./out/ipfs-404.html
 
 FROM node:16.16.0 AS runner
 WORKDIR /app
