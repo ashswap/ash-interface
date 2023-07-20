@@ -155,7 +155,7 @@ deploy_ipfs_beta:
   # TODO: prod
   BUILD_ENV: dev
   NEXT_PUBLIC_ASH_API: https://api.ashswap.io
-  NEXT_PUBLIC_ASH_DOMAIN: app-alpha.ashswap.io
+  NEXT_PUBLIC_ASH_DOMAIN: app.ashswap.io
   NEXT_PUBLIC_ASH_GRAPHQL: https://api-v2.ashswap.io
   NEXT_PUBLIC_ASH_SOCKET: https://socket-api-fra-aws.multiversx.com
   NEXT_PUBLIC_ASH_SOCKET_EXTRA: 
