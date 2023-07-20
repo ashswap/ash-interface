@@ -146,6 +146,51 @@ deploy_ipfs_beta:
     - build_beta
   <<: *deploy_ipfs_script_template
 
+######################### Mainnet Gamma #########################
+
+.env_prod_gamma: &env_prod_gamma
+  <<: *env_common
+  NEXT_PUBLIC_NETWORK: mainnet
+  NEXT_PUBLIC_ASH_ENV: beta
+  # TODO: prod
+  BUILD_ENV: dev
+  NEXT_PUBLIC_ASH_API: https://api.ashswap.io
+  NEXT_PUBLIC_ASH_DOMAIN: app-alpha.ashswap.io
+  NEXT_PUBLIC_ASH_GRAPHQL: https://api-v2.ashswap.io
+  NEXT_PUBLIC_ASH_SOCKET: https://socket-api-fra-aws.multiversx.com
+  NEXT_PUBLIC_ASH_SOCKET_EXTRA: 
+  NEXT_PUBLIC_ASH_LOG_API: https://api-tracking.ashswap.io
+  NEXT_PUBLIC_IPFS_API: https://ipfs-cluster-api-internal.bicarus.io
+  NEXT_PUBLIC_AG_API: https://aggregator-alpha.ashswap.io
+  NEXT_PUBLIC_XEXCHANGE_GRAPH_API: https://graph.xexchange.com
+
+.job_template_prod_gamma: &job_template_prod_gamma
+  environment:
+    name: mainnet-gamma
+    url: https://app.ashswap.io
+  variables:
+    <<: *env_prod_gamma
+  only:
+    - /^.*-prod-gamma$/
+  except:
+    - branches
+  retry: 2
+
+dockerize_prod_gamma:
+  extends: .build
+  <<: *job_template_prod_gamma
+
+build_prod_gamma:
+  stage: build
+  image: node:16.16.0
+  <<: *job_template_prod_gamma
+  <<: *build_script_template
+  artifacts:
+    name: "$CI_JOB_NAME-$CI_COMMIT_REF_NAME"
+    paths:
+      - out/
+    expire_in: 1 week
+
 ######################### Mainnet #########################
 
 .env_prod: &env_prod
@@ -172,7 +217,6 @@ deploy_ipfs_beta:
     <<: *env_prod
   only:
     - /^.*-prod$/
-    - /^.*-prod-gamma$/
   except:
     - branches
   retry: 2
