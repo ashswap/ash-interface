@@ -76,7 +76,7 @@ dockerize_alpha:
 
 build_alpha:
   stage: build
-  image: node:16.16.0
+  image: node:14.18.0
   <<: *job_template_alpha
   <<: *build_script_template
   artifacts:
@@ -87,7 +87,7 @@ build_alpha:
 
 deploy_ipfs_alpha:
   stage: deploy
-  image: node:16.16.0
+  image: node:14.18.0
   <<: *job_template_alpha
   dependencies:
     - build_alpha
@@ -128,7 +128,7 @@ dockerize_beta:
 
 build_beta:
   stage: build
-  image: node:16.16.0
+  image: node:14.18.0
   <<: *job_template_beta
   <<: *build_script_template
   artifacts:
@@ -139,7 +139,7 @@ build_beta:
 
 deploy_ipfs_beta:
   stage: deploy
-  image: node:16.16.0
+  image: node:14.18.0
   <<: *job_template_beta
   dependencies:
     - build_beta
@@ -170,7 +170,7 @@ deploy_ipfs_beta:
   variables:
     <<: *env_prod_gamma
   only:
-    - /^.*-prod-a$/
+    - /^.*-prod-gamma$/
   except:
     - branches
   retry: 2
@@ -181,7 +181,7 @@ dockerize_prod_gamma:
 
 build_prod_gamma:
   stage: build
-  image: node:16.16.0
+  image: node:14.18.0
   <<: *job_template_prod_gamma
   <<: *build_script_template
   artifacts:
@@ -226,7 +226,7 @@ dockerize_prod:
 
 build_prod:
   stage: build
-  image: node:16.16.0
+  image: node:14.18.0
   <<: *job_template_prod
   <<: *build_script_template
   artifacts:
@@ -237,7 +237,7 @@ build_prod:
 
 deploy_ipfs_prod:
   stage: deploy
-  image: node:16.16.0
+  image: node:14.18.0
   <<: *job_template_prod
   dependencies:
     - build_prod
