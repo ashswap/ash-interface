@@ -166,7 +166,7 @@ deploy_ipfs_beta:
 
 .job_template_prod_gamma: &job_template_prod_gamma
   environment:
-    name: mainnet-gamma
+    name: mainnet
     url: https://app.ashswap.io
   variables:
     <<: *env_prod_gamma
