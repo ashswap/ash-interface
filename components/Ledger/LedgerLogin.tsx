@@ -1,6 +1,8 @@
-import { useGetAccountInfo, useLedgerLogin } from "@multiversx/sdk-dapp/hooks";
+import { useLedgerLogin } from "@multiversx/sdk-dapp/hooks";
 import { UseLedgerLoginPropsType } from "@multiversx/sdk-dapp/hooks/login/useLedgerLogin";
-import {} from "@multiversx/sdk-dapp/types/login.types";
+import { } from "@multiversx/sdk-dapp/types/login.types";
+import { accInfoState } from "atoms/dappState";
+import { useRecoilValue } from "recoil";
 import { AddressTable } from "./AddressTable";
 import { ConfirmAddress } from "./ConfirmAddress";
 import { LedgerConnect } from "./LedgerConnect";
@@ -21,7 +23,7 @@ export const LedgerLogin = ({
     token,
     nativeAuth,
 }: LedgerLoginContainerPropsType) => {
-    const { ledgerAccount } = useGetAccountInfo();
+    const { ledgerAccount } = useRecoilValue(accInfoState);
     const [
         onStartLogin,
         { error, isLoading },
