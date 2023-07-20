@@ -212,7 +212,7 @@ function DAODetail({
                                 {proposalLabel}
                             </div>
                         )}
-                        <section ref={descriptionRef}>
+                        <section ref={descriptionRef} className="break-words">
                             <h3 className="mb-6 font-bold text-2xl text-white">
                                 {meta.title}
                             </h3>
