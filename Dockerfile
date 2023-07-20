@@ -4,9 +4,9 @@ ENV NEXT_TELEMETRY_DISABLED 1
 
 WORKDIR /app
 COPY package.json yarn.lock ./
-RUN node --stack_size=1200 && yarn install --frozen-lockfile
+RUN yarn install --frozen-lockfile
 COPY . .
-RUN yarn build && yarn export && cp ./out/404.html ./out/ipfs-404.html
+RUN . ./.env && rm .env && yarn build && yarn export && cp ./out/404.html ./out/ipfs-404.html
 
 FROM node:16.20.1 AS runner
 WORKDIR /app
