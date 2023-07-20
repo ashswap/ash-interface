@@ -1,5 +1,4 @@
-import { useGetAccountInfo } from "@multiversx/sdk-dapp/hooks";
-import { loginInfoState } from "atoms/dappState";
+import { accInfoState, loginInfoState } from "atoms/dappState";
 import { useMemo } from "react";
 import { useRecoilValue } from "recoil";
 
@@ -12,7 +11,7 @@ export const ConfirmAddress = ({
     token,
     noBorder,
 }: ConfirmAddressPropsType) => {
-    const { ledgerAccount } = useGetAccountInfo();
+    const { ledgerAccount } = useRecoilValue(accInfoState);
     const loginInfo = useRecoilValue(loginInfoState);
     const loginToken = useMemo(() => {
         return loginInfo?.tokenLogin?.loginToken ?? token;
