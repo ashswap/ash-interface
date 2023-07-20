@@ -4,7 +4,7 @@ import StakeLayout from "components/Layout/stake";
 import { GraphOptions } from "graphql/type";
 import useGraphQLQueryOptions from "graphql/useQueries/useGraphQLQueryOptions";
 import { useRouter } from "next/router";
-import { ReactElement, useEffect, useMemo } from "react";
+import { ReactElement, useMemo } from "react";
 import DAODetail from "views/gov/dao/detail";
 const queryOptions: GraphOptions = {};
 function DAODetailPage() {
@@ -12,13 +12,8 @@ function DAODetailPage() {
     const router = useRouter();
     const proposalID = useMemo(
         () => +((router.query.proposalID as string) ?? -1),
-        [router]
+        [router.query]
     );
-    useEffect(() => {
-        if (proposalID === -1 || Number.isNaN(proposalID)) {
-            router.replace("/gov/dao");
-        }
-    }, [proposalID, router]);
     return (
         <>
             <div className="ash-container text-white">
