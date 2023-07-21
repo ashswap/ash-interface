@@ -571,7 +571,7 @@ const StakeMoreContent = ({ open, onClose }: props) => {
                                         <div>
                                             Percentage of your veASH to the
                                             total veASH in ASHSWAP Governance
-                                            Stake. It depends on the reward that
+                                            Stake. It determines the reward that
                                             you’ll receive.
                                         </div>
                                     }

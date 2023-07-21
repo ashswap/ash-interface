@@ -92,7 +92,7 @@ function GovVeASHStats() {
                             content={
                                 <div>
                                     Percentage of your veASH to the total veASH
-                                    in ASHSWAP Governance Stake. It depends on
+                                    in ASHSWAP Governance Stake. It determines
                                     the reward that you’ll receive.
                                 </div>
                             }
