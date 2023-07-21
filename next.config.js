@@ -33,7 +33,7 @@ const config = {
     ) {
         const ignorePathsBase = ["/stake", "/stake/mint"];
         const ignorePaths =
-            process.NEXT_PUBLIC_NETWORK !== 'mainnet' && process.env.NEXT_PUBLIC_ASH_ENV === "beta"
+            process.NEXT_PUBLIC_NETWORK === 'devnet' && process.env.NEXT_PUBLIC_ASH_ENV === "beta"
                 ? ["/ashpoint"]
                 : [];
         const entries = Object.entries(defaultPathMap)
