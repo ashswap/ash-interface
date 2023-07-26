@@ -1,4 +1,5 @@
 import ImgAvatar from "assets/images/avatar.png";
+import ICAggregator from "assets/svg/aggregator.svg";
 import ICChevronDown from "assets/svg/chevron-down.svg";
 import ICChevronRight from "assets/svg/chevron-right.svg";
 import ICChevronLeft from "assets/svg/chevron-left.svg";
@@ -233,6 +234,15 @@ function InfoLayout({ children }: any) {
                                         Icon={ICStake}
                                         collapsed={!openSidebar}
                                         active={isActive("/info/stake", false)}
+                                    />
+                                </li>
+                                <li>
+                                    <NavLink
+                                        href="/info/aggregator"
+                                        name="Aggregator"
+                                        Icon={ICAggregator}
+                                        collapsed={!openSidebar}
+                                        active={isActive("/info/aggregator", false)}
                                     />
                                 </li>
                                 {/* <li>
