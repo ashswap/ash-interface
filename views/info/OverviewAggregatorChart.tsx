@@ -1,6 +1,5 @@
 import { ChartActiveDot } from "components/Chart/ChartActiveDot";
 import { ChartLineX } from "components/Chart/ChartLineX";
-import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 import { CHART_INTERVAL, MONTH_SHORT } from "const/time";
 import { fetcher } from "helper/common";
 import { formatAmount } from "helper/number";
@@ -23,18 +22,19 @@ const CustomActiveDot = ({ dotColor, ...props }: any) => {
     const { cx, cy } = props;
     return <ChartActiveDot dotColor={dotColor} cx={cx} cy={cy} />;
 };
-const CustomTooltipCursor = ({ areaRef, ...props }: any) => {
-    const { width, height, left, payloadIndex } = props;
-    if (!areaRef.current) return null;
-    const y = areaRef.current.state.curPoints[payloadIndex]?.y || 0;
+const CustomTooltipCursor = ({ barRef, ...props }: any) => {
+    let { width, height, payloadIndex } = props;
+    if (!barRef.current) return null;
+    const y = barRef.current.state.curData[payloadIndex]?.y || 0;
     const value =
-        areaRef.current.state.curPoints[payloadIndex]?.payload.value || 0;
+        barRef.current.state.curData[payloadIndex]?.payload.value || 0;
+    width = width * (barRef.current.state.curData.length - 1) + 51;
 
     return (
         <ChartLineX
             width={width}
             height={height}
-            left={left}
+            left={0}
             y={y}
             label={formatAmount(value) || ""}
         />
@@ -46,7 +46,7 @@ function OverviewAggregatorChart() {
         fetcher,
         { refreshInterval: 5 * 60 * 1000 }
     );
-    const areaRef = useRef<any>(null);
+    const barRef = useRef<any>(null);
     const [activePayload, setActivePayload] =
         useState<{ timestamp: number; value: number }>();
 
@@ -149,18 +149,18 @@ function OverviewAggregatorChart() {
                             tick={{ fill: "#B7B7D7", fontSize: sm ? 12 : 10 }}
                         />
                         <Bar
-                            // ref={barRef}
+                            ref={barRef}
                             dataKey="value"
                             fill="url(#OVC-pattern)"
                             maxBarSize={50}
                         />
-                        {/* <Tooltip
+                        <Tooltip
                             coordinate={{ x: 0, y: 0 }}
                             active={true}
                             position={{ x: 0, y: 0 }}
-                            // cursor={<CustomTooltipCursor barRef={barRef} />}
+                            cursor={<CustomTooltipCursor barRef={barRef} />}
                             content={<></>}
-                        /> */}
+                        />
                     </BarChart>
                 </ResponsiveContainer>
             </div>
