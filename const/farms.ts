@@ -220,7 +220,7 @@ const mainnet: IFarm[] = [
         farming_token_decimal: 18,
         farm_token_id: "FARM-13ebe8",
         farm_token_decimal: 18,
-        active: true,
+        active: false,
     },
     {
         farm_address:
