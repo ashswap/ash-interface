@@ -30,12 +30,9 @@ export const fbTreasuresSelector = selectorFamily<TokenAmount[], string>({
     key: "farm_bribe_total_availabel_treasures_selector",
     get: (farmAddress) => ({get}) => {
         const fbFarm = get(fbFarmSelector(farmAddress));
-        const fcFarm = get(fcFarmSelector(farmAddress));
         return fbFarm?.rewards.filter(r => !!TOKENS_MAP[r.tokenId]).map(r => {
-            const currentAlloc = new BigNumber(r.rewardPerVote).multipliedBy(fcFarm?.votedPoint.bias || 0).idiv(PRECISION);
             const available = new BigNumber(r.total).minus(r.claimed);
-            const nextWeek = available.minus(currentAlloc);
-            return new TokenAmount(TOKENS_MAP[r.tokenId], nextWeek.gt(10) ? nextWeek : 0);
+            return new TokenAmount(TOKENS_MAP[r.tokenId], available.gt(10) ? available : 0);
         }) || [];
     }
 })
