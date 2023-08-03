@@ -35,7 +35,8 @@ function DAOHistory({
         <div className="px-9 py-10 bg-stake-dark-300">
             <div className="mb-7.5 font-bold text-2xl text-white">History</div>
             <div className="flex flex-col gap-6">
-                {executed.map((ex) => {
+                {executed.map((_, i) => {
+                    const ex = executed[executed.length - 1 - i];
                     return (
                         <div key={ex.executed_by}>
                             <div className="mb-2 font-medium text-sm text-stake-gray-500">
