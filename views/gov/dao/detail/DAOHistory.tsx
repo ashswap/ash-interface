@@ -37,8 +37,9 @@ function DAOHistory({
             <div className="flex flex-col gap-6">
                 {executed.map((_, i) => {
                     const ex = executed[executed.length - 1 - i];
+                    const key = `${ex.executed_by}:${ex.executed_at}`;
                     return (
-                        <div key={ex.executed_by}>
+                        <div key={key}>
                             <div className="mb-2 font-medium text-sm text-stake-gray-500">
                                 <DAOHistoryTimeFormatter
                                     timestamp={ex.executed_at}
