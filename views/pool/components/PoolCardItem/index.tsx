@@ -12,7 +12,7 @@ import { formatAmount } from "helper/number";
 import { getTokenFromId } from "helper/token";
 import { useOnboarding } from "hooks/useOnboarding";
 import { useScreenSize } from "hooks/useScreenSize";
-import IPool from "interface/pool";
+import IPool, { EPoolState } from "interface/pool";
 import { Unarray } from "interface/utilities";
 import { useState, useEffect, useMemo } from "react";
 import { useRecoilValue } from "recoil";
@@ -157,8 +157,9 @@ function PoolCardItem({
                         theme="pink"
                         className="w-full clip-corner-1 clip-corner-br h-14 text-sm font-bold text-white underline"
                         wrapperClassName="hover:colored-drop-shadow-xs"
-                        disabled={!poolData.state}
+                        disabled={poolData.state === EPoolState.Inactive}
                         onClick={() => {
+                            if (poolData.state === EPoolState.Inactive) return;
                             setOpenAddLiquidity(true);
                             setOnboardedPoolDeposit(true);
                         }}

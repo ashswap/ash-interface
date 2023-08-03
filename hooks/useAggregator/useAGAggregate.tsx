@@ -1,4 +1,4 @@
-import { TokenTransfer, Transaction } from "@multiversx/sdk-core/out";
+import { Interaction, TokenTransfer } from "@multiversx/sdk-core/out";
 import { accInfoState } from "atoms/dappState";
 import BigNumber from "bignumber.js";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
@@ -24,7 +24,7 @@ const useAGAggregate = (trackStatus = false) => {
                 tokensAmount: TokenAmount[],
                 swaps: SorSwap[],
                 minTokensAmountOut: TokenAmount[],
-                hopTokenIds: string[],
+                hopTokenIds: string[]
             ) => {
                 const egldIn = tokensAmount.find(
                     (t) => t.token.identifier === "EGLD"
@@ -57,20 +57,22 @@ const useAGAggregate = (trackStatus = false) => {
                 });
                 const slippage = await snapshot.getPromise(agSlippageAtom);
                 const pct = new Percent(100, 100).subtract(slippage);
-                const normalizeTokenIds = minTokensAmountOut.map(t => getTokenIdFromCoin(t.token.identifier));
-                const hopLimits = hopTokenIds.filter(id => !normalizeTokenIds.includes(id)).map(id => ({token: id, amount: new BigNumber(0)}));
+                const normalizeTokenIds = minTokensAmountOut.map((t) =>
+                    getTokenIdFromCoin(t.token.identifier)
+                );
+                const hopLimits = hopTokenIds
+                    .filter((id) => !normalizeTokenIds.includes(id))
+                    .map((id) => ({ token: id, amount: new BigNumber(0) }));
                 const outputLimits = minTokensAmountOut.map((m) => ({
                     token: getTokenIdFromCoin(m.token.identifier)!,
-                    amount: m.raw.multipliedBy(pct.numerator).idiv(pct.denominator),
+                    amount: m.raw
+                        .multipliedBy(pct.numerator)
+                        .idiv(pct.denominator),
                 }));
                 const tx = await ContractManager.getAggregatorContract(
                     ASHSWAP_CONFIG.dappContract.aggregator
-                ).aggregate(
-                    payments,
-                    steps,
-                    [...hopLimits, ...outputLimits]
-                );
-                const txs: Transaction[] = [tx];
+                ).aggregate(payments, steps, [...hopLimits, ...outputLimits]);
+                const txs: Interaction[] = [tx];
                 if (egldIn) {
                     const wrapTx = await ContractManager.getWrappedEGLDContract(
                         wegldContract
@@ -91,7 +93,7 @@ const useAGAggregate = (trackStatus = false) => {
                     txs.push(unwrapTx);
                 }
                 await sendTransactions({
-                    transactions: txs,
+                    interactions: txs,
                     transactionsDisplayInfo: {
                         successMessage: `Swap ${tokensAmount
                             .map(

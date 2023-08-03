@@ -1,4 +1,4 @@
-import { TokenTransfer, Transaction } from "@multiversx/sdk-core/out";
+import { Interaction, TokenTransfer } from "@multiversx/sdk-core/out";
 import {
     farmLoadingMapState,
     farmNumberOfAdditionalRewards,
@@ -22,14 +22,16 @@ const useFarmClaimAll = (trackStatus = false) => {
                     farmLoadingMapState
                 );
 
-                let txs: Transaction[] = [];
+                let txs: Interaction[] = [];
                 let totalASH = new BigNumber(0);
                 const farmsAddress: string[] = [];
 
                 for (let i = 0; i < farmRecords.length; i++) {
                     const val = farmRecords[i];
                     if (
-                        val?.stakedData?.rewards.some(r => r.greaterThan(0)) &&
+                        val?.stakedData?.rewards.some((r) =>
+                            r.greaterThan(0)
+                        ) &&
                         !loadingMap[val.farm.farm_address]
                     ) {
                         const tokenPayments = val.stakedData.farmTokens.map(
@@ -41,13 +43,19 @@ const useFarmClaimAll = (trackStatus = false) => {
                                     val.farm.farm_token_decimal
                                 )
                         );
-                        const numberOfAdditionalRewards = await snapshot.getPromise(
-                            farmNumberOfAdditionalRewards(val.farm.farm_address)
-                        );
+                        const numberOfAdditionalRewards =
+                            await snapshot.getPromise(
+                                farmNumberOfAdditionalRewards(
+                                    val.farm.farm_address
+                                )
+                            );
                         const temp = await ContractManager.getFarmContract(
                             val.farm.farm_address
                         )
-                            .withContext({lastRewardBlockTs: val.lastRewardBlockTs, numberOfAdditionalRewards})
+                            .withContext({
+                                lastRewardBlockTs: val.lastRewardBlockTs,
+                                numberOfAdditionalRewards,
+                            })
                             .claimRewards(tokenPayments, false);
                         txs = [...txs, ...temp];
                         totalASH = totalASH.plus(val.stakedData.totalRewardAmt);
@@ -55,7 +63,7 @@ const useFarmClaimAll = (trackStatus = false) => {
                     }
                 }
                 const result = await sendTransactions({
-                    transactions: txs,
+                    interactions: txs,
                     transactionsDisplayInfo: {
                         successMessage: `Claim rewards succeed`,
                     },

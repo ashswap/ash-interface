@@ -58,7 +58,8 @@ function BribeCard({ fbFarm }: Props) {
         )
             return 0;
         const nextWeek = Math.floor(moment().unix() / WEEK) * WEEK + WEEK;
-        return new BigNumber(fcAccountFarm.voteUserSlope.slope).multipliedBy(fcAccountFarm.voteUserSlope.end - nextWeek)
+        return new BigNumber(fcAccountFarm.voteUserSlope.slope)
+            .multipliedBy(fcAccountFarm.voteUserSlope.end - nextWeek)
             .multipliedBy(100)
             .div(fcFarm.nextVotedPoint.bias)
             .toNumber();
@@ -203,7 +204,7 @@ function BribeCard({ fbFarm }: Props) {
                                             <div>
                                                 Percentage of your veASH to the
                                                 total veASH in ASHSWAP
-                                                Governance Stake. It depends on
+                                                Governance Stake. It determines
                                                 the reward that you’ll receive.
                                             </div>
                                         }

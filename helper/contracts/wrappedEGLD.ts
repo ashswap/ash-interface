@@ -12,18 +12,14 @@ class WrappedEGLDContract extends Contract<typeof wegldAbi> {
         let interaction = this.contract.methods.wrapEgld([]);
         interaction.withValue(amt);
         interaction.withGasLimit(3_000_000);
-        return this.interceptInteraction(interaction)
-            .check()
-            .buildTransaction();
+        return this.interceptInteraction(interaction);
     }
 
     async unwrapEgld(tokenPayment: TokenTransfer) {
         let interaction = this.contract.methods.unwrapEgld([]);
         interaction.withSingleESDTTransfer(tokenPayment);
         interaction.withGasLimit(3_000_000);
-        return this.interceptInteraction(interaction)
-            .check()
-            .buildTransaction();
+        return this.interceptInteraction(interaction);
     }
 }
 

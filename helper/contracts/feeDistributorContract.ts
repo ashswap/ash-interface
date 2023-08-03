@@ -17,9 +17,7 @@ class FeeDistributorContract extends Contract<typeof feeDistributorAbi> {
         interaction.withGasLimit(
             ENVIRONMENT.NETWORK === "mainnet" ? 50_000_000 + gas : 500_000_000
         );
-        return this.interceptInteraction(interaction)
-            .check()
-            .buildTransaction();
+        return this.interceptInteraction(interaction);
     }
 
     async getUserTimeCursor(address: Address): Promise<number> {

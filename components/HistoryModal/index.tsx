@@ -33,7 +33,7 @@ interface Props {
     open: boolean;
     onClose?: () => void;
 }
-
+const emptyArray: TxStatsRecord[] = [];
 const HistoryModal = ({ open, onClose }: Props) => {
     const loggedIn = useRecoilValue(accIsLoggedInState);
     const address = useRecoilValue(accAddressState);
@@ -41,7 +41,11 @@ const HistoryModal = ({ open, onClose }: Props) => {
         loggedIn
             ? `${ASHSWAP_CONFIG.ashApiBaseUrl}/user/${address}/transaction?offset=0&limit=50`
             : null,
-        fetcher
+        (url) =>
+            fetcher(url).then((data) =>
+                Array.isArray(data) ? data : emptyArray
+            ),
+        { fallback: emptyArray }
     );
     const screenSize = useScreenSize();
     const network: AccountInfoSliceNetworkType =

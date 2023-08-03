@@ -58,7 +58,7 @@ function DAOCard({ detail, proposal }: DAOCardProps) {
                 query: { proposalID: proposal.proposal_id },
             }}
         >
-            <div className="group relative px-6 sm:px-12 py-5 sm:py-9">
+            <div className="group relative px-6 sm:px-12 py-5 sm:py-9 break-words">
                 <DAOCardBg
                     status={status}
                     clipClassName="clip-corner-4 clip-corner-br group-hover:bg-stake-dark-300 group-active:bg-ash-dark-400"

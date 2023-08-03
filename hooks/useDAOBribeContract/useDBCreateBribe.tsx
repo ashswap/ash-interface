@@ -14,7 +14,7 @@ const useDBCreateBribe = (trackStatus = false) => {
                     ASHSWAP_CONFIG.dappContract.daoBribe
                 ).addRewardAmount(proposalID, payments);
                 await sendTransactions({
-                    transactions: [tx],
+                    interactions: [tx],
                     transactionsDisplayInfo: {
                         successMessage: `Bribe proposal #${proposalID} success!`,
                     },

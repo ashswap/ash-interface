@@ -53,7 +53,7 @@ const DAOActionGenerator = forwardRef<DAOFormRefMethods, Props>(function DAOActi
             {type === "fr:createFarm" && (
                 <DAOFRCreateFarmForm dynamicRef={formRef}/>
             )}
-            {type === "router:createPool" && (
+            {type === "pr:createPool" && (
                 <DAORouterCreatePoolForm dynamicRef={formRef}/>
             )}
         </div>

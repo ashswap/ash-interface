@@ -14,7 +14,7 @@ const useAddRewardAmount = (trackStatus = false) => {
                     ASHSWAP_CONFIG.dappContract.farmBribe
                 ).addRewardAmount(farmAddress, tokenPayments);
                 await sendTransactions({
-                    transactions: [tx],
+                    interactions: [tx],
                     transactionsDisplayInfo: {
                         successMessage: "Create Bribe success!",
                     },

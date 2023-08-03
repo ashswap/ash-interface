@@ -27,9 +27,7 @@ class AggregatorContract extends Contract<typeof aggregatorAbi> {
             .withMultiESDTNFTTransfer(tokenPayments)
             .withSender(new Address(await getAddress()));
         interaction.withGasLimit(20_000_000 + steps.length * 15_000_000);
-        return this.interceptInteraction(interaction)
-            .check()
-            .buildTransaction();
+        return this.interceptInteraction(interaction);
     }
 }
 

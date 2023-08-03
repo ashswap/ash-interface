@@ -4,13 +4,14 @@ import { accAddressState } from "atoms/dappState";
 import {
     ashRawFarmQuery,
     farmNumberOfAdditionalRewards,
-    farmOwnerTokensQuery, FarmRecord,
-    FarmToken
+    farmOwnerTokensQuery,
+    FarmRecord,
+    FarmToken,
 } from "atoms/farmsState";
 import {
     govLockedAmtSelector,
     govTotalSupplyVeASHSelector,
-    govUnlockTSSelector
+    govUnlockTSSelector,
 } from "atoms/govState";
 import BigNumber from "bignumber.js";
 import { ASHSWAP_CONFIG, VE_CONFIG } from "const/ashswapConfig";
@@ -19,12 +20,12 @@ import {
     calcYieldBoost,
     calcYieldBoostFromFarmToken
 } from "helper/farmBooster";
-import { sendTransactions } from "helper/transactionMethods";
 import { FarmBoostInfo } from "interface/farm";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import { useRecoilCallback } from "recoil";
 import useCalcBoost from "./useFarmContract/useCalcBoost";
+import useSendTxsWithTrackStatus from "./useSendTxsWithTrackStatus";
 
 export const useFarmBoostTransferState = (
     farmToken: FarmToken,
@@ -42,6 +43,7 @@ export const useFarmBoostTransferState = (
         veForBoost: new BigNumber(0),
         boost: 2.5,
     });
+    const { sendTransactions } = useSendTxsWithTrackStatus();
     const getCurrentBoost = useRecoilCallback(
         ({ snapshot }) =>
             async () => {
@@ -113,7 +115,7 @@ export const useFarmBoostTransferState = (
                     })
                     .claimRewards(tokenPayments, true);
                 const result = await sendTransactions({
-                    transactions: txs,
+                    interactions: txs,
                     transactionsDisplayInfo: {
                         successMessage: "Success to boost yourself",
                     },
@@ -122,7 +124,7 @@ export const useFarmBoostTransferState = (
                 setBoostId(sessionId);
                 return result;
             },
-        [farmData, farmToken]
+        [farmData, farmToken, sendTransactions]
     );
 
     useEffect(() => {

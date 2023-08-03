@@ -1,15 +1,18 @@
-import { useGetAccountInfo, useGetLoginInfo } from "@multiversx/sdk-dapp/hooks";
 import ICBambooShootXL from "assets/svg/bamboo-shoot-xl.svg";
 import ICSkewStep from "assets/svg/skew-step.svg";
+import { accInfoState, accIsLoggedInState } from "atoms/dappState";
 import { LedgerLogin } from "components/Ledger/LedgerLogin";
+import useMounted from "hooks/useMounted";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useRecoilValue } from "recoil";
 function LedgerContainer() {
     const router = useRouter();
     const routerRef = useRef(router);
-    const { ledgerAccount } = useGetAccountInfo();
-    const { isLoggedIn, loginMethod } = useGetLoginInfo();
+    const { ledgerAccount } = useRecoilValue(accInfoState);
+    const isLoggedIn = useRecoilValue(accIsLoggedInState);
     const [isConfirm, setIsConfirm] = useState(false);
+    const mounted = useMounted();
     const callbackUrl = useMemo(() => {
         return (router.query.callbackUrl as string) || "/";
     }, [router.query]);
@@ -61,7 +64,7 @@ function LedgerContainer() {
                     )}
                 </div>
                 <div className="sm:w-7/12 mt-10 sm:mt-0 -mx-6 md:mx-0">
-                    <LedgerLogin />
+                    {mounted && <LedgerLogin />}
                 </div>
             </div>
         </div>

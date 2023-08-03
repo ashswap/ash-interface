@@ -13,13 +13,20 @@ const useDAOPropose = (trackStatus = false) => {
                 const argSerializer = new ArgSerializer();
                 const tx = await ContractManager.getDAOContract(
                     ASHSWAP_CONFIG.dappContract.dao
-                ).propose(meta, interactions.map(interaction => ({
-                    dest_address: new Address(interaction.getContractAddress().bech32()),
-                    function_name: interaction.getFunction().toString(),
-                    arguments: argSerializer.valuesToBuffers(interaction.getArguments()),
-                })));
+                ).propose(
+                    meta,
+                    interactions.map((interaction) => ({
+                        dest_address: new Address(
+                            interaction.getContractAddress().bech32()
+                        ),
+                        function_name: interaction.getFunction().toString(),
+                        arguments: argSerializer.valuesToBuffers(
+                            interaction.getArguments()
+                        ),
+                    }))
+                );
                 await sendTransactions({
-                    transactions: [tx],
+                    interactions: [tx],
                     transactionsDisplayInfo: {
                         successMessage: "Create proposal success!",
                     },

@@ -64,9 +64,7 @@ class PoolV2Contract extends Contract<typeof poolV2Abi> {
             .withMultiESDTNFTTransfer(tokenPayments)
             .withSender(new Address(address))
             .withGasLimit(35_000_000);
-        return this.interceptInteraction(interaction)
-            .check()
-            .buildTransaction();
+        return this.interceptInteraction(interaction);
     }
 
     async exchange(tokenPayment: TokenTransfer, mintWeiOut: BigNumber) {
@@ -74,9 +72,7 @@ class PoolV2Contract extends Contract<typeof poolV2Abi> {
         interaction
             .withSingleESDTTransfer(tokenPayment)
             .withGasLimit(35_000_000);
-        return this.interceptInteraction(interaction)
-            .check()
-            .buildTransaction();
+        return this.interceptInteraction(interaction);
     }
 
     async removeLiquidity(
@@ -92,9 +88,7 @@ class PoolV2Contract extends Contract<typeof poolV2Abi> {
         interaction
             .withSingleESDTTransfer(tokenPayment)
             .withGasLimit(12_000_000);
-        return this.interceptInteraction(interaction)
-            .check()
-            .buildTransaction();
+        return this.interceptInteraction(interaction);
     }
 
     async removeLiquidityOneCoin(
@@ -108,10 +102,8 @@ class PoolV2Contract extends Contract<typeof poolV2Abi> {
         ]);
         interaction
             .withSingleESDTTransfer(tokenPayment)
-            .withGasLimit(15_000_000);
-        return this.interceptInteraction(interaction)
-            .check()
-            .buildTransaction();
+            .withGasLimit(18_000_000);
+        return this.interceptInteraction(interaction);
     }
 }
 

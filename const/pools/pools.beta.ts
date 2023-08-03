@@ -70,5 +70,12 @@ const POOLS_BETA: IPool[] = [
         tokens: [TOKENS_MAP["ASH-4ce444"], TOKENS_MAP["JWLASH-8bfcd2"]],
         type: EPoolType.PlainPool,
     },
+    {
+        address:
+            "erd1qqqqqqqqqqqqqpgqxdktu7qkd2ers90vtd9k6xlyysvvmuwh2gessch83r",
+        lpToken: TOKENS_MAP["ALP-f881e3"],
+        tokens: [TOKENS_MAP["WEGLD-d7c6bb"], TOKENS_MAP["JWLEGLD-761a4f"]],
+        type: EPoolType.PlainPool,
+    },
 ];
 export default POOLS_BETA;
