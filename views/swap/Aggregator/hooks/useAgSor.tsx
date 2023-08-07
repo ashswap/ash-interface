@@ -31,11 +31,11 @@ const useAgSor = (
     }, [amtIn, tokenIn, tokenOut]);
     const res = useSWR<SorSwapResponse>(
         params,
-        async (url, params) => {
+        async ([url, params]) => {
             const searchParams = new URLSearchParams(params);
-            return fetcher(`${url}?${searchParams}`, {
+            return fetcher([`${url}?${searchParams}`, {
                 headers: { "authen-token": ENVIRONMENT.AG_TOKEN_SECRET },
-            });
+            }]);
         },
         { refreshInterval: blockTimeMs, ...swrConfig }
     );
