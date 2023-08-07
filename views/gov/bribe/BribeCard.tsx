@@ -113,7 +113,7 @@ function BribeCard({ fbFarm }: Props) {
                         <div className="grid grid-cols-2 gap-x-2 items-center mt-16">
                             <div className="font-bold">
                                 <div className="text-xs text-stake-gray-500 underline mb-2">
-                                    Total treasures
+                                    Bribe Pool
                                 </div>
                                 <div>
                                     <span className="font-normal text-stake-gray-500">
