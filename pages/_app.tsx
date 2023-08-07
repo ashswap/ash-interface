@@ -35,6 +35,7 @@ import { theme } from "tailwind.config";
 import GlobalModals from "views/components/GlobalModal";
 import * as gtag from "../helper/gtag";
 import "../styles/globals.css";
+import { SWRConfig } from "swr";
 
 export type NextPageWithLayout = NextPage & {
     getLayout?: (page: ReactElement) => ReactNode;
@@ -57,7 +58,7 @@ const GlobalHooks = () => {
 const SdkDappAdapter = () => {
     useSDKAdapter();
     return null;
-}
+};
 const TestnetGuard = ({ children }: any) => {
     const [pass, setPass] = useState("");
     const [inputPass, setInputPass] = useState("");
@@ -177,55 +178,57 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
                     dappConfig={{ shouldUseWebViewProvider: true }}
                     // completedTransactionsDelay={500}
                 >
-                    <SdkDappAdapter/>
-                    <div className="fixed bottom-14 left-6 right-6 sm:bottom-12 sm:left-auto sm:right-12 z-toast flex flex-col items-end sm:max-w-[480px] space-y-2 sm:space-y-4">
-                        <SignTxNotification />
-                        <SignTxsModal />
-                        <div className="absolute top-0 right-0 -translate-y-full pb-4 sm:pb-8">
-                            <TxsToastList />
+                    <SWRConfig value={{ keepPreviousData: true }}>
+                        <SdkDappAdapter />
+                        <div className="fixed bottom-14 left-6 right-6 sm:bottom-12 sm:left-auto sm:right-12 z-toast flex flex-col items-end sm:max-w-[480px] space-y-2 sm:space-y-4">
+                            <SignTxNotification />
+                            <SignTxsModal />
+                            <div className="absolute top-0 right-0 -translate-y-full pb-4 sm:pb-8">
+                                <TxsToastList />
+                            </div>
                         </div>
-                    </div>
+                        <TestnetGuard>
+                            <ProductionErrorBoundary>
+                                {getLayout(<Component {...pageProps} />)}
+                                <ConnectWalletModal />
+                            </ProductionErrorBoundary>
+                            <ClientOnly>
+                                <GlobalHooks />
+                                <SocketProvider>
+                                    <TxCompletedTracker />
+                                </SocketProvider>
+                                <GlobalModals />
+                            </ClientOnly>
+                            <div className="hidden sm:flex sm:flex-col fixed bottom-20 left-6 gap-4 text-center z-10">
+                                <a
+                                    href="https://event.ashswap.io"
+                                    rel="noreferrer"
+                                    target="_blank"
+                                    className="block"
+                                >
+                                    <GlowingButton
+                                        theme="green"
+                                        className="w-full bg-stake-green-500 backdrop-blur-[25px] px-4 py-3"
+                                    >
+                                        <span className="text-xs font-bold text-ash-dark-400">
+                                            Event
+                                        </span>
+                                    </GlowingButton>
+                                </a>
+                                <a
+                                    href="https://forms.gle/VfEEfzTG3LnJPPxC9"
+                                    rel="noreferrer"
+                                    target="_blank"
+                                    className="bg-ash-dark-600 backdrop-blur-[25px] px-4 py-3"
+                                >
+                                    <span className="text-xs font-bold text-white">
+                                        Support Ticket
+                                    </span>
+                                </a>
+                            </div>
+                        </TestnetGuard>
+                    </SWRConfig>
                 </DappProvider>
-                <TestnetGuard>
-                    <ProductionErrorBoundary>
-                        {getLayout(<Component {...pageProps} />)}
-                        <ConnectWalletModal />
-                    </ProductionErrorBoundary>
-                    <ClientOnly>
-                        <GlobalHooks />
-                        <SocketProvider>
-                            <TxCompletedTracker />
-                        </SocketProvider>
-                        <GlobalModals />
-                    </ClientOnly>
-                    <div className="hidden sm:flex sm:flex-col fixed bottom-20 left-6 gap-4 text-center z-10">
-                        <a
-                            href="https://event.ashswap.io"
-                            rel="noreferrer"
-                            target="_blank"
-                            className="block"
-                        >
-                            <GlowingButton
-                                theme="green"
-                                className="w-full bg-stake-green-500 backdrop-blur-[25px] px-4 py-3"
-                            >
-                                <span className="text-xs font-bold text-ash-dark-400">
-                                    Event
-                                </span>
-                            </GlowingButton>
-                        </a>
-                        <a
-                            href="https://forms.gle/VfEEfzTG3LnJPPxC9"
-                            rel="noreferrer"
-                            target="_blank"
-                            className="bg-ash-dark-600 backdrop-blur-[25px] px-4 py-3"
-                        >
-                            <span className="text-xs font-bold text-white">
-                                Support Ticket
-                            </span>
-                        </a>
-                    </div>
-                </TestnetGuard>
             </RecoilRoot>
         </>
     );
