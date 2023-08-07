@@ -116,9 +116,8 @@ function PoolCardItem({
                     <CardTooltip
                         content={
                             <>
-                                Estimation for growth of your deposit over a
-                                year, based on trading activity in the past 24
-                                hours.
+                                Estimated growth of your deposit over a year,
+                                based on trading activity in the past 24 hours.
                             </>
                         }
                     >
@@ -174,7 +173,7 @@ function PoolCardItem({
                     <CardTooltip
                         content={
                             <>
-                                Total value of overall deposited tokens in this
+                                Total value of all deposited tokens in this
                                 pool.
                             </>
                         }
@@ -216,9 +215,9 @@ function PoolCardItem({
                             <CardTooltip
                                 content={
                                     <>
-                                        Estimation for growth of your deposit
-                                        over a year, based on trading activity
-                                        in the past 24 hours.
+                                        Estimated growth of your deposit over a
+                                        year, based on trading activity in the
+                                        past 24 hours.
                                     </>
                                 }
                             >
