@@ -485,7 +485,7 @@ const useFarmsState = () => {
 
     const [debounceQueryRewards] = useDebounce(queryRewards, 500);
 
-    useSWR([debounceQueryRewards], (query) => query());
+    useSWR([debounceQueryRewards], ([query]) => query());
 
     useEffect(() => {
         if (Object.keys(sessionIdsMap).length > 0) {
