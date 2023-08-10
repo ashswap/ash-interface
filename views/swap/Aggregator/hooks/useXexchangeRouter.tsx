@@ -4,8 +4,10 @@ import request, { Variables, gql } from "graphql-request";
 import { getTokenIdFromCoin } from "helper/token";
 import { useMemo } from "react";
 import useSWR, { SWRConfiguration } from "swr";
-export const graphqlFetcher = (query: string, variables?: Variables) =>
-    request(`${ENVIRONMENT.XEXCHANGE_GRAPH_API}/graphql`, query, variables);
+export const graphqlFetcher = ([query, variables]: [
+    query: string,
+    variables?: Variables
+]) => request(`${ENVIRONMENT.XEXCHANGE_GRAPH_API}/graphql`, query, variables);
 const useXexchangeRouter = (
     tokenIn: string,
     tokenOut: string,
@@ -16,12 +18,28 @@ const useXexchangeRouter = (
     const params = useMemo(() => {
         const inId = getTokenIdFromCoin(tokenIn);
         const outId = getTokenIdFromCoin(tokenOut);
-        if (!inId || !outId || !amountIn || !new BigNumber(amountIn).gt(0) || !ENVIRONMENT.XEXCHANGE_GRAPH_API)
+        if (
+            !inId ||
+            !outId ||
+            !amountIn ||
+            !new BigNumber(amountIn).gt(0) ||
+            !ENVIRONMENT.XEXCHANGE_GRAPH_API
+        )
             return null;
         return [
             gql`
-                query($amountIn: String!, $tokenIn: String!, $tokenOut: String!, $tolerance: Float!) {
-                    swap(amountIn: $amountIn, tokenInID: $tokenIn, tokenOutID: $tokenOut, tolerance: $tolerance){
+                query (
+                    $amountIn: String!
+                    $tokenIn: String!
+                    $tokenOut: String!
+                    $tolerance: Float!
+                ) {
+                    swap(
+                        amountIn: $amountIn
+                        tokenInID: $tokenIn
+                        tokenOutID: $tokenOut
+                        tolerance: $tolerance
+                    ) {
                         amountOut
                     }
                 }

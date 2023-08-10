@@ -457,7 +457,7 @@ function DAODetailWrapper({ proposalID }: Props) {
 
     const { data: accountVotingInfo, mutate: mutateVoteInfo } = useSWR(
         [proposalID, address],
-        async (proposalID, address) => {
+        async ([proposalID, address]) => {
             return await ContractManager.getDAOContract(
                 ASHSWAP_CONFIG.dappContract.dao
             ).getProposalVotes(proposalID, address);

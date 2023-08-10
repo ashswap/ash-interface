@@ -101,14 +101,22 @@ function StakedPoolCardItem({
                         <button
                             className="clip-corner-1 clip-corner-br bg-ash-dark-400 hover:bg-ash-dark-300 active:bg-ash-dark-600 transition-all w-14 h-14 flex items-center justify-center text-yellow-600 mr-0.5"
                             disabled={poolData.state === EPoolState.Inactive}
-                            onClick={() => setOpenRemoveLiquidity(poolData.state !== EPoolState.Inactive)}
+                            onClick={() =>
+                                setOpenRemoveLiquidity(
+                                    poolData.state !== EPoolState.Inactive
+                                )
+                            }
                         >
                             <ICMinus />
                         </button>
                         <button
                             className="clip-corner-1 clip-corner-bl bg-ash-dark-400 hover:bg-ash-dark-300 active:bg-ash-dark-600 transition-all w-14 h-14 flex items-center justify-center text-pink-600"
                             disabled={poolData.state === EPoolState.Inactive}
-                            onClick={() => setOpenAddLiquidity(poolData.state !== EPoolState.Inactive)}
+                            onClick={() =>
+                                setOpenAddLiquidity(
+                                    poolData.state !== EPoolState.Inactive
+                                )
+                            }
                         >
                             <ICPlus />
                         </button>
@@ -198,9 +206,8 @@ function StakedPoolCardItem({
                     <CardTooltip
                         content={
                             <>
-                                Estimation for growth of your deposit over a
-                                year, based on trading activity in the past 24
-                                hours.
+                                Estimated growth of your deposit over a year,
+                                based on trading activity in the past 24 hours.
                             </>
                         }
                     >
@@ -264,9 +271,9 @@ function StakedPoolCardItem({
                             <CardTooltip
                                 content={
                                     <>
-                                        Estimation for growth of your deposit
-                                        over a year, based on trading activity
-                                        in the past 24 hours.
+                                        Estimated growth of your deposit over a
+                                        year, based on trading activity in the
+                                        past 24 hours.
                                     </>
                                 }
                             >

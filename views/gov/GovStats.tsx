@@ -110,7 +110,7 @@ function GovStats() {
         if (!adminFee24h) return 0;
         return (
             (adminFee24h * 365 * 100) /
-            toEGLDD(VE_ASH_DECIMALS, totalSupplyVeASH)// calculates the maximum APR if all ASH is locked in for 4 years.
+            toEGLDD(VE_ASH_DECIMALS, totalSupplyVeASH) // calculates the maximum APR if all ASH is locked in for 4 years.
                 .multipliedBy(tokenMap[ASH_TOKEN.identifier]?.price)
                 .toNumber()
         );
@@ -139,11 +139,10 @@ function GovStats() {
                                     content={
                                         <>
                                             <div>
-                                                By staking ASH to holding veASH,
-                                                you’ll earn bounties from
-                                                trading fees in ASHSWAP DEX. The
-                                                reward will return to the user
-                                                as LP-Tokens.
+                                                By staking ASH to hold veASH,
+                                                you&apos;ll earn bounties from
+                                                trading fees in AshSwap DEX. The
+                                                reward will return as LP-Stake
                                             </div>
                                         </>
                                     }
@@ -263,12 +262,12 @@ function GovStats() {
                                 <CardTooltip
                                     content={
                                         <div>
-                                            Voting-Escrow ASH. A type of token
-                                            that you’ll receive after staking
-                                            your ASH, veASH will reduce
-                                            day-by-day till the lock period
-                                            ends. You can extend your lock
-                                            period to recover your veASH.
+                                            Voting-Escrow ASH, a type of token
+                                            that you&apos;ll receive after
+                                            staking your ASH. veASH will
+                                            decrease day-by-day till the lock
+                                            period ends. You can extend your
+                                            lock period to recover your veASH.
                                         </div>
                                     }
                                 >
@@ -453,8 +452,8 @@ function GovStats() {
                             TIPS
                         </div>
                         <div className="text-xs lg:text-sm mb-9">
-                            Stake ASH to receive veASH. You can both earn from
-                            transaction fee & have a power for voting!
+                            You can earn from transaction fees & own voting
+                            power at the same time!
                         </div>
                         <ul>
                             {VE_LOCK_LABEL.map((lock) => {
@@ -486,7 +485,7 @@ function GovStats() {
                         </div>
                         <div className="text-xs lg:text-sm mb-6">
                             Your veASH weight gradually decreases as your
-                            escrowed tokens approach their lock expiry.
+                            escrowed tokens reach their lock expiration.
                         </div>
                         <div className="bg-ash-dark-400/30">
                             <button
@@ -494,7 +493,7 @@ function GovStats() {
                                 onClick={() => setIsQAExpand((val) => !val)}
                             >
                                 <div className="line-clamp-2 text-xs lg:text-sm font-bold grow text-left mr-4">
-                                    Does it mean user will lose money everyday?
+                                    Does it mean you will lose money every day?
                                 </div>
                                 {isQAExpand ? (
                                     <ICChevronUp className="w-3 h-auto" />
@@ -505,14 +504,14 @@ function GovStats() {
                             {isQAExpand && (
                                 <div className="-mt-1 pb-8 px-4 lg:px-[2.375rem] text-2xs">
                                     <div className="mb-4">
-                                        Of course not, when your veASH decreases
-                                        to 0. It also means that the lock period
-                                        of your ASH is over. You can withdraw
-                                        your staked ASH right away.
+                                        Certainly not! When your veASH decreases
+                                        to 0, it indicates that the lock period
+                                        of your ASH has ended, allowing you to
+                                        withdraw your staked ASH immediately.
                                     </div>
                                     <div>
                                         However, If you want to keep your veASH
-                                        stays on the maximum, just extend your
+                                        stays at their maximum, just extend your
                                         lock period.
                                     </div>
                                 </div>

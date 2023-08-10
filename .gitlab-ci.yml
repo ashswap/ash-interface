@@ -51,7 +51,7 @@ stages:
   NEXT_PUBLIC_ASH_API: https://api-devnet-alpha.ashswap.io
   NEXT_PUBLIC_ASH_DOMAIN: devnet-alpha.ashswap.io
   NEXT_PUBLIC_ASH_GRAPHQL: https://api-v2-devnet-alpha.ashswap.io
-  NEXT_PUBLIC_ASH_SOCKET: https://socket-elrond-devnet.ashswap.io
+  NEXT_PUBLIC_ASH_SOCKET: https://devnet-socket-api.multiversx.com
   NEXT_PUBLIC_ASH_SOCKET_EXTRA: 
   NEXT_PUBLIC_ASH_LOG_API: https://api-tracking-devnet-alpha.ashswap.io
   NEXT_PUBLIC_IPFS_API: https://ipfs-cluster-api-internal.bicarus.io
@@ -103,7 +103,7 @@ deploy_ipfs_alpha:
   NEXT_PUBLIC_ASH_API: https://api-devnet.ashswap.io
   NEXT_PUBLIC_ASH_DOMAIN: devnet.ashswap.io
   NEXT_PUBLIC_ASH_GRAPHQL: https://api-v2-devnet.ashswap.io
-  NEXT_PUBLIC_ASH_SOCKET: https://socket-elrond-devnet.ashswap.io
+  NEXT_PUBLIC_ASH_SOCKET: https://devnet-socket-api.multiversx.com
   NEXT_PUBLIC_ASH_SOCKET_EXTRA: 
   NEXT_PUBLIC_ASH_LOG_API: https://api-tracking.ashswap.io
   NEXT_PUBLIC_IPFS_API: https://ipfs-cluster-api-internal.bicarus.io

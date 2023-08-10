@@ -1,25 +1,16 @@
-import TextAmt from "components/TextAmt";
-import { randomUUID } from "crypto";
 import { formatAmount } from "helper/number";
 import { FarmWeightChartRecord } from "interface/chart";
 import { Unarray } from "interface/utilities";
-import { v4 as uuidv4 } from "uuid";
-import React, { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import {
     Cell,
     Pie,
     PieChart,
     ResponsiveContainer,
-    Sector,
-    SectorProps,
+    Sector
 } from "recharts";
-import { Percent } from "helper/fraction/percent";
-const data = [
-    { name: "Group A", value: 400 },
-    { name: "Group B", value: 300 },
-    { name: "Group C", value: 300 },
-    { name: "Group D", value: 200 },
-];
+import { v4 as uuidv4 } from "uuid";
+
 type PieSectorDataItem = Required<
     Extract<
         Unarray<
@@ -155,9 +146,6 @@ function AllocationChart({ data, radius }: AllocationChartProps) {
                         )})`,
                     }}
                 >
-                    <div className="font-semibold text-xs text-stake-gray-500 mb-3">
-                        Weight
-                    </div>
                     <div className="flex items-center mb-4">
                         <div
                             className="w-4 h-4 mr-2.5"
@@ -168,8 +156,11 @@ function AllocationChart({ data, radius }: AllocationChartProps) {
                         </div>
                     </div>
 
-                    <div className="font-bold text-4xl text-white">
+                    <div className="font-bold text-4xl text-white mb-3">
                         {formatAmount((activeRecord.value * 100) / 10_000)}%
+                    </div>
+                    <div className="font-semibold text-xs text-stake-gray-500">
+                        veASH: {formatAmount(activeRecord.totalVe, {notation: 'standard'})}
                     </div>
                 </div>
             )}
