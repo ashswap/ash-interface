@@ -31,10 +31,10 @@ function GovVeASHStats() {
                 <CardTooltip
                     content={
                         <div>
-                            Voting-Escrow ASH. A type of token that you’ll
-                            receive after staking your ASH, veASH will reduce
+                            Voting-Escrow ASH, a type of token that you&apos;ll
+                            receive after staking your ASH. veASH will decrease
                             day-by-day till the lock period ends. You can extend
-                            your lock period to recover your veASH.
+                            your lock period to recover your veASH
                         </div>
                     }
                 >

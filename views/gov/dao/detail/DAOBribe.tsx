@@ -50,7 +50,7 @@ function DAOBribe({ bribes, proposal_id, sharePct, status }: Props) {
     const address = useRecoilValue(accAddressState);
     const { data: claimedMap, mutate } = useSWR(
         [address, proposal_id, queryTokenIDsKey, status],
-        async (address, proposal_id, queryTokenIDsKey, status) => {
+        async ([address, proposal_id, queryTokenIDsKey, status]) => {
             // do not featch claim status if status of proposal !== executed
             if (
                 !address ||

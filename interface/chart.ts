@@ -11,4 +11,5 @@ export type FarmWeightChartRecord = {
     value: number;
     name: string;
     color: string;
+    totalVe: number;
 };

@@ -1,4 +1,7 @@
-import { ashBaseStateRefresherAtom, gqlQueryOptionsSelector } from "atoms/ashswap";
+import {
+    ashBaseStateRefresherAtom,
+    gqlQueryOptionsSelector,
+} from "atoms/ashswap";
 import { accAddressState } from "atoms/dappState";
 import { ENVIRONMENT } from "const/env";
 import { FARMS_MAP } from "const/farms";
@@ -8,33 +11,59 @@ import { AshBaseState, GraphOptions } from "graphql/type";
 import produce from "immer";
 import { useEffect } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
-import useSWR from "swr";
-import { SWRConfiguration } from "swr/dist/types";
-export const graphqlFetcher = (query: string, variables?: Variables) => request<AshBaseState>(`${ENVIRONMENT.ASH_GRAPHQL}/graphql`, query, variables).then(data => {
-    return produce(data, draft => {
-        if (draft.farmController) {
-            draft.farmController.farms = draft.farmController.farms?.filter(f => !!FARMS_MAP[f.address]) || [];
-            if (draft.farmController.account) {
-                draft.farmController.account.farms = draft.farmController.account.farms?.filter(f => !!FARMS_MAP[f.address]) || [];
+import useSWR, { SWRConfiguration } from "swr";
+export const graphqlFetcher = ([query, variables]: [
+    query: string,
+    variables?: Variables
+]) =>
+    request<AshBaseState>(
+        `${ENVIRONMENT.ASH_GRAPHQL}/graphql`,
+        query,
+        variables
+    ).then((data) => {
+        return produce(data, (draft) => {
+            if (draft.farmController) {
+                draft.farmController.farms =
+                    draft.farmController.farms?.filter(
+                        (f) => !!FARMS_MAP[f.address]
+                    ) || [];
+                if (draft.farmController.account) {
+                    draft.farmController.account.farms =
+                        draft.farmController.account.farms?.filter(
+                            (f) => !!FARMS_MAP[f.address]
+                        ) || [];
+                }
             }
-        }
-        if (draft.farmBribe) {
-            draft.farmBribe.farms = draft.farmBribe.farms?.filter(f => !!FARMS_MAP[f.address]) || [];
-            if (draft.farmBribe.account) {
-                draft.farmBribe.account.farms = draft.farmBribe.account.farms?.filter(f => !!FARMS_MAP[f.address]) || [];
+            if (draft.farmBribe) {
+                draft.farmBribe.farms =
+                    draft.farmBribe.farms?.filter(
+                        (f) => !!FARMS_MAP[f.address]
+                    ) || [];
+                if (draft.farmBribe.account) {
+                    draft.farmBribe.account.farms =
+                        draft.farmBribe.account.farms?.filter(
+                            (f) => !!FARMS_MAP[f.address]
+                        ) || [];
+                }
             }
-        }
-        if (draft.farms) {
-            draft.farms = draft.farms?.filter(f => !!FARMS_MAP[f.address]) || [];
-        }
-        if (draft.pools) {
-            draft.pools = draft.pools?.filter(p => !!POOLS_MAP_ADDRESS[p.address]) || [];
-        }
-        if (draft.poolsV2) {
-            draft.poolsV2 = draft.poolsV2?.filter(p => !!POOLS_MAP_ADDRESS[p.address]) || [];
-        }
-    })
-})
+            if (draft.farms) {
+                draft.farms =
+                    draft.farms?.filter((f) => !!FARMS_MAP[f.address]) || [];
+            }
+            if (draft.pools) {
+                draft.pools =
+                    draft.pools?.filter(
+                        (p) => !!POOLS_MAP_ADDRESS[p.address]
+                    ) || [];
+            }
+            if (draft.poolsV2) {
+                draft.poolsV2 =
+                    draft.poolsV2?.filter(
+                        (p) => !!POOLS_MAP_ADDRESS[p.address]
+                    ) || [];
+            }
+        });
+    });
 const queryOptions: { [key in keyof GraphOptions]: string } = {
     withFC: gql`
         farmController(address: $accAddress) {
@@ -110,7 +139,7 @@ const queryOptions: { [key in keyof GraphOptions]: string } = {
             address
             rewardPerSec
         }
-    `
+    `,
 };
 const useAshBaseStateQuery = (config?: SWRConfiguration) => {
     const accAddress = useRecoilValue(accAddressState);
@@ -220,9 +249,13 @@ const useAshBaseStateQuery = (config?: SWRConfiguration) => {
                         }
                     }
 
-                    ${Object.entries(options).map(([k, v]) => {
-                        return v ? queryOptions[k as keyof GraphOptions] : '';
-                    }).join('\n')}
+                    ${Object.entries(options)
+                        .map(([k, v]) => {
+                            return v
+                                ? queryOptions[k as keyof GraphOptions]
+                                : "";
+                        })
+                        .join("\n")}
                 }
 
                 fragment allTokenProps on Token {

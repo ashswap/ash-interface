@@ -58,7 +58,6 @@ export const dappCoreState = atom<DappCoreState>({
         toasts: {
             customToasts: [],
             transactionToasts: [],
-            failTransactionToast: {message: ""},
         },
         transactions: {
             signedTransactions: {},

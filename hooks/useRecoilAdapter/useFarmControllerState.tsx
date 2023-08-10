@@ -36,6 +36,7 @@ const useFarmControllerState = () => {
                 farmAddress: f.address,
                 value: new BigNumber(f.relativeWeight).div(10 ** 14).toNumber(),
                 color,
+                totalVe: new BigNumber(f.votedPoint.bias).div(1e18).toNumber()
             };
             const nextRecord: FarmWeightChartRecord = {
                 name,
@@ -44,6 +45,7 @@ const useFarmControllerState = () => {
                     .div(10 ** 14)
                     .toNumber(),
                 color,
+                totalVe: new BigNumber(f.nextVotedPoint.bias).div(1e18).toNumber()
             };
             records.push(record);
             nextRecords.push(nextRecord);
