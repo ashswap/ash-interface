@@ -74,7 +74,8 @@ const Aggregator = memo(function Aggregator() {
     const { data, isValidating: loadingAgResult } = useAgSor(
         tokenIn.identifier,
         tokenOut.identifier,
-        amtIn
+        amtIn,
+        { keepPreviousData: false }
     );
     // xexchange routing
     const { data: xexchangeOutput } = useXexchangeRouter(
@@ -226,7 +227,12 @@ const Aggregator = memo(function Aggregator() {
 
     const swapHandle = useCallback(async () => {
         if (tokenAmountFrom && tokenAmountTo && data?.swaps)
-            aggregate([tokenAmountFrom], data.swaps, [tokenAmountTo], data?.tokenAddresses || []);
+            aggregate(
+                [tokenAmountFrom],
+                data.swaps,
+                [tokenAmountTo],
+                data?.tokenAddresses || []
+            );
     }, [aggregate, data, tokenAmountFrom, tokenAmountTo]);
 
     const wrapHandle = useCallback(async () => {
@@ -452,7 +458,8 @@ const Aggregator = memo(function Aggregator() {
                             {tokenIn && tokenOut && (
                                 <div
                                     className={`flex flex-row justify-between gap-2 text-xs my-5 ${
-                                        isPriceChangeTooHigh || isPriceImpactTooHigh
+                                        isPriceChangeTooHigh ||
+                                        isPriceImpactTooHigh
                                             ? "text-ash-purple-500"
                                             : "text-ash-green-500"
                                     }`}
@@ -466,8 +473,9 @@ const Aggregator = memo(function Aggregator() {
                                         }}
                                     >
                                         <div>
-                                            {isPriceImpactTooHigh ? "Price impact is too high" :
-                                                isPriceChangeTooHigh
+                                            {isPriceImpactTooHigh
+                                                ? "Price impact is too high"
+                                                : isPriceChangeTooHigh
                                                 ? "Price change is too high"
                                                 : "Fair Price"}
                                         </div>
@@ -480,18 +488,25 @@ const Aggregator = memo(function Aggregator() {
                                         </div>
                                     </div>
                                     <div>
-                                        {data?.effectivePriceReversed ? (
+                                        {data?.effectivePriceReversed &&
+                                        tokenAmountTo?.greaterThan(0) ? (
                                             <>
-                                                <span className="inline-block">1 {tokenIn?.symbol}</span><span className="inline-block">&nbsp;=&nbsp;</span>
                                                 <span className="inline-block">
-                                                {formatAmount(
-                                                    data.effectivePriceReversed,
-                                                    {
-                                                        notation: "standard",
-                                                        displayThreshold: 0,
-                                                    }
-                                                )}{" "}
-                                                {tokenOut?.symbol}
+                                                    1 {tokenIn?.symbol}
+                                                </span>
+                                                <span className="inline-block">
+                                                    &nbsp;=&nbsp;
+                                                </span>
+                                                <span className="inline-block">
+                                                    {formatAmount(
+                                                        data.effectivePriceReversed,
+                                                        {
+                                                            notation:
+                                                                "standard",
+                                                            displayThreshold: 0,
+                                                        }
+                                                    )}{" "}
+                                                    {tokenOut?.symbol}
                                                 </span>
                                             </>
                                         ) : null}

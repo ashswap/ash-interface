@@ -200,7 +200,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
                                 <GlobalModals />
                             </ClientOnly>
                             <div className="hidden sm:flex sm:flex-col fixed bottom-20 left-6 gap-4 text-center z-10">
-                                <a
+                                {/* <a
                                     href="https://event.ashswap.io"
                                     rel="noreferrer"
                                     target="_blank"
@@ -214,9 +214,9 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
                                             Event
                                         </span>
                                     </GlowingButton>
-                                </a>
+                                </a> */}
                                 <a
-                                    href="https://forms.gle/VfEEfzTG3LnJPPxC9"
+                                    href="https://u4xtuh1hoqs.sg.larksuite.com/share/base/form/shrlgRXN7Srf5VKx2O9tXXDT7Jd"
                                     rel="noreferrer"
                                     target="_blank"
                                     className="bg-ash-dark-600 backdrop-blur-[25px] px-4 py-3"
