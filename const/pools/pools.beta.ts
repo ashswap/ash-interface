@@ -44,9 +44,9 @@ const POOLS_BETA: IPool[] = [
     },
     {
         address:
-            "erd1qqqqqqqqqqqqqpgq6t46575knqqfamnchlfgxvd56x2ymhvf2ges6xpr4s",
-        lpToken: TOKENS_MAP["ALP-bf3d53"],
-        tokens: [TOKENS_MAP["WEGLD-d7c6bb"], TOKENS_MAP["SEGLD-90b353"]],
+            "erd1qqqqqqqqqqqqqpgqvu3r3pq9k37hyl679x7k48grfj5f86rw2gesuxfmva",
+        lpToken: TOKENS_MAP["ALP-90ac4b"],
+        tokens: [TOKENS_MAP["WEGLD-d7c6bb"], TOKENS_MAP["SEGLD-80807d"]],
         type: EPoolType.LendingPool,
     },
     {
@@ -75,6 +75,20 @@ const POOLS_BETA: IPool[] = [
             "erd1qqqqqqqqqqqqqpgqxdktu7qkd2ers90vtd9k6xlyysvvmuwh2gessch83r",
         lpToken: TOKENS_MAP["ALP-f881e3"],
         tokens: [TOKENS_MAP["WEGLD-d7c6bb"], TOKENS_MAP["JWLEGLD-761a4f"]],
+        type: EPoolType.PlainPool,
+    },
+    {
+        address:
+            "erd1qqqqqqqqqqqqqpgq7l48vnst4g2gmn2udp4tk5ah3hfgk0c02ges5c0yu2",
+        lpToken: TOKENS_MAP["ALP-bddc86"],
+        tokens: [TOKENS_MAP["HTM-fe1f69"], TOKENS_MAP["JWLHTM-935952"]],
+        type: EPoolType.PlainPool,
+    },
+    {
+        address:
+            "erd1qqqqqqqqqqqqqpgq7y8sgw6hyshkus5sdh3zygzts9zutyd02gesh3gr6a",
+        lpToken: TOKENS_MAP["ALP-05cdde"],
+        tokens: [TOKENS_MAP["SEGLD-80807d"], TOKENS_MAP["JWLEGLD-761a4f"]],
         type: EPoolType.PlainPool,
     },
 ];
