@@ -31,7 +31,7 @@ const dappContractDevnet: DappContractConfig = {
         daoBribe:
             "erd1qqqqqqqqqqqqqpgqqdt2ckhgn3yw6qxskawmywc98dv5jegg2ges40ygkh",
         aggregator:
-            "erd1qqqqqqqqqqqqqpgqqgm4ufxm8pncksv3dt56ura9l7m8900sh2uswmfx7v",
+            "erd1qqqqqqqqqqqqqpgq3v7zza934936euxk3zg85et4jamqalzmh2usgdgrn2",
     },
     alpha: {
         voteEscrowedContract:
