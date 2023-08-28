@@ -20,9 +20,14 @@ class AggregatorContract extends Contract<typeof aggregatorAbi> {
     async aggregate(
         tokenPayments: TokenTransfer[],
         steps: AggregatorStep[],
-        limits: { token: string; amount: BigNumber }[]
+        limits: { token: string; amount: BigNumber }[],
+        protocol?: string
     ) {
-        let interaction = this.contract.methods.aggregate([steps, ...limits]);
+        const params: any[] = [steps, limits];
+        if (protocol && protocol !== Address.Zero().bech32()) {
+            params.push(protocol);
+        }
+        let interaction = this.contract.methods.aggregate(params);
         interaction
             .withMultiESDTNFTTransfer(tokenPayments)
             .withSender(new Address(await getAddress()));

@@ -61,20 +61,34 @@ import {
     useXexchangeRouter,
 } from "./hooks";
 import * as Sentry from "@sentry/nextjs";
+import { ENVIRONMENT } from "const/env";
 const Aggregator = memo(function Aggregator() {
     const [tokenIn, setTokenIn] = useRecoilState(agTokenInAtom);
     const [tokenOut, setTokenOut] = useRecoilState(agTokenOutAtom);
     const [amountIn, setAmountIn] = useRecoilState(agAmountInAtom);
     const [cgkPriceChangeP, setCgkPriceChangeP] = useState(0);
     const amtIn = useMemo(
-        () => toWei(tokenIn, amountIn).idiv(1).toString(),
+        () => toWei(tokenIn, amountIn).idiv(1).toString(10),
+        [tokenIn, amountIn]
+    );
+    const amtAfterFee = useMemo(
+        () =>
+            toWei(tokenIn, amountIn)
+                .multipliedBy(
+                    ENVIRONMENT.NETWORK === "devnet" &&
+                        ENVIRONMENT.ENV === "alpha"
+                        ? 0.997
+                        : 1
+                )
+                .idiv(1)
+                .toString(10),
         [tokenIn, amountIn]
     );
     // sor routing
     const { data, isValidating: loadingAgResult } = useAgSor(
         tokenIn.identifier,
         tokenOut.identifier,
-        amtIn,
+        amtAfterFee,
         { keepPreviousData: false }
     );
     // xexchange routing
@@ -231,7 +245,10 @@ const Aggregator = memo(function Aggregator() {
                 [tokenAmountFrom],
                 data.swaps,
                 [tokenAmountTo],
-                data?.tokenAddresses || []
+                data?.tokenAddresses || [],
+                ENVIRONMENT.NETWORK === "devnet" && ENVIRONMENT.ENV === "alpha"
+                    ? "erd1n493ddp0v465e3qm80a56sjmxpcnd0humkz4fjmu8ph9heskh2usvetm78"
+                    : undefined
             );
     }, [aggregate, data, tokenAmountFrom, tokenAmountTo]);
 
