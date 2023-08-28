@@ -65,7 +65,7 @@ stages:
   variables:
     <<: *env_alpha
   only:
-    - /^.*-alpha1$/
+    - /^.*-alpha$/
   except:
     - branches
   retry: 2
@@ -118,7 +118,6 @@ deploy_ipfs_alpha:
     <<: *env_beta
   only:
     - /^.*-beta$/
-    - /^.*-alpha$/
   except:
     - branches
   retry: 2
