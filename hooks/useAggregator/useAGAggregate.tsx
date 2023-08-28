@@ -24,7 +24,8 @@ const useAGAggregate = (trackStatus = false) => {
                 tokensAmount: TokenAmount[],
                 swaps: SorSwap[],
                 minTokensAmountOut: TokenAmount[],
-                hopTokenIds: string[]
+                hopTokenIds: string[],
+                protocol?: string,
             ) => {
                 const egldIn = tokensAmount.find(
                     (t) => t.token.identifier === "EGLD"
@@ -71,7 +72,7 @@ const useAGAggregate = (trackStatus = false) => {
                 }));
                 const tx = await ContractManager.getAggregatorContract(
                     ASHSWAP_CONFIG.dappContract.aggregator
-                ).aggregate(payments, steps, [...hopLimits, ...outputLimits]);
+                ).aggregate(payments, steps, [...hopLimits, ...outputLimits], protocol);
                 const txs: Interaction[] = [tx];
                 if (egldIn) {
                     const wrapTx = await ContractManager.getWrappedEGLDContract(

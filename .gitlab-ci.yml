@@ -55,7 +55,7 @@ stages:
   NEXT_PUBLIC_ASH_SOCKET_EXTRA: 
   NEXT_PUBLIC_ASH_LOG_API: https://api-tracking-devnet-alpha.ashswap.io
   NEXT_PUBLIC_IPFS_API: https://ipfs-cluster-api-internal.bicarus.io
-  NEXT_PUBLIC_AG_API: https://aggregator-devnet.ashswap.io
+  NEXT_PUBLIC_AG_API: https://aggregator-devnet-alpha.ashswap.io
   NEXT_PUBLIC_XEXCHANGE_GRAPH_API: https://devnet-graph.xexchange.com
 
 .job_template_alpha: &job_template_alpha
