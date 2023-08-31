@@ -56,6 +56,13 @@ const POOLS_MAINNET: IPool[] = [
         tokens: [TOKENS_MAP["WEGLD-bd4d79"], TOKENS_MAP["JWLEGLD-023462"]],
         type: EPoolType.PlainPool,
     },
+    {
+        address:
+            "erd1qqqqqqqqqqqqqpgqpa9yh80fm9zad85phkuhr4cm323my5k94fvsxf5akw",
+        lpToken: TOKENS_MAP["ALP-d97011"],
+        tokens: [TOKENS_MAP["WEGLD-bd4d79"], TOKENS_MAP["CGO-5e9528"]],
+        type: EPoolType.PoolV2,
+    },
 ];
 
 export default POOLS_MAINNET;
