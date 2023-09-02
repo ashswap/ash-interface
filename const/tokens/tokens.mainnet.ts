@@ -8,6 +8,7 @@ import IconUSDT from "assets/images/usdt-icon.png";
 import ImgWEGLDIcon from "assets/images/wegld-icon.png";
 import IconJWLASH from "assets/images/jwlash-icon.png";
 import IconJWLEGLD from "assets/images/jwlegld-icon.png";
+import IconCGO from "assets/images/cgo-icon.png";
 import { ChainId, IESDTInfo } from "helper/token/token";
 const TOKENS_ALIAS: Record<"EGLD" | "ASH" | "wEGLD", IESDTInfo> = {
     EGLD: {
@@ -95,6 +96,14 @@ const TOKENS: IESDTInfo[] = [
         decimals: 18,
         logoURI: IconJWLEGLD.src,
     },
+    {
+        identifier: "CGO-5e9528",
+        chainId: ChainId.Mainnet,
+        symbol: "CGO",
+        name: "CathenaGold",
+        decimals: 18,
+        logoURI: IconCGO.src,
+    },
 ];
 
 const LP_TOKENS: IESDTInfo[] = [
@@ -145,6 +154,13 @@ const LP_TOKENS: IESDTInfo[] = [
         identifier: "ALP-713ae8",
         chainId: ChainId.Mainnet,
         symbol: "ALP-WEGLD-JWLEGLD",
+        name: "Ashswap LP",
+        decimals: 18,
+    },
+    {
+        identifier: "ALP-d97011",
+        chainId: ChainId.Mainnet,
+        symbol: "ALP-WEGLD-CGO",
         name: "Ashswap LP",
         decimals: 18,
     },
