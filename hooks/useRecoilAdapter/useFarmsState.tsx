@@ -17,6 +17,7 @@ import BigNumber from "bignumber.js";
 import { FARMS, FARMS_MAP } from "const/farms";
 import pools from "const/pool";
 import { ASH_TOKEN, TOKENS_MAP } from "const/tokens";
+import useFarmsInController from "graphql/useQueries/useFarmsInController";
 import { toEGLDD } from "helper/balance";
 import { ContractManager } from "helper/contracts/contractManager";
 import FarmContract from "helper/contracts/farmContract";
@@ -88,6 +89,7 @@ const useFarmsState = () => {
     const farmTokenMap = useRecoilValue(farmTokenMapState);
     const ashBase = useRecoilValue(ashswapBaseState);
     const poolRecords = useRecoilValue(poolRecordsState);
+    const {data: farmsInController} = useFarmsInController();
     const setDeboundKeyword = useSetRecoilState(farmDeboundKeywordState);
     const setLoadingMap = useSetRecoilState(farmLoadingMapState);
     const setFarmRecordsState = useSetRecoilState(farmRecordsState);
@@ -461,12 +463,16 @@ const useFarmsState = () => {
     const getFarmRecords = useCallback(async () => {
         try {
             const recordPromises: Promise<FarmRecord>[] = [];
+            const inController = farmsInController || [];
             for (let i = 0; i < FARMS.length; i++) {
                 const f = FARMS[i];
+                const rawFarm = ashBase.farms.find(
+                    (_f) => _f.address === f.farm_address
+                );
                 const p = pools.find(
                     (val) => val.lpToken.identifier === f.farming_token_id
                 );
-                if (p) {
+                if (p && (inController.length === 0 || inController.includes(f.farm_address) || (rawFarm?.additionalRewards || []).length > 0)) {
                     recordPromises.push(getFarmRecord(f, p));
                 }
             }
@@ -475,7 +481,7 @@ const useFarmsState = () => {
         } catch (error) {
             console.error(error);
         }
-    }, [getFarmRecord, setFarmRecordsState]);
+    }, [getFarmRecord, setFarmRecordsState, farmsInController, ashBase.farms]);
 
     const [deboundGetFarmRecords] = useDebounce(getFarmRecords, 1000);
 
