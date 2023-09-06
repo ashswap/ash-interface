@@ -6,9 +6,11 @@ import IconHSEGLD from "assets/images/hsegld-icon.png";
 import IconUSDC from "assets/images/usdc-icon.png";
 import IconUSDT from "assets/images/usdt-icon.png";
 import ImgWEGLDIcon from "assets/images/wegld-icon.png";
+import IconHTM from "assets/images/htm-icon.png";
+import IconCGO from "assets/images/cgo-icon.png";
 import IconJWLASH from "assets/images/jwlash-icon.png";
 import IconJWLEGLD from "assets/images/jwlegld-icon.png";
-import IconCGO from "assets/images/cgo-icon.png";
+import IconJWLHTM from "assets/images/jwlhtm-icon.png";
 import { ChainId, IESDTInfo } from "helper/token/token";
 const TOKENS_ALIAS: Record<"EGLD" | "ASH" | "wEGLD", IESDTInfo> = {
     EGLD: {
@@ -35,7 +37,7 @@ const TOKENS_ALIAS: Record<"EGLD" | "ASH" | "wEGLD", IESDTInfo> = {
         decimals: 18,
         logoURI: ImgAshIcon.src,
     },
-}
+};
 const TOKENS: IESDTInfo[] = [
     TOKENS_ALIAS.EGLD,
     TOKENS_ALIAS.wEGLD,
@@ -104,6 +106,22 @@ const TOKENS: IESDTInfo[] = [
         decimals: 18,
         logoURI: IconCGO.src,
     },
+    {
+        identifier: "JWLHTM-8e3cd5",
+        chainId: ChainId.Mainnet,
+        symbol: "JWLHTM",
+        name: "JewelLockedHTM",
+        decimals: 18,
+        logoURI: IconJWLHTM.src,
+    },
+    {
+        identifier: "HTM-f51d55",
+        chainId: ChainId.Mainnet,
+        symbol: "HTM",
+        name: "Hatom Protocol",
+        decimals: 18,
+        logoURI: IconHTM.src,
+    },
 ];
 
 const LP_TOKENS: IESDTInfo[] = [
@@ -164,11 +182,26 @@ const LP_TOKENS: IESDTInfo[] = [
         name: "Ashswap LP",
         decimals: 18,
     },
+    {
+        identifier: "ALP-0ed700",
+        chainId: ChainId.Mainnet,
+        symbol: "ALP-JWLHTM",
+        name: "Ashswap LP",
+        decimals: 18,
+    },
+    {
+        identifier: "ALP-2265f4",
+        chainId: ChainId.Mainnet,
+        symbol: "ALP-JWLEGLD",
+        name: "Ashswap LP",
+        decimals: 18,
+    },
 ];
 
-const TOKENS_MAP: Record<string, IESDTInfo> &
-    typeof TOKENS_ALIAS = {
-    ...Object.fromEntries([...TOKENS, ...LP_TOKENS].map((t) => [t.identifier, t])),
+const TOKENS_MAP: Record<string, IESDTInfo> & typeof TOKENS_ALIAS = {
+    ...Object.fromEntries(
+        [...TOKENS, ...LP_TOKENS].map((t) => [t.identifier, t])
+    ),
     ...TOKENS_ALIAS,
 };
 const TOKENS_MAINNET = {
