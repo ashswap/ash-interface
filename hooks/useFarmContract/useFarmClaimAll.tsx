@@ -3,7 +3,7 @@ import {
     farmLoadingMapState,
     farmNumberOfAdditionalRewards,
     farmRecordsState,
-    farmSessionIdMapState,
+    farmSessionIdMapState
 } from "atoms/farmsState";
 import BigNumber from "bignumber.js";
 import { ContractManager } from "helper/contracts/contractManager";

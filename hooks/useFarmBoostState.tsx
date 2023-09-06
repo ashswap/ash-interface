@@ -18,7 +18,7 @@ import { ASHSWAP_CONFIG, VE_CONFIG } from "const/ashswapConfig";
 import { ContractManager } from "helper/contracts/contractManager";
 import {
     calcYieldBoost,
-    calcYieldBoostFromFarmToken,
+    calcYieldBoostFromFarmToken
 } from "helper/farmBooster";
 import { FarmBoostInfo } from "interface/farm";
 import moment from "moment";
