@@ -88,11 +88,9 @@ function FarmFilter() {
                         >
                             <ICList className="w-6 h-6" />
                         </button> */}
-                        {screenSize.md && (
-                            <div className="grow overflow-hidden">
-                                {SearchBox}
-                            </div>
-                        )}
+                        <div className="grow overflow-hidden hidden md:block">
+                            {SearchBox}
+                        </div>
                     </div>
                     <div className="flex items-center space-x-2 shrink-0">
                         <div>
@@ -154,7 +152,7 @@ function FarmFilter() {
                         </div>
                     </div>
                 </div>
-                {!screenSize.md && SearchBox}
+                <div className="md:hidden">{SearchBox}</div>
             </div>
         </div>
     );

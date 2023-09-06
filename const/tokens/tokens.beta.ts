@@ -11,6 +11,7 @@ import IconUTK from "assets/images/utk-icon.png";
 import ImgWEGLDIcon from "assets/images/wegld-icon.png";
 import IconJWLASH from "assets/images/jwlash-icon.png";
 import IconJWLEGLD from "assets/images/jwlegld-icon.png";
+import IconJWLHTM from "assets/images/jwlhtm-icon.png";
 import { ChainId, IESDTInfo } from "helper/token/token";
 const TOKENS_ALIAS: Record<"EGLD" | "ASH" | "wEGLD", IESDTInfo> = {
     EGLD: {
@@ -84,14 +85,6 @@ const TOKENS: IESDTInfo[] = [
         logoURI: IconUTK.src,
     },
     {
-        identifier: "SEGLD-90b353",
-        chainId: ChainId.Devnet,
-        symbol: "sEGLD",
-        name: "Liquid Staked EGLD",
-        decimals: 18,
-        logoURI: IconSEGLD.src,
-    },
-    {
         identifier: "HSEGLD-8f2360",
         chainId: ChainId.Devnet,
         symbol: "HsEGLD",
@@ -122,6 +115,22 @@ const TOKENS: IESDTInfo[] = [
         name: "JewelLockedEGLD",
         decimals: 18,
         logoURI: IconJWLEGLD.src,
+    },
+    {
+        identifier: "JWLHTM-935952",
+        chainId: ChainId.Devnet,
+        symbol: "JWLHTM",
+        name: "JewelLockedHTM",
+        decimals: 18,
+        logoURI: IconJWLHTM.src,
+    },
+    {
+        identifier: "SEGLD-80807d",
+        chainId: ChainId.Devnet,
+        symbol: "sEGLD",
+        name: "Liquid Staked EGLD",
+        decimals: 18,
+        logoURI: IconSEGLD.src,
     },
 ];
 
@@ -156,16 +165,16 @@ const LP_TOKENS: IESDTInfo[] = [
         decimals: 18,
     },
     {
-        identifier: "ALP-b9e453",
+        identifier: "ALP-90ac4b",
         chainId: ChainId.Devnet,
-        symbol: "ALP-USDT-HTM",
+        symbol: "ALP-sEGLD",
         name: "Ashswap LP",
         decimals: 18,
     },
     {
-        identifier: "ALP-bf3d53",
+        identifier: "ALP-b9e453",
         chainId: ChainId.Devnet,
-        symbol: "ALP-sEGLD",
+        symbol: "ALP-USDT-HTM",
         name: "Ashswap LP",
         decimals: 18,
     },
@@ -192,6 +201,20 @@ const LP_TOKENS: IESDTInfo[] = [
     },
     {
         identifier: "ALP-f881e3",
+        chainId: ChainId.Devnet,
+        symbol: "ALP-JWLEGLD",
+        name: "Ashswap LP",
+        decimals: 18,
+    },
+    {
+        identifier: "ALP-bddc86",
+        chainId: ChainId.Devnet,
+        symbol: "ALP-JWLHTM",
+        name: "Ashswap LP",
+        decimals: 18,
+    },
+    {
+        identifier: "ALP-05cdde",
         chainId: ChainId.Devnet,
         symbol: "ALP-JWLEGLD",
         name: "Ashswap LP",
