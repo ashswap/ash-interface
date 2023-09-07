@@ -23,6 +23,7 @@ const TokenRecord = ({
             if (typeof val !== "number") return "";
             return formatAmount(val, {
                 notation: screenSize.xl ? "standard" : "compact",
+                displayThreshold: 0.00001,
             });
         },
         [screenSize]

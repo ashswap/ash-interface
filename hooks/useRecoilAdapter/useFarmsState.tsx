@@ -89,7 +89,8 @@ const useFarmsState = () => {
     const farmTokenMap = useRecoilValue(farmTokenMapState);
     const ashBase = useRecoilValue(ashswapBaseState);
     const poolRecords = useRecoilValue(poolRecordsState);
-    const {data: farmsInController} = useFarmsInController();
+    const { data: farmsInController, error: errorFarmInController } =
+        useFarmsInController();
     const setDeboundKeyword = useSetRecoilState(farmDeboundKeywordState);
     const setLoadingMap = useSetRecoilState(farmLoadingMapState);
     const setFarmRecordsState = useSetRecoilState(farmRecordsState);
@@ -472,7 +473,12 @@ const useFarmsState = () => {
                 const p = pools.find(
                     (val) => val.lpToken.identifier === f.farming_token_id
                 );
-                if (p && (inController.length === 0 || inController.includes(f.farm_address) || (rawFarm?.additionalRewards || []).length > 0)) {
+                if (
+                    p &&
+                    (!!errorFarmInController ||
+                        inController.includes(f.farm_address) ||
+                        (rawFarm?.additionalRewards || []).length > 0)
+                ) {
                     recordPromises.push(getFarmRecord(f, p));
                 }
             }
@@ -481,7 +487,13 @@ const useFarmsState = () => {
         } catch (error) {
             console.error(error);
         }
-    }, [getFarmRecord, setFarmRecordsState, farmsInController, ashBase.farms]);
+    }, [
+        getFarmRecord,
+        setFarmRecordsState,
+        farmsInController,
+        ashBase.farms,
+        errorFarmInController,
+    ]);
 
     const [deboundGetFarmRecords] = useDebounce(getFarmRecords, 1000);
 
