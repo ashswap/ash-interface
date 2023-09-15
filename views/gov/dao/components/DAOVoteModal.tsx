@@ -34,7 +34,10 @@ const DAOVoteForm = memo(function DAOVoteForm({
     const [weightStr, setWeightStr] = useInputNumberString(weightPct);
     const [isPending, setIsPending] = useState(false);
     const veAmt = useRecoilValue(govVeASHAmtSelector);
-    const {vote, trackingData: {isSigned, isSuccessful}} = useDAOVote(true);
+    const {
+        vote,
+        trackingData: { isSigned, isSuccessful },
+    } = useDAOVote(true);
     const handleStyle: React.CSSProperties = useMemo(() => {
         const color =
             voteType === "yes"
@@ -50,7 +53,10 @@ const DAOVoteForm = memo(function DAOVoteForm({
     }, [voteType]);
 
     const estimatedVeAmt = useMemo(() => {
-        return veAmt.multipliedBy(weightPct).div(100).div(10 ** VE_ASH_DECIMALS);
+        return veAmt
+            .multipliedBy(weightPct)
+            .div(100)
+            .div(10 ** VE_ASH_DECIMALS);
     }, [veAmt, weightPct]);
 
     const onVote = useCallback(() => {
@@ -58,15 +64,14 @@ const DAOVoteForm = memo(function DAOVoteForm({
         let yesPct = new Percent(voteType === "yes" ? weightPct : 0, 100);
         let noPct = new Percent(voteType === "no" ? weightPct : 0, 100);
         vote(proposalID, yesPct, noPct);
-        
     }, [proposalID, vote, voteType, weightPct]);
     useEffect(() => {
-        if(isSigned){
+        if (isSigned) {
             onTxSigned?.();
         }
     }, [isSigned, onTxSigned]);
     return (
-        <div className="px-12 pb-5 min-h-[42rem] sm:min-h-[38rem] overflow-hidden">
+        <div className="px-6 sm:px-12 pb-5 min-h-[42rem] sm:min-h-[38rem] overflow-hidden">
             <div className="relative">
                 <Transition
                     show={!isPending}
@@ -94,7 +99,9 @@ const DAOVoteForm = memo(function DAOVoteForm({
                                 <span className="text-stake-gray-500">
                                     Amount:&nbsp;
                                 </span>
-                                <span className="text-white">{formatAmount(estimatedVeAmt)} ve</span>
+                                <span className="text-white">
+                                    {formatAmount(estimatedVeAmt)} ve
+                                </span>
                             </div>
                             <Slider
                                 className={`ash-slider my-0 ${
@@ -164,7 +171,7 @@ const DAOVoteForm = memo(function DAOVoteForm({
                                 className="w-4.5 h-4.5 mr-2"
                             />
                             <TextAmt
-                                number={veAmt.div(10**VE_ASH_DECIMALS)}
+                                number={veAmt.div(10 ** VE_ASH_DECIMALS)}
                                 options={{ notation: "standard" }}
                                 className="font-bold text-lg text-white"
                             />
@@ -195,7 +202,8 @@ const DAOVoteForm = memo(function DAOVoteForm({
                     enterTo="opacity-100 translate-x-0 relative"
                 >
                     <div className="mb-20 font-bold text-2xl text-white">
-                        Confirm transaction on your <br /> wallet to apply your vote
+                        Confirm transaction on your <br /> wallet to apply your
+                        vote
                     </div>
                     {voteType === "yes" ? (
                         <ICVoteYes className="w-28 h-auto text-stake-green-500 colored-drop-shadow-xs colored-drop-shadow-current" />
@@ -224,7 +232,12 @@ const DAOVoteForm = memo(function DAOVoteForm({
     );
 });
 type DAOVoteModalProps = DAOVoteFormProps & BaseModalType;
-function DAOVoteModal({ voteType, onTxSigned, proposalID, ...props }: DAOVoteModalProps) {
+function DAOVoteModal({
+    voteType,
+    onTxSigned,
+    proposalID,
+    ...props
+}: DAOVoteModalProps) {
     return (
         <BaseModal
             {...props}
@@ -233,7 +246,13 @@ function DAOVoteModal({ voteType, onTxSigned, proposalID, ...props }: DAOVoteMod
             <div className="mb-6 flex justify-end">
                 <BaseModal.CloseBtn />
             </div>
-            <DAOVoteForm voteType={voteType} onTxSigned={onTxSigned} proposalID={proposalID} />
+            <div className="grow overflow-auto">
+                <DAOVoteForm
+                    voteType={voteType}
+                    onTxSigned={onTxSigned}
+                    proposalID={proposalID}
+                />
+            </div>
         </BaseModal>
     );
 }
