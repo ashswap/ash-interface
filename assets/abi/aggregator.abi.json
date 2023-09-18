@@ -1,11 +1,11 @@
 {
     "buildInfo": {
         "rustc": {
-            "version": "1.72.0-nightly",
-            "commitHash": "2d0aa57684e10f7b3d3fe740ee18d431181583ad",
-            "commitDate": "2023-06-18",
+            "version": "1.70.0-nightly",
+            "commitHash": "2036fdd24f77d607dcfaa24c48fbe85d3f785823",
+            "commitDate": "2023-03-27",
             "channel": "Nightly",
-            "short": "rustc 1.72.0-nightly (2d0aa5768 2023-06-18)"
+            "short": "rustc 1.70.0-nightly (2036fdd24 2023-03-27)"
         },
         "contractCrate": {
             "name": "aggregator",
@@ -35,11 +35,7 @@
                 },
                 {
                     "name": "limits",
-                    "type": "List<TokenAmount>"
-                },
-                {
-                    "name": "protocol",
-                    "type": "optional<Address>",
+                    "type": "variadic<TokenAmount>",
                     "multi_arg": true
                 }
             ],
@@ -48,113 +44,11 @@
                     "type": "List<EsdtTokenPayment>"
                 }
             ]
-        },
-        {
-            "name": "registerProtocolFee",
-            "onlyOwner": true,
-            "mutability": "mutable",
-            "inputs": [
-                {
-                    "name": "fee_percent",
-                    "type": "u64"
-                },
-                {
-                    "name": "whitelist_address",
-                    "type": "Address"
-                }
-            ],
-            "outputs": []
-        },
-        {
-            "name": "registerAshswapFee",
-            "onlyOwner": true,
-            "mutability": "mutable",
-            "inputs": [
-                {
-                    "name": "fee_percent",
-                    "type": "u64"
-                },
-                {
-                    "name": "whitelist_address",
-                    "type": "Address"
-                }
-            ],
-            "outputs": []
-        },
-        {
-            "name": "getProtocolFeePercent",
-            "mutability": "readonly",
-            "inputs": [
-                {
-                    "name": "address",
-                    "type": "Address"
-                }
-            ],
-            "outputs": [
-                {
-                    "type": "u64"
-                }
-            ]
-        },
-        {
-            "name": "getAshswapFeePercent",
-            "mutability": "readonly",
-            "inputs": [],
-            "outputs": [
-                {
-                    "type": "u64"
-                }
-            ]
-        },
-        {
-            "name": "claim",
-            "mutability": "mutable",
-            "inputs": [
-                {
-                    "name": "protocol",
-                    "type": "Address"
-                }
-            ],
-            "outputs": []
-        },
-        {
-            "name": "ashswap_claim",
-            "mutability": "mutable",
-            "inputs": [],
-            "outputs": []
         }
     ],
-    "events": [
-        {
-            "identifier": "aggregate_event",
-            "inputs": [
-                {
-                    "name": "caller",
-                    "type": "Address",
-                    "indexed": true
-                },
-                {
-                    "name": "aggregate",
-                    "type": "AggregatorEvent"
-                }
-            ]
-        }
-    ],
+    "events": [],
     "hasCallback": false,
     "types": {
-        "AggregatorEvent": {
-            "type": "struct",
-            "fields": [
-                {
-                    "name": "payment_in",
-                    "type": "List<EsdtTokenPayment>"
-                },
-                {
-                    "name": "payment_out",
-                    "type": "List<EsdtTokenPayment>"
-                }
-            ]
-        },
         "AggregatorStep": {
             "type": "struct",
             "fields": [
