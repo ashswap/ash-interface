@@ -2,24 +2,24 @@ import ICBambooShoot from "assets/svg/bamboo-shoot.svg";
 import ICQuestPrac1 from "assets/svg/quest-practical-1.svg";
 import ICQuestPrac2 from "assets/svg/quest-practical-2.svg";
 import { atomQuestUserStats } from "atoms/ashpoint";
+import { AxiosResponse } from "axios";
 import GlowingButton from "components/GlowingButton";
 import { ENVIRONMENT } from "const/env";
 import logApi from "helper/logHelper";
 import { formatAmount } from "helper/number";
 import {
-    CustomQuestMapModel,
     CUSTOM_QUEST_TYPES,
+    CustomQuestMapModel,
     ICustomQuest,
+    QuestAction,
+    QuestActionType,
+    QuestUserStatsModel,
     isFarmQuest,
     isGovQuest,
     isManualQuest,
     isSwapQuest,
-    QuestAction,
-    QuestActionType,
-    QuestUserStatsModel,
 } from "interface/quest";
 import moment from "moment";
-import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRecoilCallback } from "recoil";
 type Value = {
@@ -59,7 +59,7 @@ const actionLabelMap: { [key in QuestActionType]: string } = {
     increase_amount: "Increase amount of ASH in governance pool",
     increase_unlock_time: "Extend lock period in governance pool",
     withdraw: "Withdraw ASH from governance pool",
-    aggregate: "Use the aggregator"
+    aggregate: "Use the aggregator",
 };
 function QuestItem({
     questData,
@@ -88,12 +88,13 @@ function QuestItem({
     }, [questData, type]);
 
     const claim = useRecoilCallback(
-        () => async () => {
+        () => async (txHash: string) => {
             const claimType = type === "prize" ? "prize" : "action";
-            await logApi.post("/api/v1/wallet/claim", {
+            return await logApi.post("/api/v1/wallet/claim", {
                 claim_type: claimType,
                 [claimType === "action" ? "action_name" : "prize_day"]:
                     claimType === "action" ? type : questData.require,
+                tx_hash: txHash,
             });
         },
         [questData.require, type]
@@ -133,12 +134,13 @@ export function CustomQuestItem({
 
     const claim = useRecoilCallback(
         () => async () => {
-            await logApi.post("/api/v1/wallet/claim", {
+            const res = await logApi.post("/api/v1/wallet/claim", {
                 claim_type: questData.__typename,
                 quest_name: questData.quest_name,
                 claim_amount: require,
             });
             onClaim?.();
+            return res;
         },
         [questData, require, onClaim]
     );
@@ -348,7 +350,7 @@ type QuestItemBaseProps = {
     type: QuestActionType | keyof CustomQuestMapModel;
     progressData: ProgressData[];
     note?: string;
-    onClaim: () => Promise<void>;
+    onClaim: (txHash: string) => Promise<AxiosResponse>;
 };
 function QuestItemBase({
     status,
@@ -361,6 +363,8 @@ function QuestItemBase({
     onClaim,
 }: QuestItemBaseProps) {
     const [claiming, setClaiming] = useState(false);
+    const [txHash, setTxHash] = useState("");
+    const [error, setError] = useState("");
 
     const getUserStats = useRecoilCallback(
         ({ set }) =>
@@ -376,12 +380,27 @@ function QuestItemBase({
         []
     );
 
+    const computedHash = useMemo(() => {
+        const hash = txHash.trim();
+        const match = hash.match(/^.*\/transactions\/.{64}/);
+        const result = !match?.length
+            ? hash
+            : match[0].substring(match[0].length - 64);
+        return result.length === 64 ? result : "";
+    }, [txHash]);
+
     const claimASHPoint = useCallback(async () => {
         setClaiming(true);
-        await onClaim();
-        setClaiming(false);
+        try {
+            await onClaim(computedHash);
+            setError("");
+        } catch (error: any) {
+            setError(error?.response?.data?.error || "Something went wrong");
+        } finally {
+            setClaiming(false);
+        }
         await getUserStats();
-    }, [getUserStats, onClaim]);
+    }, [getUserStats, onClaim, computedHash]);
 
     return (
         <div className="relative px-4 sm:px-5 lg:px-12 py-5 flex flex-col xs:flex-row justify-between bg-ash-dark-600 border border-black">
@@ -390,7 +409,7 @@ function QuestItemBase({
                     className={`w-3 lg:w-4.5 h-auto colored-drop-shadow-xs ${prac1Classes[status]}`}
                 />
             </div>
-            <div className="w-full xs:w-1/3 sm:w-36 shrink-0 mb-4 xs:mb-0 xs:mr-4 lg:mr-20 flex flex-col items-end">
+            <div className="w-full xs:w-1/3 sm:w-36 shrink-0 mb-4 xs:mb-0 xs:mr-4 xl:mr-20 flex flex-col items-end">
                 <div
                     className={`font-bold text-xs mb-auto ${colorClasses[status]}`}
                 >
@@ -430,55 +449,70 @@ function QuestItemBase({
                             </div>
                         )}
                     </div>
-                    <div
-                        className={`relative max-w-[9rem] px-2 py-1 sm:px-4 sm:py-2 bg-ash-gray-600/10 ${colorClasses[status]}`}
-                    >
-                        <ICQuestPrac2 className="absolute top-0 left-0" />
-                        <span className="font-bold text-2xs sm:text-xs truncate">
-                            {formatAmount(point, { isInteger: true })} ASH
-                            points
-                        </span>
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div
+                            className={`relative max-w-[9rem] px-2 py-1 sm:px-4 sm:py-2 bg-ash-gray-600/10 ${colorClasses[status]}`}
+                        >
+                            <ICQuestPrac2 className="absolute top-0 left-0" />
+                            <span className="font-bold text-2xs sm:text-xs truncate">
+                                {formatAmount(point, { isInteger: true })} ASH
+                                points
+                            </span>
+                        </div>
+                        <div className="relative flex items-center gap-4">
+                            {status === 0 && type !== "prize" && (
+                                <div className="grow sm:max-w-[16rem]">
+                                    <input
+                                        className="py-2.5 px-4 min-w-0 w-full shrink grow bg-ash-dark-500 outline-none text-2xs sm:text-xs"
+                                        value={txHash}
+                                        onChange={(e) =>
+                                            setTxHash(e.target.value)
+                                        }
+                                        placeholder="Please input your Tx here"
+                                    />
+                                </div>
+                            )}
+
+                            <div className="shrink w-20 sm:w-24 border-notch-x border-notch-white/50">
+                                {status !== 2 ? (
+                                    <GlowingButton
+                                        theme="green"
+                                        disabled={
+                                            claiming ||
+                                            (type === "prize" &&
+                                                status === 0) ||
+                                            (type !== "prize" && !computedHash)
+                                        }
+                                        className="w-full h-8 clip-corner-1 clip-corner-tl font-bold text-xs text-ash-dark-600"
+                                        onClick={() => claimASHPoint()}
+                                    >
+                                        <div className="flex items-center space-x-2.5">
+                                            Submit
+                                        </div>
+                                    </GlowingButton>
+                                ) : (
+                                    <GlowingButton
+                                        theme="green"
+                                        disabled={true}
+                                        className="w-full h-8 clip-corner-1 clip-corner-tl font-bold text-xs"
+                                    >
+                                        <div className="flex items-center space-x-2.5">
+                                            Done
+                                        </div>
+                                    </GlowingButton>
+                                )}
+                            </div>
+                            {error && (
+                                <span className="absolute -bottom-4 inline-block max-w-full truncate text-2xs text-ash-purple-500">
+                                    {error}
+                                </span>
+                            )}
+                        </div>
                     </div>
                 </div>
-                <div className="shrink-0 relative ml-4 lg:ml-10 flex items-center">
+                <div className="shrink-0 relative flex items-center">
                     <div className="absolute -inset-y-5 -left-2 sm:-left-4 overflow-hidden">
                         <ICBambooShoot className="w-14 h-auto text-ash-gray-600/10" />
-                    </div>
-                    <div className="shrink w-20 sm:w-24 border-notch-x border-notch-white/50">
-                        {status === 0 ? (
-                            <Link href={redirect || "/"}>
-                                <GlowingButton
-                                    theme="purple"
-                                    className="w-full h-8 clip-corner-1 clip-corner-tl font-bold text-xs"
-                                    disabled={type === "prize"}
-                                >
-                                    <div className="flex items-center space-x-2.5">
-                                        Go!
-                                    </div>
-                                </GlowingButton>
-                            </Link>
-                        ) : status === 1 ? (
-                            <GlowingButton
-                                theme="green"
-                                disabled={claiming}
-                                className="w-full h-8 clip-corner-1 clip-corner-tl font-bold text-xs text-ash-dark-600"
-                                onClick={() => claimASHPoint()}
-                            >
-                                <div className="flex items-center space-x-2.5">
-                                    Claim
-                                </div>
-                            </GlowingButton>
-                        ) : (
-                            <GlowingButton
-                                theme="green"
-                                disabled={true}
-                                className="w-full h-8 clip-corner-1 clip-corner-tl font-bold text-xs"
-                            >
-                                <div className="flex items-center space-x-2.5">
-                                    Done
-                                </div>
-                            </GlowingButton>
-                        )}
                     </div>
                 </div>
             </div>
