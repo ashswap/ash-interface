@@ -145,6 +145,58 @@ deploy_ipfs_beta:
     - build_beta
   <<: *deploy_ipfs_script_template
 
+######################### Devnet beta2 #########################
+
+.env_beta2: &env_beta2
+  <<: *env_common
+  NEXT_PUBLIC_NETWORK: devnet2
+  NEXT_PUBLIC_ASH_ENV: beta
+  BUILD_ENV: dev
+  NEXT_PUBLIC_ASH_API: https://api-devnet2.ashswap.io
+  NEXT_PUBLIC_ASH_DOMAIN: devnet2.ashswap.io
+  NEXT_PUBLIC_ASH_GRAPHQL: https://api-v2-devnet2.ashswap.io
+  NEXT_PUBLIC_ASH_SOCKET: https://devnet2-socket-api.multiversx.com
+  NEXT_PUBLIC_ASH_SOCKET_EXTRA: 
+  NEXT_PUBLIC_ASH_LOG_API: https://api-tracking.ashswap.io
+  NEXT_PUBLIC_IPFS_API: https://ipfs-cluster-api-internal.bicarus.io
+  NEXT_PUBLIC_AG_API: https://aggregator-devnet2.ashswap.io
+  NEXT_PUBLIC_XEXCHANGE_GRAPH_API: https://devnet-graph.xexchange.com
+
+.job_template_beta2: &job_template_beta2
+  environment:
+    name: devnet-beta2
+    url: https://devnet2.ashswap.io
+  variables:
+    <<: *env_beta2
+  only:
+    - /^.*-beta2$/
+  except:
+    - branches
+  retry: 2
+
+dockerize_beta2:
+  extends: .build
+  <<: *job_template_beta2
+
+build_beta2:
+  stage: build
+  image: node:16.16.0
+  <<: *job_template_beta2
+  <<: *build_script_template
+  artifacts:
+    name: "$CI_JOB_NAME-$CI_COMMIT_REF_NAME"
+    paths:
+      - out/
+    expire_in: 1 week
+
+deploy_ipfs_beta2:
+  stage: deploy
+  image: node:16.16.0
+  <<: *job_template_beta2
+  dependencies:
+    - build_beta2
+  <<: *deploy_ipfs_script_template
+
 ######################### Mainnet Gamma #########################
 
 .env_prod_gamma: &env_prod_gamma

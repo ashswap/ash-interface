@@ -199,6 +199,53 @@ const devnet: FarmConfig = {
     ],
 };
 
+const devnet2: IFarm[] = [
+    {
+        farm_address:
+            "erd1qqqqqqqqqqqqqpgqnyz67pqaw34nq078t344s2qw909e5qxn2gesllm9a5",
+        reward_token_id: "ASH-e3d1b7",
+        reward_token_decimal: 18,
+        farming_token_id: "ALP-c18629",
+        farming_token_decimal: 18,
+        farm_token_id: "FARM-b9c215",
+        farm_token_decimal: 18,
+        active: true,
+    },
+    {
+        farm_address:
+            "erd1qqqqqqqqqqqqqpgqx8vewe4dlqepv6dzrsmcsne4hrf7qwj92geskmsdf3",
+        reward_token_id: "ASH-e3d1b7",
+        reward_token_decimal: 18,
+        farming_token_id: "ALP-fe666f",
+        farming_token_decimal: 18,
+        farm_token_id: "FARM-e61071",
+        farm_token_decimal: 18,
+        active: true,
+    },
+    {
+        farm_address:
+            "erd1qqqqqqqqqqqqqpgqgxw0q6pvf3mk8mnzwctyrmftvhzgdhey2geslsns08",
+        reward_token_id: "ASH-e3d1b7",
+        reward_token_decimal: 18,
+        farming_token_id: "ALP-55d5c4",
+        farming_token_decimal: 18,
+        farm_token_id: "FARM-20633f",
+        farm_token_decimal: 18,
+        active: true,
+    },
+    {
+        farm_address:
+            "erd1qqqqqqqqqqqqqpgq6qtm8hsazrp5mlxrlgfh7628yr3wlhv72gesn4qyzu",
+        reward_token_id: "ASH-e3d1b7",
+        reward_token_decimal: 18,
+        farming_token_id: "ALP-2c3abb",
+        farming_token_decimal: 18,
+        farm_token_id: "FARM-b52740",
+        farm_token_decimal: 18,
+        active: true,
+    },
+];
+
 const mainnet: IFarm[] = [
     {
         farm_address:
@@ -313,7 +360,11 @@ const mainnet: IFarm[] = [
 ];
 
 export const FARMS =
-    (ENVIRONMENT.NETWORK == "devnet" ? devnet[ENVIRONMENT.ENV] : mainnet) || [];
+    (ENVIRONMENT.NETWORK == "devnet"
+        ? devnet[ENVIRONMENT.ENV]
+        : ENVIRONMENT.NETWORK == "devnet2"
+        ? devnet2
+        : mainnet) || [];
 export const ACTIVE_FARMS = FARMS.filter((f) => f.active);
 export const FARMS_MAP = Object.fromEntries(
     FARMS.map((f) => [f.farm_address, f])
