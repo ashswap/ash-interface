@@ -1,8 +1,8 @@
-import { TOKENS_BETA } from "const/tokens/index";
+import { TOKENS_BETA2 } from "const/tokens/index";
 import IPool, { EPoolType } from "interface/pool";
 
-const TOKENS_MAP = TOKENS_BETA.TOKENS_MAP;
-const POOLS_BETA: IPool[] = [
+const TOKENS_MAP = TOKENS_BETA2.TOKENS_MAP;
+const POOLS_BETA2: IPool[] = [
     {
         address:
             "erd1qqqqqqqqqqqqqpgqs6gv0vs22a53rsdl2v935y565sftp0002gesjn5yp7",
@@ -36,4 +36,4 @@ const POOLS_BETA: IPool[] = [
         type: EPoolType.PoolV2,
     },
 ];
-export default POOLS_BETA;
+export default POOLS_BETA2;
