@@ -1,4 +1,4 @@
-type Network = "mainnet" | "devnet";
+type Network = "mainnet" | "devnet" | "devnet2";
 type Env = "alpha" | "beta";
 // -> test-devnet(for internal testing) || dev-devnet (for users)
 interface Environment {

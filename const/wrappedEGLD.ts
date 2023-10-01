@@ -10,6 +10,14 @@ const tokens = {
             "erd1qqqqqqqqqqqqqpgqfj3z3k4vlq7dc2928rxez0uhhlq46s6p4mtqerlxhc",//shard2
         ]
     },
+    devnet2: {
+        wegld: "WEGLD-a28c59",
+        wegldContracts: [
+            "erd1qqqqqqqqqqqqqpgqqkwzsxkjc83vlfex9dmznwm7tjvxlqqkpauqx0n782",
+            "erd1qqqqqqqqqqqqqpgqpv09kfzry5y4sj05udcngesat07umyj70n4sa2c0rp",
+            "erd1qqqqqqqqqqqqqpgqvn9ew0wwn7a3pk053ezex98497hd4exqdg0q8v2e0c",
+        ]
+    },
     mainnet: {
         wegld: "WEGLD-bd4d79",
         wegldContracts: [
