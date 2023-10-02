@@ -2,6 +2,7 @@ export enum ChainId {
     Mainnet = "1",
     Testnet = "T",
     Devnet = "D",
+    Devnet2 = "D",
 }
 export interface IESDTInfo {
     readonly chainId: ChainId;
