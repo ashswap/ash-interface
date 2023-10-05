@@ -11,7 +11,9 @@ import IconUTK from "assets/images/utk-icon.png";
 import ImgWEGLDIcon from "assets/images/wegld-icon.png";
 import IconJWLASH from "assets/images/jwlash-icon.png";
 import IconJWLEGLD from "assets/images/jwlegld-icon.png";
+import IconMEX from "assets/images/mex-icon.png";
 import IconJWLHTM from "assets/images/jwlhtm-icon.png";
+import IconJWLMEX from "assets/images/jwlmex-icon.png";
 import { ChainId, IESDTInfo } from "helper/token/token";
 const TOKENS_ALIAS: Record<"EGLD" | "ASH" | "wEGLD", IESDTInfo> = {
     EGLD: {
@@ -37,8 +39,8 @@ const TOKENS_ALIAS: Record<"EGLD" | "ASH" | "wEGLD", IESDTInfo> = {
         name: "Ashswap Token",
         decimals: 18,
         logoURI: ImgAshIcon.src,
-    }
-}
+    },
+};
 
 const TOKENS: IESDTInfo[] = [
     TOKENS_ALIAS.EGLD,
@@ -132,6 +134,22 @@ const TOKENS: IESDTInfo[] = [
         decimals: 18,
         logoURI: IconSEGLD.src,
     },
+    {
+        identifier: "JWLMEX-3874f7",
+        chainId: ChainId.Devnet,
+        symbol: "JWLMEX",
+        name: "JewelLockedMEX",
+        decimals: 18,
+        logoURI: IconJWLMEX.src,
+    },
+    {
+        identifier: "MEX-dc289c",
+        chainId: ChainId.Devnet,
+        symbol: "MEX",
+        name: "MEX",
+        decimals: 18,
+        logoURI: IconMEX.src,
+    },
 ];
 
 const LP_TOKENS: IESDTInfo[] = [
@@ -220,11 +238,19 @@ const LP_TOKENS: IESDTInfo[] = [
         name: "Ashswap LP",
         decimals: 18,
     },
+    {
+        identifier: "ALP-433b26",
+        chainId: ChainId.Devnet,
+        symbol: "ALP-JWLMEX",
+        name: "Ashswap LP",
+        decimals: 18,
+    },
 ];
 
-const TOKENS_MAP: Record<string, IESDTInfo> &
-    typeof TOKENS_ALIAS = {
-    ...Object.fromEntries([...TOKENS, ...LP_TOKENS].map((t) => [t.identifier, t])),
+const TOKENS_MAP: Record<string, IESDTInfo> & typeof TOKENS_ALIAS = {
+    ...Object.fromEntries(
+        [...TOKENS, ...LP_TOKENS].map((t) => [t.identifier, t])
+    ),
     ...TOKENS_ALIAS,
 };
 const TOKENS_BETA = {

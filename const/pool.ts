@@ -4,15 +4,23 @@ import { ENVIRONMENT } from "./env";
 
 import { TOKENS_MAP } from "./tokens";
 import { WRAPPED_EGLD } from "./wrappedEGLD";
-import { POOLS_ALPHA, POOLS_BETA, POOLS_MAINNET } from "./pools";
+import { POOLS_ALPHA, POOLS_BETA, POOLS_BETA2, POOLS_MAINNET } from "./pools";
 
-const _POOLS = ENVIRONMENT.NETWORK === "devnet" ? ENVIRONMENT.ENV === "alpha" ? POOLS_ALPHA : POOLS_BETA : POOLS_MAINNET;
-const pools = _POOLS.map(p => {
+const _POOLS =
+    ENVIRONMENT.ENV === "alpha"
+        ? POOLS_ALPHA
+        : ENVIRONMENT.NETWORK === "devnet"
+        ? POOLS_BETA
+        : ENVIRONMENT.NETWORK === "devnet2"
+        ? POOLS_BETA2
+        : POOLS_MAINNET;
+
+const pools = _POOLS.map((p) => {
     // verify all tokens which present in the pool
-    p.tokens.map(t => {
-        if(!t) throw new Error("Invalid token identifier in pool");
+    p.tokens.map((t) => {
+        if (!t) throw new Error("Invalid token identifier in pool");
     });
-    if(!p.lpToken) {
+    if (!p.lpToken) {
         throw new Error("Invalid token identifier in pool");
     }
     return p;

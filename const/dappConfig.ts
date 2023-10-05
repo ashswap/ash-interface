@@ -13,12 +13,23 @@ export const blockTimeMs = 6000;
 
 let defaultDevnet: CustomNetworkType = {
     ...fallbackNetworkConfigurations.devnet,
-    apiTimeout: '10000'
+    apiTimeout: "10000",
+};
+
+let defaultDevnet2: CustomNetworkType = {
+    ...fallbackNetworkConfigurations.devnet,
+    apiTimeout: "10000",
+    apiAddress: "https://devnet2-api.multiversx.com",
+    explorerAddress: "http://devnet2-explorer.multiversx.com",
+    id: "devnet2",
+    walletAddress: "https://devnet2-wallet.multiversx.com",
 };
 
 const _DAPP_CONFIG: CustomNetworkType =
     ENVIRONMENT.NETWORK === "devnet"
         ? defaultDevnet
+        : ENVIRONMENT.NETWORK === "devnet2"
+        ? defaultDevnet2
         : fallbackNetworkConfigurations.mainnet;
 export const DAPP_CONFIG: CustomNetworkType = {
     ..._DAPP_CONFIG,
@@ -26,6 +37,7 @@ export const DAPP_CONFIG: CustomNetworkType = {
 };
 export const CHAIN_ID = {
     DEVNET: ChainId.Devnet,
+    DEVNET2: ChainId.Devnet2,
     TESTNET: ChainId.Testnet,
     MAINNET: ChainId.Mainnet,
 } as const;
