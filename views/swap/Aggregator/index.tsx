@@ -67,7 +67,7 @@ const Aggregator = memo(function Aggregator() {
     const [amountIn, setAmountIn] = useRecoilState(agAmountInAtom);
     const [cgkPriceChangeP, setCgkPriceChangeP] = useState(0);
     const amtIn = useMemo(
-        () => toWei(tokenIn, amountIn).idiv(1).toString(),
+        () => toWei(tokenIn, amountIn).idiv(1).toString(10),
         [tokenIn, amountIn]
     );
     // sor routing
