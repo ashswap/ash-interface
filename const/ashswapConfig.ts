@@ -48,7 +48,8 @@ const dappContractDevnet: DappContractConfig = {
         dao: "erd1qqqqqqqqqqqqqpgq8ktcklq3qvmwpjchvadp6fm6apnn6crlrmcqegtnt3",
         daoBribe:
             "erd1qqqqqqqqqqqqqpgq7qpg3085qdweu3wx9tphq2t5gwz2mf4xrmcqagprme",
-        aggregator: "erd1qqqqqqqqqqqqqpgqqgm4ufxm8pncksv3dt56ura9l7m8900sh2uswmfx7v",
+        aggregator:
+            "erd1qqqqqqqqqqqqqpgqqgm4ufxm8pncksv3dt56ura9l7m8900sh2uswmfx7v",
     },
 };
 
@@ -60,7 +61,8 @@ const dappContractMainnet: DappContracts = {
     farmController:
         "erd1qqqqqqqqqqqqqpgqzhm689ehkacadr7elzkc3z70h6cqmz0q4fvsftax5t",
     farmBribe: "erd1qqqqqqqqqqqqqpgqgulmfcu8prrv2pmx3nqn5stqu3c42fsz4fvsa9rwdl",
-    farmRouter: "erd1qqqqqqqqqqqqqpgqe0k2j45f3w9krhx2gl0j8fpg2ksepaea4fvssap9nd",
+    farmRouter:
+        "erd1qqqqqqqqqqqqqpgqe0k2j45f3w9krhx2gl0j8fpg2ksepaea4fvssap9nd",
     router: "erd1qqqqqqqqqqqqqpgqjtlmapv42pcga5nglgfrnpqvkq06wdqx4fvsvw6xpt",
     dao: "erd1qqqqqqqqqqqqqpgqvdkft2eq9zh7cu9tkxartshu764tqe7s4fvsaw99xj",
     daoBribe: "erd1qqqqqqqqqqqqqpgqzsmhsv625er2w6w7rel7kmustn3u838f4fvs36jdmc",
@@ -68,9 +70,28 @@ const dappContractMainnet: DappContracts = {
         "erd1qqqqqqqqqqqqqpgqglgkaxm73j7mhw5u940fsmmncnayxj884fvs54lnr6",
 };
 
+const dappContractDevnet2: DappContracts = {
+    voteEscrowedContract:
+        "erd1qqqqqqqqqqqqqpgqfaljdd850wc5qpw2mthzk6czd62x28cc2gestxhzgm",
+    feeDistributor:
+        "erd1qqqqqqqqqqqqqpgql4tq8208tew08xq0d5fsk08v6xm9c7z72gesn4jc5s",
+    farmController:
+        "erd1qqqqqqqqqqqqqpgqdk0g93kgt7xtaclgnt45r23phqyfpshz2gesx6xzzk",
+    farmBribe: "erd1qqqqqqqqqqqqqpgql64877spw8tjc3f89s72fpcgva48gu7y2gesjgkr43",
+    farmRouter:
+        "erd1qqqqqqqqqqqqqpgqpea866vvcaltxdqkqajwd4zts7ljj9vp2gesjqp0ws",
+    router: "erd1qqqqqqqqqqqqqpgqd8nqy38tdh6w6sa2zujqkl8hpvqxrzj22gesmw8l75",
+    dao: "erd1qqqqqqqqqqqqqpgq09d52vjvj2tr3ezqa73fdyer6nrdkwh72ges9nlctp",
+    daoBribe: "erd1qqqqqqqqqqqqqpgqhq7kf4rdprseluwegp3azd0p0p0e2gpn2gesgcw4k5",
+    aggregator:
+        "erd1qqqqqqqqqqqqqpgqh96hhj42huhe47j3jerlec7ndhw75gy72gesy7w2d6",
+};
+
 const dappContract =
     ENVIRONMENT.NETWORK == "devnet"
         ? dappContractDevnet[ENVIRONMENT.ENV]
+        : ENVIRONMENT.NETWORK == "devnet2"
+        ? dappContractDevnet2
         : dappContractMainnet;
 
 export const VE_CONFIG =
