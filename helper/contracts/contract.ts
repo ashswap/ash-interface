@@ -5,7 +5,7 @@ import {
     EndpointParameterDefinition,
     Interaction,
     ResultsParser,
-    SmartContract
+    SmartContract,
 } from "@multiversx/sdk-core/out";
 import { GAS_PRICE } from "@multiversx/sdk-dapp/constants";
 import { AccountInfoSliceNetworkType } from "@multiversx/sdk-dapp/types";

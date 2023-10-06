@@ -1,296 +1,299 @@
 include:
-  - project: 'trancport/blockchain/util/gitlab-ci-template'
-    ref: main
-    file: '/base.yml'
+    - project: "trancport/blockchain/util/gitlab-ci-template"
+      ref: main
+      file: "/base.yml"
 
 stages:
-  - build
-  - deploy
+    - build
+    - deploy
 
 .env_common: &env_common
-  IMAGE_TAG: $CI_COMMIT_TAG
-  IMAGE_LATEST_TAG: latest
-  NEXT_TELEMETRY_DISABLED: 1
-  NEXT_PUBLIC_GA_ID: $GA_ID
-  NEXT_PUBLIC_GOOGLE_TAG_MANAGER: $GOOGLE_TAG_MANAGER
-  NEXT_PUBLIC_ASH_LOG_API_KEY: $ASH_LOG_API_KEY
-  NEXT_PUBLIC_ASH_CAPTCHA_ID: $ASH_CAPTCHA_ID
-  NEXT_PUBLIC_ASH_LOGIN_TWITTER_LINK: $ASH_LOGIN_TWITTER_LINK
-  NEXT_PUBLIC_ASH_LOGIN_DISCORD_LINK: $ASH_LOGIN_DISCORD_LINK
-  NEXT_PUBLIC_ASH_WALLET_CONNECT_V2_PROJECT_ID: $WALLET_CONNECT_V2_PROJECT_ID
-  NEXT_PUBLIC_TESTNET_PASS: $TESTNET_PASS
-  NEXT_PUBLIC_SENTRY_DSN: $SENTRY_DSN
-  NEXT_PUBLIC_AG_TOKEN_SECRET: $AG_TOKEN_SECRET
-  SENTRY_LOG_LEVEL: debug
-  SENTRY_ORG: $SENTRY_ORG
-  SENTRY_PROJECT: $SENTRY_PROJECT
-  SENTRY_URL: $SENTRY_URL
-  SENTRY_AUTH_TOKEN: $SENTRY_AUTH_TOKEN
+    IMAGE_TAG: $CI_COMMIT_TAG
+    IMAGE_LATEST_TAG: latest
+    NEXT_TELEMETRY_DISABLED: 1
+    NEXT_PUBLIC_GA_ID: $GA_ID
+    NEXT_PUBLIC_GOOGLE_TAG_MANAGER: $GOOGLE_TAG_MANAGER
+    NEXT_PUBLIC_ASH_LOG_API_KEY: $ASH_LOG_API_KEY
+    NEXT_PUBLIC_ASH_CAPTCHA_ID: $ASH_CAPTCHA_ID
+    NEXT_PUBLIC_ASH_LOGIN_TWITTER_LINK: $ASH_LOGIN_TWITTER_LINK
+    NEXT_PUBLIC_ASH_LOGIN_DISCORD_LINK: $ASH_LOGIN_DISCORD_LINK
+    NEXT_PUBLIC_ASH_WALLET_CONNECT_V2_PROJECT_ID: $WALLET_CONNECT_V2_PROJECT_ID
+    NEXT_PUBLIC_TESTNET_PASS: $TESTNET_PASS
+    NEXT_PUBLIC_SENTRY_DSN: $SENTRY_DSN
+    NEXT_PUBLIC_AG_TOKEN_SECRET: $AG_TOKEN_SECRET
+    SENTRY_LOG_LEVEL: debug
+    SENTRY_ORG: $SENTRY_ORG
+    SENTRY_PROJECT: $SENTRY_PROJECT
+    SENTRY_URL: $SENTRY_URL
+    SENTRY_AUTH_TOKEN: $SENTRY_AUTH_TOKEN
 
 .build_script_template: &build_script_template
-  before_script:
-    - printenv > .env
-  script:
-    - ls -lah
-    - yarn install --frozen-lockfile && yarn build && yarn export && cp ./out/404.html ./out/ipfs-404.html
+    before_script:
+        - printenv > .env
+    script:
+        - ls -lah
+        - yarn install --frozen-lockfile && yarn build && yarn export && cp ./out/404.html ./out/ipfs-404.html
 
 .deploy_ipfs_script_template: &deploy_ipfs_script_template
-  before_script:
-    - ls -lah
-    - npm install -g git+https://github.com/bicarus-labs/ipfs-deploy.git#182e775f849ed1a4405c9e4c3657c56ad5483abb
-  script:
-    - ipd -u ipfs-cluster -p ipfs-cluster -d cloudflare --no-clipboard=true out
+    before_script:
+        - ls -lah
+        - npm install -g git+https://github.com/bicarus-labs/ipfs-deploy.git#182e775f849ed1a4405c9e4c3657c56ad5483abb
+    script:
+        - ipd -u ipfs-cluster -p ipfs-cluster -d cloudflare --no-clipboard=true out
 
 ######################### Devnet alpha #########################
 
 .env_alpha: &env_alpha
-  <<: *env_common
-  NEXT_PUBLIC_NETWORK: devnet
-  NEXT_PUBLIC_ASH_ENV: alpha
-  BUILD_ENV: dev
-  NEXT_PUBLIC_ASH_API: https://api-devnet-alpha.ashswap.io
-  NEXT_PUBLIC_ASH_DOMAIN: devnet-alpha.ashswap.io
-  NEXT_PUBLIC_ASH_GRAPHQL: https://api-v2-devnet-alpha.ashswap.io
-  NEXT_PUBLIC_ASH_SOCKET: https://devnet-socket-api.multiversx.com
-  NEXT_PUBLIC_ASH_SOCKET_EXTRA: 
-  NEXT_PUBLIC_ASH_LOG_API: https://api-tracking-devnet-alpha.ashswap.io
-  NEXT_PUBLIC_IPFS_API: https://ipfs-cluster-api-internal.bicarus.io
-  NEXT_PUBLIC_AG_API: https://aggregator-devnet-alpha.ashswap.io
-  NEXT_PUBLIC_XEXCHANGE_GRAPH_API: https://devnet-graph.xexchange.com
+    <<: *env_common
+    NEXT_PUBLIC_NETWORK: devnet
+    NEXT_PUBLIC_ASH_ENV: alpha
+    BUILD_ENV: dev
+    NEXT_PUBLIC_ASH_API: https://api-devnet-alpha.ashswap.io
+    NEXT_PUBLIC_ASH_DOMAIN: devnet-alpha.ashswap.io
+    NEXT_PUBLIC_ASH_GRAPHQL: https://api-v2-devnet-alpha.ashswap.io
+    NEXT_PUBLIC_ASH_SOCKET: https://devnet-socket-api.multiversx.com
+    NEXT_PUBLIC_ASH_SOCKET_EXTRA:
+    NEXT_PUBLIC_ASH_LOG_API: https://api-tracking-devnet-alpha.ashswap.io
+    NEXT_PUBLIC_IPFS_API: https://ipfs-cluster-api-internal.bicarus.io
+    NEXT_PUBLIC_AG_API: https://aggregator-devnet-alpha.ashswap.io
+    NEXT_PUBLIC_XEXCHANGE_GRAPH_API: https://devnet-graph.xexchange.com
 
 .job_template_alpha: &job_template_alpha
-  environment:
-    name: devnet-alpha
-    url: https://devnet-alpha.ashswap.io
-  variables:
-    <<: *env_alpha
-  only:
-    - /^.*-alpha$/
-  except:
-    - branches
-  retry: 2
+    environment:
+        name: devnet-alpha
+        url: https://devnet-alpha.ashswap.io
+    variables:
+        <<: *env_alpha
+    only:
+        - /^.*-alpha$/
+    except:
+        - branches
+    retry: 2
 
 dockerize_alpha:
-  extends: .build
-  <<: *job_template_alpha
+    extends: .build
+    <<: *job_template_alpha
 
 build_alpha:
-  stage: build
-  image: node:16.16.0
-  <<: *job_template_alpha
-  <<: *build_script_template
-  artifacts:
-    name: "$CI_JOB_NAME-$CI_COMMIT_REF_NAME"
-    paths:
-      - out/
-    expire_in: 1 week
+    stage: build
+    image: node:16.16.0
+    <<: *job_template_alpha
+    <<: *build_script_template
+    artifacts:
+        name: "$CI_JOB_NAME-$CI_COMMIT_REF_NAME"
+        paths:
+            - out/
+        expire_in: 1 week
 
 deploy_ipfs_alpha:
-  stage: deploy
-  image: node:16.16.0
-  <<: *job_template_alpha
-  dependencies:
-    - build_alpha
-  <<: *deploy_ipfs_script_template
+    stage: deploy
+    image: node:16.16.0
+    <<: *job_template_alpha
+    dependencies:
+        - build_alpha
+    <<: *deploy_ipfs_script_template
 
 ######################### Devnet beta #########################
 
 .env_beta: &env_beta
-  <<: *env_common
-  NEXT_PUBLIC_NETWORK: devnet
-  NEXT_PUBLIC_ASH_ENV: beta
-  BUILD_ENV: dev
-  NEXT_PUBLIC_ASH_API: https://api-devnet.ashswap.io
-  NEXT_PUBLIC_ASH_DOMAIN: devnet.ashswap.io
-  NEXT_PUBLIC_ASH_GRAPHQL: https://api-v2-devnet.ashswap.io
-  NEXT_PUBLIC_ASH_SOCKET: https://devnet-socket-api.multiversx.com
-  NEXT_PUBLIC_ASH_SOCKET_EXTRA: 
-  NEXT_PUBLIC_ASH_LOG_API: https://api-tracking.ashswap.io
-  NEXT_PUBLIC_IPFS_API: https://ipfs-cluster-api-internal.bicarus.io
-  NEXT_PUBLIC_AG_API: https://aggregator-devnet.ashswap.io
-  NEXT_PUBLIC_XEXCHANGE_GRAPH_API: https://devnet-graph.xexchange.com
+    <<: *env_common
+    NEXT_PUBLIC_NETWORK: devnet
+    NEXT_PUBLIC_ASH_ENV: beta
+    BUILD_ENV: dev
+    NEXT_PUBLIC_ASH_API: https://api-devnet.ashswap.io
+    NEXT_PUBLIC_ASH_DOMAIN: devnet.ashswap.io
+    NEXT_PUBLIC_ASH_GRAPHQL: https://api-v2-devnet.ashswap.io
+    NEXT_PUBLIC_ASH_SOCKET: https://devnet-socket-api.multiversx.com
+    NEXT_PUBLIC_ASH_SOCKET_EXTRA:
+    NEXT_PUBLIC_ASH_LOG_API: https://api-tracking.ashswap.io
+    NEXT_PUBLIC_IPFS_API: https://ipfs-cluster-api-internal.bicarus.io
+    NEXT_PUBLIC_AG_API: https://aggregator-devnet.ashswap.io
+    NEXT_PUBLIC_XEXCHANGE_GRAPH_API: https://devnet-graph.xexchange.com
 
 .job_template_beta: &job_template_beta
-  environment:
-    name: devnet-beta
-    url: https://devnet.ashswap.io
-  variables:
-    <<: *env_beta
-  only:
-    - /^.*-beta$/
-  except:
-    - branches
-  retry: 2
+    environment:
+        name: devnet-beta
+        url: https://devnet.ashswap.io
+    variables:
+        <<: *env_beta
+    only:
+        - /^.*-beta$/
+    except:
+        - branches
+    retry: 2
 
 dockerize_beta:
-  extends: .build
-  <<: *job_template_beta
+    extends: .build
+    <<: *job_template_beta
 
 build_beta:
-  stage: build
-  image: node:16.16.0
-  <<: *job_template_beta
-  <<: *build_script_template
-  artifacts:
-    name: "$CI_JOB_NAME-$CI_COMMIT_REF_NAME"
-    paths:
-      - out/
-    expire_in: 1 week
+    stage: build
+    image: node:16.16.0
+    <<: *job_template_beta
+    <<: *build_script_template
+    artifacts:
+        name: "$CI_JOB_NAME-$CI_COMMIT_REF_NAME"
+        paths:
+            - out/
+        expire_in: 1 week
 
 deploy_ipfs_beta:
-  stage: deploy
-  image: node:16.16.0
-  <<: *job_template_beta
-  dependencies:
-    - build_beta
-  <<: *deploy_ipfs_script_template
+    stage: deploy
+    image: node:16.16.0
+    <<: *job_template_beta
+    dependencies:
+        - build_beta
+    <<: *deploy_ipfs_script_template
 
 ######################### Devnet beta2 #########################
 
 .env_beta2: &env_beta2
-  <<: *env_common
-  NEXT_PUBLIC_NETWORK: devnet2
-  NEXT_PUBLIC_ASH_ENV: beta
-  BUILD_ENV: dev
-  NEXT_PUBLIC_ASH_API: https://api-devnet2.ashswap.io
-  NEXT_PUBLIC_ASH_DOMAIN: devnet2.ashswap.io
-  NEXT_PUBLIC_ASH_GRAPHQL: https://api-v2-devnet2.ashswap.io
-  NEXT_PUBLIC_ASH_SOCKET: https://devnet2-socket-api.multiversx.com
-  NEXT_PUBLIC_ASH_SOCKET_EXTRA: 
-  NEXT_PUBLIC_ASH_LOG_API: https://api-tracking.ashswap.io
-  NEXT_PUBLIC_IPFS_API: https://ipfs-cluster-api-internal.bicarus.io
-  NEXT_PUBLIC_AG_API: https://aggregator-devnet2.ashswap.io
-  NEXT_PUBLIC_XEXCHANGE_GRAPH_API: https://devnet-graph.xexchange.com
+    <<: *env_common
+    NEXT_PUBLIC_NETWORK: devnet2
+    NEXT_PUBLIC_ASH_ENV: beta
+    BUILD_ENV: dev
+    NEXT_PUBLIC_ASH_API: https://api-devnet2.ashswap.io
+    NEXT_PUBLIC_ASH_DOMAIN: devnet2.ashswap.io
+    NEXT_PUBLIC_ASH_GRAPHQL: https://api-v2-devnet2.ashswap.io
+    NEXT_PUBLIC_ASH_SOCKET: https://devnet2-socket-api.multiversx.com
+    NEXT_PUBLIC_ASH_SOCKET_EXTRA:
+    NEXT_PUBLIC_ASH_LOG_API: https://api-tracking.ashswap.io
+    NEXT_PUBLIC_IPFS_API: https://ipfs-cluster-api-internal.bicarus.io
+    NEXT_PUBLIC_AG_API: https://aggregator-devnet2.ashswap.io
+    NEXT_PUBLIC_XEXCHANGE_GRAPH_API: https://devnet-graph.xexchange.com
+    NEXT_PUBLIC_MVX_API: https://devnet2-api.multiversx.com
+    NEXT_PUBLIC_MVX_WALLET: https://devnet2-wallet.multiversx.com
+    NEXT_PUBLIC_MVX_EXPLORER: https://devnet2-explorer.multiversx.com
 
 .job_template_beta2: &job_template_beta2
-  environment:
-    name: devnet-beta2
-    url: https://devnet2.ashswap.io
-  variables:
-    <<: *env_beta2
-  only:
-    - /^.*-beta2$/
-  except:
-    - branches
-  retry: 2
+    environment:
+        name: devnet-beta2
+        url: https://devnet2.ashswap.io
+    variables:
+        <<: *env_beta2
+    only:
+        - /^.*-beta2$/
+    except:
+        - branches
+    retry: 2
 
 dockerize_beta2:
-  extends: .build
-  <<: *job_template_beta2
+    extends: .build
+    <<: *job_template_beta2
 
 build_beta2:
-  stage: build
-  image: node:16.16.0
-  <<: *job_template_beta2
-  <<: *build_script_template
-  artifacts:
-    name: "$CI_JOB_NAME-$CI_COMMIT_REF_NAME"
-    paths:
-      - out/
-    expire_in: 1 week
+    stage: build
+    image: node:16.16.0
+    <<: *job_template_beta2
+    <<: *build_script_template
+    artifacts:
+        name: "$CI_JOB_NAME-$CI_COMMIT_REF_NAME"
+        paths:
+            - out/
+        expire_in: 1 week
 
 deploy_ipfs_beta2:
-  stage: deploy
-  image: node:16.16.0
-  <<: *job_template_beta2
-  dependencies:
-    - build_beta2
-  <<: *deploy_ipfs_script_template
+    stage: deploy
+    image: node:16.16.0
+    <<: *job_template_beta2
+    dependencies:
+        - build_beta2
+    <<: *deploy_ipfs_script_template
 
 ######################### Mainnet Gamma #########################
 
 .env_prod_gamma: &env_prod_gamma
-  <<: *env_common
-  NEXT_PUBLIC_NETWORK: mainnet
-  NEXT_PUBLIC_ASH_ENV: beta
-  # TODO: prod
-  BUILD_ENV: dev
-  NEXT_PUBLIC_ASH_API: https://api.ashswap.io
-  NEXT_PUBLIC_ASH_DOMAIN: app.ashswap.io
-  NEXT_PUBLIC_ASH_GRAPHQL: https://api-v2.ashswap.io
-  NEXT_PUBLIC_ASH_SOCKET: https://socket-api-fra-aws.multiversx.com
-  NEXT_PUBLIC_ASH_SOCKET_EXTRA: 
-  NEXT_PUBLIC_ASH_LOG_API: https://api-tracking.ashswap.io
-  NEXT_PUBLIC_IPFS_API: https://ipfs-cluster-api-internal.bicarus.io
-  NEXT_PUBLIC_AG_API: https://aggregator-internal.ashswap.io
-  NEXT_PUBLIC_XEXCHANGE_GRAPH_API: https://graph.xexchange.com
+    <<: *env_common
+    NEXT_PUBLIC_NETWORK: mainnet
+    NEXT_PUBLIC_ASH_ENV: beta
+    # TODO: prod
+    BUILD_ENV: dev
+    NEXT_PUBLIC_ASH_API: https://api.ashswap.io
+    NEXT_PUBLIC_ASH_DOMAIN: app.ashswap.io
+    NEXT_PUBLIC_ASH_GRAPHQL: https://api-v2.ashswap.io
+    NEXT_PUBLIC_ASH_SOCKET: https://socket-api-fra-aws.multiversx.com
+    NEXT_PUBLIC_ASH_SOCKET_EXTRA:
+    NEXT_PUBLIC_ASH_LOG_API: https://api-tracking.ashswap.io
+    NEXT_PUBLIC_IPFS_API: https://ipfs-cluster-api-internal.bicarus.io
+    NEXT_PUBLIC_AG_API: https://aggregator-gamma.ashswap.io
+    NEXT_PUBLIC_XEXCHANGE_GRAPH_API: https://graph.xexchange.com
 
 .job_template_prod_gamma: &job_template_prod_gamma
-  environment:
-    name: mainnet
-    url: https://app.ashswap.io
-  variables:
-    <<: *env_prod_gamma
-  only:
-    - /^.*-prod-gamma$/
-  except:
-    - branches
-  retry: 2
+    environment:
+        name: mainnet
+        url: https://app.ashswap.io
+    variables:
+        <<: *env_prod_gamma
+    only:
+        - /^.*-prod-gamma$/
+    except:
+        - branches
+    retry: 2
 
 dockerize_prod_gamma:
-  extends: .build
-  <<: *job_template_prod_gamma
+    extends: .build
+    <<: *job_template_prod_gamma
 
 build_prod_gamma:
-  stage: build
-  image: node:16.16.0
-  <<: *job_template_prod_gamma
-  <<: *build_script_template
-  artifacts:
-    name: "$CI_JOB_NAME-$CI_COMMIT_REF_NAME"
-    paths:
-      - out/
-    expire_in: 1 week
+    stage: build
+    image: node:16.16.0
+    <<: *job_template_prod_gamma
+    <<: *build_script_template
+    artifacts:
+        name: "$CI_JOB_NAME-$CI_COMMIT_REF_NAME"
+        paths:
+            - out/
+        expire_in: 1 week
 
 ######################### Mainnet #########################
 
 .env_prod: &env_prod
-  <<: *env_common
-  NEXT_PUBLIC_NETWORK: mainnet
-  NEXT_PUBLIC_ASH_ENV: beta
-  # TODO: prod
-  BUILD_ENV: dev
-  NEXT_PUBLIC_ASH_API: https://api.ashswap.io
-  NEXT_PUBLIC_ASH_DOMAIN: app.ashswap.io
-  NEXT_PUBLIC_ASH_GRAPHQL: https://api-v2.ashswap.io
-  NEXT_PUBLIC_ASH_SOCKET: https://socket-api-fra-aws.multiversx.com
-  NEXT_PUBLIC_ASH_SOCKET_EXTRA: 
-  NEXT_PUBLIC_ASH_LOG_API: https://api-tracking.ashswap.io
-  NEXT_PUBLIC_IPFS_API: https://ipfs-cluster-api-internal.bicarus.io
-  NEXT_PUBLIC_AG_API: https://aggregator-internal.ashswap.io
-  NEXT_PUBLIC_XEXCHANGE_GRAPH_API: https://graph.xexchange.com
+    <<: *env_common
+    NEXT_PUBLIC_NETWORK: mainnet
+    NEXT_PUBLIC_ASH_ENV: beta
+    # TODO: prod
+    BUILD_ENV: dev
+    NEXT_PUBLIC_ASH_API: https://api.ashswap.io
+    NEXT_PUBLIC_ASH_DOMAIN: app.ashswap.io
+    NEXT_PUBLIC_ASH_GRAPHQL: https://api-v2.ashswap.io
+    NEXT_PUBLIC_ASH_SOCKET: https://socket-api-fra-aws.multiversx.com
+    NEXT_PUBLIC_ASH_SOCKET_EXTRA:
+    NEXT_PUBLIC_ASH_LOG_API: https://api-tracking.ashswap.io
+    NEXT_PUBLIC_IPFS_API: https://ipfs-cluster-api-internal.bicarus.io
+    NEXT_PUBLIC_AG_API: https://aggregator-internal.ashswap.io
+    NEXT_PUBLIC_XEXCHANGE_GRAPH_API: https://graph.xexchange.com
 
 .job_template_prod: &job_template_prod
-  environment:
-    name: mainnet
-    url: https://app.ashswap.io
-  variables:
-    <<: *env_prod
-  only:
-    - /^.*-prod$/
-  except:
-    - branches
-  retry: 2
+    environment:
+        name: mainnet
+        url: https://app.ashswap.io
+    variables:
+        <<: *env_prod
+    only:
+        - /^.*-prod$/
+    except:
+        - branches
+    retry: 2
 
 dockerize_prod:
-  extends: .build
-  <<: *job_template_prod
+    extends: .build
+    <<: *job_template_prod
 
 build_prod:
-  stage: build
-  image: node:16.16.0
-  <<: *job_template_prod
-  <<: *build_script_template
-  artifacts:
-    name: "$CI_JOB_NAME-$CI_COMMIT_REF_NAME"
-    paths:
-      - out/
-    expire_in: 1 week
+    stage: build
+    image: node:16.16.0
+    <<: *job_template_prod
+    <<: *build_script_template
+    artifacts:
+        name: "$CI_JOB_NAME-$CI_COMMIT_REF_NAME"
+        paths:
+            - out/
+        expire_in: 1 week
 
 deploy_ipfs_prod:
-  stage: deploy
-  image: node:16.16.0
-  <<: *job_template_prod
-  dependencies:
-    - build_prod
-  <<: *deploy_ipfs_script_template
+    stage: deploy
+    image: node:16.16.0
+    <<: *job_template_prod
+    dependencies:
+        - build_prod
+    <<: *deploy_ipfs_script_template
