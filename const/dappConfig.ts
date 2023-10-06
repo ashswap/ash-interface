@@ -11,18 +11,35 @@ export const gasPerDataByte = 1500;
 export const shardId = 1;
 export const blockTimeMs = 6000;
 
-let defaultDevnet: CustomNetworkType = {
+const fallbackConfig: CustomNetworkType =
+    ENVIRONMENT.NETWORK === "mainnet"
+        ? fallbackNetworkConfigurations.mainnet
+        : fallbackNetworkConfigurations.devnet;
+
+const urls: CustomNetworkType = {
+    apiAddress: process.env.NEXT_PUBLIC_MVX_API || fallbackConfig.apiAddress,
+    explorerAddress:
+        process.env.NEXT_PUBLIC_MVX_EXPLORER || fallbackConfig.explorerAddress,
+    walletAddress:
+        process.env.NEXT_PUBLIC_MVX_WALLET || fallbackConfig.walletAddress,
+};
+
+const defaultDevnet: CustomNetworkType = {
     ...fallbackNetworkConfigurations.devnet,
+    ...urls,
     apiTimeout: "10000",
 };
 
-let defaultDevnet2: CustomNetworkType = {
+const defaultDevnet2: CustomNetworkType = {
     ...fallbackNetworkConfigurations.devnet,
+    ...urls,
     apiTimeout: "10000",
-    apiAddress: "https://devnet2-api.multiversx.com",
-    explorerAddress: "http://devnet2-explorer.multiversx.com",
     id: "devnet2",
-    walletAddress: "https://devnet2-wallet.multiversx.com",
+};
+
+const defaultMainnet: CustomNetworkType = {
+    ...fallbackNetworkConfigurations.mainnet,
+    ...urls,
 };
 
 const _DAPP_CONFIG: CustomNetworkType =
@@ -30,7 +47,7 @@ const _DAPP_CONFIG: CustomNetworkType =
         ? defaultDevnet
         : ENVIRONMENT.NETWORK === "devnet2"
         ? defaultDevnet2
-        : fallbackNetworkConfigurations.mainnet;
+        : defaultMainnet;
 export const DAPP_CONFIG: CustomNetworkType = {
     ..._DAPP_CONFIG,
     walletConnectV2ProjectId: ENVIRONMENT.WALLET_CONNECT_V2_PROJECT_ID,
