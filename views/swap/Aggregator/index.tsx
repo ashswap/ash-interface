@@ -61,6 +61,7 @@ import {
     useXexchangeRouter,
 } from "./hooks";
 import * as Sentry from "@sentry/nextjs";
+import { useDebounce } from "use-debounce";
 const Aggregator = memo(function Aggregator() {
     const [tokenIn, setTokenIn] = useRecoilState(agTokenInAtom);
     const [tokenOut, setTokenOut] = useRecoilState(agTokenOutAtom);
@@ -70,18 +71,19 @@ const Aggregator = memo(function Aggregator() {
         () => toWei(tokenIn, amountIn).idiv(1).toString(10),
         [tokenIn, amountIn]
     );
+    const [amtInDebounce] = useDebounce(amtIn, 500);
     // sor routing
     const { data, isValidating: loadingAgResult } = useAgSor(
         tokenIn.identifier,
         tokenOut.identifier,
-        amtIn,
+        amtInDebounce,
         { keepPreviousData: false }
     );
     // xexchange routing
     const { data: xexchangeOutput } = useXexchangeRouter(
         tokenIn.identifier,
         tokenOut.identifier,
-        amtIn,
+        amtInDebounce,
         0.01,
         { refreshInterval: blockTimeMs }
     );
