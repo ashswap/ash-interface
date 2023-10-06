@@ -10,10 +10,10 @@ import {
 export const VE_ASH_DECIMALS = 18;
 
 const TOKENS_CONFIG =
-    ENVIRONMENT.ENV === "alpha"
-        ? TOKENS_ALPHA
-        : ENVIRONMENT.NETWORK === "devnet"
-        ? TOKENS_BETA
+    ENVIRONMENT.NETWORK === "devnet"
+        ? ENVIRONMENT.ENV === "alpha"
+            ? TOKENS_ALPHA
+            : TOKENS_BETA
         : ENVIRONMENT.NETWORK === "devnet2"
         ? TOKENS_BETA2
         : TOKENS_MAINNET;
