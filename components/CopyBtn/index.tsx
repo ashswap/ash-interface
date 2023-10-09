@@ -1,5 +1,6 @@
 import BaseTooltip from "components/BaseTooltip";
-import React, { useCallback, useState } from "react";
+import { copyText } from "helper/common";
+import { useCallback, useState } from "react";
 type Props = {
     text: string;
     copiedMsg?: string;
@@ -8,12 +9,9 @@ type Props = {
 function CopyBtn({ text, copiedMsg = "Copied!", children }: Props) {
     const [visibleTooltip, setVisibleTooltip] = useState(false);
     const copy = useCallback(() => {
-        if (typeof window !== "undefined") {
-            window.navigator.clipboard.writeText(text).then(() => {
-                setVisibleTooltip(true);
-                setTimeout(() => setVisibleTooltip(false), 2000);
-            });
-        }
+        copyText(text);
+        setVisibleTooltip(true);
+        setTimeout(() => setVisibleTooltip(false), 2000);
     }, [text]);
     return (
         <BaseTooltip

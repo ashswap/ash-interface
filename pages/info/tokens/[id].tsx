@@ -9,7 +9,7 @@ import Avatar from "components/Avatar";
 import InfoLayout from "components/Layout/Info";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 import { IN_POOL_TOKENS } from "const/pool";
-import { fetcher } from "helper/common";
+import { copyText, fetcher } from "helper/common";
 import { formatAmount } from "helper/number";
 import { IESDTInfo } from "helper/token/token";
 import { PoolStatsRecord } from "interface/poolStats";
@@ -106,11 +106,7 @@ const TokenDetailPage: Page<props> = ({ token }: props) => {
                             <Tooltip trigger={["click"]} title="copied">
                                 <button
                                     onClick={() => {
-                                        if (typeof window !== "undefined") {
-                                            window.navigator.clipboard.writeText(
-                                                token.identifier
-                                            );
-                                        }
+                                        copyText(token.identifier);
                                     }}
                                 >
                                     <ICCopy className="w-4 h-4 lg:w-5 lg:h-5" />
