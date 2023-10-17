@@ -245,6 +245,13 @@ const LP_TOKENS: IESDTInfo[] = [
         name: "Ashswap LP",
         decimals: 18,
     },
+    {
+        identifier: "ALP-7304b9",
+        chainId: ChainId.Devnet,
+        symbol: "ALP-JWLUSD",
+        name: "Ashswap LP",
+        decimals: 18,
+    },
 ];
 
 const TOKENS_MAP: Record<string, IESDTInfo> & typeof TOKENS_ALIAS = {
