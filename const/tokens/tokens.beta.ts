@@ -14,6 +14,7 @@ import IconJWLEGLD from "assets/images/jwlegld-icon.png";
 import IconMEX from "assets/images/mex-icon.png";
 import IconJWLHTM from "assets/images/jwlhtm-icon.png";
 import IconJWLMEX from "assets/images/jwlmex-icon.png";
+import IconJWLUSD from "assets/images/jwlusd-icon.png";
 import { ChainId, IESDTInfo } from "helper/token/token";
 const TOKENS_ALIAS: Record<"EGLD" | "ASH" | "wEGLD", IESDTInfo> = {
     EGLD: {
@@ -149,6 +150,14 @@ const TOKENS: IESDTInfo[] = [
         name: "MEX",
         decimals: 18,
         logoURI: IconMEX.src,
+    },
+    {
+        identifier: "JWLUSD-99a226",
+        chainId: ChainId.Mainnet,
+        symbol: "JWLUSD",
+        name: "JewelLockedUSD",
+        decimals: 18,
+        logoURI: IconJWLUSD.src,
     },
 ];
 
