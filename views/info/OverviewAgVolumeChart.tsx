@@ -3,12 +3,12 @@ import { fetcher } from "helper/common";
 import useSWR from "swr";
 import BarChart from "./components/BarChart";
 
-function OverviewVolumeChart() {
+function OverviewAgVolumeChart() {
     const { data } = useSWR<[number, number][]>(
-        `${ASHSWAP_CONFIG.ashApiBaseUrl}/overview/volume`,
+        `${ASHSWAP_CONFIG.ashApiBaseUrl}/aggregator/graph-statistic`,
         fetcher
     );
-    return <BarChart data={data || []} label="volume" mode="sum" />;
+    return <BarChart data={data || []} label="Volume" mode="sum" />;
 }
 
-export default OverviewVolumeChart;
+export default OverviewAgVolumeChart;
