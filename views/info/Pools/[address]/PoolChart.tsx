@@ -16,7 +16,6 @@ type ChartType = ValueOf<typeof CHART_TYPES>;
 type Props = { pool: IPool };
 function PoolChart({ pool }: Props) {
     const [chartType, setChartType] = useState<ChartType>("Liquidity");
-    const [timeUnit, setTimeUnit] = useState<ChartTimeUnitType>("D");
     return (
         <div className="flex flex-col px-4 md:px-8 py-4 md:pb-8 md:pt-7 bg-ash-dark-600 h-full overflow-hidden">
             <div className="text-ash-gray-500 flex space-x-2 shrink-0">
@@ -39,13 +38,11 @@ function PoolChart({ pool }: Props) {
                     );
                 })}
             </div>
-            <div className="grow mb-5 overflow-hidden">
+            <div className="grow overflow-hidden">
                 {chartType === "Liquidity" && (
-                    <PoolLiquidityChart pool={pool} timeUnit={timeUnit} />
+                    <PoolLiquidityChart pool={pool} />
                 )}
-                {chartType === "Volume" && (
-                    <PoolVolumeChart pool={pool} timeUnit={timeUnit} />
-                )}
+                {chartType === "Volume" && <PoolVolumeChart pool={pool} />}
                 {/* {(chartType === "ratio12" || chartType === "ratio21") && (
                     <PoolPriceRatioAreaChart
                         pool={pool}
@@ -54,23 +51,6 @@ function PoolChart({ pool }: Props) {
                     />
                 )} */}
                 {/* {chartType === "Price" && <TokenPriceAreaChart token={token} timeUnit={timeUnit} />} */}
-            </div>
-            <div className="text-ash-gray-500 flex space-x-2 shrink-0">
-                {CHART_INTERVAL.map((unit) => {
-                    return (
-                        <button
-                            key={unit}
-                            className={`w-9 h-9 bg-ash-dark-400 ${
-                                timeUnit === unit
-                                    ? "text-white"
-                                    : "text-ash-gray-500"
-                            }`}
-                            onClick={() => setTimeUnit(unit)}
-                        >
-                            {unit}
-                        </button>
-                    );
-                })}
             </div>
         </div>
     );
