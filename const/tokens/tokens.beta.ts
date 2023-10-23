@@ -14,6 +14,7 @@ import IconJWLEGLD from "assets/images/jwlegld-icon.png";
 import IconMEX from "assets/images/mex-icon.png";
 import IconJWLHTM from "assets/images/jwlhtm-icon.png";
 import IconJWLMEX from "assets/images/jwlmex-icon.png";
+import IconJWLUSD from "assets/images/jwlusd-icon.png";
 import { ChainId, IESDTInfo } from "helper/token/token";
 const TOKENS_ALIAS: Record<"EGLD" | "ASH" | "wEGLD", IESDTInfo> = {
     EGLD: {
@@ -150,6 +151,14 @@ const TOKENS: IESDTInfo[] = [
         decimals: 18,
         logoURI: IconMEX.src,
     },
+    {
+        identifier: "JWLUSD-99a226",
+        chainId: ChainId.Mainnet,
+        symbol: "JWLUSD",
+        name: "JewelLockedUSD",
+        decimals: 18,
+        logoURI: IconJWLUSD.src,
+    },
 ];
 
 const LP_TOKENS: IESDTInfo[] = [
@@ -242,6 +251,13 @@ const LP_TOKENS: IESDTInfo[] = [
         identifier: "ALP-433b26",
         chainId: ChainId.Devnet,
         symbol: "ALP-JWLMEX",
+        name: "Ashswap LP",
+        decimals: 18,
+    },
+    {
+        identifier: "ALP-7304b9",
+        chainId: ChainId.Devnet,
+        symbol: "ALP-JWLUSD",
         name: "Ashswap LP",
         decimals: 18,
     },

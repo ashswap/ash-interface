@@ -8,6 +8,8 @@ import { ReactElement, useMemo } from "react";
 import useSWR from "swr";
 import PoolsTable from "views/info/components/PoolsTable";
 import TokenTable from "views/info/components/TokenTable";
+import OverviewAccAgVolumeChart from "views/info/OverviewAccAgVolumeChart";
+import OverviewAgVolumeChart from "views/info/OverviewAgVolumeChart";
 import OverviewLiquidityChart from "views/info/OverviewLiquidityChart";
 import OverviewVolumeChart from "views/info/OverviewVolumeChart";
 
@@ -27,7 +29,9 @@ function InfoPage() {
     );
     const topPools = useMemo(
         () =>
-            poolRecords?.sort((x, y) => y.volume_usd - x.volume_usd).slice(0, 5) || [],
+            poolRecords
+                ?.sort((x, y) => y.volume_usd - x.volume_usd)
+                .slice(0, 5) || [],
         [poolRecords]
     );
     return (
@@ -47,6 +51,19 @@ function InfoPage() {
                     </div>
                     <div className="bg-ash-dark-600 h-80 px-[1.625rem] py-6 overflow-hidden">
                         <OverviewLiquidityChart />
+                    </div>
+                </div>
+                <div className="mb-18">
+                    <h2 className="text-lg text-white font-bold mb-7">
+                        Aggregator
+                    </h2>
+                    <div className="grid lg:grid-cols-2 gap-6 mb-18 overflow-hidden">
+                        <div className="bg-ash-dark-600 h-80 px-[1.625rem] py-6 overflow-hidden">
+                            <OverviewAgVolumeChart />
+                        </div>
+                        <div className="bg-ash-dark-600 h-80 px-[1.625rem] py-6 overflow-hidden">
+                            <OverviewAccAgVolumeChart />
+                        </div>
                     </div>
                 </div>
                 <div className="mb-18">
