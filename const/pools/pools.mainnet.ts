@@ -91,6 +91,13 @@ const POOLS_MAINNET: IPool[] = [
         tokens: [TOKENS_MAP["USDC-c76f1f"], TOKENS_MAP["JWLUSD-62939e"]],
         type: EPoolType.PlainPool,
     },
+    {
+        address:
+            "erd1qqqqqqqqqqqqqpgq69ygvajjlpem5yh7v4qc98au8q5ner0l4fvshc4k5x",
+        lpToken: TOKENS_MAP["ALP-20179e"],
+        tokens: [TOKENS_MAP["UTK-2f80e9"], TOKENS_MAP["JWLUTK-2a518c"]],
+        type: EPoolType.PlainPool,
+    },
 ];
 
 export default POOLS_MAINNET;
