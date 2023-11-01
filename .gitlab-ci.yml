@@ -155,14 +155,14 @@ deploy_ipfs_beta:
     NEXT_PUBLIC_ASH_API: https://api-devnet2.ashswap.io
     NEXT_PUBLIC_ASH_DOMAIN: devnet2.ashswap.io
     NEXT_PUBLIC_ASH_GRAPHQL: https://api-v2-devnet2.ashswap.io
-    NEXT_PUBLIC_ASH_SOCKET: https://devnet2-socket-api.multiversx.com
+    NEXT_PUBLIC_ASH_SOCKET: https://devnet-socket-api.multiversx.com
     NEXT_PUBLIC_ASH_SOCKET_EXTRA:
     NEXT_PUBLIC_ASH_LOG_API: https://api-tracking.ashswap.io
     NEXT_PUBLIC_IPFS_API: https://ipfs-cluster-api-internal.bicarus.io
     NEXT_PUBLIC_AG_API: https://aggregator-devnet2.ashswap.io
     NEXT_PUBLIC_XEXCHANGE_GRAPH_API: https://devnet-graph.xexchange.com
-    NEXT_PUBLIC_MVX_API: https://devnet2-api.multiversx.com
-    NEXT_PUBLIC_MVX_WALLET: https://devnet2-wallet.multiversx.com
+    NEXT_PUBLIC_MVX_API: https://devnet-api.multiversx.com
+    NEXT_PUBLIC_MVX_WALLET: https://devnet-wallet.multiversx.com
     NEXT_PUBLIC_MVX_EXPLORER: https://devnet2-explorer.multiversx.com
 
 .job_template_beta2: &job_template_beta2
