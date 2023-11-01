@@ -83,28 +83,28 @@ const TOKENS: IESDTInfo[] = [
 const LP_TOKENS: IESDTInfo[] = [
     // LP tokens
     {
-        identifier: "ALP-c18629",
+        identifier: "ALP-a89380",
         chainId: ChainId.Devnet,
         symbol: "ALP-3pool",
         name: "Ashswap LP",
         decimals: 18,
     },
     {
-        identifier: "ALP-fe666f",
+        identifier: "ALP-20e461",
         chainId: ChainId.Devnet,
         symbol: "ALP-BUSD-wEGLD",
         name: "Ashswap LP",
         decimals: 18,
     },
     {
-        identifier: "ALP-55d5c4",
+        identifier: "ALP-8817f1",
         chainId: ChainId.Devnet,
         symbol: "ALP-ASH-USDT",
         name: "Ashswap LP",
         decimals: 18,
     },
     {
-        identifier: "ALP-2c3abb",
+        identifier: "ALP-caeac5",
         chainId: ChainId.Devnet,
         symbol: "ALP-BUSD-UTK",
         name: "Ashswap LP",
