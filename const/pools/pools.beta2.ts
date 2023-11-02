@@ -35,5 +35,19 @@ const POOLS_BETA2: IPool[] = [
         tokens: [TOKENS_MAP["BUSD-d4c014"], TOKENS_MAP["UTK-14d57d"]],
         type: EPoolType.PoolV2,
     },
+    {
+        address:
+            "erd1qqqqqqqqqqqqqpgqq8j8awvqpcptzsnjz0lqlfd02q96zktu2gesgyal9y",
+        lpToken: TOKENS_MAP["ALP-097c45"],
+        tokens: [TOKENS_MAP["WEGLD-a28c59"], TOKENS_MAP["JWLEGLD-e4b8d3"]],
+        type: EPoolType.PlainPool,
+    },
+    {
+        address:
+            "erd1qqqqqqqqqqqqqpgqlngl0xwzl3lulpeam4tycq70e83mrr6x2gesf656dj",
+        lpToken: TOKENS_MAP["ALP-7f4b3f"],
+        tokens: [TOKENS_MAP["USDC-350c4e"], TOKENS_MAP["JWLUSD-3d1fab"]],
+        type: EPoolType.PlainPool,
+    },
 ];
 export default POOLS_BETA2;
