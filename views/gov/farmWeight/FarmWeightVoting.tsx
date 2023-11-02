@@ -6,18 +6,25 @@ import ICNewTab from "assets/svg/new-tab.svg";
 import ICTickCircle from "assets/svg/tick-circle.svg";
 import { ashswapBaseState } from "atoms/ashswap";
 import { accIsLoggedInState } from "atoms/dappState";
-import { fbHasBribe, fbTotalRewardsUSD } from "atoms/farmBribeState";
+import {
+    fbClaimableRewardsSelector,
+    fbHasBribe,
+    fbTotalClaimableUSDSelector,
+    fbTotalRewardsUSD,
+} from "atoms/farmBribeState";
 import { fcAccountFarmSelector } from "atoms/farmControllerState";
 import { govVeASHAmtSelector } from "atoms/govState";
 import BigNumber from "bignumber.js";
 import Avatar from "components/Avatar";
 import BaseModal from "components/BaseModal";
+import Checkbox from "components/Checkbox";
 import GlowingButton from "components/GlowingButton";
 import InputCurrency from "components/InputCurrency";
 import TextAmt from "components/TextAmt";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 import { FARMS_MAP } from "const/farms";
 import { POOLS_MAP_LP } from "const/pool";
+import { formatAmount } from "helper/number";
 import { getTokenFromId } from "helper/token";
 import useVoteForFarm from "hooks/useFarmControllerContract/useVoteForFarm";
 import useInputNumberString from "hooks/useInputNumberString";
@@ -179,6 +186,7 @@ type VoteEditorProps = {
 const VoteEditor = memo(function VoteEditor({ farmAddress }: VoteEditorProps) {
     const [isOpenModal, setIsOpenModal] = useState(false);
     const [weight, setWeight] = useState(0);
+    const [confirmed, setConfirmed] = useState(false);
     const weightPct = useMemo(
         () => new BigNumber(weight).multipliedBy(100).div(10_000),
         [weight]
@@ -187,6 +195,12 @@ const VoteEditor = memo(function VoteEditor({ farmAddress }: VoteEditorProps) {
     const fcAccFarm = useRecoilValue(fcAccountFarmSelector(farmAddress));
     const ashBase = useRecoilValue(ashswapBaseState);
     const veAmt = useRecoilValue(govVeASHAmtSelector);
+    const totalRewardUSD = useRecoilValue(
+        fbTotalClaimableUSDSelector(farmAddress)
+    );
+    const claimableRewards = useRecoilValue(
+        fbClaimableRewardsSelector(farmAddress)
+    );
     const {
         voteFarmWeight,
         trackingData: { isPending },
@@ -362,7 +376,10 @@ const VoteEditor = memo(function VoteEditor({ farmAddress }: VoteEditorProps) {
             </div>
             <BaseModal
                 isOpen={isOpenModal}
-                onRequestClose={() => setIsOpenModal(false)}
+                onRequestClose={() => {
+                    setIsOpenModal(false);
+                    setConfirmed(false);
+                }}
                 type={screenSize.msm ? "drawer_btt" : "modal"}
                 className={`clip-corner-4 clip-corner-tl bg-ash-dark-400 text-white p-4 flex flex-col max-h-full max-w-4xl mx-auto`}
             >
@@ -370,12 +387,12 @@ const VoteEditor = memo(function VoteEditor({ farmAddress }: VoteEditorProps) {
                     <BaseModal.CloseBtn />
                 </div>
                 <div className="grow overflow-auto">
-                    <div className="flex flex-col items-center text-center px-20 pb-16">
-                        <div className="mb-5 font-bold text-2xl sm:text-5xl text-white leading-tight">
+                    <div className="px-20 pb-16">
+                        <div className="mb-5 font-bold text-2xl sm:text-5xl text-white leading-tight text-center">
                             Your vote for this farm can not be changed before
                         </div>
-                        <div>
-                            <div className="h-18 px-5 flex justify-between items-center bg-ash-dark-600">
+                        <div className="flex flex-col gap-12">
+                            <div className="h-18 px-5 flex justify-between items-center self-center bg-ash-dark-600">
                                 <div className="mr-10 flex items-center">
                                     <ICLock className="w-6 h-auto mr-2" />
                                     <span>{nextVoteDate}</span>
@@ -394,14 +411,36 @@ const VoteEditor = memo(function VoteEditor({ farmAddress }: VoteEditorProps) {
                                     })}
                                 </div>
                             </div>
-                            <div className="border-notch-x border-notch-white/50 mt-12">
+                            {claimableRewards.length > 0 && (
+                                <div>
+                                    <div className="mb-4">
+                                        You have ${formatAmount(totalRewardUSD)}{" "}
+                                        in bribe from this farm. Make sure you
+                                        have claimed bribe before voting again.
+                                    </div>
+                                    <Checkbox
+                                        text="I understand and wish to continue"
+                                        checked={confirmed}
+                                        onChange={setConfirmed}
+                                    />
+                                </div>
+                            )}
+
+                            <div className="w-full sm:w-64 self-center border-notch-x border-notch-white/50">
                                 <GlowingButton
                                     theme="pink"
                                     className="clip-corner-1 clip-corner-tl w-full h-12 font-bold text-sm"
-                                    disabled={!canVote}
+                                    disabled={
+                                        !(
+                                            canVote &&
+                                            (confirmed ||
+                                                !claimableRewards.length)
+                                        )
+                                    }
                                     onClick={() => {
                                         voteFarmWeight(farmAddress, weight);
                                         setIsOpenModal(false);
+                                        setConfirmed(false);
                                     }}
                                 >
                                     <span className="mr-3">Vote</span>
