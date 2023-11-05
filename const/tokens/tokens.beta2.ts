@@ -95,6 +95,14 @@ const TOKENS: IESDTInfo[] = [
         decimals: 18,
         logoURI: IconJWLUSD.src,
     },
+    {
+        identifier: "SEGLD-f94c36",
+        chainId: ChainId.Devnet,
+        symbol: "sEGLD",
+        name: "Liquid Staked EGLD",
+        decimals: 18,
+        logoURI: IconSEGLD.src,
+    },
 ];
 
 const LP_TOKENS: IESDTInfo[] = [
@@ -138,6 +146,20 @@ const LP_TOKENS: IESDTInfo[] = [
         identifier: "ALP-7f4b3f",
         chainId: ChainId.Devnet,
         symbol: "ALP-JWLUSD-USDC",
+        name: "Ashswap LP",
+        decimals: 18,
+    },
+    {
+        identifier: "ALP-e4391a",
+        chainId: ChainId.Devnet,
+        symbol: "ALP-SEGLD-WEGLD",
+        name: "Ashswap LP",
+        decimals: 18,
+    },
+    {
+        identifier: "ALP-3763b9",
+        chainId: ChainId.Devnet,
+        symbol: "ALP-SEGLD-JWLEGLD",
         name: "Ashswap LP",
         decimals: 18,
     },
