@@ -49,5 +49,19 @@ const POOLS_BETA2: IPool[] = [
         tokens: [TOKENS_MAP["USDC-350c4e"], TOKENS_MAP["JWLUSD-3d1fab"]],
         type: EPoolType.PlainPool,
     },
+    {
+        address:
+            "erd1qqqqqqqqqqqqqpgq24zr42pzmpxrklt04a2tq5qx7ajxyzsh2ges4fdr54",
+        lpToken: TOKENS_MAP["ALP-e4391a"],
+        tokens: [TOKENS_MAP["WEGLD-a28c59"], TOKENS_MAP["SEGLD-f94c36"]],
+        type: EPoolType.LendingPool,
+    },
+    {
+        address:
+            "erd1qqqqqqqqqqqqqpgq4zlgmjruxmp657p6fueh823h7h9rgasd2gestk2sc4",
+        lpToken: TOKENS_MAP["ALP-3763b9"],
+        tokens: [TOKENS_MAP["SEGLD-f94c36"], TOKENS_MAP["JWLEGLD-e4b8d3"]],
+        type: EPoolType.LendingPool,
+    },
 ];
 export default POOLS_BETA2;
