@@ -299,6 +299,17 @@ const devnet2: IFarm[] = [
         farm_token_decimal: 18,
         active: true,
     },
+    {
+        farm_address:
+            "erd1qqqqqqqqqqqqqpgqaphlw66645ny46c8eh2af95j2rp2tgps2gest3dl60",
+        reward_token_id: "ASH-e3d1b7",
+        reward_token_decimal: 18,
+        farming_token_id: "ALP-987b7e",
+        farming_token_decimal: 18,
+        farm_token_id: "FARM-5a3904",
+        farm_token_decimal: 18,
+        active: true,
+    },
 ];
 
 const mainnet: IFarm[] = [
