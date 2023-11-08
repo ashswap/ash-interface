@@ -173,7 +173,7 @@ const LP_TOKENS: IESDTInfo[] = [
         decimals: 18,
     },
     {
-        identifier: "ALP-987b7e",
+        identifier: "ALP-2be5ea",
         chainId: ChainId.Devnet,
         symbol: "ALP-JWLEGLD-EPUNKS",
         name: "Ashswap LP",

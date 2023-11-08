@@ -65,8 +65,8 @@ const POOLS_BETA2: IPool[] = [
     },
     {
         address:
-            "erd1qqqqqqqqqqqqqpgqjyd6yl2ccudhnmqaj5e5zde0zy8c62pt2gesec3u8u",
-        lpToken: TOKENS_MAP["ALP-987b7e"],
+            "erd1qqqqqqqqqqqqqpgq3r7sus3slny8nxf4eh7gdrey7dc073ud2ges36dhrr",
+        lpToken: TOKENS_MAP["ALP-2be5ea"],
         tokens: [TOKENS_MAP["JWLEGLD-e4b8d3"], TOKENS_MAP["EPUNKS-50d907"]],
         type: EPoolType.PoolV2,
     },
