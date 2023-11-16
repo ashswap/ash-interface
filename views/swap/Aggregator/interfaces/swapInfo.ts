@@ -8,7 +8,7 @@ export type SorSwap = {
     assetOut: string;
     functionName: string;
     arguments: string[];
-}
+};
 export type SorHop = {
     poolId: string;
     tokenInAmount: string;
@@ -16,10 +16,10 @@ export type SorHop = {
     tokenIn: string;
     tokenOut: string;
     pool: {
-        allTokens: Array<{address: string, decimal: number}>;
+        allTokens: Array<{ address: string; decimal: number }>;
         type: string;
-    }
-}
+    };
+};
 export type SorRoute = {
     hops: SorHop[];
     share: number;
@@ -27,18 +27,21 @@ export type SorRoute = {
     tokenInAmount: string;
     tokenOut: string;
     tokenOutAmount: string;
-}
+};
 export type SorSwapResponse = {
     effectivePrice: number | null;
     effectivePriceReversed: number | null;
     priceImpact: number | null;
     swapAmount: string;
     returnAmount: string;
-    returnAmountConsideringFees: string;
+    returnAmountWithDecimal: string;
+    returnAmountConsiderGasFees: string;
+    returnAmountWithoutSwapFees: string;
+    swapAmountWithDecimal: string;
     tokenAddresses: string[];
     tokenIn: string;
     tokenOut: string;
     marketSp: string;
     routes?: SorRoute[];
     swaps: SorSwap[];
-}
+};
