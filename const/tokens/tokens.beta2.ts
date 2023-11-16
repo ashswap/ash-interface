@@ -9,11 +9,13 @@ import IconUSDC from "assets/images/usdc-icon.png";
 import IconUSDT from "assets/images/usdt-icon.png";
 import IconUTK from "assets/images/utk-icon.png";
 import ImgWEGLDIcon from "assets/images/wegld-icon.png";
+import IconEPUNKS from "assets/images/epunks-icon.png";
 import IconJWLASH from "assets/images/jwlash-icon.png";
 import IconJWLEGLD from "assets/images/jwlegld-icon.png";
 import IconMEX from "assets/images/mex-icon.png";
 import IconJWLHTM from "assets/images/jwlhtm-icon.png";
 import IconJWLMEX from "assets/images/jwlmex-icon.png";
+import IconJWLUSD from "assets/images/jwlusd-icon.png";
 import { ChainId, IESDTInfo } from "helper/token/token";
 const TOKENS_ALIAS: Record<"EGLD" | "ASH" | "wEGLD", IESDTInfo> = {
     EGLD: {
@@ -78,35 +80,102 @@ const TOKENS: IESDTInfo[] = [
         decimals: 18,
         logoURI: IconUTK.src,
     },
+    {
+        identifier: "JWLEGLD-e4b8d3",
+        chainId: ChainId.Devnet,
+        symbol: "JWLEGLD",
+        name: "JewelLockedEGLD",
+        decimals: 18,
+        logoURI: IconJWLEGLD.src,
+    },
+    {
+        identifier: "JWLUSD-3d1fab",
+        chainId: ChainId.Devnet,
+        symbol: "JWLUSD",
+        name: "JewelLockedUSD",
+        decimals: 18,
+        logoURI: IconJWLUSD.src,
+    },
+    {
+        identifier: "SEGLD-f94c36",
+        chainId: ChainId.Devnet,
+        symbol: "sEGLD",
+        name: "Liquid Staked EGLD",
+        decimals: 18,
+        logoURI: IconSEGLD.src,
+    },
+    {
+        identifier: "EPUNKS-50d907",
+        chainId: ChainId.Mainnet,
+        symbol: "EPUNKS",
+        name: "ElrondPunks",
+        decimals: 18,
+        logoURI: IconEPUNKS.src,
+    },
 ];
 
 const LP_TOKENS: IESDTInfo[] = [
     // LP tokens
     {
-        identifier: "ALP-c18629",
+        identifier: "ALP-a89380",
         chainId: ChainId.Devnet,
         symbol: "ALP-3pool",
         name: "Ashswap LP",
         decimals: 18,
     },
     {
-        identifier: "ALP-fe666f",
+        identifier: "ALP-20e461",
         chainId: ChainId.Devnet,
         symbol: "ALP-BUSD-wEGLD",
         name: "Ashswap LP",
         decimals: 18,
     },
     {
-        identifier: "ALP-55d5c4",
+        identifier: "ALP-8817f1",
         chainId: ChainId.Devnet,
         symbol: "ALP-ASH-USDT",
         name: "Ashswap LP",
         decimals: 18,
     },
     {
-        identifier: "ALP-2c3abb",
+        identifier: "ALP-caeac5",
         chainId: ChainId.Devnet,
         symbol: "ALP-BUSD-UTK",
+        name: "Ashswap LP",
+        decimals: 18,
+    },
+    {
+        identifier: "ALP-097c45",
+        chainId: ChainId.Devnet,
+        symbol: "ALP-JWLEGLD-EGLD",
+        name: "Ashswap LP",
+        decimals: 18,
+    },
+    {
+        identifier: "ALP-7f4b3f",
+        chainId: ChainId.Devnet,
+        symbol: "ALP-JWLUSD-USDC",
+        name: "Ashswap LP",
+        decimals: 18,
+    },
+    {
+        identifier: "ALP-e4391a",
+        chainId: ChainId.Devnet,
+        symbol: "ALP-SEGLD-WEGLD",
+        name: "Ashswap LP",
+        decimals: 18,
+    },
+    {
+        identifier: "ALP-3763b9",
+        chainId: ChainId.Devnet,
+        symbol: "ALP-SEGLD-JWLEGLD",
+        name: "Ashswap LP",
+        decimals: 18,
+    },
+    {
+        identifier: "ALP-2be5ea",
+        chainId: ChainId.Devnet,
+        symbol: "ALP-JWLEGLD-EPUNKS",
         name: "Ashswap LP",
         decimals: 18,
     },
