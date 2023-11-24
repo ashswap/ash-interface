@@ -73,6 +73,14 @@ const TOKENS: IESDTInfo[] = [
         logoURI: IconBUSD.src,
     },
     {
+        identifier: "HTM-23a1da",
+        chainId: ChainId.Devnet,
+        symbol: "HTM",
+        name: "Hatom Protocol",
+        decimals: 18,
+        logoURI: IconHTM.src,
+    },
+    {
         identifier: "UTK-14d57d",
         chainId: ChainId.Devnet,
         symbol: "UTK",
@@ -87,6 +95,14 @@ const TOKENS: IESDTInfo[] = [
         name: "JewelLockedEGLD",
         decimals: 18,
         logoURI: IconJWLEGLD.src,
+    },
+    {
+        identifier: "JWLHTM-3ed083",
+        chainId: ChainId.Devnet,
+        symbol: "JWLHTM",
+        name: "JewelLockedHTM",
+        decimals: 18,
+        logoURI: IconJWLHTM.src,
     },
     {
         identifier: "JWLUSD-3d1fab",
@@ -148,6 +164,13 @@ const LP_TOKENS: IESDTInfo[] = [
         identifier: "ALP-097c45",
         chainId: ChainId.Devnet,
         symbol: "ALP-JWLEGLD-EGLD",
+        name: "Ashswap LP",
+        decimals: 18,
+    },
+    {
+        identifier: "ALP-a2b238",
+        chainId: ChainId.Devnet,
+        symbol: "ALP-JWLHTM",
         name: "Ashswap LP",
         decimals: 18,
     },
