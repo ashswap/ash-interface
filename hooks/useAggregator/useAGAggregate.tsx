@@ -206,7 +206,7 @@ const useAGAggregate = (trackStatus = false) => {
                             tokenAmountOut.egld.multipliedBy(
                                 1 - slippage.toBigNumber().toNumber()
                             )
-                        )} ${tokenAmountIn.token.symbol}`,
+                        )} ${tokenAmountOut.token.symbol}`,
                     },
                 });
             }
