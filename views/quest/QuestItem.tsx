@@ -145,14 +145,14 @@ export function CustomQuestItem({
     useEffect(() => {
         if (isBopQuest(questData)) {
             setName("Battle of Perps Buy-in");
-            setStatus(questData.tx_hash ? 0 : 0);
+            setStatus(questData.tx_hash ? 2 : 0);
             setPoint(questData.point);
             const isAbsolute = ["http://", "https://"].some((p) =>
                 questData.redirect.startsWith(p)
             );
             setNote(
                 <span>
-                    Visit{" "}
+                    Register to join{" "}
                     <Link
                         href={questData.redirect}
                         target={isAbsolute ? "_blank" : "_self"}
