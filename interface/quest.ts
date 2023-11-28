@@ -68,58 +68,19 @@ export type QuestWallet = {
 
 export interface ICustomQuest {
     __typename?: string;
-    start: number;
-    end: number;
-    require: number;
+    // start with https:// -> absolute url otherwise use relative url
     redirect: string;
+    // client filled
     quest_name: string;
-    // last claimed = required condition of prev ashpoint task
-    last_claimed: number;
 }
 
-export type FarmQuest = ICustomQuest & {
-    continuous_day: number;
-    continuous_run: number;
-    // days
-    min_time: number;
+export type BopQuest = ICustomQuest & {
     point: number;
-    // USD value
-    stake_amount: number;
-}
+    tx_hash: string;
+};
 
-export type GovQuest = ICustomQuest & {
-    prize: Record<number, number>;
-    create_lock_at: number;
-    locked_end_at: number;
-    // days
-    min_time: number;
-    // ve
-    ve_ash_amount: number;
-}
-
-export type SwapQuest = ICustomQuest & {
-    point: number;
-    // USD value
-    swap_amount: number;
-}
-
-export type ManualQuest = ICustomQuest & {
-    title: string;
-    note: string;
-    point: number;
-}
-
-export function isFarmQuest(quest: ICustomQuest): quest is FarmQuest {
-    return quest.__typename === "farm_quest";
-}
-export function isGovQuest(quest: ICustomQuest): quest is GovQuest {
-    return quest.__typename === "governance_quest";
-}
-export function isSwapQuest(quest: ICustomQuest): quest is SwapQuest {
-    return quest.__typename === "swap_quest";
-}
-export function isManualQuest(quest: ICustomQuest): quest is ManualQuest {
-    return quest.__typename === "manual_quest";
+export function isBopQuest(quest: ICustomQuest): quest is BopQuest {
+    return quest.__typename === "bop_quest";
 }
 
 export type DiscordMetadata = {
@@ -142,9 +103,9 @@ export type QuestUserStatsModel = {
 };
 
 export type CustomQuestMapModel = {
-    farm_quest: Record<string, FarmQuest>,
-    governance_quest: Record<string, GovQuest>,
-    swap_quest: Record<string, SwapQuest>,
-}
+    bop_quest: Record<string, BopQuest>;
+};
 
-export const CUSTOM_QUEST_TYPES: Array<keyof CustomQuestMapModel> = ["farm_quest", "governance_quest", "swap_quest"];
+export const CUSTOM_QUEST_TYPES: Array<keyof CustomQuestMapModel> = [
+    "bop_quest",
+];
