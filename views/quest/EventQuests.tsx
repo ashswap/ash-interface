@@ -2,65 +2,18 @@ import { atomCustomQuestData } from "atoms/ashpoint";
 import { accIsLoggedInState } from "atoms/dappState";
 import { ENVIRONMENT } from "const/env";
 import logApi from "helper/logHelper";
-import {
-    CustomQuestMapModel,
-    FarmQuest,
-    GovQuest,
-    ICustomQuest,
-    ManualQuest,
-    SwapQuest,
-} from "interface/quest";
-import React, {
-    memo,
-    useCallback,
-    useEffect,
-    useMemo,
-    useRef,
-    useState,
-} from "react";
+import { CustomQuestMapModel, ICustomQuest } from "interface/quest";
+import { memo, useCallback, useEffect, useMemo, useRef } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
 import useSWR from "swr";
 import { CustomQuestItem } from "./QuestItem";
 
-const DEFAULT_CUSTOM_QUEST: ICustomQuest = {
-    end: 0,
-    last_claimed: 0,
-    quest_name: "",
-    redirect: "",
-    require: 0,
-    start: 0,
-};
-const DEFAULT_FARM_QUEST: FarmQuest = {
-    ...DEFAULT_CUSTOM_QUEST,
-    continuous_day: 0,
-    continuous_run: 0,
-    min_time: 0,
-    point: 0,
-    stake_amount: 0,
-};
-
-const DEFAULT_GOV_QUEST: GovQuest = {
-    ...DEFAULT_CUSTOM_QUEST,
-    create_lock_at: 0,
-    locked_end_at: 0,
-    min_time: 0,
-    prize: [],
-    ve_ash_amount: 0,
-};
-
-const DEFAULT_SWAP_QUEST: SwapQuest = {
-    ...DEFAULT_CUSTOM_QUEST,
-    point: 0,
-    swap_amount: 0,
-};
-
 const DEFAULT_QUEST_MAP: Record<keyof CustomQuestMapModel, ICustomQuest> = {
-    farm_quest: DEFAULT_FARM_QUEST,
-    governance_quest: DEFAULT_GOV_QUEST,
-    swap_quest: DEFAULT_SWAP_QUEST,
+    bop_quest: {
+        quest_name: "",
+        redirect: "",
+    },
 };
-
-const MANUAL_QUESTS: ManualQuest[] = [];
 
 const logFetcher = (url: string) => logApi.get(url).then((res) => res.data);
 function EventQuests() {
@@ -94,7 +47,7 @@ function EventQuests() {
                 })),
             ];
         }, []);
-        return [...fromServer, ...MANUAL_QUESTS];
+        return [...fromServer];
     }, [data]);
     const onClaim = useCallback(async () => {
         await mutateRef.current?.();
