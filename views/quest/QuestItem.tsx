@@ -14,12 +14,9 @@ import {
     QuestAction,
     QuestActionType,
     QuestUserStatsModel,
-    isFarmQuest,
-    isGovQuest,
-    isManualQuest,
-    isSwapQuest,
+    isBopQuest,
 } from "interface/quest";
-import moment from "moment";
+import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRecoilCallback } from "recoil";
 type Value = {
@@ -126,157 +123,47 @@ export function CustomQuestItem({
     onClaim?: () => Promise<void>;
 }) {
     const [name, setName] = useState("");
-    const [note, setNote] = useState("");
+    const [note, setNote] = useState<React.ReactNode>("");
     const [status, setStatus] = useState(0);
     const [point, setPoint] = useState(0);
     const [require, setRequire] = useState(0);
     const [progresses, setProgresses] = useState<ProgressData[]>([]);
 
     const claim = useRecoilCallback(
-        () => async () => {
+        () => async (txHash: string) => {
             const res = await logApi.post("/api/v1/wallet/claim", {
                 claim_type: questData.__typename,
-                quest_name: questData.quest_name,
-                claim_amount: require,
+                action_name: questData.quest_name,
+                tx_hash: txHash,
             });
             onClaim?.();
             return res;
         },
-        [questData, require, onClaim]
+        [questData, onClaim]
     );
 
     useEffect(() => {
-        if (isFarmQuest(questData)) {
-            setName(
-                `Stake at least ${formatAmount(questData.require, {
-                    notation: "standard",
-                    isIntegerAuto: true,
-                })}$ value in farms and keep for ${questData.min_time} ${
-                    questData.min_time > 1 ? "days" : "day"
-                }`
-            );
-            setStatus(
-                questData.last_claimed === questData.require
-                    ? 2
-                    : questData.stake_amount >= questData.require &&
-                      questData.continuous_day >= questData.min_time
-                    ? 1
-                    : 0
-            );
+        if (isBopQuest(questData)) {
+            setName("Battle of Perps Buy-in");
+            setStatus(questData.tx_hash ? 0 : 0);
             setPoint(questData.point);
-            setRequire(questData.require);
-            setProgresses([
-                {
-                    current: {
-                        value: questData.stake_amount,
-                    },
-                    target: {
-                        value: questData.require,
-                        label: `${formatAmount(questData.require, {
-                            isIntegerAuto: true,
-                        })}$`,
-                    },
-                },
-                {
-                    current: {
-                        value: questData.continuous_day,
-                        label: `${questData.continuous_day}`,
-                    },
-                    target: {
-                        value: questData.min_time,
-                        label: `${questData.min_time} ${
-                            questData.min_time > 1 ? "days" : "day"
-                        }`,
-                    },
-                },
-            ]);
-        }
-        if (isGovQuest(questData)) {
-            const entries = Object.entries(questData.prize);
-            const [required, point] =
-                entries.find(
-                    ([_required, point]) => questData.last_claimed < +_required
-                ) || entries[entries.length - 1];
-            const currentLockDuration = Math.floor(
-                moment
-                    .duration(
-                        questData.locked_end_at - questData.create_lock_at,
-                        "seconds"
-                    )
-                    .asDays()
+            const isAbsolute = ["http://", "https://"].some((p) =>
+                questData.redirect.startsWith(p)
             );
-            setName(
-                `Stake at least ${required} veASH with minimum ${
-                    questData.min_time
-                } ${questData.min_time > 1 ? "days" : "day"}`
+            setNote(
+                <span>
+                    Visit{" "}
+                    <Link
+                        href={questData.redirect}
+                        target={isAbsolute ? "_blank" : "_self"}
+                    >
+                        <span className="text-stake-gray-500 underline decoration-dashed">
+                            Battle of Perps
+                        </span>
+                    </Link>{" "}
+                    to complete the quest
+                </span>
             );
-            setStatus(
-                questData.last_claimed === +required
-                    ? 2
-                    : questData.ve_ash_amount >= +required &&
-                      currentLockDuration > questData.min_time
-                    ? 1
-                    : 0
-            );
-            setPoint(point);
-            setRequire(+required);
-            setProgresses([
-                {
-                    current: { value: questData.ve_ash_amount },
-                    target: {
-                        value: +required,
-                        label: `${formatAmount(required, {
-                            isIntegerAuto: true,
-                        })} ve`,
-                    },
-                },
-                {
-                    current: {
-                        value: currentLockDuration,
-                        label: `${currentLockDuration}`,
-                    },
-                    target: {
-                        value: questData.min_time,
-                        label: `${questData.min_time} ${
-                            questData.min_time > 1 ? "days" : "day"
-                        }`,
-                    },
-                },
-            ]);
-        }
-        if (isSwapQuest(questData)) {
-            setName(
-                `Trading volume greater than ${formatAmount(questData.require, {
-                    notation: "standard",
-                    isIntegerAuto: true,
-                })}$`
-            );
-            setStatus(
-                questData.last_claimed === questData.require
-                    ? 2
-                    : questData.swap_amount >= questData.require
-                    ? 1
-                    : 0
-            );
-            setPoint(questData.point);
-            setRequire(questData.require);
-            setProgresses([
-                {
-                    current: { value: questData.swap_amount },
-                    target: {
-                        value: questData.require,
-                        label: `${formatAmount(questData.require, {
-                            isIntegerAuto: true,
-                        })}$`,
-                    },
-                },
-            ]);
-        }
-        if (isManualQuest(questData)) {
-            setName(questData.title);
-            setStatus(0);
-            setPoint(questData.point);
-            setNote(questData.note);
             // setRequire(questData.require);
             // setProgresses([{current: }])
         }
@@ -349,7 +236,7 @@ type QuestItemBaseProps = {
     name: string;
     type: QuestActionType | keyof CustomQuestMapModel;
     progressData: ProgressData[];
-    note?: string;
+    note?: React.ReactNode;
     onClaim: (txHash: string) => Promise<AxiosResponse>;
 };
 function QuestItemBase({
