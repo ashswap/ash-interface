@@ -23,7 +23,6 @@ interface Props {
     tokenBalance?: TokenAmount;
     onValueChange?: (value: string) => void;
     onTokenChange?: (token: IESDTInfo) => void;
-
 }
 
 const SwapAmount = (props: Props) => {
@@ -31,6 +30,9 @@ const SwapAmount = (props: Props) => {
     const isInsufficientFund = useMemo(() => {
         return props.tokenBalance?.egld.lt(props.value || 0);
     }, [props.tokenBalance, props.value]);
+    const usdValue = useMemo(() => {
+        return +(props.value || 0) * (props.cgkPrice || 0);
+    }, [props.cgkPrice, props.value]);
     return (
         <div
             className={`clip-corner-[10px] p-[1px] ${
@@ -71,8 +73,7 @@ const SwapAmount = (props: Props) => {
                         }
                         style={{
                             color:
-                                props.type === "from" &&
-                                isInsufficientFund
+                                props.type === "from" && isInsufficientFund
                                     ? theme.extend.colors["insufficent-fund"]
                                     : undefined,
                         }}
@@ -125,24 +126,25 @@ const SwapAmount = (props: Props) => {
                                         );
                                 }}
                             >
-                                {formatAmount(props.tokenBalance?.egld.toNumber(), {
-                                    notation: "standard",
-                                })}{" "}
+                                {formatAmount(
+                                    props.tokenBalance?.egld.toNumber(),
+                                    {
+                                        notation: "standard",
+                                    }
+                                )}{" "}
                                 {props.token.symbol}
                             </span>
                         </div>
                         <div className="font-medium text-white">
-                            {props.value ? (
+                            {usdValue > 0 ? (
                                 <>
                                     <span className="text-ash-gray-600">
                                         ${" "}
                                     </span>
                                     <span>
-                                        {formatAmount(
-                                            +(props.value || 0) *
-                                                (props.cgkPrice || 0),
-                                            { notation: "standard" }
-                                        )}
+                                        {formatAmount(usdValue, {
+                                            notation: "standard",
+                                        })}
                                     </span>
                                 </>
                             ) : (
