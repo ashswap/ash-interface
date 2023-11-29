@@ -21,7 +21,7 @@ export const agAmountInAtom = atom({
 
 export const agSlippageAtom = atom({
     key: "ag_slippage_atom",
-    default: new Percent(100, 100_000), // 0.1%
+    default: new Percent(500, 100_000), // 0.5%
 });
 
 export const agIsWrapSelector = selector({
