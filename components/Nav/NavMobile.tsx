@@ -34,7 +34,9 @@ function NavMobile() {
                     </NavLink>
                     <NavLink href="/gov" className="overflow-hidden">
                         <ICStake className="w-4 h-auto" />
-                        <span className="max-w-full inline-block truncate">Governance</span>
+                        <span className="max-w-full inline-block truncate">
+                            Governance
+                        </span>
                     </NavLink>
                     <NavLink href="#" onClick={() => setIsOpenDrawer(true)}>
                         <ICSocial className="-mt-0.5 w-4 h-auto" />
@@ -122,36 +124,21 @@ function NavMobile() {
                                 Others
                             </div>
                             <div className="flex flex-col gap-2">
-                            <Link
-                                href="https://event.ashswap.io"
-                                target="_blank"
-                                rel="noreferrer"
-                                className="block"
-                            >
-                                <div className="py-2.5 px-3 bg-ash-dark-400 hover:bg-stake-dark-400 flex items-center justify-between space-x-1 text-stake-gray-500 transition-all duration-300">
-                                    <div className="flex items-center space-x-4 overflow-hidden">
-                                        <div className="font-medium text-sm truncate">
-                                            Event
+                                <Link
+                                    href="https://u4xtuh1hoqs.sg.larksuite.com/share/base/form/shrlgRXN7Srf5VKx2O9tXXDT7Jd"
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="block"
+                                >
+                                    <div className="py-2.5 px-3 bg-ash-dark-400 hover:bg-stake-dark-400 flex items-center justify-between space-x-1 text-stake-gray-500 transition-all duration-300">
+                                        <div className="flex items-center space-x-4 overflow-hidden">
+                                            <div className="font-medium text-sm truncate">
+                                                Support ticket
+                                            </div>
                                         </div>
+                                        <ICNewTabRound className="w-3.5 h-auto shrink-0" />
                                     </div>
-                                    <ICNewTabRound className="w-3.5 h-auto shrink-0" />
-                                </div>
-                            </Link>
-                            <Link
-                                href="https://forms.gle/VfEEfzTG3LnJPPxC9"
-                                target="_blank"
-                                rel="noreferrer"
-                                className="block"
-                            >
-                                <div className="py-2.5 px-3 bg-ash-dark-400 hover:bg-stake-dark-400 flex items-center justify-between space-x-1 text-stake-gray-500 transition-all duration-300">
-                                    <div className="flex items-center space-x-4 overflow-hidden">
-                                        <div className="font-medium text-sm truncate">
-                                            Support ticket
-                                        </div>
-                                    </div>
-                                    <ICNewTabRound className="w-3.5 h-auto shrink-0" />
-                                </div>
-                            </Link>
+                                </Link>
                             </div>
                         </div>
                     </div>
