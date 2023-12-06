@@ -5,7 +5,7 @@ import { DAOMeta } from "../propose/Action/type";
 
 const useDAOProposalMeta = (ipfsHash: string) => {
     const url = useMemo(() => {
-        return ipfsHash ? `https://gateway.ipfs.io/ipfs/${ipfsHash}` : null;
+        return ipfsHash ? `https://cloudflare-ipfs.com/ipfs/${ipfsHash}` : null;
     }, [ipfsHash]);
     const { data, error } = useSWR<DAOMeta>(url, fetcher, {
         onErrorRetry: (error, key, config, revalidate, { retryCount }) => {
