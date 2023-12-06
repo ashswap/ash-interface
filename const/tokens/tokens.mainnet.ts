@@ -310,6 +310,20 @@ const LP_TOKENS: IESDTInfo[] = [
         name: "Ashswap LP",
         decimals: 18,
     },
+    {
+        identifier: "ALP-19d6c0",
+        chainId: ChainId.Mainnet,
+        symbol: "ALP-2USDC",
+        name: "Ashswap LP",
+        decimals: 18,
+    },
+    {
+        identifier: "ALP-8d8415",
+        chainId: ChainId.Mainnet,
+        symbol: "ALP-USDC-WEGLD",
+        name: "Ashswap LP",
+        decimals: 18,
+    },
 ];
 
 const TOKENS_MAP: Record<string, IESDTInfo> & typeof TOKENS_ALIAS = {
