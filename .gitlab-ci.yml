@@ -219,7 +219,7 @@ deploy_ipfs_beta2:
     NEXT_PUBLIC_ASH_LOG_API: https://api-tracking.ashswap.io
     NEXT_PUBLIC_IPFS_API: https://ipfs-cluster-api-internal.bicarus.io
     NEXT_PUBLIC_IPFS_GATEWAY: https://ipfs-gateway-internal.bicarus.io
-    NEXT_PUBLIC_AG_API: https://aggregator.ashswap.io
+    NEXT_PUBLIC_AG_API: https://aggregator-alpha.ashswap.io
     NEXT_PUBLIC_XEXCHANGE_GRAPH_API: https://graph.xexchange.com
 
 .job_template_prod_gamma: &job_template_prod_gamma
