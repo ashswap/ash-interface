@@ -108,7 +108,7 @@ function ConnectWalletModal() {
         if (window && !loggedIn) {
             setNotFirstRender(true);
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [loggedIn]);
     return (
         <>
@@ -181,7 +181,7 @@ function ConnectWalletModal() {
                                         </span>
                                     </div>
                                 </div>
-                                <div
+                                {/* <div
                                     className="max-w-full w-[21.875rem] h-24 bg-ash-dark-600 cursor-pointer flex items-center px-6 mb-4"
                                     onClick={() => {
                                         router.push({
@@ -204,7 +204,7 @@ function ConnectWalletModal() {
                                             Wallet
                                         </span>
                                     </div>
-                                </div>
+                                </div> */}
                                 <div
                                     className="max-w-full w-[21.875rem] h-24 bg-ash-dark-600 cursor-pointer flex items-center px-6 mb-4"
                                     onClick={webWalletLogin}
@@ -237,8 +237,7 @@ function ConnectWalletModal() {
                 <div className="grow flex flex-col items-center text-center py-10 px-6">
                     <div className="text-lg sm:text-2xl font-bold mb-9">
                         Install{" "}
-                        <span className="text-ash-blue-500">xPortal</span>{" "}
-                        App
+                        <span className="text-ash-blue-500">xPortal</span> App
                     </div>
                     <div className="flex items-center space-x-8 mb-[5.5rem]">
                         <ICConnectApp
@@ -252,7 +251,7 @@ function ConnectWalletModal() {
                         </div>
                         <div className="relative w-9 h-9 sm:w-[4.75rem] sm:h-[4.75rem] flex items-center justify-center">
                             <div className="bg-white rounded-lg md:rounded-2xl rotate-45 absolute w-full h-full"></div>
-                            <ICMultiversx className="relative w-4 h-auto sm:w-7 text-mvx-xportal"/>
+                            <ICMultiversx className="relative w-4 h-auto sm:w-7 text-mvx-xportal" />
                         </div>
                     </div>
                     <div className="overflow-auto max-w-full">
@@ -326,7 +325,9 @@ function ConnectWalletModal() {
                 <div className="grow flex flex-col items-center text-center pt-6 pb-10 px-2 sm:px-6">
                     <div className="text-lg sm:text-2xl font-bold mb-9">
                         Install{" "}
-                        <span className="text-ash-blue-500">MultiversX DeFi Wallet</span>{" "}
+                        <span className="text-ash-blue-500">
+                            MultiversX DeFi Wallet
+                        </span>{" "}
                         on your Browser
                     </div>
                     <div className="flex items-center space-x-8 mb-[5.5rem]">
@@ -341,7 +342,7 @@ function ConnectWalletModal() {
                         </div>
                         <div className="relative w-9 h-9 sm:w-[4.75rem] sm:h-[4.75rem] flex items-center justify-center">
                             <div className="bg-white rounded-lg sm:rounded-2xl rotate-45 absolute w-full h-full"></div>
-                            <ICMultiversx className="relative w-4 h-auto sm:w-7 text-mvx-xportal"/>
+                            <ICMultiversx className="relative w-4 h-auto sm:w-7 text-mvx-xportal" />
                         </div>
                     </div>
                     <a
@@ -441,20 +442,24 @@ const WalletConnect = ({
     }, [walletConnectUri]);
 
     const clearPairings = useCallback(async () => {
-        await Promise.all(wcPairings?.map(async pair => {
-            await removeExistingPairing(pair.topic);
-        }) || []);
+        await Promise.all(
+            wcPairings?.map(async (pair) => {
+                await removeExistingPairing(pair.topic);
+            }) || []
+        );
     }, [removeExistingPairing, wcPairings]);
     useEffect(() => {
         if (!walletConnectUri) {
             initConnect();
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [walletConnectUri]);
     useEffect(() => {
         buildQrCode();
     }, [buildQrCode]);
-    useEffect(() => {cancelRef.current = cancelLogin}, [cancelLogin]);
+    useEffect(() => {
+        cancelRef.current = cancelLogin;
+    }, [cancelLogin]);
     useEffect(() => {
         return () => {
             cancelRef.current();
