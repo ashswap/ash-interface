@@ -33,7 +33,7 @@ const config = {
         defaultPathMap,
         { dev, dir, outDir, distDir, buildId }
     ) {
-        const ignorePathsBase = ["/stake", "/stake/mint", "/ledger"];
+        const ignorePathsBase = ["/stake", "/stake/mint"];
         const ignorePaths =
             process.NEXT_PUBLIC_NETWORK === "devnet" &&
             process.env.NEXT_PUBLIC_ASH_ENV === "beta"

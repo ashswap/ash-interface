@@ -181,7 +181,7 @@ function ConnectWalletModal() {
                                         </span>
                                     </div>
                                 </div>
-                                {/* <div
+                                <div
                                     className="max-w-full w-[21.875rem] h-24 bg-ash-dark-600 cursor-pointer flex items-center px-6 mb-4"
                                     onClick={() => {
                                         router.push({
@@ -204,7 +204,7 @@ function ConnectWalletModal() {
                                             Wallet
                                         </span>
                                     </div>
-                                </div> */}
+                                </div>
                                 <div
                                     className="max-w-full w-[21.875rem] h-24 bg-ash-dark-600 cursor-pointer flex items-center px-6 mb-4"
                                     onClick={webWalletLogin}
