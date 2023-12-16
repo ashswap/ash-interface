@@ -95,7 +95,7 @@ function AreaChart({ data, maxRecords, mode = "sum", label, hideInfo }: Props) {
                     <PrimitiveAreaChart
                         data={displayChartData}
                         onMouseLeave={() => setActivePayload(undefined)}
-                        onMouseMove={(e) =>
+                        onMouseMove={(e: any) =>
                             setActivePayload(e?.activePayload?.[0]?.payload)
                         }
                     >

@@ -65,8 +65,8 @@ function VotePowerChart() {
         return chartData;
     }, [chartData]);
     const defaultIndex = useMemo(() => {
-        return displayChartData.findIndex(
-            (val) => moment.unix(val.timestamp).isSame(moment(), "years")
+        return displayChartData.findIndex((val) =>
+            moment.unix(val.timestamp).isSame(moment(), "years")
         );
     }, [displayChartData]);
     const [activeIndex, setActiveIndex] = useState(defaultIndex);
@@ -101,7 +101,7 @@ function VotePowerChart() {
                     <AreaChart
                         data={displayChartData}
                         onMouseLeave={() => setActiveIndex(defaultIndex)}
-                        onMouseMove={(e) => {
+                        onMouseMove={(e: any) => {
                             setActiveIndex(
                                 e?.activeTooltipIndex ?? defaultIndex
                             );
