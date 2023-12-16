@@ -85,7 +85,7 @@ function TVLLPChart() {
                     <AreaChart
                         data={displayChartData}
                         onMouseLeave={() => setActivePayload(undefined)}
-                        onMouseMove={(e) =>
+                        onMouseMove={(e: any) =>
                             setActivePayload(e?.activePayload?.[0])
                         }
                     >

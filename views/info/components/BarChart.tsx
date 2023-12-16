@@ -103,7 +103,7 @@ function BarChart({ data, maxRecords, mode = "sum", label, hideInfo }: Props) {
                     <PrimitiveBarChart
                         data={displayChartData}
                         onMouseLeave={() => setActivePayload(undefined)}
-                        onMouseMove={(e) =>
+                        onMouseMove={(e: any) =>
                             setActivePayload(e?.activePayload?.[0]?.payload)
                         }
                     >
