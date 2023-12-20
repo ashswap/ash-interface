@@ -511,6 +511,28 @@ const mainnet: IFarm[] = [
         farm_token_decimal: 18,
         active: true,
     },
+    {
+        farm_address:
+            "erd1qqqqqqqqqqqqqpgq4rdatar9nastcsy5s58kj45qvj7wm67e4fvsyrnj2y",
+        reward_token_id: "ASH-a642d1",
+        reward_token_decimal: 18,
+        farming_token_id: "ALP-25b383",
+        farming_token_decimal: 18,
+        farm_token_id: "FARM-94106f",
+        farm_token_decimal: 18,
+        active: true,
+    },
+    {
+        farm_address:
+            "erd1qqqqqqqqqqqqqpgqhh2d53ey2ra655zdqzctpm5w88cl34gr4fvsnvcvnh",
+        reward_token_id: "ASH-a642d1",
+        reward_token_decimal: 18,
+        farming_token_id: "ALP-45512a",
+        farming_token_decimal: 18,
+        farm_token_id: "FARM-8d830a",
+        farm_token_decimal: 18,
+        active: true,
+    },
 ];
 
 export const FARMS =
