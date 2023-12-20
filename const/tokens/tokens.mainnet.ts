@@ -13,6 +13,7 @@ import IconUTK from "assets/images/utk-icon.png";
 import IconEPUNKS from "assets/images/epunks-icon.png";
 import IconWSDAI from "assets/images/wsdai-icon.png";
 import IconDNA from "assets/images/dna-icon.png";
+import IconDAI from "assets/images/dai-icon.png";
 import IconJWLASH from "assets/images/jwlash-icon.png";
 import IconJWLEGLD from "assets/images/jwlegld-icon.png";
 import IconJWLHTM from "assets/images/jwlhtm-icon.png";
@@ -194,6 +195,14 @@ const TOKENS: IESDTInfo[] = [
         decimals: 18,
         logoURI: IconDNA.src,
     },
+    {
+        identifier: "WDAI-9eeb54",
+        chainId: ChainId.Mainnet,
+        symbol: "WDAI",
+        name: "WDAI",
+        decimals: 18,
+        logoURI: IconDAI.src,
+    },
 ];
 
 const LP_TOKENS: IESDTInfo[] = [
@@ -321,6 +330,20 @@ const LP_TOKENS: IESDTInfo[] = [
         identifier: "ALP-8d8415",
         chainId: ChainId.Mainnet,
         symbol: "ALP-USDC-WEGLD",
+        name: "Ashswap LP",
+        decimals: 18,
+    },
+    {
+        identifier: "ALP-25b383",
+        chainId: ChainId.Mainnet,
+        symbol: "ALP-JWLUSD-JWLEGLD",
+        name: "Ashswap LP",
+        decimals: 18,
+    },
+    {
+        identifier: "ALP-45512a",
+        chainId: ChainId.Mainnet,
+        symbol: "ALP-USDT-WDAI-JWLUSD",
         name: "Ashswap LP",
         decimals: 18,
     },
