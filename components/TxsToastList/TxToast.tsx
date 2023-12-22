@@ -65,9 +65,9 @@ const StatusIconMap: Record<
     TransactionServerStatusesEnum | "timedOut",
     () => JSX.Element
 > = {
-    pending: 
-        () => <div className="w-4 h-4 rounded-full border-2 border-ash-purple-500 border-t-transparent animate-spin"></div>
-    ,
+    pending: () => (
+        <div className="w-4 h-4 rounded-full border-2 border-ash-purple-500 border-t-transparent animate-spin"></div>
+    ),
     "not executed": () => <></>,
     success: () => <ICCheck className="w-4 h-4 text-stake-green-500" />,
     fail: () => <IClose className="w-4 h-4 text-ash-purple-500" />,
@@ -143,7 +143,13 @@ const TxRecord = ({
             });
             setIsClickedStakeButton(false);
         }
-    }, [status, isClickedStakeButton, isClickedCollapse, hash, setIsClickedStakeButton]);
+    }, [
+        status,
+        isClickedStakeButton,
+        isClickedCollapse,
+        hash,
+        setIsClickedStakeButton,
+    ]);
     useEffect(() => {
         if (
             window &&
@@ -160,7 +166,13 @@ const TxRecord = ({
             });
             setIsClickedHarvestButton(false);
         }
-    }, [status, isClickedHarvestButton, isClickedCollapse, hash, setIsClickedHarvestButton]);
+    }, [
+        status,
+        isClickedHarvestButton,
+        isClickedCollapse,
+        hash,
+        setIsClickedHarvestButton,
+    ]);
     useEffect(() => {
         if (
             window &&
@@ -177,7 +189,13 @@ const TxRecord = ({
             });
             setIsClickedUnstake(false);
         }
-    }, [status, isClickedUnstake, isClickedCollapse, hash, setIsClickedUnstake]);
+    }, [
+        status,
+        isClickedUnstake,
+        isClickedCollapse,
+        hash,
+        setIsClickedUnstake,
+    ]);
     useEffect(() => {
         if (
             window &&
@@ -194,7 +212,13 @@ const TxRecord = ({
             });
             setIsClickedGovStakeButton(false);
         }
-    }, [status, isClickedGovStakeButton, isClickedCollapse, hash, setIsClickedGovStakeButton]);
+    }, [
+        status,
+        isClickedGovStakeButton,
+        isClickedCollapse,
+        hash,
+        setIsClickedGovStakeButton,
+    ]);
     const network: AccountInfoSliceNetworkType =
         useRecoilValue(networkConfigState).network;
     const IconEl = useMemo(() => {
@@ -203,7 +227,9 @@ const TxRecord = ({
     return (
         <>
             <div className="flex items-center flex-wrap gap-2 text-stake-gray-500">
-                <div><IconEl/></div>
+                <div>
+                    <IconEl />
+                </div>
                 {!collapse && (
                     <>
                         <div className="mr-2 sm:mr-4 leading-tight text-xs sm:text-sm w-28 sm:w-32">
@@ -375,16 +401,19 @@ export const TxToast = ({
         //         <div>{transactions[0].hash}</div>
         //     </ToastProgress>
         // </div>
-        <Transition
-            show={shouldRender && transactions != null}
-            as={Fragment}
-            enter="transition duration-300 ease"
-            enterFrom="translate-x-full opacity-0"
-            enterTo="translate-x-0 opacity-100"
-            leave="transition duration-200 ease"
-            leaveFrom="translate-x-0 opacity-100"
-            leaveTo="translate-x-full opacity-0"
-        >
+        // <Transition
+        //     show={shouldRender && transactions != null}
+        //     as={Fragment}
+        //     enter="transition duration-300 ease"
+        //     enterFrom="translate-x-full opacity-0"
+        //     enterTo="translate-x-0 opacity-100"
+        //     leave="transition duration-200 ease"
+        //     leaveFrom="translate-x-0 opacity-100"
+        //     leaveTo="translate-x-full opacity-0"
+        // >
+        // </Transition>
+        shouldRender &&
+        transactions != null && (
             <div
                 className={`clip-corner-4 clip-corner-br bg-clip-border p-[1px] backdrop-blur-[30px] transition-all overflow-hidden ${
                     collapsed ? "w-auto" : "w-[calc(100vw-3rem)] sm:w-[480px]"
@@ -458,7 +487,7 @@ export const TxToast = ({
                     </div>
                 </div>
             </div>
-        </Transition>
+        )
     );
 };
 
