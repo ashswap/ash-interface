@@ -389,6 +389,7 @@ export const TxToast = ({
         );
     }, [transactions]);
 
+    if (!shouldRender || !transactions?.length) return null;
     return (
         // <div>
         //     <ToastProgress
@@ -412,52 +413,47 @@ export const TxToast = ({
         //     leaveTo="translate-x-full opacity-0"
         // >
         // </Transition>
-        shouldRender &&
-        transactions != null && (
-            <div
-                className={`clip-corner-4 clip-corner-br bg-clip-border p-[1px] backdrop-blur-[30px] transition-all overflow-hidden ${
-                    collapsed ? "w-auto" : "w-[calc(100vw-3rem)] sm:w-[480px]"
-                }`}
-            >
-                <div className="clip-corner-4 clip-corner-br p-4 bg-ash-dark-600/80 backdrop-blur-[30px]">
-                    <div className="flex justify-between">
-                        {!collapsed && (
-                            <div className="flex items-center space-x-2 xs:space-x-4 sm:space-x-10 sm:mr-5 sm:py-4 overflow-hidden">
-                                <div className="hidden xs:block px-4 sm:px-5">
-                                    <ICHourGlass className="w-8 sm:w-16 h-auto text-stake-gray-500" />
+        <div
+            className={`clip-corner-4 clip-corner-br bg-clip-border p-[1px] backdrop-blur-[30px] transition-all overflow-hidden ${
+                collapsed ? "w-auto" : "w-[calc(100vw-3rem)] sm:w-[480px]"
+            }`}
+        >
+            <div className="clip-corner-4 clip-corner-br p-4 bg-ash-dark-600/80 backdrop-blur-[30px]">
+                <div className="flex justify-between">
+                    {!collapsed && (
+                        <div className="flex items-center space-x-2 xs:space-x-4 sm:space-x-10 sm:mr-5 sm:py-4 overflow-hidden">
+                            <div className="hidden xs:block px-4 sm:px-5">
+                                <ICHourGlass className="w-8 sm:w-16 h-auto text-stake-gray-500" />
+                            </div>
+                            <div>
+                                <div className="text-white text-sm sm:text-lg font-bold mb-2 sm:mb-4">
+                                    {title}
                                 </div>
-                                <div>
-                                    <div className="text-white text-sm sm:text-lg font-bold mb-2 sm:mb-4">
-                                        {title}
-                                    </div>
-                                    <div className="text-xs sm:text-sm font-bold text-stake-gray-500 mb-6 sm:mb-8">
-                                        {processed} transactions processed
-                                    </div>
-                                    <div className="flex flex-col space-y-2">
-                                        {transactions.map((tx) => {
-                                            return (
-                                                <TxRecord
-                                                    key={tx.hash}
-                                                    tx={tx}
-                                                />
-                                            );
-                                        })}
-                                    </div>
+                                <div className="text-xs sm:text-sm font-bold text-stake-gray-500 mb-6 sm:mb-8">
+                                    {processed} transactions processed
+                                </div>
+                                <div className="flex flex-col space-y-2">
+                                    {transactions.map((tx) => {
+                                        return (
+                                            <TxRecord key={tx.hash} tx={tx} />
+                                        );
+                                    })}
                                 </div>
                             </div>
-                        )}
-                        <div>
-                            <button
-                                className="w-10 h-10 bg-ash-dark-600 hover:bg-ash-dark-400 flex items-center justify-center text-white mb-5"
-                                onClick={() => onCollapsedChange?.(!collapsed)}
-                            >
-                                {collapsed ? (
-                                    <ICChevronLeft className="w-2.5 h-2.5" />
-                                ) : (
-                                    <ICChevronRight className="w-2.5 h-2.5" />
-                                )}
-                            </button>
-                            {/* {done && (
+                        </div>
+                    )}
+                    <div>
+                        <button
+                            className="w-10 h-10 bg-ash-dark-600 hover:bg-ash-dark-400 flex items-center justify-center text-white mb-5"
+                            onClick={() => onCollapsedChange?.(!collapsed)}
+                        >
+                            {collapsed ? (
+                                <ICChevronLeft className="w-2.5 h-2.5" />
+                            ) : (
+                                <ICChevronRight className="w-2.5 h-2.5" />
+                            )}
+                        </button>
+                        {/* {done && (
                                 <button
                                     className="w-10 h-10 bg-ash-dark-600 hover:bg-ash-dark-400 flex items-center justify-center text-white mb-5"
                                     onClick={() => setShouldRender(false)}
@@ -465,29 +461,28 @@ export const TxToast = ({
                                     <IClose className="w-2.5 h-2.5" />
                                 </button>
                             )} */}
-                            {collapsed && (
-                                <>
-                                    <div className="text-sm font-bold text-stake-gray-500 mb-4">
-                                        {processed}
-                                    </div>
-                                    <div className="flex flex-col space-y-2">
-                                        {transactions.map((tx) => {
-                                            return (
-                                                <TxRecord
-                                                    key={tx.hash}
-                                                    tx={tx}
-                                                    collapse
-                                                />
-                                            );
-                                        })}
-                                    </div>
-                                </>
-                            )}
-                        </div>
+                        {collapsed && (
+                            <>
+                                <div className="text-sm font-bold text-stake-gray-500 mb-4">
+                                    {processed}
+                                </div>
+                                <div className="flex flex-col space-y-2">
+                                    {transactions.map((tx) => {
+                                        return (
+                                            <TxRecord
+                                                key={tx.hash}
+                                                tx={tx}
+                                                collapse
+                                            />
+                                        );
+                                    })}
+                                </div>
+                            </>
+                        )}
                     </div>
                 </div>
             </div>
-        )
+        </div>
     );
 };
 
