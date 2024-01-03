@@ -54,7 +54,7 @@ function BribeCard({ fbFarm }: Props) {
         if (
             !fcFarm ||
             !fcAccountFarm?.voteUserSlope?.slope ||
-            fcFarm.votedPoint.slope === "0"
+            fcFarm.nextVotedPoint.slope === "0"
         )
             return 0;
         const nextWeek = Math.floor(moment().unix() / WEEK) * WEEK + WEEK;
