@@ -55,6 +55,7 @@ stages:
     NEXT_PUBLIC_ASH_SOCKET_EXTRA:
     NEXT_PUBLIC_ASH_LOG_API: https://api-tracking-devnet-alpha.ashswap.io
     NEXT_PUBLIC_IPFS_API: https://ipfs-cluster-api-internal.bicarus.io
+    NEXT_PUBLIC_IPFS_GATEWAY: https://ipfs-gateway-internal.bicarus.io
     NEXT_PUBLIC_AG_API: https://aggregator-devnet-alpha.ashswap.io
     NEXT_PUBLIC_XEXCHANGE_GRAPH_API: https://devnet-graph.xexchange.com
 
@@ -107,6 +108,7 @@ deploy_ipfs_alpha:
     NEXT_PUBLIC_ASH_SOCKET_EXTRA:
     NEXT_PUBLIC_ASH_LOG_API: https://api-tracking.ashswap.io
     NEXT_PUBLIC_IPFS_API: https://ipfs-cluster-api-internal.bicarus.io
+    NEXT_PUBLIC_IPFS_GATEWAY: https://ipfs-gateway-internal.bicarus.io
     NEXT_PUBLIC_AG_API: https://aggregator-devnet.ashswap.io
     NEXT_PUBLIC_XEXCHANGE_GRAPH_API: https://devnet-graph.xexchange.com
 
@@ -159,6 +161,7 @@ deploy_ipfs_beta:
     NEXT_PUBLIC_ASH_SOCKET_EXTRA:
     NEXT_PUBLIC_ASH_LOG_API: https://api-tracking.ashswap.io
     NEXT_PUBLIC_IPFS_API: https://ipfs-cluster-api-internal.bicarus.io
+    NEXT_PUBLIC_IPFS_GATEWAY: https://ipfs-gateway-internal.bicarus.io
     NEXT_PUBLIC_AG_API: https://aggregator-devnet2.ashswap.io
     NEXT_PUBLIC_XEXCHANGE_GRAPH_API: https://devnet-graph.xexchange.com
     NEXT_PUBLIC_MVX_API: https://devnet-api.multiversx.com
@@ -215,7 +218,8 @@ deploy_ipfs_beta2:
     NEXT_PUBLIC_ASH_SOCKET_EXTRA:
     NEXT_PUBLIC_ASH_LOG_API: https://api-tracking.ashswap.io
     NEXT_PUBLIC_IPFS_API: https://ipfs-cluster-api-internal.bicarus.io
-    NEXT_PUBLIC_AG_API: https://aggregator-gamma.ashswap.io
+    NEXT_PUBLIC_IPFS_GATEWAY: https://ipfs-gateway-internal.bicarus.io
+    NEXT_PUBLIC_AG_API: https://aggregator-alpha.ashswap.io
     NEXT_PUBLIC_XEXCHANGE_GRAPH_API: https://graph.xexchange.com
 
 .job_template_prod_gamma: &job_template_prod_gamma
@@ -260,6 +264,7 @@ build_prod_gamma:
     NEXT_PUBLIC_ASH_SOCKET_EXTRA:
     NEXT_PUBLIC_ASH_LOG_API: https://api-tracking.ashswap.io
     NEXT_PUBLIC_IPFS_API: https://ipfs-cluster-api-internal.bicarus.io
+    NEXT_PUBLIC_IPFS_GATEWAY: https://ipfs-gateway-internal.bicarus.io
     NEXT_PUBLIC_AG_API: https://aggregator-internal.ashswap.io
     NEXT_PUBLIC_XEXCHANGE_GRAPH_API: https://graph.xexchange.com
 
