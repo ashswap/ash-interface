@@ -23,9 +23,23 @@ const POOLS_BETA2: IPool[] = [
     },
     {
         address:
+            "erd1qqqqqqqqqqqqqpgqmky28nrxcwh37x0qetff9khpvccp4t5w2geswj8ttu",
+        lpToken: TOKENS_MAP["ALP-50c469"],
+        tokens: [TOKENS_MAP["USDC-350c4e"], TOKENS_MAP["WEGLD-a28c59"]],
+        type: EPoolType.PoolV2,
+    },
+    {
+        address:
             "erd1qqqqqqqqqqqqqpgqcqllxrhz5g7f8ujkj2d32v4ywm7cwuhn2geswn4xgd",
         lpToken: TOKENS_MAP["ALP-8817f1"],
         tokens: [TOKENS_MAP["USDT-dd271a"], TOKENS_MAP["ASH-e3d1b7"]],
+        type: EPoolType.PoolV2,
+    },
+    {
+        address:
+            "erd1qqqqqqqqqqqqqpgq96u35kdgr4j5vqc9caj2tgg63mpc96ws2gesrkdskq",
+        lpToken: TOKENS_MAP["ALP-f53874"],
+        tokens: [TOKENS_MAP["USDT-58d5d0"], TOKENS_MAP["ASH-e3d1b7"]],
         type: EPoolType.PoolV2,
     },
     {
@@ -76,6 +90,20 @@ const POOLS_BETA2: IPool[] = [
         lpToken: TOKENS_MAP["ALP-a2b238"],
         tokens: [TOKENS_MAP["HTM-23a1da"], TOKENS_MAP["JWLHTM-3ed083"]],
         type: EPoolType.PlainPool,
+    },
+    {
+        address:
+            "erd1qqqqqqqqqqqqqpgqlkt2rnfg0umtp52vd3rks8u0ddagn7g32ges5p28nd",
+        lpToken: TOKENS_MAP["ALP-f5e6d8"],
+        tokens: [TOKENS_MAP["USDC-350c4e"], TOKENS_MAP["USDT-58d5d0"]],
+        type: EPoolType.PlainPool,
+    },
+    {
+        address:
+            "erd1qqqqqqqqqqqqqpgqpu4n98hdaqx87kwrht07jhl6l5rl4h942gesv0tjlw",
+        lpToken: TOKENS_MAP["ALP-47b8c2"],
+        tokens: [TOKENS_MAP["WEGLD-a28c59"], TOKENS_MAP["PROTEO-6ca7c8"]],
+        type: EPoolType.PoolV2,
     },
 ];
 export default POOLS_BETA2;
