@@ -66,6 +66,14 @@ const TOKENS: IESDTInfo[] = [
         logoURI: IconUSDT.src,
     },
     {
+        identifier: "USDT-58d5d0",
+        chainId: ChainId.Devnet,
+        symbol: "USDT",
+        name: "Tether",
+        decimals: 6,
+        logoURI: IconUSDT.src,
+    },
+    {
         identifier: "BUSD-d4c014",
         chainId: ChainId.Devnet,
         symbol: "BUSD",
@@ -157,6 +165,13 @@ const LP_TOKENS: IESDTInfo[] = [
     },
     {
         identifier: "ALP-8817f1",
+        chainId: ChainId.Devnet,
+        symbol: "ALP-ASH-USDT",
+        name: "Ashswap LP",
+        decimals: 18,
+    },
+    {
+        identifier: "ALP-f53874",
         chainId: ChainId.Devnet,
         symbol: "ALP-ASH-USDT",
         name: "Ashswap LP",
