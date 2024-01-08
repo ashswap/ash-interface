@@ -30,13 +30,6 @@ const POOLS_BETA2: IPool[] = [
     },
     {
         address:
-            "erd1qqqqqqqqqqqqqpgqcqllxrhz5g7f8ujkj2d32v4ywm7cwuhn2geswn4xgd",
-        lpToken: TOKENS_MAP["ALP-8817f1"],
-        tokens: [TOKENS_MAP["USDT-dd271a"], TOKENS_MAP["ASH-e3d1b7"]],
-        type: EPoolType.PoolV2,
-    },
-    {
-        address:
             "erd1qqqqqqqqqqqqqpgq96u35kdgr4j5vqc9caj2tgg63mpc96ws2gesrkdskq",
         lpToken: TOKENS_MAP["ALP-f53874"],
         tokens: [TOKENS_MAP["USDT-58d5d0"], TOKENS_MAP["ASH-e3d1b7"]],
