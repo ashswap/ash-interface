@@ -235,12 +235,12 @@ const devnet2: IFarm[] = [
     },
     {
         farm_address:
-            "erd1qqqqqqqqqqqqqpgqqvz5ud0zz7uetj9u3003dht8u7wvpw3v2geskvamv3",
+            "erd1qqqqqqqqqqqqqpgq09hzghyj8uuq2nnwyyrdf9rywfte4mxg2geshtyr4x",
         reward_token_id: "ASH-e3d1b7",
         reward_token_decimal: 18,
-        farming_token_id: "ALP-8817f1",
+        farming_token_id: "ALP-2d2663",
         farming_token_decimal: 18,
-        farm_token_id: "FARM-a0057a",
+        farm_token_id: "FARM-3e07c0",
         farm_token_decimal: 18,
         active: true,
     },
@@ -329,17 +329,6 @@ const devnet2: IFarm[] = [
         farming_token_id: "ALP-f5e6d8",
         farming_token_decimal: 18,
         farm_token_id: "FARM-c4462d",
-        farm_token_decimal: 18,
-        active: true,
-    },
-    {
-        farm_address:
-            "erd1qqqqqqqqqqqqqpgq09hzghyj8uuq2nnwyyrdf9rywfte4mxg2geshtyr4x",
-        reward_token_id: "ASH-e3d1b7",
-        reward_token_decimal: 18,
-        farming_token_id: "ALP-2d2663",
-        farming_token_decimal: 18,
-        farm_token_id: "FARM-3e07c0",
         farm_token_decimal: 18,
         active: true,
     },
