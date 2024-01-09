@@ -31,7 +31,7 @@ const POOLS_BETA2: IPool[] = [
     {
         address:
             "erd1qqqqqqqqqqqqqpgq96u35kdgr4j5vqc9caj2tgg63mpc96ws2gesrkdskq",
-        lpToken: TOKENS_MAP["ALP-f53874"],
+        lpToken: TOKENS_MAP["ALP-2d2663"],
         tokens: [TOKENS_MAP["USDT-58d5d0"], TOKENS_MAP["ASH-e3d1b7"]],
         type: EPoolType.PoolV2,
     },
