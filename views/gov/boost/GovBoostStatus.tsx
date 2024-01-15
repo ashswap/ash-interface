@@ -1,6 +1,6 @@
-import { useTrackTransactionStatus } from "@multiversx/sdk-dapp/hooks";
-import { TokenTransfer } from "@multiversx/sdk-core/out";
 import { Transition } from "@headlessui/react";
+import { TokenTransfer } from "@multiversx/sdk-core/out";
+import { useTrackTransactionStatus } from "@multiversx/sdk-dapp/hooks";
 import ImgASHSleep from "assets/images/ash-sleep.png";
 import ICArrowBarRight from "assets/svg/arrow-bar-right.svg";
 import ICChevronRight from "assets/svg/chevron-right.svg";
@@ -25,7 +25,7 @@ import AdvanceBoostBar from "components/BoostBar/AdvanceBoostBar";
 import GlowingButton from "components/GlowingButton";
 import Image from "components/Image";
 import CardTooltip from "components/Tooltip/CardTooltip";
-import { ACTIVE_FARMS } from "const/farms";
+import { DEFAULT_FARM } from "const/farms";
 import pools from "const/pool";
 import { VE_ASH_DECIMALS } from "const/tokens";
 import { TRANSITIONS } from "const/transitions";
@@ -37,13 +37,13 @@ import {
     useFarmBoostTransferState,
 } from "hooks/useFarmBoostState";
 import useRouteModal from "hooks/useRouteModal";
+import useSendTxsWithTrackStatus from "hooks/useSendTxsWithTrackStatus";
 import produce from "immer";
 import { FarmBoostInfo } from "interface/farm";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRecoilCallback, useRecoilValue } from "recoil";
 import FarmBoostTooltip from "views/farms/FarmBoostTooltip";
-import useSendTxsWithTrackStatus from "hooks/useSendTxsWithTrackStatus";
 const FarmRecord = ({
     farmData,
     label,
@@ -427,8 +427,7 @@ function GovBoostStatus() {
                             href={{
                                 query: {
                                     p: encode({
-                                        farmAddress:
-                                            ACTIVE_FARMS[0].farm_address,
+                                        farmAddress: DEFAULT_FARM.farm_address,
                                     }),
                                 },
                             }}

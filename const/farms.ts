@@ -545,4 +545,5 @@ export const ACTIVE_FARMS = FARMS.filter((f) => f.active);
 export const FARMS_MAP = Object.fromEntries(
     FARMS.map((f) => [f.farm_address, f])
 );
+export const DEFAULT_FARM = ENVIRONMENT.NETWORK === "mainnet" ? FARMS_MAP["erd1qqqqqqqqqqqqqpgq5aj8pk57h6d083c6qsc49gm8f649vhcs4fvsrh3m75"] : FARMS[0];
 export const FARM_DIV_SAFETY_CONST = 1_000_000_000_000;
