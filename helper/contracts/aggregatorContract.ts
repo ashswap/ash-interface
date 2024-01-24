@@ -1,5 +1,4 @@
 import { Address, Interaction, TokenTransfer } from "@multiversx/sdk-core/out";
-import { getAddress } from "@multiversx/sdk-dapp/utils";
 import aggregatorAbi from "assets/abi/aggregator.abi.json";
 import BigNumber from "bignumber.js";
 import Contract from "./contract";
@@ -28,9 +27,7 @@ class AggregatorContract extends Contract<typeof aggregatorAbi> {
         limits: { token: string; amount: BigNumber }[]
     ) {
         const interaction = this.contract.methods.aggregate([steps, ...limits]);
-        interaction
-            .withMultiESDTNFTTransfer(payments)
-            .withSender(new Address(await getAddress()));
+        interaction.withMultiESDTNFTTransfer(payments);
         interaction.withGasLimit(20_000_000 + steps.length * 15_000_000);
         return this.interceptInteraction(interaction);
     }
@@ -46,9 +43,7 @@ class AggregatorContract extends Contract<typeof aggregatorAbi> {
             params.push(protocol);
         }
         const interaction = this.contract.methods.aggregateEgld(params);
-        interaction
-            .withValue(TokenTransfer.egldFromBigInteger(egldAmount))
-            .withSender(new Address(await getAddress()));
+        interaction.withValue(TokenTransfer.egldFromBigInteger(egldAmount));
         interaction.withGasLimit(20_000_000 + steps.length * 15_000_000);
         return this.interceptInteraction(interaction);
     }
@@ -65,9 +60,7 @@ class AggregatorContract extends Contract<typeof aggregatorAbi> {
             params.push(protocol);
         }
         const interaction = this.contract.methods.aggregateEsdt(params);
-        interaction
-            .withSingleESDTTransfer(esdtPayment)
-            .withSender(new Address(await getAddress()));
+        interaction.withSingleESDTTransfer(esdtPayment);
         interaction.withGasLimit(20_000_000 + steps.length * 15_000_000);
         return this.interceptInteraction(interaction);
     }

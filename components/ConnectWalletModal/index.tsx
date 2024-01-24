@@ -7,11 +7,11 @@ import connectWalletBg from "assets/images/connect-wallet-bg.png";
 import downloadAppGallery from "assets/images/download-app-gallery.png";
 import downloadAppStore from "assets/images/download-app-store.png";
 import downloadPlayStore from "assets/images/download-play-store.png";
-import ICMultiversx from "assets/svg/multiversx.svg";
 import ICConnectApp from "assets/svg/connect-app.svg";
 import ICConnectExtension from "assets/svg/connect-extension.svg";
 import ICConnectLedger from "assets/svg/connect-ledger.svg";
 import ICConnectWebWallet from "assets/svg/connect-web-wallet.svg";
+import ICMultiversx from "assets/svg/multiversx.svg";
 import {
     accAddressState,
     accIsLoggedInState,
@@ -21,12 +21,12 @@ import { notFirstRenderConnectWallet } from "atoms/firstRenderConnectWalletState
 import { walletIsOpenConnectModalState } from "atoms/walletState";
 import BaseModal from "components/BaseModal";
 import Image from "components/Image";
+import { useConnectMethod } from "hooks/useConnectMethod";
 import { useRouter } from "next/router";
 import platform from "platform";
 import QRCode from "qrcode";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { MutableRefObject, useEffect, useRef, useState } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
-import { useConnectMethod } from "hooks/useConnectMethod";
 const MULTIVERSX_WALLET_LINK = {
     PLAY_STORE: "https://maiar.onelink.me/HLcx/52dcde54",
     APP_STORE: "https://maiar.onelink.me/HLcx/f0b7455c",
@@ -133,7 +133,7 @@ function ConnectWalletModal() {
                     >
                         {isOpenQR ? (
                             <div>
-                                <WalletConnect />
+                                <WalletConnectWrapper />
                                 <div
                                     className="text-ash-purple-500 uppercase text-xs sm:text-sm text-center font-bold cursor-pointer"
                                     onClick={() => setIsOpenDownloadApp(true)}
@@ -375,106 +375,77 @@ function ConnectWalletModal() {
     );
 }
 
-const WalletConnect = ({
-    callbackRoute,
-    logoutRoute,
-    token,
-    onLogin,
-    onLogout,
-}: {
-    callbackRoute?: string;
-    logoutRoute?: string;
-    token?: string;
-    onLogin?: () => void;
-    onLogout?: () => void;
-}) => {
-    const config = useMemo(() => {
-        return { logoutRoute: "" };
-    }, []);
-    // const [
-    //     initConnect,
-    //     { error, isLoading, isLoggedIn, loginFailed },
-    //     { uriDeepLink, walletConnectUri },
-    // ] = useWalletConnectLogin({
-    //     callbackRoute: "",
-    //     logoutRoute: "",
-    // });
-    const [
-        initConnect,
-        { error, isLoading, isLoggedIn, loginFailed },
-        {
-            uriDeepLink,
-            walletConnectUri,
-            cancelLogin,
-            removeExistingPairing,
-            connectExisting,
-            wcPairings,
-        },
-    ] = useWalletConnectV2Login(config);
-    const ref = useRef(null);
-    const cancelRef = useRef(cancelLogin);
-    const [qrSvg, setQrSvg] = useState<string>("");
+const WalletConnectWrapper = () => {
+    const canLoginRef = useRef(true);
+    useWalletConnectV2Login({ canLoginRef, nativeAuth: true });
+    return <WalletConnect canLoginRef={canLoginRef} />;
+};
 
+const WalletConnect = ({
+    canLoginRef,
+}: {
+    canLoginRef: MutableRefObject<boolean>;
+}) => {
     const isMobile =
         platform?.os?.family === "iOS" || platform?.os?.family === "Android";
+    const [
+        initLoginWithWalletConnectV2,
+        { error: walletConnectErrorV2 },
+        {
+            connectExisting,
+            removeExistingPairing,
+            uriDeepLink: walletConnectDeepLinkV2,
+            walletConnectUri: walletConnectUriV2,
+            wcPairings,
+        },
+    ] = useWalletConnectV2Login({
+        nativeAuth: true,
+        canLoginRef,
+    });
 
-    const svgQr: any = useMemo(() => {
-        return {
-            dangerouslySetInnerHTML: {
-                __html: qrSvg,
-            },
-            style: {
-                width: "157px",
-                height: "157px",
-            },
-        };
-    }, [qrSvg]);
+    const [qrCodeSvg, setQrCodeSvg] = useState<string>("");
 
-    const buildQrCode = useCallback(() => {
-        (async () => {
-            if (walletConnectUri && ref.current !== null) {
-                const svg = await QRCode.toString(walletConnectUri, {
-                    type: "svg",
-                });
-                setQrSvg(svg);
-            }
-        })();
-    }, [walletConnectUri]);
-
-    const clearPairings = useCallback(async () => {
-        await Promise.all(
-            wcPairings?.map(async (pair) => {
-                await removeExistingPairing(pair.topic);
-            }) || []
-        );
-    }, [removeExistingPairing, wcPairings]);
-    useEffect(() => {
-        if (!walletConnectUri) {
-            initConnect();
+    const generateQRCode = async () => {
+        if (!walletConnectUriV2) {
+            return;
         }
+
+        const svg = await QRCode.toString(walletConnectUriV2, {
+            type: "svg",
+        });
+
+        if (svg) {
+            setQrCodeSvg(svg);
+        }
+    };
+
+    useEffect(() => {
+        generateQRCode();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [walletConnectUri]);
+    }, [walletConnectUriV2]);
+
     useEffect(() => {
-        buildQrCode();
-    }, [buildQrCode]);
-    useEffect(() => {
-        cancelRef.current = cancelLogin;
-    }, [cancelLogin]);
-    useEffect(() => {
-        return () => {
-            cancelRef.current();
-        };
+        initLoginWithWalletConnectV2();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return (
-        <div className="text-white flex flex-col items-center" ref={ref}>
+        <div className="text-white flex flex-col items-center">
             <div className="text-lg sm:text-2xl text-center font-bold mb-16">
                 <span className="text-ash-blue-500">xPortal </span>
                 <span>login</span>
             </div>
             <div className="mx-auto mb-[2.125rem] w-48 h-48 flex justify-center items-center">
-                {walletConnectUri ? (
-                    <div {...svgQr} />
+                {walletConnectUriV2 ? (
+                    <div
+                        dangerouslySetInnerHTML={{
+                            __html: qrCodeSvg,
+                        }}
+                        style={{
+                            width: "157px",
+                            height: "157px",
+                        }}
+                    />
                 ) : (
                     <div className="w-10 h-10 rounded-full border-t-transparent border-pink-600 border-4 animate-spin"></div>
                 )}
@@ -486,7 +457,7 @@ const WalletConnect = ({
             {isMobile && (
                 <>
                     <a
-                        href={uriDeepLink || ""}
+                        href={walletConnectDeepLinkV2 || ""}
                         rel="noopener noreferrer nofollow"
                         target="_blank"
                         className="border border-white/50 relative inline-flex items-center p-1 cursor-pointer mb-5 max-w-full"
