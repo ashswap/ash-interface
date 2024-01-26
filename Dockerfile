@@ -1,4 +1,4 @@
-FROM node:16.16.0 AS builder
+FROM node:18.14.2 AS builder
 
 ENV NEXT_TELEMETRY_DISABLED 1
 
@@ -8,7 +8,7 @@ RUN yarn install --frozen-lockfile
 COPY . .
 RUN yarn build && yarn export && cp ./out/404.html ./out/ipfs-404.html
 
-FROM node:16.16.0 AS runner
+FROM node:18.14.2 AS runner
 WORKDIR /app
 RUN npm i -g serve@14.2.0
 
