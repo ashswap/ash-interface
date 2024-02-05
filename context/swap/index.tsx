@@ -1,3 +1,4 @@
+import { activeSwapPoolsAtom } from "atoms/poolsState";
 import pools from "const/pool";
 import { TOKENS_MAP } from "const/tokens";
 import { WRAPPED_EGLD } from "const/wrappedEGLD";
@@ -7,7 +8,14 @@ import { getTokenIdFromCoin } from "helper/token";
 import { IESDTInfo } from "helper/token/token";
 import IPool from "interface/pool";
 import { useRouter } from "next/router";
-import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
+import {
+    createContext,
+    useContext,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+} from "react";
 import { useRecoilValue } from "recoil";
 import { agSlippageAtom } from "views/swap/Aggregator/atoms/aggregator";
 
@@ -55,6 +63,7 @@ export function SwapProvider({ children }: Props) {
     );
     const [valueFrom, setValueFrom] = useState<string>("");
     const slippage = useRecoilValue(agSlippageAtom);
+    const activePools = useRecoilValue(activeSwapPoolsAtom);
     const [tokenTo, setTokenTo] = useState<IESDTInfo | undefined>(undefined);
     const [_valueTo, setValueTo] = useState<string>("");
 
@@ -66,8 +75,12 @@ export function SwapProvider({ children }: Props) {
         if (!tokenFrom || !tokenTo) {
             return;
         }
-        if(getTokenIdFromCoin(tokenFrom?.identifier) === getTokenIdFromCoin(tokenTo?.identifier)) return;
-        const pool = pools.find((p) => {
+        if (
+            getTokenIdFromCoin(tokenFrom?.identifier) ===
+            getTokenIdFromCoin(tokenTo?.identifier)
+        )
+            return;
+        const pool = activePools.find((p) => {
             return (
                 p.tokens.findIndex(
                     (t) =>
@@ -81,14 +94,20 @@ export function SwapProvider({ children }: Props) {
             );
         });
         return pool;
-    }, [tokenFrom, tokenTo]);
+    }, [activePools, tokenFrom, tokenTo]);
 
     const isWrap = useMemo(() => {
-        return tokenFrom?.identifier === "EGLD" && tokenTo?.identifier === WRAPPED_EGLD.wegld;
+        return (
+            tokenFrom?.identifier === "EGLD" &&
+            tokenTo?.identifier === WRAPPED_EGLD.wegld
+        );
     }, [tokenFrom, tokenTo]);
 
     const isUnwrap = useMemo(() => {
-        return tokenTo?.identifier === "EGLD" && tokenFrom?.identifier === WRAPPED_EGLD.wegld;
+        return (
+            tokenTo?.identifier === "EGLD" &&
+            tokenFrom?.identifier === WRAPPED_EGLD.wegld
+        );
     }, [tokenFrom, tokenTo]);
 
     useEffect(() => {
@@ -101,9 +120,15 @@ export function SwapProvider({ children }: Props) {
             setValueTo("");
         }
     }, [valueFrom]);
-    
-    useEffect(() => setTokenFrom(TOKENS_MAP[router.query.tokenIn as string]), [router.query.tokenIn]);
-    useEffect(() => setTokenTo(TOKENS_MAP[router.query.tokenOut as string]), [router.query.tokenOut]);
+
+    useEffect(
+        () => setTokenFrom(TOKENS_MAP[router.query.tokenIn as string]),
+        [router.query.tokenIn]
+    );
+    useEffect(
+        () => setTokenTo(TOKENS_MAP[router.query.tokenOut as string]),
+        [router.query.tokenOut]
+    );
     const valueTo = useMemo(() => {
         return isWrap || isUnwrap ? valueFrom : _valueTo;
     }, [_valueTo, isUnwrap, isWrap, valueFrom]);

@@ -2,7 +2,6 @@ import { tokenMapState } from "atoms/tokensState";
 import BigNumber from "bignumber.js";
 import InputCurrency from "components/InputCurrency";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
-import pools from "const/pool";
 import { TOKENS_MAP } from "const/tokens";
 import { MINIMUM_EGLD_AMT, WRAPPED_EGLD } from "const/wrappedEGLD";
 import { useSwap } from "context/swap";
@@ -19,6 +18,7 @@ import { useDebounce } from "use-debounce";
 import TokenSelect from "views/swap/components/TokenSelect";
 import QuickSelect from "../QuickSelect";
 import styles from "./SwapAmount.module.css";
+import { activeSwapPoolsAtom } from "atoms/poolsState";
 
 interface Props {
     topLeftCorner?: boolean;
@@ -45,6 +45,7 @@ const SwapAmount = (props: Props) => {
         setValueTo,
     } = useSwap();
     const tokenMap = useRecoilValue(tokenMapState);
+    const activePools = useRecoilValue(activeSwapPoolsAtom);
     const screenSize = useScreenSize();
     const [deboundValueFrom] = useDebounce(valueFrom, 500);
     const [onboardingQuickSelectToken, setOnboardedQuickSelectToken] =
@@ -102,7 +103,7 @@ const SwapAmount = (props: Props) => {
             return undefined;
         }
 
-        return pools.filter(
+        return activePools.filter(
             (p) =>
                 p.tokens.findIndex(
                     (t) =>
@@ -110,7 +111,7 @@ const SwapAmount = (props: Props) => {
                         getTokenIdFromCoin(poolWithToken.identifier)
                 ) !== -1
         );
-    }, [poolWithToken]);
+    }, [activePools, poolWithToken]);
 
     let suggestedTokens = useMemo(() => {
         let tokens: IESDTInfo[] = [];
@@ -125,11 +126,11 @@ const SwapAmount = (props: Props) => {
             });
         });
 
-        const useEgld = tokens.some(t => t.identifier === WRAPPED_EGLD.wegld);
-        if(useEgld || poolWithToken?.identifier === WRAPPED_EGLD.wegld) {
+        const useEgld = tokens.some((t) => t.identifier === WRAPPED_EGLD.wegld);
+        if (useEgld || poolWithToken?.identifier === WRAPPED_EGLD.wegld) {
             tokens.push(TOKENS_MAP["EGLD"]);
         }
-        if(poolWithToken?.identifier === "EGLD"){
+        if (poolWithToken?.identifier === "EGLD") {
             tokens.push(TOKENS_MAP[WRAPPED_EGLD.wegld]);
         }
         return tokens;
@@ -285,7 +286,18 @@ const SwapAmount = (props: Props) => {
                             }`}
                             onClick={() => {
                                 props.type === "from" &&
-                                    onChangeValue(token.identifier === "EGLD" ? BigNumber.max(balance.minus(MINIMUM_EGLD_AMT.div(10**18)), 0).toString() : balance.toString());
+                                    onChangeValue(
+                                        token.identifier === "EGLD"
+                                            ? BigNumber.max(
+                                                  balance.minus(
+                                                      MINIMUM_EGLD_AMT.div(
+                                                          10 ** 18
+                                                      )
+                                                  ),
+                                                  0
+                                              ).toString()
+                                            : balance.toString()
+                                    );
                             }}
                         >
                             {formatAmount(balance.toNumber(), {
