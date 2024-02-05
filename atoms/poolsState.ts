@@ -1,5 +1,5 @@
 import BigNumber from "bignumber.js";
-import { POOLS_MAP_ADDRESS } from "const/pool";
+import pools, { POOLS_MAP_ADDRESS } from "const/pool";
 import { Percent } from "helper/fraction/percent";
 import IPool, { EPoolState, EPoolType } from "interface/pool";
 import { PoolStatsRecord } from "interface/poolStats";
@@ -165,4 +165,19 @@ export const ashRawPoolV2ByAddressQuery = selectorFamily({
         (address: string) =>
         ({ get }) =>
             get(ashswapBaseState).poolsV2.find((p) => p.address === address),
+});
+
+export const activeSwapPoolsAtom = selector({
+    key: "ash_active_swap_pools",
+    get: ({ get }) => {
+        const base = get(ashswapBaseState);
+        const activeMap: Record<string, boolean> = {};
+        base.pools.map((p) => {
+            activeMap[p.address] = p.state === "Active";
+        });
+        base.poolsV2.map((p) => {
+            activeMap[p.address] = p.state === "Active";
+        });
+        return pools.filter((p) => activeMap[p.address]);
+    },
 });
