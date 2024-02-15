@@ -51,17 +51,17 @@ import { toEGLDD, toWei } from "helper/balance";
 import useAGAggregate from "hooks/useAggregator/useAGAggregate";
 import BatchSwapSorRoute from "./components/BatchSwap/BatchSwapSorRoute";
 
+import * as Sentry from "@sentry/nextjs";
 import Avatar from "components/Avatar";
 import Checkbox from "components/Checkbox";
 import { blockTimeMs } from "const/dappConfig";
+import { useDebounce } from "use-debounce";
 import {
-    useAgCgkPrices,
     useAgSor,
     useAgTokenBalance,
+    useAgTokenPrices,
     useXexchangeRouter,
 } from "./hooks";
-import * as Sentry from "@sentry/nextjs";
-import { useDebounce } from "use-debounce";
 const Aggregator = memo(function Aggregator() {
     const [tokenIn, setTokenIn] = useRecoilState(agTokenInAtom);
     const [tokenOut, setTokenOut] = useRecoilState(agTokenOutAtom);
@@ -94,13 +94,15 @@ const Aggregator = memo(function Aggregator() {
         () => [tokenIn.identifier, tokenOut.identifier],
         [tokenIn.identifier, tokenOut.identifier]
     );
-    const cgkPrices = useAgCgkPrices(ids, { refreshInterval: 30_000 });
+    const { data: cgkPrices } = useAgTokenPrices(ids, {
+        refreshInterval: 30_000,
+    });
     const tokenInCgkPrice = useMemo(
-        () => cgkPrices[tokenIn.identifier],
+        () => cgkPrices?.[tokenIn.identifier] || 0,
         [cgkPrices, tokenIn.identifier]
     );
     const tokenOutCgkPrice = useMemo(
-        () => cgkPrices[tokenOut.identifier],
+        () => cgkPrices?.[tokenOut.identifier] || 0,
         [cgkPrices, tokenOut.identifier]
     );
 
@@ -556,12 +558,7 @@ const Aggregator = memo(function Aggregator() {
                                             <div
                                                 className={`${styles.swapResultLabel} flex items-center`}
                                             >
-                                                Price change{" "}
-                                                <Avatar
-                                                    src={ImgCgkIcon}
-                                                    alt="coingecko"
-                                                    className="ml-2 inline-block w-4 h-4"
-                                                />
+                                                Price change
                                             </div>
                                             <div
                                                 className={`text-sm ${
