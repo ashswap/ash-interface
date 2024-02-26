@@ -1,6 +1,6 @@
 import { logout } from "@multiversx/sdk-dapp/utils";
 import ImgDiscord from "assets/images/discord.png";
-import ImgAshPerpBoPBanner from "assets/images/ashperp-bop.jpg";
+import ImgAshswapV2Banner from "assets/images/ashswap-v2-banner.jpeg";
 import ImgTwitter from "assets/images/twitter.png";
 import ICBambooShootSolid from "assets/svg/bamboo-shoot-solid.svg";
 import ICCaretRight from "assets/svg/caret-right.svg";
@@ -278,9 +278,9 @@ const QuestOverview = () => {
     return (
         <>
             <div ref={captchaElRef}></div>
-            <Link href="https://bop.ashswap.io/info" target="_blank">
+            <Link href="https://bit.ly/ashswap-v2" target="_blank">
                 <Image
-                    src={ImgAshPerpBoPBanner}
+                    src={ImgAshswapV2Banner}
                     alt="Ashswap pool v2 banner"
                     className="w-full h-auto"
                 />
