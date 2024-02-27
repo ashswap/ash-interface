@@ -150,6 +150,13 @@ const POOLS_MAINNET: IPool[] = [
         tokens: [TOKENS_MAP["USDT-f8c08c"], TOKENS_MAP["WDAI-9eeb54"], TOKENS_MAP["JWLUSD-62939e"]],
         type: EPoolType.PlainPool,
     },
+    {
+        address:
+            "erd1qqqqqqqqqqqqqpgqp45m86f6xkpd4rr8qgzhdlmwjqeseajm4fvsguk40h",
+        lpToken: TOKENS_MAP["ALP-1d3ebc"],
+        tokens: [TOKENS_MAP["APUSDC-1ac537"], TOKENS_MAP["USDC-c76f1f"]],
+        type: EPoolType.LendingPool,
+    },
 ];
 
 export default POOLS_MAINNET;
