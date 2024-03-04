@@ -17,6 +17,7 @@ function LedgerContainer() {
         return (router.query.callbackUrl as string) || "/";
     }, [router.query]);
     useEffect(() => {
+        console.log(ledgerAccount);
         setIsConfirm(!!ledgerAccount);
     }, [ledgerAccount]);
     useEffect(() => {

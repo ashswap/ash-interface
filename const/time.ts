@@ -13,3 +13,8 @@ export const MONTH_SHORT = [
     "DEC",
 ];
 export const CHART_INTERVAL = ["D", "W", "M"] as const;
+export const CHART_INTERVAL_MAP = {
+    D: "day",
+    W: "week",
+    M: "month",
+};

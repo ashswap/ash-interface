@@ -5,6 +5,9 @@ import { fetcher } from "helper/common";
 import { formatAmount } from "helper/number";
 import useSWR from "swr";
 import AreaChart from "./components/AreaChart";
+import { useState } from "react";
+import { ChartTimeUnitType } from "interface/chart";
+import { CHART_INTERVAL_MAP } from "const/time";
 
 const CustomActiveDot = ({ dotColor, ...props }: any) => {
     const { cx, cy } = props;
@@ -28,11 +31,20 @@ const CustomTooltipCursor = ({ areaRef, ...props }: any) => {
     );
 };
 function OverviewLiquidityChart() {
+    const [unit, setUnit] = useState<ChartTimeUnitType>("D");
     const { data } = useSWR<[number, number][]>(
-        `${ASHSWAP_CONFIG.ashApiBaseUrl}/overview/liquidity`,
+        `${ASHSWAP_CONFIG.ashApiBaseUrl}/overview/liquidity?interval=${CHART_INTERVAL_MAP[unit]}`,
         fetcher
     );
-    return <AreaChart data={data || []} label="liquidity" mode="latest" />;
+    return (
+        <AreaChart
+            data={data || []}
+            label="liquidity"
+            mode="latest"
+            timeUnit={unit}
+            onChangeTimeUnit={setUnit}
+        />
+    );
 }
 
 export default OverviewLiquidityChart;

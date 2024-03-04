@@ -1,17 +1,16 @@
 import BigNumber from "bignumber.js";
 import CardTooltip from "components/Tooltip/CardTooltip";
 import OnboardTooltip from "components/Tooltip/OnboardTooltip";
-import { ACTIVE_FARMS } from "const/farms";
+import { DEFAULT_FARM } from "const/farms";
 import { formatAmount } from "helper/number";
 import { useOnboarding } from "hooks/useOnboarding";
 import useRouteModal from "hooks/useRouteModal";
 import Link from "next/link";
-import React, {
+import {
     createContext,
     useContext,
-    useEffect,
     useMemo,
-    useState,
+    useState
 } from "react";
 
 const Polygon = ({
@@ -403,17 +402,15 @@ const TopLabel = () => {
                                         query: {
                                             p: encode({
                                                 farmAddress:
-                                                    ACTIVE_FARMS[0]
-                                                        .farm_address,
+                                                    DEFAULT_FARM.farm_address,
                                             }),
                                         },
                                     }}
-                                    onClick={close}>
-
+                                    onClick={close}
+                                >
                                     <span className="text-stake-green-500">
                                         calculator
                                     </span>
-
                                 </Link>{" "}
                                 or{" "}
                                 <span className="text-stake-green-500">

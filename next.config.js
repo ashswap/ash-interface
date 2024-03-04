@@ -1,6 +1,8 @@
 const withFonts = require("next-fonts");
 const path = require("path");
-const withReactSvg = require("next-react-svg")({include: path.resolve(__dirname, "assets/svg")});
+const withReactSvg = require("next-react-svg")({
+    include: path.resolve(__dirname, "assets/svg"),
+});
 
 const { withSentryConfig } = require("@sentry/nextjs");
 /** @type {import('next').NextConfig} */
@@ -33,7 +35,8 @@ const config = {
     ) {
         const ignorePathsBase = ["/stake", "/stake/mint"];
         const ignorePaths =
-            process.NEXT_PUBLIC_NETWORK === 'devnet' && process.env.NEXT_PUBLIC_ASH_ENV === "beta"
+            process.NEXT_PUBLIC_NETWORK === "devnet" &&
+            process.env.NEXT_PUBLIC_ASH_ENV === "beta"
                 ? ["/ashpoint"]
                 : [];
         const entries = Object.entries(defaultPathMap)

@@ -158,7 +158,8 @@ class PoolContract extends Contract<typeof poolAbi> {
             receiver,
         ]);
         interaction
-            .withMultiESDTNFTTransfer(tokenPayments).withSender(new Address(sender))
+            .withMultiESDTNFTTransfer(tokenPayments)
+            .withSender(new Address(sender))
             .withGasLimit(
                 type === "PlainPool"
                     ? 10_000_000 + tokenPayments.length * 2_000_000
@@ -176,7 +177,7 @@ class PoolContract extends Contract<typeof poolAbi> {
         ]);
         interaction
             .withSingleESDTTransfer(tokenPayment)
-            .withGasLimit(9_000_000);
+            .withGasLimit(10_000_000);
         return this.interceptInteraction(interaction);
     }
 
@@ -191,7 +192,7 @@ class PoolContract extends Contract<typeof poolAbi> {
         ]);
         interaction
             .withSingleESDTTransfer(tokenPayment)
-            .withGasLimit(15_000_000);
+            .withGasLimit(20_000_000);
         return this.interceptInteraction(interaction);
     }
 

@@ -123,10 +123,7 @@ const POOLS_MAINNET: IPool[] = [
         address:
             "erd1qqqqqqqqqqqqqpgq4hmvs47rnj6n663mteyxyxpw47h2jwsj4fvs74qdvj",
         lpToken: TOKENS_MAP["ALP-19d6c0"],
-        tokens: [
-            TOKENS_MAP["USDC-c76f1f"],
-            TOKENS_MAP["USDT-f8c08c"],
-        ],
+        tokens: [TOKENS_MAP["USDC-c76f1f"], TOKENS_MAP["USDT-f8c08c"]],
         type: EPoolType.PlainPool,
     },
     {
@@ -147,8 +144,19 @@ const POOLS_MAINNET: IPool[] = [
         address:
             "erd1qqqqqqqqqqqqqpgq3ed8p278dm5rlt94kflvgsskkp0ap3jj4fvs3lekwu",
         lpToken: TOKENS_MAP["ALP-45512a"],
-        tokens: [TOKENS_MAP["USDT-f8c08c"], TOKENS_MAP["WDAI-9eeb54"], TOKENS_MAP["JWLUSD-62939e"]],
+        tokens: [
+            TOKENS_MAP["USDT-f8c08c"],
+            TOKENS_MAP["WDAI-9eeb54"],
+            TOKENS_MAP["JWLUSD-62939e"],
+        ],
         type: EPoolType.PlainPool,
+    },
+    {
+        address:
+            "erd1qqqqqqqqqqqqqpgqp45m86f6xkpd4rr8qgzhdlmwjqeseajm4fvsguk40h",
+        lpToken: TOKENS_MAP["ALP-1d3ebc"],
+        tokens: [TOKENS_MAP["APUSDC-1ac537"], TOKENS_MAP["USDC-c76f1f"]],
+        type: EPoolType.LendingPool,
     },
 ];
 

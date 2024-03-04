@@ -153,7 +153,7 @@ function AddressMenu({ infoLayout, dropdownBtn, connectBtn }: AddressMenuProp) {
                                             <button
                                                 className={`w-full py-2 px-4 flex items-center overflow-hidden text-white hover:text-white transition-all font-bold text-xs hover:bg-ash-dark-500`}
                                                 onClick={() => {
-                                                    logoutDapp();
+                                                    logoutDapp("", () => {});
                                                     close();
                                                 }}
                                             >
@@ -204,7 +204,7 @@ function AddressMenu({ infoLayout, dropdownBtn, connectBtn }: AddressMenuProp) {
                                 className="bg-bg rounded-lg px-6 h-12 flex items-center w-full mt-4 text-xs"
                                 onClick={() => {
                                     setMShowMenu(false);
-                                    logoutDapp();
+                                    logoutDapp("", () => {});
                                 }}
                             >
                                 <i className="mr-4">

@@ -1,7 +1,7 @@
 import { offset } from "@popperjs/core";
 import ICChevronDown from "assets/svg/chevron-down.svg";
 import ICGovBoost from "assets/svg/gov-boost.svg";
-import { farmPoolQuery, farmQuery } from "atoms/farmsState";
+import { farmPoolQuery, farmQuery, farmRecordsState } from "atoms/farmsState";
 import { govTotalSupplyVeASHSelector } from "atoms/govState";
 import { poolStatsRefresherAtom } from "atoms/poolsState";
 import BigNumber from "bignumber.js";
@@ -11,7 +11,6 @@ import BasePopover from "components/BasePopover";
 import BoostBar from "components/BoostBar";
 import InputCurrency from "components/InputCurrency";
 import CardTooltip from "components/Tooltip/CardTooltip";
-import { FARMS } from "const/farms";
 import { POOLS_MAP_LP } from "const/pool";
 import { ASH_TOKEN, VE_ASH_DECIMALS } from "const/tokens";
 import { toEGLDD } from "helper/balance";
@@ -20,7 +19,7 @@ import { formatAmount } from "helper/number";
 import { estimateVeASH } from "helper/voteEscrow";
 import useInputNumberString from "hooks/useInputNumberString";
 import { useScreenSize } from "hooks/useScreenSize";
-import { useEffect, useMemo, useState } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
 
 const LOCK_OPTS_BOY = [
@@ -34,6 +33,68 @@ const LOCK_OPTS_MAIN = [
     { value: 365 * 24 * 3600, label: "1 year" },
 ];
 const LOCK_OPTS = LOCK_OPTS_MAIN;
+
+const FarmDropdown = memo(function FarmDropdown({
+    farmAddress,
+    onChange,
+}: {
+    farmAddress: string;
+    onChange: (val: string) => void;
+}) {
+    const pool = useRecoilValue(farmPoolQuery(farmAddress));
+    const farmRecords = useRecoilValue(farmRecordsState);
+    const activeAshFarms = useMemo(
+        () => farmRecords.filter((f) => f.ashPerSec.gt(0)),
+        [farmRecords]
+    );
+    return (
+        <BasePopover
+            className="absolute text-white left-0 top-2 w-max overflow-auto bg-ash-dark-700 "
+            options={{
+                placement: "bottom-start",
+                modifiers: [{ ...offset, options: { offset: [0, 8] } }],
+            }}
+            button={() => (
+                <div className="text-xs sm:text-sm font-bold text-stake-gray-500 cursor-pointer flex">
+                    {pool ? (
+                        <>{pool.tokens.map((t) => t.symbol).join(" - ")}</>
+                    ) : (
+                        <>Select farm to start</>
+                    )}
+                    <ICChevronDown className="w-2 h-auto ml-1" />
+                </div>
+            )}
+        >
+            {({ close }) => {
+                return (
+                    <ul className="py-6 max-h-[400px] overflow-auto">
+                        {activeAshFarms.map((f) => {
+                            const _pool = POOLS_MAP_LP[f.farm.farming_token_id];
+                            return (
+                                <li key={f.farm.farm_address} className="relative">
+                                    <button
+                                        className="w-full py-3 text-left px-6 text-xs font-bold"
+                                        onClick={() => {
+                                            onChange(f.farm.farm_address);
+                                            close();
+                                        }}
+                                    >
+                                        {_pool.tokens
+                                            .map((t) => t.symbol)
+                                            .join(" - ")}
+                                    </button>
+                                    {f.farm.farm_address === farmAddress && (
+                                        <span className="absolute w-[3px] h-5 bg-ash-cyan-500 top-1/2 -translate-y-1/2 left-0"></span>
+                                    )}
+                                </li>
+                            );
+                        })}
+                    </ul>
+                );
+            }}
+        </BasePopover>
+    );
+});
 
 type BoostCalcProps = { farmAddress?: string };
 const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
@@ -209,64 +270,10 @@ const BoostCalc = ({ farmAddress: farmAddressProp }: BoostCalcProps) => {
                                 );
                             })}
                     </div>
-                    <BasePopover
-                        className="absolute text-white left-0 top-2 w-max overflow-auto bg-ash-dark-700 "
-                        options={{
-                            placement: "bottom-start",
-                            modifiers: [
-                                { ...offset, options: { offset: [0, 8] } },
-                            ],
-                        }}
-                        button={() => (
-                            <div className="text-xs sm:text-sm font-bold text-stake-gray-500 cursor-pointer flex">
-                                {pool ? (
-                                    <>
-                                        {pool.tokens
-                                            .map((t) => t.symbol)
-                                            .join(" - ")}
-                                    </>
-                                ) : (
-                                    <>Select farm to start</>
-                                )}
-                                <ICChevronDown className="w-2 h-auto ml-1" />
-                            </div>
-                        )}
-                    >
-                        {({ close }) => {
-                            return (
-                                <ul className="py-6">
-                                    {FARMS.map((f) => {
-                                        const _pool =
-                                            POOLS_MAP_LP[f.farming_token_id];
-                                        return (
-                                            <li
-                                                key={f.farm_address}
-                                                className="relative"
-                                            >
-                                                <button
-                                                    className="w-full py-3 text-left px-6 text-xs font-bold"
-                                                    onClick={() => {
-                                                        setFarmAddress(
-                                                            f.farm_address
-                                                        );
-                                                        close();
-                                                    }}
-                                                >
-                                                    {_pool.tokens
-                                                        .map((t) => t.symbol)
-                                                        .join(" - ")}
-                                                </button>
-                                                {f.farm_address ===
-                                                    farmAddress && (
-                                                    <span className="absolute w-[3px] h-5 bg-ash-cyan-500 top-1/2 -translate-y-1/2 left-0"></span>
-                                                )}
-                                            </li>
-                                        );
-                                    })}
-                                </ul>
-                            );
-                        }}
-                    </BasePopover>
+                    <FarmDropdown
+                        farmAddress={farmAddress || ""}
+                        onChange={(val) => setFarmAddress(val)}
+                    />
                 </div>
                 <div className="text-right text-2xl font-bold text-white ml-4">
                     Calculate your boost

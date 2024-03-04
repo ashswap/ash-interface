@@ -43,15 +43,26 @@ type Props = {
     mode?: Parameters<typeof useValueChart>[2];
     label?: React.ReactNode;
     hideInfo?: boolean;
+    timeUnit?: ChartTimeUnitType;
+    onChangeTimeUnit?: (val: ChartTimeUnitType) => void;
 };
-function AreaChart({ data, maxRecords, mode = "sum", label, hideInfo }: Props) {
+function AreaChart({
+    data,
+    maxRecords,
+    mode = "sum",
+    label,
+    hideInfo,
+    timeUnit = "D",
+    onChangeTimeUnit: setTimeUnit,
+}: Props) {
     const areaRef = useRef<any>(null);
-    const [timeUnit, setTimeUnit] = useState<ChartTimeUnitType>("D");
     const [activePayload, setActivePayload] = useState<ValueChartRecord>();
     const { sm } = useScreenSize();
     const chartData = useMemo(() => {
         if (!data) return [];
-        return data.map(([timestamp, value]) => ({ timestamp, value }));
+        return (
+            data?.map?.(([timestamp, value]) => ({ timestamp, value })) || []
+        );
     }, [data]);
     const { displayChartData, timestampTicks: ticks } = useValueChart(
         chartData,
@@ -95,7 +106,7 @@ function AreaChart({ data, maxRecords, mode = "sum", label, hideInfo }: Props) {
                     <PrimitiveAreaChart
                         data={displayChartData}
                         onMouseLeave={() => setActivePayload(undefined)}
-                        onMouseMove={(e) =>
+                        onMouseMove={(e: any) =>
                             setActivePayload(e?.activePayload?.[0]?.payload)
                         }
                     >
@@ -207,7 +218,7 @@ function AreaChart({ data, maxRecords, mode = "sum", label, hideInfo }: Props) {
                                     ? "text-white"
                                     : "text-ash-gray-500"
                             }`}
-                            onClick={() => setTimeUnit(unit)}
+                            onClick={() => setTimeUnit?.(unit)}
                         >
                             {unit}
                         </button>

@@ -1,10 +1,19 @@
 import {
     useGetLoginInfo,
     useSignTransactions,
+    useSignTransactionsWithDevice,
 } from "@multiversx/sdk-dapp/hooks";
 import { LoginMethodsEnum } from "@multiversx/sdk-dapp/types";
 import { Transition } from "@headlessui/react";
-import { Fragment, useMemo } from "react";
+import { Fragment, memo, useMemo } from "react";
+const SignTxsWithLedger = memo(function SignTxsWithLedger() {
+    useSignTransactionsWithDevice({
+        onCancel: () => {
+            console.error({ desc: "User reject the transaction" });
+        },
+    });
+    return null;
+});
 // listen for the txs to be signed in queue, if the queue is not empty prompt the modal for user
 function SignTxsModal() {
     // ! useSignTransactions auto invoke provider for signing hence just use the hook only in once place globlally
@@ -36,6 +45,7 @@ function SignTxsModal() {
     }, [loginMethod]);
     return (
         <>
+            {loginMethod === LoginMethodsEnum.ledger && <SignTxsWithLedger />}
             <Transition
                 show={!!hasTransactions}
                 as={Fragment}

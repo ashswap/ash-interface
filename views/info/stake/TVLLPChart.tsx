@@ -1,7 +1,7 @@
 import { ChartActiveDot } from "components/Chart/ChartActiveDot";
 import { ChartLineX } from "components/Chart/ChartLineX";
 import { ASHSWAP_CONFIG } from "const/ashswapConfig";
-import { CHART_INTERVAL, MONTH_SHORT } from "const/time";
+import { CHART_INTERVAL, CHART_INTERVAL_MAP, MONTH_SHORT } from "const/time";
 import { fetcher } from "helper/common";
 import { formatAmount } from "helper/number";
 import { useScreenSize } from "hooks/useScreenSize";
@@ -41,8 +41,9 @@ const CustomTooltipCursor = ({ areaRef, ...props }: any) => {
     );
 };
 function TVLLPChart() {
+    const [timeUnit, setTimeUnit] = useState<ChartTimeUnitType>("D");
     const { data } = useSWR<[number, number][]>(
-        `${ASHSWAP_CONFIG.ashApiBaseUrl}/stake/farming/graph-statistic?type=liquidity`,
+        `${ASHSWAP_CONFIG.ashApiBaseUrl}/stake/farming/graph-statistic?type=liquidity&interval=${CHART_INTERVAL_MAP[timeUnit]}`,
         fetcher,
         { refreshInterval: 5 * 60 * 1000 }
     );
@@ -51,7 +52,6 @@ function TVLLPChart() {
         useState<{ timestamp: number; value: number }>();
 
     const { sm } = useScreenSize();
-    const [timeUnit, setTimeUnit] = useState<ChartTimeUnitType>("D");
 
     const chartData = useMemo(() => {
         if (!data) return [];
@@ -85,7 +85,7 @@ function TVLLPChart() {
                     <AreaChart
                         data={displayChartData}
                         onMouseLeave={() => setActivePayload(undefined)}
-                        onMouseMove={(e) =>
+                        onMouseMove={(e: any) =>
                             setActivePayload(e?.activePayload?.[0])
                         }
                     >
