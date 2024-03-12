@@ -46,6 +46,7 @@ function ConnectWalletModal() {
     const [isOpenDownloadApp, setIsOpenDownloadApp] = useState(false);
     const [extensionLogin] = useExtensionLogin({
         callbackRoute: "",
+        nativeAuth: true,
     });
     const dappCore = useRecoilValue(dappCoreState);
     const router = useRouter();
