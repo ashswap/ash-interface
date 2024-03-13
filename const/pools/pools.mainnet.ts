@@ -157,6 +157,26 @@ const POOLS_MAINNET: IPool[] = [
         tokens: [TOKENS_MAP["APUSDC-1ac537"], TOKENS_MAP["USDC-c76f1f"]],
         type: EPoolType.LendingPool,
     },
+    {
+        address:
+            "erd1qqqqqqqqqqqqqpgqfl4h9hce5lqqnsc8fajavskcpkteqcs24fvs4s3x3n",
+        lpToken: TOKENS_MAP["ALP-e05567"],
+        tokens: [
+            TOKENS_MAP["WETH-b4ca29"],
+            TOKENS_MAP["JWLETH-e458bc"],
+        ],
+        type: EPoolType.PlainPool,
+    },
+    {
+        address:
+            "erd1qqqqqqqqqqqqqpgqm08htvhn2dx5hg58euufadatnjkzrdgk4fvsagvpq0",
+        lpToken: TOKENS_MAP["ALP-ba9b1b"],
+        tokens: [
+            TOKENS_MAP["WBTC-5349b3"],
+            TOKENS_MAP["JWLBTC-c80796"],
+        ],
+        type: EPoolType.PlainPool,
+    },
 ];
 
 export default POOLS_MAINNET;
