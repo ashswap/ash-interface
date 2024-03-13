@@ -14,12 +14,17 @@ import IconEPUNKS from "assets/images/epunks-icon.png";
 import IconWSDAI from "assets/images/wsdai-icon.png";
 import IconDNA from "assets/images/dna-icon.png";
 import IconDAI from "assets/images/dai-icon.png";
+import IconBTC from "assets/images/btc-icon.png";
+import IconETH from "assets/images/eth-icon.png";
+import IconAPUSDC from "assets/images/apusdc-icon.png";
 import IconJWLASH from "assets/images/jwlash-icon.png";
 import IconJWLEGLD from "assets/images/jwlegld-icon.png";
 import IconJWLHTM from "assets/images/jwlhtm-icon.png";
 import IconJWLMEX from "assets/images/jwlmex-icon.png";
 import IconJWLUSD from "assets/images/jwlusd-icon.png";
 import IconJWLUTK from "assets/images/jwlutk-icon.png";
+import IconJWLETH from "assets/images/jwleth-icon.png";
+import IconJWLBTC from "assets/images/jwlbtc-icon.png";
 import { ChainId, IESDTInfo } from "helper/token/token";
 const TOKENS_ALIAS: Record<"EGLD" | "ASH" | "wEGLD", IESDTInfo> = {
     EGLD: {
@@ -203,6 +208,46 @@ const TOKENS: IESDTInfo[] = [
         decimals: 18,
         logoURI: IconDAI.src,
     },
+    {
+        identifier: "APUSDC-1ac537",
+        chainId: ChainId.Mainnet,
+        symbol: "APUSDC",
+        name: "APUSDC",
+        decimals: 6,
+        logoURI: IconAPUSDC.src,
+    },
+    {
+        identifier: "WETH-b4ca29",
+        chainId: ChainId.Mainnet,
+        symbol: "WETH",
+        name: "WETH",
+        decimals: 18,
+        logoURI: IconETH.src,
+    },
+    {
+        identifier: "WBTC-5349b3",
+        chainId: ChainId.Mainnet,
+        symbol: "WBTC",
+        name: "WBTC",
+        decimals: 8,
+        logoURI: IconBTC.src,
+    },
+    {
+        identifier: "JWLETH-e458bc",
+        chainId: ChainId.Mainnet,
+        symbol: "JWLETH",
+        name: "JWLETH",
+        decimals: 18,
+        logoURI: IconJWLETH.src,
+    },
+    {
+        identifier: "JWLBTC-c80796",
+        chainId: ChainId.Mainnet,
+        symbol: "JWLBTC",
+        name: "JWLBTC",
+        decimals: 18,
+        logoURI: IconJWLBTC.src,
+    },
 ];
 
 const LP_TOKENS: IESDTInfo[] = [
@@ -344,6 +389,27 @@ const LP_TOKENS: IESDTInfo[] = [
         identifier: "ALP-45512a",
         chainId: ChainId.Mainnet,
         symbol: "ALP-USDT-WDAI-JWLUSD",
+        name: "Ashswap LP",
+        decimals: 18,
+    },
+    {
+        identifier: "ALP-1d3ebc",
+        chainId: ChainId.Mainnet,
+        symbol: "ALP-APUSDC-USDC",
+        name: "Ashswap LP",
+        decimals: 18,
+    },
+    {
+        identifier: "ALP-e05567",
+        chainId: ChainId.Mainnet,
+        symbol: "ALP-JWLETH-WETH",
+        name: "Ashswap LP",
+        decimals: 18,
+    },
+    {
+        identifier: "ALP-ba9b1b",
+        chainId: ChainId.Mainnet,
+        symbol: "ALP-JWLBTC-WBTC",
         name: "Ashswap LP",
         decimals: 18,
     },
