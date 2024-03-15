@@ -1,4 +1,3 @@
-import ImgCgkIcon from "assets/images/coingecko-icon.webp";
 import Fire from "assets/images/fire.png";
 import ICArrowDownRounded from "assets/svg/arrow-down-rounded.svg";
 import ICArrowRight from "assets/svg/arrow-right.svg";
@@ -48,13 +47,12 @@ import {
 import SwapAmount from "./components/SwapAmount";
 
 import { toEGLDD, toWei } from "helper/balance";
-import useAGAggregate from "hooks/useAggregator/useAGAggregate";
 import BatchSwapSorRoute from "./components/BatchSwap/BatchSwapSorRoute";
 
 import * as Sentry from "@sentry/nextjs";
-import Avatar from "components/Avatar";
 import Checkbox from "components/Checkbox";
 import { blockTimeMs } from "const/dappConfig";
+import useAGV2Aggregate from "hooks/useAggregator/useAgAggregateV2";
 import { useDebounce } from "use-debounce";
 import {
     useAgSor,
@@ -150,8 +148,8 @@ const Aggregator = memo(function Aggregator() {
     const [isConfirmSwapAnyway, setIsConfirmSwapAnyway] = useState(false);
     const {
         aggregate,
-        trackingData: { isPending: swapping },
-    } = useAGAggregate(true);
+        trackingData: { isSending: swapping },
+    } = useAGV2Aggregate(true);
 
     const connectWallet = useConnectWallet();
     const loggedIn = useRecoilValue(accIsLoggedInState);

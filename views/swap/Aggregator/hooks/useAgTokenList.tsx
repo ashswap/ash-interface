@@ -6,11 +6,14 @@ const useAgTokenList = (swrConfig: SWRConfiguration = {}) => {
     const res = useSWR<
         Array<{ id: string; decimal?: number; coingeckoId?: string }>
     >(
-        `${ENVIRONMENT.AG_API}/tokens`,
+        `${ENVIRONMENT.AG_API}/v2/tokens`,
         (url) =>
-            fetcher([url, {
-                headers: { "authen-token": ENVIRONMENT.AG_TOKEN_SECRET },
-            }]).then(data => Array.isArray(data) ? data : []),
+            fetcher([
+                url,
+                {
+                    headers: { "authen-token": ENVIRONMENT.AG_TOKEN_SECRET },
+                },
+            ]).then((data) => (Array.isArray(data) ? data : [])),
         {
             fallback: [],
             ...swrConfig,

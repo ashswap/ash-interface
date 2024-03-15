@@ -1,4 +1,6 @@
+import { ASHSWAP_CONFIG } from "const/ashswapConfig";
 import AggregatorContract from "./aggregatorContract";
+import AggregatorV2Contract from "./aggregatorContractV2";
 import DAOBribeContract from "./daoBribeContract";
 import DAOContract from "./daoContract";
 import FarmBribeContract from "./farmBribeContract";
@@ -25,6 +27,7 @@ const routerContracts: Record<string, RouterContract> = {};
 const farmRouterContracts: Record<string, FarmRouterContract> = {};
 const daoBribeContracts: Record<string, DAOBribeContract> = {};
 const aggregatorContracts: Record<string, AggregatorContract> = {};
+const aggregatorV2Contracts: Record<string, AggregatorV2Contract> = {};
 const getPoolContract = (address: string) => {
     return (
         poolContracts[address] ??
@@ -106,6 +109,13 @@ const getAggregatorContract = (address: string) => {
         (aggregatorContracts[address] = new AggregatorContract(address))
     );
 };
+const getAggregatorV2Contract = (_address?: string) => {
+    const address = _address || ASHSWAP_CONFIG.dappContract.aggregatorV2;
+    return (
+        aggregatorV2Contracts[address] ??
+        (aggregatorV2Contracts[address] = new AggregatorV2Contract(address))
+    );
+};
 
 export const ContractManager = {
     getPoolContract,
@@ -121,4 +131,5 @@ export const ContractManager = {
     getFarmRouterContract,
     getDAOBribeContract,
     getAggregatorContract,
+    getAggregatorV2Contract,
 };

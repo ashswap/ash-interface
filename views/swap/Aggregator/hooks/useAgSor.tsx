@@ -2,7 +2,6 @@ import BigNumber from "bignumber.js";
 import { blockTimeMs } from "const/dappConfig";
 import { ENVIRONMENT } from "const/env";
 import { fetcher } from "helper/common";
-import { getTokenIdFromCoin } from "helper/token";
 import { useMemo } from "react";
 import useSWR, { SWRConfiguration } from "swr";
 import { SorSwapResponse } from "../interfaces/swapInfo";
@@ -15,8 +14,8 @@ const useAgSor = (
 ) => {
     const params = useMemo(() => {
         const params = {
-            from: getTokenIdFromCoin(tokenIn),
-            to: getTokenIdFromCoin(tokenOut),
+            from: tokenIn,
+            to: tokenOut,
             amount: amtIn,
         };
         if (
@@ -25,7 +24,7 @@ const useAgSor = (
             new BigNumber(amtIn).gt(0) &&
             params.from !== params.to
         ) {
-            return [`${ENVIRONMENT.AG_API}/aggregate`, params];
+            return [`${ENVIRONMENT.AG_API}/v2/aggregate`, params];
         }
         return null;
     }, [amtIn, tokenIn, tokenOut]);
@@ -33,9 +32,12 @@ const useAgSor = (
         params,
         async ([url, params]) => {
             const searchParams = new URLSearchParams(params);
-            return fetcher([`${url}?${searchParams}`, {
-                headers: { "authen-token": ENVIRONMENT.AG_TOKEN_SECRET },
-            }]);
+            return fetcher([
+                `${url}?${searchParams}`,
+                {
+                    headers: { "authen-token": ENVIRONMENT.AG_TOKEN_SECRET },
+                },
+            ]);
         },
         { refreshInterval: blockTimeMs, ...swrConfig }
     );
