@@ -18,7 +18,12 @@
     },
     "name": "AggregatorContract",
     "constructor": {
-        "inputs": [],
+        "inputs": [
+            {
+                "name": "fee_address",
+                "type": "Address"
+            }
+        ],
         "outputs": []
     },
     "endpoints": [
@@ -58,65 +63,7 @@
             ]
         },
         {
-            "name": "getClaimabeProtocolFee",
-            "mutability": "readonly",
-            "inputs": [
-                {
-                    "name": "protocol",
-                    "type": "Address"
-                },
-                {
-                    "name": "from_idx",
-                    "type": "u64"
-                },
-                {
-                    "name": "to_idx",
-                    "type": "u64"
-                }
-            ],
-            "outputs": [
-                {
-                    "type": "List<TokenAmount>"
-                }
-            ]
-        },
-        {
-            "name": "registerProtocolFee",
-            "onlyOwner": true,
-            "mutability": "mutable",
-            "inputs": [
-                {
-                    "name": "fee_percent",
-                    "type": "u64"
-                },
-                {
-                    "name": "whitelist_address",
-                    "type": "Address"
-                }
-            ],
-            "outputs": []
-        },
-        {
-            "name": "getClaimabeAshswapFee",
-            "mutability": "readonly",
-            "inputs": [
-                {
-                    "name": "from_idx",
-                    "type": "u64"
-                },
-                {
-                    "name": "to_idx",
-                    "type": "u64"
-                }
-            ],
-            "outputs": [
-                {
-                    "type": "List<TokenAmount>"
-                }
-            ]
-        },
-        {
-            "name": "getAshswapFeeAddress",
+            "name": "getFeeAddress",
             "mutability": "readonly",
             "inputs": [],
             "outputs": [
@@ -124,90 +71,6 @@
                     "type": "Address"
                 }
             ]
-        },
-        {
-            "name": "registerAshswapFee",
-            "onlyOwner": true,
-            "mutability": "mutable",
-            "inputs": [
-                {
-                    "name": "fee_percent",
-                    "type": "u64"
-                },
-                {
-                    "name": "whitelist_address",
-                    "type": "Address"
-                }
-            ],
-            "outputs": []
-        },
-        {
-            "name": "getProtocolFeePercent",
-            "mutability": "readonly",
-            "inputs": [
-                {
-                    "name": "address",
-                    "type": "Address"
-                }
-            ],
-            "outputs": [
-                {
-                    "type": "u64"
-                }
-            ]
-        },
-        {
-            "name": "getAshswapFeePercent",
-            "mutability": "readonly",
-            "inputs": [],
-            "outputs": [
-                {
-                    "type": "u64"
-                }
-            ]
-        },
-        {
-            "name": "claimProtocolFee",
-            "mutability": "mutable",
-            "inputs": [
-                {
-                    "name": "protocol",
-                    "type": "Address"
-                }
-            ],
-            "outputs": []
-        },
-        {
-            "name": "claimProtocolFeeByTokens",
-            "mutability": "mutable",
-            "inputs": [
-                {
-                    "name": "protocol",
-                    "type": "Address"
-                },
-                {
-                    "name": "tokens",
-                    "type": "List<EgldOrEsdtTokenIdentifier>"
-                }
-            ],
-            "outputs": []
-        },
-        {
-            "name": "claimAshswapFee",
-            "mutability": "mutable",
-            "inputs": [],
-            "outputs": []
-        },
-        {
-            "name": "claimAshswapFeeByTokens",
-            "mutability": "mutable",
-            "inputs": [
-                {
-                    "name": "tokens",
-                    "type": "List<EgldOrEsdtTokenIdentifier>"
-                }
-            ],
-            "outputs": []
         }
     ],
     "events": [
@@ -281,19 +144,6 @@
                 {
                     "name": "token_nonce",
                     "type": "u64"
-                },
-                {
-                    "name": "amount",
-                    "type": "BigUint"
-                }
-            ]
-        },
-        "TokenAmount": {
-            "type": "struct",
-            "fields": [
-                {
-                    "name": "token",
-                    "type": "EgldOrEsdtTokenIdentifier"
                 },
                 {
                     "name": "amount",

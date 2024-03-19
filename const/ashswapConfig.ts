@@ -90,7 +90,7 @@ const dappContractDevnet2: DappContracts = {
     aggregator:
         "erd1qqqqqqqqqqqqqpgqzshqdqcdzdl43vhy7p7q8uhc5xzu5x7zh2usyz5kg6",
     aggregatorV2:
-        "erd1qqqqqqqqqqqqqpgqvzupy3y6h6rtc8jhtel4xcg0n5r2vmv5h2uss509am",
+        "erd1qqqqqqqqqqqqqpgqqwmpyvgu6htky6a37nvuds4aemzzmw7vh2uscqf7jv",
 };
 
 const dappContract =
