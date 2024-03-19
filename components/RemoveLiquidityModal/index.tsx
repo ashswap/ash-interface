@@ -152,6 +152,9 @@ const RemoveLPContent = ({ open, onClose, poolData }: Props) => {
                                 new Fraction(
                                     poolData.swapFeePercent || 0,
                                     100_000
+                                ),
+                                poolData.underlyingPrices?.map(
+                                    (p) => new BigNumber(p)
                                 )
                             );
                         output = withdrawAmount.raw;
