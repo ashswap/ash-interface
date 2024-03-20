@@ -71,7 +71,8 @@ const dappContractMainnet: DappContracts = {
     daoBribe: "erd1qqqqqqqqqqqqqpgqzsmhsv625er2w6w7rel7kmustn3u838f4fvs36jdmc",
     aggregator:
         "erd1qqqqqqqqqqqqqpgqcc69ts8409p3h77q5chsaqz57y6hugvc4fvs64k74v",
-    aggregatorV2: "",
+    aggregatorV2:
+        "erd1qqqqqqqqqqqqqpgqn3werhpp36zc9efne6tzde5md3gptsax4fvsnpx6zr",
 };
 
 const dappContractDevnet2: DappContracts = {
