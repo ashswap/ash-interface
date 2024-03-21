@@ -128,13 +128,11 @@ const TokenSelect = ({
                     </div>
                 </div>
 
-                <div className="grow overflow-auto px-6 pb-7 min-h-[35vh] sm:min-h-[initial]">
-                    <ListToken
-                        className=""
-                        items={filteredTokenBalances}
-                        onSelect={(t) => onSelectToken(t.token)}
-                    />
-                </div>
+                <ListToken
+                    className="grow px-6 pb-7 min-h-[35vh] sm:min-h-[500px]"
+                    items={filteredTokenBalances}
+                    onSelect={(t) => onSelectToken(t.token)}
+                />
             </BaseModal>
         </>
     );
