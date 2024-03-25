@@ -177,6 +177,13 @@ const POOLS_MAINNET: IPool[] = [
         ],
         type: EPoolType.PlainPool,
     },
+    {
+        address:
+            "erd1qqqqqqqqqqqqqpgqpckcx4mns62qgcpgage7zp95fphvfmf84fvsez6cjz",
+        lpToken: TOKENS_MAP["ALP-be468d"],
+        tokens: [TOKENS_MAP["JWLXMEX-7df4db"], TOKENS_MAP["JWLMEX-ef8788"]],
+        type: EPoolType.PoolV2,
+    },
 ];
 
 export default POOLS_MAINNET;

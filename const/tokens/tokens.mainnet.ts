@@ -21,6 +21,7 @@ import IconJWLASH from "assets/images/jwlash-icon.png";
 import IconJWLEGLD from "assets/images/jwlegld-icon.png";
 import IconJWLHTM from "assets/images/jwlhtm-icon.png";
 import IconJWLMEX from "assets/images/jwlmex-icon.png";
+import IconJWLXMEX from "assets/images/jwlxmex-icon.png";
 import IconJWLUSD from "assets/images/jwlusd-icon.png";
 import IconJWLUTK from "assets/images/jwlutk-icon.png";
 import IconJWLETH from "assets/images/jwleth-icon.png";
@@ -159,6 +160,14 @@ const TOKENS: IESDTInfo[] = [
         name: "JewelLockedMEX",
         decimals: 18,
         logoURI: IconJWLMEX.src,
+    },
+    {
+        identifier: "JWLXMEX-7df4db",
+        chainId: ChainId.Mainnet,
+        symbol: "JWLXMEX",
+        name: "JewelLockedXMEX",
+        decimals: 18,
+        logoURI: IconJWLXMEX.src,
     },
     {
         identifier: "JWLUSD-62939e",
@@ -410,6 +419,13 @@ const LP_TOKENS: IESDTInfo[] = [
         identifier: "ALP-ba9b1b",
         chainId: ChainId.Mainnet,
         symbol: "ALP-JWLBTC-WBTC",
+        name: "Ashswap LP",
+        decimals: 18,
+    },
+    {
+        identifier: "ALP-be468d",
+        chainId: ChainId.Mainnet,
+        symbol: "ALP-JWLMEX-JWLXMEX",
         name: "Ashswap LP",
         decimals: 18,
     },
