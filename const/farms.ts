@@ -577,6 +577,17 @@ const mainnet: IFarm[] = [
         farm_token_decimal: 18,
         active: true,
     },
+    {
+        farm_address:
+            "erd1qqqqqqqqqqqqqpgqutfg240y3neq0ec3lk9smr6zzp72aq0w4fvsh5yx7m",
+        reward_token_id: "ASH-a642d1",
+        reward_token_decimal: 18,
+        farming_token_id: "ALP-2ff298",
+        farming_token_decimal: 18,
+        farm_token_id: "FARM-b19aec",
+        farm_token_decimal: 18,
+        active: true,
+    },
 ];
 
 export const FARMS =
@@ -589,5 +600,10 @@ export const ACTIVE_FARMS = FARMS.filter((f) => f.active);
 export const FARMS_MAP = Object.fromEntries(
     FARMS.map((f) => [f.farm_address, f])
 );
-export const DEFAULT_FARM = ENVIRONMENT.NETWORK === "mainnet" ? FARMS_MAP["erd1qqqqqqqqqqqqqpgq5aj8pk57h6d083c6qsc49gm8f649vhcs4fvsrh3m75"] : FARMS[0];
+export const DEFAULT_FARM =
+    ENVIRONMENT.NETWORK === "mainnet"
+        ? FARMS_MAP[
+              "erd1qqqqqqqqqqqqqpgq5aj8pk57h6d083c6qsc49gm8f649vhcs4fvsrh3m75"
+          ]
+        : FARMS[0];
 export const FARM_DIV_SAFETY_CONST = 1_000_000_000_000;

@@ -123,10 +123,7 @@ const POOLS_MAINNET: IPool[] = [
         address:
             "erd1qqqqqqqqqqqqqpgq4hmvs47rnj6n663mteyxyxpw47h2jwsj4fvs74qdvj",
         lpToken: TOKENS_MAP["ALP-19d6c0"],
-        tokens: [
-            TOKENS_MAP["USDC-c76f1f"],
-            TOKENS_MAP["USDT-f8c08c"],
-        ],
+        tokens: [TOKENS_MAP["USDC-c76f1f"], TOKENS_MAP["USDT-f8c08c"]],
         type: EPoolType.PlainPool,
     },
     {
@@ -147,7 +144,11 @@ const POOLS_MAINNET: IPool[] = [
         address:
             "erd1qqqqqqqqqqqqqpgq3ed8p278dm5rlt94kflvgsskkp0ap3jj4fvs3lekwu",
         lpToken: TOKENS_MAP["ALP-45512a"],
-        tokens: [TOKENS_MAP["USDT-f8c08c"], TOKENS_MAP["WDAI-9eeb54"], TOKENS_MAP["JWLUSD-62939e"]],
+        tokens: [
+            TOKENS_MAP["USDT-f8c08c"],
+            TOKENS_MAP["WDAI-9eeb54"],
+            TOKENS_MAP["JWLUSD-62939e"],
+        ],
         type: EPoolType.PlainPool,
     },
     {
@@ -161,20 +162,14 @@ const POOLS_MAINNET: IPool[] = [
         address:
             "erd1qqqqqqqqqqqqqpgqfl4h9hce5lqqnsc8fajavskcpkteqcs24fvs4s3x3n",
         lpToken: TOKENS_MAP["ALP-e05567"],
-        tokens: [
-            TOKENS_MAP["WETH-b4ca29"],
-            TOKENS_MAP["JWLETH-e458bc"],
-        ],
+        tokens: [TOKENS_MAP["WETH-b4ca29"], TOKENS_MAP["JWLETH-e458bc"]],
         type: EPoolType.PlainPool,
     },
     {
         address:
             "erd1qqqqqqqqqqqqqpgqm08htvhn2dx5hg58euufadatnjkzrdgk4fvsagvpq0",
         lpToken: TOKENS_MAP["ALP-ba9b1b"],
-        tokens: [
-            TOKENS_MAP["WBTC-5349b3"],
-            TOKENS_MAP["JWLBTC-c80796"],
-        ],
+        tokens: [TOKENS_MAP["WBTC-5349b3"], TOKENS_MAP["JWLBTC-c80796"]],
         type: EPoolType.PlainPool,
     },
     {
@@ -182,6 +177,13 @@ const POOLS_MAINNET: IPool[] = [
             "erd1qqqqqqqqqqqqqpgqpckcx4mns62qgcpgage7zp95fphvfmf84fvsez6cjz",
         lpToken: TOKENS_MAP["ALP-be468d"],
         tokens: [TOKENS_MAP["JWLXMEX-7df4db"], TOKENS_MAP["JWLMEX-ef8788"]],
+        type: EPoolType.PoolV2,
+    },
+    {
+        address:
+            "erd1qqqqqqqqqqqqqpgqxn6hj5m9x33zuq0xynjkusd8tsz3u6a94fvsn2m2ry",
+        lpToken: TOKENS_MAP["ALP-2ff298"],
+        tokens: [TOKENS_MAP["USDC-c76f1f"], TOKENS_MAP["WTAO-4f5363"]],
         type: EPoolType.PoolV2,
     },
 ];
