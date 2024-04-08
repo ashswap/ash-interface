@@ -90,6 +90,8 @@ function AreaChart({
         if (!payload) return "";
         if (timeUnit === "D")
             return moment.unix(payload.timestamp).format("DD MMM, yyyy");
+        if (timeUnit === "M")
+            return moment.unix(payload.timestamp).format("MMMM, yyyy");
         if (payload?.range) {
             const [start, end] = payload.range;
             return `${moment.unix(start).format("DD MMM")} - ${moment
