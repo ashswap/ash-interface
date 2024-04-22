@@ -27,6 +27,8 @@ import IconJWLUTK from "assets/images/jwlutk-icon.png";
 import IconJWLETH from "assets/images/jwleth-icon.png";
 import IconJWLBTC from "assets/images/jwlbtc-icon.png";
 import IconWTAO from "assets/images/wtao-icon.png";
+import ImgRAREToken from "assets/images/rare-icon.png";
+
 import { ChainId, IESDTInfo } from "helper/token/token";
 const TOKENS_ALIAS: Record<"EGLD" | "ASH" | "wEGLD", IESDTInfo> = {
     EGLD: {
@@ -266,6 +268,14 @@ const TOKENS: IESDTInfo[] = [
         decimals: 9,
         logoURI: IconWTAO.src,
     },
+    {
+        identifier: 'RARE-99e8b0',
+        chainId: ChainId.Mainnet,
+        symbol: 'RARE',
+        name: 'RARE',
+        decimals: 18,
+        logoURI: ImgRAREToken.src,
+    },
 ];
 
 const LP_TOKENS: IESDTInfo[] = [
@@ -443,6 +453,13 @@ const LP_TOKENS: IESDTInfo[] = [
         chainId: ChainId.Mainnet,
         symbol: "ALP-USDC-WTAO",
         name: "Ashswap LP",
+        decimals: 18,
+    },
+    {
+        identifier: 'ALP-c532ff',
+        chainId: ChainId.Mainnet,
+        symbol: 'ALP-RARE-ASH',
+        name: 'Ashswap LP',
         decimals: 18,
     },
 ];
