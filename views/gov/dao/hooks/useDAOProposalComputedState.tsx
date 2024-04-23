@@ -39,10 +39,11 @@ const useDAOProposalComputedState = (proposal: DAOProposal) => {
     }, [proposal.no_vote, proposal.yes_vote]);
     const quorumPct = useMemo(() => {
         return new BigNumber(proposal.yes_vote)
+            .plus(new BigNumber(proposal.no_vote))
             .multipliedBy(100)
             .div(proposal.total_supply)
             .toNumber();
-    }, [proposal.total_supply, proposal.yes_vote]);
+    }, [proposal.no_vote, proposal.total_supply, proposal.yes_vote]);
     const startVoteTS = useMemo(() => {
         return Math.floor(proposal.created_at / WEEK) * WEEK + WEEK;
     }, [proposal.created_at]);
