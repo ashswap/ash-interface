@@ -28,6 +28,8 @@ import IconJWLETH from "assets/images/jwleth-icon.png";
 import IconJWLBTC from "assets/images/jwlbtc-icon.png";
 import IconWTAO from "assets/images/wtao-icon.png";
 import ImgRAREToken from "assets/images/rare-icon.png";
+import ImgJWLTAOToken from '@/assets/images/tokens/jwltao.png';
+import ImgJWLAPUSDCToken from '@/assets/images/tokens/jwlapusdc.png';
 
 import { ChainId, IESDTInfo } from "helper/token/token";
 const TOKENS_ALIAS: Record<"EGLD" | "ASH" | "wEGLD", IESDTInfo> = {
@@ -275,6 +277,22 @@ const TOKENS: IESDTInfo[] = [
         name: 'RARE',
         decimals: 18,
         logoURI: ImgRAREToken.src,
+    },
+    {
+        identifier: 'JWLTAO-692bcc',
+        chainId: ChainId.Mainnet,
+        symbol: 'JWLTAO',
+        name: 'JewelLockedTAO',
+        decimals: 18,
+        logoURI: ImgJWLTAOToken.src,
+    },
+    {
+        identifier: 'JWLAPUSDC-31969e',
+        chainId: ChainId.Mainnet,
+        symbol: 'JWLAPUSDC',
+        name: 'JewelLockedAPUSDC',
+        decimals: 18,
+        logoURI: ImgJWLAPUSDCToken.src,
     },
 ];
 
