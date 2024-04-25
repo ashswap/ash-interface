@@ -8,7 +8,7 @@ const HomePage: NextPageWithLayout = () => {
 
     useEffect(() => {
         if (router.route === "/") {
-            router.replace("/swap");
+            router.replace("/ashpoint");
         }
     }, [router]);
 

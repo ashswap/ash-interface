@@ -3,9 +3,7 @@ import LedgerContainer from "views/ledger/LedgerContainer";
 import { NextPageWithLayout } from "./_app";
 
 const LedgerPage: NextPageWithLayout = () => {
-    return (
-        <LedgerContainer />
-    );
+    return <LedgerContainer />;
 };
 
 LedgerPage.getLayout = function getLayout(page) {
