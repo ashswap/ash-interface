@@ -16,7 +16,7 @@ const Nav = () => {
 
     return (
         <nav className="flex items-center gap-2">
-            <NavLink href="/swap">
+            {/* <NavLink href="/swap">
                 <ICSwap className="w-4 h-auto" />
                 <span>Swap</span>
             </NavLink>
@@ -31,7 +31,7 @@ const Nav = () => {
             <NavLink href="/gov">
                 <ICStake className="-mt-0.5 w-4 h-auto" />
                 <span>Governance</span>
-            </NavLink>
+            </NavLink> */}
             <NavLink href="/info" target="_blank">
                 <ICChart className="w-4 h-auto" />
                 <span className="inline-flex items-center gap-1 md:gap-2">
@@ -49,7 +49,7 @@ const Nav = () => {
                 }
             >
                 <button>
-                    <NavLink href="." onClick={e => e.preventDefault()}>
+                    <NavLink href="." onClick={(e) => e.preventDefault()}>
                         <ICSocial className="-mt-0.5 w-4 h-auto" />
                         <span className="inline-flex items-center gap-1 md:gap-2">
                             <span>More</span>

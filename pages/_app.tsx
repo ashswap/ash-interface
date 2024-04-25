@@ -49,7 +49,7 @@ const ProductionErrorBoundary =
 // const ProductionErrorBoundary = ErrorBoundary;
 const GlobalHooks = () => {
     // setup recoil
-    useRecoilAdapter();
+    // useRecoilAdapter();
     useSentryUser();
     useRefreshAfterTxCompleted();
     useAshpoint();
@@ -169,7 +169,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
                     site: "@ash_swap",
                 }}
             />
-            
+
             <RecoilRoot>
                 <DappProvider
                     environment={ENVIRONMENT.NETWORK}
