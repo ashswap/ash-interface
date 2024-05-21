@@ -30,7 +30,7 @@ import IconWTAO from "assets/images/wtao-icon.png";
 import ImgRAREToken from "assets/images/rare-icon.png";
 import ImgJWLTAOToken from "assets/images/jwltao-icon.png";
 import ImgJWLAPUSDCToken from "assets/images/jwlapusdc-icon.png";
-import ImgRSEGLDToken from '@/assets/images/tokens/rsegld-icon.png';
+import ImgRSEGLDToken from '@/assets/images/rsegld-icon.png';
 
 import { ChainId, IESDTInfo } from "helper/token/token";
 const TOKENS_ALIAS: Record<"EGLD" | "ASH" | "wEGLD", IESDTInfo> = {
