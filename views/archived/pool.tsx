@@ -4,7 +4,7 @@ import ListPool from "views/pool/components/ListPool";
 import PoolBanner from "views/pool/components/PoolBanner";
 import PoolFilter from "views/pool/components/PoolFilter";
 import PoolMenu from "views/pool/components/PoolMenu";
-import { NextPageWithLayout } from "./_app";
+import { NextPageWithLayout } from "../../pages/_app";
 
 const PoolsPage: NextPageWithLayout = () => {
     return (

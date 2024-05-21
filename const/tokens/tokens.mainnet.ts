@@ -28,9 +28,9 @@ import IconJWLETH from "assets/images/jwleth-icon.png";
 import IconJWLBTC from "assets/images/jwlbtc-icon.png";
 import IconWTAO from "assets/images/wtao-icon.png";
 import ImgRAREToken from "assets/images/rare-icon.png";
-import ImgJWLTAOToken from '@/assets/images/tokens/jwltao.png';
-import ImgJWLAPUSDCToken from '@/assets/images/tokens/jwlapusdc.png';
-import ImgRSEGLDToken from '@/assets/images/tokens/rsegld.png';
+import ImgJWLTAOToken from "assets/images/jwltao-icon.png";
+import ImgJWLAPUSDCToken from "assets/images/jwlapusdc-icon.png";
+import ImgRSEGLDToken from '@/assets/images/tokens/rsegld-icon.png';
 
 import { ChainId, IESDTInfo } from "helper/token/token";
 const TOKENS_ALIAS: Record<"EGLD" | "ASH" | "wEGLD", IESDTInfo> = {
@@ -272,26 +272,26 @@ const TOKENS: IESDTInfo[] = [
         logoURI: IconWTAO.src,
     },
     {
-        identifier: 'RARE-99e8b0',
+        identifier: "RARE-99e8b0",
         chainId: ChainId.Mainnet,
-        symbol: 'RARE',
-        name: 'RARE',
+        symbol: "RARE",
+        name: "RARE",
         decimals: 18,
         logoURI: ImgRAREToken.src,
     },
     {
-        identifier: 'JWLTAO-692bcc',
+        identifier: "JWLTAO-692bcc",
         chainId: ChainId.Mainnet,
-        symbol: 'JWLTAO',
-        name: 'JewelLockedTAO',
+        symbol: "JWLTAO",
+        name: "JewelLockedTAO",
         decimals: 18,
         logoURI: ImgJWLTAOToken.src,
     },
     {
-        identifier: 'JWLAPUSDC-31969e',
+        identifier: "JWLAPUSDC-31969e",
         chainId: ChainId.Mainnet,
-        symbol: 'JWLAPUSDC',
-        name: 'JewelLockedAPUSDC',
+        symbol: "JWLAPUSDC",
+        name: "JewelLockedAPUSDC",
         decimals: 18,
         logoURI: ImgJWLAPUSDCToken.src,
     },
@@ -483,10 +483,24 @@ const LP_TOKENS: IESDTInfo[] = [
         decimals: 18,
     },
     {
-        identifier: 'ALP-c532ff',
+        identifier: "ALP-c532ff",
         chainId: ChainId.Mainnet,
-        symbol: 'ALP-RARE-ASH',
-        name: 'Ashswap LP',
+        symbol: "ALP-ASH-RARE",
+        name: "Ashswap LP",
+        decimals: 18,
+    },
+    {
+        identifier: "ALP-a82580",
+        chainId: ChainId.Mainnet,
+        symbol: "ALP-JWLTAO-TAO",
+        name: "Ashswap LP",
+        decimals: 18,
+    },
+    {
+        identifier: "ALP-5b3202",
+        chainId: ChainId.Mainnet,
+        symbol: "ALP-APUSDC-JWLAPUSDC",
+        name: "Ashswap LP",
         decimals: 18,
     },
     {

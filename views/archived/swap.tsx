@@ -1,11 +1,9 @@
 import BasicLayout from "components/Layout/Basic";
-import { NextPageWithLayout } from "./_app";
+import { NextPageWithLayout } from "../../pages/_app";
 import Aggregator from "views/swap/Aggregator";
 
 const SwapPage: NextPageWithLayout = () => {
-    return (
-        <Aggregator />
-    );
+    return <Aggregator />;
 };
 SwapPage.getLayout = function getLayout(page) {
     return <BasicLayout>{page}</BasicLayout>;
