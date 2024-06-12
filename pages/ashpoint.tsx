@@ -76,4 +76,18 @@ function AshPointPage() {
 AshPointPage.getLayout = function getLayout(page: ReactElement) {
     return <BasicLayout>{page}</BasicLayout>;
 };
-export default AshPointPage;
+
+function AshPointStopPage() {
+    return (
+        <main className="ash-container pb-40 pt-16">
+            <h1 className="mb-6 text-3xl font-bold text-white">SNAPSHOT TAKEN</h1>
+            <p>Thank you for participating in our AshPoint program. Your points will be reviewed for reward allocation.</p>
+        </main>
+    );
+}
+
+AshPointStopPage.getLayout = function getLayout(page: ReactElement) {
+    return <BasicLayout>{page}</BasicLayout>;
+};
+
+export default AshPointStopPage;
