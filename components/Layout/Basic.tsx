@@ -1,15 +1,15 @@
 import BackgroundEffect from "components/BackgroundEffect";
 import MainHeader from "components/Header/MainHeader";
 import { ENVIRONMENT } from "const/env";
-import { useScreenSize } from "hooks/useScreenSize";
-import dynamic from "next/dynamic";
+// import { useScreenSize } from "hooks/useScreenSize";
+// import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
-const NavMobileLazy = dynamic(
-    import("components/Nav/NavMobile").then((m) => m.default)
-);
+// const NavMobileLazy = dynamic(
+//     import("components/Nav/NavMobile").then((m) => m.default)
+// );
 const BasicLayout = ({ children }: { children: any }) => {
     const router = useRouter();
-    const { isMobile } = useScreenSize();
+    // const { isMobile } = useScreenSize();
     return (
         <div className="pb-32 sm:pb-0">
             {router.route === "/swap" ? (
@@ -41,7 +41,7 @@ const BasicLayout = ({ children }: { children: any }) => {
             </div>
             {/* <AppBar /> */}
             <MainHeader />
-            {isMobile && <NavMobileLazy />}
+            {/* {isMobile && <NavMobileLazy />} */}
             {children}
         </div>
     );
