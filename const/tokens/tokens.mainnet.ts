@@ -33,6 +33,7 @@ import ImgJWLAPUSDCToken from "assets/images/jwlapusdc-icon.png";
 import ImgRSEGLDToken from 'assets/images/rsegld-icon.png';
 import ImgXOXNOToken from 'assets/images/xoxno-icon.png';
 import ImgLXOXNOToken from 'assets/images/lxoxno-icon.png';
+import ImgUSHToken from 'assets/images/ush-icon.png';
 
 import { ChainId, IESDTInfo } from "helper/token/token";
 const TOKENS_ALIAS: Record<"EGLD" | "ASH" | "wEGLD", IESDTInfo> = {
@@ -321,6 +322,14 @@ const TOKENS: IESDTInfo[] = [
         decimals: 18,
         logoURI: ImgLXOXNOToken.src,
     },
+    {
+        identifier: 'USH-111e09',
+        chainId: ChainId.Mainnet,
+        symbol: 'USH',
+        name: 'HatomUSD',
+        decimals: 18,
+        logoURI: ImgUSHToken.src,
+    },
 ];
 
 const LP_TOKENS: IESDTInfo[] = [
@@ -539,6 +548,20 @@ const LP_TOKENS: IESDTInfo[] = [
         identifier: 'ALP-ef193a',
         chainId: ChainId.Mainnet,
         symbol: 'ALP-XOXNO-LXOXNO',
+        name: 'Ashswap LP',
+        decimals: 18,
+    },
+    {
+        identifier: 'ALP-2975f6',
+        chainId: ChainId.Mainnet,
+        symbol: 'ALP-USDC-USH',
+        name: 'Ashswap LP',
+        decimals: 18,
+    },
+    {
+        identifier: 'ALP-5498a1',
+        chainId: ChainId.Mainnet,
+        symbol: 'ALP-USDT-USH',
         name: 'Ashswap LP',
         decimals: 18,
     },
